@@ -123,8 +123,13 @@ public class EnvelopeCreator {
     }
 
     //TODO: Recheck this method.
+    //the integer value endPoint is used to identify from where we call
+    //this method. If we call this form Client then pass the parameter
+    //Constants.CLIENT. if it is called from the server then it should be
+    //Constants.SERVER
+    
     public static SOAPEnvelope createCreateSequenceEnvelope(String uuid,
-            RMMessageContext message) {
+            RMMessageContext message, int endPoint) {
 
         AddressingHeaders addressingHeaders = message.getAddressingHeaders();
         SOAPEnvelope envelope = createBasicEnvelop();
@@ -141,22 +146,31 @@ public class EnvelopeCreator {
 
             MessageID messageId = new MessageID(new URI("uuid:" + uuid));
             outGoingAddressingHaders.setMessageID(messageId);
+            
+            if(endPoint==0){
+                //Setting from the Client
+                outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
+                outGoingAddressingHaders.setTo(addressingHeaders.getTo());
+                outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
+                
+            }else if(endPoint==1){
+                //Setting from the Server
+                //setting FROM and REPLY TO
+                To incommingTo = addressingHeaders.getTo();
+                URI fromURI = new URI(incommingTo.toString());
+                Address addr = new Address(fromURI);
+                From from = new From(addr);
+                outGoingAddressingHaders.setFrom(from);
+                //Reply to is the same.
+                outGoingAddressingHaders.setReplyTo(from);
 
-            //setting FROM and REPLY TO
-            To incommingTo = addressingHeaders.getTo();
-            URI fromURI = new URI(incommingTo.toString());
-            Address addr = new Address(fromURI);
-            From from = new From(addr);
-            outGoingAddressingHaders.setFrom(from);
-            //Reply to is the same.
-            outGoingAddressingHaders.setReplyTo(from);
-
-            //Setting To
-            ReplyTo incommingReplyTo = (ReplyTo) addressingHeaders.getReplyTo();
-            Address incommingAddress = incommingReplyTo.getAddress();
-            To to = new To(new URI(incommingAddress.toString()));
-            outGoingAddressingHaders.setTo(to);
-
+                //Setting To
+                ReplyTo incommingReplyTo = (ReplyTo) addressingHeaders.getReplyTo();
+                Address incommingAddress = incommingReplyTo.getAddress();
+                To to = new To(new URI(incommingAddress.toString()));
+                outGoingAddressingHaders.setTo(to);
+            }
+            
             outGoingAddressingHaders.toEnvelope(envelope);
 
             CreateSequence createSeq = new CreateSequence();
@@ -314,6 +328,56 @@ public class EnvelopeCreator {
             e.printStackTrace();
         }
         return responseEnvelope;
+    }
+    
+    /**
+     * 
+     * @param uuid
+     * @param rmMessageContext
+     * @param endPoint
+     * @return
+     */
+    public static SOAPEnvelope createServiceRequestEnvelope(
+            String uuid,RMMessageContext rmMessageContext, int endPoint) {
+        //Variable for SOAPEnvelope
+        SOAPEnvelope requestEnvelope = null;
+        //Get the AddressingHeaders
+        AddressingHeaders addressingHeaders = rmMessageContext
+                .getAddressingHeaders();
+
+        try {
+            //Get the request envelope from the incoming message context.
+            requestEnvelope = rmMessageContext.getMsgContext()
+                    .getRequestMessage().getSOAPEnvelope();
+            
+            rmMessageContext.getRMHeaders().toSoapEnvelop(requestEnvelope);
+            AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(
+                    requestEnvelope, null, true, false, true, false, null);
+             
+    	//Set the messageID
+    	MessageID messageId = new MessageID(new URI("uuid:"
+            + uuid));
+    	outGoingAddressingHaders.setMessageID(messageId);
+    	    	
+    	//This method is called from the client only.
+    	if(endPoint==0){
+             //Setting from the Client
+             outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
+             outGoingAddressingHaders.setTo(addressingHeaders.getTo());
+             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
+         }
+
+    	//Set the addressing headers to the SOAPEnvelope.
+    	outGoingAddressingHaders.toEnvelope(requestEnvelope, null);
+    	        
+        } catch (SOAPException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return requestEnvelope;
     }
 
 }
