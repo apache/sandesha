@@ -311,4 +311,34 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return null;
     }
+    
+    
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.storage.dao.ISandeshaDAO#addSendMsgNo(java.lang.String, long)
+	 */
+	public void addSendMsgNo(String seqId, long msgNo) {
+		// TODO Auto-generated method stub
+
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getLastMsgNo(java.lang.String)
+	 */
+	public long getLastMsgNo(String seqId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.storage.dao.ISandeshaDAO#hasLastMsgReceived(java.lang.String)
+	 */
+	public boolean hasLastMsgReceived(String seqId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.storage.dao.ISandeshaDAO#isSentMsg(java.lang.String, long)
+	 */
+	public boolean isSentMsg(String seqId, long msgNo) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
