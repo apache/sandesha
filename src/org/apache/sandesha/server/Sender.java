@@ -83,7 +83,14 @@ public class Sender implements Runnable {
                         break;
                     }
                     case Constants.MSG_TYPE_TERMINATE_SEQUENCE: {
-                        //TODO TODO
+                        System.out.println("INFO: SENDING TERMINATE SEQUENCE REQUEST ....");
+                        if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                                && ((System.currentTimeMillis() - rmMessageContext
+                                        .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
+                            sendTerminateSequenceRequest(rmMessageContext);
+                        } else {
+                            //TODO REPORT ERROR
+                        }
                         break;
                     }
                     case Constants.MSG_TYPE_ACKNOWLEDGEMENT: {
@@ -136,6 +143,48 @@ public class Sender implements Runnable {
 
             }
         }
+    }
+
+    /**
+     * @param rmMessageContext
+     */
+    private void sendTerminateSequenceRequest(RMMessageContext rmMessageContext) {
+
+        if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
+            //The code should not come to this point.
+            System.err.println("ERROR: NULL REQUEST MESSAGE");
+        } else {
+            Call call;
+            try {
+                rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+                rmMessageContext
+                        .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+                call = prepareCall(rmMessageContext);
+                call.invoke();
+                if (call.getResponseMessage() != null) {
+                    RMHeaders rmHeaders = new RMHeaders();
+                    rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
+                    rmMessageContext.setRMHeaders(rmHeaders);
+                    AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage()
+                            .getSOAPEnvelope());
+                    rmMessageContext.setAddressingHeaders(addrHeaders);
+                    rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
+                    IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
+                            .getMessageProcessor(rmMessageContext, storageManager);
+                    messagePrcessor.processMessage(rmMessageContext);
+                }
+            } catch (AxisFault e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (SOAPException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    
     }
 
     private void sendServiceResponse(RMMessageContext rmMessageContext) {
@@ -322,7 +371,11 @@ public class Sender implements Runnable {
             }
 
         }
+        
+        
 
     }
+    
+    
 
 }
