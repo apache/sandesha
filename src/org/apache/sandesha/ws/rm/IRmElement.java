@@ -17,13 +17,13 @@
 
 package org.apache.sandesha.ws.rm;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
+
+import javax.xml.soap.SOAPException;
 
 /**
  * class IRmElement
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan <p/><p/>This is the parent interface for the
@@ -38,11 +38,11 @@ public interface IRmElement {
 
     /**
      * Methode getSoapElement
-     * 
+     * <p/>
      * This gives the soap element of the protocol element. Each implementation
      * must implement this method such that then it can be easily get the
      * related soap element
-     * 
+     *
      * @return the soap element
      * @throws SOAPException
      */
@@ -52,9 +52,8 @@ public interface IRmElement {
      * Method addChildElement Adds an element to this element as a child
      * element. If not required to add a child element, just provide an empty
      * implementation in the concrete class
-     * 
-     * @param element
-     *            the child element
+     *
+     * @param element the child element
      * @throws SOAPException
      */
     void addChildElement(MessageElement element) throws SOAPException;

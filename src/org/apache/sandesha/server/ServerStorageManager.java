@@ -16,19 +16,19 @@
  */
 package org.apache.sandesha.server;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.server.dao.IServerDAO;
-import org.apache.sandesha.server.dao.ServerDAOFactory;
+import org.apache.sandesha.storage.dao.ISandeshaDAO;
+import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
 import org.apache.sandesha.ws.rm.RMHeaders;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Chamikara Jayalath
@@ -42,11 +42,12 @@ public class ServerStorageManager implements IStorageManager {
 
     private String tempSeqId = null; // used by getNextMessageToProcess();
 
-    IServerDAO accessor;
-    
-    public ServerStorageManager(){
-        accessor = ServerDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+    ISandeshaDAO accessor;
+
+    public ServerStorageManager() {
+        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
     }
+
     /**
      * A very important method. Makes life easy for the thread or thread pool
      * that is using this. Every thread just have to create an instance of
@@ -54,7 +55,6 @@ public class ServerStorageManager implements IStorageManager {
      * processing messages. The method will try to give the messages from the
      * same sequence id. But if that doesnt hv processable messages it will go 4
      * a new sequence.
-     *  
      */
     public RMMessageContext getNextMessageToProcess() {
         if (tempSeqId == null)
@@ -75,7 +75,7 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public void setAcknowledged(String seqID, long msgNumber) {
-       //TODO decide this in implementing the ServerSender.
+        //TODO decide this in implementing the ServerSender.
 
         accessor.moveOutgoingMessageToBin(seqID, new Long(msgNumber));
     }
@@ -123,7 +123,7 @@ public class ServerStorageManager implements IStorageManager {
      */
     /*
      * public void addMessageToOutQueue(RMMessageContext rmMessageContext) {
-     * IServerDAO accessor = ServerDAOFactory.getStorageAccessor(
+     * ISandeshaDAO accessor = SandeshaDAOFactory.getStorageAccessor(
      * Constants.SERVER_QUEUE_ACCESSOR); boolean result =
      * accessor.addOutQueueMessage(rmMessageContext);
      * 
@@ -174,10 +174,9 @@ public class ServerStorageManager implements IStorageManager {
         return results;
     }
 
-    public boolean  isMessageExist(String sequenceID, long messageNumber) {
-        synchronized(accessor){
-         return accessor.isIncomingMessageExists(sequenceID, new Long(
-                messageNumber));
+    public boolean isMessageExist(String sequenceID, long messageNumber) {
+        synchronized (accessor) {
+            return accessor.isIncomingMessageExists(sequenceID, new Long(messageNumber));
         }
     }
 
@@ -219,7 +218,7 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public boolean setApprovedOutSequence(String oldOutsequenceId,
-            String newOutSequenceId) {
+                                          String newOutSequenceId) {
 
         boolean done = false;
         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
@@ -247,7 +246,7 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public void insertOutgoingMessage(RMMessageContext msg) {
-         String sequenceId = msg.getSequenceID();
+        String sequenceId = msg.getSequenceID();
 
         boolean exists = accessor.isOutgoingSequenceExists(sequenceId);
         if (!exists)
@@ -313,8 +312,8 @@ public class ServerStorageManager implements IStorageManager {
     /* (non-Javadoc)
      * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
      */
-    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {		
-		accessor.addLowPriorityMessage(terminateSeqMessage);
+    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
+        accessor.addLowPriorityMessage(terminateSeqMessage);
     }
 
     /* (non-Javadoc)
@@ -333,7 +332,7 @@ public class ServerStorageManager implements IStorageManager {
         return false;
     }
 
-   
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.IStorageManager#terminateSequence(java.lang.String)
      */
@@ -341,9 +340,13 @@ public class ServerStorageManager implements IStorageManager {
         // TODO Auto-generated method stub
 
     }
-    
-    public void setAckReceived(String seqId,long msgNo) {
-        accessor.setAckReceived(seqId,msgNo);
 
+    public void setAckReceived(String seqId, long msgNo) {
+        accessor.setAckReceived(seqId, msgNo);
+
+    }
+
+    public void insertFault(RMMessageContext rmMsgCtx) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

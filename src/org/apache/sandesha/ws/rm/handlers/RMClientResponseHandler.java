@@ -17,25 +17,23 @@
 
 package org.apache.sandesha.ws.rm.handlers;
 
-import java.util.Iterator;
-
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * @author Amila Navarathna <br>
  *         Jaliya Ekanayaka <br>
  *         Sudar Nimalan <br>
  *         (Apache Sandesha Project)
- *  
  */
 public class RMClientResponseHandler extends RMHandler {
 
@@ -47,7 +45,7 @@ public class RMClientResponseHandler extends RMHandler {
 
     /**
      * Method invoke
-     * 
+     *
      * @param messageContext
      * @throws AxisFault
      */
@@ -69,8 +67,7 @@ public class RMClientResponseHandler extends RMHandler {
                 while (iterator.hasNext()) {
                     soapBodyElement = (SOAPBodyElement) iterator.next();
 
-                    if (soapBodyElement.getLocalName().equals(
-                            "clientMethodResponse")) {
+                    if (soapBodyElement.getLocalName().equals("clientMethodResponse")) {
 
                         Iterator ite = soapBodyElement.getChildElements();
                         MessageElement sbe;
@@ -82,7 +79,7 @@ public class RMClientResponseHandler extends RMHandler {
 
                                     messageContext
                                             .setCurrentMessage(new Message(sbe
-                                                    .getValue()));
+                                            .getValue()));
 
                                 }
                             }

@@ -16,11 +16,12 @@
  */
 package org.apache.sandesha.server;
 
-import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.AxisFault;
+import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.server.msgprocessors.*;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
@@ -31,34 +32,25 @@ public class RMMessageProcessorIdentifier {
      * This method will identify the messages. Messages specific to the
      * reliablility are identified using the action. Request messages are
      * identified using the message number property.
-     * 
+     *
      * @param rmMessageContext
      * @param storageManager
      * @return
      */
-    public static IRMMessageProcessor getMessageProcessor(
-            RMMessageContext rmMessageContext, IStorageManager storageManager) {
-       try{
-           MessageValidator.validate(rmMessageContext);
-       }catch(AxisFault af){
-          return new FaultProcessor(storageManager,af);
-       }
-
+    public static IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext, IStorageManager storageManager) {
+        
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
-        if (addrHeaders.getAction().toString().equals(
-                Constants.ACTION_CREATE_SEQUENCE)) {
+        if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
             return new CreateSequenceProcessor(storageManager);
-        } else if (addrHeaders.getAction().toString().equals(
-                Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
+        } else if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
             return new CreateSequenceResponseProcessor(storageManager);
-        } else if (addrHeaders.getAction().toString().equals(
-                Constants.ACTION_TERMINATE_SEQUENCE)) {
+        } else if (addrHeaders.getAction().toString().equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
             return new TerminateSequenceProcessor(storageManager);
         } else if ((rmHeaders.getSequenceAcknowledgement() != null)
                 || (rmHeaders.getSequence().getMessageNumber() != null)) {
-                return new CompositeProcessor(storageManager);
+            return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);
     }

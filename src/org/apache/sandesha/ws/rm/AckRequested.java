@@ -17,20 +17,19 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
 
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * class AckRequested
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -68,9 +67,8 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -83,7 +81,7 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method toSoapEnvelop
-     * 
+     *
      * @param envelope
      * @return SOAPEnvelope
      * @throws SOAPException
@@ -125,9 +123,8 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method fromSOAPEnveploe
-     * 
+     *
      * @param headerElement
-     * 
      * @return AckRequested
      */
     public AckRequested fromSOAPEnveploe(SOAPHeaderElement headerElement) {
@@ -174,7 +171,7 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
      * @throws SOAPException
      */
@@ -184,7 +181,7 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method getIdentifier
-     * 
+     *
      * @return Identifier
      */
     public Identifier getIdentifier() {
@@ -193,7 +190,7 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method getMessageNumber
-     * 
+     *
      * @return MessageNumber
      */
     public MessageNumber getMessageNumber() {
@@ -202,7 +199,7 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method setIdentifier
-     * 
+     *
      * @param identifier
      */
     public void setIdentifier(Identifier identifier) {
@@ -211,7 +208,7 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /**
      * Method setMessageNumber
-     * 
+     *
      * @param number
      */
     public void setMessageNumber(MessageNumber number) {

@@ -17,16 +17,16 @@
 
 package org.apache.sandesha.ws.rm.handlers;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
+import javax.xml.soap.SOAPException;
+
 /**
  * class RMHandler
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -35,41 +35,41 @@ public abstract class RMHandler extends BasicHandler {
 
     /**
      * Method setPropertyToMessageContext
-     * 
+     *
      * @param msgContext
      * @param property
      * @throws AxisFault
      * @throws SOAPException
      */
     public void setPropertyToMessageContext(MessageContext msgContext,
-            String property) throws AxisFault, SOAPException {
+                                            String property) throws AxisFault, SOAPException {
 
         RMHeaders rmHeaders = new RMHeaders();
 
-        if(msgContext.getCurrentMessage()!=null){
-        rmHeaders.fromSOAPEnvelope(msgContext.getCurrentMessage()
-                .getSOAPEnvelope());
-        if ((rmHeaders.getAckRequest() != null)
-                || (rmHeaders.getCreateSequence() != null)
-                || (rmHeaders.getCreateSequenceResponse() != null)
-                || (rmHeaders.getSequence() != null)
-                || (rmHeaders.getSequenceAcknowledgement() != null)
-                || (rmHeaders.getTerminateSequence() != null)) {
-            msgContext.setProperty(property, rmHeaders);
-        }
+        if (msgContext.getCurrentMessage() != null) {
+            rmHeaders.fromSOAPEnvelope(msgContext.getCurrentMessage()
+                    .getSOAPEnvelope());
+            if ((rmHeaders.getAckRequest() != null)
+                    || (rmHeaders.getCreateSequence() != null)
+                    || (rmHeaders.getCreateSequenceResponse() != null)
+                    || (rmHeaders.getSequence() != null)
+                    || (rmHeaders.getSequenceAcknowledgement() != null)
+                    || (rmHeaders.getTerminateSequence() != null)) {
+                msgContext.setProperty(property, rmHeaders);
+            }
         }
 
     }
 
     /**
      * Method getProperryFromMessageContext
-     * 
+     *
      * @param msgContext
      * @param property
      * @return
      */
     public RMHeaders getProperryFromMessageContext(MessageContext msgContext,
-            String property) {
+                                                   String property) {
         return (RMHeaders) msgContext.getProperty(property);
     }
 }

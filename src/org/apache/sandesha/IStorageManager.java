@@ -67,7 +67,7 @@ public interface IStorageManager {
     public void addAcknowledgement(RMMessageContext rmMessageContext);
 
     //Need to implement this
-    public boolean  isMessageExist(String sequenceID, long messageNumber);
+    public boolean isMessageExist(String sequenceID, long messageNumber);
 
     //Try to send me a sorted map as we disucssed.
     public Map getListOfMessageNumbers(String sequenceID);
@@ -90,7 +90,7 @@ public interface IStorageManager {
     public void setTemporaryOutSequence(String sequenceId, String outSequenceId);
 
     public boolean setApprovedOutSequence(String oldOutsequenceId,
-            String newOutSequenceId);
+                                          String newOutSequenceId);
 
     //In the server side we will get the appropriate message number
     //In the client side this will start from 1
@@ -105,22 +105,26 @@ public interface IStorageManager {
     public void insertOutgoingMessage(RMMessageContext rmMessageContext);
 
     public void insertIncomingMessage(RMMessageContext rmMessageContext);
-    
-    public RMMessageContext checkForResponseMessage(String sequenceId,String requestMsgId);
-    
-    public boolean checkForAcknowledgement(String sequenceId,String requestMsgId);
-    
-    
+
+    public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId);
+
+    public boolean checkForAcknowledgement(String sequenceId, String requestMsgId);
+
+
     public boolean isAckComplete(String sequenceID);
-    
+
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage);
-    
+
     public boolean isAllSequenceComplete();
 
 
     public boolean isResponseComplete(String sequenceID);
-    
+
     public void terminateSequence(String sequenceID);
-    
-    public void setAckReceived(String seqId,long msgNo);
+
+    public void setAckReceived(String seqId, long msgNo);
+
+    public void insertFault(RMMessageContext rmMsgCtx);
+
+
 }

@@ -17,20 +17,19 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
 
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * class TerminateSequence
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -63,9 +62,8 @@ public class TerminateSequence implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -77,11 +75,9 @@ public class TerminateSequence implements IRmElement {
 
     /**
      * Method toSoapEnvelop
-     * 
+     *
      * @param envelope
-     * 
      * @return SOAPEnvelope
-     * 
      * @throws SOAPException
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
@@ -109,9 +105,8 @@ public class TerminateSequence implements IRmElement {
 
     /**
      * Method fromSOAPEnveploe
-     * 
+     *
      * @param bodyElement
-     * 
      * @return TerminateSequence
      */
     public TerminateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) {
@@ -147,9 +142,8 @@ public class TerminateSequence implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
-     * 
      * @throws SOAPException
      */
     public void addChildElement(MessageElement element) throws SOAPException {
@@ -160,7 +154,7 @@ public class TerminateSequence implements IRmElement {
 
     /**
      * Method getIdentifier
-     * 
+     *
      * @return Identifier
      */
     public Identifier getIdentifier() {
@@ -169,7 +163,7 @@ public class TerminateSequence implements IRmElement {
 
     /**
      * Method setIdentifier
-     * 
+     *
      * @param identifier
      */
     public void setIdentifier(Identifier identifier) {

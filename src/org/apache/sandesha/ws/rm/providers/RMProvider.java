@@ -27,11 +27,11 @@ import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.server.IRMMessageProcessor;
 import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
-import org.apache.sandesha.server.FaultProcessor;
-import org.apache.sandesha.server.dao.ServerQueueDAO;
+import org.apache.sandesha.server.msgprocessors.FaultProcessor;
+import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
@@ -47,11 +47,10 @@ public class RMProvider extends RPCProvider {
     private static boolean rmInvokerStarted = false;
     private static boolean senderStarted;
     private boolean client;
-    private static final Log log = LogFactory.getLog(ServerQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
 
-    public void processMessage(
-            MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)
+    public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)
             throws Exception {
 
         System.out.println("RMProvider Received a SOAP REQUEST.....\n");
@@ -63,10 +62,10 @@ public class RMProvider extends RPCProvider {
         RMMessageContext rmMessageContext = new RMMessageContext();
         rmMessageContext.setMsgContext(msgContext);
         try {
-            MessageValidator.validate(rmMessageContext);
+            MessageValidator.validate(rmMessageContext,client);
         } catch (AxisFault af) {
-            FaultProcessor faultProcessor = new FaultProcessor(storageManager,af);
-            if(!faultProcessor.processMessage(rmMessageContext)){
+            FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
+            if (!faultProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
                 return;
             }
@@ -83,12 +82,9 @@ public class RMProvider extends RPCProvider {
             }
         }
 
-        if (null != addrHeaders.getMessageID()) {
-            rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
-        }
-
-        IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(
-                rmMessageContext, storageManager);
+        rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
+       
+        IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
         try {
             if (!rmMessageProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);

@@ -17,15 +17,15 @@
 
 package org.apache.sandesha.ws.rm;
 
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
 
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+
 /**
  * class AcknowledgementRange
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -57,7 +57,7 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method setMaxValue
-     * 
+     *
      * @param max
      */
     public void setMaxValue(long max) {
@@ -66,7 +66,7 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method setMinValue
-     * 
+     *
      * @param min
      */
     public void setMinValue(long min) {
@@ -81,7 +81,7 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
      */
     public MessageElement getSoapElement() {
@@ -94,18 +94,15 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method toSOAPEnvelope
-     * 
+     *
      * @param msgElement
-     * 
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        SOAPElement ackRange = msgElement.addChildElement(
-                "AcknowledgementRange", Constants.NS_PREFIX_RM);
+        SOAPElement ackRange = msgElement.addChildElement("AcknowledgementRange", Constants.NS_PREFIX_RM);
 
         ackRange.setAttribute("Upper", new Long(maxValue).toString());
         ackRange.setAttribute("Lower", new Long(minValue).toString());
@@ -115,9 +112,8 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method fromSOAPEnvelope
-     * 
+     *
      * @param element
-     * 
      * @return AcknowledgementRange
      */
     public AcknowledgementRange fromSOAPEnvelope(MessageElement element) {
@@ -136,7 +132,7 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
      */
     public void addChildElement(MessageElement element) {
@@ -146,7 +142,7 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method getMaxValue
-     * 
+     *
      * @return long
      */
     public long getMaxValue() {
@@ -155,7 +151,7 @@ public class AcknowledgementRange implements IRmElement {
 
     /**
      * Method getMinValue
-     * 
+     *
      * @return long
      */
     public long getMinValue() {

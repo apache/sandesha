@@ -17,20 +17,19 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
 
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * class Sequence
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -73,9 +72,8 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -89,11 +87,9 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method toSoapEnvelop
-     * 
+     *
      * @param envelope
-     * 
      * @return SOAPEnvelope
-     * 
      * @throws Exception
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws Exception {
@@ -130,9 +126,8 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method fromSOAPEnveploe
-     * 
+     *
      * @param headerElement
-     * 
      * @return Sequence
      */
     public Sequence fromSOAPEnveploe(SOAPHeaderElement headerElement) {
@@ -191,7 +186,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
      * @throws SOAPException
      */
@@ -201,7 +196,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method getIdentifier
-     * 
+     *
      * @return Identifier
      */
     public Identifier getIdentifier() {
@@ -210,7 +205,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method getLastMessage
-     * 
+     *
      * @return LastMessage
      */
     public LastMessage getLastMessage() {
@@ -219,7 +214,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method getMessageNumber
-     * 
+     *
      * @return MessageNumber
      */
     public MessageNumber getMessageNumber() {
@@ -228,7 +223,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method setIdentifier
-     * 
+     *
      * @param identifer
      */
     public void setIdentifier(Identifier identifer) {
@@ -237,7 +232,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method setLastMessage
-     * 
+     *
      * @param message
      */
     public void setLastMessage(LastMessage message) {
@@ -246,7 +241,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /**
      * Method setMessageNumber
-     * 
+     *
      * @param number
      */
     public void setMessageNumber(MessageNumber number) {

@@ -16,18 +16,17 @@
  */
 package org.apache.sandesha.ws.rm.handlers;
 
-import java.util.Iterator;
-
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
 
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * class RMServerRequestHandler
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -42,19 +41,19 @@ public class RMServerRequestHandler extends RMHandler {
 
     /**
      * Method invoke
-     * 
+     *
      * @param msgContext
      * @throws AxisFault
      */
     public void invoke(MessageContext msgContext) throws AxisFault {
         try {
-     Iterator iterator = msgContext.getRequestMessage()
+            Iterator iterator = msgContext.getRequestMessage()
                     .getSOAPEnvelope().getHeader().getChildElements();
             SOAPHeaderElement elements;
             while (iterator.hasNext()) {
                 elements = (SOAPHeaderElement) iterator.next();
                 elements.setProcessed(true);
-              }
+            }
 
             setPropertyToMessageContext(msgContext, Constants.ENV_RM_REQUEST_HEADERS);
 

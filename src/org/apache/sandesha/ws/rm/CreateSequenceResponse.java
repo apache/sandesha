@@ -17,20 +17,19 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
 
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * class CreateSequenceResponse
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -63,7 +62,7 @@ public class CreateSequenceResponse implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
      */
     public MessageElement getSoapElement() {
@@ -72,7 +71,7 @@ public class CreateSequenceResponse implements IRmElement {
 
     /**
      * Method toSoapEnvelop
-     * 
+     *
      * @param envelope
      * @return SOAPEnvelope
      * @throws SOAPException
@@ -98,9 +97,8 @@ public class CreateSequenceResponse implements IRmElement {
 
     /**
      * Method fromSOAPEnveploe
-     * 
+     *
      * @param bodyElement
-     * 
      * @return CreateSequenceResponse
      */
     public CreateSequenceResponse fromSOAPEnveploe(SOAPBodyElement bodyElement) {
@@ -133,7 +131,7 @@ public class CreateSequenceResponse implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
      * @throws SOAPException
      */
@@ -150,7 +148,7 @@ public class CreateSequenceResponse implements IRmElement {
 
     /**
      * Method setIdentifier
-     * 
+     *
      * @param identifier
      */
     public void setIdentifier(Identifier identifier) {

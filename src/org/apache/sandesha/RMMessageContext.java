@@ -16,13 +16,12 @@
  */
 package org.apache.sandesha;
 
-import java.util.Iterator;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.ws.rm.RMHeaders;
+
+import java.util.Iterator;
 
 /**
  * @author JEkanayake
@@ -58,64 +57,73 @@ public class RMMessageContext {
     private long msgNumber = 0;
 
     private String sourceURL = null;
-    
-    private String action=null;
-    
-    private String from=null;
-    
-    private String replyTo=null;
-    
-    private boolean responseReceived=false;
 
-    private boolean ackReceived=false;
+    private String action = null;
+
+    private String from = null;
+
+    private String replyTo = null;
+
+    private boolean responseReceived = false;
+
+    private boolean ackReceived = false;
+
     /**
      * @return Returns the responseReceived.
      */
     public boolean isResponseReceived() {
         return responseReceived;
     }
+
     /**
      * @param responseReceived The responseReceived to set.
      */
     public void setResponseReceived(boolean responseReceived) {
         this.responseReceived = responseReceived;
     }
+
     /**
      * @return Returns the from.
      */
     public String getFrom() {
         return from;
     }
+
     /**
      * @param from The from to set.
      */
     public void setFrom(String from) {
         this.from = from;
     }
+
     /**
      * @return Returns the replyTo.
      */
     public String getReplyTo() {
         return replyTo;
     }
+
     /**
      * @param replyTo The replyTo to set.
      */
     public void setReplyTo(String replyTo) {
         this.replyTo = replyTo;
     }
+
     /**
      * @return Returns the action.
      */
     public String getAction() {
         return action;
     }
+
     /**
      * @param action The action to set.
      */
     public void setAction(String action) {
         this.action = action;
     }
+
     //This will be used to handle the relates to field.
     //When sending the response messages from the server
     private String oldSequenceID = null;
@@ -128,8 +136,7 @@ public class RMMessageContext {
     }
 
     /**
-     * @param hasResponse
-     *            The hasResponse to set.
+     * @param hasResponse The hasResponse to set.
      */
     public void setHasResponse(boolean hasResponse) {
         this.hasResponse = hasResponse;
@@ -143,8 +150,7 @@ public class RMMessageContext {
     }
 
     /**
-     * @param lastMessage
-     *            The lastMessage to set.
+     * @param lastMessage The lastMessage to set.
      */
     public void setLastMessage(boolean lastMessage) {
         this.lastMessage = lastMessage;
@@ -166,8 +172,7 @@ public class RMMessageContext {
     }
 
     /**
-     * @param sourceURL
-     *            The sourceURL to set.
+     * @param sourceURL The sourceURL to set.
      */
     public void setSourceURL(String sourceURL) {
         this.sourceURL = sourceURL;
@@ -181,8 +186,7 @@ public class RMMessageContext {
     }
 
     /**
-     * @param msgNumber
-     *            The msgNumber to set.
+     * @param msgNumber The msgNumber to set.
      */
     public void setMsgNumber(long msgNumber) {
         this.msgNumber = msgNumber;
@@ -196,8 +200,7 @@ public class RMMessageContext {
     }
 
     /**
-     * @param oldSequenceID
-     *            The oldSequenceID to set.
+     * @param oldSequenceID The oldSequenceID to set.
      */
     public void setOldSequenceID(String oldSequenceID) {
         this.oldSequenceID = oldSequenceID;
@@ -206,9 +209,11 @@ public class RMMessageContext {
     public boolean isAckReceived() {
         return ackReceived;
     }
+
     public void setAckReceived(boolean ackReceived) {
         this.ackReceived = ackReceived;
     }
+
     /**
      * @return
      */
@@ -216,7 +221,6 @@ public class RMMessageContext {
         return msgContext;
     }
 
-  
 
     /**
      * @return
@@ -363,12 +367,12 @@ public class RMMessageContext {
 
     /**
      * This method will copy the contents of one MessageContext to another.
-     * 
+     *
      * @param msgContext1
      * @param msgContext2
      */
     public static void copyMessageContext(MessageContext msgContext1,
-            MessageContext msgContext2) {
+                                          MessageContext msgContext2) {
 
         try {
             if (msgContext1.getClassLoader() != null)
@@ -386,11 +390,11 @@ public class RMMessageContext {
             //if(msgContext1.getMaintainSession()!=null)
             msgContext2.setMaintainSession(msgContext1.getMaintainSession());
 
-           // if (msgContext1.getMessage() != null)
-           //     msgContext2.setMessage(msgContext1.getMessage());
+            // if (msgContext1.getMessage() != null)
+            //     msgContext2.setMessage(msgContext1.getMessage());
 
-           // if (msgContext1.getOperation() != null)
-           //     msgContext2.setOperation(msgContext1.getOperation());
+            // if (msgContext1.getOperation() != null)
+            //     msgContext2.setOperation(msgContext1.getOperation());
 
             if (msgContext1.getPassword() != null)
                 msgContext2.setPassword(msgContext1.getPassword());
@@ -398,12 +402,12 @@ public class RMMessageContext {
             //if(msgContext1.getPastPivot()!=null)
             msgContext2.setPastPivot(msgContext1.getPastPivot());
 
-           // if (msgContext1.getRequestMessage() != null)
-           //     msgContext2.setRequestMessage(msgContext1.getRequestMessage());
+            // if (msgContext1.getRequestMessage() != null)
+            //     msgContext2.setRequestMessage(msgContext1.getRequestMessage());
 
-           // if (msgContext1.getResponseMessage() != null)
-           //     msgContext2
-           //             .setResponseMessage(msgContext1.getResponseMessage());
+            // if (msgContext1.getResponseMessage() != null)
+            //     msgContext2
+            //             .setResponseMessage(msgContext1.getResponseMessage());
 
             if (msgContext1.getRoles() != null)
                 msgContext2.setRoles(msgContext1.getRoles());
@@ -411,14 +415,14 @@ public class RMMessageContext {
             if (msgContext1.getSchemaVersion() != null)
                 msgContext2.setSchemaVersion(msgContext1.getSchemaVersion());
 
-           // if (msgContext1.getService() != null)
-           //     msgContext2.setService(msgContext1.getService());
+            // if (msgContext1.getService() != null)
+            //     msgContext2.setService(msgContext1.getService());
 
             if (msgContext1.getSession() != null)
                 msgContext2.setSession(msgContext1.getSession());
 
 
-               if (msgContext1.getSession() != null)
+            if (msgContext1.getSession() != null)
                 msgContext2.setSession(msgContext1.getSession());
 
             if (msgContext1.getSOAPActionURI() != null)

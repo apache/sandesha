@@ -16,14 +16,14 @@
  */
 package org.apache.sandesha.ws.utility;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 
+import javax.xml.soap.SOAPException;
+
 /**
  * class Identifier
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -50,7 +50,7 @@ public class Identifier extends URI {
 
     /**
      * Method setUri
-     * 
+     *
      * @param uri
      * @throws SOAPException
      */
@@ -60,7 +60,7 @@ public class Identifier extends URI {
 
     /**
      * Method fromSOAPEnvelope
-     * 
+     *
      * @param element
      * @return
      */
@@ -72,7 +72,7 @@ public class Identifier extends URI {
 
     /**
      * Method toSOAPEnvelope
-     * 
+     *
      * @param msgElement
      * @return @throws
      *         SOAPException
@@ -86,7 +86,7 @@ public class Identifier extends URI {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return @throws
      *         SOAPException
      */
@@ -100,7 +100,7 @@ public class Identifier extends URI {
 
     /**
      * Method getIdentifier
-     * 
+     *
      * @return String
      */
     public String getIdentifier() {
@@ -109,7 +109,6 @@ public class Identifier extends URI {
 
     /**
      * Method setIdentifier
-     *  
      */
     public void setIdentifier(String string) {
         identifier = string;
@@ -117,7 +116,7 @@ public class Identifier extends URI {
 
     /**
      * Method equals
-     * 
+     *
      * @param obj
      * @return boolean
      */
@@ -137,7 +136,7 @@ public class Identifier extends URI {
 
     /**
      * Method hashCode
-     * 
+     *
      * @return int
      */
     public int hashCode() {
@@ -146,7 +145,7 @@ public class Identifier extends URI {
 
     /**
      * Method toString
-     * 
+     *
      * @return String
      */
     public String toString() {

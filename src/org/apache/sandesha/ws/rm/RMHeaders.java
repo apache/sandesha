@@ -17,18 +17,17 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * class RMHeaders
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -67,11 +66,9 @@ public class RMHeaders {
 
     /**
      * Method toSoapEnvelop
-     * 
+     *
      * @param envelope
-     * 
      * @return SOAPEnvelope
-     * 
      * @throws Exception
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws Exception {
@@ -107,11 +104,9 @@ public class RMHeaders {
 
     /**
      * Method fromSOAPEnvelope
-     * 
+     *
      * @param env
-     * 
      * @return RMHeaders
-     * 
      * @throws AxisFault
      * @throws SOAPException
      */
@@ -133,13 +128,13 @@ public class RMHeaders {
 
                 if (headerElement.getName().equals("SequenceAcknowledgement")) {
                     sequenceAcknowledgement = new SequenceAcknowledgement();
-                     headerElement.setMustUnderstand(false);
+                    headerElement.setMustUnderstand(false);
                     sequenceAcknowledgement.fromSOAPEnveploe(headerElement);
                 }
 
                 if (headerElement.getName().equals("AckRequested")) {
                     ackRequest = new AckRequested();
-                     headerElement.setMustUnderstand(false);
+                    headerElement.setMustUnderstand(false);
                     ackRequest.fromSOAPEnveploe(headerElement);
                 }
             }
@@ -153,7 +148,7 @@ public class RMHeaders {
 
                 if (bodyElement.getName().equals("CreateSequence")) {
                     createSequence = new CreateSequence();
-                   
+
                     createSequence.fromSOAPEnveploe(bodyElement);
                 }
 
@@ -176,7 +171,7 @@ public class RMHeaders {
 
     /**
      * Method getCreateSequenceResponse
-     * 
+     *
      * @return CreateSequenceResponse
      */
     public CreateSequenceResponse getCreateSequenceResponse() {
@@ -185,7 +180,7 @@ public class RMHeaders {
 
     /**
      * Method getSequence
-     * 
+     *
      * @return Sequence
      */
     public Sequence getSequence() {
@@ -194,7 +189,7 @@ public class RMHeaders {
 
     /**
      * Method getSequenceAcknowledgement
-     * 
+     *
      * @return SequenceAcknowledgement
      */
     public SequenceAcknowledgement getSequenceAcknowledgement() {
@@ -203,7 +198,7 @@ public class RMHeaders {
 
     /**
      * Method getTerminateSequence
-     * 
+     *
      * @return TerminateSequence
      */
     public TerminateSequence getTerminateSequence() {
@@ -212,7 +207,7 @@ public class RMHeaders {
 
     /**
      * Method setCreateSequence
-     * 
+     *
      * @param sequence
      */
     public void setCreateSequence(CreateSequence sequence) {
@@ -221,7 +216,7 @@ public class RMHeaders {
 
     /**
      * Method setCreateSequenceResponse
-     * 
+     *
      * @param response
      */
     public void setCreateSequenceResponse(CreateSequenceResponse response) {
@@ -230,7 +225,7 @@ public class RMHeaders {
 
     /**
      * Method setSequence
-     * 
+     *
      * @param sequence
      */
     public void setSequence(Sequence sequence) {
@@ -239,17 +234,16 @@ public class RMHeaders {
 
     /**
      * Method setSequenceAcknowledgement
-     * 
+     *
      * @param acknowledgement
      */
-    public void setSequenceAcknowledgement(
-            SequenceAcknowledgement acknowledgement) {
+    public void setSequenceAcknowledgement(SequenceAcknowledgement acknowledgement) {
         sequenceAcknowledgement = acknowledgement;
     }
 
     /**
      * Method setSequenceAcknowledgement
-     * 
+     *
      * @param sequence
      */
     public void c(TerminateSequence sequence) {
@@ -258,7 +252,7 @@ public class RMHeaders {
 
     /**
      * Method setAckRequest
-     * 
+     *
      * @param requested
      */
     public void setAckRequest(AckRequested requested) {
@@ -267,7 +261,7 @@ public class RMHeaders {
 
     /**
      * Method getAckRequest
-     * 
+     *
      * @return AckRequested
      */
     public AckRequested getAckRequest() {
@@ -276,7 +270,7 @@ public class RMHeaders {
 
     /**
      * Method getCreateSequence
-     * 
+     *
      * @return CreateSequence
      */
     public CreateSequence getCreateSequence() {

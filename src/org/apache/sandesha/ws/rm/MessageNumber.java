@@ -17,14 +17,14 @@
 
 package org.apache.sandesha.ws.rm;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
 
+import javax.xml.soap.SOAPException;
+
 /**
  * class MessageNumber
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -53,7 +53,7 @@ public class MessageNumber implements IRmElement {
 
     /**
      * Method getMessageNumber
-     * 
+     *
      * @return long
      */
     public long getMessageNumber() {
@@ -68,9 +68,8 @@ public class MessageNumber implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -83,9 +82,8 @@ public class MessageNumber implements IRmElement {
 
     /**
      * Method fromSOAPEnvelope
-     * 
+     *
      * @param element
-     * 
      * @return MessageNumber
      */
     public MessageNumber fromSOAPEnvelope(MessageElement element) {
@@ -97,11 +95,9 @@ public class MessageNumber implements IRmElement {
 
     /**
      * Method toSOAPEnvelope
-     * 
+     *
      * @param msgElement
-     * 
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
@@ -116,9 +112,8 @@ public class MessageNumber implements IRmElement {
     /**
      * Method setMessageNumber Set the message no in the soap message element
      * create
-     * 
-     * @param msgNo
-     *            the message no
+     *
+     * @param msgNo the message no
      */
     public void setMessageNumber(long msgNo) {
         messageNumber = msgNo;
@@ -132,7 +127,7 @@ public class MessageNumber implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
      */
     public void addChildElement(MessageElement element) {

@@ -16,28 +16,22 @@
 */
 package org.apache.sandesha;
 
+import org.apache.axis.Handler;
+import org.apache.axis.SimpleChain;
+import org.apache.axis.configuration.SimpleProvider;
+import org.apache.axis.description.JavaServiceDesc;
+import org.apache.axis.handlers.soap.SOAPService;
+import org.apache.axis.message.addressing.handler.AddressingHandler;
+import org.apache.axis.transport.http.SimpleAxisServer;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
 import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
-import org.apache.axis.transport.http.SimpleAxisServer;
-import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.SimpleChain;
-import org.apache.axis.Handler;
-import org.apache.axis.deployment.wsdd.WSDDDocument;
-import org.apache.axis.deployment.wsdd.WSDDDeployment;
-import org.apache.axis.description.JavaServiceDesc;
-import org.apache.axis.handlers.soap.SOAPService;
-import org.apache.axis.message.addressing.handler.AddressingHandler;
-import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import java.net.ServerSocket;
 import java.io.IOException;
-import java.io.File;
+import java.net.ServerSocket;
 
 /**
  * @author Jaliya
@@ -96,7 +90,7 @@ public class RMInitiator {
 
     private static void startListener() {
         sas = new SimpleAxisServer();
-       try {
+        try {
             SimpleProvider sp = new SimpleProvider();
             sas.setMyConfig(sp);
 
@@ -108,7 +102,7 @@ public class RMInitiator {
             // in addtion to the the above two.
             Handler addrHanlder = new AddressingHandler();
             Handler rmHandler = new RMServerRequestHandler();
-           
+
             shc.addHandler(addrHanlder);
             shc.addHandler(rmHandler);
 

@@ -17,19 +17,18 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
 
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+
 /**
  * class CreateSequence
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -57,7 +56,7 @@ public class CreateSequence implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
      */
     public MessageElement getSoapElement() {
@@ -66,7 +65,7 @@ public class CreateSequence implements IRmElement {
 
     /**
      * Method toSoapEnvelop
-     * 
+     *
      * @param envelope
      * @return SOAPEnvelope
      * @throws SOAPException
@@ -93,9 +92,8 @@ public class CreateSequence implements IRmElement {
 
     /**
      * Method fromSOAPEnveploe
-     * 
+     *
      * @param bodyElement
-     * 
      * @return CreateSequence
      */
     public CreateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) {
@@ -117,7 +115,7 @@ public class CreateSequence implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
      */
     public void addChildElement(MessageElement element) {

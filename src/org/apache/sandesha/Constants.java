@@ -17,16 +17,16 @@
 
 package org.apache.sandesha;
 
-import java.net.URI;
+
 
 /**
  * class Constants
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
  */
-public interface  Constants {
+public interface Constants {
 
     /**
      * This is the port that is used when generating the source address. Two
@@ -256,26 +256,30 @@ public interface  Constants {
     public static final int SERVER = 1;
 
     public static final int CLIENT = 0;
-    
-    public static final String IN_OUT="inOut";
-    public static final String IN_ONLY="inOnly";
-    
-    public static final String LAST_MSG="lastMessage";
-   
-    public static final String DEFAULT_URI="uri:defaultWSRM";
-    
-    public static final int CLIENT_RESPONSE_CHECKING_INTERVAL=500;
 
-    public interface AddressingHeadersValidationErrors{
-       public static final String NO_ADDRESSING_HEADERS="No Addressing Headers Available in this Message";
-       public static final String NO_MESSAGE_ID="MessageID should be present in the message";
+    public static final String IN_OUT = "inOut";
+    public static final String IN_ONLY = "inOnly";
+
+    public static final String LAST_MSG = "lastMessage";
+
+    public static final String DEFAULT_URI = "uri:defaultWSRM";
+
+    public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
+
+    public interface FaultMessages {
+        public static final String NO_ADDRESSING_HEADERS = "No Addressing Headers Available in this Message";
+        public static final String NO_MESSAGE_ID = "MessageID should be present in the message";
+
+        public static final String NO_RM_HEADES="No RM Headers Available in this Message";
+
+        public static final String UNKNOWN_SEQUENCE="Sequence Does Not Exist";
 
     }
 
-    public interface InvalidMessageErrors{
-       public static final String IN_CORRECT_MESSAGE="Incorrect Message";
+    public interface FaultCodes {
+        public static final String IN_CORRECT_MESSAGE = "Incorrect Message";
+        public static final String WSRM_FAULT_UNKNOWN_SEQUENCE="Unknown Sequence";
     }
-
 
 
 }

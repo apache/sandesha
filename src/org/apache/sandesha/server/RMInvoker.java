@@ -16,8 +16,6 @@
  */
 package org.apache.sandesha.server;
 
-import javax.xml.soap.SOAPEnvelope;
-
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.components.uuid.UUIDGen;
@@ -28,12 +26,14 @@ import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 
+import javax.xml.soap.SOAPEnvelope;
+
 /**
  * @author JEkanayake
- * 
- * This class will act as the service dispatcher for Sandesha. By default it
- * will use the RPCProvider to invoke the service but need to improve this to
- * use any Provider depending on the configuration.
+ *         <p/>
+ *         This class will act as the service dispatcher for Sandesha. By default it
+ *         will use the RPCProvider to invoke the service but need to improve this to
+ *         use any Provider depending on the configuration.
  */
 public class RMInvoker implements Runnable {
     private IStorageManager storageManager = null;
@@ -70,8 +70,8 @@ public class RMInvoker implements Runnable {
                     //configurable entity where the class can be loaded at
                     // runtime.
                     RPCProvider rpcProvider = new RPCProvider();
-                    
-                    if(rmMessageContext.isLastMessage()){
+
+                    if (rmMessageContext.isLastMessage()) {
                         //Insert Terminate Sequnce.
                         System.out.println("LAST MESSAGE IS THERE");
                         storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(rmMessageContext));
@@ -95,7 +95,7 @@ public class RMInvoker implements Runnable {
                         boolean firstMsgOfResponseSeq = !storageManager
                                 .isResponseSequenceExist(rmMessageContext.getSequenceID());
                         rmMessageContext.setMsgNumber(storageManager.getNextMessageNumber(rmMessageContext
-                                        .getSequenceID()));
+                                .getSequenceID()));
                         ////System.out.println("SEQUENCE ID -
                         // "+rmMessageContext.getSequenceID());
                         //System.out.println("msgNo -
@@ -118,12 +118,10 @@ public class RMInvoker implements Runnable {
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);
 
-                            MessageContext msgContext = new MessageContext(
-                                    rmMessageContext.getMsgContext()
-                                            .getAxisEngine());
-                             RMMessageContext.copyMessageContext(
-                                     rmMessageContext.getMsgContext(),
-                                     msgContext);
+                            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext()
+                                    .getAxisEngine());
+                            RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(),
+                                    msgContext);
                             //Set this new msgContext to the rmMsgContext.
 
                             rmMsgContext.setMsgContext(msgContext);
@@ -143,8 +141,7 @@ public class RMInvoker implements Runnable {
                                     .createCreateSequenceEnvelope(id,
                                             rmMsgContext, Constants.SERVER);
 
-                            rmMsgContext.getMsgContext().setRequestMessage(
-                                    new Message(createSequenceEnvelope));
+                            rmMsgContext.getMsgContext().setRequestMessage(new Message(createSequenceEnvelope));
 
                             //TODO Check : This line is needed right ?
                             rmMsgContext.setOutGoingAddress(rmMsgContext
@@ -158,7 +155,7 @@ public class RMInvoker implements Runnable {
                         }
 
                         //Uncomment this section to print the queues.
-                        //ServerQueue sq = ServerQueue.getInstance();
+                        //SandeshaQueue sq = SandeshaQueue.getInstance();
                         //sq.displayPriorityQueue();
                         //sq.displayOutgoingMap();
                         //sq.displayIncomingMap();
@@ -177,7 +174,7 @@ public class RMInvoker implements Runnable {
 
     }
 
-      private RMMessageContext getTerminateSeqMessage(RMMessageContext rmMessageContext) {
+    private RMMessageContext getTerminateSeqMessage(RMMessageContext rmMessageContext) {
         RMMessageContext terSeqRMMsgContext = new RMMessageContext();
         MessageContext terSeqMsgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
         terSeqRMMsgContext.setSequenceID(rmMessageContext.getSequenceID());

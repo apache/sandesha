@@ -17,31 +17,26 @@
 
 package org.apache.sandesha.ws.rm.handlers;
 
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
 
+import javax.xml.soap.*;
+
 /**
  * @author Amila Navarathna <br>
  *         Jaliya Ekanayaka <br>
  *         Sudar Nimalan <br>
  *         (Apache Sandesha Project)
- *  
  */
 
 public class RMClientRequestHandler extends RMHandler {
 
     /**
      * Method invoke
-     * 
+     *
      * @param messageContext
      * @throws AxisFault
      * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
@@ -127,8 +122,7 @@ public class RMClientRequestHandler extends RMHandler {
             soapEnvelope.clearBody();
             soapEnvelope.removeHeaders();
 
-            Name name = soapEnvelope.createName(
-                    org.apache.sandesha.Constants.CLIENT_METHOD, "ns1",
+            Name name = soapEnvelope.createName(org.apache.sandesha.Constants.CLIENT_METHOD, "ns1",
                     org.apache.sandesha.Constants.RM_CLIENT_SERVICE);
             SOAPBodyElement soapBodyElement = soapBody.addBodyElement(name);
 

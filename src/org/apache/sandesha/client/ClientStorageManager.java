@@ -16,30 +16,30 @@
  */
 package org.apache.sandesha.client;
 
-import java.util.Map;
-
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.server.dao.IServerDAO;
-import org.apache.sandesha.server.dao.ServerDAOFactory;
+import org.apache.sandesha.storage.dao.ISandeshaDAO;
+import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
 import org.apache.sandesha.ws.rm.RMHeaders;
+
+import java.util.Map;
 
 /**
  * @author Jaliya
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         <p/>
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Style - Code Templates
  */
 public class ClientStorageManager implements IStorageManager {
 
     protected static Log log = LogFactory.getLog(ClientStorageManager.class
             .getName());
-    
-    private IServerDAO accessor;
+
+    private ISandeshaDAO accessor;
 
     /*
      * (non-Javadoc)
@@ -50,9 +50,9 @@ public class ClientStorageManager implements IStorageManager {
         // TODO Auto-generated method stub
 
     }
-    
-    public ClientStorageManager(){
-        accessor = ServerDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+
+    public ClientStorageManager() {
+        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
     }
 
     public boolean isSequenceExist(String sequenceID) {
@@ -130,8 +130,7 @@ public class ClientStorageManager implements IStorageManager {
      * Check the existance of a message.
      */
     public boolean isMessageExist(String sequenceID, long messageNumber) {
-        return accessor.isIncomingMessageExists(sequenceID, new Long(
-                messageNumber));
+        return accessor.isIncomingMessageExists(sequenceID, new Long(messageNumber));
     }
 
     /**
@@ -140,7 +139,7 @@ public class ClientStorageManager implements IStorageManager {
     public Map getListOfMessageNumbers(String sequenceID) {
         return null;
         /*
-         * IServerDAO accessor = ServerDAOFactory.getStorageAccessor(
+         * ISandeshaDAO accessor = SandeshaDAOFactory.getStorageAccessor(
          * Constants.SERVER_QUEUE_ACCESSOR);
          * 
          * Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(sequenceID);
@@ -173,7 +172,7 @@ public class ClientStorageManager implements IStorageManager {
         if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
 
-        if(msg==null){
+        if (msg == null) {
             msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
         }
         return msg;
@@ -201,11 +200,11 @@ public class ClientStorageManager implements IStorageManager {
      * proper sequenceID
      */
     public boolean setApprovedOutSequence(String oldOutsequenceId,
-            String newOutSequenceId) {
+                                          String newOutSequenceId) {
 
         boolean done = false;
         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
-       
+
         if (sequenceID == null) {
             System.out.println("ERROR: setApprovedOutSequence()");
             return false;
@@ -238,10 +237,9 @@ public class ClientStorageManager implements IStorageManager {
 
     /**
      * This sholud be called by the RMSender when adding request messages.
-     *  
      */
     /*private void insertClientRequestMessage(RMMessageContext msg) {
-        IServerDAO accessor = ServerDAOFactory
+        ISandeshaDAO accessor = SandeshaDAOFactory
                 .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
 
         //This is the seuqnceid used to create the map entry.
@@ -267,9 +265,9 @@ public class ClientStorageManager implements IStorageManager {
 
         //This is the seuqnceid used to create the map entry.
         // (not the actual seq id of the msg).
-        String sequenceId = msg.getSequenceID();  
-		//if(sequenceId==null)
-		//    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+        String sequenceId = msg.getSequenceID();
+        //if(sequenceId==null)
+        //    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
 
         boolean exists = accessor.isOutgoingSequenceExists(sequenceId);
         if (!exists)
@@ -287,11 +285,11 @@ public class ClientStorageManager implements IStorageManager {
 
     //IN THE CLIENT RESPONSE HASH HAS THE ID OF RESPONSE MESSAGES.
     public void insertIncomingMessage(RMMessageContext rmMessageContext) {
- 
+
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-    	
+
         RelatesTo relatesTo = (RelatesTo) rmMessageContext
-        .getAddressingHeaders().getRelatesTo().get(0);
+                .getAddressingHeaders().getRelatesTo().get(0);
         String messageId = relatesTo.getURI().toString();
         //CHANGE THIS. SEARCH FOR THE SEQ USING MESID
         //String sequenceId = rmMessageContext.getSequenceID();
@@ -317,39 +315,39 @@ public class ClientStorageManager implements IStorageManager {
                 rmMessageContext);
 
     }
-    
-    
+
+
     //Sets the property responseReceived of the request message
     //corresponding to this response message.
-    private void setResponseReceived(RMMessageContext responseMsg){
+    private void setResponseReceived(RMMessageContext responseMsg) {
         accessor.setResponseReceived(responseMsg);
     }
 
-    public RMMessageContext checkForResponseMessage(String sequenceId,String requestMsgId){
-		if(sequenceId==null)
-		    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
-		
-		RMMessageContext response = accessor.checkForResponseMessage(requestMsgId,sequenceId);
-        return response; 
-        
+    public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
+        if (sequenceId == null)
+            sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+
+        RMMessageContext response = accessor.checkForResponseMessage(requestMsgId, sequenceId);
+        return response;
+
     }
-    
-    public boolean checkForAcknowledgement(String sequenceId,String requestMsgId){
-        
-		//Request message will be present in the queue only if the ack has not been
-		//receive. It will be deleted by the AckProcessor when an ack get received.
-		if(sequenceId==null)
-		    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
-		
-		boolean requestPresent = accessor.isRequestMessagePresent(sequenceId,requestMsgId);
-		return !requestPresent;
+
+    public boolean checkForAcknowledgement(String sequenceId, String requestMsgId) {
+
+        //Request message will be present in the queue only if the ack has not been
+        //receive. It will be deleted by the AckProcessor when an ack get received.
+        if (sequenceId == null)
+            sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+
+        boolean requestPresent = accessor.isRequestMessagePresent(sequenceId, requestMsgId);
+        return !requestPresent;
     }
 
     /* (non-Javadoc)
      * @see org.apache.sandesha.IStorageManager#isAckComplete(java.lang.String)
      */
     //For client sequenceId should be outgoing sequence id.
-    public boolean isAckComplete(String sequenceID) {		
+    public boolean isAckComplete(String sequenceID) {
         boolean result = accessor.compareAcksWithSequence(sequenceID);  //For client
         return result;
     }
@@ -359,7 +357,7 @@ public class ClientStorageManager implements IStorageManager {
      */
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
         accessor.addLowPriorityMessage(terminateSeqMessage);
-     
+
     }
 
     /* (non-Javadoc)
@@ -383,11 +381,15 @@ public class ClientStorageManager implements IStorageManager {
      */
     public void terminateSequence(String sequenceID) {
         // TODO Auto-generated method stub
-        
-    }
-  
-    public void setAckReceived(String seqId,long msgNo) {
-        accessor.setAckReceived(seqId,msgNo);
 
+    }
+
+    public void setAckReceived(String seqId, long msgNo) {
+        accessor.setAckReceived(seqId, msgNo);
+
+    }
+
+    public void insertFault(RMMessageContext rmMsgCtx) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

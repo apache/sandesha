@@ -18,7 +18,6 @@ package org.apache.sandesha;
 
 /**
  * @author JEkanayake
- *  
  */
 public class RMException extends Exception {
     public RMException() {

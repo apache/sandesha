@@ -16,51 +16,25 @@
 */
 package org.apache.sandesha.client;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.Vector;
-import java.util.Iterator;
-
-import javax.wsdl.extensions.soap.SOAPFault;
-import javax.xml.namespace.QName;
-
 import org.apache.axis.AxisFault;
-import org.apache.axis.Handler;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.description.JavaServiceDesc;
 import org.apache.axis.handlers.BasicHandler;
-import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.message.addressing.Action;
-import org.apache.axis.message.addressing.Address;
-import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.From;
-import org.apache.axis.message.addressing.ReplyTo;
-import org.apache.axis.message.addressing.To;
-import org.apache.axis.message.addressing.handler.AddressingHandler;
+import org.apache.axis.message.addressing.*;
 import org.apache.axis.transport.http.SimpleAxisServer;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.*;
 import org.apache.sandesha.server.Sender;
-import org.apache.sandesha.server.ServerStorageManager;
-import org.apache.sandesha.server.queue.ServerQueue;
-import org.apache.sandesha.ws.rm.MessageNumber;
-import org.apache.sandesha.ws.rm.RMHeaders;
-import org.apache.sandesha.ws.rm.Sequence;
-import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
-import org.apache.sandesha.ws.rm.providers.RMProvider;
-import org.apache.sandesha.ws.utility.Identifier;
-import org.omg.CORBA.portable.RemarshalException;
 
-import com.sun.jndi.url.rmi.rmiURLContext;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class RMSender extends BasicHandler {
 
@@ -109,17 +83,17 @@ public class RMSender extends BasicHandler {
                 }
 
 
-            Vector headers=responseMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope().getHeaders();
-            Iterator ite=headers.iterator();
+                Vector headers = responseMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope().getHeaders();
+                Iterator ite = headers.iterator();
 
-            while(ite.hasNext()){
-                System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-                SOAPHeaderElement headerElement = (SOAPHeaderElement)ite.next();
-                headerElement.setMustUnderstand(false);
-                headerElement.setProcessed(true);
-            }
+                while (ite.hasNext()) {
+                    System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                    SOAPHeaderElement headerElement = (SOAPHeaderElement) ite.next();
+                    headerElement.setMustUnderstand(false);
+                    headerElement.setProcessed(true);
+                }
 
-            msgContext.setResponseMessage(responseMessageContext.getMsgContext()
+                msgContext.setResponseMessage(responseMessageContext.getMsgContext()
                         .getRequestMessage());
             } else {
                 boolean gotAck = false;

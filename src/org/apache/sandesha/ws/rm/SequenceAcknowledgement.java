@@ -17,22 +17,21 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
 
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * class SequenceAcknowledgement
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -80,9 +79,8 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -110,11 +108,9 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method toSoapEnvelop
-     * 
+     *
      * @param envelope
-     * 
      * @return SOAPEnvelope
-     * 
      * @throws SOAPException
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
@@ -161,13 +157,11 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method fromSOAPEnveploe
-     * 
+     *
      * @param headerElement
-     * 
      * @return SequenceAcknowledgement
      */
-    public SequenceAcknowledgement fromSOAPEnveploe(
-            SOAPHeaderElement headerElement) {
+    public SequenceAcknowledgement fromSOAPEnveploe(SOAPHeaderElement headerElement) {
 
         Iterator iterator = headerElement.getChildElements();
         MessageElement childElement;
@@ -222,9 +216,8 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
-     * 
      * @throws SOAPException
      */
     public void addChildElement(MessageElement element) throws SOAPException {
@@ -233,7 +226,7 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method getAckRanges
-     * 
+     *
      * @return List
      */
     public List getAckRanges() {
@@ -242,7 +235,7 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method getIdentifier
-     * 
+     *
      * @return Identifier
      */
     public Identifier getIdentifier() {
@@ -251,7 +244,7 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method getNackList
-     * 
+     *
      * @return List
      */
     public List getNackList() {
@@ -260,9 +253,8 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * method addAckRanges
-     * 
+     *
      * @param ackRange
-     * 
      * @return AcknowledgementRange
      */
     public AcknowledgementRange addAckRanges(AcknowledgementRange ackRange) {
@@ -274,9 +266,8 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method addNackRanges
-     * 
+     *
      * @param nack
-     * 
      * @return Nack
      */
     public Nack addNackRanges(Nack nack) {
@@ -288,7 +279,7 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method setIdentifier
-     * 
+     *
      * @param identifier
      */
     public void setIdentifier(Identifier identifier) {
@@ -297,7 +288,7 @@ public class SequenceAcknowledgement extends MessageElement implements
 
     /**
      * Method setAckRanges
-     * 
+     *
      * @param list
      */
     public void setAckRanges(List list) {

@@ -17,14 +17,14 @@
 
 package org.apache.sandesha.ws.rm;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
 
+import javax.xml.soap.SOAPException;
+
 /**
  * class Nack
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -59,9 +59,8 @@ public class Nack implements IRmElement {
 
     /**
      * Method getSoapElement
-     * 
+     *
      * @return MessageElement
-     * 
      * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -73,7 +72,7 @@ public class Nack implements IRmElement {
 
     /**
      * Method fromSOAPEnvelope
-     * 
+     *
      * @param element
      * @return Nack
      */
@@ -86,7 +85,7 @@ public class Nack implements IRmElement {
 
     /**
      * Method toSOAPEnvelope
-     * 
+     *
      * @param msgElement
      * @return MessageElement
      * @throws SOAPException
@@ -94,8 +93,7 @@ public class Nack implements IRmElement {
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("Nack", Constants.NS_PREFIX_RM).addTextNode(
-                (new Long(notAckNum)).toString());
+        msgElement.addChildElement("Nack", Constants.NS_PREFIX_RM).addTextNode((new Long(notAckNum)).toString());
 
         return msgElement;
     }
@@ -108,7 +106,7 @@ public class Nack implements IRmElement {
 
     /**
      * Method addChildElement
-     * 
+     *
      * @param element
      */
     public void addChildElement(MessageElement element) {
