@@ -1,0 +1,133 @@
+<html>
+
+<head>
+<style>
+.style1 {
+	font-family: "Courier New", Courier, mono;
+	font-size: 14px;
+	color: #990000;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1><font size="6">Simple User Guide for Apache Sandesha</font></h1>
+<p>This is the primary version of the user guide for Apache Sandesha. The rest 
+of the document will guide you through the configuration of Sandesha and finally 
+to run the sample scenarios.</p>
+<h2><font size="5">Configuration</font></h2>
+<p>Configuration of Apache Sandesha can be described in three steps.</p>
+<ul type="square">
+  <li>Checkout the code</li>
+  <li>Run the Maven (Compile)</li>
+  <li>use <font color="#FF0000">&nbsp;</font>Sandesha-1.0.jar </li>
+</ul>
+<p>So as the first step let's focus on how to configure Sandesha and run the 
+sample tests. Following steps will guide you through the process.</p>
+<h3><font size="4">Check out Sandesha</font></h3>
+<p>Apache Sandesha is available for download as source. Please follow the cvs 
+instruction to download the code
+<a href="http://ws.apache.org/ws-fx/sandesha/cvs-usage.html">
+http://ws.apache.org/ws-fx/sandesha/cvs-usage.html</a></p>
+<h3><font size="4">Build Using Maven</font></h3>
+<p>Note : Sandesha build process is done using Apache Maven. So assume that the 
+user has already configured Maven in his machine. </p>
+<p>Build process is mainly to run a single Maven command and it is</p>
+<source>maven</source><p>Since we need the samples also to be build we need one more command</p>
+<source>maven interop:compile</source><p>If you need a project to be created for eclipse or Intellij IDEA use the 
+maven commands</p>
+<source>maven eclipse</source>
+<p><source>maven idea</source> </p>
+<h3><font size="4">Run the Inter-op Samples</font></h3>
+<p>Go to the directory, interop under the main directory tree. To run the sample 
+scenarios we only need to type simple ant commands in a command line.</p>
+<p>Followings are the commands to run the samples scenarios.</p>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+  <tr>
+    <td width="13%">Ant command</td>
+    <td width="87%">&nbsp;Description</td>
+  </tr>
+  <tr>
+    <td width="13%">run_sync_ping&nbsp</td>
+    <td width="87%">The scenario tests the simple one way Ping operation with 
+    acknowledgements coming in same HTTP connection</td>
+  </tr>
+  <tr>
+    <td width="13%">run_async_ping</td>
+    <td width="87%">The scenario tests the simple one way Ping operation with 
+    acknowledgements coming in a different&nbsp; HTTP connection</td>
+  </tr>
+  <tr>
+    <td width="13%">run_echo_string </td>
+    <td width="87%">This scenario tests the simple two way Echo String 
+    operation. Here the request, acknowledgement and the response all come in&nbsp; 
+different HTTP Connections.</td>
+  </tr>
+</table>
+<p>In all these scenarios the service <b>RMInteropService</b> is deployed in a
+<b>SimpleAxisServer</b> using the ant script and the results will be shown in TCP 
+monitors. Please check whether the java processes that is used to invoke TCP 
+monitors are not running in the back ground, before every test.</p>
+<h2><font size="5">To Use Sandesha in the Client Side</font></h2>
+<p>Following two steps will enable the usage of Sandesha in the Client Side. 
+(Assume that you have build Sandesha using Maven)</p>
+<ul type="square">
+  <li>Copy the <b>Sandesha-1.0.jar</b> to your class path</li>
+  <li>Copy the <b>config/client-config.wsdd</b> to the class path of your client. This 
+  <b>client-config.wsdd</b> is a default configuration file for Sandesha client. If the user needs to 
+modify the client side configuration file, just modify the <b>ClientDeploy.wsdd
+  </b>and then use the 
+<b>DeployClient.bat</b> to generate the <b>client-config,wsdd. </b></li>
+</ul>
+<p>To enable Sandesha in the client side, the only requirement is to use 
+<b>RMTransport</b> as the transport in the <b>client-config.wsdd</b></p>
+<p>Note: please add the jars, that are there in the target/lib to your class 
+path</p>
+<h2><font size="5">To Use Sandesha in the Server Side</font></h2>
+<p>This can again be done using two steps.</p>
+<p>Assume that axis is configured in Tomcat Server </p>
+<ul type="square">
+  <li>Copy the <b>Sandesha-1.0.jar</b> to the <b>CATALINA_HOME/webapps/axis/WEB-INF/lib</b> along 
+with the other new jars that can be found in <b>target/lib</b> folder of Sandesha.</li>
+  <li>To configure Sandesha for a particular service( say MyService) change the 
+  <b>deploy.wsdd</b> of <b>MyService</b> according to the following.</li>
+</ul>
+<source>
+<p>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot;</p>
+<p>xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;</p>
+<p>&lt;service name=&quot;MyService&quot; provider=&quot;Handler&quot;&gt;</p>
+<p>&lt;requestFlow&gt;</p>
+<p>&lt;handler type=&quot;java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler&quot;&gt;&lt;/handler&gt;</p>
+<p>&lt;handler type=&quot;java:org.apache.axis.message.addressing.handler.AddressingHandler&quot;&gt;&lt;/handler&gt;</p>
+<p>&lt;/requestFlow&gt;</p>
+<p>&lt;parameter name=&quot;handlerClass&quot; value=&quot;org.apache.sandesha.ws.rm.providers.RMProvider&quot;/&gt;</p>
+<p>&lt;parameter name=&quot;className&quot; value=&quot;test.MyService&quot;/&gt;</p>
+<p>&lt;parameter name=&quot;allowedMethods&quot; value=&quot;*&quot;/&gt;</p>
+<p>&lt;parameter name=&quot;scope&quot; value=&quot;request&quot;/&gt;</p>
+<p>&lt;/service&gt;</p>
+<p>&lt;/deployment&gt;</p></source>
+<p>Note that we have to change the provider to <b>RMProvider</b> and need to add two 
+request handlers. A sample of this <b>deploy.wsdd</b> can be found in the interop 
+directory named <b>RMInteropServiceDeploy</b> with the required bat file to deploy the 
+service. (make sure that the classes for the <b>MyService</b> is copied to 
+<b>CATALINA_HOME/webapps/axis/WEB-INF/classes</b></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

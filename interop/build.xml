@@ -359,8 +359,8 @@ Build Instructions:
         </java>
     </target>
 
-    <target name="run_async_ping" depends="run_interop_sync_ping,shutdown_server"> </target>
-     <target name="run_sync_ping" depends="run_interop_async_ping,shutdown_server"> </target>
+    <target name="run_sync_ping" depends="run_interop_sync_ping,shutdown_server"> </target>
+     <target name="run_async_ping" depends="run_interop_async_ping,shutdown_server"> </target>
      <target name="run_echo_string" depends="run_interop_echo_string,shutdown_server"> </target>
 
 </project>

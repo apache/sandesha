@@ -11,6 +11,5 @@ set CLASSPATH=%CLASSPATH%;..\lib\axis-wsdl4j-1.2-RC1.jar
 set CLASSPATH=%CLASSPATH%;..\lib\log4j-1.2.8.jar
 set CLASSPATH=%CLASSPATH%;..\lib\xerces.jar
 set CLASSPATH=%CLASSPATH%;..\target\classes
-set CLASSPATH=%CLASSPATH%;..\target\interop-classes
+java org.apache.axis.utils.tcpmon
  
-java org.apache.axis.transport.http.SimpleAxisServer

@@ -1,0 +1,15 @@
+<!-- Created By Eran Chinthaka -->
+<project name="Sandesha">
+  <title>Sandesha</title>
+  <body>
+     
+    <menu name="Sandesha">
+       
+      	<item name="Simple User Guide" href="userguide.html"/>
+    
+       
+    </menu>
+     
+    
+  </body>
+</project>

@@ -35,7 +35,6 @@
     <url>http://ws.apache.org/ws-fx/sandesha/</url>
 
     <issueTrackingUrl>http://nagoya.apache.org/jira/browse/WSFX</issueTrackingUrl>
-
     <siteAddress>ws.apache.org</siteAddress>
 
     <siteDirectory>/ws-fx/sandesha/</siteDirectory>
@@ -113,9 +112,10 @@
 
         <resources>
             <resource>
-                <directory>conf</directory>
+                <directory>${basedir}/config</directory>
                 <includes>
                     <include>*.properties</include>
+			  <include>*.wsdd</include>
                 </includes>
             </resource>
         </resources>
@@ -240,7 +240,6 @@
                 <module>true</module>
             </properties>
            </dependency> 
-              
             
     </dependencies>
 
