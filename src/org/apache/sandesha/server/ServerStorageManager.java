@@ -324,5 +324,29 @@ public class ServerStorageManager implements IStorageManager {
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#isAckComplete(java.lang.String)
+     */
+    public boolean isAckComplete(String sequenceID) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
+     */
+    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#isAllSequenceComplete()
+     */
+    public boolean isAllSequenceComplete() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
    
 }
