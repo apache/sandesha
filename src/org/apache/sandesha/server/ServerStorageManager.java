@@ -349,4 +349,50 @@ public class ServerStorageManager implements IStorageManager {
     public void insertFault(RMMessageContext rmMsgCtx) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+    
+    
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#addSentMsgNo(java.lang.String, long)
+	 */
+	public void addSentMsgNo(String seq, long msgNo) {
+		// TODO Auto-generated method stub
+
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#getLastMsgNo(java.lang.String)
+	 */
+	public long getLastMsgNo(String seq) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#hasLastMsgNo(java.lang.String)
+	 */
+	public boolean hasLastMsgNo(String seq) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#addSendMsgNo(java.lang.String, long)
+	 */
+	public void addSendMsgNo(String seqId, long msgNo) {
+		// TODO Auto-generated method stub
+
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#hasLastMsgReceived(java.lang.String)
+	 */
+	public boolean hasLastMsgReceived(String seqId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#isSentMsg(java.lang.String, long)
+	 */
+	public boolean isSentMsg(String seqId, long msgNo) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
