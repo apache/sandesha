@@ -86,7 +86,7 @@ public class RMSender extends BasicHandler {
             //Pass the storageManager to the Sender.
             sender = new Sender(storageManager);
             Thread senderThread = new Thread(sender);
-            senderThread.setDaemon(true);
+            //senderThread.setDaemon(true);
             senderThread.start();
         }
 
@@ -104,9 +104,13 @@ public class RMSender extends BasicHandler {
             SimpleChain shc = new SimpleChain();
             shc.addHandler(addrHanlder);
             shc.addHandler(rmHandler);
-
+            
+            //Set the provider to the CRMProvider so that it will use the 
+            //ClientStorageManger.. 
+            //Need to revise this use of CRMProvider.
+                        
             SOAPService myService = new SOAPService(shc,
-                    new org.apache.sandesha.ws.rm.providers.RMProvider(), null);
+                    new org.apache.sandesha.ws.rm.providers.CRMProvider(), null);
             //			customize the webservice
             JavaServiceDesc desc = new JavaServiceDesc();
             myService.setOption("className",
@@ -165,14 +169,18 @@ public class RMSender extends BasicHandler {
                 String tempUUID = "ABCDEFGH";
                 RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(
                         msgContext, addrHeaders, tempUUID);
+               
+                //Create a sequence first.
+                storageManager.addSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+                storageManager.setTemporaryOutSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,"uuid:ABCDEFGH");
                 storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-                storageManager.setTemporaryOutSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,"ABCDEFGH");
-                RMMessageContext reqRMMsgContext = getReqRMContext(msgContext,
-                        addrHeaders, tempUUID, nextMsgNumber);
-                storageManager.insertRequestMessage(reqRMMsgContext);
+                //RMMessageContext reqRMMsgContext = getReqRMContext(msgContext,
+                //        addrHeaders, tempUUID, nextMsgNumber);
+                //storageManager.insertRequestMessage(reqRMMsgContext);
 
             } else {
                 //Add the message only.
+                System.out.println("This is NOT the first message..........................");
             }
 
             /*
@@ -257,7 +265,8 @@ public class RMSender extends BasicHandler {
 
         MessageContext createSeqMsgContext = new MessageContext(msgContext
                 .getAxisEngine());
-
+           
+        RMMessageContext.copyMessageContext(msgContext,createSeqMsgContext);
         createSeqMsgContext.setRequestMessage(new Message(resEnvelope));
         createSeqRMMsgContext.setMsgContext(createSeqMsgContext);
 
