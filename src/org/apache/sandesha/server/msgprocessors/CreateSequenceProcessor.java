@@ -65,7 +65,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
 
-        storageManager.addRequestedSequence(uuid);
+        storageManager.addRequestedSequence(org.apache.sandesha.Constants.UUID+uuid);
 
         SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(uuid, rmMessageContext);
         rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);

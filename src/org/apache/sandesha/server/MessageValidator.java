@@ -59,37 +59,36 @@ public final class MessageValidator {
             return;
 
         throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_RM_HEADES, null, null);
-
     }
 
     private static void validateForFaults(RMMessageContext rmMsgCtx) throws AxisFault {
         RMHeaders rmHeaders = rmMsgCtx.getRMHeaders();
         Sequence sequence = rmHeaders.getSequence();
-       
-      //  if (sequence != null) {
-       //     if (!storageMgr.isSequenceExist(sequence.getIdentifier().getIdentifier()))
-       //         throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
 
-     //   }
-
-        if (rmHeaders.getSequenceAcknowledgement() != null) {
-           // if (!storageMgr.isSequenceExist(sequence.getIdentifier().getIdentifier()))
-           //     throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
-
+        if (sequence != null) {
+            String seqId = sequence.getIdentifier().getIdentifier();
+            if (!storageMgr.isRequestedSeqPresent(seqId)){
+                  System.out.println("I am Here lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
+                    throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
+            }
+            if (sequence.getMessageNumber() != null) {
+                long msgNo = sequence.getMessageNumber().getMessageNumber();
+                if (storageMgr.hasLastMsgReceived(sequence.getIdentifier().getIdentifier())) {
+                    long lastMsg = storageMgr.getLastMsgNo(seqId);
+                    if (msgNo > lastMsg)
+                        throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULR_LAST_MSG_NO_EXCEEDED), Constants.FaultMessages.LAST_MSG_NO_EXCEEDED, null, null);
+                }
+            }
+            }
         }
 
 
-
-
-    }
 
     private static void validateAddrHeaders(AddressingHeaders addrHeaders) throws AxisFault {
         if (addrHeaders == null) {
             throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
         }
-
         if (addrHeaders.getMessageID() == null)
             throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_MESSAGE_ID, null, null);
     }
-
 }

@@ -328,9 +328,6 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
-        if (sequenceId == null)
-            sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
-
         RMMessageContext response = accessor.checkForResponseMessage(requestMsgId, sequenceId);
         return response;
 
@@ -406,7 +403,9 @@ public class ClientStorageManager implements IStorageManager {
 	 * @see org.apache.sandesha.IStorageManager#addSendMsgNo(java.lang.String, long)
 	 */
 	public void addSendMsgNo(String seqId, long msgNo) {
-		accessor.addSendMsgNo(seqId,msgNo);
+        System.out.println("2222222222222222222222222222222222222222222222222222");
+        System.out.println( accessor.getSequenceOfOutSequence(seqId));
+		accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId),msgNo);
 
 	}
 	/* (non-Javadoc)
@@ -432,18 +431,18 @@ public class ClientStorageManager implements IStorageManager {
 	}
 
     public void addRequestedSequence(String seqId) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        accessor.addRequestedSequence(seqId);
     }
 
     public boolean isRequestedSeqPresent(String seqId) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+       return accessor.isRequestedSeqPresent(seqId);
     }
 
     /* (non-Javadoc)
 	 * @see org.apache.sandesha.IStorageManager#isSentMsg(java.lang.String, long)
 	 */
 	public boolean isSentMsg(String seqId, long msgNo) {
-		return accessor.isSentMsg(seqId,msgNo);
+		return accessor.isSentMsg(accessor.getSequenceOfOutSequence(seqId) ,msgNo);
 	}
 
     public String getOutgoingSeqOfMsg(String msgId){

@@ -19,6 +19,8 @@ package org.apache.sandesha.server.msgprocessors;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.AxisFault;
+import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
@@ -30,10 +32,10 @@ import org.apache.sandesha.ws.rm.RMHeaders;
  */
 public class CompositeProcessor implements IRMMessageProcessor {
 
-    IStorageManager storageManger = null;
+    IStorageManager storageManager = null;
 
     public CompositeProcessor(IStorageManager storageManger) {
-        this.storageManger = storageManger;
+        this.storageManager = storageManger;
     }
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
@@ -42,7 +44,8 @@ public class CompositeProcessor implements IRMMessageProcessor {
         //if the message has a body then insert it to the queue
 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-        AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor(this.storageManger);
+        AddressingHeaders addrHeaders =rmMessageContext.getAddressingHeaders();
+        AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor(this.storageManager);
         if (rmHeaders.getSequenceAcknowledgement() != null) {
             ackProcessor.processMessage(rmMessageContext);
         }
@@ -56,18 +59,25 @@ public class CompositeProcessor implements IRMMessageProcessor {
                // System.out.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE "+storageManger.isMessageExist(sequenceID, messageNumber));
 
 
-                String seqId = storageManger.getOutgoingSeqenceIdOfIncomingMsg(rmMessageContext);
+                String seqId = storageManager.getOutgoingSeqenceIdOfIncomingMsg(rmMessageContext);
+                boolean hasSequence = storageManager.isSequenceExist(seqId);
 
+                
 
-                boolean hasSequence = storageManger.isSequenceExist(seqId);
+                if(addrHeaders.getRelatesTo()!=null && !addrHeaders.getRelatesTo().isEmpty()){
+                   RelatesTo relatesTo = (RelatesTo) addrHeaders.getRelatesTo().get(0);
+                   String messageId = relatesTo.getURI().toString();
+                   seqId=storageManager.getOutgoingSeqOfMsg(messageId);
+                   System.out.println("(((((((99999999999999999999999999999999999999 "+seqId);
+                }
 
                 if(!hasSequence){
-                    storageManger.addIncomingSequence(seqId);
+                    storageManager.addIncomingSequence(seqId);
                 }
 
 
 
-                if (storageManger.isMessageExist(seqId, messageNumber) != true) {
+                if (storageManager.isMessageExist(seqId, messageNumber) != true) {
                     //Create a copy of the RMMessageContext.
                     RMMessageContext rmMsgContext = new RMMessageContext();
                     //Copy the RMMEssageContext
@@ -104,7 +114,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
 
                     System.out.println("INFO: Inserting the request message ....\n");
                     //Insert the message to the INQUEUE
-                    storageManger.insertIncomingMessage(rmMsgContext);
+                    storageManager.insertIncomingMessage(rmMsgContext);
                 }
 
                 //Send an Ack for every message received by the server.

@@ -272,8 +272,10 @@ public interface Constants {
 
         public static final String NO_RM_HEADES="No RM Headers Available in this Message";
 
+        public static final String INVALID_ACKNOWLEDGEMENT="The SequenceAcknowledgement violates the cumulative acknowledgement invariant.";
         public static final String UNKNOWN_SEQUENCE="The value of wsrm:Identifier is not a known Sequence identifier.";
         public static final String MSG_NO_ROLLOVER="The maximum value for wsrm:MessageNumber has been exceeded.";
+        public static final String LAST_MSG_NO_EXCEEDED="The value for wsrm:MessageNumber exceeds the value of the MessageNumber accompanying a LastMessage element in this Sequence.";
 
 
     }
@@ -283,8 +285,10 @@ public interface Constants {
 
 
         public static final String IN_CORRECT_MESSAGE = "Incorrect Message";
+        public static final String WSRM_FAULT_INVALID_ACKNOWLEDGEMENT="wsrm:InvalidAcknowledgement";
         public static final String WSRM_FAULT_UNKNOWN_SEQUENCE="wsrm:UnknownSequence";
         public static final String WSRM_FAULT_MSG_NO_ROLLOVER="wsrm:MessageNumberRollover";
+        public static final String WSRM_FAULR_LAST_MSG_NO_EXCEEDED="wsrm:LastMessageNumberExceeded";
     }
 
     public interface ErrorMessages{
@@ -297,6 +301,8 @@ public interface Constants {
 
 
     public static final double MAX_MSG_NO=18446744073709551615d;
+
+    public static final String UUID="uuid:";
 
 
 }

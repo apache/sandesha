@@ -60,7 +60,7 @@ public class RMProvider extends RPCProvider {
 
         IStorageManager storageManager = RMInitiator.init(client);
         storageManager.init();
-
+       
         RMMessageContext rmMessageContext = new RMMessageContext();
         rmMessageContext.setMsgContext(msgContext);
         try {
@@ -75,6 +75,7 @@ public class RMProvider extends RPCProvider {
             return;
         }
 
+        System.out.println("VALIDATION IS PASSED .................................................");
 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();

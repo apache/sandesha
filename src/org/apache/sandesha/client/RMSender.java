@@ -58,8 +58,9 @@ public class RMSender extends BasicHandler {
         try {
             String sequenceID = requestMesssageContext.getSequenceID();
             AddressingHeaders addrHeaders = getAddressingHeaders(requestMesssageContext);
-
-            if (requestMesssageContext.getMsgNumber() == 1) {
+            long msgNo=requestMesssageContext.getMsgNumber();
+           
+            if (msgNo == 1) {
                 requestMesssageContext = processFirstMessage(requestMesssageContext, addrHeaders,
                         requestMesssageContext.getSync());
             } else {
@@ -76,6 +77,7 @@ public class RMSender extends BasicHandler {
                     //TODO Need to check for errors in the queue.
                     //If the queue has an error message, then need to report it
                     // to client.
+                  
                     responseMessageContext = checkTheQueueForResponse(sequenceID,
                             requestMesssageContext.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
@@ -224,11 +226,11 @@ public class RMSender extends BasicHandler {
         //Set the tempUUID
         String tempUUID = uuidGen.nextUUID();
         RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(reqRMMsgContext, addrHeaders, tempUUID);
-        createSeqRMMsgContext.setMessageID("uuid:" + tempUUID);
+        createSeqRMMsgContext.setMessageID(Constants.UUID + tempUUID);
         //Create a sequence first.
 
         storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
-        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
+        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(),Constants.UUID + tempUUID);
 
         //Set the processing state to the RMMessageContext
         createSeqRMMsgContext.setSync(sync);
@@ -238,7 +240,7 @@ public class RMSender extends BasicHandler {
         reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
         reqRMMsgContext.setMsgNumber(nextMsgNumber);
         reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
-        reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
+        reqRMMsgContext.setMessageID(Constants.UUID+ uuidGen.nextUUID());
         storageManager.insertOutgoingMessage(reqRMMsgContext);
         return reqRMMsgContext;
     }
@@ -249,7 +251,7 @@ public class RMSender extends BasicHandler {
         reqRMMsgContext.setAddressingHeaders(addrHeaders);
         reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
         reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
-        reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
+        reqRMMsgContext.setMessageID(Constants.UUID + uuidGen.nextUUID());
         //Set the processing state of the RMMessageContext
         reqRMMsgContext.setSync(sync);
         storageManager.insertOutgoingMessage(reqRMMsgContext);

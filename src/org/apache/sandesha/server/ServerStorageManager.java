@@ -378,7 +378,7 @@ public class ServerStorageManager implements IStorageManager {
 	 * @see org.apache.sandesha.IStorageManager#addSendMsgNo(java.lang.String, long)
 	 */
 	public void addSendMsgNo(String seqId, long msgNo) {
-		// TODO Auto-generated method stub
+		accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId),msgNo);
 
 	}
 	/* (non-Javadoc)
@@ -392,8 +392,8 @@ public class ServerStorageManager implements IStorageManager {
 	 * @see org.apache.sandesha.IStorageManager#isSentMsg(java.lang.String, long)
 	 */
 	public boolean isSentMsg(String seqId, long msgNo) {
-		// TODO Auto-generated method stub
-		return false;
+		return accessor.isSentMsg(accessor.getSequenceOfOutSequence(seqId) ,msgNo);
+
 	}
 
 

@@ -875,9 +875,9 @@ public class SandeshaQueue {
     
     public void addSendMsgNo(String seqId,long msgNo){
     	OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-    	
+    	System.out.println("5555555555555555555555555555555555555555555555555555555555555555");
         if (rsh == null) {
-            System.out.println("ERROR: SEQ IS NULL");
+            System.out.println("ERROR: SEQ IS NULL "+seqId+"   "+msgNo);
         }
         
     	synchronized(rsh){
@@ -897,11 +897,13 @@ public class SandeshaQueue {
     	}   	
     }
     
-    public boolean hasLastMsgReceived(String seqId){
+    public boolean hasLastMsgReceived(String seqId) {
+        
     	OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
     	
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL");
+
         }
         
         synchronized(rsh){
@@ -914,6 +916,7 @@ public class SandeshaQueue {
     	
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL");
+
         }
         
         synchronized(rsh){

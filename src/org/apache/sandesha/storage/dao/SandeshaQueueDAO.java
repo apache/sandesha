@@ -469,7 +469,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     
     public boolean hasLastMsgReceived(String seqId){
     	SandeshaQueue sq = SandeshaQueue.getInstance();
-    	return sq.hasLastMsgReceived(seqId);   
+    	 return sq.hasLastMsgReceived(seqId);   
     }
 
     public long getLastMsgNo(String seqId){

@@ -217,6 +217,8 @@ public class Sender implements Runnable {
                     .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             //We are not expecting the ack over the
             // same HTTP connection.
+            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),rmMessageContext.getMsgNumber());
+
             call.invoke();
             //System.out.println(call.getResponseMessage().getSOAPPartAsString());
 
@@ -355,7 +357,9 @@ public class Sender implements Runnable {
                 Call call;
                 try {
                     call = prepareCall(rmMessageContext);
-                    //Send the createSequnceRequest Synchronously
+
+                    //CHECK THIS
+                    storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),rmMessageContext.getMsgNumber());
                     call.invoke();
                     if (call.getResponseMessage() != null) {
                         System.out.println("RESPONSE MESSAGE IS NOT NULL");
@@ -387,6 +391,7 @@ public class Sender implements Runnable {
                 try {
                     Call call = prepareCall(rmMessageContext);
                     //Send the createSequnceRequest Asynchronously.
+                    storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),rmMessageContext.getMsgNumber());
                     call.invoke();
                 } catch (AxisFault e) {
                     System.err.println("ERROR: SENDING REQUEST ....");

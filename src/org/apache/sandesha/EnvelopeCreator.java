@@ -62,8 +62,7 @@ public class EnvelopeCreator {
 
             //Set the messageID
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-            MessageID messageId = new MessageID(new URI("uuid:"
-                    + uuidGen.nextUUID()));
+            MessageID messageId = new MessageID(new URI(Constants.UUID+ uuidGen.nextUUID()));
             outGoingAddressingHaders.setMessageID(messageId);
 
             //Set the <wsa:From> address from the incoming <wsa:To>
@@ -90,7 +89,7 @@ public class EnvelopeCreator {
             //now set the body elements
             CreateSequenceResponse response = new CreateSequenceResponse();
             Identifier id = new Identifier();
-            id.setIdentifier("uuid:" + uuid);
+            id.setIdentifier(Constants.UUID + uuid);
             response.setIdentifier(id);
             response.toSoapEnvelop(envelope);
         } catch (MalformedURIException e) {
@@ -124,7 +123,7 @@ public class EnvelopeCreator {
             SOAPHeaderElement acionElement = action.toSOAPHeaderElement(envelope, null);
             outGoingAddressingHaders.setAction(action);
 
-            MessageID messageId = new MessageID(new URI("uuid:" + uuid));
+            MessageID messageId = new MessageID(new URI(Constants.UUID+ uuid));
             outGoingAddressingHaders.setMessageID(messageId);
 
             if (endPoint == 0) {
@@ -216,8 +215,7 @@ public class EnvelopeCreator {
 
             //Set the messageID
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-            MessageID messageId = new MessageID(new URI("uuid:"
-                    + uuidGen.nextUUID()));
+            MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
             outGoingAddressingHaders.setMessageID(messageId);
 
             //Set the <wsa:From> address from the incoming <wsa:To>
@@ -286,8 +284,7 @@ public class EnvelopeCreator {
 
             //Set the messageID
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-            MessageID messageId = new MessageID(new URI("uuid:"
-                    + uuidGen.nextUUID()));
+            MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
             outGoingAddressingHaders.setMessageID(messageId);
 
             //Set the <wsa:From> address from the incoming <wsa:To>
@@ -442,7 +439,7 @@ public class EnvelopeCreator {
             outGoingAddressingHaders.setAction(terSeqAction);
 
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-            MessageID messageId = new MessageID(new URI("uuid:" + uuidGen.nextUUID()));
+            MessageID messageId = new MessageID(new URI(Constants.UUID+ uuidGen.nextUUID()));
             outGoingAddressingHaders.setMessageID(messageId);
 
             outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());

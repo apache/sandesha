@@ -42,6 +42,7 @@ public class RMMessageProcessorIdentifier {
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
+        
         if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
             return new CreateSequenceProcessor(storageManager);
         } else if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {

@@ -136,9 +136,8 @@ public class RMInvoker implements Runnable {
                             //Posible Problem
                             //TODO
                             storageManager.setTemporaryOutSequence(rmMsgContext
-                                    .getSequenceID(), "uuid:" + id);
-                            SOAPEnvelope createSequenceEnvelope = EnvelopeCreator
-                                    .createCreateSequenceEnvelope(id,
+                                    .getSequenceID(), Constants.UUID + id);
+                            SOAPEnvelope createSequenceEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(id,
                                             rmMsgContext, Constants.SERVER);
 
                             rmMsgContext.getMsgContext().setRequestMessage(new Message(createSequenceEnvelope));
@@ -148,7 +147,7 @@ public class RMInvoker implements Runnable {
                                     .getAddressingHeaders().getReplyTo()
                                     .getAddress().toString());
 
-                            rmMsgContext.setMessageID("uuid:" + id);
+                            rmMsgContext.setMessageID(Constants.UUID + id);
                             storageManager
                                     .addCreateSequenceRequest(rmMsgContext);
 

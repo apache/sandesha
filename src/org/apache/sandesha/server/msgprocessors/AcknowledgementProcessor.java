@@ -34,15 +34,14 @@ import java.util.Vector;
  * @author
  */
 public final class AcknowledgementProcessor implements IRMMessageProcessor {
-    private IStorageManager storageManger = null;
+    private IStorageManager storageManager = null;
 
-    public AcknowledgementProcessor(IStorageManager storageManger) {
-        this.storageManger = storageManger;
+    public AcknowledgementProcessor(IStorageManager storageManager) {
+        this.storageManager = storageManager;
     }
 
     public final boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
-        SequenceAcknowledgement seqAcknowledgement = rmMessageContext
-                .getRMHeaders().getSequenceAcknowledgement();
+        SequenceAcknowledgement seqAcknowledgement = rmMessageContext.getRMHeaders().getSequenceAcknowledgement();
         String seqID = seqAcknowledgement.getIdentifier().getIdentifier();
         List ackRanges = seqAcknowledgement.getAckRanges();
         Iterator ite = ackRanges.iterator();
@@ -51,8 +50,11 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             AcknowledgementRange ackRange = (AcknowledgementRange) ite.next();
             long msgNumber = ackRange.getMinValue();
             while (ackRange.getMaxValue() >= msgNumber) {
-                storageManger.setAckReceived(seqID, msgNumber);
-                storageManger.setAcknowledged(seqID, msgNumber);
+                 if(!storageManager.isSentMsg(seqID, msgNumber)){
+                   throw new AxisFault(new javax.xml.namespace.QName(Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT), Constants.FaultMessages.INVALID_ACKNOWLEDGEMENT, null, null);
+                }
+                storageManager.setAckReceived(seqID, msgNumber);
+                storageManager.setAcknowledged(seqID, msgNumber);
                 msgNumber++;
             }
         }
@@ -70,7 +72,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         long messageNumber = rmMessageContext.getRMHeaders().getSequence()
                 .getMessageNumber().getMessageNumber();
         //Assume that the list is sorted and in the ascending order.
-        Map listOfMsgNumbers = storageManger.getListOfMessageNumbers(seqID);
+        Map listOfMsgNumbers = storageManager.getListOfMessageNumbers(seqID);
 
         if (null == listOfMsgNumbers)
             System.out.println("MSG Number list is NULL");
@@ -114,7 +116,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             //Store the asynchronize ack in the queue.
             //The name for this queue is not yet fixed.
             //RENAME insertAcknowledgement(rmMessageContext)
-            storageManger.addAcknowledgement(rmMsgContext);
+            storageManager.addAcknowledgement(rmMsgContext);
             return false;
         }
 
