@@ -27,6 +27,10 @@ package org.apache.sandesha;
 public interface Constants {
 
     /**
+	 * Namespace for wsu.
+	 */
+	public static final String NS_URI_WSU="http://schemas.xmlsoap.org/ws/2002/07/utility";
+    /**
      * Field RM_CLIENT_SERVICE
      */
     public static final String RM_CLIENT_SERVICE = "RMClientService";
