@@ -27,16 +27,16 @@ Build Instructions:
     </description>
 
     <target name="init">
-        <property name='product.Name' value='Apache-Sandesha-J'/>
-        <property name='product.name' value='sandesha'/>
-        <property name='product.shortname' value='sandesha'/>
+        <property name="product.Name" value="Apache-Sandesha-J"/>
+        <property name="product.name" value="sandesha"/>
+        <property name="product.shortname" value="sandesha"/>
 
-        <property name='product.version.major' value='1'/>
-        <property name='product.version.minor' value='0'/>
-        <property name='product.version.level' value='Beta'/>
-        <property name='product.Version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
-        <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}'/>
-        <property name='product_version' value='${product.version.major}_${product.version.minor}_${product.version.level}'/>
+        <property name="product.version.major" value="1"/>
+        <property name="product.version.minor" value="0"/>
+        <property name="product.version.level" value="Beta2"/>
+        <property name="product.Version" value="${product.version.major}.${product.version.minor}.${product.version.level}"/>
+        <property name="product.version" value="${product.version.major}.${product.version.minor}.${product.version.level}"/>
+        <property name="product_version" value="${product.version.major}_${product.version.minor}_${product.version.level}"/>
         <property name="year" value="2004"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache Sandesha Project. All Rights Reserved."/>
 
@@ -86,6 +86,7 @@ Build Instructions:
          java.class.path and leave the sandesha/lib empty. This requires that
          the CLASSPATH includes all required packages (see above
 
+	ALEK: thos does nto seems to be true as start-functional-test-http-server depends on AXIS.jar (what version?)
          -->
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
@@ -203,9 +204,9 @@ org.apache.sandesha.ws.rm.providers
         <echo message="                                                                   "/>
         <echo message="   usage           --> provides help on using the build tool       "/>
         <echo message="                       (default)                                   "/>
-        <echo message="                                                                   "/>
+<!--        <echo message="                                                                   "/>
         <echo message="   changelog       --> generates changelog.html                    "/>
-        <echo message="                                                                   "/>
+        <echo message="                                                                   "/> -->
         <echo message=" See comments inside the build.xml file for more details.          "/>
         <echo message="-------------------------------------------------------------------"/>
         <echo message="                                                                   "/>
@@ -301,8 +302,12 @@ org.apache.sandesha.ws.rm.providers
             description="compile everything"/>
 
     <target name="test"
-            depends="unitTests, systemTests"
-            description="tests everything"/>        
+            depends="unitTests"
+            description="unti tests only"/>        
+
+    <target name="interop"
+            depends="interopTests"
+            description="interop tests"/>        
 
     <!-- #################################################################### -->
 
@@ -372,7 +377,7 @@ org.apache.sandesha.ws.rm.providers
             httpStopTarget="stop-functional-test-http-server"/>
     </target>
 
-    <target name="start-functional-test-http-server" if="junit.present">
+    <target name="start-functional-test-http-server" if="junit.present" depends="init">
         <echo message="Starting http server."/>
         <java classname="org.apache.axis.transport.http.SimpleAxisServer" fork="yes" dir="${build.dir}">
             <classpath refid="classpath.library"/>
@@ -400,13 +405,17 @@ org.apache.sandesha.ws.rm.providers
                 <include name="**/undeploy.wsdd"/>
             </fileset>
         </path>
-
+        
+        <mkdir dir="${build.work}"/>
+        
+<!-- ALEK
         <copy todir="${build.dir}/keys">
             <fileset dir="${dir.keys}" includes="**"/>
         </copy>
         <copy todir="${build.dir}/interop">
             <fileset dir="${dir.interop}" includes="*.jks"/>
         </copy>
+-->        
         
         <property name="deploy_xml_property" refid="deploy_xml_files"/>
         <property name="undeploy_xml_property" refid="undeploy_xml_files"/>
