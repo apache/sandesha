@@ -259,7 +259,11 @@ public interface Constants {
     
     public static final String IN_OUT="inOut";
     public static final String IN_ONLY="inOnly";
+    
+    public static final String LAST_MSG="lastMessage";
    
     public static final String DEFAULT_URI="uri:defaultWSRM";
+    
+    public static final int CLIENT_RESPONSE_CHECKING_INTERVAL=500;
 }
 
