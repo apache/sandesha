@@ -307,4 +307,15 @@ public class ServerStorageManager implements IStorageManager {
                 rmMessageContext);
 
     }
+
+    public RMMessageContext checkForResponseMessage(String requestId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    
+    public boolean checkForAcknowledgement(String requestMsgId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }
