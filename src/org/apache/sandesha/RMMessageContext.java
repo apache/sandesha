@@ -41,7 +41,7 @@ public class RMMessageContext {
 	private int messageType;
 	private long reTransmissionCount=0;
 	private long lastPrecessedTime=0;
-
+	private long lastSentTime=0;
 	/**
 	 * @return
 	 */
@@ -325,6 +325,14 @@ public class RMMessageContext {
 			e.printStackTrace();
 		}
 
+	}
+
+	public long getLastSentTime() {
+		return lastSentTime;
+	}
+
+	public void setLastSentTime(long l) {
+		lastSentTime = l;
 	}
 
 }
