@@ -29,21 +29,22 @@ import org.apache.sandesha.ws.rm.RMHeaders;
  */
 public class RMMessageProcessorIdentifier {
 
-	public IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext, IStorageManager storageManger) {
+	public static IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext, IStorageManager storageManager) {
 
 		AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
 		RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
 		if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
-			return new CreateSequenceProcessor(storageManger);
+			return new CreateSequenceProcessor(storageManager);
 		} else if (
 			addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
-			return new CreateSequenceResponseProcessor(storageManger);
+			return new CreateSequenceResponseProcessor(storageManager);
 		} else if (
 			addrHeaders.getAction().toString().equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
-			return new TerminateSequenceProcessor(storageManger);
-		} else {
-			return new CompositeProcessor(storageManger);
-		}
+			return new TerminateSequenceProcessor(storageManager);
+		} else if ((rmHeaders.getSequenceAcknowledgement() != null)||(rmHeaders.getSequence().getMessageNumber() != null)){
+			return new CompositeProcessor(storageManager);
+		}else
+			return new FaultProcessor(storageManager);
 	}
 }
