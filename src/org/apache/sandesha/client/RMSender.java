@@ -108,9 +108,11 @@ public class RMSender extends BasicHandler {
             //Set the provider to the CRMProvider so that it will use the 
             //ClientStorageManger.. 
             //Need to revise this use of CRMProvider.
-                        
+            
+            //This needs to be corrected. To Client provider
+            //TODO
             SOAPService myService = new SOAPService(shc,
-                    new org.apache.sandesha.ws.rm.providers.CRMProvider(), null);
+                    new org.apache.sandesha.ws.rm.providers.RMProvider(), null);
             //			customize the webservice
             JavaServiceDesc desc = new JavaServiceDesc();
             myService.setOption("className",
