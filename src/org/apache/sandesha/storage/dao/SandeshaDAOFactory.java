@@ -19,7 +19,6 @@ package org.apache.sandesha.storage.dao;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.storage.queue.IncomingSequence;
 
 /**
  * @author Chamikara Jayalath
@@ -29,7 +28,7 @@ import org.apache.sandesha.storage.queue.IncomingSequence;
 public class SandeshaDAOFactory {
 
     private static final Log log = LogFactory.getLog(SandeshaDAOFactory.class.getName());
-    
+
     public static ISandeshaDAO getStorageAccessor(int accessor) {
 
         if (accessor == Constants.SERVER_QUEUE_ACCESSOR)

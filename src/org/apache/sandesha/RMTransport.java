@@ -26,7 +26,7 @@ import org.apache.axis.transport.http.HTTPConstants;
 
 /**
  * A File Transport class.
- * 
+ *
  * @author Rob Jellinghaus (robj@unrealities.com)
  * @author Doug Davis (dug@us.ibm.com)
  * @author Glen Daniels (gdaniels@allaire.com)
@@ -51,7 +51,7 @@ public class RMTransport extends Transport {
     }
 
     public void setupMessageContextImpl(MessageContext mc, Call call,
-            AxisEngine engine) throws AxisFault {
+                                        AxisEngine engine) throws AxisFault {
         if (action != null) {
             mc.setUseSOAPAction(true);
             mc.setSOAPActionURI(action);

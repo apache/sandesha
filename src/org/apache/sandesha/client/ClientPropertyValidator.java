@@ -18,7 +18,6 @@ package org.apache.sandesha.client;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
-import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.util.PropertyLoader;
 
@@ -46,11 +45,11 @@ public class ClientPropertyValidator {
         String replyTo = getReplyTo(call);
 
         try {
-            if(from==null)
+            if (from == null)
                 sourceURL = getSourceURL(call);
             else
-                sourceURL=from;
-           } catch (UnknownHostException e) {
+                sourceURL = from;
+        } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             throw new AxisFault(e.getMessage());
         }

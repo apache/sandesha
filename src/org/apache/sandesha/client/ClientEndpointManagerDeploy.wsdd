@@ -1,21 +1,21 @@
 <deployment xmlns="http://xml.apache.org/axis/wsdd/"
-            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 
-<service name="RMClientService" provider="java:RPC">
-  <parameter name="className" value="org.apache.sandesha.client.RMClientService"/>
-  <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="request"/>
-</service>
+    <service name="RMClientService" provider="java:RPC">
+        <parameter name="className" value="org.apache.sandesha.client.RMClientService"/>
+        <parameter name="allowedMethods" value="*"/>
+        <parameter name="scope" value="request"/>
+    </service>
 
-<service name="RMClientReference" provider="Handler">
-<requestFlow>
-	<handler type="java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler"></handler>
-	<handler type="java:org.apache.axis.message.addressing.handler.AddressingHandler"></handler>
-</requestFlow>
-  <parameter name="handlerClass" value="org.apache.sandesha.ws.rm.providers.RMProvider"/>
-  <parameter name="className" value="org.apache.sandesha.client.RMClientReference"/>
-  <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="request"/>
-</service>
+    <service name="RMClientReference" provider="Handler">
+        <requestFlow>
+            <handler type="java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler"></handler>
+            <handler type="java:org.apache.axis.message.addressing.handler.AddressingHandler"></handler>
+        </requestFlow>
+        <parameter name="handlerClass" value="org.apache.sandesha.ws.rm.providers.RMProvider"/>
+        <parameter name="className" value="org.apache.sandesha.client.RMClientReference"/>
+        <parameter name="allowedMethods" value="*"/>
+        <parameter name="scope" value="request"/>
+    </service>
 
 </deployment>

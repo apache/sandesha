@@ -83,7 +83,7 @@ public class ServerStorageManager implements IStorageManager {
     public void setAcknowledged(String seqID, long msgNumber) {
         //TODO decide this in implementing the ServerSender.
         //accessor.moveOutgoingMessageToBin(seqID, new Long(msgNumber));
-         accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
+        accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
     }
 
     public void init() {
@@ -112,7 +112,7 @@ public class ServerStorageManager implements IStorageManager {
         msg = accessor.getNextPriorityMessageContextToSend();
         if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
-         if (msg == null)
+        if (msg == null)
             msg = accessor.getNextLowPriorityMessageContextToSend();
         return msg;
 
@@ -325,40 +325,41 @@ public class ServerStorageManager implements IStorageManager {
     public void insertFault(RMMessageContext rmMsgCtx) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
-    
-    
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#addSentMsgNo(java.lang.String, long)
-	 */
-	public void addSentMsgNo(String seq, long msgNo) {
-		// TODO Auto-generated method stub
 
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#getLastMsgNo(java.lang.String)
-	 */
-	public long getLastMsgNo(String seq) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	public void addSendMsgNo(String seqId, long msgNo) {
-		accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId),msgNo);
 
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#addSentMsgNo(java.lang.String, long)
+     */
+    public void addSentMsgNo(String seq, long msgNo) {
+        // TODO Auto-generated method stub
 
-	public boolean isSentMsg(String seqId, long msgNo) {
-		return accessor.isSentMsg(accessor.getSequenceOfOutSequence(seqId) ,msgNo);
+    }
 
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#getLastMsgNo(java.lang.String)
+     */
+    public long getLastMsgNo(String seq) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void addSendMsgNo(String seqId, long msgNo) {
+        accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId), msgNo);
+
+    }
+
+    public boolean isSentMsg(String seqId, long msgNo) {
+        return accessor.isSentMsg(accessor.getSequenceOfOutSequence(seqId), msgNo);
+
+    }
 
 
     public void addOutgoingSequence(String sequenceId) {
         accessor.addOutgoingSequence(sequenceId);
     }
 
-    public void addIncomingSequence(String sequenceId){
-         accessor.addIncomingSequence(sequenceId);
+    public void addIncomingSequence(String sequenceId) {
+        accessor.addIncomingSequence(sequenceId);
     }
 
     public String getOutgoingSeqOfMsg(String msgId) {
@@ -377,15 +378,15 @@ public class ServerStorageManager implements IStorageManager {
 
         return msg.getSequenceID();
     }
-    
-	public boolean hasLastOutgoingMsgReceived(String seqId) {
-		return accessor.hasLastOutgoingMsgReceived(seqId);
-	}
-	
-	public long getLastOutgoingMsgNo(String seqId) {
-		return accessor.getLastOutgoingMsgNo(seqId);
-	}
-	
+
+    public boolean hasLastOutgoingMsgReceived(String seqId) {
+        return accessor.hasLastOutgoingMsgReceived(seqId);
+    }
+
+    public long getLastOutgoingMsgNo(String seqId) {
+        return accessor.getLastOutgoingMsgNo(seqId);
+    }
+
     public long getLastIncomingMsgNo(String seqId) {
         return accessor.getLastIncomingMsgNo(seqId);
     }

@@ -67,8 +67,8 @@ public final class MessageValidator {
 
         if (sequence != null) {
             String seqId = sequence.getIdentifier().getIdentifier();
-            if (!storageMgr.isRequestedSeqPresent(seqId)){
-              throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
+            if (!storageMgr.isRequestedSeqPresent(seqId)) {
+                throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
             }
             if (sequence.getMessageNumber() != null) {
                 long msgNo = sequence.getMessageNumber().getMessageNumber();
@@ -78,9 +78,8 @@ public final class MessageValidator {
                         throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULR_LAST_MSG_NO_EXCEEDED), Constants.FaultMessages.LAST_MSG_NO_EXCEEDED, null, null);
                 }
             }
-            }
         }
-
+    }
 
 
     private static void validateAddrHeaders(AddressingHeaders addrHeaders) throws AxisFault {

@@ -17,12 +17,12 @@
 
 package org.apache.sandesha.ws.rm;
 
-import org.apache.axis.message.MessageElement;
 import org.apache.axis.AxisFault;
+import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
 
-import javax.xml.soap.SOAPException;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 /**
  * class MessageNumber
@@ -87,10 +87,10 @@ public class MessageNumber implements IRmElement {
      * @param element
      * @return MessageNumber
      */
-    public MessageNumber fromSOAPEnvelope(MessageElement element) throws AxisFault{
+    public MessageNumber fromSOAPEnvelope(MessageElement element) throws AxisFault {
 
-        double tempMsgNo=(new Double(element.getValue())).doubleValue();
-        if(tempMsgNo>=Constants.MAX_MSG_NO)
+        double tempMsgNo = (new Double(element.getValue())).doubleValue();
+        if (tempMsgNo >= Constants.MAX_MSG_NO)
             throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_MSG_NO_ROLLOVER), Constants.FaultMessages.MSG_NO_ROLLOVER, null, null);
 
         messageNumber = (new Long(element.getValue())).longValue();

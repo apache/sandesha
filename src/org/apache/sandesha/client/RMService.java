@@ -20,5 +20,5 @@ package org.apache.sandesha.client;
 public class RMService {
     //The service is used as a dummy entity in
     //the client side only.
-       
+
 }

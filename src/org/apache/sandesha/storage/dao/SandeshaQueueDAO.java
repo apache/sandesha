@@ -21,12 +21,11 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.queue.QueueException;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
-import org.apache.sandesha.storage.queue.IncomingSequence;
 
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Iterator;
 
 /**
  * @author Chamikara Jayalath
@@ -390,37 +389,37 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         sq.setAckReceived(seqId, msgNo);
     }
-    
-    public void addSendMsgNo(String seqId,long msgNo){
-    	SandeshaQueue sq = SandeshaQueue.getInstance();
-    	sq.addSendMsgNo(seqId,msgNo);
-    }
-    
-    public boolean isSentMsg(String seqId,long msgNo){
-    	SandeshaQueue sq = SandeshaQueue.getInstance();
-    	return sq.isSentMsg(seqId,msgNo);
-    }
-    
-    public boolean hasLastOutgoingMsgReceived(String seqId){
-    	SandeshaQueue sq = SandeshaQueue.getInstance();
-    	 return sq.hasLastOutgoingMsgReceived(seqId);   
+
+    public void addSendMsgNo(String seqId, long msgNo) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        sq.addSendMsgNo(seqId, msgNo);
     }
 
-    public long getLastOutgoingMsgNo(String seqId){
-    	SandeshaQueue sq = SandeshaQueue.getInstance();
-    	return sq.getLastOutgoingMsgNo(seqId);
+    public boolean isSentMsg(String seqId, long msgNo) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.isSentMsg(seqId, msgNo);
     }
 
-    public boolean hasLastIncomingMsgReceived(String seqId){
-    	SandeshaQueue sq = SandeshaQueue.getInstance();
-    	 return sq.hasLastIncomingMsgReceived(seqId);   
+    public boolean hasLastOutgoingMsgReceived(String seqId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.hasLastOutgoingMsgReceived(seqId);
     }
 
-    public long getLastIncomingMsgNo(String seqId){
-    	SandeshaQueue sq = SandeshaQueue.getInstance();
-    	return sq.getLastIncomingMsgNo(seqId);
+    public long getLastOutgoingMsgNo(String seqId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.getLastOutgoingMsgNo(seqId);
     }
-    
+
+    public boolean hasLastIncomingMsgReceived(String seqId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.hasLastIncomingMsgReceived(seqId);
+    }
+
+    public long getLastIncomingMsgNo(String seqId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.getLastIncomingMsgNo(seqId);
+    }
+
     public void addRequestedSequence(String seqId) {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         sq.addRequestedSequence(seqId);
@@ -430,8 +429,8 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         return sq.isRequestedSeqPresent(seqId);
     }
-    
-    
+
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getKeyFromIncomingSequenceId(java.lang.String)
      */
@@ -439,34 +438,34 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         return sq.getKeyFromIncomingSequenceId(seqID);
     }
-    
+
     public String getKeyFromOutgoingSequenceId(String seqID) {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         return sq.getKeyFromOutgoingSequenceId(seqID);
     }
 
     public Iterator getAllOutgoingSequences() {
-       SandeshaQueue sq=SandeshaQueue.getInstance();
-       return sq.getAllOutgoingSequences();
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.getAllOutgoingSequences();
     }
 
     public boolean isAllOutgoingTerminateSent() {
-       SandeshaQueue sq=SandeshaQueue.getInstance();
-       return sq.isAllOutgoingTerminateSent();
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.isAllOutgoingTerminateSent();
     }
 
     public boolean isAllIncommingTerminateReceived() {
-        SandeshaQueue sq=SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance();
         return sq.isAllIncommingTerminateReceived();
     }
 
     public void setTerminateSend(String seqId) {
-        SandeshaQueue sq=SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance();
         sq.setTerminateSend(seqId);
     }
 
     public void setTerminateReceived(String seqId) {
-        SandeshaQueue sq=SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance();
         sq.setTerminateReceived(seqId);
     }
 

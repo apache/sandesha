@@ -21,7 +21,6 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 
 import java.util.*;
 
@@ -142,7 +141,7 @@ public class IncomingSequence {
         hasProcessableMessages = hash.containsKey(nextKey);
 
         if (!hasProcessableMessages) //Cant be being procesed if no messages to
-            // process.
+        // process.
             setProcessLock(false);
     }
 

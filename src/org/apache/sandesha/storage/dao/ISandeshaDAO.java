@@ -17,10 +17,9 @@
 package org.apache.sandesha.storage.dao;
 
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.storage.queue.SandeshaQueue;
 
-import java.util.Set;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author Chamikara Jayalath
@@ -87,15 +86,15 @@ public interface ISandeshaDAO {
     public void addLowPriorityMessage(RMMessageContext msg);
 
     public RMMessageContext getNextLowPriorityMessageContextToSend();
-    
-    public void addSendMsgNo(String seqId,long msgNo);
-    
-    public boolean isSentMsg(String seqId,long msgNo);
-    
+
+    public void addSendMsgNo(String seqId, long msgNo);
+
+    public boolean isSentMsg(String seqId, long msgNo);
+
     public boolean hasLastOutgoingMsgReceived(String seqId);
 
     public long getLastOutgoingMsgNo(String seqId);
-    
+
     public boolean hasLastIncomingMsgReceived(String seqId);
 
     public long getLastIncomingMsgNo(String seqId);
@@ -107,15 +106,15 @@ public interface ISandeshaDAO {
     //The client side will not be able to have sequenceId as a key for storing request messages.
     //Since it may be not known when the user adds first message.
     //Two methods below will be used to get this key from the actual sequenceid.
-    public String getKeyFromIncomingSequenceId(String incomingSeqID); 
-    
+    public String getKeyFromIncomingSequenceId(String incomingSeqID);
+
     public String getKeyFromOutgoingSequenceId(String outgoingSeqID);
 
     public Iterator getAllOutgoingSequences();
 
-    public void setTerminateSend (String seqId);
+    public void setTerminateSend(String seqId);
 
-    public void setTerminateReceived (String seqId);
+    public void setTerminateReceived(String seqId);
 
     public boolean isAllOutgoingTerminateSent();
 

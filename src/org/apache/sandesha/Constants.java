@@ -18,7 +18,6 @@
 package org.apache.sandesha;
 
 
-
 /**
  * class Constants
  *
@@ -28,29 +27,13 @@ package org.apache.sandesha;
  */
 public interface Constants {
 
-    /**
-     * This is the port that is used when generating the source address. Two
-     * constants SOURCE_ADDRESS_PORT and SOURCE_LISTEN_PORT are used to help
-     * debuging using TCP monitor. TCP mon can listen in 8080 while the
-     * SimpleAxisServer listens in 8090. In the final version these two should
-     * contain the same value.
-     */
+    public static final int DEFAULR_CLIENT_SIDE_LISTENER_PORT = 8090;
 
-    public static final int SOURCE_ADDRESS_PORT = 8080;
+    public static final String CLIENT_LISTENER_CONFIG = "config/client-listener-config.wsdd";
 
-    /**
-     * This is the port that the SimpleAxisServer in the client side listen for
-     * asynchronous responses /acks.
-     */
-    public static final int SOURCE_LISTEN_PORT = 8090;
+    public static final String PROPERTIES_CONFIG = "config/sandesha.properties";
 
-    public static final int DEFAULR_CLIENT_SIDE_LISTENER_PORT=8090;
-
-    public static final String CLIENT_LISTENER_CONFIG="config/client-listener-config.wsdd";
-
-    public static final String PROPERTIES_CONFIG="config/sandesha.properties";
-
-    public static final String SIMPLE_AXIS_SERVER_PORT_POPERTY="SIMPLE_AXIS_SERVER_PORT";
+    public static final String SIMPLE_AXIS_SERVER_PORT_POPERTY = "SIMPLE_AXIS_SERVER_PORT";
 
     /**
      * Namespace for wsu.
@@ -84,11 +67,6 @@ public interface Constants {
 
     // Policy related constants.
     // public static final EXPIRATION=new Date();
-
-    /**
-     * Field INACTIVITY_TIMEOUT
-     */
-    public static final long INACTIVITY_TIMEOUT = 120000;
 
     // double the expectd for breaking of the network in ms.
 
@@ -130,11 +108,6 @@ public interface Constants {
     public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
 
     /**
-     * Field MAX_CHECKING_TIME
-     */
-    public static final int MAX_CHECKING_TIME = 2;
-
-    /**
      * Field ENV_RM_REQUEST_HEADERS
      */
     public static final String ENV_RM_REQUEST_HEADERS = "org.apache.sandesha.ws.rm.REQUEST.HEADERS";
@@ -145,34 +118,14 @@ public interface Constants {
     public static final String CLIENT_SEQUENCE_IDENTIFIER = "SequenceIdetifier";
 
     /**
-     * Field CLIENT_ONE_WAY_INVOKE
-     */
-    public static final String CLIENT_ONE_WAY_INVOKE = "OneWayInvoke";
-
-    /**
      * Field CLIENT_RESPONSE_EXPECTED
      */
     public static final String CLIENT_RESPONSE_EXPECTED = "ResponseExpected";
 
     /**
-     * Field CLIENT_CREATE_SEQUENCE
-     */
-    public static final String CLIENT_CREATE_SEQUENCE = "CreateSequence";
-
-    /**
      * Field CLIENT_LAST_MESSAGE
      */
     public static final String CLIENT_LAST_MESSAGE = "LastMessage";
-
-    /**
-     * Field MAXIMAM_SERVER_RETRANSMISION_COUNT
-     */
-    public static final int MAXIMAM_SERVER_RETRANSMISION_COUNT = 2;
-
-    /**
-     * Field SERVER_RETRANSMISION_INTERVAL
-     */
-    public static final long SERVER_RETRANSMISION_INTERVAL = 4000;
 
     /**
      * Field ACTION_CREATE_SEQUENCE
@@ -200,21 +153,6 @@ public interface Constants {
     public static final String ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2004/03/rm/TerminateSequence";
 
     /**
-     * Field SERVICE_INVOKE_INTERVAL
-     */
-    public static final long SERVICE_INVOKE_INTERVAL = 500;
-
-    /**
-     * Field SERVER_RESPONSE_CREATE_SEQUENCE_MAX_CHECK_COUNT
-     */
-    public static final int SERVER_RESPONSE_CREATE_SEQUENCE_MAX_CHECK_COUNT = 16;
-
-    /**
-     * Field SERVER_RESPONSE_CREATE_SEQUENCE_CHECKING_INTERVAL
-     */
-    public static final long SERVER_RESPONSE_CREATE_SEQUENCE_CHECKING_INTERVAL = 2000;
-
-    /**
      * Field WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION
      */
     public static final String WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION = "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
@@ -225,16 +163,9 @@ public interface Constants {
     public static final String RESPONSE_NAME_SPACE = "http://www.w3.org/2001/XMLSchema";
 
     /**
-     * Field WS_ADDRESSING_NAMESPACE
-     */
-    public static final String WS_ADDRESSING_NAMESPACE = "http://schemas.xmlsoap.org/ws/2003/03/addressing";
-
-    /**
      * Field RM_SEQUENCE_ACKNOWLEDMENT_ACTION
      */
     public static final String RM_SEQUENCE_ACKNOWLEDMENT_ACTION = "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
-
-    public int SERVER_QUEUE_CACHE = 100;
 
     public int SERVER_QUEUE_ACCESSOR = 1;
 
@@ -265,69 +196,64 @@ public interface Constants {
 
     public static final int CLIENT = 0;
 
-    public static final String IN_OUT = "inOut";
-    public static final String IN_ONLY = "inOnly";
-
     public static final String LAST_MSG = "lastMessage";
-
-    public static final String DEFAULT_URI = "uri:defaultWSRM";
 
     public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
 
 
-    public static final long CLIENT_WAIT_PERIOD_FOR_COMPLETE=1000l;
+    public static final long CLIENT_WAIT_PERIOD_FOR_COMPLETE = 1000l;
 
 
     public interface FaultMessages {
-        public static final String SERVER_INTERNAL_ERROR="Server Interanal Error";
+        public static final String SERVER_INTERNAL_ERROR = "Server Interanal Error";
 
         public static final String NO_ADDRESSING_HEADERS = "No Addressing Headers Available in this Message";
         public static final String NO_MESSAGE_ID = "MessageID should be present in the message";
 
-        public static final String NO_RM_HEADES="No RM Headers Available in this Message";
+        public static final String NO_RM_HEADES = "No RM Headers Available in this Message";
 
-        public static final String INVALID_ACKNOWLEDGEMENT="The SequenceAcknowledgement violates the cumulative acknowledgement invariant.";
-        public static final String UNKNOWN_SEQUENCE="The value of wsrm:Identifier is not a known Sequence identifier.";
-        public static final String MSG_NO_ROLLOVER="The maximum value for wsrm:MessageNumber has been exceeded.";
-        public static final String LAST_MSG_NO_EXCEEDED="The value for wsrm:MessageNumber exceeds the value of the MessageNumber accompanying a LastMessage element in this Sequence.";
+        public static final String INVALID_ACKNOWLEDGEMENT = "The SequenceAcknowledgement violates the cumulative acknowledgement invariant.";
+        public static final String UNKNOWN_SEQUENCE = "The value of wsrm:Identifier is not a known Sequence identifier.";
+        public static final String MSG_NO_ROLLOVER = "The maximum value for wsrm:MessageNumber has been exceeded.";
+        public static final String LAST_MSG_NO_EXCEEDED = "The value for wsrm:MessageNumber exceeds the value of the MessageNumber accompanying a LastMessage element in this Sequence.";
 
 
     }
 
     public interface FaultCodes {
-        public static final String WSRM_SERVER_INTERNAL_ERROR="ServerInternalError";
+        public static final String WSRM_SERVER_INTERNAL_ERROR = "ServerInternalError";
 
 
         public static final String IN_CORRECT_MESSAGE = "Incorrect Message";
-        public static final String WSRM_FAULT_INVALID_ACKNOWLEDGEMENT="wsrm:InvalidAcknowledgement";
-        public static final String WSRM_FAULT_UNKNOWN_SEQUENCE="wsrm:UnknownSequence";
-        public static final String WSRM_FAULT_MSG_NO_ROLLOVER="wsrm:MessageNumberRollover";
-        public static final String WSRM_FAULR_LAST_MSG_NO_EXCEEDED="wsrm:LastMessageNumberExceeded";
+        public static final String WSRM_FAULT_INVALID_ACKNOWLEDGEMENT = "wsrm:InvalidAcknowledgement";
+        public static final String WSRM_FAULT_UNKNOWN_SEQUENCE = "wsrm:UnknownSequence";
+        public static final String WSRM_FAULT_MSG_NO_ROLLOVER = "wsrm:MessageNumberRollover";
+        public static final String WSRM_FAULR_LAST_MSG_NO_EXCEEDED = "wsrm:LastMessageNumberExceeded";
     }
 
-    public interface ErrorMessages{
-      
-    }
-
-    public interface InfomationMessage{
+    public interface ErrorMessages {
 
     }
 
+    public interface InfomationMessage {
 
-    public static final double MAX_MSG_NO=18446744073709551615d;
+    }
 
-    public static final String UUID="uuid:";
-    
+
+    public static final double MAX_MSG_NO = 18446744073709551615d;
+
+    public static final String UUID = "uuid:";
+
     //Constants related to the queue.
-    public interface Queue{
-       public static final String ADD_ERROR = "Error in adding message";
-       public static final String QUEUE_INCONSIS= "Inconsistent queue";
-       public static final String MESSAGE_EXISTS= "Message already exists";
-       public static final String SEQUENCE_NOTPRESENT= "Sequence not present";
-       public static final String SEQUENCE_ABSENT = "Sequence id does not exist";
-       public static final String RESPONSE_SEQ_NULL = "ERROR: RESPONSE SEQ IS NULL"; 
-       public static final String SEQUENCE_ID_NULL = "Sequence Id is null";
-       public static final String MESSAGE_ID_NULL = "Message is null";
+    public interface Queue {
+        public static final String ADD_ERROR = "Error in adding message";
+        public static final String QUEUE_INCONSIS = "Inconsistent queue";
+        public static final String MESSAGE_EXISTS = "Message already exists";
+        public static final String SEQUENCE_NOTPRESENT = "Sequence not present";
+        public static final String SEQUENCE_ABSENT = "Sequence id does not exist";
+        public static final String RESPONSE_SEQ_NULL = "ERROR: RESPONSE SEQ IS NULL";
+        public static final String SEQUENCE_ID_NULL = "Sequence Id is null";
+        public static final String MESSAGE_ID_NULL = "Message is null";
     }
 
 

@@ -1,11 +1,11 @@
 package org.apache.sandesha;
 
 public class RMReport {
-    public boolean isAllAcked(){
+    public boolean isAllAcked() {
         return false;
     }
 
-    public int getNumberOfReturnMessages(){
+    public int getNumberOfReturnMessages() {
         return 0;
     }
 

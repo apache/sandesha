@@ -16,11 +16,10 @@
  */
 package org.apache.sandesha.server.msgprocessors;
 
+import org.apache.axis.AxisFault;
 import org.apache.sandesha.IStorageManager;
-import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.TerminateSequence;
-import org.apache.axis.AxisFault;
 
 /**
  * @author
@@ -50,7 +49,6 @@ public class TerminateSequenceProcessor implements IRMMessageProcessor {
 
         return false;
     }
-
 
 
 }

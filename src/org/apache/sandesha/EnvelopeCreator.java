@@ -234,7 +234,7 @@ public class EnvelopeCreator {
         //outGoingAddressingHaders.setRelatesTo(relatesToList);
         ///RelatesTo relatesTo = new RelatesTo();
         if (rmMessageContext.getOldSequenceID() != null)
-             outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(), new QName("aa", "bb"));
+            outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(), new QName("aa", "bb"));
 
         //Set the messageID
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
@@ -265,10 +265,10 @@ public class EnvelopeCreator {
         //Set the action
         //TODO
         //Action shuld also be taken from the server-config.wsdd
-       if(rmMessageContext.getAction()!=null){
-        Action action = new Action(new URI(rmMessageContext.getAction()));
-        outGoingAddressingHaders.setAction(action);
-       }
+        if (rmMessageContext.getAction() != null) {
+            Action action = new Action(new URI(rmMessageContext.getAction()));
+            outGoingAddressingHaders.setAction(action);
+        }
 
 
         //Set the addressing headers to the SOAPEnvelope.

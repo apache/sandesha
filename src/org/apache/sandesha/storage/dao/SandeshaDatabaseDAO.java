@@ -19,10 +19,9 @@ package org.apache.sandesha.storage.dao;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.storage.queue.IncomingSequence;
 
-import java.util.Set;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author Chamikara Jayalath
@@ -32,7 +31,7 @@ import java.util.Iterator;
 public class SandeshaDatabaseDAO implements ISandeshaDAO {
 
     private static final Log log = LogFactory.getLog(SandeshaDatabaseDAO.class.getName());
-    
+
     public void setAckReceived(String seqId, long msgNo) {
         // TODO Auto-generated method stub
     }
@@ -330,17 +329,16 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.storage.dao.ISandeshaDAO#addSendMsgNo(java.lang.String, long)
-	 */
-	public void addSendMsgNo(String seqId, long msgNo) {
-		// TODO Auto-generated method stub
 
-	}
 
-	
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.storage.dao.ISandeshaDAO#addSendMsgNo(java.lang.String, long)
+     */
+    public void addSendMsgNo(String seqId, long msgNo) {
+        // TODO Auto-generated method stub
+
+    }
+
 
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getLastIncomingMsgNo(java.lang.String)
@@ -349,6 +347,7 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return 0;
     }
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getLastOutgoingMsgNo(java.lang.String)
      */
@@ -356,6 +355,7 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return 0;
     }
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#hasLastIncomingMsgReceived(java.lang.String)
      */
@@ -363,6 +363,7 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return false;
     }
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#hasLastOutgoingMsgReceived(java.lang.String)
      */
@@ -370,15 +371,16 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return false;
     }
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.storage.dao.ISandeshaDAO#isSentMsg(java.lang.String, long)
-	 */
-	public boolean isSentMsg(String seqId, long msgNo) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.storage.dao.ISandeshaDAO#isSentMsg(java.lang.String, long)
+     */
+    public boolean isSentMsg(String seqId, long msgNo) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getKeyFromIncomingSequenceId(java.lang.String)
      */
@@ -386,8 +388,8 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
+
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getKeyFromOutgoingSequenceId(java.lang.String)
      */

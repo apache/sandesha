@@ -23,13 +23,14 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.*;
+import org.apache.sandesha.IStorageManager;
+import org.apache.sandesha.RMInitiator;
+import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.server.msgprocessors.FaultProcessor;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
-import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
@@ -42,8 +43,6 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 
 public class RMProvider extends RPCProvider {
 
-    private static boolean rmInvokerStarted = false;
-    private static boolean senderStarted;
     private boolean client;
     private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
@@ -56,14 +55,14 @@ public class RMProvider extends RPCProvider {
 
         IStorageManager storageManager = RMInitiator.init(client);
         storageManager.init();
-       
+
         RMMessageContext rmMessageContext = new RMMessageContext();
         rmMessageContext.setMsgContext(msgContext);
         try {
-            MessageValidator.validate(rmMessageContext,client);
-        } catch (AxisFault af) { 
-        	FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
-           
+            MessageValidator.validate(rmMessageContext, client);
+        } catch (AxisFault af) {
+            FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
+
             if (!faultProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
                 return;
@@ -87,15 +86,15 @@ public class RMProvider extends RPCProvider {
         try {
             if (!rmMessageProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
-            }else{
+            } else {
                 // TODO Get the from envecreator
                 
                 // SOAPEnvelope resEn=EnvelopeCreator.createAcknowledgementEnvelope()
             }
-         } catch (AxisFault af) {
-                  RMProvider.log.error(af);
+        } catch (AxisFault af) {
+            RMProvider.log.error(af);
 
-        	FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
+            FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
 
             if (!faultProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);

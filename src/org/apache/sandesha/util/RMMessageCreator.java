@@ -1,20 +1,18 @@
 package org.apache.sandesha.util;
 
-import org.apache.axis.MessageContext;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
+import org.apache.axis.MessageContext;
+import org.apache.axis.client.Call;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.apache.axis.types.URI;
-import org.apache.axis.message.addressing.*;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.client.Call;
+import org.apache.axis.message.addressing.*;
+import org.apache.axis.types.URI;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.EnvelopeCreator;
+import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.client.ClientPropertyValidator;
-
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,15 +24,15 @@ import java.util.Vector;
 public class RMMessageCreator {
 
     public static RMMessageContext createCreateSeqMsg(RMMessageContext rmMsgCtx) throws Exception {
-         //String toAddress = (String)
+        //String toAddress = (String)
         // msgContext.getProperty(MessageContext.TRANS_URL);
-        AddressingHeaders addrHeaders= getAddressingHeaders(rmMsgCtx);
+        AddressingHeaders addrHeaders = getAddressingHeaders(rmMsgCtx);
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
 
-             //Create the RMMessageContext to hold the create Sequence Request.
+        //Create the RMMessageContext to hold the create Sequence Request.
         RMMessageContext createSeqRMMsgContext = new RMMessageContext();
-        createSeqRMMsgContext.setMessageID(Constants.UUID+uuid);
+        createSeqRMMsgContext.setMessageID(Constants.UUID + uuid);
 
         MessageContext msgContext = rmMsgCtx.getMsgContext();
         String toAddress = rmMsgCtx.getOutGoingAddress();
@@ -49,7 +47,7 @@ public class RMMessageCreator {
 
         //Set the outgoing address these need to be corrected.
         createSeqRMMsgContext.setOutGoingAddress(toAddress);
-        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid,createSeqRMMsgContext, Constants.CLIENT);
+        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid, createSeqRMMsgContext, Constants.CLIENT);
         MessageContext createSeqMsgContext = new MessageContext(msgContext.getAxisEngine());
 
         //This should be a clone operation.
@@ -78,7 +76,7 @@ public class RMMessageCreator {
     }
 
     public static RMMessageContext createAcknowledgementMsg(RMMessageContext rmMessageContext) throws Exception {
-      return new RMMessageContext();
+        return new RMMessageContext();
 
     }
 
@@ -99,8 +97,8 @@ public class RMMessageCreator {
 //    }
 
 
-       public  static RMMessageContext createServiceRequestMsg(MessageContext msgCtx) throws Exception {
-         MessageContext newMsgContext = cloneMsgContext(msgCtx);
+    public static RMMessageContext createServiceRequestMsg(MessageContext msgCtx) throws Exception {
+        MessageContext newMsgContext = cloneMsgContext(msgCtx);
 
         RMMessageContext requestMesssageContext = new RMMessageContext();
         //Get the message information from the client.
@@ -127,7 +125,7 @@ public class RMMessageCreator {
         return requestMesssageContext;
     }
 
-     private static MessageContext cloneMsgContext(MessageContext msgContext) throws AxisFault {
+    private static MessageContext cloneMsgContext(MessageContext msgContext) throws AxisFault {
         MessageContext clone = new MessageContext(msgContext.getAxisEngine());
         String str = msgContext.getRequestMessage().getSOAPPartAsString();
         Message msg = new Message(str);
@@ -137,7 +135,7 @@ public class RMMessageCreator {
     }
 
 
-         private static AddressingHeaders getAddressingHeaders(RMMessageContext rmMsgContext)
+    private static AddressingHeaders getAddressingHeaders(RMMessageContext rmMsgContext)
             throws URI.MalformedURIException {
 
         // MessageContext msgContext= rmMsgContext.getMsgContext();
