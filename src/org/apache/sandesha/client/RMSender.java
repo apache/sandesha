@@ -19,6 +19,9 @@ package org.apache.sandesha.client;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import javax.wsdl.extensions.soap.SOAPFault;
+import javax.xml.namespace.QName;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.Handler;
 import org.apache.axis.Message;
@@ -77,116 +80,72 @@ public class RMSender extends BasicHandler {
 
     public void invoke(MessageContext msgContext) throws AxisFault {
 
-        //Get the URL to send the message.
+        //Get the message information from the client.
+        Call call = (Call) msgContext.getProperty(MessageContext.CALL);
+        RMMessageContext requestMesssageContext = null;
 
+        //If the property specified by the client is not valid
+        //an AxisFault will be sent at this point.
+        requestMesssageContext = ClientPropertyValidator.validate(call);
+
+        //Initialize the storage manager
         storageManager = new ClientStorageManager();
-        initializeRMSender(msgContext, storageManager);
-
-        //Check whether we have messages or not in the queue.
-        //If yes, just add
-        //If no, need to add a priority message.
-        //return.
-
-        //Start the sender
-        //Start the SimpleAxisServer
-        //Initiate the StorageManager
-        //Insert the messae
-        //Return null ; Later return for callback.
+        initializeRMSender(msgContext, storageManager, requestMesssageContext
+                .getSync());
 
         try {
-            //This should be changed so the inital sequence is sent by the
-            // client.
-            //This way we can verify that we are shifting from one set of
-            // messages to the other.
-            //Also helps when we introduce the callback mechanism.
-            //we need the following sequence of methods to support this
+
+           long nextMsgNumber = storageManager
+                    .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+
+            //Currently we override the message number taken from the user
+            //This should shoud be changed in order to support multiple
+            // sequences of messages
+            //for client.
+            requestMesssageContext.setMsgNumber(nextMsgNumber);
 
             AddressingHeaders addrHeaders = getAddressingHeaders(msgContext);
 
-            long nextMsgNumber = storageManager
-                    .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-
-            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-
             if (nextMsgNumber == 1) {
-                //This is the first message..
-                //add a create sequence message
-                //add the message with the temp seqID
-                //System.out.println("First Message");
-
-                //Set the tempUUID
-                String tempUUID = uuidGen.nextUUID();
-                RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(
-                        msgContext, addrHeaders, tempUUID);
-                createSeqRMMsgContext.setMessageID("uuid:" + tempUUID);
-                //Create a sequence first.
-                storageManager
-                        .addSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-                storageManager.setTemporaryOutSequence(
-                        Constants.CLIENT_DEFAULD_SEQUENCE_ID, "uuid:"
-                                + tempUUID);
-                storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-
-                //RMMessageContext reqRMMsgContext =
-                // getReqRMContext(msgContext,
-                //        addrHeaders, tempUUID, nextMsgNumber);
-
-                RMMessageContext reqRMMsgContext = new RMMessageContext();
-                reqRMMsgContext.setAddressingHeaders(addrHeaders);
-                reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo()
-                        .toString());
-                reqRMMsgContext.setMsgContext(msgContext);
-                reqRMMsgContext.setMsgNumber(nextMsgNumber);
-                reqRMMsgContext
-                        .setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
-                reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
-                storageManager.insertOutgoingMessage(reqRMMsgContext);
-
+                requestMesssageContext = processFirstMessage(
+                        requestMesssageContext, msgContext, addrHeaders,
+                        requestMesssageContext.getSync());
             } else {
-                RMMessageContext reqRMMsgContext = new RMMessageContext();
-                reqRMMsgContext.setMsgContext(msgContext);
-                reqRMMsgContext.setAddressingHeaders(addrHeaders);
-                reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo()
-                        .toString());
-                //reqRMMsgContext.setMsgNumber(storageManager
-                //        .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID));
-                reqRMMsgContext.setMsgNumber(nextMsgNumber);
-
-                reqRMMsgContext
-                        .setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
-                reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
-                storageManager.insertOutgoingMessage(reqRMMsgContext);
-                //System.out.println("This is NOT the first
-                // message..........................");
+                requestMesssageContext = processNonFirstMessage(
+                        requestMesssageContext, msgContext, nextMsgNumber,
+                        addrHeaders, requestMesssageContext.getSync());
             }
 
-            /*
-             * RMMessageContext rmMessageContext= new RMMessageContext();
-             * 
-             * rmMessageContext.setMsgContext(msgContext);
-             * rmMessageContext.setSequenceID("abc");
-             * storageManager.insertRequestMessage(rmMessageContext);
-             * 
-             * storageManager.setTemporaryOutSequence("abc","def");
-             * storageManager.setApprovedOutSequence("def","pqr");
-             *  
-             */
+            if (requestMesssageContext.isHasResponse()) {
+                RMMessageContext responseMessageContext = null;
+                while (responseMessageContext == null) {
+                    responseMessageContext = checkTheQueueForResponse(requestMesssageContext
+                            .getMessageID());
+                    Thread.sleep(500);
+                    System.out.println("Checking for Responses");
+
+                }
+
+                msgContext.setResponseMessage(responseMessageContext
+                        .getMsgContext().getRequestMessage());
+                
+                //SEND TERMINATE SEQ
+                
+            } else {
+                boolean gotAck = false;
+                while (!gotAck) {
+                    gotAck = checkTheQueueForAck(requestMesssageContext
+                            .getMessageID());
+                    Thread.sleep(500);
+                    System.out.println("Checking for Acks");
+                }
+                msgContext.setResponseMessage(null);
+                //SEND TERMINATE SEQ
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        //ServerQueue sq= ServerQueue.getInstance();
-        // sq.displayIncomingMap();
-        // sq.displayOutgoingMap();
-        // sq.displayPriorityQueue();
-
-        // RMSender will hang at this point.
-        //while(storageManager.getResponseMessage(MessageID)!=null){
-        //Thread.sleap(1000);
-        //}
-        //
-        //msgContext.setResponseMessage(storageManager.getResponseMessage(MessageID));
-        msgContext.setResponseMessage(null);
 
     }
 
@@ -277,7 +236,7 @@ public class RMSender extends BasicHandler {
     }
 
     private void initializeRMSender(MessageContext msgContext,
-            IStorageManager storageManager) {
+            IStorageManager storageManager, boolean sync) {
 
         if (!senderStarted) {
             //Pass the storageManager to the Sender.
@@ -287,18 +246,23 @@ public class RMSender extends BasicHandler {
             senderThread.start();
         }
 
-        if (!serverStarted) {
+        if (!sync && !serverStarted) {
             sas = new SimpleAxisServer();
             serverStarted = true;
             try {
                 SimpleProvider sp = new SimpleProvider();
                 sas.setMyConfig(sp);
-                //SOAPService myService = new SOAPService(new RPCProvider());
-
-                Handler addrHanlder = new AddressingHandler();
-                Handler rmHandler = new RMServerRequestHandler();
 
                 SimpleChain shc = new SimpleChain();
+                //We need these two handlers in the request path to the client.
+                //Actually the response messages coming asynchronously should
+                // come
+                //through the SimpleAxisServer instance.
+                //We need to load the response handlers specified by the users
+                // in addtion to the
+                //the above two.
+                Handler addrHanlder = new AddressingHandler();
+                Handler rmHandler = new RMServerRequestHandler();
                 shc.addHandler(addrHanlder);
                 shc.addHandler(rmHandler);
 
@@ -324,7 +288,8 @@ public class RMSender extends BasicHandler {
                 sp.deployService("MyService", myService);
                 //finally start the server
                 //Start the simple axis server in port 8090
-                sas.setServerSocket(new ServerSocket(8090));
+                sas.setServerSocket(new ServerSocket(
+                        Constants.SOURCE_LISTEN_PORT));
 
                 Thread serverThread = new Thread(sas);
                 //serverThread.setDaemon(true);
@@ -340,15 +305,18 @@ public class RMSender extends BasicHandler {
     private AddressingHeaders getAddressingHeaders(MessageContext msgContext)
             throws MalformedURIException {
         String toAddress = (String) msgContext
-                .getProperty(MessageContext.TRANS_URL);//"http://127.0.0.1:9070/axis/services/EchoStringService?wsdl";
+                .getProperty(MessageContext.TRANS_URL); //"http://127.0.0.1:9070/axis/services/EchoStringService?wsdl";
         Call call = (Call) msgContext.getProperty(MessageContext.CALL);
+
         //Variable to hold the status of the asynchronous or synchronous state.
+
         boolean isAsync = false;
-        if ((String) call.getProperty("isAsync") == "true")
+
+        if ((String) call.getProperty("synchronous") == "false")
             isAsync = true;
 
         //Get the host address of the source machine.
-        String sourceHost = (String) call.getProperty("sourceAddress");
+        String sourceHost = (String) call.getProperty("sourceURI");
 
         AddressingHeaders addrHeaders = new AddressingHeaders();
 
@@ -364,6 +332,10 @@ public class RMSender extends BasicHandler {
             addrHeaders.setReplyTo(replyTo);
         } else {
             from = new From(new Address(Constants.ANONYMOUS_URI));
+            addrHeaders.setFrom(from);
+
+            ReplyTo replyTo = new ReplyTo(new Address(Constants.ANONYMOUS_URI));
+            addrHeaders.setReplyTo(replyTo);
         }
 
         //Set the target endpoint URL
@@ -371,6 +343,130 @@ public class RMSender extends BasicHandler {
         addrHeaders.setTo(to);
 
         return addrHeaders;
+    }
+
+    private RMMessageContext processFirstMessage(
+            RMMessageContext reqRMMsgContext, MessageContext msgContext,
+            AddressingHeaders addrHeaders, boolean sync) throws Exception {
+        //This is the first message..
+        //add a create sequence message
+        //add the message with the temp seqID
+        //System.out.println("First Message");
+
+        long nextMsgNumber = storageManager
+                .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+
+        System.out.println(nextMsgNumber);
+
+        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+
+        //Set the tempUUID
+        String tempUUID = uuidGen.nextUUID();
+        RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(
+                msgContext, addrHeaders, tempUUID);
+        createSeqRMMsgContext.setMessageID("uuid:" + tempUUID);
+        //Create a sequence first.
+        storageManager.addSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        storageManager.setTemporaryOutSequence(
+                Constants.CLIENT_DEFAULD_SEQUENCE_ID, "uuid:" + tempUUID);
+
+        //Set the processing state to the RMMessageContext
+        createSeqRMMsgContext.setSync(sync);
+
+        storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
+
+        //RMMessageContext reqRMMsgContext =
+        // getReqRMContext(msgContext,
+        //        addrHeaders, tempUUID, nextMsgNumber);
+
+        // RMMessageContext reqRMMsgContext = new RMMessageContext();
+        reqRMMsgContext.setAddressingHeaders(addrHeaders);
+        reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
+        reqRMMsgContext.setMsgContext(msgContext);
+        reqRMMsgContext.setMsgNumber(nextMsgNumber);
+        reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
+        reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
+
+        //Set the processing state to the RMMessageContext
+        reqRMMsgContext.setSync(sync);
+        storageManager.insertOutgoingMessage(reqRMMsgContext);
+
+        return reqRMMsgContext;
+    }
+
+    private RMMessageContext processNonFirstMessage(
+            RMMessageContext reqRMMsgContext, MessageContext msgContext,
+            long nextMsgNumber, AddressingHeaders addrHeaders, boolean sync)
+            throws Exception {
+
+        System.out.println(nextMsgNumber);
+
+        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+
+        reqRMMsgContext.setMsgContext(msgContext);
+        reqRMMsgContext.setAddressingHeaders(addrHeaders);
+        reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
+        //reqRMMsgContext.setMsgNumber(storageManager
+        //        .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID));
+        reqRMMsgContext.setMsgNumber(nextMsgNumber);
+
+        reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
+        reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
+        //Set the processing state of the RMMessageContext
+        reqRMMsgContext.setSync(sync);
+        storageManager.insertOutgoingMessage(reqRMMsgContext);
+        //System.out.println("This is NOT the first
+        // message..........................");
+
+        return reqRMMsgContext;
+    }
+
+    private boolean getAckExpected(String synchronous, String hasResponse,
+            String sourceURI) {
+        boolean ackExpected = false;
+
+        if (synchronous.equals("true") && hasResponse.equals("false")
+                && sourceURI.equals(""))
+            ackExpected = true;
+
+        if (synchronous.equals("true") && hasResponse.equals("false")
+                && !sourceURI.equals(""))
+            ackExpected = true;
+
+        //With synchronous we cannot expect an application response.
+        //if(synchronous.equals("true") && hasResponse.equals("true") &&
+        // !sourceURI.equals(""))
+        //	ackExpected = true;
+
+        return ackExpected;
+
+    }
+
+    private boolean getResponseExpected(String synchronous, String hasResponse,
+            String sourceURI) {
+        boolean responseExpeceted = false;
+
+        if (synchronous.equals("true") && hasResponse.equals("true"))
+            responseExpeceted = true;
+
+        if (synchronous.equals("false") && hasResponse.equals("true"))
+            responseExpeceted = true;
+
+        return responseExpeceted;
+    }
+
+    private boolean checkTheQueueForAck(String reqMessageID) {
+        return storageManager.checkForAcknowledgement(reqMessageID);
+    }
+
+    private RMMessageContext checkTheQueueForResponse(String reqMessageID) {
+        return storageManager.checkForResponseMessage(reqMessageID);
+
+    }
+
+    private void setProcessingState(RMMessageContext rmMessageContext,
+            boolean sync) {
+
     }
 
 }
