@@ -519,6 +519,7 @@ public class RMProvider extends RPCProvider {
 
 		MessageID incommingMessageId = addressingHeaders.getMessageID();
 		AddressingHeaders outgoingAddressingHaders = new AddressingHeaders();
+        outgoingAddressingHaders.setSetMustUnderstand(true);
 		outgoingAddressingHaders.addRelatesTo(
 			incommingMessageId.toString(),
 			(new QName(Constants.WSA_PREFIX, Constants.WSA_NS)));
