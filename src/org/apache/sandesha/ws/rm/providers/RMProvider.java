@@ -17,12 +17,13 @@
 package org.apache.sandesha.ws.rm.providers;
 
 import org.apache.axis.MessageContext;
+import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
-import org.apache.sandesha.RMIntiator;
+import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.IRMMessageProcessor;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
@@ -61,7 +62,7 @@ public class RMProvider extends RPCProvider {
         System.out.println("RMProvider GOT SOAP REQUEST.....\n");
         // System.out.println(reqEnv.toString());
         //Initiates the StorageManager
-        IStorageManager storageManager = RMIntiator.init(client);
+        IStorageManager storageManager = RMInitiator.init(client);
         storageManager.init();
 
         //Get the addressing headers.
@@ -102,7 +103,6 @@ public class RMProvider extends RPCProvider {
         rmMessageContext.setAddressingHeaders(addressingHeaders);
         rmMessageContext.setRMHeaders(rmHeaders);
 
-
         new RMMessageProcessorIdentifier();
         IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier
                 .getMessageProcessor(rmMessageContext, storageManager);
@@ -113,13 +113,14 @@ public class RMProvider extends RPCProvider {
             }
         } catch (RMException rmEx) {
             rmEx.printStackTrace();
+            throw new AxisFault(rmEx.getStackTrace().toString());
             //TODO
             //throw a SOAPFault.
         }
     }
 
-    //TODO
-    //NEED TO CHECK THIS METHOD.
+   //This is used by the Client to set the
+   //set the side that the RMProvider is used.
     public void setClient(boolean client) {
         RMProvider.client = client;
     }

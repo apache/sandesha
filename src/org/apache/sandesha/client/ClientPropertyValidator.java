@@ -136,7 +136,7 @@ public class ClientPropertyValidator {
         InetAddress addr = InetAddress.getLocalHost();
         
         sourceURI="http://"+addr.getHostAddress()+":" + Constants.SOURCE_ADDRESS_PORT
-        + "/axis/services/MyService";
+        + "/axis/services/RMService";
          
         return sourceURI;
     }

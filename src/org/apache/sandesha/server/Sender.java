@@ -34,7 +34,6 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
  * @author JEkanayake
- *  
  */
 public class Sender implements Runnable {
     private IStorageManager storageManager;
@@ -60,71 +59,77 @@ public class Sender implements Runnable {
                 } else {
                     //Send the message.
                     switch (rmMessageContext.getMessageType()) {
-                    case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST: {
-                        System.out.println("INFO: SENDING CREATE SEQUENCE REQUEST ....");
-                        if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                && ((System.currentTimeMillis() - rmMessageContext
+                        case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
+                            {
+                                System.out.println("INFO: SENDING CREATE SEQUENCE REQUEST ....");
+                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                                        && ((System.currentTimeMillis() - rmMessageContext
                                         .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                            sendCreateSequenceRequest(rmMessageContext);
-                        } else {
-                            //TODO REPORT ERROR
-                        }
-                        break;
-                    }
-                    case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE: {
-                        System.out.println("INFO: SENDING CREATE SEQUENCE RESPONSE ....");
-                        if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                && ((System.currentTimeMillis() - rmMessageContext
+                                    sendCreateSequenceRequest(rmMessageContext);
+                                } else {
+                                    //TODO REPORT ERROR
+                                }
+                                break;
+                            }
+                        case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
+                            {
+                                System.out.println("INFO: SENDING CREATE SEQUENCE RESPONSE ....");
+                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                                        && ((System.currentTimeMillis() - rmMessageContext
                                         .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                            sendCreateSequenceResponse(rmMessageContext);
-                        } else {
-                            //TODO REPORT ERROR
-                        }
-                        break;
-                    }
-                    case Constants.MSG_TYPE_TERMINATE_SEQUENCE: {
-                        System.out.println("INFO: SENDING TERMINATE SEQUENCE REQUEST ....");
-                        if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                && ((System.currentTimeMillis() - rmMessageContext
+                                    sendCreateSequenceResponse(rmMessageContext);
+                                } else {
+                                    //TODO REPORT ERROR
+                                }
+                                break;
+                            }
+                        case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
+                            {
+                                System.out.println("INFO: SENDING TERMINATE SEQUENCE REQUEST ....");
+                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                                        && ((System.currentTimeMillis() - rmMessageContext
                                         .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                            sendTerminateSequenceRequest(rmMessageContext);
-                        } else {
-                            //TODO REPORT ERROR
-                        }
-                        break;
-                    }
-                    case Constants.MSG_TYPE_ACKNOWLEDGEMENT: {
-                        System.out.println("INFO: SENDING ACKNOWLEDGEMENT ....\n");
-                        if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                && ((System.currentTimeMillis() - rmMessageContext
+                                    sendTerminateSequenceRequest(rmMessageContext);
+                                } else {
+                                    //TODO REPORT ERROR
+                                }
+                                break;
+                            }
+                        case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
+                            {
+                                System.out.println("INFO: SENDING ACKNOWLEDGEMENT ....\n");
+                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                                        && ((System.currentTimeMillis() - rmMessageContext
                                         .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                            sendAcknowldgement(rmMessageContext);
-                        } else {
-                            //TODO REPORT ERROR
-                        }
-                        break;
-                    }
-                    case Constants.MSG_TYPE_SERVICE_REQUEST: {
-                        System.out.println("INFO: SENDING REQUEST MESSAGE ....\n");
-                        if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                && ((System.currentTimeMillis() - rmMessageContext
+                                    sendAcknowldgement(rmMessageContext);
+                                } else {
+                                    //TODO REPORT ERROR
+                                }
+                                break;
+                            }
+                        case Constants.MSG_TYPE_SERVICE_REQUEST:
+                            {
+                                System.out.println("INFO: SENDING REQUEST MESSAGE ....\n");
+                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                                        && ((System.currentTimeMillis() - rmMessageContext
                                         .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                           sendServiceRequest(rmMessageContext);
-                        } else { //TODO REPORT ERROR
-                        }
-                        break;
-                    }
-                    case Constants.MSG_TYPE_SERVICE_RESPONSE: {
-                        System.out.println("INFO: SENDING RESPONSE MESSAGE ....\n");
-                        if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                && ((System.currentTimeMillis() - rmMessageContext
+                                    sendServiceRequest(rmMessageContext);
+                                } else { //TODO REPORT ERROR
+                                }
+                                break;
+                            }
+                        case Constants.MSG_TYPE_SERVICE_RESPONSE:
+                            {
+                                System.out.println("INFO: SENDING RESPONSE MESSAGE ....\n");
+                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                                        && ((System.currentTimeMillis() - rmMessageContext
                                         .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                            sendServiceResponse(rmMessageContext);
-                        } else {
-                            //TODO REPORT ERROR
-                        }
-                        break;
-                    }
+                                    sendServiceResponse(rmMessageContext);
+                                } else {
+                                    //TODO REPORT ERROR
+                                }
+                                break;
+                            }
                     }
 
                 }
@@ -149,41 +154,41 @@ public class Sender implements Runnable {
      * @param rmMessageContext
      */
     private void sendTerminateSequenceRequest(RMMessageContext rmMessageContext) {
-       SOAPEnvelope terSeqEnv=EnvelopeCreator.createTerminatSeqMessage(rmMessageContext);
-       Message terSeqMsg= new Message(terSeqEnv);       
-       rmMessageContext.getMsgContext().setRequestMessage(terSeqMsg);
+        SOAPEnvelope terSeqEnv = EnvelopeCreator.createTerminatSeqMessage(rmMessageContext);
+        Message terSeqMsg = new Message(terSeqEnv);
+        rmMessageContext.getMsgContext().setRequestMessage(terSeqMsg);
 
-            Call call;
-            try {
-                rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-                rmMessageContext
-                        .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
-                call = prepareCall(rmMessageContext);
-                call.invoke();
-                if (call.getResponseMessage() != null) {
-                    RMHeaders rmHeaders = new RMHeaders();
-                    rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
-                    rmMessageContext.setRMHeaders(rmHeaders);
-                    AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage()
-                            .getSOAPEnvelope());
-                    rmMessageContext.setAddressingHeaders(addrHeaders);
-                    rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
-                    IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
-                            .getMessageProcessor(rmMessageContext, storageManager);
-                    messagePrcessor.processMessage(rmMessageContext);
-                }
-            } catch (AxisFault e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SOAPException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+        Call call;
+        try {
+            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+            rmMessageContext
+                    .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+            call = prepareCall(rmMessageContext);
+            call.invoke();
+            if (call.getResponseMessage() != null) {
+                RMHeaders rmHeaders = new RMHeaders();
+                rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
+                rmMessageContext.setRMHeaders(rmHeaders);
+                AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage()
+                        .getSOAPEnvelope());
+                rmMessageContext.setAddressingHeaders(addrHeaders);
+                rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
+                IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
+                        .getMessageProcessor(rmMessageContext, storageManager);
+                messagePrcessor.processMessage(rmMessageContext);
             }
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SOAPException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-    
+
     }
 
     private void sendServiceResponse(RMMessageContext rmMessageContext) {
@@ -333,8 +338,7 @@ public class Sender implements Runnable {
                         AddressingHeaders addrHeaders = new AddressingHeaders(call
                                 .getResponseMessage().getSOAPEnvelope());
                         rmMessageContext.setAddressingHeaders(addrHeaders);
-                        rmMessageContext.getMsgContext().setResponseMessage(
-                                call.getResponseMessage());
+                        rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
                         IRMMessageProcessor messageProcessor = RMMessageProcessorIdentifier
                                 .getMessageProcessor(rmMessageContext, storageManager);
                         messageProcessor.processMessage(rmMessageContext);
@@ -352,9 +356,7 @@ public class Sender implements Runnable {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-            }
-
-            else {
+            } else {
                 try {
                     Call call = prepareCall(rmMessageContext);
                     //Send the createSequnceRequest Asynchronously.
@@ -370,11 +372,7 @@ public class Sender implements Runnable {
             }
 
         }
-        
-        
 
     }
-    
-    
 
 }
