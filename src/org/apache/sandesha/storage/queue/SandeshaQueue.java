@@ -113,6 +113,11 @@ public class SandeshaQueue {
                 if (resSeqHash == null)
                     throw new QueueException("Inconsistent queue");
                 resSeqHash.putNewMessage(msgCon);
+                
+                //if last message
+                if(msgCon.isLastMessage())
+                	resSeqHash.setLastMsg(msgCon.getMsgNumber());
+                	
             }
         }
 
@@ -702,6 +707,7 @@ public class SandeshaQueue {
         Iterator it = outgoingMap.keySet().iterator();
 
         String key = null;
+        
         while (it.hasNext()) {
             key = (String) it.next();
             Object obj = outgoingMap.get(key);
@@ -863,5 +869,55 @@ public class SandeshaQueue {
 
         return terminateMsg;
     }
+    
+    public void addSendMsgNo(String seqId,long msgNo){
+    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	
+        if (rsh == null) {
+            System.out.println("ERROR: SEQ IS NULL");
+        }
+        
+    	synchronized(rsh){
+    		rsh.addMsgToSendList(msgNo);
+    	}
+    }
+    
+    public boolean isSentMsg(String seqId,long msgNo){
+    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	
+        if (rsh == null) {
+            System.out.println("ERROR: SEQ IS NULL");
+        }
+        
+    	synchronized(rsh){
+    		return rsh.isMsgInSentList(msgNo);
+    	}   	
+    }
+    
+    public boolean hasLastMsgReceived(String seqId){
+    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	
+        if (rsh == null) {
+            System.out.println("ERROR: SEQ IS NULL");
+        }
+        
+        synchronized(rsh){
+        	return rsh.hasLastMsgReceived();
+        }        
+    }
+
+    public long getLastMsgNo(String seqId){
+    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	
+        if (rsh == null) {
+            System.out.println("ERROR: SEQ IS NULL");
+        }
+        
+        synchronized(rsh){
+        	return rsh.getLastMsgNumber();
+        } 
+    }
+    
+    
 }
 

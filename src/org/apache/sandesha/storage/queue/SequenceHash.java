@@ -45,6 +45,7 @@ public class SequenceHash {
 
     private boolean beingProcessedLock = false; //When true messages are
 
+
     // currently being processed.
 
     public SequenceHash(String sequenceId) {
@@ -236,4 +237,7 @@ public class SequenceHash {
         }
         return false;
     }
+    
+
+    
 }

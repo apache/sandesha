@@ -392,4 +392,35 @@ public class ClientStorageManager implements IStorageManager {
     public void insertFault(RMMessageContext rmMsgCtx) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+    
+    
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#addSentMsgNo(java.lang.String, long)
+	 */
+
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#addSendMsgNo(java.lang.String, long)
+	 */
+	public void addSendMsgNo(String seqId, long msgNo) {
+		accessor.addSendMsgNo(seqId,msgNo);
+
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#getLastMsgNo(java.lang.String)
+	 */
+	public long getLastMsgNo(String seqId) {
+		return accessor.getLastMsgNo(seqId);
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#hasLastMsgReceived(java.lang.String)
+	 */
+	public boolean hasLastMsgReceived(String seqId) {
+		return accessor.hasLastMsgReceived(seqId);
+	}
+	/* (non-Javadoc)
+	 * @see org.apache.sandesha.IStorageManager#isSentMsg(java.lang.String, long)
+	 */
+	public boolean isSentMsg(String seqId, long msgNo) {
+		return accessor.isSentMsg(seqId,msgNo);
+	}
 }

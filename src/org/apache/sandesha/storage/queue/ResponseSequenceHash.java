@@ -53,6 +53,10 @@ public class ResponseSequenceHash {
     private HashMap hash;
 
     private Vector markedAsDelete;
+    
+    private Vector sendMsgNoList;
+    
+    private long lastMsgNo = -1;
 
     private long nextAutoNumber; // key for storing messages.
     //--> USING AUTONUMBER FOR MESSAGENUMBERS
@@ -66,6 +70,8 @@ public class ResponseSequenceHash {
         markedAsDelete = new Vector();
         nextAutoNumber = 1; //This is the key for storing messages.
         outSeqApproved = false;
+        
+        sendMsgNoList = new Vector ();
     }
 
     /*
@@ -382,5 +388,33 @@ public class ResponseSequenceHash {
 
         return -1;
     }
+    
+    public void addMsgToSendList(long msgNo){
+    	sendMsgNoList.add( new Long(msgNo));
+    }
+    
+    public boolean isMsgInSentList(long msgNo){
+    	return sendMsgNoList.contains(new Long(msgNo));
+    }
+    
+    public boolean hasLastMsgReceived(){
+       if(lastMsgNo >0)
+       	   return true;
+
+       return false;
+    }
+
+    public long getLastMsgNumber(){
+    	if(lastMsgNo>0)
+    		return lastMsgNo;
+    	
+    	return -1;
+    }
+    
+    public void setLastMsg(long lastMsg){
+    	lastMsgNo = lastMsg;
+    }
+    
+
 
 }
