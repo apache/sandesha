@@ -35,6 +35,7 @@ public class RMMessageContext {
 	private AddressingHeaders addressingHeaders;
 	private RMHeaders rmHeaders;
 	private String outGoingAddress;
+	private int messageType;
 	
 
 	/**
@@ -161,6 +162,20 @@ public class RMMessageContext {
 	 */
 	public void setOutGoingAddress(String outGoingAddress) {
 		this.outGoingAddress = outGoingAddress;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getMessageType() {
+		return messageType;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setMessageType(int messageType) {
+		this.messageType = messageType;
 	}
 
 }
