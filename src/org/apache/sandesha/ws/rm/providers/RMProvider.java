@@ -32,6 +32,7 @@ import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.server.msgprocessors.FaultProcessor;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
+import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
@@ -56,6 +57,7 @@ public class RMProvider extends RPCProvider {
         System.out.println("RMProvider Received a SOAP REQUEST.....\n");
         RMProvider.log.info("RMProvider Received a SOAP REQUEST");
 
+
         IStorageManager storageManager = RMInitiator.init(client);
         storageManager.init();
 
@@ -63,14 +65,16 @@ public class RMProvider extends RPCProvider {
         rmMessageContext.setMsgContext(msgContext);
         try {
             MessageValidator.validate(rmMessageContext,client);
-        } catch (AxisFault af) {
-            FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
+        } catch (AxisFault af) { 
+        	FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
+           
             if (!faultProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
                 return;
             }
             return;
         }
+
 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
@@ -85,6 +89,7 @@ public class RMProvider extends RPCProvider {
         rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
        
         IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
+
         try {
             if (!rmMessageProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
@@ -93,6 +98,10 @@ public class RMProvider extends RPCProvider {
             rmEx.printStackTrace();
             RMProvider.log.error(rmEx);
         }
+        
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        sq.displayIncomingMap();
+        sq.displayOutgoingMap();
     }
 
     //This is used by the Client to set the
