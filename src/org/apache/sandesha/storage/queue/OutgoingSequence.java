@@ -17,11 +17,11 @@
 
 package org.apache.sandesha.storage.queue;
 
+import org.apache.axis.components.logger.LogFactory;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
-
 import java.util.*;
-
 
 /*
  * Created on Aug 4, 2004 at 5:08:29 PM
@@ -38,40 +38,23 @@ import java.util.*;
  */
 public class OutgoingSequence {
 
-    //following concepts was removed from highPriorityQueue.
-    //This was to reduce complexity. (Since here time is also taken into
-    // account)
-    //private long lastProcessed;
-    //private boolean hasMessagesToSend;
-
     private String sequenceId;
-
     private String outSequenceId;
-
     private boolean outSeqApproved;
-
     private HashMap hash;
-
     private Vector markedAsDelete;
-    
     private Vector sendMsgNoList;
-    
     private long lastMsgNo = -1;
-
     private long nextAutoNumber; // key for storing messages.
-    //--> USING AUTONUMBER FOR MESSAGENUMBERS
-    // private long nextMessageNumber;
-    
+    private static final Log log = LogFactory.getLog(OutgoingSequence.class.getName());
+
     public OutgoingSequence(String sequenceId) {
-        //lastProcessed = 0;
-        //hasMessagesToSend = false;
         this.sequenceId = sequenceId;
         hash = new HashMap();
         markedAsDelete = new Vector();
         nextAutoNumber = 1; //This is the key for storing messages.
         outSeqApproved = false;
-        
-        sendMsgNoList = new Vector ();
+        sendMsgNoList = new Vector();
     }
 
     /*
@@ -109,7 +92,6 @@ public class OutgoingSequence {
         Long key = new Long(nextAutoNumber);
         Object obj = hash.put(key, msg);
         increaseAutoNo();
-        //refreshHasProcessableMessages();
         return obj;
     }
 
@@ -132,52 +114,26 @@ public class OutgoingSequence {
 
         if (obj != null)
             removed = true;
-
         return removed;
     }
-
-    /**
-     * Returns the key of the next message to be sent.
-     */
-    /*
-     * public long getNextMessageKeyToSend(){
-     * 
-     * long id = lastProcessed+1;
-     * 
-     * return id; }
-     */
 
     /**
      * Returns the next deliverable message if has any. Otherwise returns null.
      */
     public RMMessageContext getNextMessageToSend() {
-        //Long nextKey = new Long (lastProcessed+1);
-        //RMMessageContext msg = (RMMessageContext) hash.get(nextKey);
-
-        //RMMessageContext msg = null;
         RMMessageContext minMsg = null;
         Iterator keys = hash.keySet().iterator();
 
         whileLoop: while (keys.hasNext()) {
             RMMessageContext tempMsg;
             tempMsg = (RMMessageContext) hash.get(keys.next());
-            
-            //EDITED FOR MARKASDELETE
             Long msgNo = new Long(tempMsg.getMsgNumber());
             if (markedAsDelete.contains(msgNo)) {
-                System.out.println("mark as delete contains " + msgNo);
                 continue;
             }
-            //System.out.println("mark as delete does not contains "+msgNo);
-            
-            //END - EDITED FOR MARKASDELETE
-            
             long lastSentTime = tempMsg.getLastSentTime();
-            //System.out.println("last sent time: "+lastSentTime);
             Date d = new Date();
             long currentTime = d.getTime();
-            //System.out.println("current time: "+currentTime);
-            // System.out.println("difference: "+(currentTime-lastSentTime));
             if (currentTime >= lastSentTime + Constants.RETRANSMISSION_INTERVAL) {
                 if (minMsg == null)
                     minMsg = tempMsg;
@@ -200,31 +156,6 @@ public class OutgoingSequence {
         return minMsg;
     }
 
-    /**
-     * Gives all the deliverable messages of this sequence. Resturns a vector.
-     */
-    /*
-     * public Vector getNextMessagesToSend(){
-     * 
-     * boolean done = false; Vector messages = new Vector();
-     * 
-     * while(!done){ Long nextKey = new Long(lastProcessed+1); Object obj =
-     * hash.get(nextKey); if(obj!=null){ messages.add(obj);
-     * incrementProcessedCount(); }else{ done=true; //To exit the loop. } }
-     * refreshHasProcessableMessages();
-     * 
-     * return messages; }
-     */
-
-    /*
-     * private void incrementProcessedCount(){ lastProcessed++; }
-     */
-
-    /*
-     * private void refreshHasProcessableMessages(){ Long nextKey = new
-     * Long(lastProcessed+1); hasMessagesToSend = hash.containsKey(nextKey); }
-     */
-
     public boolean hasMessage(Long key) {
         Object obj = hash.get(key);
 
@@ -234,10 +165,7 @@ public class OutgoingSequence {
     public void clearSequence(boolean yes) {
         if (!yes)
             return;
-
         hash.clear();
-        //lastProcessed = 0;
-        //hasMessagesToSend = false;
         nextAutoNumber = 1;
         outSeqApproved = false;
         outSequenceId = null;
@@ -260,10 +188,8 @@ public class OutgoingSequence {
     //Deleting returns the deleted message.
     public RMMessageContext deleteMessage(Long msgId) {
         RMMessageContext msg = (RMMessageContext) hash.get(msgId);
-
         if (msg == null)
             return null;
-
         hash.remove(msgId);
         return msg;
     }
@@ -272,8 +198,7 @@ public class OutgoingSequence {
         if (hash.containsKey(messageNo)) {
             markedAsDelete.add(messageNo);
             String msgId = ((RMMessageContext) hash.get(messageNo)).getMessageID();
-            System.out.println("INFO: Marking outgoing message deleted : msgId "
-                    + msgId);
+            log.info("INFO: Marking outgoing message deleted : msgId " + msgId);
             return true;
         }
         return false;
@@ -285,27 +210,22 @@ public class OutgoingSequence {
 
     public boolean isMessagePresent(String msgId) {
         boolean b = false;
-
         b = hash.containsKey(msgId);
         return b;
     }
 
     public boolean hasMessageWithId(String msgId) {
-        //boolean b = false;
-        
         Iterator it = hash.keySet().iterator();
         while (it.hasNext()) {
 
             RMMessageContext msg = (RMMessageContext) hash.get(it.next());
             if (msg.getMessageID().equals(msgId))
                 return true;
-
         }
         return false;
     }
 
     public Vector getReceivedMsgNumbers() {
-
         Vector result = new Vector();
         Iterator it = hash.keySet().iterator();
 
@@ -315,13 +235,11 @@ public class OutgoingSequence {
             long l = msg.getMsgNumber();
             result.add(new Long(l));
         }
-
         return result;
     }
 
     public void setResponseReceived(String msgID) {
         Iterator it = hash.keySet().iterator();
-
         while (it.hasNext()) {
             RMMessageContext msg = (RMMessageContext) hash.get(it.next());
             if (msg.getMessageID().equals(msgID))
@@ -331,7 +249,6 @@ public class OutgoingSequence {
 
     public void setAckReceived(String msgID) {
         Iterator it = hash.keySet().iterator();
-
         while (it.hasNext()) {
             RMMessageContext msg = (RMMessageContext) hash.get(it.next());
             if (msg.getMessageID().equals(msgID))
@@ -340,12 +257,12 @@ public class OutgoingSequence {
     }
 
     public void setAckReceived(long msgNo) {
-
         RMMessageContext msg = (RMMessageContext) hash.get(new Long(msgNo));
         if (msg != null) {
             msg.setAckReceived(true);
-        } else
-            System.out.println("ERROR: MESSAGE IS NULL IN ResponseSeqHash");
+        } else {
+            log.error("ERROR: MESSAGE IS NULL IN ResponseSeqHash");
+        }
 
     }
 
@@ -369,8 +286,8 @@ public class OutgoingSequence {
                     return false;
                 }
             }
-
             return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -385,36 +302,33 @@ public class OutgoingSequence {
                 return msg.getMsgNumber();
             }
         }
+        return -1;
+    }
+
+    public void addMsgToSendList(long msgNo) {
+        sendMsgNoList.add(new Long(msgNo));
+    }
+
+    public boolean isMsgInSentList(long msgNo) {
+        return sendMsgNoList.contains(new Long(msgNo));
+    }
+
+    public boolean hasLastMsgReceived() {
+        if (lastMsgNo > 0)
+            return true;
+
+        return false;
+    }
+
+    public long getLastMsgNumber() {
+        if (lastMsgNo > 0)
+            return lastMsgNo;
 
         return -1;
     }
-    
-    public void addMsgToSendList(long msgNo){
-    	sendMsgNoList.add( new Long(msgNo));
-    }
-    
-    public boolean isMsgInSentList(long msgNo){
-    	return sendMsgNoList.contains(new Long(msgNo));
-    }
-    
-    public boolean hasLastMsgReceived(){
-       if(lastMsgNo >0)
-       	   return true;
 
-       return false;
+    public void setLastMsg(long lastMsg) {
+        lastMsgNo = lastMsg;
     }
-
-    public long getLastMsgNumber(){
-    	if(lastMsgNo>0)
-    		return lastMsgNo;
-    	
-    	return -1;
-    }
-    
-    public void setLastMsg(long lastMsg){
-    	lastMsgNo = lastMsg;
-    }
-    
-
 
 }

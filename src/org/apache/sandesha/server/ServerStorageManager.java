@@ -39,9 +39,7 @@ public class ServerStorageManager implements IStorageManager {
 
     protected static Log log = LogFactory.getLog(ServerStorageManager.class
             .getName());
-
     private String tempSeqId = null; // used by getNextMessageToProcess();
-
     ISandeshaDAO accessor;
 
     public ServerStorageManager() {
@@ -76,7 +74,6 @@ public class ServerStorageManager implements IStorageManager {
 
     public void setAcknowledged(String seqID, long msgNumber) {
         //TODO decide this in implementing the ServerSender.
-
         accessor.moveOutgoingMessageToBin(seqID, new Long(msgNumber));
     }
 
@@ -103,39 +100,18 @@ public class ServerStorageManager implements IStorageManager {
      */
     public RMMessageContext getNextMessageToSend() {
         RMMessageContext msg;
-
         msg = accessor.getNextPriorityMessageContextToSend();
-
         if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
-
-        //if(msg==null){
-        //    msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
-        //}
-
         return msg;
 
     }
-
-    /**
-     * This is used to add a new message to the out queue. Will be used by
-     * various processors.
-     */
-    /*
-     * public void addMessageToOutQueue(RMMessageContext rmMessageContext) {
-     * ISandeshaDAO accessor = SandeshaDAOFactory.getStorageAccessor(
-     * Constants.SERVER_QUEUE_ACCESSOR); boolean result =
-     * accessor.addOutQueueMessage(rmMessageContext);
-     * 
-     * if(!result) log.error("Message was not added to the out queue"); }
-     */
 
     /**
      * Will be used to add a new Sequence Hash to the In Queue.
      */
     public void addSequence(String sequenceId) {
         boolean result = accessor.addIncomingSequence(sequenceId);
-
         if (!result)
             log.error("Sequence was not created correcly in the in queue");
     }
@@ -146,9 +122,7 @@ public class ServerStorageManager implements IStorageManager {
      */
     public Map getListOfMessageNumbers(String sequenceID) {
         Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(sequenceID);
-
         Iterator it = st.iterator();
-
         //To find the largest id present
         long largest = 0;
         while (it.hasNext()) {
@@ -251,24 +225,15 @@ public class ServerStorageManager implements IStorageManager {
         boolean exists = accessor.isOutgoingSequenceExists(sequenceId);
         if (!exists)
             accessor.addOutgoingSequence(sequenceId);
-
         accessor.addMessageToOutgoingSequence(sequenceId, msg);
 
     }
 
     public void insertIncomingMessage(RMMessageContext rmMessageContext) {
-        //No need to use this property
-        //RMHeaders rmHeaders =
-        //	(RMHeaders) rmMessageContext.getMsgContext().getProperty(
-        //		org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
-
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-
         String sequenceId = rmHeaders.getSequence().getIdentifier()
                 .getIdentifier();
-
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
-
         if (!exists)
             addSequence(sequenceId); //Creating new sequence
 
@@ -365,32 +330,12 @@ public class ServerStorageManager implements IStorageManager {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#hasLastMsgNo(java.lang.String)
-	 */
-	public boolean hasLastMsgNo(String seq) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 	
-	
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#addSendMsgNo(java.lang.String, long)
-	 */
 	public void addSendMsgNo(String seqId, long msgNo) {
 		accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId),msgNo);
 
 	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#hasLastMsgReceived(java.lang.String)
-	 */
-	public boolean hasLastMsgReceived(String seqId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#isSentMsg(java.lang.String, long)
-	 */
+
 	public boolean isSentMsg(String seqId, long msgNo) {
 		return accessor.isSentMsg(accessor.getSequenceOfOutSequence(seqId) ,msgNo);
 
@@ -421,4 +366,21 @@ public class ServerStorageManager implements IStorageManager {
 
         return msg.getSequenceID();
     }
+    
+	public boolean hasLastOutgoingMsgReceived(String seqId) {
+		return accessor.hasLastOutgoingMsgReceived(seqId);
+	}
+	
+	public long getLastOutgoingMsgNo(String seqId) {
+		return accessor.getLastOutgoingMsgNo(seqId);
+	}
+	
+    public long getLastIncomingMsgNo(String seqId) {
+        return accessor.getLastIncomingMsgNo(seqId);
+    }
+
+    public boolean hasLastIncomingMsgReceived(String seqId) {
+        return accessor.hasLastIncomingMsgReceived(seqId);
+    }
+
 }

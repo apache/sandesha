@@ -119,7 +119,6 @@ public interface IStorageManager {
 
     public boolean isAllSequenceComplete();
 
-
     public boolean isResponseComplete(String sequenceID);
 
     public void terminateSequence(String sequenceID);
@@ -132,9 +131,13 @@ public interface IStorageManager {
     
     public boolean isSentMsg(String seqId,long msgNo);
     
-    public boolean hasLastMsgReceived(String seqId);
+    public boolean hasLastOutgoingMsgReceived(String seqId);
 
-    public long getLastMsgNo(String seqId);
+    public long getLastOutgoingMsgNo(String seqId);
+    
+    public boolean hasLastIncomingMsgReceived(String seqId);
+
+    public long getLastIncomingMsgNo(String seqId);
 
     public void addOutgoingSequence(String seqId);
 

@@ -49,19 +49,13 @@ public interface ISandeshaDAO {
 
     RMMessageContext getNextMsgContextToProcess(String sequenceId);
 
-    //RMMessageContext getNextResponseMsgContextToSend(String sequenceId);
-    //String getRandomResponseSeqIdToSend();
-    RMMessageContext getNextOutgoingMsgContextToSend(); //Used this instead of
-
-    // above 2.
+    RMMessageContext getNextOutgoingMsgContextToSend();
 
     String getRandomSeqIdToProcess();
 
     Set getAllReceivedMsgNumsOfIncomingSeq(String sequenceId);
 
     Set getAllReceivedMsgNumsOfOutgoingSeq(String sequenceId);
-
-    // boolean hasNewMessages();
 
     void setOutSequence(String sequenceId, String outSequenceId);
 
@@ -97,11 +91,24 @@ public interface ISandeshaDAO {
     
     public boolean isSentMsg(String seqId,long msgNo);
     
-    public boolean hasLastMsgReceived(String seqId);
+    public boolean hasLastOutgoingMsgReceived(String seqId);
 
-    public long getLastMsgNo(String seqId);
+    public long getLastOutgoingMsgNo(String seqId);
+    
+    public boolean hasLastIncomingMsgReceived(String seqId);
+
+    public long getLastIncomingMsgNo(String seqId);
 
     public void addRequestedSequence(String seqId);
 
     public boolean isRequestedSeqPresent(String seqId);
+
+    //The client side will not be able to have sequenceId as a key for storing request messages.
+    //Since it may be not known when the user adds first message.
+    //Two methods below will be used to get this key from the actual sequenceid.
+    public String getKeyFromIncomingSequenceId(String incomingSeqID); 
+    
+    public String getKeyFromOutgoingSequenceId(String outgoingSeqID); 
+    
+    
 }

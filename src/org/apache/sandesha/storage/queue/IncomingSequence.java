@@ -17,9 +17,11 @@
 
 package org.apache.sandesha.storage.queue;
 
-
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.RelatesTo;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 
 import java.util.*;
 
@@ -35,22 +37,16 @@ import java.util.*;
 public class IncomingSequence {
 
     private long lastProcessed;
-
     private boolean hasProcessableMessages;
-
     private String sequenceId;
-
-    //private String outSequenceId;
     private HashMap hash;
-
     private boolean beingProcessedLock = false; //When true messages are
-
-
-    // currently being processed.
+    private long lastMsgNo = -1;
+    
+    private static final Log log = LogFactory.getLog(IncomingSequence.class.getName());
 
     public IncomingSequence(String sequenceId) {
         lastProcessed = 0;
-        //cacheBottom = 1;
         hasProcessableMessages = false;
         this.sequenceId = sequenceId;
         hash = new HashMap();
@@ -72,30 +68,23 @@ public class IncomingSequence {
      * adds the message to map. Also adds a record to cache if needed.
      */
     public Object putNewMessage(Long key, RMMessageContext value) {
-
         Object obj = hash.put(key, value);
-        //addToCacheIfNeeded(key);
         refreshHasProcessableMessages();
         return obj;
     }
 
     public boolean removeMessage(long msgId) {
-        //TODO: Add messageremoving code if needed.
         boolean removed = false;
-
         Long key = new Long(msgId);
         Object obj = hash.remove(key);
 
         if (obj != null)
             removed = true;
-
         return removed;
     }
 
     public long getNextMessageIdToProcess() {
-
         long id = lastProcessed + 1;
-
         return id;
     }
 
@@ -106,8 +95,7 @@ public class IncomingSequence {
             incrementProcessedCount();
             refreshHasProcessableMessages();
         } else {
-            setProcessLock(false); // Not a must. (det done in
-            // refreshHasProcessableMessages();)
+            setProcessLock(false);
         }
 
         return msg;
@@ -131,7 +119,6 @@ public class IncomingSequence {
             }
         }
         refreshHasProcessableMessages();
-
         return messages;
     }
 
@@ -144,20 +131,18 @@ public class IncomingSequence {
         hasProcessableMessages = hash.containsKey(nextKey);
 
         if (!hasProcessableMessages) //Cant be being procesed if no messages to
-        // process.
+            // process.
             setProcessLock(false);
     }
 
     public boolean hasMessage(Long msgId) {
         Object obj = hash.get(msgId);
-
         return (!(obj == null));
     }
 
     public void clearSequence(boolean yes) {
         if (!yes)
             return;
-
         hash.clear();
         lastProcessed = 0;
         hasProcessableMessages = false;
@@ -181,7 +166,6 @@ public class IncomingSequence {
             return null;
 
         return msg.getMessageID();
-
     }
 
     //Only for client.
@@ -204,18 +188,6 @@ public class IncomingSequence {
         }
 
         return msgToSend;
-        
-        /*Long nextKey = new Long(lastProcessed + 1);
-        RMMessageContext msg = (RMMessageContext) hash.get(nextKey);
-        if (msg != null) {
-            incrementProcessedCount();
-            refreshHasProcessableMessages();
-        } else {
-            setProcessLock(false); // Not a must. (det done in
-            // refreshHasProcessableMessages();)
-        }
-
-        return msg;*/
     }
 
     public boolean isMessagePresent(String msgId) {
@@ -226,8 +198,6 @@ public class IncomingSequence {
     }
 
     public boolean hasMessageWithId(String msgId) {
-        //boolean b = false;
-        
         Iterator it = hash.keySet().iterator();
 
         while (it.hasNext()) {
@@ -237,7 +207,23 @@ public class IncomingSequence {
         }
         return false;
     }
-    
 
-    
+    public boolean hasLastMsgReceived() {
+        if (lastMsgNo > 0)
+            return true;
+
+        return false;
+    }
+
+    public long getLastMsgNumber() {
+        if (lastMsgNo > 0)
+            return lastMsgNo;
+
+        return -1;
+    }
+
+    public void setLastMsg(long lastMsg) {
+        lastMsgNo = lastMsg;
+    }
+
 }

@@ -73,8 +73,8 @@ public final class MessageValidator {
             }
             if (sequence.getMessageNumber() != null) {
                 long msgNo = sequence.getMessageNumber().getMessageNumber();
-                if (storageMgr.hasLastMsgReceived(sequence.getIdentifier().getIdentifier())) {
-                    long lastMsg = storageMgr.getLastMsgNo(seqId);
+                if (storageMgr.hasLastIncomingMsgReceived(sequence.getIdentifier().getIdentifier())) {
+                    long lastMsg = storageMgr.getLastIncomingMsgNo(seqId);
                     if (msgNo > lastMsg)
                         throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULR_LAST_MSG_NO_EXCEEDED), Constants.FaultMessages.LAST_MSG_NO_EXCEEDED, null, null);
                 }

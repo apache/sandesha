@@ -303,6 +303,18 @@ public interface Constants {
     public static final double MAX_MSG_NO=18446744073709551615d;
 
     public static final String UUID="uuid:";
+    
+    //Constants related to the queue.
+    public interface Queue{
+       public static final String ADD_ERROR = "Error in adding message";
+       public static final String QUEUE_INCONSIS= "Inconsistent queue";
+       public static final String MESSAGE_EXISTS= "Message already exists";
+       public static final String SEQUENCE_NOTPRESENT= "Sequence not present";
+       public static final String SEQUENCE_ABSENT = "Sequence id does not exist";
+       public static final String RESPONSE_SEQ_NULL = "ERROR: RESPONSE SEQ IS NULL"; 
+       public static final String SEQUENCE_ID_NULL = "Sequence Id is null";
+       public static final String MESSAGE_ID_NULL = "Message is null";
+    }
 
 
 }
