@@ -96,6 +96,7 @@ public class Sender implements Runnable {
                         break;
                     }
                     case Constants.MSG_TYPE_TERMINATE_SEQUENCE: {
+                        //TODO TODO
                         break;
                     }
                     case Constants.MSG_TYPE_ACKNOWLEDGEMENT: {
@@ -111,133 +112,24 @@ public class Sender implements Runnable {
 
                     }
                     case Constants.MSG_TYPE_SERVICE_REQUEST: {
-
-                        //Send the response message.
-                        //Here we need to figure out a mechanism to load the
-                        // response handlers
-                        //that are scheduled to run in the original response
-                        // path.
-                        //Need to re-send messsages if we didn't get a
-                        // response.
-                        //RMMessageContext a field to store the long
-                        // lastProcessedTime
-                        //Another field to hold retransmission count.
+                       
                         System.out.println("SENDING REQUEST MESSAGE .....\n");
-                                               
                         SOAPEnvelope requestEnvelope = null;
 
                         if (rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT) {
                             if ((System.currentTimeMillis() - rmMessageContext
                                     .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL) {
-
-                                //TODO
-                                //We should do this only once and then need to
-                                //Save the respones message.
-                                //if (rmMessageContext.getReTransmissionCount()
-                                // == 0) {
-                                //Need to create the response envelope.
-                                requestEnvelope = EnvelopeCreator
-                                        .createServiceRequestEnvelope(rmMessageContext);
-                                rmMessageContext.getMsgContext()
-                                        .setRequestMessage(
-                                                new Message(requestEnvelope));
-                                //System.out.println(requestEnvelope);
-
                                 try {
-                                    Service service = new Service();
-                                    Call call = (Call) service.createCall();
-                                    call
-                                            .setTargetEndpointAddress(rmMessageContext
-                                                    .getOutGoingAddress());
-
-                                    //NOTE: WE USE THE REQUEST MESSAGE TO SEND
-                                    // THE RESPONSE.
-
-                                    call.setRequestMessage(rmMessageContext
-                                            .getMsgContext()
-                                            .getRequestMessage());
-                                    //System.out.println(rmMessageContext.getMsgContext().getResponseMessage().getSOAPPartAsString());
-                                    try {
-                                        rmMessageContext
-                                                .setLastPrecessedTime(System
-                                                        .currentTimeMillis());
-                                        rmMessageContext
-                                                .setReTransmissionCount(rmMessageContext
-                                                        .getReTransmissionCount() + 1);
-                                        //We are not expecting the ack over the
-                                        // same HTTP connection.
-                                        call.invoke();
-                                        //System.out.println(call.getResponseMessage().getSOAPPartAsString());
-                                    } catch (AxisFault e) {
-                                        e.printStackTrace();
-                                        break;
-                                    }
-                                    
-                                    
-                                    
-                                    //-----------------------------------------------------------
-                                    
-                                    
-                                    //Check whther we have a response. If so then use to set the
-                                    // response.
-                                    if (call.getResponseMessage() != null) {
-                                        try{
-                                        
-                                        RMHeaders rmHeaders = new RMHeaders();
-                                        rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
-                                        rmMessageContext.setRMHeaders(rmHeaders);
-                                               
-                                       // AddressingHeaders addrHeaders=(AddressingHeaders) resMsgCtx.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
-                                        AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage().getSOAPEnvelope());
-                                        rmMessageContext.setAddressingHeaders(addrHeaders);
-                                        
-                                        
-                                        ////TOTOTOOTOTOOTOTO
-                                        
-                                  
-                                        rmMessageContext.getMsgContext().setResponseMessage(
-                                                call.getResponseMessage());
-                                        IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
-                                                .getMessageProcessor(rmMessageContext, storageManager);
-                                        System.out.println(messagePrcessor);                  
-                                        if (messagePrcessor instanceof FaultProcessor) {
-                                         
-                                            //process the fault.
-                                            //For now just ignore.
-                                            System.out.println("Fault for the CreateSequenceRequest");
-                                            //For testing only.
-                                            //storageManager.setApprovedOutSequence(
-                                            //        "abcdefghijk", "1233abcdefghijk");
-                                        } else if (messagePrcessor instanceof CompositeProcessor) {
-                                         
-                                        
-                                                messagePrcessor.processMessage(rmMessageContext);
-                                          
-                                        }
-                                        }catch (AxisFault e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
-                                        } catch (SOAPException e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
-                                        } catch (Exception e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    //-----------------------------------------------------------
-                                    
-                                    
-
-                                } catch (ServiceException e1) {
-                                    System.out
-                                            .println("(!)(!)(!)Cannot send the Response message.....");
-                                    e1.printStackTrace();
-                                    break;
+                                    sendServiceRequest(rmMessageContext);
+                                } catch (RMException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
                                 }
+                            
                             }
                             break;
                         }
+                        break;
 
                     }
                     case Constants.MSG_TYPE_SERVICE_RESPONSE: {
@@ -343,75 +235,57 @@ public class Sender implements Runnable {
 
     private void sendCreateSequenceRequest(RMMessageContext rmMessageContext)
             throws RMException {
-        try {
-            System.out.println("INFO: Sending Create Sequence Request Message ....");
-            //Send the message.
-            //may get the reply back to here.
-            Service service = new Service();
-            Call call = (Call) service.createCall();
-            call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
-            
+        
+            System.out
+                .println("INFO: Sending Create Sequence Request Message ....");
+        if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
+            System.out.println("NULL REQUEST MESSAGE");
+            throw new RMException("NULL REQUEST MESSAGE");
+        } else {
+            //Prepare the Call
+
             //Need the addressing header in the return path.
-            //Need to add the RMServerRequestHandler but this shoud be check again.
+            //Need to add the RMServerRequestHandler but this shoud be check
+            // again.
             //We may not need to use this atall.
             //SimpleChain sc=new SimpleChain();
             //sc.addHandler(new ClientSyncResponseHandler());
             //sc.addHandler(new AddressingHandler());
             //call.setClientHandlers(null,sc);
-            
-            if (rmMessageContext.getMsgContext().getRequestMessage() == null)
-                System.out.println("NULL REQUEST MESSAGE");
-            
-            call.setRequestMessage(rmMessageContext.getMsgContext().getRequestMessage());
-            try {
-                //Send the createSequnceRequest.
-                call.invoke();
-            } catch (AxisFault e) {
-                e.printStackTrace();
-                throw new RMException(
-                        "ERROR : Sending the create sequence request message");
-            }
-            
-            //Check whther we have a response. If so then use to set the
-            // response.
-            if (call.getResponseMessage() != null) {
-                try{
-                
-                RMHeaders rmHeaders = new RMHeaders();
-                rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
-                rmMessageContext.setRMHeaders(rmHeaders);
-                       
-               // AddressingHeaders addrHeaders=(AddressingHeaders) resMsgCtx.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
-                AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage().getSOAPEnvelope());
-                rmMessageContext.setAddressingHeaders(addrHeaders);
-                
-                
-                ////TOTOTOOTOTOOTOTO
-                
-          
-                rmMessageContext.getMsgContext().setResponseMessage(
-                        call.getResponseMessage());
-                IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
-                        .getMessageProcessor(rmMessageContext, storageManager);
-                System.out.println(messagePrcessor);                  
-                if (messagePrcessor instanceof FaultProcessor) {
-                 
-                    //process the fault.
-                    //For now just ignore.
-                    System.out.println("Fault for the CreateSequenceRequest");
-                    //For testing only.
-                    //storageManager.setApprovedOutSequence(
-                    //        "abcdefghijk", "1233abcdefghijk");
-                } else if (messagePrcessor instanceof CreateSequenceResponseProcessor) {
-                 
-                
+            //call.setRequestMessage(rmMessageContext.getMsgContext().getRequestMessage());
+
+            if (rmMessageContext.getSync()) {
+                Call call;
+                try {
+                    call = prepareCall(rmMessageContext);
+                    //Send the createSequnceRequest Synchronously
+                    call.invoke();
+
+                    if (call.getResponseMessage() != null) {
+
+                        RMHeaders rmHeaders = new RMHeaders();
+                        rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
+                        rmMessageContext.setRMHeaders(rmHeaders);
+
+                        // AddressingHeaders addrHeaders=(AddressingHeaders)
+                        // resMsgCtx.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+                        AddressingHeaders addrHeaders = new AddressingHeaders(
+                                call.getResponseMessage().getSOAPEnvelope());
+                        rmMessageContext.setAddressingHeaders(addrHeaders);
+
+                        rmMessageContext.getMsgContext().setResponseMessage(
+                                call.getResponseMessage());
+                        IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
+                                .getMessageProcessor(rmMessageContext,
+                                        storageManager);
+
                         messagePrcessor.processMessage(rmMessageContext);
-                  
-                }
-                }catch (RMException rmEx) {
+                        System.out.println(messagePrcessor);
+                    }
+                } catch (RMException rmEx) {
                     throw new RMException(
-                    "ERROR: Processing async create sequence response ....");
-        } catch (AxisFault e) {
+                            "ERROR: Processing async create sequence response ....");
+                } catch (AxisFault e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (SOAPException e) {
@@ -423,56 +297,162 @@ public class Sender implements Runnable {
                 }
             }
 
-        } catch (ServiceException e1) {
-            throw new RMException(
-                    "ERROR: Service exception when sending the create sequence request ....");
+            else {
+                try {
+                    Call call = prepareCall(rmMessageContext);
+                    //Send the createSequnceRequest Asynchronously.
+                    call.invoke();
+                } catch (AxisFault e) {
+                    e.printStackTrace();
+                    throw new RMException(
+                            "ERROR : Sending the create sequence request message");
+                } catch (ServiceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            }
 
         }
+
     }
 
     private void sendCreateSequenceResponse(RMMessageContext rmMessageContext)
             throws RMException {
-        try {
-            System.out.println("INFO: Sending Create sequence response ....");
-
-            Service service = new Service();
-            Call call = (Call) service.createCall();
-            call
-                    .setTargetEndpointAddress(rmMessageContext
-                            .getOutGoingAddress());
-            if (rmMessageContext.getMsgContext().getResponseMessage() == null)
+      //Here there is no concept of sending synchronous CreateSequenceRequest resposne.
+        if (rmMessageContext.getMsgContext().getResponseMessage() == null){
                 System.out.println("NULL RESPONSE MESSAGE");
-
-            call.setRequestMessage(rmMessageContext.getMsgContext()
-                    .getResponseMessage());
-            call.invoke();
-        } catch (ServiceException e1) {
-            throw new RMException(
-                    "ERROR: Service exception when sending the create sequence response");
-        } catch (AxisFault e) {
-            e.printStackTrace();
+                throw new RMException("NULL RESPONSE MESSAGE");
+            }else{
+                try{ 
+                Call call=prepareCall(rmMessageContext);
+                call.setRequestMessage(rmMessageContext.getMsgContext()
+                        .getResponseMessage());
+              
+                call.invoke();
+            } catch (ServiceException e1) {
+                throw new RMException(
+                        "ERROR: Service exception when sending the create sequence response");
+            } catch (AxisFault e) {
+                e.printStackTrace();
+            }
+            
+            }
+            	
         }
-    }
+            
 
     private void sendAcknowldgement(RMMessageContext rmMessageContext)
             throws RMException {
-        try {
-            System.out.println("INFO: Sending Async Acknowledgement ....");
+//      Here there is no concept of sending synchronous CreateSequenceRequest resposne.
+        if (rmMessageContext.getMsgContext().getResponseMessage() == null){
+                System.out.println("NULL RESPONSE MESSAGE");
+                throw new RMException("NULL RESPONSE MESSAGE");
+            }else{
+                try{ 
+                Call call=prepareCall(rmMessageContext);
+                call.setRequestMessage(rmMessageContext.getMsgContext()
+                        .getResponseMessage());
+              
+                call.invoke();
+            } catch (ServiceException e1) {
+                throw new RMException(
+                        "ERROR: Service exception when sending the create sequence response");
+            } catch (AxisFault e) {
+                e.printStackTrace();
+            }
+            
+            }
+    }
+        
+        private Call prepareCall(RMMessageContext rmMessageContext) throws ServiceException{
             Service service = new Service();
             Call call = (Call) service.createCall();
-            call
-                    .setTargetEndpointAddress(rmMessageContext
-                            .getOutGoingAddress());
-            call.setRequestMessage(rmMessageContext.getMsgContext()
-                    .getResponseMessage());
-            call.invoke();
-        } catch (ServiceException e1) {
-            throw new RMException("ERROR: Sending the acknowledgement message");
-
-        } catch (AxisFault e) {
-            e.printStackTrace();
-
+            call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
+            call.setRequestMessage(rmMessageContext.getMsgContext().getRequestMessage());
+            return call;
         }
-    }
+        
+        
+        private void sendServiceRequest(RMMessageContext rmMessageContext)  throws RMException {
+           System.out
+                    .println("INFO: Sending Create Sequence Request Message ....");
+            if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
+                System.out.println("NULL REQUEST MESSAGE");
+                throw new RMException("NULL REQUEST MESSAGE");
+            } else {
+                SOAPEnvelope requestEnvelope = null;   
+                //Need to create the response envelope.
+                requestEnvelope = EnvelopeCreator.createServiceRequestEnvelope(rmMessageContext);
+                rmMessageContext.getMsgContext().setRequestMessage( new Message(requestEnvelope));
+                rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+                rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+
+                if (rmMessageContext.getSync()) {
+                    Call call;
+                    try {
+                  
+                        call = prepareCall(rmMessageContext);
+                        //Send the createSequnceRequest Synchronously
+                        call.invoke();
+
+                        if (call.getResponseMessage() != null) {
+
+                            RMHeaders rmHeaders = new RMHeaders();
+                            rmHeaders.fromSOAPEnvelope(call.getResponseMessage()
+                                    .getSOAPEnvelope());
+                            rmMessageContext.setRMHeaders(rmHeaders);
+
+                            // AddressingHeaders addrHeaders=(AddressingHeaders)
+                            // resMsgCtx.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+                            AddressingHeaders addrHeaders = new AddressingHeaders(
+                                    call.getResponseMessage().getSOAPEnvelope());
+                            rmMessageContext.setAddressingHeaders(addrHeaders);
+
+                            rmMessageContext.getMsgContext().setResponseMessage(
+                                    call.getResponseMessage());
+                            IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
+                                    .getMessageProcessor(rmMessageContext,
+                                            storageManager);
+
+                            messagePrcessor.processMessage(rmMessageContext);
+                            System.out.println(messagePrcessor);
+                        }
+                    } catch (RMException rmEx) {
+                        throw new RMException(
+                                "ERROR: Processing async create sequence response ....");
+                    } catch (AxisFault e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (SOAPException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+
+                else {
+                    try {
+                        Call call = prepareCall(rmMessageContext);
+                        //Send the createSequnceRequest Asynchronously.
+                        call.invoke();
+                    } catch (AxisFault e) {
+                        e.printStackTrace();
+                        throw new RMException(
+                                "ERROR : Sending the create sequence request message");
+                    } catch (ServiceException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+
+            
+        }
+    
 
 }
