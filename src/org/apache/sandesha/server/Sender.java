@@ -43,10 +43,20 @@ public class Sender implements Runnable {
 			boolean hasMessages = true;
 			do {
 				RMMessageContext rmMessageContext = storageManager.getNextMessageToSend();
-				if (rmMessageContext == null)
+				if (rmMessageContext== null){
 					hasMessages = false;
+					System.out.println("rmMessageContext == null");
+				}
+					
 				else {
 					//Send the message.
+					
+					if(rmMessageContext.getMsgContext()==null)
+						System.out.println("rmMessageContext.getMsgContext()  == null");
+					if(rmMessageContext.getMsgContext().getResponseMessage()==null)
+						System.out.println("rmMessageContext.getMsgContext().getResponseMessage()  == null");
+					
+					
 
 					switch (rmMessageContext.getMessageType()) {
 						case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST :
@@ -60,9 +70,16 @@ public class Sender implements Runnable {
 								//Send creat seq message.
 								//No response and we can just close the connection
 								try {
+									System.out.println("******** Sending the message**************");
+									System.out.println(rmMessageContext.getMsgContext().getResponseMessage().getSOAPPartAsString());
+									System.out.println("******** Sending the message**************");
 									Service service = new Service();
 									Call call = (Call) service.createCall();
+									System.out.println(rmMessageContext.getOutGoingAddress());
 									call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
+									if(rmMessageContext.getMsgContext().getResponseMessage()==null)
+										System.out.println("It is null man");
+									
 									call.setRequestMessage(
 										rmMessageContext.getMsgContext().getResponseMessage());
 									call.invoke();
@@ -72,6 +89,7 @@ public class Sender implements Runnable {
 								} catch (AxisFault e) {
 									e.printStackTrace();
 								}
+								break;
 							}
 						case Constants.MSG_TYPE_TERMINATE_SEQUENCE :
 							{
@@ -79,19 +97,21 @@ public class Sender implements Runnable {
 							}
 						case Constants.MSG_TYPE_ACKNOWLEDGEMENT :
 							{
+								System.out.println("Sending ASYNC ACK");
 								try {
 									Service service = new Service();
 									Call call = (Call) service.createCall();
 									call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
-									call.setRequestMessage(
-										rmMessageContext.getMsgContext().getResponseMessage());
+									call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
+									System.out.println(rmMessageContext.getMsgContext().getResponseMessage().getSOAPPartAsString());
 									call.invoke();
 								} catch (ServiceException e1) {
 									System.out.println("(!)(!)(!)Cannot send the Ack message.");
 									e1.printStackTrace();
-								} catch (AxisFault e) {
+							} catch (AxisFault e) {
 									e.printStackTrace();
 								}
+								break;
 							}
 						case Constants.MSG_TYPE_SERVICE_RESPONSE :
 							{
@@ -105,7 +125,7 @@ public class Sender implements Runnable {
 			long timeGap = System.currentTimeMillis() - startTime;
 			if ((timeGap - Constants.SENDER_SLEEP_TIME) <= 0) {
 				try {
-					System.out.println("Sender thread is sleeping .............................");
+					System.out.println("Sender thread is sleeping ----------------------------------");
 					Thread.sleep(Constants.SENDER_SLEEP_TIME - timeGap);
 				} catch (Exception ex) {
 					ex.printStackTrace();
