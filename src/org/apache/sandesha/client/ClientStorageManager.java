@@ -175,7 +175,7 @@ public class ClientStorageManager implements IStorageManager {
 
         if(msg==null){
 
-           // msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
+            msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
         }
         return msg;
     }
@@ -393,4 +393,8 @@ public class ClientStorageManager implements IStorageManager {
     
 
 
+    public void setAckReceived(RMMessageContext responseMsg) {
+        accessor.setAckReceived(responseMsg);
+
+    }
 }
