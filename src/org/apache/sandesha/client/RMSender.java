@@ -79,7 +79,8 @@ public class RMSender extends BasicHandler {
     private Sender sender = null;
 
     public void invoke(MessageContext msgContext) throws AxisFault {
-
+        
+            
         //Get the message information from the client.
         Call call = (Call) msgContext.getProperty(MessageContext.CALL);
         RMMessageContext requestMesssageContext = null;
@@ -95,14 +96,19 @@ public class RMSender extends BasicHandler {
 
         try {
 
-           long nextMsgNumber = storageManager
-                    .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-
+           //long nextMsgNumber = storageManager
+           //         .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+            
+            long nextMsgNumber= requestMesssageContext.getMsgNumber();
+            System.out.println("nextMsgNumber  "+nextMsgNumber);
+            System.out.println("sequnecID" + requestMesssageContext.getSequenceID());
+            String sequenceID=requestMesssageContext.getSequenceID();
+            
             //Currently we override the message number taken from the user
             //This should shoud be changed in order to support multiple
             // sequences of messages
             //for client.
-            requestMesssageContext.setMsgNumber(nextMsgNumber);
+            //requestMesssageContext.setMsgNumber(nextMsgNumber);
 
             AddressingHeaders addrHeaders = getAddressingHeaders(msgContext);
 
@@ -119,7 +125,9 @@ public class RMSender extends BasicHandler {
             if (requestMesssageContext.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
-                    responseMessageContext = checkTheQueueForResponse(requestMesssageContext.getSequenceID(),requestMesssageContext.getMessageID());
+                    
+                    System.out.println("CHECKING K   "+sequenceID);
+                    responseMessageContext = checkTheQueueForResponse(sequenceID,requestMesssageContext.getMessageID());
                     Thread.sleep(500);
                     System.out.println("Checking for Responses");
 
@@ -351,8 +359,9 @@ public class RMSender extends BasicHandler {
         //add the message with the temp seqID
         //System.out.println("First Message");
 
-        long nextMsgNumber = storageManager
-                .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+       // long nextMsgNumber = storageManager
+       //         .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        long nextMsgNumber=reqRMMsgContext.getMsgNumber();
 
         System.out.println(nextMsgNumber);
 
@@ -364,9 +373,13 @@ public class RMSender extends BasicHandler {
                 msgContext, addrHeaders, tempUUID);
         createSeqRMMsgContext.setMessageID("uuid:" + tempUUID);
         //Create a sequence first.
-        storageManager.addSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        //storageManager.addSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        //storageManager.setTemporaryOutSequence(
+        //        Constants.CLIENT_DEFAULD_SEQUENCE_ID, "uuid:" + tempUUID);
+        
+        storageManager.addSequence(reqRMMsgContext.getSequenceID());
         storageManager.setTemporaryOutSequence(
-                Constants.CLIENT_DEFAULD_SEQUENCE_ID, "uuid:" + tempUUID);
+                reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
 
         //Set the processing state to the RMMessageContext
         createSeqRMMsgContext.setSync(sync);
