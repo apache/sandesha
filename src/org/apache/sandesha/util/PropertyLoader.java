@@ -103,7 +103,7 @@ public class PropertyLoader {
         Properties prop = loadProperties();
         String s;
 
-        s = prop.getProperty(Constants.ClientProperties.PROVIDER_NAME);
+        s = prop.getProperty(Constants.ClientProperties.PROVIDER_CLASS);
 
         if (s == null)
             return Constants.ClientProperties.PROVIDER_CLASS;

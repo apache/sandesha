@@ -86,6 +86,7 @@ public interface Constants {
         public static final String SEQUENCE_ACK = "SequenceAcknowledgement";
         public static final String TERMINATE_DEQUENCE = "TerminateSequence";
         public static final String SEQUENCE_FAULT = "SequenceFault";
+        public static final String ACKS_TO="AcksTo";
 
         public static final double MAX_MSG_NO = 18446744073709551615d;
 
@@ -184,8 +185,8 @@ public interface Constants {
         public static final String LISTENER_REQUEST_HANDLER = "listenerRequestHandler";
         public static final String LISTENER_RESPONSE_HANDLER = "listenerResponseHandler";
 
-        public static final String PROVIDER_NAME = "providerClass";
-        public static final String PROVIDER_CLASS = "org.apache.axis.providers.java.RPCProvider";
+        public static final String PROVIDER_CLASS = "providerClass";
+        public static final String DEFAULT_PROVIDER_CLASS = "org.apache.axis.providers.java.RPCProvider";
 
         public static final String CLASS_NAME="className";
          public static final String RMSERVICE="RMService";

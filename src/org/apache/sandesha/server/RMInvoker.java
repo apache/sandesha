@@ -18,11 +18,13 @@ package org.apache.sandesha.server;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.Handler;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
+import org.apache.axis.providers.java.JavaProvider;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
@@ -30,6 +32,7 @@ import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.RMMessageCreator;
+import org.apache.sandesha.util.PropertyLoader;
 
 import javax.xml.soap.SOAPEnvelope;
 
@@ -61,8 +64,10 @@ public class RMInvoker implements Runnable {
                     //Currently RPCProvider is used as the default provider and this is used to actually invoke the service.
                     //To provide a maximum flexibility the actual provider should be a configurable entity
                     // where the class can be loaded at runtime.
-                    RPCProvider rpcProvider = new RPCProvider();
-                    rpcProvider.invoke(rmMessageContext.getMsgContext());
+
+                    Class c = Class.forName(PropertyLoader.getProvider());
+                    JavaProvider provider=(JavaProvider)c.newInstance();
+                    provider.invoke(rmMessageContext.getMsgContext());
 
                     if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() != Void.TYPE) {
                         if (rmMessageContext.isLastMessage()) {
