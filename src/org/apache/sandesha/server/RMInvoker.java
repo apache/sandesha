@@ -27,7 +27,6 @@ import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.server.queue.ServerQueue;
 
 /**
  * @author JEkanayake
@@ -48,8 +47,8 @@ public class RMInvoker implements Runnable {
     public void run() {
         while (true) {
             try {
-                System.out
-                        .print("-");//RMInvoker THREAD IS SLEEPING -----------000----------\n");
+                // System.out
+                //        .print("|");
 
                 //Sleep for Constants.RMINVOKER_SLEEP_TIME.
                 //Currently the RMInvoker is a single thread, but this needs to
@@ -72,20 +71,14 @@ public class RMInvoker implements Runnable {
                     //configurable entity where the class can be loaded at
                     // runtime.
                     RPCProvider rpcProvider = new RPCProvider();
-
-                    System.out.println("INFO: Invoking the service ....\n");
-                    //Call for the processMessage method.
-                    rpcProvider.processMessage(
-                            rmMessageContext.getMsgContext(), rmMessageContext
-                                    .getReqEnv(), rmMessageContext.getResEnv(),
-                            rmMessageContext.getObj());
+                    rpcProvider.invoke(rmMessageContext.getMsgContext());
 
                     //Check whether we have an output (response) or not.
 
                     if (rmMessageContext.getMsgContext().getOperation()
                             .getMethod().getReturnType() != Void.TYPE) {
-                        System.out
-                                .println("INFO: String the response message ....\n");
+                        //System.out
+                        //        .println("STORING THE RESPONSE MESSAGE.....\n");
                         //Store the message in the response queue.
                         //If there is an application response then that
                         // response is always sent using
@@ -103,6 +96,10 @@ public class RMInvoker implements Runnable {
                         rmMessageContext.setMsgNumber(storageManager
                                 .getNextMessageNumber(rmMessageContext
                                         .getSequenceID()));
+                        ////System.out.println("SEQUENCE ID -
+                        // "+rmMessageContext.getSequenceID());
+                        //System.out.println("msgNo -
+                        // "+storageManager.getNextMessageNumber(rmMessageContext.getSequenceID()));
                         storageManager.insertOutgoingMessage(rmMessageContext);
                         //This will automatically create a response requence
                         // and add the message.
@@ -117,7 +114,7 @@ public class RMInvoker implements Runnable {
                         //can create a new UUID from here.
 
                         if (firstMsgOfResponseSeq) {
-                            //System.out.println("NO RESPONSE SEQUENCE");
+                            // System.out.println("NO RESPONSE SEQUENCE");
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);
 
@@ -129,7 +126,7 @@ public class RMInvoker implements Runnable {
                             //         msgContext);
                             //Set this new msgContext to the rmMsgContext.
 
-                            rmMessageContext.setMsgContext(msgContext);
+                            rmMsgContext.setMsgContext(msgContext);
                             rmMsgContext
                                     .setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
 
@@ -161,10 +158,10 @@ public class RMInvoker implements Runnable {
                         }
 
                         //Uncomment this section to print the queues.
-                        ServerQueue sq = ServerQueue.getInstance();
-                        sq.displayPriorityQueue();
-                        sq.displayOutgoingMap();
-                        sq.displayIncomingMap();
+                        //ServerQueue sq = ServerQueue.getInstance();
+                        //sq.displayPriorityQueue();
+                        //sq.displayOutgoingMap();
+                        //sq.displayIncomingMap();
 
                     }
                 }
