@@ -50,7 +50,7 @@ import org.apache.sandesha.ws.utility.Identifier;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
+
 
 /**
  * class RMProvider
