@@ -18,12 +18,15 @@ package org.apache.sandesha.client;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
+import org.apache.axis.Message;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.commons.logging.Log;
@@ -63,17 +66,13 @@ public class RMSender extends BasicHandler {
                     responseMessageContext = checkTheQueueForResponse(sequenceID, requestMesssageContext.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
-            Vector headers=responseMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope().getHeaders();
-            Iterator ite=headers.iterator();
 
-            while(ite.hasNext()){
-                SOAPHeaderElement headerElement = (SOAPHeaderElement)ite.next();
-                headerElement.setMustUnderstand(false);
-                headerElement.setProcessed(true);
-            }
+                //We need these steps to filter all addressing and rm related headers.
+                Message resMsg=responseMessageContext.getMsgContext().getRequestMessage();
+                RMHeaders.removeHeaders(resMsg.getSOAPEnvelope());
+                AddressingHeaders addHeaders= new AddressingHeaders(resMsg.getSOAPEnvelope(),null,true,false,false, null);
 
-            msgContext.setResponseMessage(responseMessageContext.getMsgContext()
-                        .getRequestMessage());
+            msgContext.setResponseMessage(resMsg);
             } else {
                 boolean gotAck = false;
                 while (!gotAck) {

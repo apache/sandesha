@@ -43,6 +43,8 @@ public final class MessageValidator {
         } catch (SOAPException e) {
           log.error(e);
             //TODO Do we need to throw a Sequence Fault at this level.
+        } catch (Exception e) {
+           log.error(e);
         }
     }
 

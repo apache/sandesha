@@ -22,7 +22,6 @@ import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 
-import javax.xml.soap.SOAPException;
 import java.util.Iterator;
 
 /**
@@ -109,7 +108,7 @@ public class RMHeaders {
      * @return RMHeaders
      * @throws AxisFault
      */
-    public RMHeaders fromSOAPEnvelope(SOAPEnvelope env) throws SOAPException, AxisFault {
+    public RMHeaders fromSOAPEnvelope(SOAPEnvelope env) throws Exception, AxisFault {
 
         if (env != null) {
             Iterator iterator = env.getHeaders().iterator();
@@ -120,18 +119,21 @@ public class RMHeaders {
 
                 if (headerElement.getName().equals("Sequence")) {
                     sequence = new Sequence();
+                    headerElement.setProcessed(true);
                     headerElement.setMustUnderstand(false);
                     sequence.fromSOAPEnveploe(headerElement);
                 }
 
                 if (headerElement.getName().equals("SequenceAcknowledgement")) {
                     sequenceAcknowledgement = new SequenceAcknowledgement();
+                    headerElement.setProcessed(true);
                     headerElement.setMustUnderstand(false);
                     sequenceAcknowledgement.fromSOAPEnveploe(headerElement);
                 }
 
                 if (headerElement.getName().equals("AckRequested")) {
                     ackRequest = new AckRequested();
+                    headerElement.setProcessed(true);
                     headerElement.setMustUnderstand(false);
                     ackRequest.fromSOAPEnveploe(headerElement);
                 }
@@ -273,5 +275,28 @@ public class RMHeaders {
      */
     public CreateSequence getCreateSequence() {
         return createSequence;
+    }
+
+    public static void removeHeaders(SOAPEnvelope env) throws AxisFault {
+        if (env != null) {
+            Iterator iterator = env.getHeaders().iterator();
+            SOAPHeaderElement headerElement;
+
+            while (iterator.hasNext()) {
+                headerElement = (SOAPHeaderElement) iterator.next();
+
+                if (headerElement.getName().equals("Sequence")) {
+                    headerElement.detachNode();
+                }
+
+                if (headerElement.getName().equals("SequenceAcknowledgement")) {
+                    headerElement.detachNode();
+                }
+
+                if (headerElement.getName().equals("AckRequested")) {
+                    headerElement.detachNode();
+                }
+            }
+        }
     }
 }

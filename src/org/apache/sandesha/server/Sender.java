@@ -82,11 +82,11 @@ public class Sender implements Runnable {
                         try {
                             sendMessage(rmMessageContext);
                         } catch (AxisFault e) {
-                           log.error(e);
+                            log.error(e);
                         } catch (SOAPException e) {
-                           log.error(e);
+                            log.error(e);
                         } catch (Exception e) {
-                           log.error(e);
+                            log.error(e);
                         }
                     } else {
                         //TODO REPORT ERROR
@@ -100,7 +100,7 @@ public class Sender implements Runnable {
                     //System.out.print("|"); //Sender THREAD IS SLEEPING
                     Thread.sleep(Constants.SENDER_SLEEP_TIME - timeGap);
                 } catch (Exception ex) {
-                  log.error(ex);
+                    log.error(ex);
                 }
             }
         }
@@ -199,14 +199,14 @@ public class Sender implements Runnable {
         call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
 
         //We need these two handlers in our
-        SimpleChain sc = new SimpleChain();
-        Handler serverRequestHandler = new RMServerRequestHandler();
-        Handler addressingHandler = new AddressingHandler();
+        //SimpleChain sc = new SimpleChain();
+        //Handler serverRequestHandler = new RMServerRequestHandler();
+       // Handler addressingHandler = new AddressingHandler();
 
-        sc.addHandler(addressingHandler);
-        sc.addHandler(serverRequestHandler);
+       // sc.addHandler(addressingHandler);
+        //sc.addHandler(serverRequestHandler);
 
-        call.setClientHandlers(null, sc);
+        //call.setClientHandlers(null, sc);
 
         if (rmMessageContext.getMsgContext().getRequestMessage() != null) {
             String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
@@ -216,32 +216,29 @@ public class Sender implements Runnable {
     }
 
     private void sendServiceRequest(RMMessageContext rmMessageContext) throws Exception {
-        if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
-            log.error("ERROR : NULL REQUEST MESSAGE");
+
+        SOAPEnvelope requestEnvelope = null;
+        //Need to create the response envelope.
+        requestEnvelope = EnvelopeCreator.createServiceRequestEnvelope(rmMessageContext);
+        rmMessageContext.getMsgContext().setRequestMessage(new Message(requestEnvelope));
+        rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+        rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+        if (rmMessageContext.getSync()) {
+            Call call;
+            call = prepareCall(rmMessageContext);
+            //CHECK THIS
+            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+            call.invoke();
+            processResponseMessage(call, rmMessageContext);
+
         } else {
-            SOAPEnvelope requestEnvelope = null;
-            //Need to create the response envelope.
-            requestEnvelope = EnvelopeCreator.createServiceRequestEnvelope(rmMessageContext);
-            rmMessageContext.getMsgContext().setRequestMessage(new Message(requestEnvelope));
-            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-            rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
-            if (rmMessageContext.getSync()) {
-                Call call;
-                call = prepareCall(rmMessageContext);
-                //CHECK THIS
-                storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
-                call.invoke();
-                processResponseMessage(call, rmMessageContext);
-
-            } else {
-                Call call = prepareCall(rmMessageContext);
-                //Send the createSequnceRequest Asynchronously.
-                storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
-                call.invoke();
-
-            }
+            Call call = prepareCall(rmMessageContext);
+            //Send the createSequnceRequest Asynchronously.
+            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+            call.invoke();
 
         }
+
 
     }
 
