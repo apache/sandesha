@@ -31,12 +31,6 @@ public class RMMessageContext {
 
     private MessageContext msgContext;
 
-    private SOAPEnvelope reqEnv;
-
-    private SOAPEnvelope resEnv;
-
-    private Object obj;
-
     private String sequenceID;
 
     private String messageID;
@@ -166,26 +160,7 @@ public class RMMessageContext {
         return msgContext;
     }
 
-    /**
-     * @return
-     */
-    public Object getObj() {
-        return obj;
-    }
-
-    /**
-     * @return
-     */
-    public SOAPEnvelope getReqEnv() {
-        return reqEnv;
-    }
-
-    /**
-     * @return
-     */
-    public SOAPEnvelope getResEnv() {
-        return resEnv;
-    }
+  
 
     /**
      * @return
@@ -204,23 +179,7 @@ public class RMMessageContext {
     /**
      * @param object
      */
-    public void setObj(Object obj) {
-        this.obj = obj;
-    }
-
-    /**
-     * @param envelope
-     */
-    public void setReqEnv(SOAPEnvelope reqEnv) {
-        this.reqEnv = reqEnv;
-    }
-
-    /**
-     * @param envelope
-     */
-    public void setResEnv(SOAPEnvelope resEnv) {
-        this.resEnv = resEnv;
-    }
+   
 
     /**
      * @param string
@@ -304,12 +263,6 @@ public class RMMessageContext {
             rmMsgContext.setAddressingHeaders(this.addressingHeaders);
         if (messageID != null)
             rmMsgContext.setMessageID(this.messageID);
-        if (obj != null)
-            rmMsgContext.setObj(this.obj);
-        if (reqEnv != null)
-            rmMsgContext.setReqEnv(this.reqEnv);
-        if (resEnv != null)
-            rmMsgContext.setResEnv(this.resEnv);
         if (rmHeaders != null)
             rmMsgContext.setRMHeaders(this.rmHeaders);
         if (sequenceID != null)
