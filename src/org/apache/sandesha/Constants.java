@@ -57,13 +57,13 @@ public interface Constants {
     /**
      * Field INACTIVITY_TIMEOUT
      */
-    public static final long INACTIVITY_TIMEOUT = 60000;
+    public static final long INACTIVITY_TIMEOUT = 120000;
     // double the expectd for breaking of the network in ms.
 
     /**
      * Field RETRANSMISSION_INTERVAL
      */
-    public static final long RETRANSMISSION_INTERVAL = 2000;
+    public static final long RETRANSMISSION_INTERVAL = 4000;
     // Set to two 2000ms
 
     /**
@@ -137,7 +137,7 @@ public interface Constants {
     /**
      * Field SERVER_RETRANSMISION_INTERVAL
      */
-    public static final long SERVER_RETRANSMISION_INTERVAL = 2000;
+    public static final long SERVER_RETRANSMISION_INTERVAL = 4000;
     /**
      * Field ACTION_CREATE_SEQUENCE
      */
@@ -167,7 +167,7 @@ public interface Constants {
     /**
      * Field SERVICE_INVOKE_INTERVAL
      */
-    public static final long SERVICE_INVOKE_INTERVAL = 200;
+    public static final long SERVICE_INVOKE_INTERVAL = 500;
     /**
      * Field SERVER_RESPONSE_CREATE_SEQUENCE_MAX_CHECK_COUNT
      */
@@ -176,7 +176,7 @@ public interface Constants {
     /**
      * Field SERVER_RESPONSE_CREATE_SEQUENCE_CHECKING_INTERVAL
      */
-    public static final long SERVER_RESPONSE_CREATE_SEQUENCE_CHECKING_INTERVAL = 1000;
+    public static final long SERVER_RESPONSE_CREATE_SEQUENCE_CHECKING_INTERVAL = 2000;
     
     /**
      * Field WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION
@@ -198,3 +198,4 @@ public interface Constants {
     public static final String RM_SEQUENCE_ACKNOWLEDMENT_ACTION =    "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
 
 }
+
