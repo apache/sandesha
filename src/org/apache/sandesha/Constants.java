@@ -17,6 +17,8 @@
 
 package org.apache.sandesha;
 
+import java.net.URI;
+
 /**
  * class Constants
  * 
@@ -254,5 +256,10 @@ public interface Constants {
     public static final int SERVER = 1;
 
     public static final int CLIENT = 0;
+    
+    public static final String IN_OUT="inOut";
+    public static final String IN_ONLY="inOnly";
+   
+    public static final String DEFAULT_URI="uri:defaultWSRM";
 }
 
