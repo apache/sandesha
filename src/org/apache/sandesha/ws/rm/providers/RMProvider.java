@@ -48,7 +48,6 @@ import org.apache.sandesha.ws.utility.Identifier;
 import javax.xml.namespace.QName;
 import java.util.List;
 
-
 /**
  * class RMProvider
  * 
@@ -58,408 +57,501 @@ import java.util.List;
  */
 
 public class RMProvider extends RPCProvider {
-    /**
-     * Method processMessage
-     * 
-     * @param msgContext 
-     * @param reqEnv     
-     * @param resEnv     
-     * @param obj        
-     * @throws Exception 
-     */
+	/**
+	 * Method processMessage
+	 * 
+	 * @param msgContext 
+	 * @param reqEnv     
+	 * @param resEnv     
+	 * @param obj        
+	 * @throws Exception 
+	 */
 
-    public void processMessage(
-        MessageContext msgContext,
-        SOAPEnvelope reqEnv,
-        SOAPEnvelope resEnv,
-        Object obj)
-        throws Exception {
-            
-        
-        if (!(isRmHeadersAvailable(msgContext) && isAddressingHeadersAvailable(msgContext))) {
-            throw new AxisFault("Insufficient Headers to Process Reliability.");
-        } else {
-            AddressingHeaders addressingHeaders =
-                (AddressingHeaders) msgContext.getProperty(
-                    org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
-            RMHeaders rmHeaders =
-                (RMHeaders) msgContext.getProperty(org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
+	public void processMessage(
+		MessageContext msgContext,
+		SOAPEnvelope reqEnv,
+		SOAPEnvelope resEnv,
+		Object obj)
+		throws Exception {
 
-            boolean anonymousFrom = false;
-            boolean anonymousReplyTo = false;
+		if (!(isRmHeadersAvailable(msgContext)
+			&& isAddressingHeadersAvailable(msgContext))) {
+			throw new AxisFault("Insufficient Headers to Process Reliability.");
+		} else {
+			AddressingHeaders addressingHeaders =
+				(AddressingHeaders) msgContext.getProperty(
+					org
+						.apache
+						.axis
+						.message
+						.addressing
+						.Constants
+						.ENV_ADDRESSING_REQUEST_HEADERS);
+			RMHeaders rmHeaders =
+				(RMHeaders) msgContext.getProperty(
+					org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
 
-            if (addressingHeaders.getFrom() != null) {
-                if (addressingHeaders.getFrom().getAddress().toString().equals(Constants.ANONYMOUS_URI)) {
-                    anonymousFrom = true;
-                }
-            }
+			boolean anonymousFrom = false;
+			boolean anonymousReplyTo = false;
 
-            if (addressingHeaders.getReplyTo() != null) {
-                if (addressingHeaders.getReplyTo().getAddress().toString().equals(Constants.ANONYMOUS_URI)) {
-                    anonymousReplyTo = true;
-                }
-            }
+			if (addressingHeaders.getFrom() != null) {
+				if (addressingHeaders
+					.getFrom()
+					.getAddress()
+					.toString()
+					.equals(Constants.ANONYMOUS_URI)) {
+					anonymousFrom = true;
+				}
+			}
 
-            ServerMessageController serverMessageController = ServerMessageController.getInstance();
-            ClientMessageController clientMessageController = ClientMessageController.getInstance();
+			if (addressingHeaders.getReplyTo() != null) {
+				if (addressingHeaders
+					.getReplyTo()
+					.getAddress()
+					.toString()
+					.equals(Constants.ANONYMOUS_URI)) {
+					anonymousReplyTo = true;
+				}
+			}
 
-            Action action = addressingHeaders.getAction();
-            String strAction = action.toString();
-            //this returns something like "http://schemas.xmlsoap.org/ws/2004/03/rm/TerminateSequence" 
+			ServerMessageController serverMessageController =
+				ServerMessageController.getInstance();
+			ClientMessageController clientMessageController =
+				ClientMessageController.getInstance();
 
-            if (strAction.equals(Constants.ACTION_CREATE_SEQUENCE)) {
-                //TODO:create the required env and send it to the source
-                
- 
-                if (!anonymousReplyTo) {
-                    //TODO:add the create seq flags
-                    ////////////////////////////////////////////////////
-                    ////////////////////////////////////////////////////
-                    
+			Action action = addressingHeaders.getAction();
+			String strAction = action.toString();
+			//this returns something like "http://schemas.xmlsoap.org/ws/2004/03/rm/TerminateSequence" 
 
-                    SOAPEnvelope envelope = createSequenceResponseEnvelope(addressingHeaders);
-                    //create the call
-                    Service service = new Service();
-                    Call call = (Call) service.createCall();
-                    
+			if (strAction.equals(Constants.ACTION_CREATE_SEQUENCE)) {
+				//TODO:create the required env and send it to the source
 
-                    //get  the reply address
-                    ReplyTo replyTo = (ReplyTo) addressingHeaders.getReplyTo();
-                    URI replyToAddress = replyTo.getAddress();
-                    call.setTargetEndpointAddress(replyToAddress.toString());
-                    
-                    RMHeaders createSeqRMHeadres = new RMHeaders();
-                    createSeqRMHeadres.fromSOAPEnvelope(envelope);
-                    RMSequence createSeq = new RMSequence();
-                    createSeq.setSequenceIdentifier(
-                    
-                    createSeqRMHeadres.getCreateSequenceResponse().getIdentifier());
-                    createSeq.setClientDidReclamtion(true);
-                    serverMessageController.storeSequence(createSeq);
-                    
-                    
-                    
-                    
-                    Message msg=new Message(envelope);
-                    call.setRequestMessage(msg);
-                    
-                    //call.setReturnType(XMLType.AXIS_VOID);
-                    
-                    
+				if (!anonymousReplyTo) {
+					//TODO:add the create seq flags
+					////////////////////////////////////////////////////
+					////////////////////////////////////////////////////
 
-                    //invoke
-                    call.invoke();
-                    
-                    //disconnect http
-                    msgContext.setResponseMessage(null);
-                } else {
-                    
+					SOAPEnvelope envelope =
+						createSequenceResponseEnvelope(addressingHeaders);
+					//create the call
+					Service service = new Service();
+					Call call = (Call) service.createCall();
 
-                    //KEEP THE MESSAGE/////////////////////////////////////////
-                    //TODO:
+					//get  the reply address
+					ReplyTo replyTo = (ReplyTo) addressingHeaders.getReplyTo();
+					URI replyToAddress = replyTo.getAddress();
+					call.setTargetEndpointAddress(replyToAddress.toString());
 
-                    SOAPEnvelope envelope = createSequenceResponseEnvelope(addressingHeaders);
-                    RMHeaders createSeqRMHeadres = new RMHeaders();
-                    createSeqRMHeadres.fromSOAPEnvelope(envelope);
-                    RMSequence createSeq = new RMSequence();
-                    createSeq.setSequenceIdentifier(createSeqRMHeadres.getCreateSequenceResponse().getIdentifier());
-                    createSeq.setClientDidReclamtion(true);
-                    serverMessageController.storeSequence(createSeq);
-                    msgContext.setResponseMessage(new Message(envelope));
-                }
+					RMHeaders createSeqRMHeadres = new RMHeaders();
+					createSeqRMHeadres.fromSOAPEnvelope(envelope);
+					RMSequence createSeq = new RMSequence();
+					createSeq.setSequenceIdentifier(
+						createSeqRMHeadres
+							.getCreateSequenceResponse()
+							.getIdentifier());
+					createSeq.setClientDidReclamtion(true);
+					serverMessageController.storeSequence(createSeq);
 
-            } else if (strAction.equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
-                //TODO:
-                
-                createSequenceResponse(msgContext);
+					Message msg = new Message(envelope);
+					call.setRequestMessage(msg);
 
-            } else if (strAction.equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
-                //TODO:
-                //
-                terminateSequence(rmHeaders.getTerminateSequence().getIdentifier());
-            } else {
-                if (!anonymousFrom) {
-                    ///TODO Check MessageInserter
-                    MessageInserter messageInserter = new MessageInserter(msgContext, obj);
-                    Thread thread = new Thread(messageInserter);
-                    thread.start();
-                    msgContext.setResponseMessage(null);
+					//call.setReturnType(XMLType.AXIS_VOID);
 
-                } else {
+					//invoke
+					call.invoke();
 
-                    RMMessage message = new RMMessage();
+					//disconnect http
+					msgContext.setResponseMessage(null);
+				} else {
 
-                    
-                    message.setAddressingHeaders(addressingHeaders);
-                    message.setRMHeaders(rmHeaders);
-                    message.setRequestMessage(msgContext.getRequestMessage());
-                    msgContext.setEncodingStyle(msgContext.getEncodingStyle());
+					//KEEP THE MESSAGE/////////////////////////////////////////
+					//TODO:
 
-                    if (rmHeaders.getSequenceAcknowledgement() != null) {
-                        
+					SOAPEnvelope envelope =
+						createSequenceResponseEnvelope(addressingHeaders);
+					RMHeaders createSeqRMHeadres = new RMHeaders();
+					createSeqRMHeadres.fromSOAPEnvelope(envelope);
+					RMSequence createSeq = new RMSequence();
+					createSeq.setSequenceIdentifier(
+						createSeqRMHeadres
+							.getCreateSequenceResponse()
+							.getIdentifier());
+					createSeq.setClientDidReclamtion(true);
+					serverMessageController.storeSequence(createSeq);
+					msgContext.setResponseMessage(new Message(envelope));
+				}
 
-                        Identifier seqAckID = rmHeaders.getSequenceAcknowledgement().getIdentifier();
-                        RMSequence clientSeq = clientMessageController.retrieveIfSequenceExists(seqAckID);
-                        RMSequence serverSeq = serverMessageController.retrieveIfSequenceExists(seqAckID);
+			} else if (
+				strAction.equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
+				//TODO:
 
-                        if (clientSeq != null) {
-                            
-                            clientSeq.setSequenceAcknowledgement(rmHeaders.getSequenceAcknowledgement());
-                        }
+				createSequenceResponse(msgContext);
 
-                        if (serverSeq != null) {
-                            
-                            serverSeq.setSequenceAcknowledgement(rmHeaders.getSequenceAcknowledgement());
-                        }
-                    }
+			} else if (strAction.equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
+				//TODO:
+				//
+				terminateSequence(
+					rmHeaders.getTerminateSequence().getIdentifier());
+			} else {
+				if (!anonymousFrom) {
+					///TODO Check MessageInserter
+					MessageInserter messageInserter =
+						new MessageInserter(msgContext, obj);
+					Thread thread = new Thread(messageInserter);
+					thread.start();
+					msgContext.setResponseMessage(null);
 
-                    if (rmHeaders.getSequence() != null) {
-                        
-                        message.setIdentifier(rmHeaders.getSequence().getIdentifier());
+				} else {
 
-                        if (msgContext.getOperation() != null) {
-                            
-                            message.setOperation(msgContext.getOperation());
-                            message.setServiceDesc(msgContext.getService().getServiceDescription());
-                            message.setServiceObject(obj);
+					RMMessage message = new RMMessage();
 
-                            // serverMessageController.insertMessage(message);
-                            // ///////
-                            // keeping message in the server no meaningfull in this mode
-                            // becouse the response is going in the same HTTP connection
-                            // just to have a in-order invoketion
-                            // we have to reffer the last message number
-                            Identifier seqID = rmHeaders.getSequenceAcknowledgement().getIdentifier();
-                            RMSequence serverSeq = serverMessageController.retrieveIfSequenceExists(seqID);
-                            
+					message.setAddressingHeaders(addressingHeaders);
+					message.setRMHeaders(rmHeaders);
+					message.setRequestMessage(msgContext.getRequestMessage());
+					msgContext.setEncodingStyle(msgContext.getEncodingStyle());
+
+					if (rmHeaders.getSequenceAcknowledgement() != null) {
+
+						Identifier seqAckID =
+							rmHeaders
+								.getSequenceAcknowledgement()
+								.getIdentifier();
+						RMSequence clientSeq =
+							clientMessageController.retrieveIfSequenceExists(
+								seqAckID);
+						RMSequence serverSeq =
+							serverMessageController.retrieveIfSequenceExists(
+								seqAckID);
+
+						if (clientSeq != null) {
+
+							clientSeq.setSequenceAcknowledgement(
+								rmHeaders.getSequenceAcknowledgement());
+						}
+
+						if (serverSeq != null) {
+
+							serverSeq.setSequenceAcknowledgement(
+								rmHeaders.getSequenceAcknowledgement());
+						}
+					}
+
+					if (rmHeaders.getSequence() != null) {
+
+						message.setIdentifier(
+							rmHeaders.getSequence().getIdentifier());
+
+						if (msgContext.getOperation() != null) {
+
+							message.setOperation(msgContext.getOperation());
+							message.setServiceDesc(
+								msgContext
+									.getService()
+									.getServiceDescription());
+							message.setServiceObject(obj);
+
+							// serverMessageController.insertMessage(message);
+							// ///////
+							// keeping message in the server no meaningfull in this mode
+							// becouse the response is going in the same HTTP connection
+							// just to have a in-order invoketion
+							// we have to reffer the last message number
+							Identifier seqID =
+								rmHeaders.getSequence().getIdentifier();
+							RMSequence serverSeq =
+								serverMessageController
+									.retrieveIfSequenceExists(
+									seqID);
+
 							if (serverSeq == null) {
-								serverSeq=new RMSequence();
+								serverSeq = new RMSequence();
 								serverSeq.setSequenceIdentifier(seqID);
 								serverSeq.setLastProcessedMessageNumber(0);
-								serverMessageController.storeSequence(serverSeq);
+								serverMessageController.storeSequence(
+									serverSeq);
 							}
 
-							long msgNo = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
-							   long lastProcessedMsgNo;
+							long msgNo =
+								rmHeaders
+									.getSequence()
+									.getMessageNumber()
+									.getMessageNumber();
+							long lastProcessedMsgNo;
+							RMMessage rmMsg =
+								(RMMessage) serverSeq.getMessageList().get(new Long(msgNo));
 
-							   serverSeq.getMessageList().put(new Long(msgNo), message);
+							if (rmMsg == null) {
+								serverSeq.getMessageList().put(
+									new Long(msgNo),
+									message);
+								while (true) {
+									lastProcessedMsgNo =
+										serverSeq
+											.getLastProcessedMessageNumber();
+									if (msgNo == lastProcessedMsgNo + 1) {
+										super.processMessage(
+											msgContext,
+											reqEnv,
+											resEnv,
+											obj);
+										lastProcessedMsgNo++;
+										serverSeq
+											.setLastProcessedMessageNumber(
+											lastProcessedMsgNo);
+										message.setResponseMessage(
+											msgContext.getResponseMessage());
+										break;
+									}
+									Thread.sleep(
+										Constants.SERVICE_INVOKE_INTERVAL);
+								}
+							} else {
+								msgContext.setResponseMessage(rmMsg.getResponseMessage());
+								}
 
-							   while (true) {
-								   lastProcessedMsgNo = serverSeq.getLastProcessedMessageNumber();
+							while (true) {
+								lastProcessedMsgNo =
+									serverSeq.getLastProcessedMessageNumber();
 
-								   if (msgNo  == lastProcessedMsgNo+1) {
-									   super.processMessage(msgContext, reqEnv, resEnv, obj);
-									   lastProcessedMsgNo++;
-									   serverSeq.setLastProcessedMessageNumber(lastProcessedMsgNo);
+								if (msgNo == lastProcessedMsgNo + 1) {
+									super.processMessage(
+										msgContext,
+										reqEnv,
+										resEnv,
+										obj);
+									lastProcessedMsgNo++;
+									serverSeq.setLastProcessedMessageNumber(
+										lastProcessedMsgNo);
 
-									   break;
-								   }
+									break;
+								}
 
-								   Thread.sleep(Constants.SERVICE_INVOKE_INTERVAL);
-							   }
+								Thread.sleep(Constants.SERVICE_INVOKE_INTERVAL);
+							}
 
-                            // //////
-                        } else {
-                            //TODO: response message processing 
-                            //This is when we got a a response with "From as anonymous...." 
+							// //////
+						} else {
+							//TODO: response message processing 
+							//This is when we got a a response with "From as anonymous...." 
 
-                            // haveing is?
-                            
-                            
-                            RMSequence responsedSeq =
-                                    clientMessageController.retrieveIfSequenceExists(rmHeaders.getSequence().getIdentifier());
-                            
-                            if (responsedSeq != null) {
-                                RMMessage resMsg = responsedSeq.retrieveMessage(new Long(message.getMessageNumber()));
-                            
-                                resMsg.setResponseMessage(message.getRequestMessage());
-                            }
-                            
-                            responsedSeq.insertResponseMessage(message);
-                        }
-                    }
+							// haveing is?
 
-                    if (rmHeaders.getAckRequest() != null) {
-                        
+							RMSequence responsedSeq =
+								clientMessageController
+									.retrieveIfSequenceExists(
+									rmHeaders.getSequence().getIdentifier());
 
-                        RMSequence serSeq =
-                            serverMessageController.retrieveIfSequenceExists(
-                                rmHeaders.getAckRequest().getIdentifier());
-                        SequenceAcknowledgement seqAck = serSeq.getSequenceAcknowledgement();
-                        
-                        RMHeaders ackResRMHeaders = new RMHeaders();
+							if (responsedSeq != null) {
+								RMMessage resMsg =
+									responsedSeq.retrieveMessage(
+										new Long(message.getMessageNumber()));
 
-                        ackResRMHeaders.setSequenceAcknowledgement(seqAck);
-                        ackResRMHeaders.toSoapEnvelop(msgContext.getResponseMessage().getSOAPEnvelope());
-    
-                    }
-                }
-            }
+								resMsg.setResponseMessage(
+									message.getRequestMessage());
+							}
 
-        }
+							responsedSeq.insertResponseMessage(message);
+						}
+					}
 
-    }
-    
-    /**
-     * Method isRmHeadersAvailable
-     * 
-     * @param messageContext MessageContext
-     * @return boolean
-     * 
-     */
-    
-    
+					if (rmHeaders.getAckRequest() != null) {
 
-    private boolean isRmHeadersAvailable(MessageContext messageContext) {
-        RMHeaders rmHeaders =
-            (RMHeaders) messageContext.getProperty(org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
+						RMSequence serSeq =
+							serverMessageController.retrieveIfSequenceExists(
+								rmHeaders.getAckRequest().getIdentifier());
+						SequenceAcknowledgement seqAck =
+							serSeq.getSequenceAcknowledgement();
 
-        if ((rmHeaders.getAckRequest() != null)
-            || (rmHeaders.getCreateSequence() != null)
-            || (rmHeaders.getCreateSequenceResponse() != null)
-            || (rmHeaders.getSequence() != null)
-            || (rmHeaders.getSequenceAcknowledgement() != null)
-            || (rmHeaders.getTerminateSequence() != null)) {
-            return true;
-        } else
-            return true;
-    }
-    
-    /**
-     * Method isAddressingHeadersAvailable
-     * 
-     * @param messageContext MessageContext
-     * @return boolean
-     * 
-     */
+						RMHeaders ackResRMHeaders = new RMHeaders();
 
-    private boolean isAddressingHeadersAvailable(MessageContext messageContext) {
-        AddressingHeaders addressingHeaders =
-            (AddressingHeaders) messageContext.getProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+						ackResRMHeaders.setSequenceAcknowledgement(seqAck);
+						ackResRMHeaders.toSoapEnvelop(
+							msgContext.getResponseMessage().getSOAPEnvelope());
 
-        if ((addressingHeaders.getAction() != null) && (addressingHeaders.getTo() != null))
-            return true;
-        else
-            return false;
-    }
-    
+					}
+				}
+			}
 
+		}
 
-    /**
-     * Method terminateSequence
-     * 
-     * @param identifier 
-     *  
-     */
-    private void terminateSequence(Identifier identifier) {
-        //TODO: is there a way to identify whether this is the server or client
-        //try to get both the MesageControllers and check them for this sequence
-        ServerMessageController serverMessageController = ServerMessageController.getInstance();
-        ClientMessageController clientMessageController = ClientMessageController.getInstance();
+	}
 
-        //check in serverMessageController
-        if (serverMessageController != null) {
-            serverMessageController.removeIfSequenceExists(identifier);
-        }
-        //check in clientMessageController
-        if (clientMessageController != null) {
-            clientMessageController.removeIfSequenceExists(identifier);
-        }
-    }
+	/**
+	 * Method isRmHeadersAvailable
+	 * 
+	 * @param messageContext MessageContext
+	 * @return boolean
+	 * 
+	 */
 
-    /**
-     * Method createSequenceResponse
-     * 
-     * Called when the createSequenceResponse message arrives
-     * Now we have received a sequenceIdentifier, So, store it
-     * To do this, use the relates to tag.
-     * <b>Everytime the server send the responses, it acts as a client and hence it calls ClientMessageController</b>
-     * 
-     * @param messageContext 
-     *  
-     */
-    private void createSequenceResponse(MessageContext messageContext) {
-        //get the ClientMessageController
-        ClientMessageController clientMessageController = ClientMessageController.getInstance();
+	private boolean isRmHeadersAvailable(MessageContext messageContext) {
+		RMHeaders rmHeaders =
+			(RMHeaders) messageContext.getProperty(
+				org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
 
-        //get the Relates to id from the env
-        AddressingHeaders addressingHeaders =
-            (AddressingHeaders) messageContext.getProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
-        List relatesToList = addressingHeaders.getRelatesTo();
-        if (relatesToList.size() > 0) {
-            RelatesTo relatesTo = (RelatesTo) relatesToList.get(0);
-            MessageID messageId = new MessageID(relatesTo.getURI());
+		if ((rmHeaders.getAckRequest() != null)
+			|| (rmHeaders.getCreateSequence() != null)
+			|| (rmHeaders.getCreateSequenceResponse() != null)
+			|| (rmHeaders.getSequence() != null)
+			|| (rmHeaders.getSequenceAcknowledgement() != null)
+			|| (rmHeaders.getTerminateSequence() != null)) {
+			return true;
+		} else
+			return true;
+	}
 
-            if (clientMessageController != null) {
-                RMMessage rmMessage = clientMessageController.retrieveIfMessageExists(messageId);
-                rmMessage.setResponseMessage(messageContext.getCurrentMessage());
-            }
-        }
-    }
+	/**
+	 * Method isAddressingHeadersAvailable
+	 * 
+	 * @param messageContext MessageContext
+	 * @return boolean
+	 * 
+	 */
 
-    /**
-     * Method createSequenceResponseEnvelope
-     * 
-     * create the envelope to send to the source who require the sequence identifier
-     * 
-     * @param addressingHeaders
-     *     
-     * 
-     */
-    private SOAPEnvelope createSequenceResponseEnvelope(
-        AddressingHeaders addressingHeaders)
-        throws Exception {
+	private boolean isAddressingHeadersAvailable(MessageContext messageContext) {
+		AddressingHeaders addressingHeaders =
+			(AddressingHeaders) messageContext.getProperty(
+				org
+					.apache
+					.axis
+					.message
+					.addressing
+					.Constants
+					.ENV_ADDRESSING_REQUEST_HEADERS);
 
-        SOAPEnvelope envelope = new SOAPEnvelope();
+		if ((addressingHeaders.getAction() != null)
+			&& (addressingHeaders.getTo() != null))
+			return true;
+		else
+			return false;
+	}
 
-        envelope.addNamespaceDeclaration(
-            Constants.NS_PREFIX_RM,
-            Constants.NS_URI_RM);
-        envelope.addNamespaceDeclaration(
-            Constants.WSA_PREFIX,
-            Constants.WSA_NS);
-        envelope.addNamespaceDeclaration(
-            Constants.WSU_PREFIX,
-            Constants.WSU_NS);
+	/**
+	 * Method terminateSequence
+	 * 
+	 * @param identifier 
+	 *  
+	 */
+	private void terminateSequence(Identifier identifier) {
+		//TODO: is there a way to identify whether this is the server or client
+		//try to get both the MesageControllers and check them for this sequence
+		ServerMessageController serverMessageController =
+			ServerMessageController.getInstance();
+		ClientMessageController clientMessageController =
+			ClientMessageController.getInstance();
 
-        Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE_RESPONSE));
-        action.toSOAPHeaderElement(envelope);
+		//check in serverMessageController
+		if (serverMessageController != null) {
+			serverMessageController.removeIfSequenceExists(identifier);
+		}
+		//check in clientMessageController
+		if (clientMessageController != null) {
+			clientMessageController.removeIfSequenceExists(identifier);
+		}
+	}
 
-        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-        MessageID messageId = new MessageID(new URI("uuid:" + uuidGen.nextUUID()));
-        messageId.toSOAPHeaderElement(envelope);
+	/**
+	 * Method createSequenceResponse
+	 * 
+	 * Called when the createSequenceResponse message arrives
+	 * Now we have received a sequenceIdentifier, So, store it
+	 * To do this, use the relates to tag.
+	 * <b>Everytime the server send the responses, it acts as a client and hence it calls ClientMessageController</b>
+	 * 
+	 * @param messageContext 
+	 *  
+	 */
+	private void createSequenceResponse(MessageContext messageContext) {
+		//get the ClientMessageController
+		ClientMessageController clientMessageController =
+			ClientMessageController.getInstance();
 
-        To incommingTo = addressingHeaders.getTo();
-        URI fromAddressURI = new URI(incommingTo.toString());
+		//get the Relates to id from the env
+		AddressingHeaders addressingHeaders =
+			(AddressingHeaders) messageContext.getProperty(
+				org
+					.apache
+					.axis
+					.message
+					.addressing
+					.Constants
+					.ENV_ADDRESSING_REQUEST_HEADERS);
+		List relatesToList = addressingHeaders.getRelatesTo();
+		if (relatesToList.size() > 0) {
+			RelatesTo relatesTo = (RelatesTo) relatesToList.get(0);
+			MessageID messageId = new MessageID(relatesTo.getURI());
 
-        Address fromAddress = new Address(fromAddressURI);
-        From from = new From(fromAddress);
-        from.toSOAPHeaderElement(envelope);
+			if (clientMessageController != null) {
+				RMMessage rmMessage =
+					clientMessageController.retrieveIfMessageExists(messageId);
+				rmMessage.setResponseMessage(
+					messageContext.getCurrentMessage());
+			}
+		}
+	}
 
-        ReplyTo incommingReplyTo = (ReplyTo) addressingHeaders.getReplyTo();
-        Address incommingAddress = incommingReplyTo.getAddress();
-        To to = new To(new URI(incommingAddress.toString()));
-        to.toSOAPHeaderElement(envelope);
+	/**
+	 * Method createSequenceResponseEnvelope
+	 * 
+	 * create the envelope to send to the source who require the sequence identifier
+	 * 
+	 * @param addressingHeaders
+	 *     
+	 * 
+	 */
+	private SOAPEnvelope createSequenceResponseEnvelope(AddressingHeaders addressingHeaders)
+		throws Exception {
 
-        MessageID incommingMessageId = addressingHeaders.getMessageID();
-        AddressingHeaders outgoingAddressingHaders = new AddressingHeaders();
-        outgoingAddressingHaders.addRelatesTo(
-             incommingMessageId.toString(),
-            (new QName(Constants.WSA_PREFIX, Constants.WSA_NS)));
+		SOAPEnvelope envelope = new SOAPEnvelope();
 
-        //now set the body elements
-        CreateSequenceResponse response = new CreateSequenceResponse();
-        //UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-        Identifier id=new Identifier();
-        id.setIdentifier("uuid:"+uuidGen.nextUUID());
-        response.setIdentifier(id);
-        response.toSoapEnvelop(envelope);
+		envelope.addNamespaceDeclaration(
+			Constants.NS_PREFIX_RM,
+			Constants.NS_URI_RM);
+		envelope.addNamespaceDeclaration(
+			Constants.WSA_PREFIX,
+			Constants.WSA_NS);
+		envelope.addNamespaceDeclaration(
+			Constants.WSU_PREFIX,
+			Constants.WSU_NS);
 
-        outgoingAddressingHaders.toEnvelope(envelope);
+		Action action =
+			new Action(new URI(Constants.ACTION_CREATE_SEQUENCE_RESPONSE));
+		action.toSOAPHeaderElement(envelope);
 
-        return envelope;
-    }
+		UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+		MessageID messageId =
+			new MessageID(new URI("uuid:" + uuidGen.nextUUID()));
+		messageId.toSOAPHeaderElement(envelope);
+
+		To incommingTo = addressingHeaders.getTo();
+		URI fromAddressURI = new URI(incommingTo.toString());
+
+		Address fromAddress = new Address(fromAddressURI);
+		From from = new From(fromAddress);
+		from.toSOAPHeaderElement(envelope);
+
+		ReplyTo incommingReplyTo = (ReplyTo) addressingHeaders.getReplyTo();
+		Address incommingAddress = incommingReplyTo.getAddress();
+		To to = new To(new URI(incommingAddress.toString()));
+		to.toSOAPHeaderElement(envelope);
+
+		MessageID incommingMessageId = addressingHeaders.getMessageID();
+		AddressingHeaders outgoingAddressingHaders = new AddressingHeaders();
+		outgoingAddressingHaders.addRelatesTo(
+			incommingMessageId.toString(),
+			(new QName(Constants.WSA_PREFIX, Constants.WSA_NS)));
+
+		//now set the body elements
+		CreateSequenceResponse response = new CreateSequenceResponse();
+		//UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+		Identifier id = new Identifier();
+		id.setIdentifier("uuid:" + uuidGen.nextUUID());
+		response.setIdentifier(id);
+		response.toSoapEnvelop(envelope);
+
+		outgoingAddressingHaders.toEnvelope(envelope);
+
+		return envelope;
+	}
 
 }
