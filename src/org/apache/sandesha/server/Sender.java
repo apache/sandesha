@@ -21,23 +21,16 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.AxisFault;
-import org.apache.axis.Handler;
 import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.handler.AddressingHandler;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.test.TestHandler;
 import org.apache.sandesha.ws.rm.RMHeaders;
-import org.apache.sandesha.ws.rm.handlers.ClientSyncResponseHandler;
-import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 
 /**
  * @author JEkanayake
