@@ -14,7 +14,6 @@
  *  limitations under the License.
  *
  */
-
 package org.apache.sandesha.samples.interop;
 
 
@@ -49,14 +48,14 @@ public class Scenario_1_1_Client {
             	System.out.println("Pass Target End Point Address as a Parametter");
             	throw new Exception("Target End Point Address did not Set");
             }
-            
+
             call.setTargetEndpointAddress(args[0]);
             call.setOperationName(new QName("PingService", "Ping"));
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
             call.setReturnType(XMLType.AXIS_VOID);
 
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-                    
+
             call.setProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER,"uuid:" + uuidGen.nextUUID());
 			call.setProperty(Constants.CLIENT_ONE_WAY_INVOKE,(new Boolean(true)));
 			call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(false)));
@@ -64,7 +63,7 @@ public class Scenario_1_1_Client {
 
             call.invoke(new Object[] {"Ping 1"});
             call.invoke(new Object[] {"Ping 2"});
-            call.setLastMessage(true);
+	    //call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
             call.invoke(new Object[] {"Ping 3"});
 
         } catch (Exception e) {
