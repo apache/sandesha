@@ -16,6 +16,7 @@
  */
 package org.apache.sandesha.server;
 
+import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
 
 /**
@@ -23,8 +24,8 @@ import org.apache.sandesha.RMMessageContext;
  */
 public interface IRMMessageProcessor {
 	
-	//Returns true if the message has a synchronous response or ack.
-	public boolean processMessage(RMMessageContext rmMessageContext);
+		//Returns true if the message has a synchronous response or ack.
+	public boolean processMessage(RMMessageContext rmMessageContext) throws RMException;
 		
 	public Object getSynchronousResponse();
 

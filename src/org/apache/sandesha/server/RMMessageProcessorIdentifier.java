@@ -17,6 +17,7 @@
 package org.apache.sandesha.server;
 
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 
 import org.apache.sandesha.Constants;
@@ -28,21 +29,21 @@ import org.apache.sandesha.ws.rm.RMHeaders;
  */
 public class RMMessageProcessorIdentifier {
 
-	public IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext) {
+	public IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext, IStorageManager storageManger) {
 
 		AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
 		RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
 		if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
-			return new CreateSequenceProcessor();
+			return new CreateSequenceProcessor(storageManger);
 		} else if (
 			addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
-			return new CreateSequenceResponseProcessor();
+			return new CreateSequenceResponseProcessor(storageManger);
 		} else if (
 			addrHeaders.getAction().toString().equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
-			return new TerminateSequenceProcessor();
+			return new TerminateSequenceProcessor(storageManger);
 		} else {
-			return new CompositeProcessor();
+			return new CompositeProcessor(storageManger);
 		}
 	}
 }
