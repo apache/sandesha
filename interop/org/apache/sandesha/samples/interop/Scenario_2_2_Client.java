@@ -57,7 +57,7 @@ public class Scenario_2_2_Client {
 
 			call.setProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER,"uuid:" + uuidGen.nextUUID());
 			//call.setProperty(Constants.CLIENT_ONE_WAY_INVOKE,(new Boolean(true)));
-			call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(false)));
+			call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(true)));
 			//call.setProperty(Constants.CLIENT_CREATE_SEQUENCE,(new Boolean(false)));
 
 			String seq=uuidGen.nextUUID();
