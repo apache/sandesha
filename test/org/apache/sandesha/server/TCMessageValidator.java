@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.sandesha.test;
+package org.apache.sandesha;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;

@@ -1,4 +1,4 @@
-package org.apache.sandesha.test;
+package org.apache.sandesha;
 
 import java.io.File;
 import java.net.ServerSocket;
