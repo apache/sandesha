@@ -82,9 +82,7 @@ public class LastMessage extends MessageElement implements IRmElement {
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
-
         msgElement.addChildElement("LastMessage", Constants.NS_PREFIX_RM);
-
         return msgElement;
     }
 
