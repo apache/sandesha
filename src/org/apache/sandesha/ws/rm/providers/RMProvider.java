@@ -98,7 +98,7 @@ public class RMProvider extends RPCProvider {
         rmMessageContext.setMsgContext(msgContext);
         rmMessageContext.setAddressingHeaders(addressingHeaders);
         rmMessageContext.setRMHeaders(rmHeaders);
-        if(rmHeaders.getSequence().getLastMessage()!=null)
+        if(rmHeaders.getSequence()!=null  && rmHeaders.getSequence().getLastMessage()!=null)
             rmMessageContext.setLastMessage(true);
 
         new RMMessageProcessorIdentifier();
