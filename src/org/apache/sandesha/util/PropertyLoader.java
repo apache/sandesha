@@ -106,7 +106,7 @@ public class PropertyLoader {
         s = prop.getProperty(Constants.ClientProperties.PROVIDER_CLASS);
 
         if (s == null)
-            return Constants.ClientProperties.PROVIDER_CLASS;
+            return Constants.ClientProperties.DEFAULT_PROVIDER_CLASS;
 
         return s;
     }
