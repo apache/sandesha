@@ -122,5 +122,5 @@ public interface IStorageManager {
     
     public void terminateSequence(String sequenceID);
     
-    public void setAckReceived(RMMessageContext responseMsg);
+    public void setAckReceived(String seqId,long msgNo);
 }

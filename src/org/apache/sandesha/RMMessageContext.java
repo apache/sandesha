@@ -336,6 +336,7 @@ public class RMMessageContext {
             rmMsgContext.setMsgContext(this.msgContext);
         rmMsgContext.setReTransmissionCount(this.reTransmissionCount);
         rmMsgContext.setLastPrecessedTime(this.lastPrecessedTime);
+        rmMsgContext.setLastMessage(this.isLastMessage());
 
     }
 
@@ -421,6 +422,10 @@ public class RMMessageContext {
            //     msgContext2.setService(msgContext1.getService());
 
             if (msgContext1.getSession() != null)
+                msgContext2.setSession(msgContext1.getSession());
+
+
+               if (msgContext1.getSession() != null)
                 msgContext2.setSession(msgContext1.getSession());
 
             if (msgContext1.getSOAPActionURI() != null)
