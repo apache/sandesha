@@ -118,20 +118,21 @@ public class RMSender extends BasicHandler {
             }
             
             if(requestMesssageContext.isLastMessage()){
-                while(!storageManager.isAckComplete(requestMesssageContext.getSequenceID())){
-                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
-                }
-                if(requestMesssageContext.getSync()){
-                    while(!storageManager.isResponseComplete(requestMesssageContext.getSequenceID())){
-                        Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
-                    }   
-                               }
-               storageManager.insertTerminateSeqMessage(getTerminateSeqMessage()); 	
+//                 while(!storageManager.isAckComplete(requestMesssageContext.getSequenceID())){
+//                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+//                }
+//                if(requestMesssageContext.getSync()){
+//                    while(!storageManager.isResponseComplete(requestMesssageContext.getSequenceID())){
+//                        Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+//                    }   
+//                               }
+               storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(requestMesssageContext)); 
                
-               if(storageManager.isAllSequenceComplete()){
-                   senderThread.stop();
-                   sas.stop(); 
-               }
+               
+//               if(storageManager.isAllSequenceComplete()){
+//                   senderThread.stop();
+//                   sas.stop(); 
+//               }
             }
             
             
@@ -145,9 +146,20 @@ public class RMSender extends BasicHandler {
     /**
      * @return
      */
-    private RMMessageContext getTerminateSeqMessage() {
+    private RMMessageContext getTerminateSeqMessage(RMMessageContext rmMessageContext) {
+        RMMessageContext terSeqRMMsgContext = new RMMessageContext();
+        MessageContext terSeqMsgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
+        //RMMessageContext.copyMessageContext(msgContext, messageContext);
+        terSeqRMMsgContext.setOutGoingAddress(rmMessageContext.getOutGoingAddress());
+        SOAPEnvelope terSeqEnv=EnvelopeCreator.createTerminatSeqMessage(rmMessageContext);
+        Message terSeqMsg= new Message(terSeqEnv);
+        
+        terSeqMsgContext.setRequestMessage(terSeqMsg);
+        terSeqRMMsgContext.setMsgContext(terSeqMsgContext);
+        
+        terSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_TERMINATE_SEQUENCE);
         // TODO Auto-generated method stub
-        return null;
+        return terSeqRMMsgContext;
     }
 
     /**
