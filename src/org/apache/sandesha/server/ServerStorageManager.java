@@ -348,5 +348,13 @@ public class ServerStorageManager implements IStorageManager {
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#isResponseComplete(java.lang.String)
+     */
+    public boolean isResponseComplete(String sequenceID) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
    
 }
