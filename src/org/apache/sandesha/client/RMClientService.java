@@ -194,14 +194,21 @@ public class RMClientService {
                         action,
                         replyTo);
 
-                CreateSequence createSqe = new CreateSequence();
-                createSqe.toSoapEnvelop(syncReqEnv);
+                //CreateSequence createSqe = new CreateSequence();
+                //createSqe.toSoapEnvelop(syncReqEnv);
 
-                Service service = new Service();
+                /*Service service = new Service();
                 Call call = (Call) service.createCall();
                 call.setTargetEndpointAddress(destinationURL);
                 call.invoke(syncReqEnv);
-                stringReturn = call.getResponseMessage().getSOAPPartAsString();
+                stringReturn = call.getResponseMessage().getSOAPPartAsString();*/
+                
+				Call call=new Call(destinationURL);
+				Message msg=new Message(syncReqEnv);
+				call.setRequestMessage(msg);
+				call.invoke();
+                
+                
 
             } else {
 
