@@ -16,6 +16,7 @@
  */
 package org.apache.sandesha;
 
+import java.net.URL;
 import java.util.Vector;
 
 import javax.xml.namespace.QName;
@@ -141,10 +142,8 @@ public class EnvelopeCreator {
             AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(
                     envelope, null, true, false, true, false, null);
 
-            Action action = new Action(
-                    new URI(Constants.ACTION_CREATE_SEQUENCE));
-            SOAPHeaderElement acionElement = action
-                    .toSOAPHeaderElement(envelope);
+            Action action = new Action( new URI(Constants.ACTION_CREATE_SEQUENCE));
+            SOAPHeaderElement acionElement = action.toSOAPHeaderElement(envelope);
             outGoingAddressingHaders.setAction(action);
 
             MessageID messageId = new MessageID(new URI("uuid:" + uuid));
@@ -154,11 +153,14 @@ public class EnvelopeCreator {
                 //Setting from the Client
                 outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
                 outGoingAddressingHaders.setTo(addressingHeaders.getTo());
-
+                if(message.getSync()){
+                    outGoingAddressingHaders.setReplyTo(new ReplyTo(new Address(Constants.ANONYMOUS_URI)));
+                }
+                else{
                 if (addressingHeaders.getReplyTo() != null)
                     outGoingAddressingHaders.setReplyTo(addressingHeaders
                             .getReplyTo());
-
+                }
             } else if (endPoint == 1) {
                 //Setting from the Server
                 //setting FROM and REPLY TO
@@ -419,6 +421,7 @@ public class EnvelopeCreator {
             //Setting from the Client
             outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
             outGoingAddressingHaders.setTo(addressingHeaders.getTo());
+            if(addressingHeaders.getReplyTo()!=null)
             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
 
             //TODO
@@ -442,6 +445,15 @@ public class EnvelopeCreator {
             e.printStackTrace();
         }
         return requestEnvelope;
+    }
+
+    /**
+     * @param sequenceID
+     * @return
+     */
+    public static SOAPEnvelope createTerminatSeqMessage(String sequenceID) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
