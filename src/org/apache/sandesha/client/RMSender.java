@@ -53,205 +53,219 @@ import org.apache.sandesha.ws.utility.Identifier;
 
 public class RMSender extends BasicHandler {
 
-	/**
-	 * Initialize the StorageManager Add the messsag to the queue and just
-	 * return Create SimpleAxisServer
-	 */
+    /**
+     * Initialize the StorageManager Add the messsag to the queue and just
+     * return Create SimpleAxisServer
+     */
 
-	private static boolean senderStarted = false;
-	private static boolean serverStarted = false;
-	
-	private IStorageManager storageManager;
+    private static boolean senderStarted = false;
 
-	   
-	       
-	 
+    private static boolean serverStarted = false;
 
-	private SimpleAxisServer sas = null;
-	private Sender sender = null;
-	
-	
-	public void invoke(MessageContext msgContext) throws AxisFault {
-		//Check whether we have messages or not in the queue.
-		//If yes, just add
-		//If no, need to add a priority message.
-		//return.
+    private IStorageManager storageManager;
 
-		//Start the sender
-		//Start the SimpleAxisServer
-		//Initiate the StorageManager
-		//Insert the messae
-		//Return null ; Later return for callback.
-	    
-	    storageManager = new ClientStorageManager();
+    private SimpleAxisServer sas = null;
 
-		if (!senderStarted) {
-		    //Pass the storageManager to the Sender.
-			sender = new Sender(storageManager);
-			Thread senderThread= new Thread(sender);
-			senderThread.setDaemon(true);
-			senderThread.start();
-		}
+    private Sender sender = null;
 
-		if (!serverStarted) {
-			sas = new SimpleAxisServer();
-			serverStarted = true;
+    public void invoke(MessageContext msgContext) throws AxisFault {
+        //Check whether we have messages or not in the queue.
+        //If yes, just add
+        //If no, need to add a priority message.
+        //return.
 
-			try {
-			    
-			    //At this moment we don't know a sequence
-			    long nextMsgNumber=storageManager.getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-			    
-			    if(nextMsgNumber==1){
-			        //This is the first message..
-			        //add a create sequence message
-			        //add the message with the temp seqID
-			        System.out.println("First Message");
-			        long msgNo=1;
-			        
-			        //Addressing information currently hard-coded.
-			        //---------------------------------------------------------------
-			        AddressingHeaders addrHeaders =  new AddressingHeaders();
-			        From from= new From(new Address("http://localhost:8090/axis/services/MyService"));
-			        addrHeaders.setFrom(from);
-			        
-			        To to = new To(new Address("http://127.0.0.1:8080/axis/services/EchoStringService?wsdl"));
-			        addrHeaders.setTo(to);
-			        
-			        ReplyTo replyTo = new ReplyTo(new Address("http://localhost:8090/axis/services/MyService"));
-			        addrHeaders.setReplyTo(replyTo);
-			        //---------------------------------------------------------------
-			        
-			        //Set the tempUUID
-			        String tempUUID="abcdefgh";
-			        RMMessageContext createSeqRMMsgContext=getCreateSeqRMContext( msgContext,addrHeaders,tempUUID);
-			        storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-			        RMMessageContext reqRMMsgContext=getReqRMContext(msgContext, addrHeaders,tempUUID, msgNo);
-			        storageManager.insertRequestMessage(reqRMMsgContext);
-			        
-			        
-			    }else{
-			        //Add the message only.
-			    }
-			    			    
-			    /*RMMessageContext rmMessageContext= new RMMessageContext();
-			    
-			    rmMessageContext.setMsgContext(msgContext);
-			    rmMessageContext.setSequenceID("abc");
-			    storageManager.insertRequestMessage(rmMessageContext);
-			    
-			    storageManager.setTemporaryOutSequence("abc","def");
-			    storageManager.setApprovedOutSequence("def","pqr");
-			    
-			    */
-			    
-			    
-				SimpleProvider sp = new SimpleProvider();
-				sas.setMyConfig(sp);
-				//SOAPService  myService = new SOAPService(new RPCProvider());
+        //Start the sender
+        //Start the SimpleAxisServer
+        //Initiate the StorageManager
+        //Insert the messae
+        //Return null ; Later return for callback.
 
-				Handler addrHanlder = new AddressingHandler();
-				Handler rmHandler = new RMServerRequestHandler();
+        storageManager = new ClientStorageManager();
 
-				SimpleChain shc = new SimpleChain();
-				shc.addHandler(addrHanlder);
-				shc.addHandler(rmHandler);
+        if (!senderStarted) {
+            //Pass the storageManager to the Sender.
+            sender = new Sender(storageManager);
+            Thread senderThread = new Thread(sender);
+            senderThread.setDaemon(true);
+            senderThread.start();
+        }
 
-				SOAPService myService =
-					new SOAPService(shc, new org.apache.sandesha.ws.rm.providers.RMProvider(), null);
-				//			customize the webservice
-				JavaServiceDesc desc = new JavaServiceDesc();
-				myService.setOption("className", "samples.userguide.example3.MyService");
-				myService.setOption("allowedMethods", "*");
+        if (!serverStarted) {
+            sas = new SimpleAxisServer();
+            serverStarted = true;
+            try{
+            SimpleProvider sp = new SimpleProvider();
+            sas.setMyConfig(sp);
+            //SOAPService myService = new SOAPService(new RPCProvider());
 
-				//Add Handlers ; Addressing and ws-rm before the service.
+            Handler addrHanlder = new AddressingHandler();
+            Handler rmHandler = new RMServerRequestHandler();
 
-				desc.setName("MyService");
-				myService.setServiceDescription(desc);
+            SimpleChain shc = new SimpleChain();
+            shc.addHandler(addrHanlder);
+            shc.addHandler(rmHandler);
 
-				//			 deploy the service to server
-				sp.deployService("MyService", myService);
-				//			finally start the server
-				sas.setServerSocket(new ServerSocket(8090));
+            SOAPService myService = new SOAPService(shc,
+                    new org.apache.sandesha.ws.rm.providers.RMProvider(), null);
+            //			customize the webservice
+            JavaServiceDesc desc = new JavaServiceDesc();
+            myService.setOption("className",
+                    "samples.userguide.example3.MyService");
+            myService.setOption("allowedMethods", "*");
 
-				Thread serverThread = new Thread(sas);
-				//serverThread.setDaemon(true);
-				serverThread.start();
-			
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
+            //Add Handlers ; Addressing and ws-rm before the service.
 
-		}
-		
-		msgContext.setResponseMessage(null);
-		
-		
-	}
-	
-	/**
+            desc.setName("MyService");
+            myService.setServiceDescription(desc);
+
+            //			 deploy the service to server
+            sp.deployService("MyService", myService);
+            //			finally start the server
+            sas.setServerSocket(new ServerSocket(8090));
+
+            Thread serverThread = new Thread(sas);
+            //serverThread.setDaemon(true);
+            serverThread.start();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+            
+            
+        }
+        try {
+
+            //At this moment we don't know a sequence
+            long nextMsgNumber = storageManager
+                    .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+
+            if (nextMsgNumber == 1) {
+                //This is the first message..
+                //add a create sequence message
+                //add the message with the temp seqID
+                System.out.println("First Message");
+               
+                //Addressing information currently hard-coded.
+                //---------------------------------------------------------------
+                AddressingHeaders addrHeaders = new AddressingHeaders();
+                From from = new From(new Address(
+                        "http://localhost:8090/axis/services/MyService"));
+                addrHeaders.setFrom(from);
+
+                To to = new To(
+                        new Address(
+                                "http://127.0.0.1:8080/axis/services/EchoStringService?wsdl"));
+                addrHeaders.setTo(to);
+
+                ReplyTo replyTo = new ReplyTo(new Address(
+                        "http://localhost:8090/axis/services/MyService"));
+                addrHeaders.setReplyTo(replyTo);
+                //---------------------------------------------------------------
+
+                //Set the tempUUID
+                String tempUUID = "ABCDEFGH";
+                RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(
+                        msgContext, addrHeaders, tempUUID);
+                storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
+                storageManager.setTemporaryOutSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,"ABCDEFGH");
+                RMMessageContext reqRMMsgContext = getReqRMContext(msgContext,
+                        addrHeaders, tempUUID, nextMsgNumber);
+                storageManager.insertRequestMessage(reqRMMsgContext);
+
+            } else {
+                //Add the message only.
+            }
+
+            /*
+             * RMMessageContext rmMessageContext= new RMMessageContext();
+             * 
+             * rmMessageContext.setMsgContext(msgContext);
+             * rmMessageContext.setSequenceID("abc");
+             * storageManager.insertRequestMessage(rmMessageContext);
+             * 
+             * storageManager.setTemporaryOutSequence("abc","def");
+             * storageManager.setApprovedOutSequence("def","pqr");
+             *  
+             */
+
+        
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        msgContext.setResponseMessage(null);
+
+    }
+
+    /**
      * @param msgContext
      * @param addrHeaders
      * @return
      */
-    private RMMessageContext getReqRMContext(MessageContext msgContext, AddressingHeaders addrHeaders, String uuid, long msgNo) {
+    private RMMessageContext getReqRMContext(MessageContext msgContext,
+            AddressingHeaders addrHeaders, String uuid, long msgNo) {
         // Create the RMMessageContext to hold the create Sequence Request.
-        
+
         //RMHeaders for the message.
         RMHeaders rmHeaders = new RMHeaders();
-        
+
         //Sequence for the new message.
-        Sequence seq=new Sequence();
-        Identifier id= new Identifier();
+        Sequence seq = new Sequence();
+        Identifier id = new Identifier();
         id.setIdentifier(uuid);
         seq.setIdentifier(id);
         rmHeaders.setSequence(seq);
-        
+
         //Message Number for the new message.
-        MessageNumber msgNumber= new MessageNumber();
+        MessageNumber msgNumber = new MessageNumber();
         msgNumber.setMessageNumber(msgNo);
         seq.setMessageNumber(msgNumber);
-        
-         
-        RMMessageContext reqRMMsgContext= new RMMessageContext();
+
+        RMMessageContext reqRMMsgContext = new RMMessageContext();
         //Set the RMheaders to the RMMessageContext.
         reqRMMsgContext.setRMHeaders(rmHeaders);
         //Set the addrssing headers to RMMessageContext.
         reqRMMsgContext.setAddressingHeaders(addrHeaders);
         reqRMMsgContext.setMsgContext(msgContext);
-        reqRMMsgContext.setOutGoingAddress("http://127.0.0.1:8080/axis/services/EchoStringService?wsdl");
-        SOAPEnvelope resEnvelope = EnvelopeCreator.createServiceRequestEnvelope(uuid,
-                reqRMMsgContext, Constants.CLIENT);
-        
+        reqRMMsgContext
+                .setOutGoingAddress("http://127.0.0.1:8080/axis/services/EchoStringService?wsdl");
+        SOAPEnvelope resEnvelope = EnvelopeCreator
+                .createServiceRequestEnvelope(uuid, reqRMMsgContext,
+                        Constants.CLIENT);
+
         return reqRMMsgContext;
     }
 
-    private RMMessageContext getCreateSeqRMContext(MessageContext msgContext, AddressingHeaders addrHeaders, String uuid) throws MalformedURIException{
-	    //Set the action
-	    Action action = new Action(
-                new URI(Constants.ACTION_CREATE_SEQUENCE));
+    private RMMessageContext getCreateSeqRMContext(MessageContext msgContext,
+            AddressingHeaders addrHeaders, String uuid)
+            throws MalformedURIException {
+        //Set the action
+        Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE));
         addrHeaders.setAction(action);
-        
+
         //Create the RMMessageContext to hold the create Sequence Request.
-        RMMessageContext createSeqRMMsgContext= new RMMessageContext();
+        RMMessageContext createSeqRMMsgContext = new RMMessageContext();
         createSeqRMMsgContext.setAddressingHeaders(addrHeaders);
-        
+
         //Set the outgoing address these need to be corrected.
-        createSeqRMMsgContext.setOutGoingAddress("http://127.0.0.1:8080/axis/services/EchoStringService?wsdl");
-        
-        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid,
-                createSeqRMMsgContext, Constants.CLIENT);
-        
-        MessageContext createSeqMsgContext = new MessageContext(msgContext.getAxisEngine());
-        
-       
+        createSeqRMMsgContext
+                .setOutGoingAddress("http://127.0.0.1:8080/axis/services/EchoStringService?wsdl");
+
+        SOAPEnvelope resEnvelope = EnvelopeCreator
+                .createCreateSequenceEnvelope(uuid, createSeqRMMsgContext,
+                        Constants.CLIENT);
+
+        MessageContext createSeqMsgContext = new MessageContext(msgContext
+                .getAxisEngine());
+
         createSeqMsgContext.setRequestMessage(new Message(resEnvelope));
         createSeqRMMsgContext.setMsgContext(createSeqMsgContext);
 
         //Set the message type
-        createSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
-	    return createSeqRMMsgContext;
-	}
+        createSeqRMMsgContext
+                .setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
+        return createSeqRMMsgContext;
+    }
 
 }
 

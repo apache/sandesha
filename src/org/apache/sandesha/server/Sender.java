@@ -71,8 +71,8 @@ public class Sender implements Runnable {
                         try {
 
                             System.out.println("CREATE SEQ REQUESET");
-                            storageManager.setApprovedOutSequence(
-                                    "abcdefghijk", "1233abcdefghijk");
+                            //storageManager.setApprovedOutSequence(
+                            //        "abcdefghijk", "1233abcdefghijk");
 
                             //Send the message.
                             //may get the reply back to here.
@@ -108,8 +108,8 @@ public class Sender implements Runnable {
                                     System.out
                                             .println("Fault for the CreateSequenceRequest");
                                     //For testing only.
-                                    storageManager.setApprovedOutSequence(
-                                            "abcdefghijk", "1233abcdefghijk");
+                                    //storageManager.setApprovedOutSequence(
+                                    //        "abcdefghijk", "1233abcdefghijk");
                                 } else if (messagePrcessor instanceof CreateSequenceResponseProcessor) {
                                     try {
                                         messagePrcessor
