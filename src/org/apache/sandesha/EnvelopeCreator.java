@@ -147,7 +147,7 @@ public class EnvelopeCreator {
 	 * @param ackRangeVector
 	 * @return
 	 */
-	public static SOAPEnvelope createAcknowledgement(RMMessageContext rmMessageContext, Vector ackRangeVector) {
+	public static SOAPEnvelope createAcknowledgementEnvelope(RMMessageContext rmMessageContext, Vector ackRangeVector) {
 		
 		AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
 		SOAPEnvelope envelope = createBasicEnvelop();
@@ -195,6 +195,16 @@ public class EnvelopeCreator {
 		}
 		
 		return envelope;
+	}
+
+
+
+	/**
+	 * @param rmMessageContext
+	 */
+	public static SOAPEnvelope createServiceResponseEnvelope(RMMessageContext rmMessageContext) {
+		
+		return null;
 	}
 
 }
