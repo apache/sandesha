@@ -56,12 +56,11 @@ public class Scenario_1_1_Client {
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
             
             call.setProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER,"uuid:" + uuidGen.nextUUID());
-            call.setProperty(Constants.CLIENT_ONE_WAY_INVOKE,(new Boolean(true)));
             call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(false)));
-            call.setProperty(Constants.CLIENT_CREATE_SEQUENCE,(new Boolean(false)));
-            
+          
             call.invoke(new Object[] {"Ping 1"});
             call.invoke(new Object[] {"Ping 2"});
+			call.setProperty(Constants.CLIENT_LAST_MESSAGE,(new Boolean(false)));
             //call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
             call.invoke(new Object[] {"Ping 3"});
             
