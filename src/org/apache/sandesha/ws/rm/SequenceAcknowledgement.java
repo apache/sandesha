@@ -131,6 +131,7 @@ public class SequenceAcknowledgement extends MessageElement
        
         headerElement.setActor(null);
         headerElement.setName("SequenceAcknowledgement");
+        headerElement.setMustUnderstand(true);
 
         Iterator iterator = ackRanges.iterator();
 

@@ -107,6 +107,7 @@ public class AckRequested extends MessageElement implements IRmElement {
         // .setActor(null);
         headerElement.setActor(null);
         headerElement.setName("AckRequested");
+        headerElement.setMustUnderstand(true);
 
         if (identifier != null) {
             identifier.toSOAPEnvelope(headerElement);

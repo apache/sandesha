@@ -84,6 +84,7 @@ public class CreateSequence implements IRmElement {
                 (SOAPBodyElement) env.getBody().addBodyElement(name);
 
         bodyElement.setName("CreateSequence");
+       
 
         return env;
     }
