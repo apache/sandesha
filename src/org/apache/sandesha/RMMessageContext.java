@@ -58,7 +58,21 @@ public class RMMessageContext {
     //This will be used to handle the relates to field.
     //When sending the response messages from the server
     private String oldSequenceID=null;
+    
+    private long msgNumber=0;
 
+    /**
+     * @return Returns the msgNumber.
+     */
+    public long getMsgNumber() {
+        return msgNumber;
+    }
+    /**
+     * @param msgNumber The msgNumber to set.
+     */
+    public void setMsgNumber(long msgNumber) {
+        this.msgNumber = msgNumber;
+    }
     /**
      * @return Returns the oldSequenceID.
      */
