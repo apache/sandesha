@@ -203,8 +203,8 @@ public class EnvelopeCreator {
 	 * @param rmMessageContext
 	 */
 	public static SOAPEnvelope createServiceResponseEnvelope(RMMessageContext rmMessageContext) {
-		
-		return null;
+		SOAPEnvelope responseEnvelope = createBasicEnvelop();
+		return responseEnvelope;
 	}
 
 }
