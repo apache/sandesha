@@ -308,14 +308,21 @@ public class ServerStorageManager implements IStorageManager {
 
     }
 
-    public RMMessageContext checkForResponseMessage(String requestId) {
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#checkForResponseMessage(java.lang.String, java.lang.String)
+     */
+    public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
-    public boolean checkForAcknowledgement(String requestMsgId) {
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#checkForAcknowledgement(java.lang.String, java.lang.String)
+     */
+    public boolean checkForAcknowledgement(String sequenceId, String requestMsgId) {
         // TODO Auto-generated method stub
         return false;
     }
+
+   
 }

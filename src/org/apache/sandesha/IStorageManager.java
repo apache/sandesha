@@ -106,7 +106,8 @@ public interface IStorageManager {
 
     public void insertIncomingMessage(RMMessageContext rmMessageContext);
     
-    public RMMessageContext checkForResponseMessage(String requestMsgId);
+    public RMMessageContext checkForResponseMessage(String sequenceId,String requestMsgId);
     
-    public boolean checkForAcknowledgement(String requestMsgId);
+    public boolean checkForAcknowledgement(String sequenceId,String requestMsgId);
+
 }

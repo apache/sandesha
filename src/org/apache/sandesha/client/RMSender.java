@@ -119,8 +119,7 @@ public class RMSender extends BasicHandler {
             if (requestMesssageContext.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
-                    responseMessageContext = checkTheQueueForResponse(requestMesssageContext
-                            .getMessageID());
+                    responseMessageContext = checkTheQueueForResponse(requestMesssageContext.getSequenceID(),requestMesssageContext.getMessageID());
                     Thread.sleep(500);
                     System.out.println("Checking for Responses");
 
@@ -134,8 +133,7 @@ public class RMSender extends BasicHandler {
             } else {
                 boolean gotAck = false;
                 while (!gotAck) {
-                    gotAck = checkTheQueueForAck(requestMesssageContext
-                            .getMessageID());
+                    gotAck = checkTheQueueForAck(requestMesssageContext.getSequenceID(),requestMesssageContext.getMessageID());
                     Thread.sleep(500);
                     System.out.println("Checking for Acks");
                 }
@@ -455,12 +453,12 @@ public class RMSender extends BasicHandler {
         return responseExpeceted;
     }
 
-    private boolean checkTheQueueForAck(String reqMessageID) {
-        return storageManager.checkForAcknowledgement(reqMessageID);
+    private boolean checkTheQueueForAck(String sequenceId, String reqMessageID) {
+        return storageManager.checkForAcknowledgement(sequenceId, reqMessageID);
     }
 
-    private RMMessageContext checkTheQueueForResponse(String reqMessageID) {
-        return storageManager.checkForResponseMessage(reqMessageID);
+    private RMMessageContext checkTheQueueForResponse(String sequenceId,String reqMessageID) {
+        return storageManager.checkForResponseMessage(sequenceId, reqMessageID);
 
     }
 

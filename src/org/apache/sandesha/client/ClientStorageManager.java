@@ -329,30 +329,21 @@ public class ClientStorageManager implements IStorageManager {
 
     }
 
-    public RMMessageContext checkForResponseMessage(String requestMsgId) {
-
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
-
-        RMMessageContext response = accessor.checkForResponseMessage(
-                requestMsgId, Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        return response;
-
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#checkForResponseMessage(java.lang.String, java.lang.String)
+     */
+    public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public boolean checkForAcknowledgement(String requestMsgId) {
-
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
-
-        //Request message will be present in the queue only if the ack has not
-        // been
-        //receive. It will be deleted by the AckProcessor when an ack get
-        // received.
-
-        boolean requestPresent = accessor.isRequestMessagePresent(
-                Constants.CLIENT_DEFAULD_SEQUENCE_ID, requestMsgId);
-        return !requestPresent;
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#checkForAcknowledgement(java.lang.String, java.lang.String)
+     */
+    public boolean checkForAcknowledgement(String sequenceId, String requestMsgId) {
+        // TODO Auto-generated method stub
+        return false;
     }
+
 
 }
