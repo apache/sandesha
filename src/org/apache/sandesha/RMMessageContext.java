@@ -71,7 +71,7 @@ public class RMMessageContext {
 
     private boolean ackReceived = false;
 
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
 
     /**
      * @return Returns the responseReceived.

@@ -36,7 +36,7 @@ import java.util.Vector;
  * @author JEkanayake
  */
 public class EnvelopeCreator {
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(EnvelopeCreator.class.getName());
 
     public static SOAPEnvelope createCreateSequenceResponseEnvelope(String uuid, RMMessageContext rmMessageContext) throws Exception {
 

@@ -51,7 +51,7 @@ import java.util.List;
 public class RMProvider extends RPCProvider {
 
     private boolean client;
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(RMProvider.class.getName());
 
 
     public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)

@@ -42,7 +42,7 @@ import javax.xml.soap.SOAPException;
  */
 public class Sender implements Runnable {
 
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(Sender.class.getName());
     public boolean running = true;
     private IStorageManager storageManager;
 

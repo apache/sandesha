@@ -26,14 +26,13 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 public class RMSender extends BasicHandler {
 
     private IStorageManager storageManager;
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(RMSender.class.getName());
 
     public void invoke(MessageContext msgContext) throws AxisFault {
 

@@ -55,7 +55,7 @@ public class RMInitiator {
     private static Thread thSender;
     private static Thread thInvoker;
     private static Sender sender;
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(RMInitiator.class.getName());
 
     public static IStorageManager init(boolean client) {
         if (client) {

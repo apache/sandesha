@@ -35,7 +35,7 @@ import javax.xml.soap.SOAPException;
 
 public final class MessageValidator {
     private static IStorageManager storageMgr = null;
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(MessageValidator.class.getName());
 
     public static void validate(final RMMessageContext rmMsgContext, boolean client) throws AxisFault {
 

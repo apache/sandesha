@@ -45,7 +45,7 @@ import javax.xml.soap.SOAPEnvelope;
  */
 public class RMInvoker implements Runnable {
     private IStorageManager storageManager = null;
-    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private static final Log log = LogFactory.getLog(RMInvoker.class.getName());
 
     public RMInvoker() {
         storageManager = new ServerStorageManager();
