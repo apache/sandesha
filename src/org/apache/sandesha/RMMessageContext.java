@@ -18,6 +18,8 @@ package org.apache.sandesha;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
  * @author JEkanayake
@@ -30,6 +32,9 @@ public class RMMessageContext {
 	private Object obj;
 	private String sequenceID;
 	private String messageID;
+	private AddressingHeaders addressingHeaders;
+	private RMHeaders rmHeaders;
+	
 
 	/**
 	 * @return
@@ -113,6 +118,34 @@ public class RMMessageContext {
 	 */
 	public void setMessageID(String string) {
 		messageID = string;
+	}
+
+	/**
+	 * @return
+	 */
+	public AddressingHeaders getAddressingHeaders() {
+		return addressingHeaders;
+	}
+
+	/**
+	 * @return
+	 */
+	public RMHeaders getRMHeaders() {
+		return rmHeaders;
+	}
+
+	/**
+	 * @param headers
+	 */
+	public void setAddressingHeaders(AddressingHeaders addressingHeaders) {
+		this.addressingHeaders = addressingHeaders;
+	}
+
+	/**
+	 * @param headers
+	 */
+	public void setRMHeaders(RMHeaders rmHeaders) {
+		this.rmHeaders = rmHeaders;
 	}
 
 }
