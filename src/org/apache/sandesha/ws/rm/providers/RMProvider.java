@@ -71,8 +71,6 @@ public class RMProvider extends RPCProvider {
             return;
         }
 
-        System.out.println("VALIDATION IS PASSED .................................................");
-
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
 
@@ -106,9 +104,9 @@ public class RMProvider extends RPCProvider {
             return;
         }
         
-        SandeshaQueue sq = SandeshaQueue.getInstance();
-        sq.displayIncomingMap();
-        sq.displayOutgoingMap();
+//        SandeshaQueue sq = SandeshaQueue.getInstance();
+//        sq.displayIncomingMap();
+//        sq.displayOutgoingMap();
     }
 
     //This is used by the Client to set the

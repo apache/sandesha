@@ -25,8 +25,8 @@ import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
-import org.apache.sandesha.ws.rm.providers.RMProvider;
 import org.apache.sandesha.util.PropertyLoader;
+import org.apache.sandesha.ws.rm.providers.RMProvider;
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
@@ -94,15 +94,14 @@ public class RMInitiator {
     }
 
     public static RMStatus stopClient() {
-
         //This should check whether we have received all the acks or reponses if any
         IStorageManager storageManager = new ClientStorageManager();
         storageManager.isAllSequenceComplete();
 
-        while(!storageManager.isAllSequenceComplete()){
+        while (!storageManager.isAllSequenceComplete()) {
             try {
-                System.out.println("Checking to stop the client......................");
-                Thread.sleep(1000);
+                System.out.println("INFO : Waiting to Stop Client .....");
+                Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
             } catch (InterruptedException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
@@ -110,11 +109,6 @@ public class RMInitiator {
 
         if (listenerStarted)
             sas.stop();
-//        try {
-//            Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
         sender.setRunning(false);
         return new RMStatus();
 
@@ -124,13 +118,13 @@ public class RMInitiator {
     private static void startListener() {
 
         try {
-            System.out.println("Sandesha Client Side Listener Started ....");
+            System.out.println("INFO : Sandesha Client Side Listener Started ....");
             sas = new SimpleAxisServer();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
 
-            Document doc = db.parse(new File("config/client-listener-config.wsdd"));
+            Document doc = db.parse(new File(Constants.CLIENT_LISTENER_CONFIG));
             WSDDDocument wsdddoc = new WSDDDocument(doc);
             WSDDDeployment wsdddep = wsdddoc.getDeployment();
             sas.setMyConfig(wsdddep);
@@ -139,7 +133,6 @@ public class RMInitiator {
             SOAPService service = sas.getMyConfig().getService(new QName("RMService"));
             RMProvider rmP = (RMProvider) service.getPivotHandler();
             rmP.setClient(true);
-            System.out.println(" Service " + service.getPivotHandler());
 
             sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
             Thread serverThread = new Thread(sas);

@@ -16,10 +16,9 @@
  */
 package org.apache.sandesha.server.msgprocessors;
 
-import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.axis.AxisFault;
+import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.sandesha.IStorageManager;
-import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.CreateSequenceResponse;
 
@@ -35,13 +34,9 @@ public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
 
-        CreateSequenceResponse createSeqRes = rmMessageContext.getRMHeaders()
-                .getCreateSequenceResponse();
-        //Assumne that the relatesTo is present.
-        //CHEK CHEK
-        // *********************************************************************************
-        RelatesTo relatesTo = (RelatesTo) rmMessageContext
-                .getAddressingHeaders().getRelatesTo().get(0);
+        CreateSequenceResponse createSeqRes = rmMessageContext.getRMHeaders().getCreateSequenceResponse();
+
+        RelatesTo relatesTo = (RelatesTo) rmMessageContext.getAddressingHeaders().getRelatesTo().get(0);
         String sequenceID = createSeqRes.getIdentifier().toString();
         //Approve the sequences. Now we can start sending the messages using
         // that sequence.

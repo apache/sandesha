@@ -27,7 +27,7 @@ public class PropertyLoader {
      public static int getSimpleAxisServerPort(){
        Properties prop=loadProperties();
        if(prop!=null){
-          return  new Integer(prop.getProperty("SIMPLE_AXIS_SERVER_PORT")).intValue();
+          return  new Integer(prop.getProperty(Constants.SIMPLE_AXIS_SERVER_PORT_POPERTY)).intValue();
        }else
            return Constants.DEFAULR_CLIENT_SIDE_LISTENER_PORT;
 
@@ -37,7 +37,7 @@ public class PropertyLoader {
           Properties properties = new Properties();
     try {
         System.out.println((new File(".")).getAbsolutePath());
-        properties.load(new FileInputStream("config/sandesha.properties"));
+        properties.load(new FileInputStream(Constants.PROPERTIES_CONFIG));
         return properties;
     } catch (IOException e) {
         e.printStackTrace();

@@ -46,6 +46,12 @@ public interface Constants {
 
     public static final int DEFAULR_CLIENT_SIDE_LISTENER_PORT=8090;
 
+    public static final String CLIENT_LISTENER_CONFIG="config/client-listener-config.wsdd";
+
+    public static final String PROPERTIES_CONFIG="config/sandesha.properties";
+
+    public static final String SIMPLE_AXIS_SERVER_PORT_POPERTY="SIMPLE_AXIS_SERVER_PORT";
+
     /**
      * Namespace for wsu.
      */
@@ -269,7 +275,7 @@ public interface Constants {
     public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
 
 
-    public static final long CLIENT_WAIT_PERIOD_FOR_COMPLETE=10000l;
+    public static final long CLIENT_WAIT_PERIOD_FOR_COMPLETE=1000l;
 
 
     public interface FaultMessages {

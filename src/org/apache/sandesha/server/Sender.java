@@ -22,13 +22,16 @@ import org.apache.axis.Message;
 import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.message.addressing.handler.AddressingHandler;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 
@@ -40,8 +43,9 @@ import javax.xml.soap.SOAPException;
  * @author JEkanayake
  */
 public class Sender implements Runnable {
-    public boolean running = true;
 
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    public boolean running = true;
     private IStorageManager storageManager;
 
     public Sender() {
@@ -93,8 +97,7 @@ public class Sender implements Runnable {
             long timeGap = System.currentTimeMillis() - startTime;
             if ((timeGap - Constants.SENDER_SLEEP_TIME) <= 0) {
                 try {
-                    System.out.print("|"); //Sender THREAD IS SLEEPING
-                    // -----------XXX----------\n");
+                    //System.out.print("|"); //Sender THREAD IS SLEEPING
                     Thread.sleep(Constants.SENDER_SLEEP_TIME - timeGap);
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -180,18 +183,14 @@ public class Sender implements Runnable {
         // Here there is no concept of sending synchronous CreateSequenceRequest
         // resposne.
         if (rmMessageContext.getMsgContext().getResponseMessage() == null) {
-            System.err.println("ERROR: NULL RESPONSE MESSAGE");
+            log.error("ERROR: NULL RESPONSE MESSAGE");
         } else {
             rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
             rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             Call call = prepareCall(rmMessageContext);
             call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
             call.invoke();
-            if (call.getResponseMessage() != null) {
-                System.out.println("RESPONSE MESSAGE IS NOT NULL");
-                System.out.println(call.getResponseMessage().getSOAPEnvelope().toString());
-            }
-        }
+         }
     }
 
     private Call prepareCall(RMMessageContext rmMessageContext) throws ServiceException, AxisFault {
@@ -218,7 +217,7 @@ public class Sender implements Runnable {
 
     private void sendServiceRequest(RMMessageContext rmMessageContext) throws Exception {
         if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
-            System.err.println("ERROR: NULL REQUEST MESSAGE");
+            log.error("ERROR : NULL REQUEST MESSAGE");
         } else {
             SOAPEnvelope requestEnvelope = null;
             //Need to create the response envelope.
@@ -233,7 +232,6 @@ public class Sender implements Runnable {
                 storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
                 call.invoke();
                 processResponseMessage(call, rmMessageContext);
-
 
             } else {
                 Call call = prepareCall(rmMessageContext);

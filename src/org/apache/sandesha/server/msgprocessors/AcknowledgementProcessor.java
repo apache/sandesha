@@ -16,13 +16,18 @@
  */
 package org.apache.sandesha.server.msgprocessors;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.AxisFault;
-import org.apache.sandesha.*;
+import org.apache.axis.components.logger.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.sandesha.Constants;
+import org.apache.sandesha.EnvelopeCreator;
+import org.apache.sandesha.IStorageManager;
+import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.AcknowledgementRange;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
-import org.apache.xml.utils.QName;
 
 import javax.xml.soap.SOAPEnvelope;
 import java.util.Iterator;
@@ -35,6 +40,7 @@ import java.util.Vector;
  */
 public final class AcknowledgementProcessor implements IRMMessageProcessor {
     private IStorageManager storageManager = null;
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public AcknowledgementProcessor(IStorageManager storageManager) {
         this.storageManager = storageManager;
@@ -50,8 +56,8 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             AcknowledgementRange ackRange = (AcknowledgementRange) ite.next();
             long msgNumber = ackRange.getMinValue();
             while (ackRange.getMaxValue() >= msgNumber) {
-                 if(!storageManager.isSentMsg(seqID, msgNumber)){
-                   throw new AxisFault(new javax.xml.namespace.QName(Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT), Constants.FaultMessages.INVALID_ACKNOWLEDGEMENT, null, null);
+                if (!storageManager.isSentMsg(seqID, msgNumber)) {
+                    throw new AxisFault(new javax.xml.namespace.QName(Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT), Constants.FaultMessages.INVALID_ACKNOWLEDGEMENT, null, null);
                 }
                 storageManager.setAckReceived(seqID, msgNumber);
                 storageManager.setAcknowledged(seqID, msgNumber);
@@ -64,20 +70,12 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
 
 
     public boolean sendAcknowledgement(RMMessageContext rmMessageContext) throws AxisFault {
-        //EnvelopCreater createAcknowledgement
-        //if async then add message to the queue
+        //EnvelopCreater createAcknowledgement.  If async then add message to the queue
         //else set the response env of the messageContext.
         String seqID = rmMessageContext.getSequenceID();
 
-        long messageNumber = rmMessageContext.getRMHeaders().getSequence() .getMessageNumber().getMessageNumber();
-        //Assume that the list is sorted and in the ascending order.
+        long messageNumber = rmMessageContext.getRMHeaders().getSequence().getMessageNumber().getMessageNumber();
         Map listOfMsgNumbers = storageManager.getListOfMessageNumbers(seqID);
-
-        if (null == listOfMsgNumbers)
-            System.out.println("MSG Number list is NULL");
-//        else {
-//            Iterator ite = listOfMsgNumbers.keySet().iterator();
-//        }
 
         Vector ackRangeVector = null;
         if (listOfMsgNumbers != null) {
@@ -89,49 +87,37 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             ackRange.setMinValue(messageNumber);
             ackRangeVector.add(ackRange);
         }
-
         RMMessageContext rmMsgContext = getAckRMMsgCtx(rmMessageContext, ackRangeVector);
 
-        //FIX THIS FIX THIS //FIX THIS FIX THIS //FIX THIS FIX THIS
-        //Need to change this to the new Anonymous URI.
-        if ((true == (rmMessageContext.getAddressingHeaders().getFrom().getAddress().toString()
-                .equals(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS)))
-                || ("http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous".equals(rmMessageContext.getAddressingHeaders().getFrom()
-                .getAddress().toString()))) {
+        if (true == (rmMessageContext.getAddressingHeaders().getFrom().getAddress().toString()
+                .equals(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS))) {
+//                || ("http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous".equals(rmMessageContext.getAddressingHeaders().getFrom()
+//                .getAddress().toString()))) {
             //Now we have synchronized ack.
             //The original message context is used to send the ack
             // asynchronously to the client.
             //So the response message is replaced by the new ack message.
-            try{
+            try {
                 String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPPartAsString();
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(soapMsg));
-            }catch(AxisFault af){
+            } catch (AxisFault af) {
                 af.setFaultCodeAsString(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);
                 throw af;
             }
-
             return true;
         } else {
-            //Store the asynchronize ack in the queue.
-            //The name for this queue is not yet fixed.
-            //RENAME insertAcknowledgement(rmMessageContext)
+            //Store the asynchronize ack in the queue. The name for this queue is not yet fixed.
             storageManager.addAcknowledgement(rmMsgContext);
             return false;
         }
-
     }
 
     private static RMMessageContext getAckRMMsgCtx(RMMessageContext rmMessageContext, Vector ackRangeVector) {
-
-        SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext, ackRangeVector);
-        //Add the envelope to the response message of the messageContext.
-        //rmMessageContext.getMsgContext().setResponseMessage(new
-        // Message(ackEnvelope));
         RMMessageContext rmMsgContext = new RMMessageContext();
         try {
+            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext, ackRangeVector);
             //Create a new message using the ackEnvelope
             Message resMsg = new Message(ackEnvelope);
-
             //Create a new message context to store the ack message.
             MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
             //Copy the contents of the rmMessageContext to the rmMsgContext.
@@ -141,16 +127,14 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             //Set the msgContext to the rmMsgContext
             rmMsgContext.setMsgContext(msgContext);
 
-            //Get the from address to send the Ack.
-            //Doesn't matter whether we have Sync or ASync messages.
+            //Get the from address to send the Ack. Doesn't matter whether we have Sync or ASync messages.
             //If we have Sync them this property is not used.
-            rmMsgContext.setOutGoingAddress(rmMessageContext
-                    .getAddressingHeaders().getFrom().getAddress().toString());
+            rmMsgContext.setOutGoingAddress(rmMessageContext.getAddressingHeaders().getFrom().getAddress().toString());
             //Set the messsage type
             rmMsgContext.setMessageType(Constants.MSG_TYPE_ACKNOWLEDGEMENT);
         } catch (Exception e) {
             e.printStackTrace();
-            //TODO: Log the error
+            log.error(e);
         }
         return rmMsgContext;
     }
@@ -203,14 +187,12 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
                 }
             }
             if (found) {
-                //System.out.println("Range "+min+" "+max);
                 AcknowledgementRange ackRange = new AcknowledgementRange();
                 ackRange.setMaxValue(max);
                 ackRange.setMinValue(min);
                 vec.add(ackRange);
             }
         } else {
-            // System.out.println("Range "+min+" "+max);
             AcknowledgementRange ackRange = new AcknowledgementRange();
             ackRange.setMaxValue(max);
             ackRange.setMinValue(min);

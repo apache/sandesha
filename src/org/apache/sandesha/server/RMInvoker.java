@@ -18,14 +18,17 @@ package org.apache.sandesha.server;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.RMMessageCreator;
 
 import javax.xml.soap.SOAPEnvelope;
@@ -39,6 +42,7 @@ import javax.xml.soap.SOAPEnvelope;
  */
 public class RMInvoker implements Runnable {
     private IStorageManager storageManager = null;
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public RMInvoker() {
         storageManager = new ServerStorageManager();
@@ -49,145 +53,75 @@ public class RMInvoker implements Runnable {
     public void run() {
         while (true) {
             try {
-                // System.out
-                //        .print("|");
-
-                //Sleep for Constants.RMINVOKER_SLEEP_TIME.
-                //Currently the RMInvoker is a single thread, but this needs to
-                // be replaced by a thread pool so that the performance can be
-                // improved.
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);
-                //Get the next message to invoke.
-                //storeManager is responsible of giving the correct message to
-                // invoke.
+
                 RMMessageContext rmMessageContext = storageManager.getNextMessageToProcess();
 
-                //If not return is null then proceed with invokation.
                 if (rmMessageContext != null) {
-                    //Currently RPCProvider is used as the default provider and
-                    // this is
-                    //used to actually invoke the service.
-                    //To provide a maximum flexibility the actual provider
-                    // should be a
-                    //configurable entity where the class can be loaded at
-                    // runtime.
+                    //Currently RPCProvider is used as the default provider and this is used to actually invoke the service.
+                    //To provide a maximum flexibility the actual provider should be a configurable entity
+                    // where the class can be loaded at runtime.
                     RPCProvider rpcProvider = new RPCProvider();
-
-
                     rpcProvider.invoke(rmMessageContext.getMsgContext());
-                
-                    //Check whether we have an output (response) or not.
 
                     if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() != Void.TYPE) {
                         if (rmMessageContext.isLastMessage()) {
                             //Insert Terminate Sequnce.
                             AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
-
                             if (addrHeaders.getReplyTo() != null) {
                                 String replyTo = addrHeaders.getReplyTo().getAddress().toString();
-
-                                 RMMessageContext terminateMsg= RMMessageCreator.createTerminateSeqMsg(rmMessageContext);
-                            terminateMsg.setOutGoingAddress(replyTo);
-                            storageManager.insertTerminateSeqMessage(terminateMsg);
-                            }else{
-                                System.out.println("SERVER ERROR , CANNOT SEND THE TERMINTATION");
-                                //TODO LOG THE ERROR
+                                RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(rmMessageContext);
+                                terminateMsg.setOutGoingAddress(replyTo);
+                                storageManager.insertTerminateSeqMessage(terminateMsg);
+                            } else {
+                                System.out.println("SERVER ERROR, CANNOT SEND THE TERMINTATION");
+                                log.error("SERVER ERROR: Cannot send the CreateSequenceRequest from Server");
                             }
-
                         }
-                        //System.out
-                        //        .println("STORING THE RESPONSE MESSAGE.....\n");
-                        //Store the message in the response queue.
-                        //If there is an application response then that
-                        // response is always sent using
-                        //a new HTTP connection and the <replyTo> header is
-                        // used in this case.
-                        //This is done by the RMSender.
+                        //Store the message in the response queue. If there is an application response then that
+                        // response is always sent using a new HTTP connection and the <replyTo> header is
+                        // used in this case. This is done by the RMSender.
                         rmMessageContext.setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
 
-                        //System.out.println("TESTING FOR RESPONSE SEQUENCE");
-                        boolean firstMsgOfResponseSeq = !storageManager
-                                .isResponseSequenceExist(rmMessageContext.getSequenceID());
+                        boolean firstMsgOfResponseSeq = !storageManager.isResponseSequenceExist(rmMessageContext.getSequenceID());
                         rmMessageContext.setMsgNumber(storageManager.getNextMessageNumber(rmMessageContext
                                 .getSequenceID()));
-                        ////System.out.println("SEQUENCE ID -
-                        // "+rmMessageContext.getSequenceID());
-                        //System.out.println("msgNo -
-                        // "+storageManager.getNextMessageNumber(rmMessageContext.getSequenceID()));
                         storageManager.insertOutgoingMessage(rmMessageContext);
-                        //This will automatically create a response requence
-                        // and add the message.
-                        //Need to decide whether the server needs resource
-                        // reclamtion or not.
-                        //This can be a property set by adminstrator and may be
-                        // in the deploy.wsdd
-                        //If it is not required to send the
-                        // CreateSequenceRequest messages before sending
-                        //application respones then we can use the same
-                        // sequence as the incoming one or
-                        //can create a new UUID from here.
 
                         if (firstMsgOfResponseSeq) {
-                            // System.out.println("NO RESPONSE SEQUENCE");
-
-
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);
-
-                            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext()
-                                    .getAxisEngine());
-                            RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(),
-                                    msgContext);
+                            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
+                            RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(), msgContext);
                             //Set this new msgContext to the rmMsgContext.
 
                             rmMsgContext.setMsgContext(msgContext);
-                            rmMsgContext
-                                    .setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
+                            rmMsgContext.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
 
                             UUIDGen uuid = UUIDGenFactory.getUUIDGen();
                             String id = uuid.nextUUID();
 
-                            //Need to add "uuid" or we can always remove this
-                            // part
-                            //Posible Problem
-                            //TODO
-                            storageManager.setTemporaryOutSequence(rmMsgContext
-                                    .getSequenceID(), Constants.UUID + id);
+                            storageManager.setTemporaryOutSequence(rmMsgContext.getSequenceID(), Constants.UUID + id);
                             SOAPEnvelope createSequenceEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(id,
                                     rmMsgContext, Constants.SERVER);
 
                             rmMsgContext.getMsgContext().setRequestMessage(new Message(createSequenceEnvelope));
 
-                            //TODO Check : This line is needed right ?
-                            rmMsgContext.setOutGoingAddress(rmMsgContext
-                                    .getAddressingHeaders().getReplyTo()
+                            //TODO Check : Are We are sending only to the ReplyTo?
+                            rmMsgContext.setOutGoingAddress(rmMsgContext.getAddressingHeaders().getReplyTo()
                                     .getAddress().toString());
-
                             rmMsgContext.setMessageID(Constants.UUID + id);
-                            storageManager
-                                    .addCreateSequenceRequest(rmMsgContext);
-
+                            storageManager.addCreateSequenceRequest(rmMsgContext);
                         }
-
-                        //Uncomment this section to print the queues.
-                        //SandeshaQueue sq = SandeshaQueue.getInstance();
-                        //sq.displayPriorityQueue();
-                        //sq.displayOutgoingMap();
-                        //sq.displayIncomingMap();
-
                     }
                 }
-            } catch (InterruptedException e2) {
-                // TODO Auto-generated catch block
-                e2.printStackTrace();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (InterruptedException error) {
+                error.printStackTrace();
+                log.error(error);
+            } catch (Exception error) {
+                error.printStackTrace();
+                log.error(error);
             }
-
         }
-
     }
-
-
 }

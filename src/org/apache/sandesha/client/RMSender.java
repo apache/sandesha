@@ -30,8 +30,6 @@ public class RMSender extends BasicHandler {
 
     public void invoke(MessageContext msgContext) throws AxisFault {
 
-        //TODO This we need to check.
-
         //Initialize the storage manager. We are in the client side So initialize the client Storage Manager.
         storageManager = new ClientStorageManager();
         //  RMInitiator.initClient(requestMesssageContext.getSync());
@@ -54,9 +52,6 @@ public class RMSender extends BasicHandler {
             if (requestMesssageContext.isHasResponse() && !requestMesssageContext.getSync()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
-                    //TODO Need to check for errors in the queue.
-                    //If the queue has an error message, then need to report it
-                    // to client.
                     responseMessageContext = checkTheQueueForResponse(sequenceID, requestMesssageContext.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }

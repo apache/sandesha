@@ -16,7 +16,6 @@
  */
 package org.apache.sandesha.server;
 
-import org.apache.axis.AxisFault;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
@@ -38,19 +37,22 @@ public class RMMessageProcessorIdentifier {
      * @return
      */
     public static IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext, IStorageManager storageManager) {
-        
+
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
-        
-        if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
-            return new CreateSequenceProcessor(storageManager);
-        } else if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
-            return new CreateSequenceResponseProcessor(storageManager);
-        } else if (addrHeaders.getAction().toString().equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
-            return new TerminateSequenceProcessor(storageManager);
-        } else if ((rmHeaders.getSequenceAcknowledgement() != null)
-                || (rmHeaders.getSequence().getMessageNumber() != null)) {
+        if (addrHeaders.getAction() != null) {
+            if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
+                return new CreateSequenceProcessor(storageManager);
+            } else if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
+                return new CreateSequenceResponseProcessor(storageManager);
+            } else if (addrHeaders.getAction().toString().equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
+                return new TerminateSequenceProcessor(storageManager);
+            } else if ((rmHeaders.getSequenceAcknowledgement() != null) || (rmHeaders.getSequence().getMessageNumber() != null)) {
+                return new CompositeProcessor(storageManager);
+            } else
+                return new FaultProcessor(storageManager);
+        } else if ((rmHeaders.getSequenceAcknowledgement() != null) || (rmHeaders.getSequence().getMessageNumber() != null)) {
             return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);

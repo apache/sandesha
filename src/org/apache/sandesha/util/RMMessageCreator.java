@@ -77,12 +77,9 @@ public class RMMessageCreator {
         return terSeqRMMsgContext;
     }
 
-    public static RMMessageContext createAcknowledgementMsg(RMMessageContext rmMsgCtx) throws Exception {
+    public static RMMessageContext createAcknowledgementMsg(RMMessageContext rmMessageContext) throws Exception {
+      return new RMMessageContext();
 
-         
-
-
-        return new RMMessageContext();
     }
 
     public static RMMessageContext createServiceResponseMsg(RMMessageContext rmMsgCtx) throws Exception {

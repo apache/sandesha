@@ -212,7 +212,7 @@ public class ClientStorageManager implements IStorageManager {
         String sequenceId = null;
         sequenceId = accessor.searchForSequenceId(messageId);
         SandeshaQueue sq = SandeshaQueue.getInstance();
-        sq.displayOutgoingMap();
+        //sq.displayOutgoingMap();
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
         if (!exists) {

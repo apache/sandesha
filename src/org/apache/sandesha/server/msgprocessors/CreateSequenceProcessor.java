@@ -40,20 +40,13 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
     }
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
-
-
-
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
-
-
-    AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor(this.storageManager);
+        AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor(this.storageManager);
         if (rmHeaders.getSequenceAcknowledgement() != null) {
             ackProcessor.processMessage(rmMessageContext);
         }
-
-
 
 
         if (addrHeaders.getReplyTo() == null)
@@ -66,21 +59,17 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         if (rmHeaders.getCreateSequence() == null)
             throw new AxisFault();
 
-        /*
-         * We may let the user to decide on the UUID generation process. If
-         * the user specify a method or service for generating UUIDs then
-         * this request will be used to invoke that service and a UUID is
-         * acquired. However if we want to do it, the user shoudl specify
-         * the provider for that service as an parameter in the RM
-         * Configuration. Currently the RMProvider will send create sequence
-         * responses.
-         */
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
 
-        storageManager.addRequestedSequence(org.apache.sandesha.Constants.UUID+uuid);
+        storageManager.addRequestedSequence(org.apache.sandesha.Constants.UUID + uuid);
 
-        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(uuid, rmMessageContext);
+        SOAPEnvelope resEnvelope = null;
+        try {
+            resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(uuid, rmMessageContext);
+        } catch (Exception e) {
+           throw new AxisFault(org.apache.sandesha.Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);
+        }
         rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
 
         //FIX THIS FIX THIS
@@ -90,9 +79,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         //If the from is also missing, and the reply to is alos null then we will assume it is
         //synchornous.
         if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString()
-                .equals("http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous") || addrHeaders.getReplyTo().getAddress().toString()
                 .equals(Constants.NS_URI_ANONYMOUS)) {
-
             //Inform that we have a synchronous response.
             rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
             rmMessageContext.setSync(true);

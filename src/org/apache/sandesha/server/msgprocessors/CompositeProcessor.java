@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
  */
 public class CompositeProcessor implements IRMMessageProcessor {
 
-    IStorageManager storageManager = null;
+    private IStorageManager storageManager = null;
 
     public CompositeProcessor(IStorageManager storageManger) {
         this.storageManager = storageManger;
@@ -61,11 +61,9 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     String messageId = relatesTo.getURI().toString();
                     seqId = storageManager.getOutgoingSeqOfMsg(messageId);
                 }
-
                 if (!hasSequence) {
                     storageManager.addIncomingSequence(seqId);
                 }
-
                 if (storageManager.isMessageExist(seqId, messageNumber) != true) {
                     //Create a copy of the RMMessageContext.
                     RMMessageContext rmMsgContext = new RMMessageContext();
@@ -74,26 +72,18 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     rmMsgContext.setSequenceID(sequenceUUID);
                     rmMsgContext.setMsgNumber(messageNumber);
                     try {
-                        //Create a new MessageContext, by pasing the axis engine.
                         MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
-                        //Copy the existing message context to the new message context.
                         RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(), msgContext);
-                        //Copy the request and response messages.
                         String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
                         Message reqMsg = new Message(soapMsg);
 
                         msgContext.setRequestMessage(reqMsg);
                         rmMsgContext.setMsgContext(msgContext);
-                        //Set the message type for this message.
                         rmMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new AxisFault(new QName(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR), Constants.FaultMessages.SERVER_INTERNAL_ERROR, null, null);
-                        //TODO: Add to log.
                     }
-
-                    System.out.println("INFO: Inserting the request message ....\n");
-                    //Insert the message to the INQUEUE
                     storageManager.insertIncomingMessage(rmMsgContext);
                 }
 
@@ -102,7 +92,6 @@ public class CompositeProcessor implements IRMMessageProcessor {
                 return ackProcessor.sendAcknowledgement(rmMessageContext);
             }
         }
-        //If we don't have the sequence in the message then we have to send some errors.
         return false;
     }
 

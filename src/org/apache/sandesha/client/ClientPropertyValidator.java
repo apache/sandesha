@@ -70,6 +70,7 @@ public class ClientPropertyValidator {
             rmMessageContext.setSequenceID(action);
             rmMessageContext.setReplyTo(replyTo);
             rmMessageContext.setFrom(from);
+            rmMessageContext.setAction(action);
             return rmMessageContext;
         } else
             throw new AxisFault(errorMsg);
