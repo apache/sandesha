@@ -60,7 +60,7 @@ public class LastMessage extends MessageElement implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
      */
     public MessageElement getSoapElement() {
         return lastMsgElement;
@@ -70,7 +70,8 @@ public class LastMessage extends MessageElement implements IRmElement {
      * Method fromSOAPEnvelope
      * 
      * @param element 
-     * @return 
+     * 
+     * @return LastMessage
      */
     public LastMessage fromSOAPEnvelope(MessageElement element) {
 
@@ -82,8 +83,10 @@ public class LastMessage extends MessageElement implements IRmElement {
     /**
      * Method toSOAPEnvelope
      * 
-     * @param msgElement 
-     * @return 
+     * @param msgElement
+     *  
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
@@ -110,13 +113,17 @@ public class LastMessage extends MessageElement implements IRmElement {
     }
 
     /**
-     * @return 
+     * Method getLastMsgElement
+     * 
+     * @return MessageElement
      */
     public MessageElement getLastMsgElement() {
         return lastMsgElement;
     }
 
     /**
+     * Method setLastMsgElement
+     * 
      * @param element 
      */
     public void setLastMsgElement(MessageElement element) {

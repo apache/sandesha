@@ -54,7 +54,7 @@ public class MessageNumber implements IRmElement {
     /**
      * Method getMessageNumber
      * 
-     * @return 
+     * @return long
      */
     public long getMessageNumber() {
         return messageNumber;
@@ -68,7 +68,8 @@ public class MessageNumber implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -83,7 +84,8 @@ public class MessageNumber implements IRmElement {
      * Method fromSOAPEnvelope
      * 
      * @param element 
-     * @return 
+     * 
+     * @return MessageNumber
      */
     public MessageNumber fromSOAPEnvelope(MessageElement element) {
 
@@ -96,7 +98,9 @@ public class MessageNumber implements IRmElement {
      * Method toSOAPEnvelope
      * 
      * @param msgElement 
-     * @return 
+     * 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
@@ -108,6 +112,7 @@ public class MessageNumber implements IRmElement {
     }
 
     /**
+     * Method setMessageNumber
      * Set the message no in the soap message element create
      * 
      * @param msgNo the message no

@@ -44,9 +44,7 @@ public class Identifier extends URI {
      * Constructor Identifier
      */
     public Identifier() {
-
         identifierElement = new MessageElement();
-
         identifierElement.setName("wsu:Identifier");
     }
 
@@ -68,11 +66,7 @@ public class Identifier extends URI {
      */
     public Identifier fromSOAPEnvelope(MessageElement element) {
 
-        // System.out.println("Identifier::getSequenceAcknowledgement");
         identifier = element.getValue();
-
-        System.out.println(identifier);
-
         return this;
     }
 
@@ -87,8 +81,6 @@ public class Identifier extends URI {
             throws SOAPException {
 
         msgElement.addChildElement("Identifier", "wsu").addTextNode(identifier);
-
-        // System.out.println("--------------"+msgElement);
         return msgElement;
     }
 
@@ -107,15 +99,18 @@ public class Identifier extends URI {
     }
 
     /**
-     * @return 
+     * Method getIdentifier
+     * 
+     * @return String
      */
     public String getIdentifier() {
         return identifier;
     }
 
-    /**
-     * @param string 
-     */
+	/**
+	 * Method setIdentifier
+	 * 
+	 */
     public void setIdentifier(String string) {
         identifier = string;
     }
@@ -124,7 +119,7 @@ public class Identifier extends URI {
      * Method equals
      * 
      * @param obj 
-     * @return 
+     * @return boolean
      */
     public boolean equals(Object obj) {
 
@@ -143,7 +138,7 @@ public class Identifier extends URI {
     /**
      * Method hashCode
      * 
-     * @return 
+     * @return int
      */
     public int hashCode() {
         return identifier.hashCode();
@@ -152,7 +147,7 @@ public class Identifier extends URI {
     /**
      * Method toString
      * 
-     * @return 
+     * @return String
      */
     public String toString() {
         return identifier;

@@ -50,9 +50,7 @@ public class TerminateSequence implements IRmElement {
      * Constructor TerminateSequence
      */
     public TerminateSequence() {
-
         terminateSequence = new MessageElement();
-
         terminateSequence.setName("wsrm:TerminateSequence");
     }
 
@@ -64,7 +62,8 @@ public class TerminateSequence implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -78,7 +77,9 @@ public class TerminateSequence implements IRmElement {
      * Method toSoapEnvelop
      * 
      * @param envelop 
-     * @return 
+     * 
+     * @return SOAPEnvelope
+     * 
      * @throws SOAPException 
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
@@ -86,10 +87,6 @@ public class TerminateSequence implements IRmElement {
 
         SOAPEnvelope env = envelop;
 
-        /*
-         * terminateSequence.addChildElement(identifier.getSoapElement());
-         * env.addHeader((SOAPHeaderElement)terminateSequence);
-         */
         if (env.getBody() == null) {
             env.addBody();
         }
@@ -111,7 +108,8 @@ public class TerminateSequence implements IRmElement {
      * Method fromSOAPEnveploe
      * 
      * @param bodyElement 
-     * @return 
+     * 
+     * @return TerminateSequence
      */
     public TerminateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) {
 
@@ -120,7 +118,7 @@ public class TerminateSequence implements IRmElement {
 
         while (iterator.hasNext()) {
 
-            // System.out.println(iterator.next());
+     
             childElement = (MessageElement) iterator.next();
 
             if (childElement.getName().equals("wsu:Identifier")) {
@@ -148,23 +146,28 @@ public class TerminateSequence implements IRmElement {
      * Method addChildElement
      * 
      * @param element 
+     * 
      * @throws SOAPException 
      */
     public void addChildElement(MessageElement element) throws SOAPException {
 
         terminateSequence.addChildElement(element);
 
-        // TODO identifier
+        
     }
 
     /**
-     * @return 
+     * Method getIdentifier
+     * 
+     * @return Identifier
      */
     public Identifier getIdentifier() {
         return identifier;
     }
 
     /**
+     * Method setIdentifier
+     * 
      * @param identifier 
      */
     public void setIdentifier(Identifier identifier) {

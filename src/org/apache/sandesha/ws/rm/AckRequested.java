@@ -55,9 +55,7 @@ public class AckRequested extends MessageElement implements IRmElement {
      * Constructor AckRequested
      */
     public AckRequested() {
-
         ackRequested = new MessageElement();
-
         ackRequested.setName("wsrm:AckRequested");
     }
 
@@ -69,7 +67,8 @@ public class AckRequested extends MessageElement implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -84,7 +83,7 @@ public class AckRequested extends MessageElement implements IRmElement {
      * Method toSoapEnvelop
      * 
      * @param envelop 
-     * @return 
+     * @return SOAPEnvelope
      * @throws SOAPException 
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
@@ -124,7 +123,8 @@ public class AckRequested extends MessageElement implements IRmElement {
      * Method fromSOAPEnveploe
      * 
      * @param headerElement 
-     * @return 
+     * 
+     * @return AckRequested
      */
     public AckRequested fromSOAPEnveploe(SOAPHeaderElement headerElement) {
 
@@ -152,7 +152,7 @@ public class AckRequested extends MessageElement implements IRmElement {
                 messageNumber.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("wsrm:MessageaNumber")) {
+            if (childElement.getName().equals("MessageaNumber")) {
                 messageNumber = new MessageNumber();
 
                 messageNumber.fromSOAPEnvelope(childElement);
@@ -177,30 +177,38 @@ public class AckRequested extends MessageElement implements IRmElement {
         ackRequested.addChildElement(element);
     }
 
-    /**
-     * @return 
-     */
+	/**
+	 * Method getIdentifier
+	 * 
+	 * @return Identifier
+	 */
     public Identifier getIdentifier() {
         return identifier;
     }
 
-    /**
-     * @return 
-     */
+	/**
+	 * Method getMessageNumber
+	 * 
+	 * @return MessageNumber
+	 */
     public MessageNumber getMessageNumber() {
         return messageNumber;
     }
 
-    /**
-     * @param identifier 
-     */
+	/**
+	 * Method setIdentifier
+	 * 
+	 * @param identifier
+	 */
     public void setIdentifier(Identifier identifier) {
         this.identifier = identifier;
     }
 
-    /**
-     * @param number 
-     */
+	/**
+	 * Method setMessageNumber
+	 * 
+	 * @param number
+	 */
     public void setMessageNumber(MessageNumber number) {
         messageNumber = number;
     }

@@ -60,9 +60,7 @@ public class Sequence extends MessageElement implements IRmElement {
      * Constructor Sequence
      */
     public Sequence() {
-
         seqElement = new MessageElement();
-
         seqElement.setName("wsrm:Sequence");
     }
 
@@ -74,7 +72,8 @@ public class Sequence extends MessageElement implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -90,18 +89,16 @@ public class Sequence extends MessageElement implements IRmElement {
      * Method toSoapEnvelop
      * 
      * @param envelop 
-     * @return 
+     * 
+     * @return SOAPEnvelope
+     * 
      * @throws Exception 
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop) throws Exception {
 
         SOAPEnvelope env = envelop;
 
-        /*
-         * seqElement.addChildElement(lastMessage.getSoapElement());
-         * seqElement.addChildElement(identifier.getSoapElement());
-         * seqElement.addChildElement(messageNumber.getSoapElement());
-         */
+     
         if (env.getHeader() == null) {
             env.addHeader();
         }
@@ -110,12 +107,12 @@ public class Sequence extends MessageElement implements IRmElement {
         SOAPHeaderElement headerElement =
                 (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
 
-        // .setActor(null);
+     
         headerElement.setActor(null);
         headerElement.setName("Sequence");
+        headerElement.setMustUnderstand(true);
 
-        // System.out.println("must undestsnd set");
-        // headerElement.setMustUnderstand(true);
+      
         if (lastMessage != null) {
             lastMessage.toSOAPEnvelope(headerElement);
         }
@@ -135,7 +132,8 @@ public class Sequence extends MessageElement implements IRmElement {
      * Method fromSOAPEnveploe
      * 
      * @param headerElement 
-     * @return 
+     * 
+     * @return Sequence
      */
     public Sequence fromSOAPEnveploe(SOAPHeaderElement headerElement) {
 
@@ -145,7 +143,7 @@ public class Sequence extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            // System.out.println(childElement.getName());
+           
             if (childElement.getName().equals("wsu:Identifier")) {
                 identifier = new Identifier();
 
@@ -202,27 +200,35 @@ public class Sequence extends MessageElement implements IRmElement {
     }
 
     /**
-     * @return 
+     * Method getIdentifier
+     * 
+     * @return Identifier
      */
     public Identifier getIdentifier() {
         return identifier;
     }
 
     /**
-     * @return 
+     * Method getLastMessage
+     * 
+     * @return LastMessage
      */
     public LastMessage getLastMessage() {
         return lastMessage;
     }
 
     /**
-     * @return 
+     * Method getMessageNumber
+     * 
+     * @return MessageNumber
      */
     public MessageNumber getMessageNumber() {
         return messageNumber;
     }
 
     /**
+     * Method setIdentifier
+     * 
      * @param identifer 
      */
     public void setIdentifier(Identifier identifer) {
@@ -230,6 +236,8 @@ public class Sequence extends MessageElement implements IRmElement {
     }
 
     /**
+     * Method setLastMessage
+     * 
      * @param message 
      */
     public void setLastMessage(LastMessage message) {
@@ -237,6 +245,8 @@ public class Sequence extends MessageElement implements IRmElement {
     }
 
     /**
+     * Method setMessageNumber
+     * 
      * @param number 
      */
     public void setMessageNumber(MessageNumber number) {

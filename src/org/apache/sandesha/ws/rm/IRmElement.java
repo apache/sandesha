@@ -38,6 +38,8 @@ import javax.xml.soap.SOAPException;
 public interface IRmElement {
 
     /**
+     * Methode getSoapElement
+     * 
      * This gives the soap element of the protocol element. Each implementation
      * must implement this method such that then it can be easily get the
      * related soap element
@@ -48,6 +50,7 @@ public interface IRmElement {
     MessageElement getSoapElement() throws SOAPException;
 
     /**
+     * Method addChildElement
      * Adds an element to this element as a child element.
      * If not required to add a child element, just provide an empty
      * implementation in the concrete class

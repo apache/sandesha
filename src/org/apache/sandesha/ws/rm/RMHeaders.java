@@ -68,7 +68,9 @@ public class RMHeaders {
      * Method toSoapEnvelop
      * 
      * @param envelop 
-     * @return 
+     * 
+     * @return SOAPEnvelope
+     * 
      * @throws Exception 
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop) throws Exception {
@@ -106,7 +108,9 @@ public class RMHeaders {
      * Method fromSOAPEnvelope
      * 
      * @param env 
-     * @return 
+     * 
+     * @return RMHeaders
+     * 
      * @throws AxisFault     
      * @throws SOAPException 
      */
@@ -120,10 +124,10 @@ public class RMHeaders {
             while (iterator.hasNext()) {
                 headerElement = (SOAPHeaderElement) iterator.next();
 
-                // System.out.println(headerElement.getName());
+                
                 if (headerElement.getName().equals("Sequence")) {
                     sequence = new Sequence();
-
+                    headerElement.setMustUnderstand(false);
                     sequence.fromSOAPEnveploe(headerElement);
                 }
 
@@ -171,34 +175,43 @@ public class RMHeaders {
     }
 
     /**
-     * @return 
+     * Method getCreateSequenceResponse
+     * 
+     * @return CreateSequenceResponse
      */
     public CreateSequenceResponse getCreateSequenceResponse() {
         return createSequenceResponse;
     }
 
     /**
-     * @return 
+     * Method getSequence
+     * 
+     * @return Sequence
      */
     public Sequence getSequence() {
         return sequence;
     }
 
     /**
-     * @return 
+     * Method getSequenceAcknowledgement
+     * 
+     * @return SequenceAcknowledgement
      */
     public SequenceAcknowledgement getSequenceAcknowledgement() {
         return sequenceAcknowledgement;
     }
 
     /**
-     * @return 
+     * Method getTerminateSequence
+     * 
+     * @return TerminateSequence
      */
     public TerminateSequence getTerminateSequence() {
         return terminateSequence;
     }
 
     /**
+     * Method setCreateSequence
      * @param sequence 
      */
     public void setCreateSequence(CreateSequence sequence) {
@@ -206,6 +219,7 @@ public class RMHeaders {
     }
 
     /**
+     * Method setCreateSequenceResponse
      * @param response 
      */
     public void setCreateSequenceResponse(CreateSequenceResponse response) {
@@ -213,6 +227,8 @@ public class RMHeaders {
     }
 
     /**
+     * Method setSequence
+     * 
      * @param sequence 
      */
     public void setSequence(Sequence sequence) {
@@ -220,6 +236,8 @@ public class RMHeaders {
     }
 
     /**
+     * Method setSequenceAcknowledgement
+     * 
      * @param acknowledgement 
      */
     public void setSequenceAcknowledgement(SequenceAcknowledgement acknowledgement) {
@@ -227,13 +245,17 @@ public class RMHeaders {
     }
 
     /**
+     * Method setSequenceAcknowledgement
+     * 
      * @param sequence 
      */
-    public void setTerminateSequence(TerminateSequence sequence) {
+    public void c(TerminateSequence sequence) {
         terminateSequence = sequence;
     }
 
     /**
+     * Method setAckRequest
+     * 
      * @param requested 
      */
     public void setAckRequest(AckRequested requested) {
@@ -241,14 +263,18 @@ public class RMHeaders {
     }
 
     /**
-     * @return 
+     * Method getAckRequest
+     * 
+     * @return AckRequested
      */
     public AckRequested getAckRequest() {
         return ackRequest;
     }
 
     /**
-     * @return 
+     * Method getCreateSequence
+     * 
+     * @return CreateSequence
      */
     public CreateSequence getCreateSequence() {
         return createSequence;

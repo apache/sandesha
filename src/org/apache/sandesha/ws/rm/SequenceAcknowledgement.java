@@ -79,7 +79,8 @@ public class SequenceAcknowledgement extends MessageElement
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -109,7 +110,9 @@ public class SequenceAcknowledgement extends MessageElement
      * Method toSoapEnvelop
      * 
      * @param envelop 
-     * @return 
+     * 
+     * @return SOAPEnvelope
+     * 
      * @throws SOAPException 
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
@@ -125,7 +128,7 @@ public class SequenceAcknowledgement extends MessageElement
         SOAPHeaderElement headerElement =
                 (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
 
-        // .setActor(null);
+       
         headerElement.setActor(null);
         headerElement.setName("SequenceAcknowledgement");
 
@@ -133,10 +136,8 @@ public class SequenceAcknowledgement extends MessageElement
 
         while (iterator.hasNext()) {
 
-            // System.out.println(ite.next().getClass());
             AcknowledgementRange ackRange =
                     (AcknowledgementRange) iterator.next();
-
             ackRange.toSOAPEnvelope(headerElement);
         }
 
@@ -152,7 +153,6 @@ public class SequenceAcknowledgement extends MessageElement
             identifier.toSOAPEnvelope(headerElement);
         }
 
-        // env.addHeader((SOAPHeaderElement)seqAck);
         return env;
     }
 
@@ -160,21 +160,20 @@ public class SequenceAcknowledgement extends MessageElement
      * Method fromSOAPEnveploe
      * 
      * @param headerElement 
-     * @return 
+     * 
+     * @return SequenceAcknowledgement
      */
     public SequenceAcknowledgement fromSOAPEnveploe(SOAPHeaderElement headerElement) {
 
-        System.out.println("fromSOAPEnveploe");
+       
 
         Iterator iterator = headerElement.getChildElements();
         MessageElement childElement;
 
         while (iterator.hasNext()) {
 
-            // System.out.println(iterator.next());
             childElement = (MessageElement) iterator.next();
 
-            // System.out.println("from SeqAck " + childElement.getName());
             if (childElement.getName().equals("wsu:Identifier")) {
                 identifier = new Identifier();
 
@@ -182,10 +181,7 @@ public class SequenceAcknowledgement extends MessageElement
             }
 
             if (childElement.getName().equals("Identifier")) {
-
-                // System.out.println("childElement.getName().equals(\"Identifier\")");
                 identifier = new Identifier();
-
                 identifier.fromSOAPEnvelope(childElement);
             }
 
@@ -198,20 +194,17 @@ public class SequenceAcknowledgement extends MessageElement
 
             if (childElement.getName().equals("AcknowledgementRange")) {
                 AcknowledgementRange ackRange = new AcknowledgementRange();
-
                 ackRange.fromSOAPEnvelope(childElement);
                 ackRanges.add(ackRange);
             }
 
             if (childElement.getName().equals("wsrm:Nack")) {
                 Nack nack = new Nack();
-
                 nack.fromSOAPEnvelope(childElement);
             }
 
             if (childElement.getName().equals("Nack")) {
                 Nack nack = new Nack();
-
                 nack.fromSOAPEnvelope(childElement);
             }
         }
@@ -228,6 +221,7 @@ public class SequenceAcknowledgement extends MessageElement
      * Method addChildElement
      * 
      * @param element 
+     * 
      * @throws SOAPException 
      */
     public void addChildElement(MessageElement element) throws SOAPException {
@@ -235,21 +229,27 @@ public class SequenceAcknowledgement extends MessageElement
     }
 
     /**
-     * @return 
+     * Method getAckRanges
+     * 
+     * @return List
      */
     public List getAckRanges() {
         return ackRanges;
     }
 
     /**
-     * @return 
+     * Method getIdentifier
+     * 
+     * @return Identifier
      */
     public Identifier getIdentifier() {
         return identifier;
     }
 
     /**
-     * @return 
+     * Method getNackList
+     * 
+     * @return List
      */
     public List getNackList() {
         return nackList;
@@ -259,6 +259,7 @@ public class SequenceAcknowledgement extends MessageElement
      * method addAckRanges
      * 
      * @param ackRange 
+     * 
      * @return AcknowledgementRange
      */
     public AcknowledgementRange addAckRanges(AcknowledgementRange ackRange) {
@@ -272,7 +273,8 @@ public class SequenceAcknowledgement extends MessageElement
      * Method addNackRanges
      * 
      * @param nack 
-     * @return 
+     * 
+     * @return Nack
      */
     public Nack addNackRanges(Nack nack) {
 
@@ -281,31 +283,23 @@ public class SequenceAcknowledgement extends MessageElement
         return nack;
     }
 
-    /*
-     * public void setAckRanges(List list) {
-     *   ackRanges = list;
-     * }
-     */
+ 
 
     /**
+     * Method setIdentifier
+     * 
      * @param identifier 
      */
     public void setIdentifier(Identifier identifier) {
         this.identifier = identifier;
     }
 
-    /**
-     * @param list
-     */
 
-    /*
-     * public void setNackList(List list) {
-     *   nackList = list;
-     * }
-     */
 
     /**
-     * @param list TODO:
+     * Method setAckRanges
+     * 
+     * @param list 
      */
     public void setAckRanges(List list) {
         ackRanges = list;

@@ -44,9 +44,7 @@ public class CreateSequence implements IRmElement {
      * Constructor CreateSequence
      */
     public CreateSequence() {
-
         createSequence = new MessageElement();
-
         createSequence.setName("wsrm:CreateSequence");
     }
 
@@ -58,7 +56,7 @@ public class CreateSequence implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
      */
     public MessageElement getSoapElement() {
         return createSequence;
@@ -68,7 +66,7 @@ public class CreateSequence implements IRmElement {
      * Method toSoapEnvelop
      * 
      * @param envelop 
-     * @return 
+     * @return SOAPEnvelope
      * @throws SOAPException 
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
@@ -94,14 +92,15 @@ public class CreateSequence implements IRmElement {
      * Method fromSOAPEnveploe
      * 
      * @param bodyElement 
-     * @return 
+     * 
+     * @return CreateSequence
      */
     public CreateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) {
 
         Iterator iterator = bodyElement.getChildElements();
 
         while (iterator.hasNext()) {
-            System.out.println(iterator.next());
+            
         }
 
         return this;

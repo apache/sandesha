@@ -59,7 +59,8 @@ public class Nack implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement getSoapElement() throws SOAPException {
@@ -73,7 +74,7 @@ public class Nack implements IRmElement {
      * Method fromSOAPEnvelope
      * 
      * @param element 
-     * @return 
+     * @return Nack
      */
     public Nack fromSOAPEnvelope(MessageElement element) {
 
@@ -86,7 +87,7 @@ public class Nack implements IRmElement {
      * Method toSOAPEnvelope
      * 
      * @param msgElement 
-     * @return 
+     * @return MessageElement
      * @throws SOAPException 
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)

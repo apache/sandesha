@@ -51,9 +51,7 @@ public class AcknowledgementRange implements IRmElement {
      * Constructor AcknowledgementRange
      */
     public AcknowledgementRange() {
-
         ackRangeElement = new MessageElement();
-
         ackRangeElement.setName("wsrm:AcknowledgementRange");
     }
 
@@ -83,7 +81,7 @@ public class AcknowledgementRange implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
      */
     public MessageElement getSoapElement() {
 
@@ -97,7 +95,9 @@ public class AcknowledgementRange implements IRmElement {
      * Method toSOAPEnvelope
      * 
      * @param msgElement 
-     * @return 
+     * 
+     * @return MessageElement
+     * 
      * @throws SOAPException 
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
@@ -116,7 +116,8 @@ public class AcknowledgementRange implements IRmElement {
      * Method fromSOAPEnvelope
      * 
      * @param element 
-     * @return 
+     * 
+     * @return AcknowledgementRange
      */
     public AcknowledgementRange fromSOAPEnvelope(MessageElement element) {
 
@@ -142,14 +143,17 @@ public class AcknowledgementRange implements IRmElement {
     }
 
     /**
-     * @return TODO:
+     * Method getMaxValue
+     * 
+     * @return long
      */
     public long getMaxValue() {
         return maxValue;
     }
 
     /**
-     * @return TODO:
+     * Method getMinValue
+     * @return long
      */
     public long getMinValue() {
         return minValue;

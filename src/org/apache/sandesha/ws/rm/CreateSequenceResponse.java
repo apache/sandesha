@@ -50,9 +50,7 @@ public class CreateSequenceResponse implements IRmElement {
      * Constructor CreateSequenceResponse
      */
     public CreateSequenceResponse() {
-
         createSequenceResponse = new MessageElement();
-
         createSequenceResponse.setName("wsrm:CreateSequenceResponse");
     }
 
@@ -64,7 +62,7 @@ public class CreateSequenceResponse implements IRmElement {
     /**
      * Method getSoapElement
      * 
-     * @return 
+     * @return MessageElement
      */
     public MessageElement getSoapElement() {
         return createSequenceResponse;
@@ -74,34 +72,24 @@ public class CreateSequenceResponse implements IRmElement {
      * Method toSoapEnvelop
      * 
      * @param envelop 
-     * @return 
+     * @return SOAPEnvelope
      * @throws SOAPException 
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
             throws SOAPException {
 
         SOAPEnvelope env = envelop;
-        ;
-
-        /*
-         * createSequenceResponse.addChildElement(identifier.getSoapElement());
-         *
-         *       env.addHeader((SOAPHeaderElement)createSequenceResponse);
-         */
+        
         if (env.getBody() == null) {
             env.addBody();
         }
-
         Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
         SOAPBodyElement bodyElement =
                 (SOAPBodyElement) env.getBody().addBodyElement(name);
-
         bodyElement.setName("CreateSequenceResponse");
-
         if (identifier != null) {
             identifier.toSOAPEnvelope(bodyElement);
         }
-
         return env;
     }
 
@@ -109,7 +97,8 @@ public class CreateSequenceResponse implements IRmElement {
      * Method fromSOAPEnveploe
      * 
      * @param bodyElement 
-     * @return 
+     * 
+     * @return CreateSequenceResponse
      */
     public CreateSequenceResponse fromSOAPEnveploe(SOAPBodyElement bodyElement) {
 
@@ -117,19 +106,15 @@ public class CreateSequenceResponse implements IRmElement {
         MessageElement childElement;
 
         while (iterator.hasNext()) {
-
-            // System.out.println(iterator.next());
             childElement = (MessageElement) iterator.next();
-
+          
             if (childElement.getName().equals("wsu:Identifier")) {
                 identifier = new Identifier();
-
                 identifier.fromSOAPEnvelope(childElement);
             }
-
+          
             if (childElement.getName().equals("Identifier")) {
                 identifier = new Identifier();
-
                 identifier.fromSOAPEnvelope(childElement);
             }
         }
@@ -152,14 +137,20 @@ public class CreateSequenceResponse implements IRmElement {
         createSequenceResponse.addChildElement(element);
     }
 
-    /**
-     * @return 
-     */
+	/**
+	 * Method getIdentifier
+	 * 
+	 * @param element 
+	 * @return 
+	 * @throws SOAPException 
+	 */
     public Identifier getIdentifier() {
         return identifier;
     }
 
     /**
+     * Method setIdentifier
+     * 
      * @param identifier 
      */
     public void setIdentifier(Identifier identifier) {

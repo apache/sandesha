@@ -107,8 +107,7 @@ public interface Constants {
 	/**
 	 * Field ENV_RM_REQUEST_HEADERS
 	 */
-	public static final String ENV_RM_REQUEST_HEADERS =
-		"org.apache.sandesha.ws.rm.REQUEST.HEADERS";
+	public static final String ENV_RM_REQUEST_HEADERS =	"org.apache.sandesha.ws.rm.REQUEST.HEADERS";
 
 	/**
 	 * Field CLIENT_SEQUENCE_IDENTIFIER
@@ -130,4 +129,66 @@ public interface Constants {
 	 * Field CLIENT_LAST_MESSAGE
 	 */
 	public static final String CLIENT_LAST_MESSAGE = "LastMessage";
+
+	/**
+	 * Field MAXIMAM_SERVER_RETRANSMISION_COUNT
+	 */
+	public static final int MAXIMAM_SERVER_RETRANSMISION_COUNT = 2;
+	/**
+	 * Field SERVER_RETRANSMISION_INTERVAL
+	 */
+	public static final long SERVER_RETRANSMISION_INTERVAL = 2000;
+	/**
+	 * Field ACTION_CREATE_SEQUENCE
+	 */
+	public static final String ACTION_CREATE_SEQUENCE =
+		"http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequence";
+	/**
+	 * Field WSA_NS
+	 */
+	public static final String WSA_NS =
+		"http://schemas.xmlsoap.org/ws/2003/03/addressing";
+	/**
+	 * Field ACTION_CREATE_SEQUENCE_RESPONSE
+	 */
+	public static final String ACTION_CREATE_SEQUENCE_RESPONSE =
+		"http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequenceResponse";
+	/**
+	 * Field ACTION_TERMINATE_SEQUENCE
+	 */
+	public static final String ACTION_TERMINATE_SEQUENCE =
+		"http://schemas.xmlsoap.org/ws/2004/03/rm/TerminateSequence";
+	/**
+	 * Field SERVICE_INVOKE_INTERVAL
+	 */
+	public static final long SERVICE_INVOKE_INTERVAL = 200;
+	/**
+	 * Field SERVER_RESPONSE_CREATE_SEQUENCE_MAX_CHECK_COUNT
+	 */
+	public static final int SERVER_RESPONSE_CREATE_SEQUENCE_MAX_CHECK_COUNT =
+		16;
+	/**
+	 * Field SERVER_RESPONSE_CREATE_SEQUENCE_CHECKING_INTERVAL
+	 */
+	public static final long SERVER_RESPONSE_CREATE_SEQUENCE_CHECKING_INTERVAL = 1000;
+	
+	/**
+	 * Field WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION
+	 */
+	public static final String WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION =	"http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
+	
+	/**
+	 * Field RESPONCE_NAME_SPACE
+	 */
+	public static final String RESPONCE_NAME_SPACE =	"http://www.w3.org/2001/XMLSchema";
+
+	/**
+	 * Field WS_ADDRESSING_NAMESPACE
+	 */
+	public static final String WS_ADDRESSING_NAMESPACE ="http://schemas.xmlsoap.org/ws/2003/03/addressing";
+	/**
+	 * Field RM_SEQUENCE_ACKNOWLEDMENT_ACTION
+	 */
+	public static final String RM_SEQUENCE_ACKNOWLEDMENT_ACTION =	"http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
+
 }
