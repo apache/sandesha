@@ -10,90 +10,91 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 
 import javax.xml.soap.SOAPException;
+
 //import //org.apache.xalan.templates.ElemApplyImport;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class Identifier extends URI {
 
-	private MessageElement identifierElement;
-	private String identifier = null;
+    private MessageElement identifierElement;
+    private String identifier = null;
 
-	public Identifier() {
-		identifierElement = new MessageElement();
-		identifierElement.setName("wsu:Identifier");
-	}
+    public Identifier() {
+        identifierElement = new MessageElement();
+        identifierElement.setName("wsu:Identifier");
+    }
 
-	public void setUri(String uri) throws SOAPException {
-		identifierElement.addTextNode(uri);
-	}
+    public void setUri(String uri) throws SOAPException {
+        identifierElement.addTextNode(uri);
+    }
 
-	
-	public Identifier fromSOAPEnvelope(MessageElement element) {
-		//System.out.println("Identifier::getSequenceAcknowledgement");
-		identifier=element.getValue();
-		System.out.println(identifier);
+    public Identifier fromSOAPEnvelope(MessageElement element) {
+        //System.out.println("Identifier::getSequenceAcknowledgement");
+        identifier = element.getValue();
+        System.out.println(identifier);
+
+        return this;
+    }
+
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
+
+        msgElement.addChildElement("Identifier", "wsu").addTextNode(identifier);
+        //System.out.println("--------------"+msgElement);
 		
-		return this;
-	}
-	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
-	 
-		msgElement.addChildElement("Identifier","wsu").addTextNode(identifier);
-		//System.out.println("--------------"+msgElement);
-		
-		return msgElement;
-	}
-	
-	public MessageElement getSoapElement() throws SOAPException {
-		// create the soap element for the message no
-		identifierElement.addTextNode(identifier);
-		return identifierElement;
-	}
-	/**
-	 * @return
-	 */
-	public String getIdentifier() {
-		return identifier;
-	}
+        return msgElement;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setIdentifier(String string) {
-		identifier = string;
-	}
+    public MessageElement getSoapElement() throws SOAPException {
+        // create the soap element for the message no
+        identifierElement.addTextNode(identifier);
+        return identifierElement;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) throws SOAPException {
-		// TODO Auto-generated method stub
+    /**
+     * @return 
+     */
+    public String getIdentifier() {
+        return identifier;
+    }
 
-	}
-	public boolean equals(Object obj) {
-			if (obj instanceof Identifier) {
-				if (this.identifier
-					== ((String) (((Identifier) obj).getIdentifier())))
-					return true;
-				else
-					return false;
-			} else
-				return false;
-		}
+    /**
+     * @param string 
+     */
+    public void setIdentifier(String string) {
+        identifier = string;
+    }
 
-		public int hashCode(){
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) throws SOAPException {
+        // TODO Auto-generated method stub
 
-			return identifier.hashCode();
-		}
-		public String toString(){
-			return identifier;
-		}
+    }
 
+    public boolean equals(Object obj) {
+        if (obj instanceof Identifier) {
+            if (this.identifier
+                    == ((String) (((Identifier) obj).getIdentifier())))
+                return true;
+            else
+                return false;
+        } else
+            return false;
+    }
+
+    public int hashCode() {
+
+        return identifier.hashCode();
+    }
+
+    public String toString() {
+        return identifier;
+    }
 
 }

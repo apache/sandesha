@@ -64,87 +64,88 @@ import javax.xml.soap.SOAPException;
 import java.util.Iterator;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class TerminateSequence implements IRmElement {
 
-	private MessageElement terminateSequence;
-	private Identifier identifier;
+    private MessageElement terminateSequence;
+    private Identifier identifier;
 
-	public TerminateSequence() {
-		terminateSequence = new MessageElement();
-		terminateSequence.setName("wsrm:TerminateSequence");
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement() throws SOAPException {
-		terminateSequence.addChildElement(identifier.getSoapElement());
-		return terminateSequence;
-	}
+    public TerminateSequence() {
+        terminateSequence = new MessageElement();
+        terminateSequence.setName("wsrm:TerminateSequence");
+    }
 
-	public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
-		throws SOAPException {
-		SOAPEnvelope env = envelop;
-		/*terminateSequence.addChildElement(identifier.getSoapElement());
-		env.addHeader((SOAPHeaderElement)terminateSequence);*/
-		if (env.getBody() == null) {
-			env.addBody();
-		}
-		Name name = env.createName("","wsrm","http://schemas.xmlsoap.org/ws/2004/03/rm");
-		SOAPBodyElement bodyElement =
-			(SOAPBodyElement) env.getBody().addBodyElement(name);
-		bodyElement.setName("TerminateSequence");
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() throws SOAPException {
+        terminateSequence.addChildElement(identifier.getSoapElement());
+        return terminateSequence;
+    }
 
-		if (identifier != null) {
-			identifier.toSOAPEnvelope(bodyElement);
-		}
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
+            throws SOAPException {
+        SOAPEnvelope env = envelop;
+        /*terminateSequence.addChildElement(identifier.getSoapElement());
+        env.addHeader((SOAPHeaderElement)terminateSequence);*/
+        if (env.getBody() == null) {
+            env.addBody();
+        }
+        Name name = env.createName("", "wsrm", "http://schemas.xmlsoap.org/ws/2004/03/rm");
+        SOAPBodyElement bodyElement =
+                (SOAPBodyElement) env.getBody().addBodyElement(name);
+        bodyElement.setName("TerminateSequence");
 
-		return env;
-	}
-	public TerminateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) {
-		Iterator iterator = bodyElement.getChildElements();
-		MessageElement childElement;
-		while (iterator.hasNext()) {
-			//System.out.println(iterator.next());
-			childElement = (MessageElement) iterator.next();
-			if (childElement.getName().equals("wsu:Identifier")) {
-				identifier = new Identifier();
-				identifier.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("Identifier")) {
-							identifier=new Identifier();
-							identifier.fromSOAPEnvelope(childElement);
-						}
-		}
-		return this;
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) throws SOAPException {
-		terminateSequence.addChildElement(element);
-		// TODO identifier
+        if (identifier != null) {
+            identifier.toSOAPEnvelope(bodyElement);
+        }
 
-	}
+        return env;
+    }
 
-	/**
-	 * @return
-	 */
-	public Identifier getIdentifier() {
-		return identifier;
-	}
+    public TerminateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) {
+        Iterator iterator = bodyElement.getChildElements();
+        MessageElement childElement;
+        while (iterator.hasNext()) {
+            //System.out.println(iterator.next());
+            childElement = (MessageElement) iterator.next();
+            if (childElement.getName().equals("wsu:Identifier")) {
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("Identifier")) {
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+        }
+        return this;
+    }
 
-	/**
-	 * @param identifier
-	 */
-	public void setIdentifier(Identifier identifier) {
-		this.identifier = identifier;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) throws SOAPException {
+        terminateSequence.addChildElement(element);
+        // TODO identifier
+
+    }
+
+    /**
+     * @return 
+     */
+    public Identifier getIdentifier() {
+        return identifier;
+    }
+
+    /**
+     * @param identifier 
+     */
+    public void setIdentifier(Identifier identifier) {
+        this.identifier = identifier;
+    }
 
 }

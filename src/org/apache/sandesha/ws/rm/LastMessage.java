@@ -54,64 +54,65 @@
  */
 package org.apache.sandesha.ws.rm;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 
+import javax.xml.soap.SOAPException;
+
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class LastMessage extends MessageElement implements IRmElement {
-	private MessageElement lastMsgElement;
-	private boolean lastMessage;
+    private MessageElement lastMsgElement;
+    private boolean lastMessage;
 
-	public LastMessage() {
-		lastMessage=true;
-		lastMsgElement = new MessageElement();
-		lastMsgElement.setName("wsrm:LastMessage");
+    public LastMessage() {
+        lastMessage = true;
+        lastMsgElement = new MessageElement();
+        lastMsgElement.setName("wsrm:LastMessage");
 
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement() {
+    }
 
-		return lastMsgElement;
-	}
-	public LastMessage fromSOAPEnvelope(MessageElement element){
-		lastMessage=true;
-		return this;		
-	}
-	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
-		msgElement.addChildElement("LastMessage","wsrm");
-		return msgElement;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() {
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) {
-		// no child elements in LastMessage element
+        return lastMsgElement;
+    }
 
-	}
+    public LastMessage fromSOAPEnvelope(MessageElement element) {
+        lastMessage = true;
+        return this;
+    }
 
-	/**
-	 * @return
-	 */
-	public MessageElement getLastMsgElement() {
-		return lastMsgElement;
-	}
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
+        msgElement.addChildElement("LastMessage", "wsrm");
+        return msgElement;
+    }
 
-	/**
-	 * @param element
-	 */
-	public void setLastMsgElement(MessageElement element) {
-		lastMsgElement = element;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) {
+        // no child elements in LastMessage element
+
+    }
+
+    /**
+     * @return 
+     */
+    public MessageElement getLastMsgElement() {
+        return lastMsgElement;
+    }
+
+    /**
+     * @param element 
+     */
+    public void setLastMsgElement(MessageElement element) {
+        lastMsgElement = element;
+    }
 
 }

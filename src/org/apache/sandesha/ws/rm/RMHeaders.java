@@ -63,179 +63,177 @@ import javax.xml.soap.SOAPException;
 import java.util.Iterator;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class RMHeaders {
-	private CreateSequence createSequence = null;
-	private CreateSequenceResponse createSequenceResponse = null;
-	private AckRequested ackRequest = null;
-	private SequenceAcknowledgement sequenceAcknowledgement = null;
-	private Sequence sequence = null;
-	private TerminateSequence terminateSequence = null;
+    private CreateSequence createSequence = null;
+    private CreateSequenceResponse createSequenceResponse = null;
+    private AckRequested ackRequest = null;
+    private SequenceAcknowledgement sequenceAcknowledgement = null;
+    private Sequence sequence = null;
+    private TerminateSequence terminateSequence = null;
 
-	public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop) throws Exception {
-		SOAPEnvelope env = envelop;
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop) throws Exception {
+        SOAPEnvelope env = envelop;
 
-		if (createSequence != null) {
-			createSequence.toSoapEnvelop(env);
-		}
-		if (createSequenceResponse != null) {
-			createSequenceResponse.toSoapEnvelop(env);
-		}
-		if (ackRequest != null) {
-			ackRequest.toSoapEnvelop(env);
-		}
-		if (sequenceAcknowledgement != null) {
-			sequenceAcknowledgement.toSoapEnvelop(env);
-		}
-		if (sequence != null) {
-			sequence.toSoapEnvelop(env);
-		}
-		if (terminateSequence != null) {
-			terminateSequence.toSoapEnvelop(env);
-		}
+        if (createSequence != null) {
+            createSequence.toSoapEnvelop(env);
+        }
+        if (createSequenceResponse != null) {
+            createSequenceResponse.toSoapEnvelop(env);
+        }
+        if (ackRequest != null) {
+            ackRequest.toSoapEnvelop(env);
+        }
+        if (sequenceAcknowledgement != null) {
+            sequenceAcknowledgement.toSoapEnvelop(env);
+        }
+        if (sequence != null) {
+            sequence.toSoapEnvelop(env);
+        }
+        if (terminateSequence != null) {
+            terminateSequence.toSoapEnvelop(env);
+        }
 
-		return env;
-	}
-	public RMHeaders fromSOAPEnvelope(SOAPEnvelope env)
-		throws AxisFault, SOAPException {
-		if (env != null) {
-			Iterator iterator = env.getHeaders().iterator();
-			SOAPHeaderElement headerElement;
-			while (iterator.hasNext()) {
-				headerElement = (SOAPHeaderElement) iterator.next();
-				//System.out.println(headerElement.getName());
-				if (headerElement.getName().equals("Sequence")) {
-					sequence = new Sequence();
-					sequence.fromSOAPEnveploe(headerElement);
-									
-				}
+        return env;
+    }
 
-				if (headerElement
-					.getName()
-					.equals("SequenceAcknowledgement")) {
-					sequenceAcknowledgement = new SequenceAcknowledgement();
-					sequenceAcknowledgement.fromSOAPEnveploe(headerElement);
-				}
-				if (headerElement.getName().equals("AckRequested")) {
-					ackRequest = new AckRequested();
-					ackRequest.fromSOAPEnveploe(headerElement);
-				}
-			}
-			iterator = (Iterator) env.getBody().getChildElements();
-			SOAPBodyElement bodyElement;
-			while (iterator.hasNext()) {
-				bodyElement = (SOAPBodyElement) iterator.next();
-				if (bodyElement.getName().equals("CreateSequence")) {
-					createSequence = new CreateSequence();
-					createSequence.fromSOAPEnveploe(bodyElement);
-				}
+    public RMHeaders fromSOAPEnvelope(SOAPEnvelope env)
+            throws AxisFault, SOAPException {
+        if (env != null) {
+            Iterator iterator = env.getHeaders().iterator();
+            SOAPHeaderElement headerElement;
+            while (iterator.hasNext()) {
+                headerElement = (SOAPHeaderElement) iterator.next();
+                //System.out.println(headerElement.getName());
+                if (headerElement.getName().equals("Sequence")) {
+                    sequence = new Sequence();
+                    sequence.fromSOAPEnveploe(headerElement);
 
-				if (bodyElement
-					.getName()
-					.equals("CreateSequenceResponse")) {
-					createSequenceResponse = new CreateSequenceResponse();
-					createSequenceResponse.fromSOAPEnveploe(bodyElement);
-				}
-				if (bodyElement.getName().equals("TerminateSequence")) {
-					terminateSequence = new TerminateSequence();
-					terminateSequence.fromSOAPEnveploe(bodyElement);
-				}
-			}
-		}
+                }
 
-		return this;
+                if (headerElement
+                        .getName()
+                        .equals("SequenceAcknowledgement")) {
+                    sequenceAcknowledgement = new SequenceAcknowledgement();
+                    sequenceAcknowledgement.fromSOAPEnveploe(headerElement);
+                }
+                if (headerElement.getName().equals("AckRequested")) {
+                    ackRequest = new AckRequested();
+                    ackRequest.fromSOAPEnveploe(headerElement);
+                }
+            }
+            iterator = (Iterator) env.getBody().getChildElements();
+            SOAPBodyElement bodyElement;
+            while (iterator.hasNext()) {
+                bodyElement = (SOAPBodyElement) iterator.next();
+                if (bodyElement.getName().equals("CreateSequence")) {
+                    createSequence = new CreateSequence();
+                    createSequence.fromSOAPEnveploe(bodyElement);
+                }
 
-	}
+                if (bodyElement
+                        .getName()
+                        .equals("CreateSequenceResponse")) {
+                    createSequenceResponse = new CreateSequenceResponse();
+                    createSequenceResponse.fromSOAPEnveploe(bodyElement);
+                }
+                if (bodyElement.getName().equals("TerminateSequence")) {
+                    terminateSequence = new TerminateSequence();
+                    terminateSequence.fromSOAPEnveploe(bodyElement);
+                }
+            }
+        }
 
-	/**
-	 * @return
-	 */
-	public CreateSequenceResponse getCreateSequenceResponse() {
-		return createSequenceResponse;
-	}
+        return this;
 
-	/**
-	 * @return
-	 */
-	public Sequence getSequence() {
-		return sequence;
-	}
+    }
 
-	/**
-	 * @return
-	 */
-	public SequenceAcknowledgement getSequenceAcknowledgement() {
-		return sequenceAcknowledgement;
-	}
+    /**
+     * @return 
+     */
+    public CreateSequenceResponse getCreateSequenceResponse() {
+        return createSequenceResponse;
+    }
 
-	/**
-	 * @return
-	 */
-	public TerminateSequence getTerminateSequence() {
-		return terminateSequence;
-	}
+    /**
+     * @return 
+     */
+    public Sequence getSequence() {
+        return sequence;
+    }
 
-	/**
-	 * @param sequence
-	 */
-	public void setCreateSequence(CreateSequence sequence) {
-		createSequence = sequence;
-	}
+    /**
+     * @return 
+     */
+    public SequenceAcknowledgement getSequenceAcknowledgement() {
+        return sequenceAcknowledgement;
+    }
 
-	/**
-	 * @param response
-	 */
-	public void setCreateSequenceResponse(CreateSequenceResponse response) {
-		createSequenceResponse = response;
-	}
+    /**
+     * @return 
+     */
+    public TerminateSequence getTerminateSequence() {
+        return terminateSequence;
+    }
 
-	/**
-	 * @param sequence
-	 */
-	public void setSequence(Sequence sequence) {
-		this.sequence = sequence;
-	}
+    /**
+     * @param sequence 
+     */
+    public void setCreateSequence(CreateSequence sequence) {
+        createSequence = sequence;
+    }
 
-	/**
-	 * @param acknowledgement
-	 */
-	public void setSequenceAcknowledgement(SequenceAcknowledgement acknowledgement) {
-		sequenceAcknowledgement = acknowledgement;
-	}
+    /**
+     * @param response 
+     */
+    public void setCreateSequenceResponse(CreateSequenceResponse response) {
+        createSequenceResponse = response;
+    }
 
-	/**
-	 * @param sequence
-	 */
-	public void setTerminateSequence(TerminateSequence sequence) {
-		terminateSequence = sequence;
-	}
+    /**
+     * @param sequence 
+     */
+    public void setSequence(Sequence sequence) {
+        this.sequence = sequence;
+    }
 
-	/**
-	 * @param requested
-	 */
-	public void setAckRequest(AckRequested requested) {
-		ackRequest = requested;
-	}
+    /**
+     * @param acknowledgement 
+     */
+    public void setSequenceAcknowledgement(SequenceAcknowledgement acknowledgement) {
+        sequenceAcknowledgement = acknowledgement;
+    }
 
-	/**
-	 * @return
-	 */
-	public AckRequested getAckRequest() {
-		return ackRequest;
-	}
+    /**
+     * @param sequence 
+     */
+    public void setTerminateSequence(TerminateSequence sequence) {
+        terminateSequence = sequence;
+    }
 
-	/**
-	 * @return
-	 */
-	public CreateSequence getCreateSequence() {
-		return createSequence;
-	}
-	
+    /**
+     * @param requested 
+     */
+    public void setAckRequest(AckRequested requested) {
+        ackRequest = requested;
+    }
+
+    /**
+     * @return 
+     */
+    public AckRequested getAckRequest() {
+        return ackRequest;
+    }
+
+    /**
+     * @return 
+     */
+    public CreateSequence getCreateSequence() {
+        return createSequence;
+    }
 
 }

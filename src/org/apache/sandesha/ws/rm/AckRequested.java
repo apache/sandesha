@@ -64,127 +64,126 @@ import javax.xml.soap.SOAPException;
 import java.util.Iterator;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class AckRequested extends MessageElement implements IRmElement {
 
-	private MessageElement ackRequested;
-	private Identifier identifier;
-	private MessageNumber messageNumber;
+    private MessageElement ackRequested;
+    private Identifier identifier;
+    private MessageNumber messageNumber;
 
-	public AckRequested() {
-		ackRequested = new MessageElement();
-		ackRequested.setName("wsrm:AckRequested");
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement() throws SOAPException {
+    public AckRequested() {
+        ackRequested = new MessageElement();
+        ackRequested.setName("wsrm:AckRequested");
+    }
 
-		ackRequested.addChildElement(identifier.getSoapElement());
-		ackRequested.addChildElement(messageNumber.getSoapElement());
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() throws SOAPException {
 
-		return ackRequested;
-	}
+        ackRequested.addChildElement(identifier.getSoapElement());
+        ackRequested.addChildElement(messageNumber.getSoapElement());
 
-	public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
-		throws SOAPException {
-		SOAPEnvelope env = envelop;
-		/*ackRequested.addChildElement(identifier.getSoapElement());
-		ackRequested.addChildElement(messageNumber.getSoapElement());
-			env.addHeader((SOAPHeaderElement)ackRequested);*/
-		if (env.getHeader() == null) {
-			env.addHeader();
-		}
+        return ackRequested;
+    }
 
-		Name name =
-			env.createName(
-				"",
-				"wsrm",
-				"http://schemas.xmlsoap.org/ws/2004/03/rm");
-		SOAPHeaderElement headerElement =
-			(SOAPHeaderElement) env.getHeader().addHeaderElement(name);
-		//.setActor(null);
-		headerElement.setActor(null);
-		headerElement.setName("AckRequested");
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
+            throws SOAPException {
+        SOAPEnvelope env = envelop;
+        /*ackRequested.addChildElement(identifier.getSoapElement());
+        ackRequested.addChildElement(messageNumber.getSoapElement());
+            env.addHeader((SOAPHeaderElement)ackRequested);*/
+        if (env.getHeader() == null) {
+            env.addHeader();
+        }
 
-		if (identifier != null) {
-			identifier.toSOAPEnvelope(headerElement);
-		}
-		if (messageNumber != null) {
-			messageNumber.toSOAPEnvelope(headerElement);
-		}
+        Name name =
+                env.createName("",
+                        "wsrm",
+                        "http://schemas.xmlsoap.org/ws/2004/03/rm");
+        SOAPHeaderElement headerElement =
+                (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
+        //.setActor(null);
+        headerElement.setActor(null);
+        headerElement.setName("AckRequested");
 
-		return env;
-	}
-	public AckRequested fromSOAPEnveploe(SOAPHeaderElement headerElement) {
-		Iterator iterator = headerElement.getChildElements();
-		MessageElement childElement;
-		while (iterator.hasNext()) {
+        if (identifier != null) {
+            identifier.toSOAPEnvelope(headerElement);
+        }
+        if (messageNumber != null) {
+            messageNumber.toSOAPEnvelope(headerElement);
+        }
 
-			childElement = (MessageElement) iterator.next();
-			if (childElement.getName().equals("wsu:Identifier")) {
-				identifier = new Identifier();
-				identifier.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("Identifier")) {
-				identifier = new Identifier();
-				identifier.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("wsrm:MessageaNumber")) {
-				messageNumber = new MessageNumber();
-				messageNumber.fromSOAPEnvelope(childElement);
+        return env;
+    }
 
-			}
-			if (childElement.getName().equals("wsrm:MessageaNumber")) {
-				messageNumber = new MessageNumber();
-				messageNumber.fromSOAPEnvelope(childElement);
+    public AckRequested fromSOAPEnveploe(SOAPHeaderElement headerElement) {
+        Iterator iterator = headerElement.getChildElements();
+        MessageElement childElement;
+        while (iterator.hasNext()) {
 
-			}
+            childElement = (MessageElement) iterator.next();
+            if (childElement.getName().equals("wsu:Identifier")) {
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("Identifier")) {
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("wsrm:MessageaNumber")) {
+                messageNumber = new MessageNumber();
+                messageNumber.fromSOAPEnvelope(childElement);
 
-		}
-		return this;
-	}
+            }
+            if (childElement.getName().equals("wsrm:MessageaNumber")) {
+                messageNumber = new MessageNumber();
+                messageNumber.fromSOAPEnvelope(childElement);
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) throws SOAPException {
-		ackRequested.addChildElement(element);
+            }
 
-	}
+        }
+        return this;
+    }
 
-	/**
-	 * @return
-	 */
-	public Identifier getIdentifier() {
-		return identifier;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) throws SOAPException {
+        ackRequested.addChildElement(element);
 
-	/**
-	 * @return
-	 */
-	public MessageNumber getMessageNumber() {
-		return messageNumber;
-	}
+    }
 
-	/**
-	 * @param identifier
-	 */
-	public void setIdentifier(Identifier identifier) {
-		this.identifier = identifier;
-	}
+    /**
+     * @return 
+     */
+    public Identifier getIdentifier() {
+        return identifier;
+    }
 
-	/**
-	 * @param number
-	 */
-	public void setMessageNumber(MessageNumber number) {
-		messageNumber = number;
-	}
+    /**
+     * @return 
+     */
+    public MessageNumber getMessageNumber() {
+        return messageNumber;
+    }
+
+    /**
+     * @param identifier 
+     */
+    public void setIdentifier(Identifier identifier) {
+        this.identifier = identifier;
+    }
+
+    /**
+     * @param number 
+     */
+    public void setMessageNumber(MessageNumber number) {
+        messageNumber = number;
+    }
 
 }

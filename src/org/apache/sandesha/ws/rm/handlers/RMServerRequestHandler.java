@@ -61,30 +61,28 @@ import org.apache.sandesha.ws.rm.Constants;
 import javax.xml.soap.SOAPException;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class RMServerRequestHandler extends RMHandler {
 
-	/* (non-Javadoc)
-	 * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
-	 */
-	public void invoke(MessageContext msgContext) throws AxisFault {
-		//System.out.println("RMServerRequestHandler::invoke");
+    /* (non-Javadoc)
+     * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
+     */
+    public void invoke(MessageContext msgContext) throws AxisFault {
+        //System.out.println("RMServerRequestHandler::invoke");
 				
-		try {
-			setPropertyToMessageContext(msgContext,Constants.ENV_RM_REQUEST_HEADERS);
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SOAPException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}			
-	}
+        try {
+            setPropertyToMessageContext(msgContext, Constants.ENV_RM_REQUEST_HEADERS);
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SOAPException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -59,53 +59,54 @@ import org.apache.axis.message.MessageElement;
 import javax.xml.soap.SOAPException;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class Nack implements IRmElement {
-	
-	private long notAckNum;
-	private MessageElement nackElement;
-	
-	public Nack(){
-		nackElement = new MessageElement();
-		nackElement.setName("wsrm:Nack"); 
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement() throws SOAPException {
-		nackElement.addTextNode(new Long(notAckNum).toString());
-		return nackElement;
-	}
-	public Nack fromSOAPEnvelope(MessageElement element){
-		notAckNum=(new Long(element.getFirstChild().toString())).longValue();
-		return this;
-	}
-	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
-		msgElement.addChildElement("Nack","wsrm").addTextNode((new Long(notAckNum)).toString());;
-				
-		return msgElement;
-	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) {
-		// TODO no child elements ?
+    private long notAckNum;
+    private MessageElement nackElement;
 
-	}
+    public Nack() {
+        nackElement = new MessageElement();
+        nackElement.setName("wsrm:Nack");
+    }
 
-	/**
-	 * @param notAckNo
-	 */
-	public void setNotAckNum(long notAckNo) {
-		notAckNum = notAckNo;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() throws SOAPException {
+        nackElement.addTextNode(new Long(notAckNum).toString());
+        return nackElement;
+    }
+
+    public Nack fromSOAPEnvelope(MessageElement element) {
+        notAckNum = (new Long(element.getFirstChild().toString())).longValue();
+        return this;
+    }
+
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
+        msgElement.addChildElement("Nack", "wsrm").addTextNode((new Long(notAckNum)).toString());
+        ;
+
+        return msgElement;
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) {
+        // TODO no child elements ?
+
+    }
+
+    /**
+     * @param notAckNo 
+     */
+    public void setNotAckNum(long notAckNo) {
+        notAckNum = notAckNo;
+    }
 
 }

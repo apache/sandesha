@@ -64,154 +64,154 @@ import javax.xml.soap.SOAPException;
 import java.util.Iterator;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class Sequence extends MessageElement implements IRmElement {
 
-	private MessageElement seqElement;
+    private MessageElement seqElement;
 
-	private Identifier identifier;
-	private MessageNumber messageNumber;
-	private LastMessage lastMessage;
+    private Identifier identifier;
+    private MessageNumber messageNumber;
+    private LastMessage lastMessage;
 
-	public Sequence() {
-		seqElement = new MessageElement();
-		seqElement.setName("wsrm:Sequence");
+    public Sequence() {
+        seqElement = new MessageElement();
+        seqElement.setName("wsrm:Sequence");
 
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement() throws SOAPException {
-		seqElement.addChildElement(lastMessage.getSoapElement());
-		seqElement.addChildElement(identifier.getSoapElement());
-		seqElement.addChildElement(messageNumber.getSoapElement());
-		return seqElement;
-	}
+    }
 
-	public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop) throws Exception {
-		SOAPEnvelope env = envelop;
-		/*seqElement.addChildElement(lastMessage.getSoapElement());
-		seqElement.addChildElement(identifier.getSoapElement());
-		seqElement.addChildElement(messageNumber.getSoapElement());*/
-		if (env.getHeader() == null) {
-			env.addHeader();
-		}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() throws SOAPException {
+        seqElement.addChildElement(lastMessage.getSoapElement());
+        seqElement.addChildElement(identifier.getSoapElement());
+        seqElement.addChildElement(messageNumber.getSoapElement());
+        return seqElement;
+    }
 
-		Name name =
-			env.createName(
-				"",
-				"wsrm",
-				"http://schemas.xmlsoap.org/ws/2004/03/rm");
-		SOAPHeaderElement headerElement =
-			(SOAPHeaderElement) env.getHeader().addHeaderElement(name);
-		//.setActor(null);
-		headerElement.setActor(null);
-		headerElement.setName("Sequence");
-		//System.out.println("must undestsnd set");
-		//headerElement.setMustUnderstand(true);
-		if (lastMessage != null) {
-			lastMessage.toSOAPEnvelope(headerElement);
-		}
-		if (identifier != null) {
-			identifier.toSOAPEnvelope(headerElement);
-		}
-		if (messageNumber != null) {
-			messageNumber.toSOAPEnvelope(headerElement);
-		}
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop) throws Exception {
+        SOAPEnvelope env = envelop;
+        /*seqElement.addChildElement(lastMessage.getSoapElement());
+        seqElement.addChildElement(identifier.getSoapElement());
+        seqElement.addChildElement(messageNumber.getSoapElement());*/
+        if (env.getHeader() == null) {
+            env.addHeader();
+        }
 
-		return env;
-	}
-	public Sequence fromSOAPEnveploe(SOAPHeaderElement headerElement) {
-		Iterator iterator = headerElement.getChildElements();
-		MessageElement childElement;
-		while (iterator.hasNext()) {
+        Name name =
+                env.createName("",
+                        "wsrm",
+                        "http://schemas.xmlsoap.org/ws/2004/03/rm");
+        SOAPHeaderElement headerElement =
+                (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
+        //.setActor(null);
+        headerElement.setActor(null);
+        headerElement.setName("Sequence");
+        //System.out.println("must undestsnd set");
+        //headerElement.setMustUnderstand(true);
+        if (lastMessage != null) {
+            lastMessage.toSOAPEnvelope(headerElement);
+        }
+        if (identifier != null) {
+            identifier.toSOAPEnvelope(headerElement);
+        }
+        if (messageNumber != null) {
+            messageNumber.toSOAPEnvelope(headerElement);
+        }
 
-			childElement = (MessageElement) iterator.next();
-			//System.out.println(childElement.getName());
-			if (childElement.getName().equals("wsu:Identifier")) {
-				identifier = new Identifier();
-				identifier.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("Identifier")) {
-				identifier = new Identifier();
-				identifier.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("wsrm:MessageNumber")) {
-				messageNumber = new MessageNumber();
-				messageNumber.fromSOAPEnvelope(childElement);
+        return env;
+    }
 
-			}
-			if (childElement.getName().equals("MessageNumber")) {
-				messageNumber = new MessageNumber();
-				messageNumber.fromSOAPEnvelope(childElement);
+    public Sequence fromSOAPEnveploe(SOAPHeaderElement headerElement) {
+        Iterator iterator = headerElement.getChildElements();
+        MessageElement childElement;
+        while (iterator.hasNext()) {
 
-			}
-			if (childElement.getName().equals("wsrm:LastMessage")) {
-				lastMessage = new LastMessage();
-				lastMessage.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("LastMessage")) {
-				lastMessage = new LastMessage();
-				lastMessage.fromSOAPEnvelope(childElement);
-			}
+            childElement = (MessageElement) iterator.next();
+            //System.out.println(childElement.getName());
+            if (childElement.getName().equals("wsu:Identifier")) {
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("Identifier")) {
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("wsrm:MessageNumber")) {
+                messageNumber = new MessageNumber();
+                messageNumber.fromSOAPEnvelope(childElement);
 
-		}
-		return this;
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) throws SOAPException {
-		seqElement.addChildElement(element);
+            }
+            if (childElement.getName().equals("MessageNumber")) {
+                messageNumber = new MessageNumber();
+                messageNumber.fromSOAPEnvelope(childElement);
 
-	}
+            }
+            if (childElement.getName().equals("wsrm:LastMessage")) {
+                lastMessage = new LastMessage();
+                lastMessage.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("LastMessage")) {
+                lastMessage = new LastMessage();
+                lastMessage.fromSOAPEnvelope(childElement);
+            }
 
-	/**
-	 * @return
-	 */
-	public Identifier getIdentifier() {
-		return identifier;
-	}
+        }
+        return this;
+    }
 
-	/**
-	 * @return
-	 */
-	public LastMessage getLastMessage() {
-		return lastMessage;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) throws SOAPException {
+        seqElement.addChildElement(element);
 
-	/**
-	 * @return
-	 */
-	public MessageNumber getMessageNumber() {
-		return messageNumber;
-	}
+    }
 
-	/**
-	 * @param identifer
-	 */
-	public void setIdentifier(Identifier identifer) {
-		identifier = identifer;
-	}
+    /**
+     * @return 
+     */
+    public Identifier getIdentifier() {
+        return identifier;
+    }
 
-	/**
-	 * @param message
-	 */
-	public void setLastMessage(LastMessage message) {
-		lastMessage = message;
-	}
+    /**
+     * @return 
+     */
+    public LastMessage getLastMessage() {
+        return lastMessage;
+    }
 
-	/**
-	 * @param number
-	 */
-	public void setMessageNumber(MessageNumber number) {
-		messageNumber = number;
-	}
+    /**
+     * @return 
+     */
+    public MessageNumber getMessageNumber() {
+        return messageNumber;
+    }
+
+    /**
+     * @param identifer 
+     */
+    public void setIdentifier(Identifier identifer) {
+        identifier = identifer;
+    }
+
+    /**
+     * @param message 
+     */
+    public void setLastMessage(LastMessage message) {
+        lastMessage = message;
+    }
+
+    /**
+     * @param number 
+     */
+    public void setMessageNumber(MessageNumber number) {
+        messageNumber = number;
+    }
 
 }

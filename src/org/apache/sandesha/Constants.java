@@ -55,30 +55,25 @@
 package org.apache.sandesha;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public interface Constants {
-	public static final String RM_CLIENT_SERVICE="RMClientService";
-		public static final String CLIENT_METHOD="clientMethod";
-		public static final String AXIS_SERVICES="/axis/services/";
-		public static final String QUESTION_WSDL="?wsdl";
-		public static final String CLIENT_REFERANCE="RMClientReferance";
+    public static final String RM_CLIENT_SERVICE = "RMClientService";
+    public static final String CLIENT_METHOD = "clientMethod";
+    public static final String AXIS_SERVICES = "/axis/services/";
+    public static final String QUESTION_WSDL = "?wsdl";
+    public static final String CLIENT_REFERANCE = "RMClientReferance";
 
-		//Policy related constants.
-		//public static final  EXPIRATION=new Date();
-		public static final long INACTIVITY_TIMEOUT=60000; //double the expectd for breaking of the network in ms.
-		public static final long RETRANSMISSION_INTERVAL=2000;//Set to two 2000ms 
-		public static final int MAXIMUM_RETRANSMISSION_COUNT = 20;
-		
-		
-		public static final String ANONYMOUS_URI="http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous";
-		public static final int   MAX_CHECKING_TIME=2;
+    //Policy related constants.
+    //public static final  EXPIRATION=new Date();
+    public static final long INACTIVITY_TIMEOUT = 60000; //double the expectd for breaking of the network in ms.
+    public static final long RETRANSMISSION_INTERVAL = 2000;//Set to two 2000ms 
+    public static final int MAXIMUM_RETRANSMISSION_COUNT = 20;
 
-	
+    public static final String ANONYMOUS_URI = "http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous";
+    public static final int MAX_CHECKING_TIME = 2;
 
 }

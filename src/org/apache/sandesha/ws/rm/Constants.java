@@ -55,16 +55,14 @@
 package org.apache.sandesha.ws.rm;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public interface Constants {
-	
-	public static final String ENV_RM_REQUEST_HEADERS =
-				"org.apache.sandesha.ws.rm.REQUEST.HEADERS";
-	
+
+    public static final String ENV_RM_REQUEST_HEADERS =
+            "org.apache.sandesha.ws.rm.REQUEST.HEADERS";
+
 }

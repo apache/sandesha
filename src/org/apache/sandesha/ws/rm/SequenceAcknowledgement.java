@@ -66,189 +66,186 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class SequenceAcknowledgement
-	extends MessageElement
-	implements IRmElement {
+        extends MessageElement
+        implements IRmElement {
 
-	private MessageElement seqAck; //this element
-	private List ackRanges;
-	private List nackList;
-	private Identifier identifier;
+    private MessageElement seqAck; //this element
+    private List ackRanges;
+    private List nackList;
+    private Identifier identifier;
 
-	public SequenceAcknowledgement() {
-		ackRanges = new LinkedList();
-		nackList = new LinkedList();
-		seqAck = new MessageElement();
-		seqAck.setName("wsrm:SequenceAcknowledgement");
-	}
+    public SequenceAcknowledgement() {
+        ackRanges = new LinkedList();
+        nackList = new LinkedList();
+        seqAck = new MessageElement();
+        seqAck.setName("wsrm:SequenceAcknowledgement");
+    }
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement() throws SOAPException {
-		Iterator ite = ackRanges.iterator();
-		while (ite.hasNext()) {
-			MessageElement element = (MessageElement) ite.next();
-			seqAck.addChildElement(element);
-		}
-		ite = nackList.iterator();
-		while (ite.hasNext()) {
-			MessageElement element = (MessageElement) ite.next();
-			seqAck.addChildElement(element);
-		}
-		seqAck.addChildElement(identifier.getSoapElement());
-		return seqAck;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() throws SOAPException {
+        Iterator ite = ackRanges.iterator();
+        while (ite.hasNext()) {
+            MessageElement element = (MessageElement) ite.next();
+            seqAck.addChildElement(element);
+        }
+        ite = nackList.iterator();
+        while (ite.hasNext()) {
+            MessageElement element = (MessageElement) ite.next();
+            seqAck.addChildElement(element);
+        }
+        seqAck.addChildElement(identifier.getSoapElement());
+        return seqAck;
+    }
 
-	public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
-		throws SOAPException {
-		SOAPEnvelope env = envelop;
-		if (env.getHeader() == null) {
-			env.addHeader();
-		}
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
+            throws SOAPException {
+        SOAPEnvelope env = envelop;
+        if (env.getHeader() == null) {
+            env.addHeader();
+        }
 
-		Name name =
-			env.createName(
-				"",
-				"wsrm",
-				"http://schemas.xmlsoap.org/ws/2004/03/rm");
+        Name name =
+                env.createName("",
+                        "wsrm",
+                        "http://schemas.xmlsoap.org/ws/2004/03/rm");
 
-		SOAPHeaderElement headerElement =
-			(SOAPHeaderElement) env.getHeader().addHeaderElement(name);
-		//.setActor(null);
-		headerElement.setActor(null);
-		headerElement.setName("SequenceAcknowledgement");
+        SOAPHeaderElement headerElement =
+                (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
+        //.setActor(null);
+        headerElement.setActor(null);
+        headerElement.setName("SequenceAcknowledgement");
 
-		Iterator iterator = ackRanges.iterator();
-		while (iterator.hasNext()) {
-			//System.out.println(ite.next().getClass());
-			AcknowledgementRange ackRange =
-				(AcknowledgementRange) iterator.next();
-			ackRange.toSOAPEnvelope(headerElement);
-		}
-		iterator = nackList.iterator();
-		while (iterator.hasNext()) {
-			Nack nack = (Nack) iterator.next();
-			nack.toSOAPEnvelope(headerElement);
-		}
-		if (identifier != null) {
-			identifier.toSOAPEnvelope(headerElement);
-		}
+        Iterator iterator = ackRanges.iterator();
+        while (iterator.hasNext()) {
+            //System.out.println(ite.next().getClass());
+            AcknowledgementRange ackRange =
+                    (AcknowledgementRange) iterator.next();
+            ackRange.toSOAPEnvelope(headerElement);
+        }
+        iterator = nackList.iterator();
+        while (iterator.hasNext()) {
+            Nack nack = (Nack) iterator.next();
+            nack.toSOAPEnvelope(headerElement);
+        }
+        if (identifier != null) {
+            identifier.toSOAPEnvelope(headerElement);
+        }
 
-		//env.addHeader((SOAPHeaderElement)seqAck);
-		return env;
-	}
-	public SequenceAcknowledgement fromSOAPEnveploe(SOAPHeaderElement headerElement) {
-		System.out.println("fromSOAPEnveploe");
-		Iterator iterator = headerElement.getChildElements();
-		MessageElement childElement;
-		while (iterator.hasNext()) {
-			//System.out.println(iterator.next());
-			childElement = (MessageElement) iterator.next();
-			//System.out.println("from SeqAck " + childElement.getName());
-			if (childElement.getName().equals("wsu:Identifier")) {
-				identifier = new Identifier();
-				identifier.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("Identifier")) {
-				//System.out.println("childElement.getName().equals(\"Identifier\")");
-				identifier = new Identifier();
-				identifier.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("wsrm:AcknowledgementRange")) {
-				AcknowledgementRange ackRange = new AcknowledgementRange();
-				ackRange.fromSOAPEnvelope(childElement);
-				ackRanges.add(ackRange);
-			}
-			if (childElement.getName().equals("AcknowledgementRange")) {
-				AcknowledgementRange ackRange = new AcknowledgementRange();
-				ackRange.fromSOAPEnvelope(childElement);
-				ackRanges.add(ackRange);
-			}
-			if (childElement.getName().equals("wsrm:Nack")) {
-				Nack nack = new Nack();
-				nack.fromSOAPEnvelope(childElement);
-			}
-			if (childElement.getName().equals("Nack")) {
-				Nack nack = new Nack();
-				nack.fromSOAPEnvelope(childElement);
-			}
+        //env.addHeader((SOAPHeaderElement)seqAck);
+        return env;
+    }
 
-		}
-		return this;
-	}
+    public SequenceAcknowledgement fromSOAPEnveploe(SOAPHeaderElement headerElement) {
+        System.out.println("fromSOAPEnveploe");
+        Iterator iterator = headerElement.getChildElements();
+        MessageElement childElement;
+        while (iterator.hasNext()) {
+            //System.out.println(iterator.next());
+            childElement = (MessageElement) iterator.next();
+            //System.out.println("from SeqAck " + childElement.getName());
+            if (childElement.getName().equals("wsu:Identifier")) {
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("Identifier")) {
+                //System.out.println("childElement.getName().equals(\"Identifier\")");
+                identifier = new Identifier();
+                identifier.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("wsrm:AcknowledgementRange")) {
+                AcknowledgementRange ackRange = new AcknowledgementRange();
+                ackRange.fromSOAPEnvelope(childElement);
+                ackRanges.add(ackRange);
+            }
+            if (childElement.getName().equals("AcknowledgementRange")) {
+                AcknowledgementRange ackRange = new AcknowledgementRange();
+                ackRange.fromSOAPEnvelope(childElement);
+                ackRanges.add(ackRange);
+            }
+            if (childElement.getName().equals("wsrm:Nack")) {
+                Nack nack = new Nack();
+                nack.fromSOAPEnvelope(childElement);
+            }
+            if (childElement.getName().equals("Nack")) {
+                Nack nack = new Nack();
+                nack.fromSOAPEnvelope(childElement);
+            }
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) throws SOAPException {
-		seqAck.addChildElement(element);
-	}
+        }
+        return this;
+    }
 
-	/**
-	 * @return
-	 */
-	public List getAckRanges() {
-		return ackRanges;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) throws SOAPException {
+        seqAck.addChildElement(element);
+    }
 
-	/**
-	 * @return
-	 */
-	public Identifier getIdentifier() {
-		return identifier;
-	}
+    /**
+     * @return 
+     */
+    public List getAckRanges() {
+        return ackRanges;
+    }
 
-	/**
-	 * @return
-	 */
-	public List getNackList() {
-		return nackList;
-	}
+    /**
+     * @return 
+     */
+    public Identifier getIdentifier() {
+        return identifier;
+    }
 
-	/**
-	 * @param list
-	 */
-	public AcknowledgementRange addAckRanges(AcknowledgementRange ackRange) {
-		ackRanges.add(ackRange);
-		return ackRange;
-	}
-	public Nack addNackRanges(Nack nack) {
-		nackList.add(nack);
-		return nack;
-	}
-	/*public void setAckRanges(List list) {
-		ackRanges = list;
-	}*/
+    /**
+     * @return 
+     */
+    public List getNackList() {
+        return nackList;
+    }
 
-	/**
-	 * @param identifier
-	 */
-	public void setIdentifier(Identifier identifier) {
-		this.identifier = identifier;
-	}
+    /**
+     * @param list 
+     */
+    public AcknowledgementRange addAckRanges(AcknowledgementRange ackRange) {
+        ackRanges.add(ackRange);
+        return ackRange;
+    }
 
-	/**
-	 * @param list
-	 */
-	/*public void setNackList(List list) {
-		nackList = list;
-	}*/
+    public Nack addNackRanges(Nack nack) {
+        nackList.add(nack);
+        return nack;
+    }
+    /*public void setAckRanges(List list) {
+        ackRanges = list;
+    }*/
 
-	/**
-	 * @param list
-	 * 
-	 * TODO:
-	 */
-	public void setAckRanges(List list) {
-		ackRanges = list;
-	}
+    /**
+     * @param identifier 
+     */
+    public void setIdentifier(Identifier identifier) {
+        this.identifier = identifier;
+    }
+
+    /**
+     * @param list
+     */
+    /*public void setNackList(List list) {
+        nackList = list;
+    }*/
+
+    /**
+     * @param list TODO:
+     */
+    public void setAckRanges(List list) {
+        ackRanges = list;
+    }
 
 }

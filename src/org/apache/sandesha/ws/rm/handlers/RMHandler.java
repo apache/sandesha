@@ -62,21 +62,20 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 import javax.xml.soap.SOAPException;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
-public abstract class RMHandler extends BasicHandler{
-	public void setPropertyToMessageContext(MessageContext msgContext,String property) throws AxisFault, SOAPException{
-		RMHeaders rmHeaders=new RMHeaders();
-		rmHeaders.fromSOAPEnvelope(msgContext.getCurrentMessage().getSOAPEnvelope());
-		msgContext.setProperty(property,rmHeaders);	
-	}
-	public RMHeaders getProperryFromMessageContext(MessageContext msgContext,String property){
-		return (RMHeaders) msgContext.getProperty(property);
-	}
-	
+public abstract class RMHandler extends BasicHandler {
+    public void setPropertyToMessageContext(MessageContext msgContext, String property) throws AxisFault, SOAPException {
+        RMHeaders rmHeaders = new RMHeaders();
+        rmHeaders.fromSOAPEnvelope(msgContext.getCurrentMessage().getSOAPEnvelope());
+        msgContext.setProperty(property, rmHeaders);
+    }
+
+    public RMHeaders getProperryFromMessageContext(MessageContext msgContext, String property) {
+        return (RMHeaders) msgContext.getProperty(property);
+    }
+
 }

@@ -19,79 +19,76 @@ import javax.xml.soap.SOAPException;
 import java.util.Iterator;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class RMClientResponseHandler extends RMHandler {
 
-	/* (non-Javadoc)
-	 * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
-	 */
-	public void invoke(MessageContext messageContext) throws AxisFault {
-		try {
-			//System.out.println("WSRMClientResponseHandler");
-			////System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-			//System.out.println(messageContext.getCurrentMessage().getSOAPPartAsString());
-			//messageContext.getCurrentMessage()
-			SOAPEnvelope soapEnvelope =	messageContext.getResponseMessage().getSOAPEnvelope();
-			SOAPBody soapBody = soapEnvelope.getBody();
+    /* (non-Javadoc)
+     * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
+     */
+    public void invoke(MessageContext messageContext) throws AxisFault {
+        try {
+            //System.out.println("WSRMClientResponseHandler");
+            ////System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+            //System.out.println(messageContext.getCurrentMessage().getSOAPPartAsString());
+            //messageContext.getCurrentMessage()
+            SOAPEnvelope soapEnvelope = messageContext.getResponseMessage().getSOAPEnvelope();
+            SOAPBody soapBody = soapEnvelope.getBody();
 			
-			//System.out.println("In the response handler" );
-			//System.out.println(soapEnvelope.toString());
+            //System.out.println("In the response handler" );
+            //System.out.println(soapEnvelope.toString());
 			
-			if(soapBody.getValue()==null){
-				System.out.println("This is what i get");
-			}
-			else{
-				//System.out.println("In the response handlerrrr" );		
+            if (soapBody.getValue() == null) {
+                System.out.println("This is what i get");
+            } else {
+                //System.out.println("In the response handlerrrr" );		
 
-			Iterator iterator = soapBody.getChildElements();
-			SOAPBodyElement soapBodyElement;
-			
-			while (iterator.hasNext()) {
-				soapBodyElement=(SOAPBodyElement) iterator.next();
-				//System.out.println(soapBodyElement.getLocalName());
-				if(soapBodyElement.getLocalName().equals("clientMethodResponse")){
-					//System.out.println("clientMethodResponse");
-					Iterator ite=soapBodyElement.getChildElements();
-					MessageElement sbe;
-					while(ite.hasNext()){
-						sbe=  (MessageElement) ite.next();
-						if(sbe.getName().equals("clientMethodReturn")){
-							messageContext.setCurrentMessage(new Message(sbe.getValue()));
-							//System.out.println(sbe.getValue());
-						}
-					}
-				}				
-			}
-			//if()
-			if (messageContext.getCurrentMessage().getSOAPEnvelope().getBody().getFault()!= null) {
+                Iterator iterator = soapBody.getChildElements();
+                SOAPBodyElement soapBodyElement;
 
-				soapBodyElement = (SOAPBodyElement) iterator.next();
+                while (iterator.hasNext()) {
+                    soapBodyElement = (SOAPBodyElement) iterator.next();
+                    //System.out.println(soapBodyElement.getLocalName());
+                    if (soapBodyElement.getLocalName().equals("clientMethodResponse")) {
+                        //System.out.println("clientMethodResponse");
+                        Iterator ite = soapBodyElement.getChildElements();
+                        MessageElement sbe;
+                        while (ite.hasNext()) {
+                            sbe = (MessageElement) ite.next();
+                            if (sbe.getName().equals("clientMethodReturn")) {
+                                messageContext.setCurrentMessage(new Message(sbe.getValue()));
+                                //System.out.println(sbe.getValue());
+                            }
+                        }
+                    }
+                }
+                //if()
+                if (messageContext.getCurrentMessage().getSOAPEnvelope().getBody().getFault() != null) {
 
-				iterator = soapBodyElement.getChildElements();
-				SOAPElement soapElement = (SOAPElement) iterator.next();
+                    soapBodyElement = (SOAPBodyElement) iterator.next();
 
-				Message message = new Message(soapElement.getValue());
-				messageContext.setCurrentMessage(message);
-			}
-			
-		}
+                    iterator = soapBodyElement.getChildElements();
+                    SOAPElement soapElement = (SOAPElement) iterator.next();
 
-			//////System.out.println("\n" + messageContext.getCurrentMessage().getSOAPPartAsString() + "\n");
+                    Message message = new Message(soapElement.getValue());
+                    messageContext.setCurrentMessage(message);
+                }
 
-		} catch (AxisFault axisFault) {
-			System.out.println("axisFault.printStackTrace()");
-			//To change body of catch statement use Options | File Templates.
-		} catch (SOAPException e) {
-			System.out.println("e.printStackTrace()");
-			//To change body of catch statement use Options | File Templates.
-		}
+            }
 
-	}
+            //////System.out.println("\n" + messageContext.getCurrentMessage().getSOAPPartAsString() + "\n");
+
+        } catch (AxisFault axisFault) {
+            System.out.println("axisFault.printStackTrace()");
+            //To change body of catch statement use Options | File Templates.
+        } catch (SOAPException e) {
+            System.out.println("e.printStackTrace()");
+            //To change body of catch statement use Options | File Templates.
+        }
+
+    }
 
 }

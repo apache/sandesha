@@ -57,64 +57,66 @@ package org.apache.sandesha.ws.rm;
 import org.apache.axis.message.MessageElement;
 
 import javax.xml.soap.SOAPException;
+
 //import javax.xml.soap.Name;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class MessageNumber implements IRmElement {
-	private long messageNumber;
-	private MessageElement messageNoElement;
+    private long messageNumber;
+    private MessageElement messageNoElement;
 
-	public MessageNumber() {
-		messageNoElement = new MessageElement();
-		messageNoElement.setName("wsrm:MessageaNumber");
-	}
+    public MessageNumber() {
+        messageNoElement = new MessageElement();
+        messageNoElement.setName("wsrm:MessageaNumber");
+    }
 
-	public long getMessageNumber() {
-		
-		return messageNumber;
-	}
+    public long getMessageNumber() {
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement()  throws SOAPException{
-		// create the soap element for the message no
-		messageNoElement.addTextNode((new Long(messageNumber)).toString());
-		return messageNoElement;
-	}
-	public MessageNumber fromSOAPEnvelope(MessageElement element){
-		messageNumber=(new Long(element.getValue())).longValue();
-		return this;
-		
-	}
-	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
-		msgElement.addChildElement("MessageNumber","wsrm").addTextNode((new Long(messageNumber)).toString());
-		return msgElement;
-	}
+        return messageNumber;
+    }
 
-	/**
-	 * Set the message no in the soap message element create
-	 * @param msgNo 	the message no
-	 */
-	public void setMessageNumber(long msgNo) {
-		messageNumber = msgNo;
-		
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() throws SOAPException {
+        // create the soap element for the message no
+        messageNoElement.addTextNode((new Long(messageNumber)).toString());
+        return messageNoElement;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) {
-		//no child elements in the message no
-		//add your optional tags if required
+    public MessageNumber fromSOAPEnvelope(MessageElement element) {
+        messageNumber = (new Long(element.getValue())).longValue();
+        return this;
 
-	}
+    }
+
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
+        msgElement.addChildElement("MessageNumber", "wsrm").addTextNode((new Long(messageNumber)).toString());
+        return msgElement;
+    }
+
+    /**
+     * Set the message no in the soap message element create
+     * 
+     * @param msgNo the message no
+     */
+    public void setMessageNumber(long msgNo) {
+        messageNumber = msgNo;
+
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) {
+        //no child elements in the message no
+        //add your optional tags if required
+
+    }
 
 }

@@ -60,78 +60,74 @@ import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 
 /**
- * @author 
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna<br>
+ *         Jaliya Ekanayaka<br>
+ *         Sudar Nimalan<br>
+ *         (Apache Sandesha Project)
  */
 public class AcknowledgementRange implements IRmElement {
 
-	private MessageElement ackRangeElement;
-	private long minValue;
-	private long maxValue;
-	
-	public AcknowledgementRange(){
-		ackRangeElement = new MessageElement();
-		ackRangeElement.setName("wsrm:AcknowledgementRange");
-	}
-	
-	public void setMaxValue(long max){
-		maxValue = max;
-	}
-	
-	public void setMinValue(long min){
-		minValue=min;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-	 */
-	public MessageElement getSoapElement() {
-		
-		ackRangeElement.setAttribute("Upper",new Long(maxValue).toString());
-		ackRangeElement.setAttribute("Lower",new Long(minValue).toString());
-		return ackRangeElement;
-	}
-	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
-		SOAPElement ackRange=msgElement.addChildElement("AcknowledgementRange","wsrm");
-		ackRange.setAttribute("Upper",new Long(maxValue).toString());
-		ackRange.setAttribute("Lower",new Long(minValue).toString());
-		return msgElement;
-	}
-	public AcknowledgementRange fromSOAPEnvelope(MessageElement element){
-		minValue=(new Long(element.getAttribute("Lower").trim())).longValue();
-		maxValue=(new Long(element.getAttribute("Upper").trim())).longValue();
-		
-		return this;
-	}
+    private MessageElement ackRangeElement;
+    private long minValue;
+    private long maxValue;
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-	 */
-	public void addChildElement(MessageElement element) {
-		// TODO no child elements
+    public AcknowledgementRange() {
+        ackRangeElement = new MessageElement();
+        ackRangeElement.setName("wsrm:AcknowledgementRange");
+    }
 
-	}
+    public void setMaxValue(long max) {
+        maxValue = max;
+    }
 
-	/**
-	 * @return
-	 * 
-	 * TODO:
-	 */
-	public long getMaxValue() {
-		return maxValue;
-	}
+    public void setMinValue(long min) {
+        minValue = min;
+    }
 
-	/**
-	 * @return
-	 * 
-	 * TODO:
-	 */
-	public long getMinValue() {
-		return minValue;
-	}
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
+     */
+    public MessageElement getSoapElement() {
+
+        ackRangeElement.setAttribute("Upper", new Long(maxValue).toString());
+        ackRangeElement.setAttribute("Lower", new Long(minValue).toString());
+        return ackRangeElement;
+    }
+
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
+        SOAPElement ackRange = msgElement.addChildElement("AcknowledgementRange", "wsrm");
+        ackRange.setAttribute("Upper", new Long(maxValue).toString());
+        ackRange.setAttribute("Lower", new Long(minValue).toString());
+        return msgElement;
+    }
+
+    public AcknowledgementRange fromSOAPEnvelope(MessageElement element) {
+        minValue = (new Long(element.getAttribute("Lower").trim())).longValue();
+        maxValue = (new Long(element.getAttribute("Upper").trim())).longValue();
+
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
+     */
+    public void addChildElement(MessageElement element) {
+        // TODO no child elements
+
+    }
+
+    /**
+     * @return TODO:
+     */
+    public long getMaxValue() {
+        return maxValue;
+    }
+
+    /**
+     * @return TODO:
+     */
+    public long getMinValue() {
+        return minValue;
+    }
 
 }
