@@ -18,6 +18,8 @@ package org.apache.sandesha;
 
 import java.util.Map;
 
+import org.apache.sandesha.storage.queue.SandeshaQueue;
+
 /**
  * @author
  */
@@ -125,6 +127,14 @@ public interface IStorageManager {
     public void setAckReceived(String seqId, long msgNo);
 
     public void insertFault(RMMessageContext rmMsgCtx);
+    
+    public void addSendMsgNo(String seqId,long msgNo);
+    
+    public boolean isSentMsg(String seqId,long msgNo);
+    
+    public boolean hasLastMsgReceived(String seqId);
+
+    public long getLastMsgNo(String seqId);
 
 
 }
