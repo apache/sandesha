@@ -55,6 +55,8 @@ public class RMMessageContext {
 
     private long lastSentTime = 0;
 
+    private boolean sync=false;
+    
     //This will be used to handle the relates to field.
     //When sending the response messages from the server
     private String oldSequenceID = null;
@@ -386,6 +388,19 @@ public class RMMessageContext {
 
     public void setLastSentTime(long l) {
         lastSentTime = l;
+    }
+
+    /**
+     * @param b
+     */
+    public void setSync(boolean sync) {
+        this.sync=sync;
+        
+    }
+    
+    public boolean getSync(){
+        
+    return sync;
     }
 
 }
