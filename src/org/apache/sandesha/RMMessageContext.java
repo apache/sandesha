@@ -55,13 +55,79 @@ public class RMMessageContext {
 
     private long lastSentTime = 0;
 
-    private boolean sync=false;
-    
+    private boolean sync = false;
+
+    private boolean hasResponse = false;
+
+    private boolean lastMessage = false;
+
+    private long msgNumber = 0;
+
+    private String sourceURL = null;
+
     //This will be used to handle the relates to field.
     //When sending the response messages from the server
     private String oldSequenceID = null;
 
-    private long msgNumber = 0;
+    /**
+     * @return Returns the hasResponse.
+     */
+    public boolean isHasResponse() {
+        return hasResponse;
+    }
+
+    /**
+     * @param hasResponse
+     *            The hasResponse to set.
+     */
+    public void setHasResponse(boolean hasResponse) {
+        this.hasResponse = hasResponse;
+    }
+
+    /**
+     * @return Returns the lastMessage.
+     */
+    public boolean isLastMessage() {
+        return lastMessage;
+    }
+
+    /**
+     * @param lastMessage
+     *            The lastMessage to set.
+     */
+    public void setLastMessage(boolean lastMessage) {
+        this.lastMessage = lastMessage;
+    }
+
+    /**
+     * @return Returns the rmHeaders.
+     */
+    public RMHeaders getRmHeaders() {
+        return rmHeaders;
+    }
+
+    /**
+     * @param rmHeaders
+     *            The rmHeaders to set.
+     */
+    public void setRmHeaders(RMHeaders rmHeaders) {
+        this.rmHeaders = rmHeaders;
+    }
+
+    /**
+     * @return Returns the sourceURL.
+     */
+    public String getSourceURL() {
+        return sourceURL;
+    }
+
+    /**
+     * @param sourceURL
+     *            The sourceURL to set.
+     */
+    public void setSourceURL(String sourceURL) {
+        this.sourceURL = sourceURL;
+    }
 
     /**
      * @return Returns the msgNumber.
@@ -394,13 +460,13 @@ public class RMMessageContext {
      * @param b
      */
     public void setSync(boolean sync) {
-        this.sync=sync;
-        
+        this.sync = sync;
+
     }
-    
-    public boolean getSync(){
-        
-    return sync;
+
+    public boolean getSync() {
+
+        return sync;
     }
 
 }
