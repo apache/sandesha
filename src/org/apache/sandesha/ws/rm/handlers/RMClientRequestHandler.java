@@ -21,6 +21,7 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPBody;
@@ -37,16 +38,12 @@ import javax.xml.soap.SOAPException;
  */
 public class RMClientRequestHandler extends RMHandler {
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
-     */
-
     /**
      * Method invoke
      * 
      * @param messageContext 
      * @throws AxisFault 
+     * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      */
     public void invoke(MessageContext messageContext) throws AxisFault {
 
@@ -68,32 +65,28 @@ public class RMClientRequestHandler extends RMHandler {
         Call call = (Call) messageContext.getProperty(MessageContext.CALL);
 
         // Three parameters: sequenceIdentifier, isOneWay and isLastMessage.
-        /*String sequenceID = call.getSequenceIdentifier();
-        boolean isOneWay = call.isOneWayInvoke();
-        boolean isLastMessage = call.isLastMessage();
-        boolean isCreateSequence = call.isCreateSequence();
-        boolean isResponseExpected = call.isResponseExpected();*/
-		if(call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER)!=null){
-					sequenceID=(String) call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER);
-				}
+        String sequenceID = null;
+        if (call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER) != null) {
+            sequenceID = (String) call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER);
+        }
 
-				boolean isOneWay = false;
-				boolean isLastMessage = false;
-				boolean isCreateSequence = false;
-				boolean isResponseExpected = false;
+        boolean isOneWay = false;
+        boolean isLastMessage = false;
+        boolean isCreateSequence = false;
+        boolean isResponseExpected = false;
 
-				if (call.getProperty(Constants.CLIENT_ONE_WAY_INVOKE) != null) {
-					isOneWay=((Boolean) (call.getProperty(Constants.CLIENT_ONE_WAY_INVOKE))).booleanValue();
-				}
-				if (call.getProperty(Constants.CLIENT_LAST_MESSAGE) != null) {
-					isLastMessage=((Boolean) (call.getProperty(Constants.CLIENT_LAST_MESSAGE))).booleanValue();
-				}
-				if (call.getProperty(Constants.CLIENT_CREATE_SEQUENCE) != null) {
-					isCreateSequence=((Boolean) (call.getProperty(Constants.CLIENT_CREATE_SEQUENCE))).booleanValue();
-				}
-				if (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED) != null) {
-					isResponseExpected=((Boolean) (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED))).booleanValue();
-				}
+        if (call.getProperty(Constants.CLIENT_ONE_WAY_INVOKE) != null) {
+            isOneWay = ((Boolean) (call.getProperty(Constants.CLIENT_ONE_WAY_INVOKE))).booleanValue();
+        }
+        if (call.getProperty(Constants.CLIENT_LAST_MESSAGE) != null) {
+            isLastMessage = ((Boolean) (call.getProperty(Constants.CLIENT_LAST_MESSAGE))).booleanValue();
+        }
+        if (call.getProperty(Constants.CLIENT_CREATE_SEQUENCE) != null) {
+            isCreateSequence = ((Boolean) (call.getProperty(Constants.CLIENT_CREATE_SEQUENCE))).booleanValue();
+        }
+        if (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED) != null) {
+            isResponseExpected = ((Boolean) (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED))).booleanValue();
+        }
         
 
         // Get the SOAP envelop of the request message and send it as a string parameter to the
@@ -208,8 +201,7 @@ public class RMClientRequestHandler extends RMHandler {
             // System.out.println(   messageContext.getCurrentMessage().getSOAPEnvelope().toString());
             // System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         } catch (SOAPException soapException) {
-
-            // TODO implement the exception.
+            throw AxisFault.makeFault(soapException);
         }
     }
 }
