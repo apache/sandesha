@@ -58,7 +58,21 @@ public class RMMessageContext {
     private long msgNumber = 0;
 
     private String sourceURL = null;
+    
+    private String action=null;
 
+    /**
+     * @return Returns the action.
+     */
+    public String getAction() {
+        return action;
+    }
+    /**
+     * @param action The action to set.
+     */
+    public void setAction(String action) {
+        this.action = action;
+    }
     //This will be used to handle the relates to field.
     //When sending the response messages from the server
     private String oldSequenceID = null;
