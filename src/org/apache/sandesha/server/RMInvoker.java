@@ -49,7 +49,7 @@ public class RMInvoker implements Runnable {
         while (true) {
             try {
                 System.out
-                        .println("RMInvoker THREAD IS SLEEPING -----------000----------\n");
+                        .print("-");//RMInvoker THREAD IS SLEEPING -----------000----------\n");
 
                 //Sleep for Constants.RMINVOKER_SLEEP_TIME.
                 //Currently the RMInvoker is a single thread, but this needs to
@@ -73,7 +73,7 @@ public class RMInvoker implements Runnable {
                     // runtime.
                     RPCProvider rpcProvider = new RPCProvider();
 
-                    System.out.println("INVOKE THE SERVICE.....\n");
+                    System.out.println("INFO: Invoking the service ....\n");
                     //Call for the processMessage method.
                     rpcProvider.processMessage(
                             rmMessageContext.getMsgContext(), rmMessageContext
@@ -85,7 +85,7 @@ public class RMInvoker implements Runnable {
                     if (rmMessageContext.getMsgContext().getOperation()
                             .getMethod().getReturnType() != Void.TYPE) {
                         System.out
-                                .println("STORING THE RESPONSE MESSAGE.....\n");
+                                .println("INFO: String the response message ....\n");
                         //Store the message in the response queue.
                         //If there is an application response then that
                         // response is always sent using
@@ -100,8 +100,10 @@ public class RMInvoker implements Runnable {
                         boolean firstMsgOfResponseSeq = !storageManager
                                 .isResponseSequenceExist(rmMessageContext
                                         .getSequenceID());
-
-                        storageManager.insertResponseMessage(rmMessageContext);
+                        rmMessageContext.setMsgNumber(storageManager
+                                .getNextMessageNumber(rmMessageContext
+                                        .getSequenceID()));
+                        storageManager.insertOutgoingMessage(rmMessageContext);
                         //This will automatically create a response requence
                         // and add the message.
                         //Need to decide whether the server needs resource
@@ -115,7 +117,7 @@ public class RMInvoker implements Runnable {
                         //can create a new UUID from here.
 
                         if (firstMsgOfResponseSeq) {
-                            System.out.println("NO RESPONSE SEQUENCE");
+                            //System.out.println("NO RESPONSE SEQUENCE");
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);
 
@@ -128,7 +130,6 @@ public class RMInvoker implements Runnable {
                             //Set this new msgContext to the rmMsgContext.
 
                             rmMessageContext.setMsgContext(msgContext);
-
                             rmMsgContext
                                     .setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
 
