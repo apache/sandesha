@@ -67,6 +67,7 @@ public class RMMessageContext {
     
     private boolean responseReceived=false;
 
+    private boolean ackReceived=false;
     /**
      * @return Returns the responseReceived.
      */
@@ -209,6 +210,12 @@ public class RMMessageContext {
         this.oldSequenceID = oldSequenceID;
     }
 
+    public boolean isAckReceived() {
+        return ackReceived;
+    }
+    public void setAckReceived(boolean ackReceived) {
+        this.ackReceived = ackReceived;
+    }
     /**
      * @return
      */
