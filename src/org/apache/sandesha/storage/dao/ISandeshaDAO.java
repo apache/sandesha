@@ -113,5 +113,12 @@ public interface ISandeshaDAO {
 
     public Iterator getAllOutgoingSequences();
 
+    public void setTerminateSend (String seqId);
+
+    public void setTerminateReceived (String seqId);
+
+    public boolean isAllOutgoingTerminateSent();
+
+    public boolean isAllIncommingTerminateReceived();
 
 }

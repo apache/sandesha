@@ -69,16 +69,15 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         //else set the response env of the messageContext.
         String seqID = rmMessageContext.getSequenceID();
 
-        long messageNumber = rmMessageContext.getRMHeaders().getSequence()
-                .getMessageNumber().getMessageNumber();
+        long messageNumber = rmMessageContext.getRMHeaders().getSequence() .getMessageNumber().getMessageNumber();
         //Assume that the list is sorted and in the ascending order.
         Map listOfMsgNumbers = storageManager.getListOfMessageNumbers(seqID);
 
         if (null == listOfMsgNumbers)
             System.out.println("MSG Number list is NULL");
-        else {
-            Iterator ite = listOfMsgNumbers.keySet().iterator();
-        }
+//        else {
+//            Iterator ite = listOfMsgNumbers.keySet().iterator();
+//        }
 
         Vector ackRangeVector = null;
         if (listOfMsgNumbers != null) {
@@ -124,8 +123,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
 
     private static RMMessageContext getAckRMMsgCtx(RMMessageContext rmMessageContext, Vector ackRangeVector) {
 
-        SOAPEnvelope ackEnvelope = EnvelopeCreator
-                .createAcknowledgementEnvelope(rmMessageContext, ackRangeVector);
+        SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext, ackRangeVector);
         //Add the envelope to the response message of the messageContext.
         //rmMessageContext.getMsgContext().setResponseMessage(new
         // Message(ackEnvelope));

@@ -39,6 +39,7 @@ public class TerminateSequenceProcessor implements IRMMessageProcessor {
 
         if (terminateSeq != null && terminateSeq.getIdentifier() != null) {
             String seqID = terminateSeq.getIdentifier().getIdentifier();
+            storageManger.setTerminateReceived(seqID);
         }
 
 
@@ -49,5 +50,7 @@ public class TerminateSequenceProcessor implements IRMMessageProcessor {
 
         return false;
     }
+
+
 
 }

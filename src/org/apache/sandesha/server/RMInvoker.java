@@ -20,11 +20,13 @@ import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.util.RMMessageCreator;
 
 import javax.xml.soap.SOAPEnvelope;
 
@@ -71,15 +73,28 @@ public class RMInvoker implements Runnable {
                     // runtime.
                     RPCProvider rpcProvider = new RPCProvider();
 
-                    if (rmMessageContext.isLastMessage()) {
-                        //Insert Terminate Sequnce.
-                                               storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(rmMessageContext));
-                    }
+
                     rpcProvider.invoke(rmMessageContext.getMsgContext());
                 
                     //Check whether we have an output (response) or not.
 
                     if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() != Void.TYPE) {
+                        if (rmMessageContext.isLastMessage()) {
+                            //Insert Terminate Sequnce.
+                            AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
+
+                            if (addrHeaders.getReplyTo() != null) {
+                                String replyTo = addrHeaders.getReplyTo().getAddress().toString();
+
+                                 RMMessageContext terminateMsg= RMMessageCreator.createTerminateSeqMsg(rmMessageContext);
+                            terminateMsg.setOutGoingAddress(replyTo);
+                            storageManager.insertTerminateSeqMessage(terminateMsg);
+                            }else{
+                                System.out.println("SERVER ERROR , CANNOT SEND THE TERMINTATION");
+                                //TODO LOG THE ERROR
+                            }
+
+                        }
                         //System.out
                         //        .println("STORING THE RESPONSE MESSAGE.....\n");
                         //Store the message in the response queue.
@@ -114,6 +129,8 @@ public class RMInvoker implements Runnable {
 
                         if (firstMsgOfResponseSeq) {
                             // System.out.println("NO RESPONSE SEQUENCE");
+
+
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);
 
@@ -137,7 +154,7 @@ public class RMInvoker implements Runnable {
                             storageManager.setTemporaryOutSequence(rmMsgContext
                                     .getSequenceID(), Constants.UUID + id);
                             SOAPEnvelope createSequenceEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(id,
-                                            rmMsgContext, Constants.SERVER);
+                                    rmMsgContext, Constants.SERVER);
 
                             rmMsgContext.getMsgContext().setRequestMessage(new Message(createSequenceEnvelope));
 
@@ -172,16 +189,5 @@ public class RMInvoker implements Runnable {
 
     }
 
-    private RMMessageContext getTerminateSeqMessage(RMMessageContext rmMessageContext) {
-        RMMessageContext terSeqRMMsgContext = new RMMessageContext();
-        MessageContext terSeqMsgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
-        terSeqRMMsgContext.setSequenceID(rmMessageContext.getSequenceID());
-        terSeqRMMsgContext.setAddressingHeaders(rmMessageContext.getAddressingHeaders());
-        //RMMessageContext.copyMessageContext(msgContext, messageContext);
-        terSeqRMMsgContext.setOutGoingAddress(rmMessageContext.getOutGoingAddress());
-        terSeqRMMsgContext.setMsgContext(terSeqMsgContext);
-        terSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_TERMINATE_SEQUENCE);
-        // TODO Auto-generated method stub
-        return terSeqRMMsgContext;
-    }
+
 }

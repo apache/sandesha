@@ -274,13 +274,15 @@ public class ClientStorageManager implements IStorageManager {
      * @see org.apache.sandesha.IStorageManager#isAllSequenceComplete()
      */
     public boolean isAllSequenceComplete() {
-        boolean result=false;
-        Iterator ite=accessor.getAllOutgoingSequences();
-       while(ite.hasNext()){
-            result=isAckComplete((String)ite.next());
-       }
 
-        return result;
+        boolean outTerminateSent = accessor.isAllOutgoingTerminateSent();
+
+        boolean incomingTerminateReceived = accessor.isAllIncommingTerminateReceived();
+
+        if(outTerminateSent && incomingTerminateReceived)
+            return true;
+        else
+            return false;
     }
 
     /* (non-Javadoc)
@@ -373,5 +375,16 @@ public class ClientStorageManager implements IStorageManager {
         return accessor.searchForSequenceId(msgId);
     }
 
-    
+    public void setTerminateSend(String seqId) {
+        accessor.setTerminateSend(seqId);
+    }
+
+    public void setTerminateReceived(String seqId) {
+        accessor.setTerminateReceived(seqId);
+    }
+
+    public String getKeyFromOutgoingSeqId(String seqId){
+        return accessor.getKeyFromOutgoingSequenceId(seqId);
+    }
+
 }

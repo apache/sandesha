@@ -26,7 +26,7 @@ import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
-import org.apache.util.PropertyLoader;
+import org.apache.sandesha.util.PropertyLoader;
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
@@ -97,23 +97,24 @@ public class RMInitiator {
 
         //This should check whether we have received all the acks or reponses if any
         IStorageManager storageManager = new ClientStorageManager();
+        storageManager.isAllSequenceComplete();
 
-//        while(!storageManager.isAllSequenceComplete()){
-//            try {
-//                System.out.println("Checking to stop the client......................");
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//            }
-//        }
+        while(!storageManager.isAllSequenceComplete()){
+            try {
+                System.out.println("Checking to stop the client......................");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
 
         if (listenerStarted)
             sas.stop();
-        try {
-            Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+//        try {
+//            Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
         sender.setRunning(false);
         return new RMStatus();
 

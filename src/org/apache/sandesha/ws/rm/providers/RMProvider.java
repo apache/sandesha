@@ -23,10 +23,7 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.IStorageManager;
-import org.apache.sandesha.RMException;
-import org.apache.sandesha.RMInitiator;
-import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.*;
 import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.server.msgprocessors.FaultProcessor;
@@ -92,6 +89,10 @@ public class RMProvider extends RPCProvider {
         try {
             if (!rmMessageProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
+            }else{
+                // TODO Get the from envecreator
+                
+                // SOAPEnvelope resEn=EnvelopeCreator.createAcknowledgementEnvelope()
             }
          } catch (AxisFault af) {
                   RMProvider.log.error(af);

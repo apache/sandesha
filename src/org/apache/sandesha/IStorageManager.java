@@ -151,4 +151,10 @@ public interface IStorageManager {
 
     public String getOutgoingSeqenceIdOfIncomingMsg(RMMessageContext msg);
 
+    public void setTerminateSend(String seqId);
+
+    public void setTerminateReceived(String seqId);
+
+    public String getKeyFromOutgoingSeqId(String seqId);
+
 }

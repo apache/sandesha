@@ -265,6 +265,7 @@ public class Sender implements Runnable {
                 {
                     System.out.println("INFO: SENDING TERMINATE SEQUENCE REQUEST ....");
                     sendTerminateSequenceRequest(rmMessageContext);
+                    storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(rmMessageContext.getSequenceID()));
                     break;
                 }
             case Constants.MSG_TYPE_ACKNOWLEDGEMENT:

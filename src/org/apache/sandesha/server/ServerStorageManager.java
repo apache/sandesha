@@ -37,6 +37,14 @@ import java.util.Set;
 
 public class ServerStorageManager implements IStorageManager {
 
+    public void setTerminateSend(String seqId) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setTerminateReceived(String seqId) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     protected static Log log = LogFactory.getLog(ServerStorageManager.class
             .getName());
     private String tempSeqId = null; // used by getNextMessageToProcess();
@@ -74,7 +82,8 @@ public class ServerStorageManager implements IStorageManager {
 
     public void setAcknowledged(String seqID, long msgNumber) {
         //TODO decide this in implementing the ServerSender.
-        accessor.moveOutgoingMessageToBin(seqID, new Long(msgNumber));
+        //accessor.moveOutgoingMessageToBin(seqID, new Long(msgNumber));
+         accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
     }
 
     public void init() {
@@ -103,6 +112,8 @@ public class ServerStorageManager implements IStorageManager {
         msg = accessor.getNextPriorityMessageContextToSend();
         if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
+         if (msg == null)
+            msg = accessor.getNextLowPriorityMessageContextToSend();
         return msg;
 
     }
@@ -383,4 +394,7 @@ public class ServerStorageManager implements IStorageManager {
         return accessor.hasLastIncomingMsgReceived(seqId);
     }
 
+    public String getKeyFromOutgoingSeqId(String seqId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

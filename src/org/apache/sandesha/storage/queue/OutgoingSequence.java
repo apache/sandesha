@@ -47,6 +47,24 @@ public class OutgoingSequence {
     private long lastMsgNo = -1;
     private long nextAutoNumber; // key for storing messages.
     private static final Log log = LogFactory.getLog(OutgoingSequence.class.getName());
+    public boolean terminateSent = false;
+    private boolean hasResponse = false;
+
+    public boolean hasResponse() {
+        return hasResponse;
+    }
+
+    public void setHasResponse(boolean hasResponse) {
+        this.hasResponse = hasResponse;
+    }
+
+    public boolean isTerminateSent() {
+        return terminateSent;
+    }
+
+    public void setTerminateSent(boolean terminateSent) {
+        this.terminateSent = terminateSent;
+    }
 
     public OutgoingSequence(String sequenceId) {
         this.sequenceId = sequenceId;
@@ -268,7 +286,7 @@ public class OutgoingSequence {
 
     public boolean isAckComplete() {
         try {
-            long lastMsgNo = getLastMessage();
+            long lastMsgNo = getLastMsgNumber();
             if (lastMsgNo <= 0) {
                 return false;
             }

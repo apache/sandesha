@@ -66,12 +66,12 @@ public class SandeshaQueue {
      * This will not replace messages automatically.
      */
 
-    public Iterator getAllOutgoingSequences(){
+    public Iterator getAllOutgoingSequences() {
         return outgoingMap.keySet().iterator();
     }
 
     public boolean addMessageToIncomingSequence(String seqId, Long messageNo,
-            RMMessageContext msgCon) throws QueueException {
+                                                RMMessageContext msgCon) throws QueueException {
         boolean successful = false;
 
         if (seqId == null || msgCon == null)
@@ -123,6 +123,9 @@ public class SandeshaQueue {
                 //if last message
                 if (msgCon.isLastMessage())
                     resSeqHash.setLastMsg(msgCon.getMsgNumber());
+
+                if (msgCon.isHasResponse())
+                    resSeqHash.setHasResponse(true);
 
             }
         }
@@ -241,6 +244,7 @@ public class SandeshaQueue {
         synchronized (highPriorityQueue) {
             if (msg == null)
                 throw new QueueException(Constants.Queue.MESSAGE_ID_NULL);
+
             highPriorityQueue.add(msg);
         }
     }
@@ -252,6 +256,7 @@ public class SandeshaQueue {
             lowPriorityQueue.add(msg);
         }
     }
+
 
     public RMMessageContext nextPriorityMessageToSend() throws QueueException {
 
@@ -268,22 +273,22 @@ public class SandeshaQueue {
                     RMMessageContext tempMsg = (RMMessageContext) highPriorityQueue.get(i);
                     if (tempMsg != null) {
                         switch (tempMsg.getMessageType()) {
-                        //Create seq messages will not be removed.
-                        case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
-                            long lastSentTime = tempMsg.getLastSentTime();
-                            Date d = new Date();
-                            long currentTime = d.getTime();
-                            if (currentTime >= lastSentTime + Constants.RETRANSMISSION_INTERVAL) {
-                                tempMsg.setLastSentTime(currentTime);
+                            //Create seq messages will not be removed.
+                            case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
+                                long lastSentTime = tempMsg.getLastSentTime();
+                                Date d = new Date();
+                                long currentTime = d.getTime();
+                                if (currentTime >= lastSentTime + Constants.RETRANSMISSION_INTERVAL) {
+                                    tempMsg.setLastSentTime(currentTime);
+                                    msg = tempMsg;
+                                    break forLoop;
+                                }
+                                break;
+                            default:
+                                highPriorityQueue.remove(i);
+                                queueBin.put(tempMsg.getMessageID(), tempMsg);
                                 msg = tempMsg;
                                 break forLoop;
-                            }
-                            break;
-                        default:
-                            highPriorityQueue.remove(i);
-                            queueBin.put(tempMsg.getMessageID(), tempMsg);
-                            msg = tempMsg;
-                            break forLoop;
                         }
                     }
                 }
@@ -630,7 +635,7 @@ public class SandeshaQueue {
                 while (temp <= ackRng.getMaxValue()) {
                     Long lng = new Long(temp);
                     if (!msgNumbers.contains(lng)) //vector cant hv duplicate
-                        // entries.
+                    // entries.
                         msgNumbers.add(new Long(temp));
                     temp++;
                 }
@@ -664,7 +669,7 @@ public class SandeshaQueue {
                 OutgoingSequence hash = (OutgoingSequence) obj;
                 boolean hasMsg = hash.hasMessageWithId(requestMsgID);
                 if (!hasMsg)
-                    //set the property response received
+                //set the property response received
                     hash.setResponseReceived(requestMsgID);
             }
         }
@@ -816,8 +821,9 @@ public class SandeshaQueue {
 
     public String getKeyFromOutgoingSequenceId(String seqId) {
         Iterator it = outgoingMap.keySet().iterator();
+        String key = null;
         while (it.hasNext()) {
-            String key = (String) it.next();
+            key = (String) it.next();
             OutgoingSequence os = (OutgoingSequence) outgoingMap.get(key);
 
             String seq = os.getSequenceId();
@@ -825,9 +831,55 @@ public class SandeshaQueue {
                 continue;
 
             if (seq.equals(seqId))
-                return key;
+                break;
+
         }
-        return null;
+        return key;
     }
+
+    public boolean isAllOutgoingTerminateSent() {
+        synchronized (outgoingMap) {
+            Iterator keys = outgoingMap.keySet().iterator();
+
+            while (keys.hasNext()) {
+                OutgoingSequence ogs = (OutgoingSequence) outgoingMap.get(keys.next());
+                if (!ogs.isTerminateSent())
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
+    public boolean isAllIncommingTerminateReceived() {
+        synchronized (incomingMap) {
+            Iterator keys = incomingMap.keySet().iterator();
+
+            while (keys.hasNext()) {
+                Object key = keys.next();
+                IncomingSequence ics = (IncomingSequence) incomingMap.get(key);
+                OutgoingSequence ogs = (OutgoingSequence) outgoingMap.get(key);
+
+                boolean hasResponse = ogs.hasResponse();
+
+                if (hasResponse && !ics.isTerminateReceived())
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
+    public void setTerminateSend(String seqId) {
+        OutgoingSequence ogs = (OutgoingSequence) outgoingMap.get(seqId);
+        ogs.setTerminateSent(true);
+    }
+
+    public void setTerminateReceived(String seqId) {
+        IncomingSequence ics = (IncomingSequence) incomingMap.get(getKeyFromIncomingSequenceId(seqId));
+        ics.setTerminateReceived(true);
+    }
+
+
 }
 

@@ -14,6 +14,8 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.client.ClientPropertyValidator;
 
+import java.util.Vector;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Jaliya
@@ -47,8 +49,7 @@ public class RMMessageCreator {
 
         //Set the outgoing address these need to be corrected.
         createSeqRMMsgContext.setOutGoingAddress(toAddress);
-        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid,
-                createSeqRMMsgContext, Constants.CLIENT);
+        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid,createSeqRMMsgContext, Constants.CLIENT);
         MessageContext createSeqMsgContext = new MessageContext(msgContext.getAxisEngine());
 
         //This should be a clone operation.
@@ -77,6 +78,10 @@ public class RMMessageCreator {
     }
 
     public static RMMessageContext createAcknowledgementMsg(RMMessageContext rmMsgCtx) throws Exception {
+
+         
+
+
         return new RMMessageContext();
     }
 

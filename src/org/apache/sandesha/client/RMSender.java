@@ -22,7 +22,7 @@ import org.apache.axis.handlers.BasicHandler;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.util.RMMessageCreator;
+import org.apache.sandesha.util.RMMessageCreator;
 
 public class RMSender extends BasicHandler {
 

@@ -44,6 +44,14 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
     }
 
+    public boolean isOutgoingTerminateSent() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean isIncommingTerminateReceived() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public void addRequestedSequence(String seqId) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -391,4 +399,21 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public Iterator getAllOutgoingSequences() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    public void setTerminateSend(String seqId) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setTerminateReceived(String seqId) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean isAllOutgoingTerminateSent() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean isAllIncommingTerminateReceived() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

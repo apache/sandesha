@@ -20,7 +20,7 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.util.PropertyLoader;
+import org.apache.sandesha.util.PropertyLoader;
 
 import javax.xml.namespace.QName;
 import java.net.InetAddress;

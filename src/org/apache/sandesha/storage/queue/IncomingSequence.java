@@ -42,7 +42,18 @@ public class IncomingSequence {
     private HashMap hash;
     private boolean beingProcessedLock = false; //When true messages are
     private long lastMsgNo = -1;
-    
+
+
+    private boolean terminateReceived = false;
+
+    public boolean isTerminateReceived() {
+        return terminateReceived;
+    }
+
+    public void setTerminateReceived(boolean terminateReceived) {
+        this.terminateReceived = terminateReceived;
+    }
+
     private static final Log log = LogFactory.getLog(IncomingSequence.class.getName());
 
     public IncomingSequence(String sequenceId) {
