@@ -54,7 +54,7 @@ Build Instructions:
 
         <property name="dir.doc" value="..\doc"/>
         <property name="dir.dist" value="..\dist"/>
-        <property name="dir.libs" value="..\lib"/>
+        <property name="dir.libs" value="..\target\lib"/>
         <property name="dir.src" value="..\src"/>
         <property name="dir.samples" value="..\samples"/>
         <property name="dir.test" value="..\test"/>

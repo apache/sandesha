@@ -13,14 +13,31 @@
             <path refid="maven.dependency.classpath"/>
         </path>
     </goal>
+    
+     <preGoal name="java:compile">
+     	<copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
+     	<copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
+     	<copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
+     </preGoal>
+
+ 	<preGoal name="interop:compile">
+     	<copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
+     	<copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
+     	<copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
+     </preGoal>
 
     <postGoal name="jar">
         <ant:mkdir dir="${basedir}/target/lib"/>
         <deploy:copy-deps todir="${basedir}/target/lib"/>
+        <copy file="lib/xerces.jar" todir="${basedir}/target/lib"/>
     </postGoal>
+    
+    <preGoal name="interop:compile">
+    	  <ant:mkdir dir="${basedir}/target/interop-classes"/>
+    </preGoal>
 
     <goal name="interop:compile" prereqs="java:compile">
-        <ant:javac  srcdir="interop" destdir="${maven.build.dest}"  includes="**/*.java"
+        <ant:javac  srcdir="interop" destdir="${maven.build.dir}/interop-classes"  includes="**/*.java"
              debug="${maven.compile.debug}"
 	     optimize="${optimize}"
 	     deprecation="${maven.compile.deprecation}">
