@@ -71,6 +71,11 @@ public class RMInvoker implements Runnable {
                     //configurable entity where the class can be loaded at
                     // runtime.
                     RPCProvider rpcProvider = new RPCProvider();
+                    
+                    if(rmMessageContext.isLastMessage()){
+                        //Insert Terminate Sequnce.
+                        //storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(requestMesssageContext)); 
+                    }
                     rpcProvider.invoke(rmMessageContext.getMsgContext());
 
                     //Check whether we have an output (response) or not.
@@ -89,12 +94,9 @@ public class RMInvoker implements Runnable {
                                 .setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
 
                         //System.out.println("TESTING FOR RESPONSE SEQUENCE");
-
                         boolean firstMsgOfResponseSeq = !storageManager
-                                .isResponseSequenceExist(rmMessageContext
-                                        .getSequenceID());
-                        rmMessageContext.setMsgNumber(storageManager
-                                .getNextMessageNumber(rmMessageContext
+                                .isResponseSequenceExist(rmMessageContext.getSequenceID());
+                        rmMessageContext.setMsgNumber(storageManager.getNextMessageNumber(rmMessageContext
                                         .getSequenceID()));
                         ////System.out.println("SEQUENCE ID -
                         // "+rmMessageContext.getSequenceID());
