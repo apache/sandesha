@@ -31,142 +31,112 @@ import org.apache.sandesha.storage.queue.SandeshaQueue;
  * @author Jaliya Ekanayaka
  */
 public class TCClientStorageManager extends TestCase {
-
+    
+    //tests functions related to outgoing messages.
     public void testOutGoingMessages() throws QueueException {
-
         SandeshaQueue sq = SandeshaQueue.getInstance();
-
         ClientStorageManager csm = new ClientStorageManager();
-
-        long l = csm.getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(l, 1);
-
+        
+        //setup and add 4 messages
+        long nextMsgNo = csm.getNextMessageNumber("seqid1");
+        assertEquals(nextMsgNo, 1);
         RMMessageContext msg = new RMMessageContext();
         msg.setMessageID("rmsg1");
-        msg.setSequenceID(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        msg.setSequenceID("seqid1");
+        msg.setMsgNumber(nextMsgNo);
 
-        sq.createNewOutgoingSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        sq.addMessageToOutgoingSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,
-                msg);
+        sq.createNewOutgoingSequence("seqid1");
+        sq.addMessageToOutgoingSequence("seqid1",msg);
 
-        l = csm.getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(l, 2);
-
+        nextMsgNo = csm.getNextMessageNumber("seqid1");
+        assertEquals(nextMsgNo, 2);
         msg = new RMMessageContext();
         msg.setMessageID("rmsg2");
-        msg.setSequenceID(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        msg.setSequenceID("seqid1");
+        msg.setMsgNumber(nextMsgNo);
+        sq.addMessageToOutgoingSequence("seqid1",msg);
 
-        sq.addMessageToOutgoingSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,
-                msg);
-
-        l = csm.getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(l, 3);
+        nextMsgNo = csm.getNextMessageNumber("seqid1");
+        assertEquals(nextMsgNo, 3);
 
         msg = new RMMessageContext();
         msg.setMessageID("rmsg3");
-        msg.setSequenceID(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        msg.setSequenceID("seqid1");
+        msg.setMsgNumber(nextMsgNo);
 
-        sq.addMessageToOutgoingSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,
-                msg);
-
-        l = csm.getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(l, 4);
-
+        sq.addMessageToOutgoingSequence("seqid1",msg);
+        nextMsgNo = csm.getNextMessageNumber("seqid1");
+        assertEquals(nextMsgNo, 4);
+       
         msg = new RMMessageContext();
         msg.setMessageID("rmsg4");
-        msg.setSequenceID(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-
-        sq.addMessageToOutgoingSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,
-                msg);
-
-        //csm.
-
-        //sq.displayOutgoingMap();
-
-        csm.setTemporaryOutSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID,
-                "temp1");
+        msg.setSequenceID("seqid1");
+        msg.setMsgNumber(nextMsgNo);
+        sq.addMessageToOutgoingSequence("seqid1",msg);
+        csm.setTemporaryOutSequence("seqid1","temp1");
 
         RMMessageContext createSeqReq1 = new RMMessageContext();
-        createSeqReq1
-                .setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
+        createSeqReq1.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
         createSeqReq1.setMessageID("temp1");
-
-        //RMMessageContext createSeqReq2 = new RMMessageContext();
-        //createSeqReq2.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
-        //createSeqReq2.setMessageID("temp2");
-
-        //sq.diaplayPriorityQueue();
-        //csm.addCreateSequenceRequest(createSeqReq1);
-        //sq.diaplayPriorityQueue();
         csm.addCreateSequenceRequest(createSeqReq1);
-        //sq.displayPriorityQueue();
 
         RMMessageContext msg1;
-        ClientStorageManager ssm1 = new ClientStorageManager();
+        ClientStorageManager csm1 = new ClientStorageManager();
 
-        //sq.displayPriorityQueue();
-
-        //msg1 = ssm1.getNextMessageToSend();
-        //assertEquals(msg1.getMessageID(),"temp1");
-
-        msg1 = ssm1.getNextMessageToSend();
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1.getMessageID(), "temp1");
 
-        //sq.displayPriorityQueue();
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1, null);
 
-        msg1 = ssm1.getNextMessageToSend();
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1, null);
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1, null);
 
         RMMessageContext ack1 = new RMMessageContext();
         ack1.setMessageID("msgack1");
         csm.addAcknowledgement(ack1);
 
-        msg1 = ssm1.getNextMessageToSend();
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1.getMessageID(), "msgack1");
 
-        msg1 = ssm1.getNextMessageToSend();
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1, null);
 
         RMMessageContext createSeq = new RMMessageContext();
         createSeq.setMessageID("createSeqid1");
 
         csm.addCreateSequenceResponse(createSeq);
-
+        
         sq.displayPriorityQueue();
-
         csm.setApprovedOutSequence("temp1", "approved1");
-
         sq.displayPriorityQueue();
 
-        msg1 = ssm1.getNextMessageToSend();
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1.getMessageID(), "createSeqid1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg2");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg4");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg1");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg3");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1, null);
 
         Date d1 = new Date();
         long l1 = d1.getTime();
 
-        for (int i = 0; i < 2000000000; i++) {
-        }
+		try{
+		    Thread.sleep(5000);
+		}catch(InterruptedException e){
+		    e.printStackTrace();
+		}
 
         Date d2 = new Date();
         long l2 = d2.getTime();
@@ -176,40 +146,28 @@ public class TCClientStorageManager extends TestCase {
             return;
         }
 
-        //msg1 = ssm1.getNextMessageToSend();
-        //assertEquals(msg1.getMessageID(),"temp2");
-
-        //ssm1.setApprovedOutSequence("temp2","approved2");
-
         sq.displayPriorityQueue();
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg2");
-
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg4");
-
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg1");
-
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg3");
-
-        msg1 = ssm1.getNextMessageToSend();
-        //System.out.println(msg1.getMessageID());
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1, null);
 
-        //sq.displayResponseMap();
 
         d1 = new Date();
         l1 = d1.getTime();
 
-        for (int i = 0; i < 2140000000; i++) {
-        }
+		try{
+		    Thread.sleep(5000);
+		}catch(InterruptedException e){
+		    e.printStackTrace();
+		}
 
         d2 = new Date();
         l2 = d2.getTime();
@@ -220,36 +178,31 @@ public class TCClientStorageManager extends TestCase {
         }
 
         //Old messages must come again
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        //System.out.println(msg1.getMessageID());
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg2");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg4");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg1");
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
-        assertEquals(msg1.getMessageID(), "rmsg3");
+        csm1.setAcknowledged("approved1", 1);
+        csm1.setAcknowledged("approved1", 2);
+        csm1.setAcknowledged("approved1", 4);
 
-        //sq.displayResponseMap();
-        ssm1.setAcknowledged(Constants.CLIENT_DEFAULD_SEQUENCE_ID, 1);
-        ssm1.setAcknowledged(Constants.CLIENT_DEFAULD_SEQUENCE_ID, 2);
-        ssm1.setAcknowledged(Constants.CLIENT_DEFAULD_SEQUENCE_ID, 4);
-
-        //sq.displayResponseMap();
 
         d1 = new Date();
         l1 = d1.getTime();
 
-        for (int i = 0; i < 2140000000; i++) {
-        }
+		try{
+		    Thread.sleep(5000);
+		}catch(InterruptedException e){
+		    e.printStackTrace();
+		}
 
         d2 = new Date();
         l2 = d2.getTime();
@@ -259,46 +212,40 @@ public class TCClientStorageManager extends TestCase {
             return;
         }
 
-        msg1 = ssm1.getNextMessageToSend();
-        assertEquals(msg1.getSequenceID(), Constants.CLIENT_DEFAULD_SEQUENCE_ID);
+        msg1 = csm1.getNextMessageToSend();
+        assertEquals(msg1.getSequenceID(), "approved1");
         assertEquals(msg1.getMessageID(), "rmsg3");
 
-        msg1 = ssm1.getNextMessageToSend();
+        msg1 = csm1.getNextMessageToSend();
         assertEquals(msg1, null);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
+
     protected void setUp() throws Exception {
-        // TODO Auto-generated method stub
-        /*
-         * super.setUp();
-         * 
-         * SandeshaQueue sq = SandeshaQueue.getInstance();
-         * 
-         * sq.clear(true);
-         * 
-         * sq.createNewIncomingSequence("test");
-         * 
-         * RMMessageContext msg1 = new RMMessageContext();
-         * msg1.setMessageID("msgid1"); msg1.setSequenceID("test");
-         * 
-         * RMMessageContext msg2 = new RMMessageContext();
-         * msg2.setMessageID("msgid2"); msg2.setSequenceID("test");
-         * 
-         * RMMessageContext msg3 = new RMMessageContext();
-         * msg3.setMessageID("msgid3"); msg3.setSequenceID("test");
-         * 
-         * RMMessageContext msg4 = new RMMessageContext();
-         * msg4.setMessageID("msgid4"); msg4.setSequenceID("test");
-         * 
-         * sq.addMessageToIncomingSequence("test", new Long(1), msg1);
-         * sq.addMessageToIncomingSequence("test", new Long(2), msg2);
-         * sq.addMessageToIncomingSequence("test", new Long(3), msg3);
-         * sq.addMessageToIncomingSequence("test", new Long(4), msg4);
-         */
+         super.setUp();
+         
+         SandeshaQueue sq = SandeshaQueue.getInstance();
+         
+         sq.clear(true);
+         
+         sq.createNewIncomingSequence("test");
+         
+         RMMessageContext msg1 = new RMMessageContext();
+         msg1.setMessageID("msgid1"); msg1.setSequenceID("test");
+         
+         RMMessageContext msg2 = new RMMessageContext();
+         msg2.setMessageID("msgid2"); msg2.setSequenceID("test");
+         
+         RMMessageContext msg3 = new RMMessageContext();
+         msg3.setMessageID("msgid3"); msg3.setSequenceID("test");
+         
+         RMMessageContext msg4 = new RMMessageContext();
+         msg4.setMessageID("msgid4"); msg4.setSequenceID("test");
+         
+         sq.addMessageToIncomingSequence("test", new Long(1), msg1);
+         sq.addMessageToIncomingSequence("test", new Long(2), msg2);
+         sq.addMessageToIncomingSequence("test", new Long(3), msg3);
+         sq.addMessageToIncomingSequence("test", new Long(4), msg4);
+         
     }
 }
