@@ -140,10 +140,22 @@ see [3].</p>
 dispatching of the web service request to the actual service. RMInvoker will 
 also put the service response (if any) to the Queue present in the server side.</p>
 <h3 align="left">Service</h3>
-<p >
-This is the actual web 
-service, which will be the Application Destination according to the high-level 
-architecture.</p>
+<p > This is the actual web service, which will be the Application Destination 
+  according to the high-level architecture.</p>
+<p >&nbsp;</p>
+<h2 >Class diagrams</h2>
+<h3 >Sandesha Server</h3>
+<p >Following diagram describes the class structure of the Sandesha server.</p>
+<p ><img src="images/server_class.png" width="718" height="615"></p>
+<h3 >Sandesha Client<br>
+</h3>
+<p >This diagram describes the class structure of Sandesha Client. </p>
+<p><img src="images/client_class.png" width="753" height="388"> </p>
+<h3 >Sandesha Queue</h3>
+<p >Following describes the sandesha storage classes. Currently we use a temporary 
+  queue to hold messages in memory. We have added the ServerDatabaseDAO class 
+  for adding persistant storage support for Sandesh in the future.</p>
+<p ><img src="images/server_queue.png" width="462" height="511"></p>
 <h2 >
 Messaging Scenarios</h2>
 <p >
@@ -164,8 +176,8 @@ connection.</p>
 <p style="text-align:center">
 <font size="2">Figure 4: Client Side - Request Only with Synchronous 
 Acknowledgement</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 style="text-align: justify;">Client Side - Initialization</h3>
 <p style="text-align: justify;">This is happening only at the first message of a 
 particular sequence. Web service client should initialize the reliable messaging 
@@ -176,8 +188,8 @@ Sender and the Client side receiver.</p>
 <img border="0" src="images/ClientInitialization.png" width="556" height="250"></p>
 <p style="text-align:center">
 <font size="2">Figure 5: Client Side - Initialization</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 >
 Client Side - Termination</h3>
 <p >
@@ -191,8 +203,8 @@ and the Client side receiver passing control back to the client.</p>
 <img border="0" src="images/ClientTermination.png" width="556" height="259"></p>
 <p style="text-align:center">
 <font size="2">Figure 6: Client Side - Termination</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 >
 Client Side - Request Only with Asynchronous Acknowledgement</h3>
 <p >
@@ -205,8 +217,8 @@ sent through a new connection other than the one use for the request.</p>
 <p style="text-align:center">
 <font size="2">Figure 7: Client Side - Request Only with Asynchronous 
 Acknowledgement</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 >
 Client Side - Request Response with Synchronous Acknowledgement</h3>
 <p >
@@ -215,15 +227,15 @@ sending the service requests the RMSource will include the anonymous URI in the
 &lt;wsa:From&gt; address. So the sequence acknowledgements will be sent through the 
 same one use for the request (note that; this can only be used with two way 
 transports).</p>
-<p >
-&nbsp;</p>
+<p >&nbsp;
+</p>
 <p style="text-align:center">
 <img border="0" src="images/EchoSync.png" width="814" height="403"></p>
 <p style="text-align:center">
 <font size="2">Figure 8: Client Side - Request Response with Synchronous 
 Acknowledgement</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 style="text-align:left">
 Client Side - Request Response with Asynchronous Acknowledgement</h3>
 <p style="text-align:left">
@@ -240,8 +252,8 @@ client has not offered a sequence).</p>
 <p style="text-align:center">
 <font size="2">Figure 9: Client Side - Request Response with Asynchronous 
 Acknowledgement</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 align="left">Server Side - Request Only with Synchronous Acknowledgement</h3>
 
 <p align="left">This sequence diagram will illustrate the sequence of operations 
@@ -254,8 +266,8 @@ request. Sequence Acknowledgement is sent using the same connection.</p>
 <p style="text-align:center">
 <font size="2">Figure 10: Server Side - Request Only with Synchronous 
 Acknowledgement</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 align="left">Server Side - Request Only with Asynchronous Acknowledgement</h3>
 <p align="left">This sequence diagram will illustrate the sequence of operations 
 that will be executed&nbsp; when the RMDestination receives a One-way service 
@@ -278,8 +290,8 @@ connection.</p>
 <p style="text-align:center">
 <font size="2">Figure 11: Server&nbsp; Side - Request Response with Synchronous 
 Acknowledgement</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h3 style="text-align:left">
 Server Side - Request Response with Asynchronous Acknowledgement</h3>
 <p align="left">In this scenario, the RMDestination will receive a service 
@@ -288,15 +300,15 @@ non-anonymous EPR for the &lt;wsa:From&gt; EPR and a non-anonymous EPR for &lt;w
 hence the acknowledgement is sent using the same connection with which the 
 service request has sent while the service response is sent using a different 
 connection.</p>
-<p style="text-align:left">
-&nbsp;</p>
+<p style="text-align:left">&nbsp;
+</p>
 <p style="text-align:center">
 <img border="0" src="images/ServerWithResponse.png" width="741" height="414"></p>
 <p style="text-align:center">
 <font size="2">Figure 12: Server&nbsp; Side - Request Response with Asynchronous 
 Acknowledgement</font></p>
-<p style="text-align:center">
-&nbsp;</p>
+<p style="text-align:center">&nbsp;
+</p>
 <h2 align="left">Conclusions and Future Work</h2>
 
 <p align="left">Sandesha implements the WS-ReliableMessaging protocol on top of 
