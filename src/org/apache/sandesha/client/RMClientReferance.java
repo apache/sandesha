@@ -18,11 +18,14 @@
 package org.apache.sandesha.client;
 
 /**
- * class RMClientReferance
- * 
- * @author Amila Navarathna
- * @author Jaliya Ekanayaka
- * @author Sudar Nimalan
+ * @author
+ * Amila Navarathna<br>
+ * Jaliya Ekanayaka<br>
+ * Sudar Nimalan<br>
+ * (Apache Sandesha Project)
+ *
  */
+
 public class RMClientReferance {
+
 }

@@ -17,108 +17,175 @@
 
 package org.apache.sandesha.client;
 
+import org.apache.axis.message.addressing.MessageID;
+
+import org.apache.sandesha.RMMessage;
 import org.apache.sandesha.RMSequence;
-import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
- * class ClientMessageController
- * 
- * @author Amila Navarathna
- * @author Jaliya Ekanayaka
- * @author Sudar Nimalan
+ * @author
+ * Amila Navarathna<br>
+ * Jaliya Ekanayaka<br>
+ * Sudar Nimalan<br>
+ * (Apache Sandesha Project)
+ *
  */
 public class ClientMessageController {
-    /**
-     * Field instance
-     */
+	/**
+	 * Field instance
+	 */
     private static ClientMessageController instance;
-
-    /**
-     * Field sequenceMap
-     */
+	/**
+	 * Field messageMap
+	 */
+    private Map messageMap;
+	/**
+	 * Field sequenceMap
+	 */
     private Map sequenceMap;
-
-    /**
-     * Field seqAck
-     */
-    private SequenceAcknowledgement seqAck;
-
-    /**
-     * Constructor ClientMessageController
-     */
+	/**
+	 * Field seqAck
+	 */
+ 
+    private Identifier sequenceIdentifier;
+	
+	/**
+	 * Constructor ClientMessageController
+	 */  
     private ClientMessageController() {
         sequenceMap = new HashMap();
+        messageMap = new HashMap();
     }
-
-    /**
-     * Method getInstance
-     * 
-     * @return 
-     */
-    public static ClientMessageController getInstance() {
-
-        System.out.println("MessageController::getInstance");
-
+    
+	/**
+	 * Method getInstance
+	 * 
+	 * @return ClientMessageController
+	 */
+     public static ClientMessageController getInstance() {
+       
         if (instance == null) {
             instance = new ClientMessageController();
         }
 
         return instance;
     }
+    
+	/**
+	 * Method retrieveIfMessageExists
+	 *
+	 * returns a RMMessage if a message for the message id exists.
+	 * else return a null value
+	 * <b>developer must handle the null value returned</b>
+	 * 
+	 * @param messageID
+	 * @return RMMessage
+	 *
+	 * 
+	 */
 
-    /**
-     * Method storeSequence
-     * <p/>
-     * stores a sequence object in the map. Each of these sequence objects
-     * consists of one or more message objects.
-     * The sequences are stored as the sequenceIdentifier as a key
-     * 
-     * @param sequence 
-     */
-    public void storeSequence(RMSequence sequence) {
-
-        // System.out.println("----------------storeSequence::"+sequence.getSequenceIdetifer());
-        sequenceMap.put(sequence.getSequenceIdentifier().toString(), sequence);
-    }
-
-    /**
-     * Method retrieveIfSequenceExists
-     * <p/>
-     * returns a RMSequence if a sequence for the identifier exists.
-     * else return a null value
-     * <b>developer must handle the null value returned</b>
-     * 
-     * @param identifier 
-     * @return RMSequence
-     */
-    public RMSequence retrieveIfSequenceExists(Identifier identifier) {
-
-        if (sequenceMap.get(identifier.toString()) != null) {
-            return ((RMSequence) sequenceMap.get(identifier.toString()));
+    public RMMessage retrieveIfMessageExists(MessageID messageID) {
+    	RMMessage rmMessage = (RMMessage)messageMap.get(messageID.toString());
+        if (rmMessage!= null) {
+            return rmMessage;
         } else {
             return null;
         }
     }
 
-    /**
-     * Method getSeqAck
-     * 
-     * @return SequenceAcknowledgement
-     */
-    public SequenceAcknowledgement getSeqAck() {
-        return seqAck;
-    }
 
     /**
-     * Method setSeqAck
+     * Method storeSequence
      * 
-     * @param acknowledgement 
+     * stores a sequence object in the map. Each of these sequence objects
+     * consists of one or more message objects.
+     * The sequences are stored as the sequenceIdentifier as a key
+     *
+     * @param sequence
+     *
+     * 
      */
-    public void setSeqAck(SequenceAcknowledgement acknowledgement) {
-        seqAck = acknowledgement;
+    public void storeSequence(RMSequence sequence) {
+      
+        sequenceMap.put(sequence.getSequenceIdetifer().toString(), sequence);
     }
+    
+	/**
+	 * Method storeMessage
+	 * 
+	 * stores a message object in the map. 
+	 * The message are stored as the message id as a key
+	 *
+	 * @param message
+	 *
+	 * 
+	 */
+
+    public void storeMessage(RMMessage message) {
+        messageMap.put(message.getMessageID().toString(), message);
+    }
+
+
+    /**
+     * Method retrieveIfSequenceExists
+     *
+     * returns a RMSequence if a sequence for the identifier exists.
+     * else return a null value
+     * <b>developer must handle the null value returned</b>
+     * @param identifier
+     * 
+     * @return RMSequence
+     *
+     * 
+     */
+    public RMSequence retrieveIfSequenceExists(Identifier identifier) {
+    	RMSequence rmSequence = (RMSequence)sequenceMap.get(identifier.getIdentifier().toString());
+        if (rmSequence != null) {
+            return rmSequence;
+        } else {
+            return null;
+        }
+    }
+
+
+    
+	/**
+	 * Method removeIfSequenceExists
+	 * 
+	 * Search for a sequence and if it exists(means it is in the map),
+	 * remove it from the map
+	 * 
+	 * @param identifier
+	 * 
+	 * 
+	 */
+	public void removeIfSequenceExists(Identifier identifier) {
+		if (sequenceMap.get(identifier.toString()) != null) {
+			sequenceMap.remove(identifier.toString());
+		}
+	}
+	/**
+	 * Method getSequenceIdentifier
+	 * 
+	 * @return Identifier
+	 */
+	public Identifier getSequenceIdentifier() {
+		return sequenceIdentifier;
+	}
+
+	/**
+	 * Method setSequenceIdentifier
+	 * 
+	 * @param  identifier
+	 * 
+	 */
+	public void setSequenceIdentifier(Identifier identifier) {
+		sequenceIdentifier = identifier;
+	}
+
 }
