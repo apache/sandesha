@@ -16,6 +16,13 @@
  */
 package org.apache.sandesha.client;
 
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.sandesha.Constants;
@@ -30,27 +37,37 @@ public class ClientPropertyValidator {
     public static RMMessageContext validate(Call call) throws AxisFault {
 
         RMMessageContext rmMessageContext = null;
-
-        boolean sync = getSync(call);
-        boolean hasRes = getHasResponse(call);
+        
+        boolean inOut=getInOut(call);
         long msgNumber = getMessageNumber(call);
         boolean lastMessage = getLastMessage(call);
-        String clientSequence= getClientSequence(call);
-
+        boolean sync=getSync(call);
+        String action = getAction(call);
         String sourceURL = null;
-        if (!sync)
-            sourceURL = getSourceURL(call);
+ 
+        try {
+            if (inOut)
+                sourceURL = getSourceURL(call);
+            System.out.println("Souce URI " + sourceURL);
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            throw new AxisFault(e.getMessage());
+        }
 
-        String errorMsg = getValidated(sync, hasRes, lastMessage, msgNumber,
-                sourceURL);
+        String errorMsg = getValidated(msgNumber,action);
         if (errorMsg == null) {
             rmMessageContext = new RMMessageContext();
+            //Assume that the service invocations with respect to client is done
+            //in synchronus manner in all the cases. This has to be changed when 
+            //a callback mechanism is introduced.
+            //TODO
             rmMessageContext.setSync(sync);
-            rmMessageContext.setHasResponse(hasRes);
+            rmMessageContext.setHasResponse(inOut);
             rmMessageContext.setMsgNumber(msgNumber);
             rmMessageContext.setLastMessage(lastMessage);
             rmMessageContext.setSourceURL(sourceURL);
-            rmMessageContext.setSequenceID(clientSequence);
+            rmMessageContext.setSequenceID(action);
+          
             return rmMessageContext;
         } else
             throw new AxisFault(errorMsg);
@@ -58,32 +75,46 @@ public class ClientPropertyValidator {
     }
 
     /**
+     * This will decide whether we have an IN-OUT style service request
+     * or IN-ONLY service request by checking the value of the QNane
+     * returned by the call.getReturnType(). 
+     * 
      * @param call
      * @return
      */
-    private static String getClientSequence(Call call) {
-        String clientSequence=(String)call.getProperty("clientSequence");
-         if(clientSequence!=null)
-                return clientSequence;
-         else
-             return Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+    private static boolean getInOut(Call call) {
+        QName returnQName = (QName) call.getReturnType();
+        if (returnQName != null)
+            return true;
+        else
+            return false;
+
+    }
+
+    /**
+     * @param call
+     * @return
+     * @throws URISyntaxException
+     */
+    private static String getAction(Call call) {
+        String action=(String)call.getProperty("action");
+         if(action!=null)
+                return action;
+       else
+           return null;
+        
     }
 
     private static boolean getSync(Call call) {
-        String synchronous = (String) call.getProperty("synchronous");
-        boolean sync = false;
+        Boolean synchronous = (Boolean) call.getProperty("sync");
+       
         if (synchronous != null) {
-            if (synchronous.equals("true"))
-                sync = true;
-            else
-                sync = false;
+           return synchronous.booleanValue();
         } else
-            sync = true;//If the user has not specified the synchronous
-        // property sync=true
-        return sync;
+            return  true;//If the user has not specified the synchronous
     }
 
-    private static boolean getHasResponse(Call call) {
+  /*  private static boolean getHasResponse(Call call) {
         String hasResponse = (String) call.getProperty("hasResponse");
         boolean hasRes = false;
         if (hasResponse != null) {
@@ -97,15 +128,14 @@ public class ClientPropertyValidator {
         return hasRes;
 
     }
-
-    private static String getSourceURL(Call call) {
-        Object temp = call.getProperty("sourceURI");
+*/
+    private static String getSourceURL(Call call) throws UnknownHostException {
         String sourceURI = null;
-        if (temp != null) {
-            sourceURI = (String) temp;
-            sourceURI = sourceURI + ":" + Constants.SOURCE_ADDRESS_PORT
-                    + "/axis/services/MyService";
-        }
+        InetAddress addr = InetAddress.getLocalHost();
+        
+        sourceURI="http://"+addr.getHostAddress()+":" + Constants.SOURCE_ADDRESS_PORT
+        + "/axis/services/MyService";
+         
         return sourceURI;
     }
 
@@ -134,19 +164,13 @@ public class ClientPropertyValidator {
 
     }
 
-    private static String getValidated(boolean sync, boolean hasRes,
-            boolean lastMsg, long msgNumber, String sourceURL) {
+    private static String getValidated(long msgNumber,String action) {
         String errorMsg = null;
 
-        if (!sync && msgNumber == 0)
-            errorMsg = "ERROR: Message Number Not Specified";
-        else {
-            if (sync && hasRes)
-                errorMsg = "ERROR: Cannot Handle a Response Under Synchronus Messaging";
-
-            if (!sync && sourceURL == null)
-                errorMsg = "ERROR: Asynchronous Mode without Souceh URL";
-        }
+        if ((msgNumber == 0)||(action==null))
+            errorMsg = "ERROR: Message Number Not Specified or Action is null";
+      
+        
         return errorMsg;
     }
 
