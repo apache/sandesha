@@ -26,7 +26,10 @@ import org.apache.axis.client.Service;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
+import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
+
+import com.sun.rsasign.s;
 
 /**
  * @author JEkanayake
@@ -45,6 +48,7 @@ public class Sender implements Runnable {
 			long startTime = System.currentTimeMillis();
 			boolean hasMessages = true;
 			do {
+				//System.out.println("SENDER");
 				RMMessageContext rmMessageContext = storageManager.getNextMessageToSend();
 				if (rmMessageContext == null) {
 					hasMessages = false;
@@ -60,15 +64,62 @@ public class Sender implements Runnable {
 					switch (rmMessageContext.getMessageType()) {
 						case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST :
 							{
-								//Send the message.
-								//may get the reply back to here.
 
+								
+								try {
+
+									System.out.println("CREATE SEQ REQUESET");
+									storageManager.setApprovedOutSequence("abcdefghijk", "1233abcdefghijk");
+
+									//Send the message.
+									//may get the reply back to here.
+									Service service = new Service();
+									Call call = (Call) service.createCall();
+									System.out.println(rmMessageContext.getOutGoingAddress());
+									call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
+									if (rmMessageContext.getMsgContext().getRequestMessage() == null)
+										System.out.println("It is null man");
+
+									call.setRequestMessage(
+										rmMessageContext.getMsgContext().getRequestMessage());
+									try {
+									    //Send the createSequnceRequest.
+									   	call.invoke();
+									} catch (AxisFault e) {
+										e.printStackTrace();
+									}
+									
+									if(call.getResponseMessage()!=null){
+										rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
+										IRMMessageProcessor messagePrcessor= RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext,storageManager);
+										if(messagePrcessor instanceof FaultProcessor){
+											//process the fault.
+											//For now just ignore.
+											System.out.println("Fault for the CreateSequenceRequest");
+											//For testing only.
+											storageManager.setApprovedOutSequence("abcdefghijk", "1233abcdefghijk");
+										}else if(messagePrcessor instanceof CreateSequenceResponseProcessor){
+											try{
+											 messagePrcessor.processMessage(rmMessageContext);
+											 }catch(RMException rmEx){
+											 	rmEx.printStackTrace();
+											 }
+										}
+										
+									}
+
+								} catch (ServiceException e1) {
+									System.out.println("(!)(!)(!)Cannot send the create sequence response.");
+									e1.printStackTrace();
+								}
+								break;
 							}
 						case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE :
 							{
 								//Send creat seq message.
 								//No response and we can just close the connection
 								try {
+									System.out.println("CREATE SEQ RESPONSE");
 									System.out.println("******** Sending the message**************");
 									System.out.println(
 										rmMessageContext
@@ -96,7 +147,7 @@ public class Sender implements Runnable {
 							}
 						case Constants.MSG_TYPE_TERMINATE_SEQUENCE :
 							{
-
+								break;
 							}
 						case Constants.MSG_TYPE_ACKNOWLEDGEMENT :
 							{
@@ -104,6 +155,7 @@ public class Sender implements Runnable {
 								try {
 									Service service = new Service();
 									Call call = (Call) service.createCall();
+									System.out.println(rmMessageContext.getOutGoingAddress());
 									call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
 									call.setRequestMessage(
 										rmMessageContext.getMsgContext().getResponseMessage());
@@ -131,7 +183,7 @@ public class Sender implements Runnable {
 								//Need to re-send messsages if we didn't get a response.
 								//RMMessageContext a field to store the long lastProcessedTime
 								//Another field to hold retransmission count.
-								
+
 								SOAPEnvelope responseEnvelope = null;
 
 								if (rmMessageContext.getReTransmissionCount()
@@ -139,47 +191,53 @@ public class Sender implements Runnable {
 									if ((System.currentTimeMillis()
 										- rmMessageContext.getLastPrecessedTime())
 										> Constants.RETRANSMISSION_INTERVAL) {
-										
-								
-											if(rmMessageContext.getReTransmissionCount()==0){
-												//Need to create the response envelope.
-												responseEnvelope= EnvelopeCreator.createServiceResponseEnvelope(rmMessageContext);
-												rmMessageContext.getMsgContext().setRequestMessage(new Message(responseEnvelope));
-											}
+
+										if (rmMessageContext.getReTransmissionCount() == 0) {
+											//Need to create the response envelope.
+											responseEnvelope =
+												EnvelopeCreator.createServiceResponseEnvelope(
+													rmMessageContext);
+											rmMessageContext.getMsgContext().setRequestMessage(
+												new Message(responseEnvelope));
+										}
 
 										System.out.println("SENDING RESPONSE MESSAGE .....\n");
-										System.out.println(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
+										System.out.println(
+											rmMessageContext
+												.getAddressingHeaders()
+												.getReplyTo()
+												.getAddress()
+												.toString());
 										System.out.println(responseEnvelope);
 										try {
 											Service service = new Service();
 											Call call = (Call) service.createCall();
 											//call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
-											call.setTargetEndpointAddress(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
-											
-											
+											call.setTargetEndpointAddress(
+												rmMessageContext
+													.getAddressingHeaders()
+													.getReplyTo()
+													.getAddress()
+													.toString());
+
 											//NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
 											call.setRequestMessage(
 												rmMessageContext.getMsgContext().getRequestMessage());
 											//System.out.println(rmMessageContext.getMsgContext().getResponseMessage().getSOAPPartAsString());
 											try {
-												rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-												rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount()+1);
-												System.out.println("INVOKING THE RESPONSE MESSAGE 888888888888888888888888888888888");
+												rmMessageContext.setLastPrecessedTime(
+													System.currentTimeMillis());
+												rmMessageContext.setReTransmissionCount(
+													rmMessageContext.getReTransmissionCount() + 1);
+												System.out.println(
+													"INVOKING THE RESPONSE MESSAGE 888888888888888888888888888888888");
+													//We are not expecting the ack over the same HTTP connection.
 												call.invoke();
 											} catch (AxisFault e) {
 												e.printStackTrace();
 												break;
 											}
-											if (call.getResponseMessage() != null) {
-												AcknowledgementProcessor ackProcessor =
-													new AcknowledgementProcessor(storageManager);
-												rmMessageContext.getMsgContext().setResponseMessage(
-													call.getResponseMessage());
-												ackProcessor.processMessage(rmMessageContext);
-											} else {
-												break;
-											}
-
+										
 										} catch (ServiceException e1) {
 											System.out.println(
 												"(!)(!)(!)Cannot send the Response message.....");
@@ -201,7 +259,9 @@ public class Sender implements Runnable {
 			long timeGap = System.currentTimeMillis() - startTime;
 			if ((timeGap - Constants.SENDER_SLEEP_TIME) <= 0) {
 				try {
+
 					System.out.println("Sender  THREAD IS SLEEPING    -----------XXX----------\n");
+
 					Thread.sleep(Constants.SENDER_SLEEP_TIME - timeGap);
 				} catch (Exception ex) {
 					ex.printStackTrace();
