@@ -111,7 +111,7 @@ public class ClientMessageController {
      */
     public void storeSequence(RMSequence sequence) {
       
-        sequenceMap.put(sequence.getSequenceIdetifer().toString(), sequence);
+        sequenceMap.put(sequence.getSequenceIdentifier().toString(), sequence);
     }
     
     /**

@@ -49,7 +49,7 @@ public interface Constants {
     /**
      * Field CLIENT_REFERANCE
      */
-    public static final String CLIENT_REFERANCE = "RMClientReferance";
+    public static final String CLIENT_REFERENCE = "RMClientReference";
 
     // Policy related constants.
     // public static final  EXPIRATION=new Date();

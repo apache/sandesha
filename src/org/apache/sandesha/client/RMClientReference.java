@@ -26,6 +26,6 @@ package org.apache.sandesha.client;
  *
  */
 
-public class RMClientReferance {
+public class RMClientReference {
 
 }

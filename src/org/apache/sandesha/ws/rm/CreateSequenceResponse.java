@@ -139,10 +139,6 @@ public class CreateSequenceResponse implements IRmElement {
 
     /**
      * Method getIdentifier
-     * 
-     * @param element 
-     * @return 
-     * @throws SOAPException 
      */
     public Identifier getIdentifier() {
         return identifier;

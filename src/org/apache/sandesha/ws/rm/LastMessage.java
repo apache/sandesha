@@ -37,16 +37,9 @@ public class LastMessage extends MessageElement implements IRmElement {
     private MessageElement lastMsgElement;
 
     /**
-     * Field lastMessage
-     */
-    private boolean lastMessage;
-
-    /**
      * Constructor LastMessage
      */
     public LastMessage() {
-
-        lastMessage = true;
         lastMsgElement = new MessageElement();
 
         lastMsgElement.setName("wsrm:LastMessage");
@@ -74,9 +67,6 @@ public class LastMessage extends MessageElement implements IRmElement {
      * @return LastMessage
      */
     public LastMessage fromSOAPEnvelope(MessageElement element) {
-
-        lastMessage = true;
-
         return this;
     }
 

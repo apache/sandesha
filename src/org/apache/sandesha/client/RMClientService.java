@@ -300,7 +300,6 @@ public class RMClientService {
                     call.setTargetEndpointAddress(destinationURL);
                     call.invoke(envelopToSend);
 
-                    boolean gotResponse = false;
                     int count = 0;
                     Message tempMessage = rmMessage.getRequestMessage();
                     AckRequested ackRequested = new AckRequested();

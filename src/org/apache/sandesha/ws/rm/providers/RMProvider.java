@@ -117,7 +117,7 @@ public class RMProvider extends RPCProvider {
                     ////////////////////////////////////////////////////
                     
 
-                    SOAPEnvelope envelope = createSequenceResponseEnvelop(addressingHeaders, msgContext);
+                    SOAPEnvelope envelope = createSequenceResponseEnvelope(addressingHeaders);
                     //create the call
                     Service service = new Service();
                     Call call = (Call) service.createCall();
@@ -131,7 +131,7 @@ public class RMProvider extends RPCProvider {
                     RMHeaders createSeqRMHeadres = new RMHeaders();
                     createSeqRMHeadres.fromSOAPEnvelope(envelope);
                     RMSequence createSeq = new RMSequence();
-                    createSeq.setSequenceIdetifer(
+                    createSeq.setSequenceIdentifier(
                     
                     createSeqRMHeadres.getCreateSequenceResponse().getIdentifier());
                     createSeq.setClientDidReclamtion(true);
@@ -158,11 +158,11 @@ public class RMProvider extends RPCProvider {
                     //KEEP THE MESSAGE/////////////////////////////////////////
                     //TODO:
 
-                    SOAPEnvelope envelope = createSequenceResponseEnvelop(addressingHeaders, msgContext);
+                    SOAPEnvelope envelope = createSequenceResponseEnvelope(addressingHeaders);
                     RMHeaders createSeqRMHeadres = new RMHeaders();
                     createSeqRMHeadres.fromSOAPEnvelope(envelope);
                     RMSequence createSeq = new RMSequence();
-                    createSeq.setSequenceIdetifer(createSeqRMHeadres.getCreateSequenceResponse().getIdentifier());
+                    createSeq.setSequenceIdentifier(createSeqRMHeadres.getCreateSequenceResponse().getIdentifier());
                     createSeq.setClientDidReclamtion(true);
                     serverMessageController.storeSequence(createSeq);
                     msgContext.setResponseMessage(new Message(envelope));
@@ -395,7 +395,7 @@ public class RMProvider extends RPCProvider {
     }
 
     /**
-     * Method createSequenceResponseEnvelop
+     * Method createSequenceResponseEnvelope
      * 
      * create the envelope to send to the source who require the sequence identifier
      * 
@@ -403,9 +403,8 @@ public class RMProvider extends RPCProvider {
      *     
      * 
      */
-    private SOAPEnvelope createSequenceResponseEnvelop(
-        AddressingHeaders addressingHeaders,
-        MessageContext messageContext)
+    private SOAPEnvelope createSequenceResponseEnvelope(
+        AddressingHeaders addressingHeaders)
         throws Exception {
 
         SOAPEnvelope envelope = new SOAPEnvelope();

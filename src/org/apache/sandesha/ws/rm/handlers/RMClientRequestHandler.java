@@ -105,10 +105,10 @@ public class RMClientRequestHandler extends RMHandler {
 
         //Set the URL of the client side reference that can be used to send the asynchronous responses
         //by the services.
-        String clientReferanceURL =
+        String clientReferenceURL =
             sourceURI
                 + org.apache.sandesha.Constants.AXIS_SERVICES
-                + org.apache.sandesha.Constants.CLIENT_REFERANCE
+                + org.apache.sandesha.Constants.CLIENT_REFERENCE
                 + org.apache.sandesha.Constants.QUESTION_WSDL;
 
         messageContext.setProperty(
@@ -145,7 +145,7 @@ public class RMClientRequestHandler extends RMHandler {
 
             //Add the toClientServiceURL. This can be used by the asynchronous server to reference the Client Service
             soapElement = soapBodyElement.addChildElement("arg4", "");
-            soapElement.addTextNode(clientReferanceURL);
+            soapElement.addTextNode(clientReferenceURL);
 
             //Add the isOneWay as a string value.
             soapElement = soapBodyElement.addChildElement("arg5", "");
@@ -173,7 +173,7 @@ public class RMClientRequestHandler extends RMHandler {
             soapElement.addTextNode(action);
             
             String strReplyTo=replyTo+ org.apache.sandesha.Constants.AXIS_SERVICES
-            + org.apache.sandesha.Constants.CLIENT_REFERANCE
+            + org.apache.sandesha.Constants.CLIENT_REFERENCE
             + org.apache.sandesha.Constants.QUESTION_WSDL;
 
             soapElement = soapBodyElement.addChildElement("arg9", "");
