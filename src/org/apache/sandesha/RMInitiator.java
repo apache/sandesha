@@ -16,17 +16,23 @@
 */
 package org.apache.sandesha;
 
+import org.apache.axis.Handler;
+import org.apache.axis.SimpleChain;
 import org.apache.axis.deployment.wsdd.WSDDDeployment;
 import org.apache.axis.deployment.wsdd.WSDDDocument;
+import org.apache.axis.description.JavaServiceDesc;
 import org.apache.axis.handlers.soap.SOAPService;
+import org.apache.axis.message.addressing.handler.AddressingHandler;
 import org.apache.axis.server.AxisServer;
 import org.apache.axis.transport.http.SimpleAxisServer;
 import org.apache.axis.components.logger.LogFactory;
+import org.apache.axis.configuration.SimpleProvider;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
 import org.apache.sandesha.util.PropertyLoader;
+import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.commons.logging.Log;
@@ -38,6 +44,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @author Jaliya
@@ -130,6 +138,60 @@ public class RMInitiator {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
 
+            //CHANGE FOR SECURITY ADDITION
+
+
+            SimpleProvider sp = new SimpleProvider();
+            sas.setMyConfig(sp);
+
+            SimpleChain reqHandlers = new SimpleChain();
+            SimpleChain resHandlers = new SimpleChain();
+
+            Handler addrHanlder = new AddressingHandler();
+            Handler rmHandler = new RMServerRequestHandler();
+            reqHandlers.addHandler(rmHandler);
+            reqHandlers.addHandler(addrHanlder);
+
+            ArrayList arr = PropertyLoader.getRequestHandlerNames();
+            Iterator it = arr.iterator();
+
+            while(it.hasNext()){
+                String strClass = (String) it.next();
+                Class c = Class.forName(strClass);
+                Handler h = (Handler) c.newInstance();
+                reqHandlers.addHandler(h);
+            }
+
+            arr = PropertyLoader.getResponseHandlerNames();
+            it = arr.iterator();
+
+            while(it.hasNext()){
+                String strClass = (String) it.next();
+                Class c = Class.forName(strClass);
+                Handler h = (Handler) c.newInstance();
+                resHandlers.addHandler(h);
+            }
+
+            RMProvider rmp = new RMProvider();
+            rmp.setClient(true);
+            SOAPService rmService = new SOAPService(reqHandlers,rmp,resHandlers);
+
+            JavaServiceDesc desc = new JavaServiceDesc();
+            rmService.setOption("className", "org.apache.sandesha.client.RMService");
+            rmService.setOption("allowedMethods", "*");
+
+            desc.setName("RMService");
+            rmService.setServiceDescription(desc);
+            sp.deployService("RMService", rmService);
+            sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
+
+            Thread serverThread = new Thread(sas);
+            serverThread.start();
+
+            //END CHANGE FOR SECURITY ADDITION
+
+
+            /*
             InputStream in=Thread.currentThread().getContextClassLoader().getResourceAsStream("client-listener-config.wsdd");
 
             //Document doc = db.parse(new File(Constants.CLIENT_LISTENER_CONFIG));
@@ -145,7 +207,9 @@ public class RMInitiator {
 
             sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
             Thread serverThread = new Thread(sas);
-            serverThread.start();
+            serverThread.start();*/
+
+
         } catch (Exception e) {
            log.error(e);
         }
