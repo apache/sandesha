@@ -42,9 +42,6 @@ public interface IStorageManager {
     //This for the invoker and need to be implemented.
     public RMMessageContext getNextMessageToProcess();
 
-    //Keep this, no need to implement.
-    public void setReponse(RMMessageContext rmMessageContext);
-
     //Remove this
     //public void setAcknowledged();
 
@@ -92,5 +89,10 @@ public interface IStorageManager {
 
     public boolean setApprovedOutSequence(String oldOutsequenceId,
             String newOutSequenceId);
+
+    //In the server side we will get the appropriate message number
+    //In the client side this will start from 1
+    //But the sequenceID is neglected.
+    public long getNextMessageNumber(String sequenceID);
 
 }

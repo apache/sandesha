@@ -72,16 +72,6 @@ public class ServerStorageManager implements IStorageManager {
         return nextMsg;
     }
 
-    /**
-     * This is used to set messages in the OutQueue. Various processors will use
-     * this.
-     */
-    public void setReponse(RMMessageContext rmMessageContext) {
-        //addMessageToOutQueue(rmMessageContext);
-
-        //TODO decide this in implementing the ServerSender.
-    }
-
     public void setAcknowledged(String seqID, long msgNumber) {
         IServerDAO accessor = ServerDAOFactory
                 .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
@@ -330,5 +320,15 @@ public class ServerStorageManager implements IStorageManager {
         //Deleting create sequence message from the priority queue.
         accessor.removeCreateSequenceMsg(oldOutsequenceId);
         return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.sandesha.IStorageManager#getNextMessageNumber(java.lang.String)
+     */
+    public long getNextMessageNumber(String sequenceID) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }
