@@ -57,7 +57,7 @@ public class Scenario_2_1_Client {
 			call.invoke(new Object[] { "Ping 2" });
 			call.setProperty(
 				Constants.CLIENT_LAST_MESSAGE,
-				(new Boolean(false)));
+				(new Boolean(true)));
 			call.invoke(new Object[] { "Ping 3" });
 
 		} catch (Exception e) {

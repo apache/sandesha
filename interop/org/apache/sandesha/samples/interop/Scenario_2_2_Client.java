@@ -63,7 +63,7 @@ public class Scenario_2_2_Client {
 			String seq=uuidGen.nextUUID();
 			System.out.println(call.invoke(new Object[] {"Hello",seq}));
 			System.out.println(call.invoke(new Object[] {"World",seq}));
-			call.setProperty(Constants.CLIENT_LAST_MESSAGE,(new Boolean(false)));
+			call.setProperty(Constants.CLIENT_LAST_MESSAGE,(new Boolean(true)));
 			//call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
 			System.out.println(call.invoke(new Object[] {"Bye",seq}));
 

@@ -60,7 +60,7 @@ public class Scenario_1_1_Client {
           
             call.invoke(new Object[] {"Ping 1"});
             call.invoke(new Object[] {"Ping 2"});
-			call.setProperty(Constants.CLIENT_LAST_MESSAGE,(new Boolean(false)));
+			call.setProperty(Constants.CLIENT_LAST_MESSAGE,(new Boolean(true)));
             //call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
             call.invoke(new Object[] {"Ping 3"});
             
