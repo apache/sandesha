@@ -325,7 +325,7 @@ public class ClientStorageManager implements IStorageManager {
     //Sets the property responseReceived of the request message
     //corresponding to this response message.
     private void setResponseReceived(RMMessageContext responseMsg){
-       // accessor.setResponseReceived(responseMsg);
+        accessor.setResponseReceived(responseMsg);
     }
 
     public RMMessageContext checkForResponseMessage(String sequenceId,String requestMsgId){
@@ -361,7 +361,7 @@ public class ClientStorageManager implements IStorageManager {
      * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
      */
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
-       // accessor.addLowPriorityMessage(terminateSeqMessage);
+        accessor.addLowPriorityMessage(terminateSeqMessage);
      
     }
 
