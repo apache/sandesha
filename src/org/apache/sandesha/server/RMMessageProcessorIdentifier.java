@@ -16,7 +16,11 @@
  */
 package org.apache.sandesha.server;
 
-import javax.xml.soap.SOAPEnvelope;
+import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.sandesha.RMMessageContext;
+
+import org.apache.sandesha.Constants;
+import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
  * @author 
@@ -24,7 +28,21 @@ import javax.xml.soap.SOAPEnvelope;
  */
 public class RMMessageProcessorIdentifier {
 
-public IRMMessageProcessor getMessageProcessor(SOAPEnvelope soapEnv){
-	return null;
-}
+	public IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext) {
+
+		AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
+		RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
+
+		if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
+			return new CreateSequenceProcessor();
+		} else if (
+			addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
+			return new CreateSequenceResponseProcessor();
+		} else if (
+			addrHeaders.getAction().toString().equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
+			return new TerminateSequenceProcessor();
+		} else {
+			return new CompositeProcessor();
+		}
+	}
 }
