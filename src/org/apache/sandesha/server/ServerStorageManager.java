@@ -334,4 +334,9 @@ public class ServerStorageManager implements IStorageManager {
         // TODO Auto-generated method stub
 
     }
+    
+    public void setAckReceived(RMMessageContext responseMsg) {
+        accessor.setAckReceived(responseMsg);
+
+    }
 }
