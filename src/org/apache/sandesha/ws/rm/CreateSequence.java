@@ -65,14 +65,14 @@ public class CreateSequence implements IRmElement {
     /**
      * Method toSoapEnvelop
      * 
-     * @param envelop 
+     * @param envelope 
      * @return SOAPEnvelope
      * @throws SOAPException 
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
             throws SOAPException {
 
-        SOAPEnvelope env = envelop;
+        SOAPEnvelope env = envelope;
 
         // env.addHeader((SOAPHeaderElement)createSequence);
         if (env.getBody() == null) {

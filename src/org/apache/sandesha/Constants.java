@@ -148,6 +148,12 @@ public interface Constants {
      */
     public static final String WSA_NS =
         "http://schemas.xmlsoap.org/ws/2003/03/addressing";
+
+    /**
+     * Field WSA_PREFIX
+     */
+    public static final String WSA_PREFIX = "wsa";
+
     /**
      * Field ACTION_CREATE_SEQUENCE_RESPONSE
      */
@@ -178,9 +184,9 @@ public interface Constants {
     public static final String WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION =    "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
     
     /**
-     * Field RESPONCE_NAME_SPACE
+     * Field RESPONSE_NAME_SPACE
      */
-    public static final String RESPONCE_NAME_SPACE =    "http://www.w3.org/2001/XMLSchema";
+    public static final String RESPONSE_NAME_SPACE =    "http://www.w3.org/2001/XMLSchema";
 
     /**
      * Field WS_ADDRESSING_NAMESPACE

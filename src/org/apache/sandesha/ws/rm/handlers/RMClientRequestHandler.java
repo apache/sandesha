@@ -82,15 +82,15 @@ public class RMClientRequestHandler extends RMHandler {
             isResponseExpected=((Boolean) (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED))).booleanValue();
         }
 
-        //Get the SOAP envelop of the request message and send it as a string parameter to the
+        //Get the SOAP envelope of the request message and send it as a string parameter to the
         //clientService
-        SOAPEnvelope requestSOAPEnvelop =
+        SOAPEnvelope requestSOAPEnvelope =
             messageContext.getCurrentMessage().getSOAPEnvelope();
-        requestSOAPEnvelop.setSchemaVersion(messageContext.getSchemaVersion());
-        requestSOAPEnvelop.setSoapConstants(messageContext.getSOAPConstants());
+        requestSOAPEnvelope.setSchemaVersion(messageContext.getSchemaVersion());
+        requestSOAPEnvelope.setSoapConstants(messageContext.getSOAPConstants());
 
-        //Convert the SOAP envelop to string.
-        String strRequestSOAPEnvelop = requestSOAPEnvelop.toString();
+        //Convert the SOAP envelope to string.
+        String strRequestSOAPEnvelope = requestSOAPEnvelope.toString();
 
         //Get the destination URL from the message context.
         String destinationURL =
@@ -130,10 +130,10 @@ public class RMClientRequestHandler extends RMHandler {
                     org.apache.sandesha.Constants.RM_CLIENT_SERVICE);
             SOAPBodyElement soapBodyElement = soapBody.addBodyElement(name);
 
-            //Add the SOAP envelop as a string parameter.
+            //Add the SOAP envelope as a string parameter.
             SOAPElement soapElement =
                 soapBodyElement.addChildElement("arg1", "");
-            soapElement.addTextNode(strRequestSOAPEnvelop);
+            soapElement.addTextNode(strRequestSOAPEnvelope);
 
             //Add the sequenceIdnetifier
             soapElement = soapBodyElement.addChildElement("arg2", "");

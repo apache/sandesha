@@ -117,7 +117,7 @@ public class RMProvider extends RPCProvider {
                     ////////////////////////////////////////////////////
                     
 
-                    SOAPEnvelope envelop = createSequenceResponseEnvelop(addressingHeaders, msgContext);
+                    SOAPEnvelope envelope = createSequenceResponseEnvelop(addressingHeaders, msgContext);
                     //create the call
                     Service service = new Service();
                     Call call = (Call) service.createCall();
@@ -129,7 +129,7 @@ public class RMProvider extends RPCProvider {
                     call.setTargetEndpointAddress(replyToAddress.toString());
                     
                     RMHeaders createSeqRMHeadres = new RMHeaders();
-                    createSeqRMHeadres.fromSOAPEnvelope(envelop);
+                    createSeqRMHeadres.fromSOAPEnvelope(envelope);
                     RMSequence createSeq = new RMSequence();
                     createSeq.setSequenceIdetifer(
                     
@@ -140,7 +140,7 @@ public class RMProvider extends RPCProvider {
                     
                     
                     
-                    Message msg=new Message(envelop);
+                    Message msg=new Message(envelope);
                     call.setRequestMessage(msg);
                     
                     //call.setReturnType(XMLType.AXIS_VOID);
@@ -158,14 +158,14 @@ public class RMProvider extends RPCProvider {
                     //KEEP THE MESSAGE/////////////////////////////////////////
                     //TODO:
 
-                    SOAPEnvelope envelop = createSequenceResponseEnvelop(addressingHeaders, msgContext);
+                    SOAPEnvelope envelope = createSequenceResponseEnvelop(addressingHeaders, msgContext);
                     RMHeaders createSeqRMHeadres = new RMHeaders();
-                    createSeqRMHeadres.fromSOAPEnvelope(envelop);
+                    createSeqRMHeadres.fromSOAPEnvelope(envelope);
                     RMSequence createSeq = new RMSequence();
                     createSeq.setSequenceIdetifer(createSeqRMHeadres.getCreateSequenceResponse().getIdentifier());
                     createSeq.setClientDidReclamtion(true);
                     serverMessageController.storeSequence(createSeq);
-                    msgContext.setResponseMessage(new Message(envelop));
+                    msgContext.setResponseMessage(new Message(envelope));
                 }
 
             } else if (strAction.equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
@@ -255,7 +255,7 @@ public class RMProvider extends RPCProvider {
 
                             // //////
                         } else {
-                            //TODO: responcse message processing 
+                            //TODO: response message processing 
                             //This is when we got a a response with "From as anonymous...." 
 
                             // haveing is?
@@ -298,7 +298,7 @@ public class RMProvider extends RPCProvider {
     /**
      * Method isRmHeadersAvailable
      * 
-     * @param msgContext MessageContext
+     * @param messageContext MessageContext
      * @return boolean
      * 
      */
@@ -323,7 +323,7 @@ public class RMProvider extends RPCProvider {
     /**
      * Method isAddressingHeadersAvailable
      * 
-     * @param msgContext MessageContext
+     * @param messageContext MessageContext
      * @return boolean
      * 
      */
@@ -397,7 +397,7 @@ public class RMProvider extends RPCProvider {
     /**
      * Method createSequenceResponseEnvelop
      * 
-     * create the envelop to send to the source who require the sequence identifier
+     * create the envelope to send to the source who require the sequence identifier
      * 
      * @param addressingHeaders
      *     
@@ -408,36 +408,42 @@ public class RMProvider extends RPCProvider {
         MessageContext messageContext)
         throws Exception {
 
-        SOAPEnvelope envelop = new SOAPEnvelope();
+        SOAPEnvelope envelope = new SOAPEnvelope();
 
-        envelop.addNamespaceDeclaration("wsrm", "http://schemas.xmlsoap.org/ws/2003/03/rm");
-        envelop.addNamespaceDeclaration("wsa", "http://schemas.xmlsoap.org/ws/2003/03/addressing");
-        envelop.addNamespaceDeclaration("wsu", "http://schemas.xmlsoap.org/ws/2003/07/utility");
+        envelope.addNamespaceDeclaration(
+            Constants.NS_PREFIX_RM,
+            Constants.NS_URI_RM);
+        envelope.addNamespaceDeclaration(
+            Constants.WSA_PREFIX,
+            Constants.WSA_NS);
+        envelope.addNamespaceDeclaration(
+            Constants.WSU_PREFIX,
+            Constants.WSU_NS);
 
         Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE_RESPONSE));
-        action.toSOAPHeaderElement(envelop);
+        action.toSOAPHeaderElement(envelope);
 
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         MessageID messageId = new MessageID(new URI("uuid:" + uuidGen.nextUUID()));
-        messageId.toSOAPHeaderElement(envelop);
+        messageId.toSOAPHeaderElement(envelope);
 
         To incommingTo = addressingHeaders.getTo();
         URI fromAddressURI = new URI(incommingTo.toString());
 
         Address fromAddress = new Address(fromAddressURI);
         From from = new From(fromAddress);
-        from.toSOAPHeaderElement(envelop);
+        from.toSOAPHeaderElement(envelope);
 
         ReplyTo incommingReplyTo = (ReplyTo) addressingHeaders.getReplyTo();
         Address incommingAddress = incommingReplyTo.getAddress();
         To to = new To(new URI(incommingAddress.toString()));
-        to.toSOAPHeaderElement(envelop);
+        to.toSOAPHeaderElement(envelope);
 
         MessageID incommingMessageId = addressingHeaders.getMessageID();
         AddressingHeaders outgoingAddressingHaders = new AddressingHeaders();
         outgoingAddressingHaders.addRelatesTo(
              incommingMessageId.toString(),
-            (new QName("wsa", Constants.WSA_NS)));
+            (new QName(Constants.WSA_PREFIX, Constants.WSA_NS)));
 
         //now set the body elements
         CreateSequenceResponse response = new CreateSequenceResponse();
@@ -445,11 +451,11 @@ public class RMProvider extends RPCProvider {
         Identifier id=new Identifier();
         id.setIdentifier("uuid:"+uuidGen.nextUUID());
         response.setIdentifier(id);
-        response.toSoapEnvelop(envelop);
+        response.toSoapEnvelop(envelope);
 
-        outgoingAddressingHaders.toEnvelope(envelop);
+        outgoingAddressingHaders.toEnvelope(envelope);
 
-        return envelop;
+        return envelope;
     }
 
 }

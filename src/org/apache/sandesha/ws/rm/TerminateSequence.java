@@ -76,16 +76,16 @@ public class TerminateSequence implements IRmElement {
     /**
      * Method toSoapEnvelop
      * 
-     * @param envelop 
+     * @param envelope 
      * 
      * @return SOAPEnvelope
      * 
      * @throws SOAPException 
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop)
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
             throws SOAPException {
 
-        SOAPEnvelope env = envelop;
+        SOAPEnvelope env = envelope;
 
         if (env.getBody() == null) {
             env.addBody();

@@ -88,15 +88,15 @@ public class Sequence extends MessageElement implements IRmElement {
     /**
      * Method toSoapEnvelop
      * 
-     * @param envelop 
+     * @param envelope 
      * 
      * @return SOAPEnvelope
      * 
      * @throws Exception 
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelop) throws Exception {
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws Exception {
 
-        SOAPEnvelope env = envelop;
+        SOAPEnvelope env = envelope;
 
      
         if (env.getHeader() == null) {

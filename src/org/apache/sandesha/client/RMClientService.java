@@ -64,7 +64,7 @@ public class RMClientService {
     /**
      * Method clientMethod
      * 
-     * @param reqSOAPEnvelop     
+     * @param reqSOAPEnvelope     
      * @param sequenceID         
      * @param destinationURL     
      * @param sourceURL 
@@ -77,7 +77,7 @@ public class RMClientService {
      * @return String
      */
     public String clientMethod(
-        String reqSOAPEnvelop,
+        String reqSOAPEnvelope,
         String sequenceID,
         String destinationURL,
         String sourceURL,
@@ -149,7 +149,7 @@ public class RMClientService {
 
             Identifier identifier = new Identifier();
             identifier.setIdentifier(sequenceID);
-            Message message = new Message(reqSOAPEnvelop);
+            Message message = new Message(reqSOAPEnvelope);
             RMMessage rmMessage = new RMMessage(message);
 
             rmMessage.setDestinationURL(destinationURL);
@@ -184,7 +184,7 @@ public class RMClientService {
                 //TODO: normal invocation. but for future...
                 SOAPEnvelope syncReqEnv =
                     getInitialMessageWithRMHeaders(
-                        reqSOAPEnvelop,
+                        reqSOAPEnvelope,
                         rmMessage,
                         identifier,
                         destinationURL,
@@ -209,7 +209,7 @@ public class RMClientService {
                     //Response Expected
                     SOAPEnvelope envelopToSend =
                         getInitialMessageWithRMHeaders(
-                            reqSOAPEnvelop,
+                            reqSOAPEnvelope,
                             rmMessage,
                             identifier,
                             destinationURL,
@@ -228,16 +228,16 @@ public class RMClientService {
                     call.setTargetEndpointAddress(destinationURL);
                     call.invoke(envelopToSend);
 
-                    boolean gotResponce = false;
+                    boolean gotResponse = false;
                     int count = 0;
 
                     Message tempMessage = rmMessage.getRequestMessage();
                     AckRequested ackRequested = new AckRequested();
                     ackRequested.setIdentifier(rmMessage.getIdentifier());
-                    SOAPEnvelope retransmissionEnvelop =
+                    SOAPEnvelope retransmissionEnvelope =
                         tempMessage.getSOAPEnvelope();
 
-                    ackRequested.toSoapEnvelop(retransmissionEnvelop);
+                    ackRequested.toSoapEnvelop(retransmissionEnvelope);
 
                     while (count < Constants.MAXIMUM_RETRANSMISSION_COUNT) {
                         count++;
@@ -248,7 +248,7 @@ public class RMClientService {
                             .booleanValue()) {
 
                             if (rmMessage.getResponseMessage() != null) {
-                                gotResponce = true;
+                                gotResponse = true;
                                 stringReturn =
                                     rmMessage
                                         .getResponseMessage()
@@ -262,7 +262,7 @@ public class RMClientService {
                         if (!rmMessage.isAcknowledged()) {
 
                             Message retransmissionMessage =
-                                new Message(retransmissionEnvelop);
+                                new Message(retransmissionEnvelope);
                             Service retransmissionService = new Service();
                             Call retransmissionCall =
                                 (Call) service.createCall();
@@ -274,7 +274,7 @@ public class RMClientService {
 
                     }
 
-                    if (!gotResponce) {
+                    if (!gotResponse) {
                         throw new Exception("No Response from the Service");
                     }
 
@@ -282,7 +282,7 @@ public class RMClientService {
                     //No Response
                     SOAPEnvelope envelopToSend =
                         getInitialMessageWithRMHeaders(
-                            reqSOAPEnvelop,
+                            reqSOAPEnvelope,
                             rmMessage,
                             identifier,
                             destinationURL,
@@ -300,14 +300,14 @@ public class RMClientService {
                     call.setTargetEndpointAddress(destinationURL);
                     call.invoke(envelopToSend);
 
-                    boolean gotResponce = false;
+                    boolean gotResponse = false;
                     int count = 0;
                     Message tempMessage = rmMessage.getRequestMessage();
                     AckRequested ackRequested = new AckRequested();
                     ackRequested.setIdentifier(rmMessage.getIdentifier());
-                    SOAPEnvelope retransmissionEnvelop =
+                    SOAPEnvelope retransmissionEnvelope =
                         tempMessage.getSOAPEnvelope();
-                    ackRequested.toSoapEnvelop(retransmissionEnvelop);
+                    ackRequested.toSoapEnvelop(retransmissionEnvelope);
 
                     while (count < Constants.MAXIMUM_RETRANSMISSION_COUNT) {
                         count++;
@@ -315,7 +315,7 @@ public class RMClientService {
                         Thread.sleep(Constants.RETRANSMISSION_INTERVAL);
                         if (!rmMessage.isAcknowledged()) {
                             Message retransmissionMessage =
-                                new Message(retransmissionEnvelop);
+                                new Message(retransmissionEnvelope);
                             Service retransmissionService = new Service();
                             Call retransmissionCall =
                                 (Call) service.createCall();
@@ -349,7 +349,7 @@ public class RMClientService {
     /**
      * Method getInitialMessageWithRMHeaders
      * 
-     * @param reqSOAPEnvelop
+     * @param reqSOAPEnvelope
      * @param rmMessage
      * @param identifier
      * @param destinationURL
@@ -362,7 +362,7 @@ public class RMClientService {
      */
 
     private SOAPEnvelope getInitialMessageWithRMHeaders(
-        String reqSOAPEnvelop,
+        String reqSOAPEnvelope,
         RMMessage rmMessage,
         Identifier identifier,
         String destinationURL,
@@ -375,27 +375,27 @@ public class RMClientService {
         SOAPEnvelope envelopToSend = null;
 
         
-            //Crate amessage using the reqSOAPEnvelop string parameter.
-            Message msg = new Message(reqSOAPEnvelop);
+            //Crate a message using the reqSOAPEnvelope string parameter.
+            Message msg = new Message(reqSOAPEnvelope);
 
-            //Get the envelop using the message.
-            SOAPEnvelope requestEnvelop = msg.getSOAPEnvelope();
+            //Get the envelope using the message.
+            SOAPEnvelope requestEnvelope = msg.getSOAPEnvelope();
             envelopToSend = new SOAPEnvelope();
-            envelopToSend.setSchemaVersion(requestEnvelop.getSchemaVersion());
-            envelopToSend.setSoapConstants(requestEnvelop.getSOAPConstants());
+            envelopToSend.setSchemaVersion(requestEnvelope.getSchemaVersion());
+            envelopToSend.setSoapConstants(requestEnvelope.getSOAPConstants());
             envelopToSend.setBody(
-                (org.apache.axis.message.SOAPBody) requestEnvelop.getBody());
+                (org.apache.axis.message.SOAPBody) requestEnvelope.getBody());
             envelopToSend.addNamespaceDeclaration(
-                "wsrm",
-                "http://schemas.xmlsoap.org/ws/2003/03/rm");
+                Constants.NS_PREFIX_RM,
+                Constants.NS_URI_RM);
             envelopToSend.addNamespaceDeclaration(
-                "wsa",
-                "http://schemas.xmlsoap.org/ws/2003/03/addressing");
+                Constants.WSA_PREFIX,
+                Constants.WSA_NS);
             envelopToSend.addNamespaceDeclaration(
-                "wsu",
-                "http://schemas.xmlsoap.org/ws/2003/07/utility");
+                Constants.WSU_PREFIX,
+                Constants.WSU_NS);
 
-            //New envelop to create the SOAP envelop to send. Why use of two envelop is not clear.
+            //New envelope to create the SOAP envelope to send. Why use of two envelope is not clear.
             //adding the name spaces to the env
             // now get the sequence element
             Sequence seqElement = new Sequence();
@@ -411,7 +411,7 @@ public class RMClientService {
 
             seqElement.setMessageNumber(msgNumber);
 
-            //add the sequence element to the envelop to send
+            //add the sequence element to the envelope to send
             seqElement.toSoapEnvelop(envelopToSend);
 
             //set the action
@@ -466,14 +466,14 @@ public class RMClientService {
     
 
             envelopToSend.addNamespaceDeclaration(
-                "wsrm",
-                "http://schemas.xmlsoap.org/ws/2003/03/rm");
+                    Constants.NS_PREFIX_RM,
+                    Constants.NS_URI_RM);
             envelopToSend.addNamespaceDeclaration(
-                "wsa",
-                "http://schemas.xmlsoap.org/ws/2003/03/addressing");
+                    Constants.WSA_PREFIX,
+                    Constants.WSA_NS);
             envelopToSend.addNamespaceDeclaration(
-                "wsu",
-                "http://schemas.xmlsoap.org/ws/2003/07/utility");
+                    Constants.WSU_PREFIX,
+                    Constants.WSU_NS);
 
             URI actionURI = new URI(action);
             Action tempAction = new Action(actionURI);
