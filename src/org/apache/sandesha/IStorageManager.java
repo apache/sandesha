@@ -28,11 +28,13 @@ public interface IStorageManager {
     //Here a decision need to be made whether we use the sequence already
     // created or need to
     //create a new sequence as there are no sequence request by the client.
-    public void insertRequestMessage(RMMessageContext rmMessageContext);
+
+    //public void insertRequestMessage(RMMessageContext rmMessageContext);
 
     //This will be used by the Invoker but at the moment we don't need this
     // too.
-    public void insertResponseMessage(RMMessageContext rmMessageContext);
+
+    //public void insertResponseMessage(RMMessageContext rmMessageContext);
 
     //This is used by the processors.
     public boolean isSequenceExist(String sequenceID);
@@ -95,4 +97,12 @@ public interface IStorageManager {
     //But the sequenceID is neglected.
     public long getNextMessageNumber(String sequenceID);
 
+    //This is used by the client when storing the request messages.
+
+    //public void insertClientRequestMessage(RMMessageContext
+    // rmMessageContext);
+
+    public void insertOutgoingMessage(RMMessageContext rmMessageContext);
+
+    public void insertIncomingMessage(RMMessageContext rmMessageContext);
 }
