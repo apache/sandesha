@@ -92,6 +92,10 @@ public class RMSender extends BasicHandler {
                         addrHeaders, requestMesssageContext.getSync());
             }
 
+            if(requestMesssageContext.isLastMessage()){
+               storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(requestMesssageContext));
+            }
+
             if (requestMesssageContext.isHasResponse() && !requestMesssageContext.getSync()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
@@ -117,25 +121,7 @@ public class RMSender extends BasicHandler {
                 //SEND TERMINATE SEQ
             }
             
-            if(requestMesssageContext.isLastMessage()){
-//                 while(!storageManager.isAckComplete(requestMesssageContext.getSequenceID())){
-//                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
-//                }
-//                if(requestMesssageContext.getSync()){
-//                    while(!storageManager.isResponseComplete(requestMesssageContext.getSequenceID())){
-//                        Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
-//                    }   
-//                               }
-               storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(requestMesssageContext)); 
-               
-               
-//               if(storageManager.isAllSequenceComplete()){
-//                   senderThread.stop();
-//                   sas.stop(); 
-//               }
-            }
-            
-            
+
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -149,14 +135,11 @@ public class RMSender extends BasicHandler {
     private RMMessageContext getTerminateSeqMessage(RMMessageContext rmMessageContext) {
         RMMessageContext terSeqRMMsgContext = new RMMessageContext();
         MessageContext terSeqMsgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
+        terSeqRMMsgContext.setSequenceID(rmMessageContext.getSequenceID());
+        terSeqRMMsgContext.setAddressingHeaders(rmMessageContext.getAddressingHeaders());
         //RMMessageContext.copyMessageContext(msgContext, messageContext);
         terSeqRMMsgContext.setOutGoingAddress(rmMessageContext.getOutGoingAddress());
-        SOAPEnvelope terSeqEnv=EnvelopeCreator.createTerminatSeqMessage(rmMessageContext);
-        Message terSeqMsg= new Message(terSeqEnv);
-        
-        terSeqMsgContext.setRequestMessage(terSeqMsg);
         terSeqRMMsgContext.setMsgContext(terSeqMsgContext);
-        
         terSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_TERMINATE_SEQUENCE);
         // TODO Auto-generated method stub
         return terSeqRMMsgContext;

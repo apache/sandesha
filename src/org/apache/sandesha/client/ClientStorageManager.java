@@ -174,7 +174,6 @@ public class ClientStorageManager implements IStorageManager {
             msg = accessor.getNextOutgoingMsgContextToSend();
 
         if(msg==null){
-
             msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
         }
         return msg;
@@ -296,12 +295,10 @@ public class ClientStorageManager implements IStorageManager {
         String messageId = relatesTo.getURI().toString();
         //CHANGE THIS. SEARCH FOR THE SEQ USING MESID
         //String sequenceId = rmMessageContext.getSequenceID();
-        System.out.println("******** SEARCH FOR THIS MSG ID "+messageId);
-        
+
         String sequenceId = null;
         sequenceId = accessor.searchForSequenceId(messageId);
-        
-        System.out.println("******** SEARCH OBTAINED SEQ ID IS : "+sequenceId);
+
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
         if (!exists) {
@@ -388,13 +385,9 @@ public class ClientStorageManager implements IStorageManager {
         // TODO Auto-generated method stub
         
     }
-    
-
-    
-
-
-    public void setAckReceived(RMMessageContext responseMsg) {
-        accessor.setAckReceived(responseMsg);
+  
+    public void setAckReceived(String seqId,long msgNo) {
+        accessor.setAckReceived(seqId,msgNo);
 
     }
 }
