@@ -181,25 +181,49 @@ public class Sender implements Runnable {
                                     //Check whther we have a response. If so then use to set the
                                     // response.
                                     if (call.getResponseMessage() != null) {
+                                        try{
+                                        
+                                        RMHeaders rmHeaders = new RMHeaders();
+                                        rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
+                                        rmMessageContext.setRMHeaders(rmHeaders);
+                                               
+                                       // AddressingHeaders addrHeaders=(AddressingHeaders) resMsgCtx.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+                                        AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage().getSOAPEnvelope());
+                                        rmMessageContext.setAddressingHeaders(addrHeaders);
+                                        
+                                        
+                                        ////TOTOTOOTOTOOTOTO
+                                        
+                                  
                                         rmMessageContext.getMsgContext().setResponseMessage(
                                                 call.getResponseMessage());
                                         IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
                                                 .getMessageProcessor(rmMessageContext, storageManager);
+                                        System.out.println(messagePrcessor);                  
                                         if (messagePrcessor instanceof FaultProcessor) {
+                                         
                                             //process the fault.
                                             //For now just ignore.
                                             System.out.println("Fault for the CreateSequenceRequest");
                                             //For testing only.
                                             //storageManager.setApprovedOutSequence(
                                             //        "abcdefghijk", "1233abcdefghijk");
-                                        } else if (messagePrcessor instanceof AcknowledgementProcessor) {
-                                            try {
+                                        } else if (messagePrcessor instanceof CompositeProcessor) {
+                                         
+                                        
                                                 messagePrcessor.processMessage(rmMessageContext);
-                                            } catch (RMException rmEx) {
-                                                rmEx.printStackTrace();
-                                            }
+                                          
                                         }
-
+                                        }catch (AxisFault e) {
+                                            // TODO Auto-generated catch block
+                                            e.printStackTrace();
+                                        } catch (SOAPException e) {
+                                            // TODO Auto-generated catch block
+                                            e.printStackTrace();
+                                        } catch (Exception e) {
+                                            // TODO Auto-generated catch block
+                                            e.printStackTrace();
+                                        }
                                     }
                                     //-----------------------------------------------------------
                                     
