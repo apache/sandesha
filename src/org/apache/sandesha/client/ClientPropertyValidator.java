@@ -134,6 +134,8 @@ public class ClientPropertyValidator {
         sourceURI = "http://" + addr.getHostAddress() + ":" + Constants.SOURCE_ADDRESS_PORT
                 + "/axis/services/RMService";
 
+        //sourceURI="http://192.248.18.51:8080/axis/services/RMService";
+
         return sourceURI;
     }
 

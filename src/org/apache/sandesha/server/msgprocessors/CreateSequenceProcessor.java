@@ -40,8 +40,21 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
     }
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
+
+
+
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
+
+
+
+    AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor(this.storageManager);
+        if (rmHeaders.getSequenceAcknowledgement() != null) {
+            ackProcessor.processMessage(rmMessageContext);
+        }
+
+
+
 
         if (addrHeaders.getReplyTo() == null)
             rmMessageContext.setSync(true);

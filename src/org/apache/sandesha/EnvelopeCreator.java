@@ -426,10 +426,6 @@ public class EnvelopeCreator {
             AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(terSeqEnv);
             Identifier seqId = new Identifier();
             seqId.setIdentifier(rmMessageContext.getSequenceID());
-            Sequence seq = new Sequence();
-            seq.setIdentifier(seqId);
-            seq.toSoapEnvelop(terSeqEnv);
-
 
             Action terSeqAction = new Action(new URI(Constants.ACTION_TERMINATE_SEQUENCE));
             outGoingAddressingHaders.setAction(terSeqAction);
@@ -445,6 +441,7 @@ public class EnvelopeCreator {
 
 
             TerminateSequence terSeq = new TerminateSequence();
+            terSeq.setIdentifier(seqId);
             terSeq.toSoapEnvelop(terSeqEnv);
 
 

@@ -18,6 +18,8 @@ package org.apache.sandesha;
 
 import org.apache.axis.Handler;
 import org.apache.axis.SimpleChain;
+import org.apache.axis.deployment.wsdd.WSDDDocument;
+import org.apache.axis.deployment.wsdd.WSDDDeployment;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.description.JavaServiceDesc;
 import org.apache.axis.handlers.soap.SOAPService;
@@ -29,8 +31,13 @@ import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
 import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.namespace.QName;
 import java.io.IOException;
+import java.io.File;
 import java.net.ServerSocket;
 
 /**
@@ -89,6 +96,34 @@ public class RMInitiator {
     }
 
     private static void startListener() {
+      /*
+     try {
+            SimpleAxisServer sas = new SimpleAxisServer();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+
+            //Need to change the path
+           Document doc = db.parse(new File("config\\listener-config.wsdd"));
+            //"C:/SandeshaPrj/SandeshaIMPL/PrjWorkspace/bin/server-config.wsdd"));
+            WSDDDocument wsdddoc = new WSDDDocument(doc);
+            WSDDDeployment wsdddep = wsdddoc.getDeployment();
+            sas.setMyConfig(wsdddep);
+           //Set the port 9090 to the SimpleAxisServer.
+
+            sas.getMyConfig().getServiceByNamespaceURI("RMService");
+
+
+            sas.setServerSocket(new ServerSocket(9090));
+            Thread serverThread = new Thread(sas);
+            serverThread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+       */
+
+
         sas = new SimpleAxisServer();
         try {
             SimpleProvider sp = new SimpleProvider();
@@ -135,7 +170,7 @@ public class RMInitiator {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
+     
 
     }
 }
