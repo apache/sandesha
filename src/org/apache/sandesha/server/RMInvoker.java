@@ -104,6 +104,7 @@ public class RMInvoker implements Runnable {
                         boolean firstMsgOfResponseSeq = !storageManager
                                 .isResponseSequenceExist(rmMessageContext
                                         .getSequenceID());
+                                                
                         storageManager.insertResponseMessage(rmMessageContext); //This
                                                                                 // will
                                                                                 // automatically
@@ -144,11 +145,14 @@ public class RMInvoker implements Runnable {
                                     .setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
 
                             UUIDGen uuid = UUIDGenFactory.getUUIDGen();
-                            //String id = uuid.nextUUID();
-                            String id = "abcdefghijk";
-
+                            String id = uuid.nextUUID();
+                            //String id = "abcdefghijk";
+                            
+                            //Need to add "uuid" or we can always remove this part
+                            //Posible Problem
+                            //TODO
                             storageManager.setTemporaryOutSequence(rmMsgContext
-                                    .getSequenceID(), id);
+                                    .getSequenceID(), "uuid:"+id);
                             SOAPEnvelope createSequenceEnvelope = EnvelopeCreator
                                     .createCreateSequenceEnvelope(id,
                                             rmMsgContext, Constants.SERVER);
@@ -164,6 +168,8 @@ public class RMInvoker implements Runnable {
                                     .getAddress().toString());
 
                             System.out.println("ddddd");
+                            
+                            rmMsgContext.setMessageID("uuid:"+id);
                             storageManager
                                     .addCreateSequenceRequest(rmMsgContext);
                             System.out.println("END OF IF");
@@ -172,6 +178,8 @@ public class RMInvoker implements Runnable {
 
                         ServerQueue sq = ServerQueue.getInstance();
                         sq.displayPriorityQueue();
+                        sq.displayOutgoingMap();
+                        sq.displayIncomingMap();
 
                         //we need to check whether we have this sequence in the
                         // response queue.
