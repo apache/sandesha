@@ -16,6 +16,9 @@
  */
 package org.apache.sandesha;
 
+import java.util.Iterator;
+
+import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
@@ -36,7 +39,8 @@ public class RMMessageContext {
 	private RMHeaders rmHeaders;
 	private String outGoingAddress;
 	private int messageType;
-	
+	private long reTransmissionCount=0;
+	private long lastPrecessedTime=0;
 
 	/**
 	 * @return
@@ -176,6 +180,151 @@ public class RMMessageContext {
 	 */
 	public void setMessageType(int messageType) {
 		this.messageType = messageType;
+	}
+	public void copyContents(RMMessageContext rmMsgContext){
+		if(addressingHeaders!=null)
+		rmMsgContext.setAddressingHeaders(this.addressingHeaders);
+		if(messageID!=null)
+		rmMsgContext.setMessageID(this.messageID);
+		if(obj!=null)
+		rmMsgContext.setObj(this.obj);
+		if(reqEnv!=null)
+		rmMsgContext.setReqEnv(this.reqEnv);
+		if(resEnv!=null)
+		rmMsgContext.setResEnv(this.resEnv);
+		if(rmHeaders!=null)
+		rmMsgContext.setRMHeaders(this.rmHeaders);
+		if(sequenceID!=null)
+		rmMsgContext.setSequenceID(this.sequenceID);
+		if(outGoingAddress!=null)
+		rmMsgContext.setOutGoingAddress(this.outGoingAddress);
+		if(msgContext!=null)
+		rmMsgContext.setMsgContext(this.msgContext);
+		rmMsgContext.setReTransmissionCount(this.reTransmissionCount);
+		rmMsgContext.setLastPrecessedTime(this.lastPrecessedTime);
+		
+	
+	}
+
+	/**
+	 * @return
+	 */
+	public long getLastPrecessedTime() {
+		return lastPrecessedTime;
+	}
+
+	/**
+	 * @return
+	 */
+	public long getReTransmissionCount() {
+		return reTransmissionCount;
+	}
+
+	/**
+	 * @param l
+	 */
+	public void setLastPrecessedTime(long lastPrecessedTime) {
+		this.lastPrecessedTime = lastPrecessedTime;
+	}
+
+	/**
+	 * @param l
+	 */
+	public void setReTransmissionCount(long reTransmissionCount) {
+		this.reTransmissionCount = reTransmissionCount;
+	}
+
+	/**
+ * This method will copy the contents of one MessageContext to another.
+ * @param msgContext1
+ * @param msgContext2
+ */
+	public static void copyMessageContext(MessageContext msgContext1, MessageContext msgContext2) {
+
+		try {
+			if (msgContext1.getClassLoader() != null)
+				msgContext2.setClassLoader(msgContext1.getClassLoader());
+
+			if (msgContext1.getCurrentMessage() != null)
+				msgContext2.setCurrentMessage(msgContext1.getCurrentMessage());
+
+			if (msgContext1.getEncodingStyle() != null)
+				msgContext2.setEncodingStyle(msgContext1.getEncodingStyle());
+
+			//if(msgContext1.isHighFidelity()!=null)
+			msgContext2.setHighFidelity(msgContext1.isHighFidelity());
+
+			//if(msgContext1.getMaintainSession()!=null)
+			msgContext2.setMaintainSession(msgContext1.getMaintainSession());
+
+			if (msgContext1.getMessage() != null)
+				msgContext2.setMessage(msgContext1.getMessage());
+
+			if (msgContext1.getOperation() != null)
+				msgContext2.setOperation(msgContext1.getOperation());
+
+			if (msgContext1.getPassword() != null)
+				msgContext2.setPassword(msgContext1.getPassword());
+
+			//if(msgContext1.getPastPivot()!=null)
+			msgContext2.setPastPivot(msgContext1.getPastPivot());
+
+			if (msgContext1.getRequestMessage() != null)
+				msgContext2.setRequestMessage(msgContext1.getRequestMessage());
+
+			if (msgContext1.getResponseMessage() != null)
+				msgContext2.setResponseMessage(msgContext1.getResponseMessage());
+
+			if (msgContext1.getRoles() != null)
+				msgContext2.setRoles(msgContext1.getRoles());
+
+			if (msgContext1.getSchemaVersion() != null)
+				msgContext2.setSchemaVersion(msgContext1.getSchemaVersion());
+
+			if (msgContext1.getService() != null)
+				msgContext2.setService(msgContext1.getService());
+
+			if (msgContext1.getSession() != null)
+				msgContext2.setSession(msgContext1.getSession());
+
+			if (msgContext1.getSOAPActionURI() != null)
+				msgContext2.setSOAPActionURI(msgContext1.getSOAPActionURI());
+
+			if (msgContext1.getSOAPConstants() != null)
+				msgContext2.setSOAPConstants(msgContext1.getSOAPConstants());
+
+			if (msgContext1.getTargetService() != null)
+				msgContext2.setTargetService(msgContext1.getTargetService());
+
+			//if(msgContext1.getTimeout()!=null)
+			msgContext2.setTimeout(msgContext1.getTimeout());
+
+			if (msgContext1.getTransportName() != null)
+				msgContext2.setTransportName(msgContext1.getTransportName());
+
+			if (msgContext1.getTypeMappingRegistry() != null)
+				msgContext2.setTypeMappingRegistry(msgContext1.getTypeMappingRegistry());
+
+			if (msgContext1.getUsername() != null)
+				msgContext2.setUsername(msgContext1.getUsername());
+
+			//if(msgContext1.useSOAPAction()!=null)
+			msgContext2.setUseSOAPAction(msgContext1.useSOAPAction());
+
+			if (msgContext1.getAllPropertyNames() != null) {
+				Iterator ite = msgContext1.getAllPropertyNames();
+
+				while (ite.hasNext()) {
+					String str = (String) ite.next();
+					msgContext2.setProperty(str, msgContext1.getProperty(str));
+				}
+			}
+
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }
