@@ -38,6 +38,8 @@ public class ClientStorageManager implements IStorageManager {
 
     protected static Log log = LogFactory.getLog(ClientStorageManager.class
             .getName());
+    
+    private IServerDAO accessor;
 
     /*
      * (non-Javadoc)
@@ -48,16 +50,16 @@ public class ClientStorageManager implements IStorageManager {
         // TODO Auto-generated method stub
 
     }
+    
+    public ClientStorageManager(){
+        accessor = ServerDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+    }
 
     public boolean isSequenceExist(String sequenceID) {
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
         return accessor.isOutgoingSequenceExists(sequenceID);
     }
 
     public boolean isResponseSequenceExist(String sequenceID) {
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
         return accessor.isIncomingSequenceExists(sequenceID);
     }
 
@@ -75,9 +77,6 @@ public class ClientStorageManager implements IStorageManager {
      */
     public void setAcknowledged(String seqID, long msgNumber) {
         //seqId is just a dummy since the client will hv only a one seq.
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
-
         //No hard checking. User may insert the real sequence.
 
         String sequenceId = seqID;
@@ -88,9 +87,6 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public void addSequence(String sequenceID) {
-
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
         //boolean result = accessor.addIncomingSequence(sequenceID);
         boolean result = accessor.addOutgoingSequence(sequenceID);
 
@@ -127,9 +123,6 @@ public class ClientStorageManager implements IStorageManager {
 
     //private method
     private void addPriorityMessage(RMMessageContext msg) {
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
-
         accessor.addPriorityMessage(msg);
     }
 
@@ -137,8 +130,6 @@ public class ClientStorageManager implements IStorageManager {
      * Check the existance of a message.
      */
     public boolean isMessageExist(String sequenceID, long messageNumber) {
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
         return accessor.isIncomingMessageExists(sequenceID, new Long(
                 messageNumber));
     }
@@ -175,8 +166,6 @@ public class ClientStorageManager implements IStorageManager {
      */
     public RMMessageContext getNextMessageToSend() {
         //System.out.println("getNextMessageToSend() is called");
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
         RMMessageContext msg;
 
         msg = accessor.getNextPriorityMessageContextToSend();
@@ -184,6 +173,10 @@ public class ClientStorageManager implements IStorageManager {
         if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
 
+        if(msg==null){
+
+           // msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
+        }
         return msg;
     }
 
@@ -199,9 +192,6 @@ public class ClientStorageManager implements IStorageManager {
             return;
         }*/
 
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
-
         accessor.setOutSequence(sequenceId, outSequenceId);
         accessor.setOutSequenceApproved(sequenceId, false);
 
@@ -213,9 +203,6 @@ public class ClientStorageManager implements IStorageManager {
      */
     public boolean setApprovedOutSequence(String oldOutsequenceId,
             String newOutSequenceId) {
-
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
 
         boolean done = false;
         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
@@ -245,9 +232,6 @@ public class ClientStorageManager implements IStorageManager {
      * should return 1.
      */
     public long getNextMessageNumber(String sequenceID) {
-
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
         long msgNo = accessor.getNextOutgoingMessageNumber(sequenceID);
         return msgNo;
 
@@ -280,16 +264,13 @@ public class ClientStorageManager implements IStorageManager {
     public void insertOutgoingMessage(RMMessageContext msg) {
         //System.out.println("RESPONSE MESSAGE IS RECEIVED..");
 
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
-
         //System.out.println("Client StorageManager is called");
 
         //This is the seuqnceid used to create the map entry.
         // (not the actual seq id of the msg).
         String sequenceId = msg.getSequenceID();  
-		if(sequenceId==null)
-		    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+		//if(sequenceId==null)
+		//    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
 
         boolean exists = accessor.isOutgoingSequenceExists(sequenceId);
         if (!exists)
@@ -307,9 +288,7 @@ public class ClientStorageManager implements IStorageManager {
 
     //IN THE CLIENT RESPONSE HASH HAS THE ID OF RESPONSE MESSAGES.
     public void insertIncomingMessage(RMMessageContext rmMessageContext) {
-        IServerDAO accessor = ServerDAOFactory
-                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
-
+ 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
     	
         RelatesTo relatesTo = (RelatesTo) rmMessageContext
@@ -341,13 +320,15 @@ public class ClientStorageManager implements IStorageManager {
                 rmMessageContext);
 
     }
+    
+    
+    //Sets the property responseReceived of the request message
+    //corresponding to this response message.
+    private void setResponseReceived(RMMessageContext responseMsg){
+       // accessor.setResponseReceived(responseMsg);
+    }
 
     public RMMessageContext checkForResponseMessage(String sequenceId,String requestMsgId){
-        
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		
 		if(sequenceId==null)
 		    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
 		
@@ -358,10 +339,6 @@ public class ClientStorageManager implements IStorageManager {
     
     public boolean checkForAcknowledgement(String sequenceId,String requestMsgId){
         
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		
 		//Request message will be present in the queue only if the ack has not been
 		//receive. It will be deleted by the AckProcessor when an ack get received.
 		if(sequenceId==null)
@@ -374,17 +351,18 @@ public class ClientStorageManager implements IStorageManager {
     /* (non-Javadoc)
      * @see org.apache.sandesha.IStorageManager#isAckComplete(java.lang.String)
      */
-    public boolean isAckComplete(String sequenceID) {
-        // TODO Auto-generated method stub
-        return false;
+    //For client sequenceId should be outgoing sequence id.
+    public boolean isAckComplete(String sequenceID) {		
+        boolean result = accessor.compareAcksWithSequence(sequenceID);  //For client
+        return result;
     }
 
     /* (non-Javadoc)
      * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
      */
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
-        // TODO Auto-generated method stub
-        
+       // accessor.addLowPriorityMessage(terminateSeqMessage);
+     
     }
 
     /* (non-Javadoc)
@@ -401,6 +379,14 @@ public class ClientStorageManager implements IStorageManager {
     public boolean isResponseComplete(String sequenceID) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#terminateSequence(java.lang.String)
+     */
+    public void terminateSequence(String sequenceID) {
+        // TODO Auto-generated method stub
+        
     }
     
 
