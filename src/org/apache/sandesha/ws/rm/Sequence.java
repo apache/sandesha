@@ -20,6 +20,7 @@ package org.apache.sandesha.ws.rm;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.axis.AxisFault;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
 
@@ -130,7 +131,7 @@ public class Sequence extends MessageElement implements IRmElement {
      * @param headerElement
      * @return Sequence
      */
-    public Sequence fromSOAPEnveploe(SOAPHeaderElement headerElement) {
+    public Sequence fromSOAPEnveploe(SOAPHeaderElement headerElement) throws AxisFault{
 
         Iterator iterator = headerElement.getChildElements();
         MessageElement childElement;

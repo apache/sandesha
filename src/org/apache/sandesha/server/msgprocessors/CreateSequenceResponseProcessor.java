@@ -17,6 +17,7 @@
 package org.apache.sandesha.server.msgprocessors;
 
 import org.apache.axis.message.addressing.RelatesTo;
+import org.apache.axis.AxisFault;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
@@ -32,7 +33,7 @@ public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
         this.storageManager = storageManger;
     }
 
-    public boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
+    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
 
         CreateSequenceResponse createSeqRes = rmMessageContext.getRMHeaders()
                 .getCreateSequenceResponse();

@@ -53,7 +53,7 @@ public class FaultProcessor implements IRMMessageProcessor {
      * 
      * @see org.apache.sandesha.server.msgprocessors.IRMMessageProcessor#processMessage(org.apache.sandesha.RMMessageContext)
      */
-    public boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
+    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
 
         //Check the fault type.
         //Create the fault envelop

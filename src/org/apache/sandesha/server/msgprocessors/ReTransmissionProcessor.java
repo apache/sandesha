@@ -18,6 +18,7 @@ package org.apache.sandesha.server.msgprocessors;
 
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.axis.AxisFault;
 
 /**
  * @author
@@ -29,7 +30,7 @@ public class ReTransmissionProcessor implements IRMMessageProcessor {
      * 
      * @see org.apache.sandesha.server.RMMessageProcessor#processMessage(org.apache.sandesha.RMMessageContext)
      */
-    public boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
+    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
         // TODO Auto-generated method stub
         return false;
     }

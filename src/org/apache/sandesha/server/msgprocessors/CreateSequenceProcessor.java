@@ -18,6 +18,7 @@ package org.apache.sandesha.server.msgprocessors;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.AxisFault;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.SOAPEnvelope;
@@ -40,7 +41,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         this.storageManager = storageManager;
     }
 
-    public boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
+    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault  {
 
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
@@ -49,6 +50,11 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
             rmMessageContext.setSync(true);
         else
             rmMessageContext.setSync(false);
+
+        //TODO This should be sent by looking at the offer and the rest
+        //wsrm:CreateSequenceRefused
+        if(rmHeaders.getCreateSequence()!=null)
+            throw new AxisFault();
 
         /*
          * We may let the user to decide on the UUID generation process. If

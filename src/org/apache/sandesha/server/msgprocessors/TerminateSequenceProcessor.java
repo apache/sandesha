@@ -20,6 +20,7 @@ import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.TerminateSequence;
+import org.apache.axis.AxisFault;
 
 /**
  * @author
@@ -32,7 +33,7 @@ public class TerminateSequenceProcessor implements IRMMessageProcessor {
         this.storageManger = storageManger;
     }
 
-    public boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
+    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
 
         TerminateSequence terminateSeq = rmMessageContext.getRMHeaders().getTerminateSequence();
 

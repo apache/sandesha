@@ -108,10 +108,9 @@ public class RMHeaders {
      * @param env
      * @return RMHeaders
      * @throws AxisFault
-     * @throws SOAPException
      */
-    public RMHeaders fromSOAPEnvelope(SOAPEnvelope env) throws AxisFault,
-            SOAPException {
+    public RMHeaders fromSOAPEnvelope(SOAPEnvelope env) throws SOAPException,AxisFault
+             {
 
         if (env != null) {
             Iterator iterator = env.getHeaders().iterator();

@@ -39,6 +39,7 @@ public final class MessageValidator {
             validateForFaults(rmMsgContext);
         } catch (SOAPException e) {
             e.printStackTrace();
+            //TODO Do we need to throw a Sequence Fault at this level.
         }
     }
 
@@ -68,8 +69,16 @@ public final class MessageValidator {
         if (sequence != null) {
             if (!storageMgr.isSequenceExist(sequence.getIdentifier().getIdentifier()))
                 throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
-        
+
         }
+
+        if (rmHeaders.getSequenceAcknowledgement() != null) {
+           // if (!storageMgr.isSequenceExist(sequence.getIdentifier().getIdentifier()))
+           //     throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
+
+        }
+
+
 
 
     }

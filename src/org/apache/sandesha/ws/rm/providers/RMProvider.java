@@ -94,9 +94,16 @@ public class RMProvider extends RPCProvider {
             if (!rmMessageProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
             }
-        } catch (RMException rmEx) {
-            rmEx.printStackTrace();
-            RMProvider.log.error(rmEx);
+         } catch (AxisFault af) {
+            RMProvider.log.error(af);
+
+        	FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
+
+            if (!faultProcessor.processMessage(rmMessageContext)) {
+                msgContext.setResponseMessage(null);
+                return;
+            }
+            return;
         }
         
         SandeshaQueue sq = SandeshaQueue.getInstance();

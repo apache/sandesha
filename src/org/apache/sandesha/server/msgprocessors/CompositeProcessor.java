@@ -18,6 +18,7 @@ package org.apache.sandesha.server.msgprocessors;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.AxisFault;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
@@ -35,7 +36,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
         this.storageManger = storageManger;
     }
 
-    public boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
+    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
 
         //if the message is and Ack then process the ack
         //if the message has a body then insert it to the queue

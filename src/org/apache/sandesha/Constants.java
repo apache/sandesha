@@ -272,14 +272,23 @@ public interface Constants {
 
         public static final String NO_RM_HEADES="No RM Headers Available in this Message";
 
-        public static final String UNKNOWN_SEQUENCE="Sequence Does Not Exist";
+        public static final String UNKNOWN_SEQUENCE="The value of wsrm:Identifier is not a known Sequence identifier.";
+        public static final String MSG_NO_ROLLOVER="The maximum value for wsrm:MessageNumber has been exceeded.";
+
 
     }
 
     public interface FaultCodes {
+        public static final String WSRM_SERVER_INTERNAL_ERROR="ServerInternalError";
+
+
         public static final String IN_CORRECT_MESSAGE = "Incorrect Message";
-        public static final String WSRM_FAULT_UNKNOWN_SEQUENCE="Unknown Sequence";
+        public static final String WSRM_FAULT_UNKNOWN_SEQUENCE="wsrm:UnknownSequence";
+        public static final String WSRM_FAULT_MSG_NO_ROLLOVER="wsrm:MessageNumberRollover";
     }
+
+
+    public static final double MAX_MSG_NO=18446744073709551615d;
 
 
 }

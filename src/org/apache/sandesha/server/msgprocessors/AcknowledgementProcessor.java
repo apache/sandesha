@@ -18,9 +18,11 @@ package org.apache.sandesha.server.msgprocessors;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.AxisFault;
 import org.apache.sandesha.*;
 import org.apache.sandesha.ws.rm.AcknowledgementRange;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
+import org.apache.xml.utils.QName;
 
 import javax.xml.soap.SOAPEnvelope;
 import java.util.Iterator;
@@ -38,7 +40,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         this.storageManger = storageManger;
     }
 
-    public final boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
+    public final boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
         SequenceAcknowledgement seqAcknowledgement = rmMessageContext
                 .getRMHeaders().getSequenceAcknowledgement();
         String seqID = seqAcknowledgement.getIdentifier().getIdentifier();
@@ -59,7 +61,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
     }
 
 
-    public boolean sendAcknowledgement(RMMessageContext rmMessageContext) throws RMException {
+    public boolean sendAcknowledgement(RMMessageContext rmMessageContext) throws AxisFault {
         //EnvelopCreater createAcknowledgement
         //if async then add message to the queue
         //else set the response env of the messageContext.
@@ -99,11 +101,12 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             //The original message context is used to send the ack
             // asynchronously to the client.
             //So the response message is replaced by the new ack message.
-            try {
+            try{
                 String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPPartAsString();
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(soapMsg));
-            } catch (Exception e) {
-                throw new RMException(e.getLocalizedMessage());
+            }catch(AxisFault af){
+                af.setFaultCodeAsString(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);
+                throw af;
             }
 
             return true;
