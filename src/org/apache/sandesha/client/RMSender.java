@@ -112,20 +112,29 @@ public class RMSender extends BasicHandler {
                             requestMesssageContext.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
-                if(requestMesssageContext.isLastMessage()){
-                    while(!storageManager.isAckComplete(requestMesssageContext.getSequenceID())){
-                        Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
-                    }
-                   storageManager.insertTerminateSeqMessage(getTerminateSeqMessage()); 	
-                   
-                   if(storageManager.isAllSequenceComplete()){
-                       senderThread.stop();
-                       sas.stop(); 
-                   }
-                }
+            
                 msgContext.setResponseMessage(null);
                 //SEND TERMINATE SEQ
             }
+            
+            if(requestMesssageContext.isLastMessage()){
+                while(!storageManager.isAckComplete(requestMesssageContext.getSequenceID())){
+                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+                }
+                if(requestMesssageContext.getSync()){
+                    while(!storageManager.isResponseComplete(requestMesssageContext.getSequenceID())){
+                        Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+                    }   
+                               }
+               storageManager.insertTerminateSeqMessage(getTerminateSeqMessage()); 	
+               
+               if(storageManager.isAllSequenceComplete()){
+                   senderThread.stop();
+                   sas.stop(); 
+               }
+            }
+            
+            
 
         } catch (Exception ex) {
             ex.printStackTrace();
