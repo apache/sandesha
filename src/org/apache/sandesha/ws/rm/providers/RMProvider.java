@@ -342,27 +342,10 @@ public class RMProvider extends RPCProvider {
 			return false;
 	}
 	
-	/**
-	 * Method createSequence
-	 * 
-	 * @param msgContext MessageContext
-	 * 
-	 * @return boolean
-	 * 
-	 * @throws SOAPException
-	 *  
-	 */
 
-	private Identifier createSequence(MessageContext messageContext) throws SOAPException {
-		Identifier identifire = new Identifier();
-		Call call = (Call) messageContext.getProperty(MessageContext.CALL);
-		String sequenceId = call.getSequenceIdentifier();
-		identifire.setIdentifier(sequenceId);
-		return identifire;
-	}
 
 	/**
-	 * Method createSequence
+	 * Method terminateSequence
 	 * 
 	 * @param identifier 
 	 *  
