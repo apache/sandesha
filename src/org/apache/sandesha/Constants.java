@@ -27,6 +27,22 @@ package org.apache.sandesha;
 public interface Constants {
 
     /**
+     * This is the port that is used when generating the source address. Two
+     * constants SOURCE_ADDRESS_PORT and SOURCE_LISTEN_PORT are used to help
+     * debuging using TCP monitor. TCP mon can listen in 8080 while the
+     * SimpleAxisServer listens in 8090. In the final version these two should
+     * contain the same value.
+     */
+
+    public static final int SOURCE_ADDRESS_PORT = 8080;
+
+    /**
+     * This is the port that the SimpleAxisServer in the client side listen for
+     * asynchronous responses /acks.
+     */
+    public static final int SOURCE_LISTEN_PORT = 8090;
+
+    /**
      * Namespace for wsu.
      */
     public static final String NS_URI_WSU = "http://schemas.xmlsoap.org/ws/2002/07/utility";
