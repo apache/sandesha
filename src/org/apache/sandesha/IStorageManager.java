@@ -112,14 +112,15 @@ public interface IStorageManager {
     
     
     public boolean isAckComplete(String sequenceID);
+    
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage);
+    
     public boolean isAllSequenceComplete();
 
-    /**
-     * @param sequenceID
-     * @return
-     */
+
     public boolean isResponseComplete(String sequenceID);
     
     public void terminateSequence(String sequenceID);
+    
+    public void setAckReceived(RMMessageContext responseMsg);
 }
