@@ -35,6 +35,7 @@ public class ClientPropertyValidator {
         boolean hasRes = getHasResponse(call);
         long msgNumber = getMessageNumber(call);
         boolean lastMessage = getLastMessage(call);
+        String clientSequence= getClientSequence(call);
 
         String sourceURL = null;
         if (!sync)
@@ -49,10 +50,23 @@ public class ClientPropertyValidator {
             rmMessageContext.setMsgNumber(msgNumber);
             rmMessageContext.setLastMessage(lastMessage);
             rmMessageContext.setSourceURL(sourceURL);
+            rmMessageContext.setSequenceID(clientSequence);
             return rmMessageContext;
         } else
             throw new AxisFault(errorMsg);
 
+    }
+
+    /**
+     * @param call
+     * @return
+     */
+    private static String getClientSequence(Call call) {
+        String clientSequence=(String)call.getProperty("clientSequence");
+         if(clientSequence!=null)
+                return clientSequence;
+         else
+             return Constants.CLIENT_DEFAULD_SEQUENCE_ID;
     }
 
     private static boolean getSync(Call call) {
