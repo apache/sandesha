@@ -145,6 +145,19 @@ public class EnvelopeCreator {
         outGoingAddressingHaders.toEnvelope(envelope);
 
         CreateSequence createSeq = new CreateSequence();
+        
+        //uncommenting following will send the sequence with a offer (for response seq) to the create seq msg. 
+        //offer
+//        SequenceOffer offer = new SequenceOffer ();
+//        Identifier id = new Identifier ();
+//        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+//        String offerUuid = Constants.UUID + uuidGen.nextUUID();
+//        id.setIdentifier(offerUuid);
+//        
+//        offer.setIdentifier(id);
+//        createSeq.setOffer(offer);
+        //end offer
+        
         createSeq.toSoapEnvelop(envelope);
 
         return envelope;
