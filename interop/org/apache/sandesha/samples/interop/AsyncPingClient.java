@@ -29,7 +29,7 @@
 
   public class AsyncPingClient {
 
-  private static String targetURL = "http://127.0.0.1:9080/axis/services/RMInteropService?wsdl";
+  private static String targetURL = "http://127.0.0.1:9090/axis/services/RMInteropService?wsdl";
 
   public static void main(String[] args) {
       System.out.println("Client started...... Asynchronous ");

@@ -29,7 +29,7 @@ import javax.xml.rpc.ParameterMode;
 
 public class EchoClient {
 
-    private static String targetURL = "http://127.0.0.1:9070/axis/services/RMInteropService?wsdl";
+    private static String targetURL = "http://127.0.0.1:9090/axis/services/RMInteropService?wsdl";
 
     public static void main(String[] args) {
 
@@ -54,7 +54,7 @@ public class EchoClient {
 
             //These two are additional
             //call.setProperty("from","http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous");
-            call.setProperty("from","http://localhost:8070/axis/services/RMService");
+            call.setProperty("from","http://localhost:8080/axis/services/RMService");
             //call.setProperty("replyTo","http://10.10.0.4:8080/axis/services/MyService");
 
             call.setTargetEndpointAddress(targetURL);
