@@ -54,12 +54,12 @@
  */
 package org.apache.sandesha.ws.rm.handlers;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.sandesha.ws.rm.RMHeaders;
+
+import javax.xml.soap.SOAPException;
 
 /**
  * @author 

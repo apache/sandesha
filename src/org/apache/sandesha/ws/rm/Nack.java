@@ -54,9 +54,9 @@
  */
 package org.apache.sandesha.ws.rm;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
+
+import javax.xml.soap.SOAPException;
 
 /**
  * @author 

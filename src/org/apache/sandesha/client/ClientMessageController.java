@@ -54,12 +54,12 @@
  */
 package org.apache.sandesha.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.sandesha.RMSequence;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author 

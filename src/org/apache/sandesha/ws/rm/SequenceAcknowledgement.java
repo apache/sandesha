@@ -54,17 +54,16 @@
  */
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.ws.utility.Identifier;
+
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author 

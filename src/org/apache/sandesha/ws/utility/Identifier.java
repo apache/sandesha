@@ -6,10 +6,10 @@
  */
 package org.apache.sandesha.ws.utility;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+
+import javax.xml.soap.SOAPException;
 //import //org.apache.xalan.templates.ElemApplyImport;
 
 /**

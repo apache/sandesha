@@ -6,8 +6,6 @@
  */
 package org.apache.sandesha.ws.rm.providers;
 
-import java.lang.reflect.Method;
-
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
@@ -20,6 +18,8 @@ import org.apache.sandesha.server.ServerMessageController;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;
+
+import java.lang.reflect.Method;
 
 /**
  * @author h
