@@ -115,10 +115,10 @@ public class AckRequested extends MessageElement implements IRmElement {
 		headerElement.setName("AckRequested");
 
 		if (identifier != null) {
-			headerElement.addChildElement(identifier.getSoapElement());
+			identifier.toSOAPEnvelope(headerElement);
 		}
 		if (messageNumber != null) {
-			headerElement.addChildElement(messageNumber.getSoapElement());
+			messageNumber.toSOAPEnvelope(headerElement);
 		}
 
 		return env;

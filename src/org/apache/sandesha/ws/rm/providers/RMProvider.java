@@ -6,49 +6,18 @@
  */
 package org.apache.sandesha.ws.rm.providers;
 
-import org.apache.axis.AxisEngine;
-import org.apache.axis.AxisFault;
-import org.apache.axis.Constants;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.Call;
-import org.apache.axis.description.OperationDesc;
-import org.apache.axis.description.ParameterDesc;
-import org.apache.axis.description.ServiceDesc;
-import org.apache.axis.enum.Style;
-import org.apache.axis.handlers.soap.SOAPService;
-import org.apache.axis.message.RPCElement;
-import org.apache.axis.message.RPCHeaderParam;
-import org.apache.axis.message.RPCParam;
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.addressing.Address;
-import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.From;
-import org.apache.axis.soap.SOAPConstants;
-import org.apache.axis.utils.JavaUtils;
-import org.apache.axis.utils.Messages;
-import org.xml.sax.SAXException;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.holders.Holder;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Vector;
+
+import org.apache.axis.MessageContext;
+import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
-
-
 import org.apache.sandesha.RMMessage;
-import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.RMMessageController;
 import org.apache.sandesha.RMSequence;
-
 import org.apache.sandesha.client.ClientMessageController;
+import org.apache.sandesha.server.MessageInserter;
 import org.apache.sandesha.server.ServerMessageController;
-import org.apache.sandesha.test.RMDisplayer;
 import org.apache.sandesha.ws.rm.RMHeaders;
-import org.apache.sandesha.ws.rm.Sequence;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;
 
@@ -70,132 +39,154 @@ public class RMProvider extends RPCProvider {
 		}
 
 		//////////////To test whether the addressing headers are accessible at this point
-		System.out.println("This is from the RMProvider"); 
+		System.out.println("This is from the RMProvider");
 		System.out.println(
 			"-----------------------------------------------------------");
-			System.out.println(obj);
+		System.out.println(obj);
 		System.out.println(
 			"-----------------------------------------------------------");
 		System.out.println(
 			msgContext.getRequestMessage().getSOAPPartAsString());
 		System.out.println(
 			"-----------------------------------------------------------");
-		
-		//System.out.println(msgContext.getResponseMessage());
-
-		ServerMessageController serverMessageController =
-			ServerMessageController.getInstance();
-		ClientMessageController clientMessageController =
-			ClientMessageController.getInstance();
-
-		RMMessage message = new RMMessage();
-
-		/////////////
-		//code will be in the real implemention
-
-		RMHeaders rmHeaders =(RMHeaders) msgContext.getProperty(org.apache.sandesha.ws.rm.Constants.ENV_RM_REQUEST_HEADERS);
-		System.out.println(rmHeaders);
-		AddressingHeaders addressingHeaders =(AddressingHeaders) msgContext.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
-		System.out.println(addressingHeaders);
-		
-
-		if(true){
-			
-		}//Address fromAddress = addressingHeaders.getFrom().getAddress();
-		String anonymous =new String(org.apache.sandesha.Constants.ANONYMOUS_URI);
-		boolean asynchronous = true;
-
-		message.setAddressingHeaders(addressingHeaders);
-		message.setRMHeaders(rmHeaders);
-		message.setRequestMessage(msgContext.getRequestMessage());
-		msgContext.setEncodingStyle(msgContext.getEncodingStyle());
-		//rmHeaders=null;
-
-		//			check for wsrm headers pass to super
+		RMHeaders rmHeaders =
+			(RMHeaders) msgContext.getProperty(
+				org.apache.sandesha.ws.rm.Constants.ENV_RM_REQUEST_HEADERS);
+			AddressingHeaders addressingHeaders =
+							(AddressingHeaders) msgContext.getProperty(
+								org
+									.apache
+									.axis
+									.message
+									.addressing
+									.Constants
+									.ENV_ADDRESSING_REQUEST_HEADERS);
 		if (rmHeaders == null) {
 			System.out.println("rmHeaders==null");
 			System.out.println("Calling to super");
 			super.processMessage(msgContext, reqEnv, resEnv, obj);
 		} else {
-		
-			//has some wsrm header 
 			System.out.println("rmHeaders!=null");
-			message.setRMHeaders(rmHeaders);
-			message.setAddressingHeaders(addressingHeaders);
+			
+			String anonymous =
+				new String(org.apache.sandesha.Constants.ANONYMOUS_URI);
+				
+			boolean asynchronous = true;
+			/*if(addressingHeaders.getFrom().getAddress().toString().equals(org.apache.sandesha.Constants.ANONYMOUS_URI)){
+				asynchronous=false;
+			
+			}*/
 			
 
-			if (rmHeaders.getCreateSequence() != null) {
-				//Address fromAddress= addressingHeaders.getFrom().getAddress();
-				//String anonymous=new String("http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous");
-				if (asynchronous) {
+			if (asynchronous) {
+				System.out.println("asynchronous=true");
+				MessageInserter messageInserter =
+					new MessageInserter(msgContext, obj);
+				Thread thread = new Thread(messageInserter);
+				thread.start();
+				msgContext.setResponseMessage(null);
+			} else {
+				System.out.println("asynchronous=false");
+				ServerMessageController serverMessageController =
+					ServerMessageController.getInstance();
+				ClientMessageController clientMessageController =
+					ClientMessageController.getInstance();
 
-				}
-			}
-			if (rmHeaders.getCreateSequenceResponse() != null) {
-				if (asynchronous) {
-
-				}
-			}
-			if (rmHeaders.getAckRequest() != null) {
-				if (asynchronous) {
-					System.out.println("rmHeaders.getAckRequest() != null");
-					SequenceAcknowledgement seqAck=serverMessageController.getAcknowledgement(rmHeaders.getAckRequest().getIdentifier());
-					SOAPEnvelope ackResEnv=new SOAPEnvelope();
-					RMHeaders ackResRMHeaders=new RMHeaders();
-					ackResRMHeaders.setSequenceAcknowledgement(seqAck);
-					ackResRMHeaders.toSoapEnvelop(ackResEnv);
-					Message ackResMsg=new Message(ackResEnv);
-					Call call=new Call(addressingHeaders.getReplyTo().getAddress().toString());
-					call.setRequestMessage(ackResMsg);
-					try{
-						call.invoke();
-						}catch(Exception e){
-							
-						}
-					
-					
-				}
-			}
-			if (rmHeaders.getSequenceAcknowledgement() != null) {
-				System.out.println("rmHeaders.getSequenceAcknowledgement() != null");
-				Identifier seqAckID=rmHeaders.getSequenceAcknowledgement().getIdentifier();
-				RMSequence clientSeq=clientMessageController.retrieveIfSequenceExists(seqAckID);
-				RMSequence serverSeq=serverMessageController.retrieveIfSequenceExists(seqAckID);
-				if(clientSeq!=null){
-					System.out.println("clientSeq!=null");
-					clientSeq.setSequenceAcknowledgement(rmHeaders.getSequenceAcknowledgement());
-				}
-				if(serverSeq!=null){
-					System.out.println("serverSeq!=null");
-					serverSeq.setSequenceAcknowledgement(rmHeaders.getSequenceAcknowledgement());
-				}
+				RMMessage message = new RMMessage();
 				
-			}
-			if (rmHeaders.getSequence() != null) {
-				System.out.println("rmHeaders.getSequence()!=null");
-				 message.setIdentifier(rmHeaders.getSequence().getIdentifier());
-				if (msgContext.getOperation() != null) {
-					System.out.println("msgContext.getOperation() != null");
-					message.setOperation(msgContext.getOperation());
-					message.setServiceDesc(msgContext.getService().getServiceDescription());
-					message.setServiceObject(obj);
-					serverMessageController.insertMessage(message);
-					
-				}else{
-					System.out.println(msgContext.getOperation() == null);
-					RMSequence responsedSeq=clientMessageController.retrieveIfSequenceExists(rmHeaders.getSequence().getIdentifier());
-					if(responsedSeq!=null){
-						RMMessage resMsg=responsedSeq.retrieveMessage(new Long(message.getMessageNumber()));
-						resMsg.setResponseMessage(message.getRequestMessage());
+				//System.out.println(addressingHeaders);
+				message.setAddressingHeaders(addressingHeaders);
+				message.setRMHeaders(rmHeaders);
+				message.setRequestMessage(msgContext.getRequestMessage());
+				msgContext.setEncodingStyle(msgContext.getEncodingStyle());
+				
+				message.setRMHeaders(rmHeaders);
+				message.setAddressingHeaders(addressingHeaders);
+				if (rmHeaders.getCreateSequence() != null) {
+				}
+				if (rmHeaders.getCreateSequenceResponse() != null) {
+				}
+
+				if (rmHeaders.getSequenceAcknowledgement() != null) {
+					System.out.println(	"rmHeaders.getSequenceAcknowledgement() != null");
+					Identifier seqAckID =rmHeaders.getSequenceAcknowledgement().getIdentifier();
+					RMSequence clientSeq =	clientMessageController.retrieveIfSequenceExists(seqAckID);
+					RMSequence serverSeq =	serverMessageController.retrieveIfSequenceExists(seqAckID);
+					if (clientSeq != null) {
+						System.out.println("clientSeq!=null");
+						clientSeq.setSequenceAcknowledgement(
+							rmHeaders.getSequenceAcknowledgement());
 					}
-					responsedSeq.setResponceMessage(message);
-					
+					if (serverSeq != null) {
+						System.out.println("serverSeq!=null");
+						serverSeq.setSequenceAcknowledgement(
+							rmHeaders.getSequenceAcknowledgement());
+					}
+				}
+				if (rmHeaders.getSequence() != null) {
+					System.out.println("rmHeaders.getSequence()!=null");
+					message.setIdentifier(
+						rmHeaders.getSequence().getIdentifier());
+					if (msgContext.getOperation() != null) {
+						System.out.println("msgContext.getOperation() != null");
+						message.setOperation(msgContext.getOperation());
+						message.setServiceDesc(	msgContext.getService().getServiceDescription());
+						message.setServiceObject(obj);
+						//serverMessageController.insertMessage(message);
+						/////////
+						//keeping message in the server no meaningfull in this mode
+						//becouse the response is going in the same HTTP connection
+						//just to have a in-order invoketion
+						//we have to reffer the last message number
+						Identifier seqAckID =rmHeaders.getSequenceAcknowledgement().getIdentifier();
+						RMSequence serverSeq =	serverMessageController.retrieveIfSequenceExists(seqAckID);
+						if(serverSeq!=null){
+							long msgNo=rmHeaders.getSequence().getMessageNumber().getMessageNumber();
+							long lastProcessedMsgNo;
+							serverSeq.getMessageList().put(new Long(msgNo),message);
+							while(true){
+								lastProcessedMsgNo=serverSeq.getLastProcessedMessageNumber();
+								if(msgNo+1==lastProcessedMsgNo){
+									super.processMessage(msgContext,reqEnv,resEnv,obj);
+									lastProcessedMsgNo++;
+									break;									
+								}
+								Thread.sleep(200);
+								
+							}
+							
+						}						 						
+						////////
+					} else {
+						//haveing is?
+						System.out.println("msgContext.getOperation() == null");
+						RMSequence responsedSeq = clientMessageController.retrieveIfSequenceExists(	rmHeaders.getSequence().getIdentifier());
+						if (responsedSeq != null) {
+							RMMessage resMsg =	responsedSeq.retrieveMessage(new Long(message.getMessageNumber()));
+							resMsg.setResponseMessage(message.getRequestMessage());
+						}
+						responsedSeq.setResponceMessage(message);
+					}
+				}
+				if (rmHeaders.getAckRequest() != null) {
+					System.out.println("rmHeaders.getAckRequest() != null");
+					RMSequence serSeq = serverMessageController.retrieveIfSequenceExists(rmHeaders.getAckRequest().getIdentifier());
+					SequenceAcknowledgement seqAck=serSeq.getSequenceAcknowledgement();// =serverMessageController.getAcknowledgement(	rmHeaders.getAckRequest().getIdentifier());
+					RMHeaders ackResRMHeaders = new RMHeaders();
+					ackResRMHeaders.setSequenceAcknowledgement(seqAck);
+					try {
+						ackResRMHeaders.toSoapEnvelop(msgContext.getResponseMessage().getSOAPEnvelope());
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					
 				}
 			}
-
 		}
-		System.out.println(msgContext.getResponseMessage());
+
+		//System.out.println();
+		//System.out.println(msgContext.getResponseMessage());
 		System.out.println("RMProvider finished");
 
 	}

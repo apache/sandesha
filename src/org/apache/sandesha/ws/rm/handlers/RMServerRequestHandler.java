@@ -58,9 +58,7 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
-import org.apache.log4j.lf5.viewer.configure.MRUFileManager;
 import org.apache.sandesha.ws.rm.Constants;
-import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
  * @author 

@@ -62,7 +62,6 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.ws.utility.Identifier;
 
 /**
@@ -104,7 +103,7 @@ public class TerminateSequence implements IRmElement {
 		bodyElement.setName("TerminateSequence");
 
 		if (identifier != null) {
-			bodyElement.addChildElement(identifier.getSoapElement());
+			identifier.toSOAPEnvelope(bodyElement);
 		}
 
 		return env;

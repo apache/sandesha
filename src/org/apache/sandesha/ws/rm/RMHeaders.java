@@ -55,7 +55,6 @@
 package org.apache.sandesha.ws.rm;
 
 import java.util.Iterator;
-import java.util.Vector;
 
 import javax.xml.soap.SOAPException;
 
@@ -63,7 +62,6 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.sandesha.ws.utility.Identifier;
 
 /**
  * @author 
@@ -112,7 +110,7 @@ public class RMHeaders {
 			SOAPHeaderElement headerElement;
 			while (iterator.hasNext()) {
 				headerElement = (SOAPHeaderElement) iterator.next();
-				System.out.println(headerElement.getName());
+				//System.out.println(headerElement.getName());
 				if (headerElement.getName().equals("Sequence")) {
 					sequence = new Sequence();
 					sequence.fromSOAPEnveploe(headerElement);

@@ -87,6 +87,11 @@ public class Nack implements IRmElement {
 		notAckNum=(new Long(element.getFirstChild().toString())).longValue();
 		return this;
 	}
+	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
+		msgElement.addChildElement("Nack","wsrm").addTextNode((new Long(notAckNum)).toString());;
+				
+		return msgElement;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)

@@ -6,17 +6,12 @@
  */
 package org.apache.sandesha.client;
 
-import java.io.StringReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.naming.ldap.Control;
-import javax.wsdl.extensions.soap.SOAPHeader;
 import javax.xml.rpc.ServiceException;
-import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeaderElement;
 
@@ -27,7 +22,6 @@ import org.apache.axis.client.Service;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.SOAPBody;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.Address;
@@ -82,10 +76,10 @@ public class RMClientService {
 		rmMessage.setIsOneWay(isOneWay);
 		rmMessage.setIsCreateSequence(isCreateSequence);
 		rmMessage.setIsResponseExpected(isResponseExpected);
+		rmMessage.setIdentifier(identifier);
 
 		//get the singleton instance
-		ClientMessageController controller =
-			ClientMessageController.getInstance();
+		ClientMessageController controller = ClientMessageController.getInstance();
 
 		RMSequence sequence = controller.retrieveIfSequenceExists(identifier);
 
@@ -151,17 +145,11 @@ public class RMClientService {
 						Message msg = new Message(reqSOAPEnvelop);
 
 						//Get the envelop using the message.
-						SOAPEnvelope requestEnvelop;
-
-						requestEnvelop = msg.getSOAPEnvelope();
+						SOAPEnvelope requestEnvelop = msg.getSOAPEnvelope();
 						SOAPEnvelope envelopToSend = new SOAPEnvelope();
-						envelopToSend.setSchemaVersion(
-							requestEnvelop.getSchemaVersion());
-						envelopToSend.setSoapConstants(
-							requestEnvelop.getSOAPConstants());
-						envelopToSend.setBody(
-							(org.apache.axis.message.SOAPBody) requestEnvelop
-								.getBody());
+						envelopToSend.setSchemaVersion(requestEnvelop.getSchemaVersion());
+						envelopToSend.setSoapConstants(requestEnvelop.getSOAPConstants());
+						envelopToSend.setBody((org.apache.axis.message.SOAPBody) requestEnvelop.getBody());
 						envelopToSend.addNamespaceDeclaration(
 							"wsrm",
 							"http://schemas.xmlsoap.org/ws/2003/03/rm");
@@ -172,16 +160,13 @@ public class RMClientService {
 							"wsu",
 							"http://schemas.xmlsoap.org/ws/2003/07/utility");
 						//						New envelop to create the SOAP envelop to send. Why use of two envelop is not clear.     
-
 						//						adding the name spaces to the env
-
 						// now get the sequence element
 						Sequence seqElement = new Sequence();
 						seqElement.setIdentifier(identifier);
 
 						MessageNumber msgNumber = new MessageNumber();
-						msgNumber.setMessageNumber(
-							rmMessage.getMessageNumber());
+						msgNumber.setMessageNumber(rmMessage.getMessageNumber());
 
 						if (isLastMessage.equals("true")) {
 							LastMessage lastMessage = new LastMessage();
@@ -208,8 +193,7 @@ public class RMClientService {
 						from.toSOAPHeaderElement(envelopToSend);
 
 						UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-						URI messageIDURI =
-							new URI("uuid:" + uuidGen.nextUUID());
+						URI messageIDURI = new URI("uuid:" + uuidGen.nextUUID());
 						MessageID messageID = new MessageID(messageIDURI);
 						messageID.toSOAPHeaderElement(envelopToSend);
 
@@ -219,10 +203,6 @@ public class RMClientService {
 						URI toAddress = new To(destinationURL);
 						To to = new To(toAddress);
 						to.toSOAPHeaderElement(envelopToSend);
-
-						//System.out.println("@@@@@@@@@@@@@@@BeforeEnvoking from ClientService@@@@@@@@@");
-						//System.out.println(envelopToSend.toString());
-						//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
 						//now store this new message in the rmMessage
 						//so that it can be used for retrasmission
@@ -235,14 +215,94 @@ public class RMClientService {
 						call.setTargetEndpointAddress(destinationURL);
 
 						//System.out.println("just before invoke 00000");
+						//System.out.println();
+						//System.out.println(
+						//	"@@@@@@@@@@@@@@@ BeforeEnvoking from ClientService @@@@@@@@@@@@@@@@@@@@@@@@@");
+						//System.out.println(envelopToSend.toString());
+						//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+						//System.out.println();
 						//invoke for the first time
 
-						call.invoke(envelopToSend);
-						///System.out.println("invoked");
+						try {
+							call.invoke(envelopToSend);
+							//System.out.println("the retransmisssion 55555555555" + rmMessage.getIdentifier().toString());
+						} catch (Exception e) {
+							System.out.println(
+								"The exception after invokeWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+							e.printStackTrace();
+						}
+						boolean gotResponce = false;
+						int count = 0;
 
-					} catch (AxisFault axisFault) {
+						Message tempMessage = rmMessage.getRequestMessage();
+						AckRequested ackRequested = new AckRequested();
+						ackRequested.setIdentifier(rmMessage.getIdentifier());
+						SOAPEnvelope retransmissionEnvelop = tempMessage.getSOAPEnvelope();
 
-						//To change body of catch statement use Options | File Templates.
+						//System.out.println(	"tempMessage.getSOAPEnvelope()" + retransmissionEnvelop.toString());
+						System.out.println(ackRequested.getIdentifier().toString());
+						ackRequested.toSoapEnvelop(retransmissionEnvelop);
+
+						//System.out.println(retransmissionEnvelop.toString());
+
+						while (count < Constants.MAXIMUM_RETRANSMISSION_COUNT) {
+							count++;
+							System.out.println(
+								"Retransmission ................................................>> " + count);
+							System.out.println();
+							Thread.sleep(2000);
+							if (!rmMessage.isAcknowledged()) {
+
+								Message retransmissionMessage = new Message(retransmissionEnvelop);
+								Service retransmissionService = new Service();
+								Call retransmissionCall = (Call) service.createCall();
+								retransmissionCall.setTargetEndpointAddress(destinationURL);
+
+								try {
+									retransmissionCall.invoke(envelopToSend);
+									//System.out.println("invoked");
+								} catch (Exception e) {
+									//Not handle let finlly to handle it.	
+								}
+								continue;
+
+								///retransmete
+							}
+
+							if (new Boolean(rmMessage.getIsResponseExpected()).booleanValue()) {
+
+								if (rmMessage.getResponseMessage() != null) {
+									gotResponce = true;
+									try {
+										stringReturn = rmMessage.getResponseMessage().getSOAPPartAsString();
+
+									} catch (AxisFault e2) {
+										// TODO Auto-generated catch block
+										e2.printStackTrace();
+									}
+									break;
+								}
+							} else
+								break;
+
+						}
+
+						if (!gotResponce) {
+							try {
+								SOAPEnvelope env = new SOAPEnvelope();
+								stringReturn = env.getAsString();
+								System.out.println("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+								System.out.println(stringReturn);
+
+							} catch (Exception e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}
+
+						///System.out.println(stringReturn);
+
+						//Not handle let finlly to handle it.	
 					} catch (ServiceException e) {
 						// TODO Auto-generated catch block
 
@@ -251,90 +311,15 @@ public class RMClientService {
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
+						//If it is comming to this location then there will be an severe error than the 
+						//HTTP termination.
 
-					} finally {
-						//retranmission will be here
-						boolean gotResponce = false;
-						
-						for (int i = 0; i < Constants.MAX_CHECKING_TIME; i++) {
-
-							if (!rmMessage.isAcknowledged()) {
-								///retransmete
-
-							}
-							if (rmMessage.getResponseMessage() != null) {
-								gotResponce = true;
-								try {
-									stringReturn =
-										rmMessage
-											.getResponseMessage()
-											.getSOAPPartAsString();
-
-								} catch (AxisFault e2) {
-									// TODO Auto-generated catch block
-									e2.printStackTrace();
-								}
-								break;
-							}
-
-						}
-
-						if (!gotResponce) {
-							try {
-								
-								SOAPEnvelope empty = new SOAPEnvelope();
-								//empty.getBody().addBodyElement(empty.createName("Responce")).addChildElement(empty.createName("Return"));
-								stringReturn = empty.getAsString();
-							} catch (Exception e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						}
-
-						///System.out.println(stringReturn);
 					}
 
-					//in this case the response is itself is the ack. So, no response means no ack.
-					//retransmissionCount = 0;
-					//while ((retransmissionCount
-					//	<= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-					//	&& (rmMessage.isAcknowledged()) == false) {
-					//call.invoke(envelopToSend);
-
-					//no return form the web service
-					//Thread.sleep(retransmissinInterval);
-					//stringReturn =call.getMessageContext().getCurrentMessage().getSOAPPartAsString();
-					//	if (stringReturn == null) {
-					//create the ack requested element for the first retransmission
-					//and use that env for the all of next retransmissions
-					//		if (retransmissionCount == 1) {
-					//		AckRequested ackRequested = new AckRequested();
-					//envelopToSend =	ackRequested.toSoapEnvelop(envelopToSend);
-					//rmMessage.setRequestMessage(new Message(envelopToSend));
-					//	}
-					//	retransmissionCount++;
-					//	continue;
-					//} else {
-					//response, i.e. the ack came
-					//set the acked messages
-					//	Message returnMessage = new Message(stringReturn);
-					//setAckedMessages(identifier, returnMessage);
-					//	stringReturn = null;
-					//	break;
-					//}
-					//	}
-
-					//	}
-
-					//Set the messageID
-
-					//call. invoke 
-					//can return.  wait for ack no return.  ack will come over the same HTTP;
-
 				}
-
 			}
 		}
+		System.out.println("Before returning no exception no exception no exception ...");
 
 		return stringReturn;
 	}
@@ -370,8 +355,7 @@ public class RMClientService {
 	 * TODO:
 	 */
 
-	private void setAckedMessages(Identifier identifier, Message message)
-		throws AxisFault {
+	private void setAckedMessages(Identifier identifier, Message message) throws AxisFault {
 
 		List ackRangeList = new ArrayList();
 		SOAPHeaderElement header = null;
@@ -393,8 +377,7 @@ public class RMClientService {
 						String upper = element.getAttributeValue("Upper");
 						String lower = element.getAttributeValue("Lower");
 
-						AcknowledgementRange ackRange =
-							new AcknowledgementRange();
+						AcknowledgementRange ackRange = new AcknowledgementRange();
 						ackRange.setMaxValue(new Long(upper).longValue());
 						ackRange.setMinValue(new Long(lower).longValue());
 						ackRangeList.add(ackRange);
@@ -409,8 +392,7 @@ public class RMClientService {
 		seqAck.setAckRanges(ackRangeList);
 		//now add this SequenceAcknowledgement to the RMSequence
 		//get the singleton instance
-		ClientMessageController controller =
-			ClientMessageController.getInstance();
+		ClientMessageController controller = ClientMessageController.getInstance();
 		RMSequence sequence = controller.retrieveIfSequenceExists(identifier);
 		if (sequence != null) {
 			sequence.setSeqAck(seqAck);

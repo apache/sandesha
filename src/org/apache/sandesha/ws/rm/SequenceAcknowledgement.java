@@ -132,15 +132,15 @@ public class SequenceAcknowledgement
 			//System.out.println(ite.next().getClass());
 			AcknowledgementRange ackRange =
 				(AcknowledgementRange) iterator.next();
-			headerElement.addChildElement(ackRange.getSoapElement());
+			ackRange.toSOAPEnvelope(headerElement);
 		}
 		iterator = nackList.iterator();
 		while (iterator.hasNext()) {
 			Nack nack = (Nack) iterator.next();
-			headerElement.addChildElement(nack.getSoapElement());
+			nack.toSOAPEnvelope(headerElement);
 		}
 		if (identifier != null) {
-			headerElement.addChildElement(identifier.getSoapElement());
+			identifier.toSOAPEnvelope(headerElement);
 		}
 
 		//env.addHeader((SOAPHeaderElement)seqAck);

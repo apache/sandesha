@@ -60,10 +60,8 @@ import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.SOAPBody;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.ws.utility.Identifier;
 
 /**
@@ -107,7 +105,7 @@ public class CreateSequenceResponse implements IRmElement {
 		bodyElement.setName("CreateSequenceResponse");
 
 		if (identifier != null) {
-			bodyElement.addChildElement(identifier.getSoapElement());
+			identifier.toSOAPEnvelope(bodyElement);
 		}
 
 		return env;

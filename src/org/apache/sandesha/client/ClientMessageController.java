@@ -57,10 +57,6 @@ package org.apache.sandesha.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.sound.midi.Sequence;
-
-
-import org.apache.sandesha.RMMessage;
 import org.apache.sandesha.RMSequence;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;

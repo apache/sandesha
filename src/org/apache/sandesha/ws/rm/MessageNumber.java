@@ -56,7 +56,7 @@ package org.apache.sandesha.ws.rm;
 
 import javax.xml.soap.SOAPException;
 
-import org.apache.axis.message.*;
+import org.apache.axis.message.MessageElement;
 //import javax.xml.soap.Name;
 
 /**
@@ -93,6 +93,10 @@ public class MessageNumber implements IRmElement {
 		messageNumber=(new Long(element.getValue())).longValue();
 		return this;
 		
+	}
+	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
+		msgElement.addChildElement("MessageNumber","wsrm").addTextNode((new Long(messageNumber)).toString());
+		return msgElement;
 	}
 
 	/**

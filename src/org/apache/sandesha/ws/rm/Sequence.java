@@ -59,13 +59,9 @@ import java.util.Iterator;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
 
-import junit.swingui.TestHierarchyRunView;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.SOAPHandler;
 import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.soap.SOAPConstants;
 import org.apache.sandesha.ws.utility.Identifier;
 
 /**
@@ -121,13 +117,13 @@ public class Sequence extends MessageElement implements IRmElement {
 		//System.out.println("must undestsnd set");
 		//headerElement.setMustUnderstand(true);
 		if (lastMessage != null) {
-			headerElement.addChildElement(lastMessage.getSoapElement());
+			lastMessage.toSOAPEnvelope(headerElement);
 		}
 		if (identifier != null) {
-			headerElement.addChildElement(identifier.getSoapElement());
+			identifier.toSOAPEnvelope(headerElement);
 		}
 		if (messageNumber != null) {
-			headerElement.addChildElement(messageNumber.getSoapElement());
+			messageNumber.toSOAPEnvelope(headerElement);
 		}
 
 		return env;
@@ -147,12 +143,12 @@ public class Sequence extends MessageElement implements IRmElement {
 				identifier = new Identifier();
 				identifier.fromSOAPEnvelope(childElement);
 			}
-			if (childElement.getName().equals("wsrm:MessageaNumber")) {
+			if (childElement.getName().equals("wsrm:MessageNumber")) {
 				messageNumber = new MessageNumber();
 				messageNumber.fromSOAPEnvelope(childElement);
 
 			}
-			if (childElement.getName().equals("MessageaNumber")) {
+			if (childElement.getName().equals("MessageNumber")) {
 				messageNumber = new MessageNumber();
 				messageNumber.fromSOAPEnvelope(childElement);
 

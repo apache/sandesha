@@ -6,14 +6,10 @@
  */
 package org.apache.sandesha.ws.utility;
 
-import java.util.Iterator;
-
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.types.URI;
-import org.apache.sandesha.ws.rm.IRmElement;
 //import //org.apache.xalan.templates.ElemApplyImport;
 
 /**
@@ -46,6 +42,14 @@ public class Identifier extends URI {
 		
 		return this;
 	}
+	public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException{
+	 
+		msgElement.addChildElement("Identifier","wsu").addTextNode(identifier);
+		//System.out.println("--------------"+msgElement);
+		
+		return msgElement;
+	}
+	
 	public MessageElement getSoapElement() throws SOAPException {
 		// create the soap element for the message no
 		identifierElement.addTextNode(identifier);
