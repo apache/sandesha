@@ -30,6 +30,7 @@ import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
+import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import javax.xml.rpc.ServiceException;
@@ -92,9 +93,9 @@ public class Sender implements Runnable {
                     hasMessages = false;
                 } else {
                     //Send the message.
-                    if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                    if ((rmMessageContext.getReTransmissionCount() <= PolicyLoader.getInstance().getRetransmissionCount())
                             && ((System.currentTimeMillis() - rmMessageContext
-                            .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
+                            .getLastPrecessedTime()) > PolicyLoader.getInstance().getBaseRetransmissionInterval())) {
                         try {
                             sendMessage(rmMessageContext);
                         } catch (AxisFault e) {

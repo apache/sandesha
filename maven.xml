@@ -18,12 +18,14 @@
      	<copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
      	<copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
      	<copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
+	<copy file="config/WSRMPolicy.xml" todir="${maven.build.dir}/classes"/>
      </preGoal>
 
  	<preGoal name="interop:compile">
      	<copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
      	<copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
      	<copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
+	<copy file="config/WSRMPolicy.xml" todir="${maven.build.dir}/classes"/>
      </preGoal>
 
     <postGoal name="jar">

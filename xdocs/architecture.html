@@ -8,46 +8,50 @@
 	font-size: 14px;
 	color: #990000;
 }
+ li.MsoNormal
+	{mso-style-parent:"";
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	margin-left:0in; margin-right:0in; margin-top:0in}
 </style>
 
 </head>
 
 <body>
 
-<h1><font face="Times New Roman">Architecture Guide of Apache Sandesha</font></h1>
-<p><font face="Times New Roman">Apache Sandesha is implemented on top of the 
+<h1><font size="6">Architecture Guide of Apache Sandesha</font></h1>
+<p>Apache Sandesha is implemented on top of the 
 current version of Apache Axis. In-order to support the reliable message 
 delivery in web services there are set of new messages that needs to be passed 
 between the parties to the communication. According to the WS-RelibleMessging 
 specification these messages are exchanged between the RM Source and the RM 
 Destination and enable the delivery assurance. Rest of the this architecture 
 guide will focus on how Apache Sandesha has achieved the above goal and its 
-architecture.</font></p>
-<h2><font face="Times New Roman">The Model</font></h2>
-<p class="MsoNormal" style="text-align:justify">
-<span style="font-family: Times New Roman">WS-ReliableMessaging protocol 
+architecture.</p>
+<h2><font size="5">The Model</font></h2>
+<p>
+WS-ReliableMessaging protocol 
 provides the solution for the reliable delivery of messages based on the pattern
 <i>end-point managers</i>. The model proposed by the specification is as 
-follows, see [1].</span></p>
-<p class="MsoNormal" style="text-align:center">
+follows, see [1].</p>
+<p align="center">
 <img border="0" src="images/RMModel.jpg" width="320" height="183"></p>
+</p>
 <p align="center">
 <p align="center">
 <font size="2">Figure 1: The Reliable Messaging Model</font></p>
-<h2 align="left"><font face="Times New Roman">Architecture of Apache Sandesha</font></h2>
-<p class="MsoBodyText"><font face="Times New Roman">The architecture of Sandesha 
-was mainly guided by the requirements of the WS-ReliableMessaging protocol and 
+<h2 align="left">Architecture of Apache Sandesha</h2>
+<p>The architecture of Sandesha was mainly guided by the requirements of the WS-ReliableMessaging protocol and 
 the Axis Architecture [2]. According to the specification it is a core 
-requirement that the RM Source has an endpoint reference.</font></p>
-<blockquote>
-  <p class="MsoNormal" style="text-align: justify; text-autospace: none">
-  <span style="font-family: Times New Roman">&nbsp;</span><i><span style="font-family: Times New Roman">“The 
+requirement that the RM Source has an endpoint reference.</p>
+<p>  &nbsp;<i>“The 
   RM Source MUST have an endpoint reference that uniquely identifies the RM 
   Destination endpoint; correlations across messages addressed to the unique 
-  endpoint MUST be meaningful.”</span></i><span style="font-family: Times New Roman">[1]</span></p>
-</blockquote>
-<p class="MsoNormal" style="text-align:justify">
-<span style="font-family: Times New Roman">&nbsp;As a consequence to the above fact 
+  endpoint MUST be meaningful.”</i>[1]
+</p>
+<p>
+&nbsp;As a consequence to the above fact 
 the Sandesha architecture cannot utilize the default synchronous message pattern 
 provided by the Axis engine for asynchronous invocations. A separate end point 
 reference is required for the RM Source. Similarly the server end point manger 
@@ -56,64 +60,61 @@ Overall both client and server endpoint managers needs a sender and a receiver.
 In order to support the connectivity between the sender and the receiver with 
 respect to particular end point manager Sandesha architecture uses an in-memory 
 Queue by default. The architecture providers the capability to plug a database 
-instead of a Queue, which will ultimately, leads to the persistence. </span></p>
-<p class="MsoNormal" style="text-align:justify">
-<span style="font-family: Times New Roman">So at this point the top level 
-architecture would be explained using the following diagram.</span></p>
-<p class="MsoNormal" style="text-align:center">
+instead of a Queue, which will ultimately, leads to the persistence. </p>
+<p>
+So at this point the top level 
+architecture would be explained using the following diagram.</p>
+<p align="center">
 <img border="0" src="images/Architecture.jpg" width="440" height="201"></p>
-<p class="MsoNormal" style="text-align:center">
+<p align="center">
 <font size="2">Figure 2: High Level Architecture of Apache Sandesha</font></p>
-<p class="MsoNormal" style="text-align: center">
-&nbsp;</p>
-<p style="text-align:justify"><span style="font-family: Times New Roman">This 
+
+<p >This 
 architecture provides a complete support for both synchronous and asynchronous 
 messaging scenarios. WS-Addressing [3] provides the information for the 
 correlation of messages when the asynchronous pattern is adopted. However with 
 the use of two way transports (like HTTP), there is a possibility that the 
 Acknowledgements for the requests to be sent using the same connection. As shown 
 using the dotted lines) So the sender in both the sides should be able to handle 
-that accordingly. </span></p>
-<h2 style="text-align:justify"><font face="Times New Roman">Sandesha 
-architecture on top of Apache Axis</font></h2>
-<p style="text-align:justify" align="center">
-<span style="font-family: Times New Roman">A more detailed view of the 
+that accordingly. </p>
+<h2 >Sandesha 
+architecture on top of Apache Axis</h2>
+<p  align="center"></p>
+A more detailed view of the 
 architecture will emerge when the Axis specific components are added to the 
-above diagram. A complete diagram would be as follows.</span></p>
+above diagram. A complete diagram would be as follows.</p>
 <p align="center">
 <img border="0" src="images/Architecture2.jpg" width="637" height="219"></p>
 <p align="center">
 <font size="2">Figure 3: Sandesha Architecture on top of Apache Axis</font></p>
-<p style="text-align:justify"><span style="font-family: Times New Roman">The 
+<p >The 
 individual components and the message paths in the above diagram can be 
-described in more detailed as follows. </span></p>
-<h3 style="text-align:justify"><span style="font-family: Times New Roman">Client</span></h3>
-<p style="text-align:justify"><span style="font-family: Times New Roman">This is 
+described in more detailed as follows. </p>
+<h3 >Client</h3>
+<p >This is 
 the program that invokes (utilize) the web service. According to the high-level 
-architecture this is the Application Source<b>.</b></span></p>
-<h3 style="text-align:justify"><span style="font-family: Times New Roman">Axis 
-Engine</span></h3>
-<p style="text-align:justify"><span style="font-family: Times New Roman">This is 
-the apache Axis. </span><font face="Times New Roman">Axis is essentially a
-</font><span style="font-family: Verdana"><em>
-<span style="font-family: Times New Roman">SOAP engine -</span></em></span><font face="Times New Roman"> 
+architecture this is the Application Source<b>.</b></p>
+<h3 >Axis 
+Engine</h3>
+<p >This is 
+the apache Axis. Axis is essentially a SOAP engine 
 a framework for constructing SOAP processors such as clients, servers, gateways, 
-etc.</font></p>
-<h3 style="text-align:justify"><font face="Times New Roman">RMSender</font></h3>
-<p style="text-align:justify"><font face="Times New Roman">This is the transport 
+etc.</p>
+<h3 >RMSender</h3>
+<p >This is the transport 
 sender that the user should use in order to enable reliability in the client 
 side Axis Engine. However RMSender will not directly write the request to the 
-transport layer, instead it will insert the request to a Queue. </font></p>
-<h3 style="text-align:justify"><font face="Times New Roman">Queue</font></h3>
-<p style="text-align:justify">This is the persistence layer for Sandesha. 
+transport layer, instead it will insert the request to a Queue. </p>
+<h3 >Queue</h3>
+<p >This is the persistence layer for Sandesha. 
 Currently the solution for reliability is achieved using an in-memory Queue. But 
 Sandesha provides an extensible storage manager for the storage and hence 
 replacing the Queue with a database is fairly easy. Although the Queue acts as a 
 single component, it will maintain two Queues for incoming and out going 
 messages internally.</p>
-<h3 style="text-align:justify"><b><span style="font-family: Times New Roman">
-Sender</span></b></h3>
-<p style="text-align:justify">This is a running thread to send the request 
+<h3 ><b>
+Sender</b></h3>
+<p >This is a running thread to send the request 
 messages. Sandesha uses the same sender in the server side to send the responses 
 (if any) to the client asynchronously. <br>
 When the Sender sends a request using by directional transport protocol (e.g. 
@@ -122,41 +123,49 @@ anonymous URI [3]) that the receiver sends the acknowledgment using the same
 connection. However, it should be noted that Sandesha is not expecting any 
 application responses over the same connection. <br>
 &nbsp;</p>
-<h3 style="text-align:justify">Receiver</h3>
-<p style="text-align:justify">This is the listener for the client side and it is 
+<h3 >Receiver</h3>
+<p >This is the listener for the client side and it is 
 the SimpleAxisServer that is used as the receiver for Sandesha. The 
 functionality of the Receiver is to accept the asynchronous SOAP messages and to 
 insert them to the Queue according to the correlation information present in the 
 message itself.</p>
-<h3 style="text-align:justify">RMProvider</h3>
-<p style="text-align:justify">This is the provider used by Sandesha inside the 
+<h3 >RMProvider</h3>
+<p >This is the provider used by Sandesha inside the 
 Axis engine in the server side. RMProvider will identify the incoming message 
 and insert the required message or messages to the Queue. It will also generate 
 messages for Reliable Messaging specific messages such as &lt;wsrm:AckRequested&gt;, 
 see [3].</p>
-<h3 align="left"><font face="Times New Roman">RMInvoker</font></h3>
+<h3 align="left"><fonts>RMInvoker</h3>
 <p align="left">This is a runnable component that actually handles the 
 dispatching of the web service request to the actual service. RMInvoker will 
 also put the service response (if any) to the Queue present in the server side.</p>
 <h3 align="left">Service</h3>
-<p style="text-align:justify">
-<span style="font-family: Times New Roman">This is the actual web 
+<p >
+This is the actual web 
 service, which will be the Application Destination according to the high-level 
-architecture.</span></p>
-<h2 style="text-align:justify">
-<span style="font-family: Times New Roman">Messaging Scenarios</span></h2>
-<p style="text-align:justify">
+architecture.</p>
+<h2 >
+Messaging Scenarios</h2>
+<p >
 There are many messaging scenarios that can be used to consume web services. 
 These combinations are created mainly by the usage of the WS-Addressing headers 
 and the MEPs of the service. Following sequence diagrams will explain some of 
 the possible combinations.</p>
-<h3 style="text-align:justify">
+<h3 >
 Client Side - Request Only with Synchronous Acknowledgement</h3>
+<p >
+In this scenario, client makes a service request to a service with one way 
+operation. Client has specified that the operations are synchronous in nature. 
+So the RMSource will include the anonymous URI for the &lt;wsa:From&gt; EPR of the out 
+going messages. So the sequence acknowledgement will come only on the same 
+connection.</p>
 <p style="text-align:center">
 <img border="0" src="images/PingSync.png" width="717" height="360"></p>
 <p style="text-align:center">
 <font size="2">Figure 4: Client Side - Request Only with Synchronous 
 Acknowledgement</font></p>
+<p style="text-align:center">
+&nbsp;</p>
 <h3 style="text-align: justify;">Client Side - Initialization</h3>
 <p style="text-align: justify;">This is happening only at the first message of a 
 particular sequence. Web service client should initialize the reliable messaging 
@@ -167,11 +176,11 @@ Sender and the Client side receiver.</p>
 <img border="0" src="images/ClientInitialization.png" width="556" height="250"></p>
 <p style="text-align:center">
 <font size="2">Figure 5: Client Side - Initialization</font></p>
-<p style="text-align: center">
+<p style="text-align:center">
 &nbsp;</p>
-<h3 style="text-align:justify">
+<h3 >
 Client Side - Termination</h3>
-<p style="text-align:justify">
+<p >
 This is happening only after the last message of a 
 particular sequence. Web service client should terminate the RM Environment 
 after receiving all the messages.&nbsp; This can be done by calling the method&nbsp; 
@@ -182,11 +191,11 @@ and the Client side receiver passing control back to the client.</p>
 <img border="0" src="images/ClientTermination.png" width="556" height="259"></p>
 <p style="text-align:center">
 <font size="2">Figure 6: Client Side - Termination</font></p>
-<h3 style="text-align:justify">
-&nbsp;</h3>
-<h3 style="text-align:justify">
+<p style="text-align:center">
+&nbsp;</p>
+<h3 >
 Client Side - Request Only with Asynchronous Acknowledgement</h3>
-<p style="text-align:justify">
+<p >
 In this scenario client invoke a web service with one-way operation. When 
 sending the service requests the RMSource will include the client side endpoint 
 reference in the &lt;wsa:From&gt; address. So the sequence acknowledgements will be 
@@ -196,17 +205,17 @@ sent through a new connection other than the one use for the request.</p>
 <p style="text-align:center">
 <font size="2">Figure 7: Client Side - Request Only with Asynchronous 
 Acknowledgement</font></p>
-<h3 style="text-align:justify">
-&nbsp;</h3>
-<h3 style="text-align:justify">
+<p style="text-align:center">
+&nbsp;</p>
+<h3 >
 Client Side - Request Response with Synchronous Acknowledgement</h3>
-<p style="text-align:justify">
+<p >
 In this scenario client invoke a web service with two-way operation. When 
 sending the service requests the RMSource will include the anonymous URI in the 
 &lt;wsa:From&gt; address. So the sequence acknowledgements will be sent through the 
 same one use for the request (note that; this can only be used with two way 
 transports).</p>
-<p style="text-align:justify">
+<p >
 &nbsp;</p>
 <p style="text-align:center">
 <img border="0" src="images/EchoSync.png" width="814" height="403"></p>
@@ -298,7 +307,18 @@ Sandesha does not provide the persistence with respect to software component
 failures. This can be achieved using a database as the storage for SOAP messages 
 instead of an in-memory Queue. The future developments will mainly focus on this 
 area and also to implement Sandesha on top of Apache Axis 2, which is the new 
-version of Axis still under development.<br>
+version of Axis still under development.</p>
+
+<h2 align="left">References</h2>
+
+<p align="left">1. WS-RelliableMessaging protocol, available at 
+ftp://www6.software.ibm.com/software/developer/library/ws-reliablemessaging200502.pdf<br>
+2. Apache Axis Architecture, available at http://ws.apache.org/Axis/java/architecture-guide.html
+<br>
+3. WS-Addressing specification, available at 
+http://www.w3.org/Submission/2004/SUBM-ws-addressing-20040810/</p>
+
+<p align="left"><br>
 &nbsp;</p>
 
 </body>

@@ -337,9 +337,12 @@ public class EnvelopeCreator {
         outGoingAddressingHaders.setTo(addressingHeaders.getTo());
         if (addressingHeaders.getReplyTo() != null)
             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
-
+        try{
         Action action = new Action(new URI(rmMessageContext.getAction()));
         outGoingAddressingHaders.setAction(action);
+        }catch(Exception e){
+           e.printStackTrace();
+        }
 
         //Set the addressing headers to the SOAPEnvelope.
         outGoingAddressingHaders.toEnvelope(requestEnvelope, null);

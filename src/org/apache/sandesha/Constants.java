@@ -34,13 +34,14 @@ public interface Constants {
     public static final String COLON = ":";
     public static final String SLASH = "/";
     public static final String UUID = "uuid:";
-    public static final String ASTERISK="*";
+    public static final String ASTERISK = "*";
 
     public static final String URL_RM_SERVICE = "/axis/services/RMService";
     public static final String IGNORE_ACTION = "ignoreAction";
 
-
     public static final long RETRANSMISSION_INTERVAL = 4000;
+    public static final long ACKNOWLEDGEMENT_INTERVAL = 200;
+    public static final long INACTIVITY_TIMEOUT = 600000;
     public static final int MAXIMUM_RETRANSMISSION_COUNT = 20;
     public static final long RMINVOKER_SLEEP_TIME = 2000;
     public static final long SENDER_SLEEP_TIME = 2000;
@@ -86,7 +87,7 @@ public interface Constants {
         public static final String SEQUENCE_ACK = "SequenceAcknowledgement";
         public static final String TERMINATE_DEQUENCE = "TerminateSequence";
         public static final String SEQUENCE_FAULT = "SequenceFault";
-        public static final String ACKS_TO="AcksTo";
+        public static final String ACKS_TO = "AcksTo";
         public static final String SEQUENCE_OFFER = "Offer";
 
         public static final double MAX_MSG_NO = 18446744073709551615d;
@@ -145,10 +146,10 @@ public interface Constants {
         public static final String SENDING_REQ = "INFO: SENDING REQUEST MESSAGE ....\n";
         public static final String SENDING_RES = "INFO: SENDING RESPONSE MESSAGE ....\n";
         public static final String PROVIDER_RECEIVED_MSG = "INFO: RMPROVIDER RECEIVED A SOAP REQUEST....\n";
-        public static final String SENDER_STARTED="INFO: SENDER STARTED ....\n";
-        public static final String RMINVOKER_STARTED="INFO: RMINVOKER STARTED ....\n";
-         public static final String WAITING_TO_STOP_CLIENT="INFO: WATING TO STOP CLIENT ....\n";
-        public static final String CLIENT_LISTENER_STARTED ="NFO: CLIENT LISTENER STARTED ....\n";
+        public static final String SENDER_STARTED = "INFO: SENDER STARTED ....\n";
+        public static final String RMINVOKER_STARTED = "INFO: RMINVOKER STARTED ....\n";
+        public static final String WAITING_TO_STOP_CLIENT = "INFO: WATING TO STOP CLIENT ....\n";
+        public static final String CLIENT_LISTENER_STARTED = "NFO: CLIENT LISTENER STARTED ....\n";
 
     }
 
@@ -169,6 +170,7 @@ public interface Constants {
     public interface ClientProperties {
 
         public static final String PROPERTY_FILE = "sandesha.properties";
+        public static final String WSRM_POLICY_FILE = "WSRMPolicy.xml";
 
         public static final String CLIENT_LISTENER_PORT = "CLIENT_LISTENER_PORT";
         public static final String SIMPLE_AXIS_SERVER_PORT_POPERTY = "SIMPLE_AXIS_SERVER_PORT";
@@ -189,10 +191,19 @@ public interface Constants {
         public static final String PROVIDER_CLASS = "providerClass";
         public static final String DEFAULT_PROVIDER_CLASS = "org.apache.axis.providers.java.RPCProvider";
 
-        public static final String CLASS_NAME="className";
-         public static final String RMSERVICE="RMService";
-        public static final String RMSERVICE_CLASS="org.apache.sandesha.client.RMService";
-        public static final String ALLOWED_METHODS="allowedMethods";
+        public static final String CLASS_NAME = "className";
+        public static final String RMSERVICE = "RMService";
+        public static final String RMSERVICE_CLASS = "org.apache.sandesha.client.RMService";
+        public static final String ALLOWED_METHODS = "allowedMethods";
+    }
+
+    public interface WSRMPolicy {
+        public final String INA_TIMEOUT = "InactivityTimeout";
+        public final String BASE_TX_INTERVAL = "BaseRetransmissionInterval";
+        public final String ACK_INTERVAL = "AcknowledgementInterval";
+        public final String EXP_BACKOFF = "ExponentialBackoff";
+
+        public final String WSRM = "http://schemas.xmlsoap.org/ws/2005/02/rm/policy";
     }
 }
 
