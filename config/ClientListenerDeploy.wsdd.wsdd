@@ -1,0 +1,18 @@
+<deployment xmlns="http://xml.apache.org/axis/wsdd/"
+            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+
+<service name="RMService" provider="Handler">
+<requestFlow>
+	<handler type="java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler"></handler>
+	<handler type="java:org.apache.axis.message.addressing.handler.AddressingHandler"></handler>
+</requestFlow>
+<parameter name="handlerClass" value="org.apache.sandesha.ws.rm.providers.RMProvider"/>
+  <parameter name="className" value="org.apache.sandesha.client.RMService"/>
+  <parameter name="allowedMethods" value="*"/>
+  <parameter name="scope" value="request"/>
+</service>
+
+
+
+</deployment>
