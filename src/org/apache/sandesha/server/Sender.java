@@ -39,6 +39,10 @@ public class Sender implements Runnable {
     public Sender() {
         storageManager = new ServerStorageManager();
     }
+    
+    public Sender(IStorageManager storageManager){
+      this.storageManager= storageManager;
+    }
 
     public void run() {
 
@@ -64,7 +68,6 @@ public class Sender implements Runnable {
 
                     switch (rmMessageContext.getMessageType()) {
                     case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST: {
-
                         try {
 
                             System.out.println("CREATE SEQ REQUESET");
