@@ -109,7 +109,12 @@ public class ServerStorageManager implements IStorageManager {
         if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
 
+        //if(msg==null){
+        //    msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
+        //}
+
         return msg;
+
     }
 
     /**
@@ -307,7 +312,7 @@ public class ServerStorageManager implements IStorageManager {
      * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
      */
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {		
-		accessor.addPriorityMessage(terminateSeqMessage);
+		accessor.addLowPriorityMessage(terminateSeqMessage);
     }
 
     /* (non-Javadoc)
@@ -335,8 +340,8 @@ public class ServerStorageManager implements IStorageManager {
 
     }
     
-    public void setAckReceived(RMMessageContext responseMsg) {
-        accessor.setAckReceived(responseMsg);
+    public void setAckReceived(String seqId,long msgNo) {
+        accessor.setAckReceived(seqId,msgNo);
 
     }
 }

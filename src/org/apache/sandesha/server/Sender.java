@@ -149,11 +149,10 @@ public class Sender implements Runnable {
      * @param rmMessageContext
      */
     private void sendTerminateSequenceRequest(RMMessageContext rmMessageContext) {
+       SOAPEnvelope terSeqEnv=EnvelopeCreator.createTerminatSeqMessage(rmMessageContext);
+       Message terSeqMsg= new Message(terSeqEnv);       
+       rmMessageContext.getMsgContext().setRequestMessage(terSeqMsg);
 
-        if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
-            //The code should not come to this point.
-            System.err.println("ERROR: NULL REQUEST MESSAGE");
-        } else {
             Call call;
             try {
                 rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
@@ -183,7 +182,7 @@ public class Sender implements Runnable {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
+
     
     }
 

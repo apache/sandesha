@@ -74,7 +74,8 @@ public class RMInvoker implements Runnable {
                     
                     if(rmMessageContext.isLastMessage()){
                         //Insert Terminate Sequnce.
-                        //storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(requestMesssageContext)); 
+                        System.out.println("LAST MESSAGE IS THERE");
+                        storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(rmMessageContext));
                     }
                     rpcProvider.invoke(rmMessageContext.getMsgContext());
 
@@ -177,5 +178,18 @@ public class RMInvoker implements Runnable {
 
         }
 
+    }
+
+      private RMMessageContext getTerminateSeqMessage(RMMessageContext rmMessageContext) {
+        RMMessageContext terSeqRMMsgContext = new RMMessageContext();
+        MessageContext terSeqMsgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
+        terSeqRMMsgContext.setSequenceID(rmMessageContext.getSequenceID());
+        terSeqRMMsgContext.setAddressingHeaders(rmMessageContext.getAddressingHeaders());
+        //RMMessageContext.copyMessageContext(msgContext, messageContext);
+        terSeqRMMsgContext.setOutGoingAddress(rmMessageContext.getOutGoingAddress());
+        terSeqRMMsgContext.setMsgContext(terSeqMsgContext);
+        terSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_TERMINATE_SEQUENCE);
+        // TODO Auto-generated method stub
+        return terSeqRMMsgContext;
     }
 }
