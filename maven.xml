@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Revision$ $Date$ -->
+
+<project default="jar"
+    xmlns:j="jelly:core"
+    xmlns:maven="jelly:maven"
+    xmlns:deploy="deploy"
+    xmlns:ant="jelly:ant">
+
+    <goal name="setclasspath">
+        <path id="test.classpath">
+            <path refid="maven.dependency.classpath"/>
+        </path>
+    </goal>
+
+    <postGoal name="jar">
+        <ant:mkdir dir="${basedir}/target/lib"/>
+        <deploy:copy-deps todir="${basedir}/target/lib"/>
+    </postGoal>
+
+    <goal name="interop:compile" prereqs="java:compile">
+        <ant:javac  srcdir="interop" destdir="${maven.build.dest}"  includes="**/*.java"
+             debug="${maven.compile.debug}"
+	     optimize="${optimize}"
+	     deprecation="${maven.compile.deprecation}">
+      <ant:classpath>
+        <pathelement location="${maven.build.dest}"/>
+        <path refid="maven.dependency.classpath"/>
+      </ant:classpath>
+    </ant:javac>
+    </goal>
+
+    <!-- to transforme htmls to xdocs -->
+  <preGoal name="xdoc:jelly-transform">
+    <attainGoal name="html2xdoc"/>
+  </preGoal>
+
+</project>

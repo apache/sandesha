@@ -160,7 +160,7 @@ public class EnvelopeCreator {
     public static void addNamespaceDeclarations(SOAPEnvelope soapEnv) throws Exception {
 
         soapEnv.addNamespaceDeclaration(Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
-        soapEnv.addNamespaceDeclaration(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING, org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING);
+        soapEnv.addNamespaceDeclaration(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING, org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT);
         soapEnv.addNamespaceDeclaration(Constants.WSU_PREFIX, Constants.NS_URI_WSU);
 
     }
@@ -278,13 +278,7 @@ public class EnvelopeCreator {
         return responseEnvelope;
     }
 
-    /**
-     * @param uuid
-     * @param rmMessageContext
-     * @param endPoint
-     * @return @throws
-     *         MalformedURIException
-     */
+
     public static SOAPEnvelope createServiceRequestEnvelope(RMMessageContext rmMessageContext) throws Exception {
         //Variable for SOAPEnvelope
         SOAPEnvelope requestEnvelope = null;
@@ -338,10 +332,7 @@ public class EnvelopeCreator {
         return requestEnvelope;
     }
 
-    /**
-     * @param sequenceID
-     * @return
-     */
+
     public static SOAPEnvelope createTerminatSeqMessage(RMMessageContext rmMessageContext) throws Exception {
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
         SOAPEnvelope terSeqEnv = createBasicEnvelop();
