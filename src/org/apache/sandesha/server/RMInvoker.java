@@ -108,6 +108,7 @@ public class RMInvoker implements Runnable {
                             SOAPEnvelope createSequenceEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(id,
                                     rmMsgContext, Constants.SERVER);
 
+                            
                             rmMsgContext.getMsgContext().setRequestMessage(new Message(createSequenceEnvelope));
 
                             //TODO Check : Are We are sending only to the ReplyTo?

@@ -51,7 +51,7 @@ public class CreateSequence implements IRmElement {
         createSequence.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE);
    
         //TEST - added for offer
-        offer = new SequenceOffer ();
+        //offer = new SequenceOffer ();
         //END TEST
     }
 
@@ -94,7 +94,9 @@ public class CreateSequence implements IRmElement {
 
         bodyElement.setName(Constants.WSRM.CREATE_SEQUENCE);
 
-        offer.toSOAPEnvelope(bodyElement);
+        if(offer!=null)
+            offer.toSOAPEnvelope(bodyElement);
+        
         return env;
     }
 
@@ -114,8 +116,10 @@ public class CreateSequence implements IRmElement {
             //TEST OFFER
             childElement = (MessageElement) iterator.next();
             if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
+                offer = new SequenceOffer ();
                 offer.fromSOAPEnvelope(childElement);
             }else if (childElement.getName().equals(Constants.WSRM.SEQUENCE_OFFER)) {
+                offer = new SequenceOffer ();
                 offer.fromSOAPEnvelope(childElement);
             }
             
