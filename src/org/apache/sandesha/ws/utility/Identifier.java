@@ -1,8 +1,18 @@
 /*
- * Created on Apr 24, 2004
+ * Copyright  1999-2004 The Apache Software Foundation.
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 package org.apache.sandesha.ws.utility;
 
@@ -11,47 +21,88 @@ import org.apache.axis.types.URI;
 
 import javax.xml.soap.SOAPException;
 
-//import //org.apache.xalan.templates.ElemApplyImport;
-
 /**
- * @author Amila Navarathna<br>
- *         Jaliya Ekanayaka<br>
- *         Sudar Nimalan<br>
- *         (Apache Sandesha Project)
+ * class Identifier
+ * 
+ * @author Amila Navarathna
+ * @author Jaliya Ekanayaka
+ * @author Sudar Nimalan
  */
 public class Identifier extends URI {
 
+    /**
+     * Field identifierElement
+     */
     private MessageElement identifierElement;
+
+    /**
+     * Field identifier
+     */
     private String identifier = null;
 
+    /**
+     * Constructor Identifier
+     */
     public Identifier() {
+
         identifierElement = new MessageElement();
+
         identifierElement.setName("wsu:Identifier");
     }
 
+    /**
+     * Method setUri
+     * 
+     * @param uri 
+     * @throws SOAPException 
+     */
     public void setUri(String uri) throws SOAPException {
         identifierElement.addTextNode(uri);
     }
 
+    /**
+     * Method fromSOAPEnvelope
+     * 
+     * @param element 
+     * @return 
+     */
     public Identifier fromSOAPEnvelope(MessageElement element) {
-        //System.out.println("Identifier::getSequenceAcknowledgement");
+
+        // System.out.println("Identifier::getSequenceAcknowledgement");
         identifier = element.getValue();
+
         System.out.println(identifier);
 
         return this;
     }
 
-    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
+    /**
+     * Method toSOAPEnvelope
+     * 
+     * @param msgElement 
+     * @return 
+     * @throws SOAPException 
+     */
+    public MessageElement toSOAPEnvelope(MessageElement msgElement)
+            throws SOAPException {
 
         msgElement.addChildElement("Identifier", "wsu").addTextNode(identifier);
-        //System.out.println("--------------"+msgElement);
-		
+
+        // System.out.println("--------------"+msgElement);
         return msgElement;
     }
 
+    /**
+     * Method getSoapElement
+     * 
+     * @return 
+     * @throws SOAPException 
+     */
     public MessageElement getSoapElement() throws SOAPException {
+
         // create the soap element for the message no
         identifierElement.addTextNode(identifier);
+
         return identifierElement;
     }
 
@@ -69,32 +120,57 @@ public class Identifier extends URI {
         identifier = string;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
-    public void addChildElement(MessageElement element) throws SOAPException {
-        // TODO Auto-generated method stub
 
+    /**
+     * Method addChildElement
+     * 
+     * @param element 
+     * @throws SOAPException 
+     */
+    public void addChildElement(MessageElement element) throws SOAPException {
+
+        // TODO Auto-generated method stub
     }
 
+    /**
+     * Method equals
+     * 
+     * @param obj 
+     * @return 
+     */
     public boolean equals(Object obj) {
+
         if (obj instanceof Identifier) {
             if (this.identifier
-                    == ((String) (((Identifier) obj).getIdentifier())))
+                    == ((String) (((Identifier) obj).getIdentifier()))) {
                 return true;
-            else
+            } else {
                 return false;
-        } else
+            }
+        } else {
             return false;
+        }
     }
 
+    /**
+     * Method hashCode
+     * 
+     * @return 
+     */
     public int hashCode() {
-
         return identifier.hashCode();
     }
 
+    /**
+     * Method toString
+     * 
+     * @return 
+     */
     public String toString() {
         return identifier;
     }
-
 }
