@@ -17,22 +17,18 @@
 package org.apache.sandesha.client;
 
 import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
 import org.apache.axis.Message;
+import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
-import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.handlers.BasicHandler;
+import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.RMMessageCreator;
-import org.apache.commons.logging.Log;
-
-import java.util.Vector;
-import java.util.Iterator;
+import org.apache.sandesha.ws.rm.RMHeaders;
 
 public class RMSender extends BasicHandler {
 
@@ -60,7 +56,8 @@ public class RMSender extends BasicHandler {
                 storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(requestMesssageContext));
             }
 
-            if (requestMesssageContext.isHasResponse() && !requestMesssageContext.getSync()) {
+
+            if (requestMesssageContext.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
                     responseMessageContext = checkTheQueueForResponse(sequenceID, requestMesssageContext.getMessageID());
@@ -68,22 +65,18 @@ public class RMSender extends BasicHandler {
                 }
 
                 //We need these steps to filter all addressing and rm related headers.
-                Message resMsg=responseMessageContext.getMsgContext().getRequestMessage();
+                Message resMsg = responseMessageContext.getMsgContext().getRequestMessage();
                 RMHeaders.removeHeaders(resMsg.getSOAPEnvelope());
-                AddressingHeaders addHeaders= new AddressingHeaders(resMsg.getSOAPEnvelope(),null,true,false,false, null);
+                AddressingHeaders addHeaders = new AddressingHeaders(resMsg.getSOAPEnvelope(), null, true, false, false, null);
 
-            msgContext.setResponseMessage(resMsg);
+                msgContext.setResponseMessage(resMsg);
             } else {
-                boolean gotAck = false;
-                while (!gotAck) {
-                    gotAck = checkTheQueueForAck(requestMesssageContext.getSequenceID(),
-                            requestMesssageContext.getMessageID());
-                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
-                }
                 msgContext.setResponseMessage(null);
             }
+
+
         } catch (Exception ex) {
-           log.error(ex);
+            log.error(ex);
         }
     }
 
