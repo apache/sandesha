@@ -17,6 +17,7 @@
 package org.apache.sandesha.storage.dao;
 
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.queue.SandeshaQueue;
 
 import java.util.Set;
 
@@ -91,4 +92,12 @@ public interface ISandeshaDAO {
     public void addLowPriorityMessage(RMMessageContext msg);
 
     public RMMessageContext getNextLowPriorityMessageContextToSend();
+    
+    public void addSendMsgNo(String seqId,long msgNo);
+    
+    public boolean isSentMsg(String seqId,long msgNo);
+    
+    public boolean hasLastMsgReceived(String seqId);
+
+    public long getLastMsgNo(String seqId);
 }
