@@ -48,17 +48,14 @@ public class RMInvoker implements Runnable {
     public void run() {
         while (true) {
             try {
-
                 System.out
                         .println("RMInvoker THREAD IS SLEEPING -----------000----------\n");
 
                 //Sleep for Constants.RMINVOKER_SLEEP_TIME.
                 //Currently the RMInvoker is a single thread, but this needs to
-                // be
-                //replaced by a thread pool so that the performance can be
+                // be replaced by a thread pool so that the performance can be
                 // improved.
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);
-
                 //Get the next message to invoke.
                 //storeManager is responsible of giving the correct message to
                 // invoke.
@@ -67,7 +64,6 @@ public class RMInvoker implements Runnable {
 
                 //If not return is null then proceed with invokation.
                 if (rmMessageContext != null) {
-
                     //Currently RPCProvider is used as the default provider and
                     // this is
                     //used to actually invoke the service.
@@ -104,19 +100,10 @@ public class RMInvoker implements Runnable {
                         boolean firstMsgOfResponseSeq = !storageManager
                                 .isResponseSequenceExist(rmMessageContext
                                         .getSequenceID());
-                                                
-                        storageManager.insertResponseMessage(rmMessageContext); //This
-                                                                                // will
-                                                                                // automatically
-                                                                                // create
-                                                                                // a
-                                                                                // response
-                                                                                // requence
-                                                                                // and
-                                                                                // add
-                                                                                // the
-                                                                                // message.
 
+                        storageManager.insertResponseMessage(rmMessageContext);
+                        //This will automatically create a response requence
+                        // and add the message.
                         //Need to decide whether the server needs resource
                         // reclamtion or not.
                         //This can be a property set by adminstrator and may be
@@ -131,16 +118,15 @@ public class RMInvoker implements Runnable {
                             System.out.println("NO RESPONSE SEQUENCE");
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);
-                            
+
                             MessageContext msgContext = new MessageContext(
                                     rmMessageContext.getMsgContext()
                                             .getAxisEngine());
-                            
-                           // RMMessageContext.copyMessageContext(
-                           //         rmMessageContext.getMsgContext(),
-                           //         msgContext);
+                            // RMMessageContext.copyMessageContext(
+                            //         rmMessageContext.getMsgContext(),
+                            //         msgContext);
                             //Set this new msgContext to the rmMsgContext.
-                                                       
+
                             rmMessageContext.setMsgContext(msgContext);
 
                             rmMsgContext
@@ -148,18 +134,17 @@ public class RMInvoker implements Runnable {
 
                             UUIDGen uuid = UUIDGenFactory.getUUIDGen();
                             String id = uuid.nextUUID();
-                            //String id = "abcdefghijk";
-                            
-                            //Need to add "uuid" or we can always remove this part
+
+                            //Need to add "uuid" or we can always remove this
+                            // part
                             //Posible Problem
                             //TODO
                             storageManager.setTemporaryOutSequence(rmMsgContext
-                                    .getSequenceID(), "uuid:"+id);
+                                    .getSequenceID(), "uuid:" + id);
                             SOAPEnvelope createSequenceEnvelope = EnvelopeCreator
                                     .createCreateSequenceEnvelope(id,
                                             rmMsgContext, Constants.SERVER);
 
-                            
                             rmMsgContext.getMsgContext().setRequestMessage(
                                     new Message(createSequenceEnvelope));
 
@@ -168,73 +153,17 @@ public class RMInvoker implements Runnable {
                                     .getAddressingHeaders().getReplyTo()
                                     .getAddress().toString());
 
-                    
-                            
-                            rmMsgContext.setMessageID("uuid:"+id);
+                            rmMsgContext.setMessageID("uuid:" + id);
                             storageManager
                                     .addCreateSequenceRequest(rmMsgContext);
-                            System.out.println("END OF IF");
 
                         }
 
+                        //Uncomment this section to print the queues.
                         ServerQueue sq = ServerQueue.getInstance();
                         sq.displayPriorityQueue();
                         sq.displayOutgoingMap();
                         sq.displayIncomingMap();
-
-                        //we need to check whether we have this sequence in the
-                        // response queue.
-                        //storageManager.isResponseSequenceExist();
-                        //If this is false then we need to create a new create
-                        // sequence request messag
-                        //and add it to the queue.
-                        /*
-                         * if(storageManager.isResponseSequenceExist(rmMessageContext.getSequenceID())){
-                         * 
-                         * RMMessageContext rmMsgContext= new
-                         * RMMessageContext();
-                         * rmMessageContext.copyContents(rmMsgContext);
-                         * rmMsgContext.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
-                         * 
-                         * //Use UUIDGen to genrrate a temp messageID
-                         * 
-                         * //We will create a new out sequence with this
-                         * right??.
-                         * storageManager.setTemporaryOutSequence(rmMessageContext.getSequenceID(),"abcdefghijklmnop");
-                         * 
-                         * SOAPEnvelope
-                         * createSequenceEnvelop=EnvelopeCreator.createCreateSequenceRequestEnvelope(String
-                         * messageID);
-                         * 
-                         * MessageContext msgContext = new
-                         * MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
-                         * RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(),msgContext);
-                         * 
-                         * rmMsgContext.getMsgContext().setRequestMessage(new
-                         * Message(createSequenceEnvelop));
-                         * 
-                         * storageManager.addCreateSequenceRequest(rmMsgContext); }
-                         */
-
-                        //At this point we don't know the new sequence that we
-                        // are going to use for sending
-                        //the response messages. So we will just add the
-                        // response message as it is,
-                        //without RM or Addressing headers
-
-                        /*
-                         * //@@@@@@@@@@ ----THIS PART IS JUST FOR
-                         * TESTING-----@@@@@@@@@@@@@@@@@@@@@ //If we enable this
-                         * part, we can just send responses asynchronously.
-                         * 
-                         * //We have to get this using create sequence from the
-                         * client. //This should be able to switched off
-                         * depending on the server config.
-                         * storageManager.setTemporaryOutSequence(rmMessageContext.getSequenceID(),"abcdefghijklmnop");
-                         * storageManager.setApprovedOutSequence("abcdefghijklmnop","qrstuvwxyz1234");
-                         * 
-                         * //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                         */
 
                     }
                 }

@@ -23,16 +23,24 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
- * @author  
+ * @author
  */
 public class RMMessageProcessorIdentifier {
-
+    /**
+     * This method will identify the messages. Messages specific to the
+     * reliablility are identified using the action. Request messages are
+     * identified using the message number property.
+     * 
+     * @param rmMessageContext
+     * @param storageManager
+     * @return
+     */
     public static IRMMessageProcessor getMessageProcessor(
             RMMessageContext rmMessageContext, IStorageManager storageManager) {
 
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-      
+
         if (addrHeaders.getAction().toString().equals(
                 Constants.ACTION_CREATE_SEQUENCE)) {
             return new CreateSequenceProcessor(storageManager);
@@ -44,7 +52,6 @@ public class RMMessageProcessorIdentifier {
             return new TerminateSequenceProcessor(storageManager);
         } else if ((rmHeaders.getSequenceAcknowledgement() != null)
                 || (rmHeaders.getSequence().getMessageNumber() != null)) {
-            
             return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);

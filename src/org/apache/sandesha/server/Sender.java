@@ -70,11 +70,7 @@ public class Sender implements Runnable {
                     switch (rmMessageContext.getMessageType()) {
                     case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST: {
                         try {
-
                             System.out.println("CREATE SEQ REQUESET");
-                            //storageManager.setApprovedOutSequence(
-                            //        "abcdefghijk", "1233abcdefghijk");
-
                             //Send the message.
                             //may get the reply back to here.
                             Service service = new Service();
@@ -85,7 +81,7 @@ public class Sender implements Runnable {
                                     .getOutGoingAddress());
                             if (rmMessageContext.getMsgContext()
                                     .getRequestMessage() == null)
-                                System.out.println("It is null man");
+                                System.out.println("NULL REQUEST MESSAGE");
 
                             call.setRequestMessage(rmMessageContext
                                     .getMsgContext().getRequestMessage());
@@ -134,14 +130,14 @@ public class Sender implements Runnable {
                         //No response and we can just close the connection
                         try {
                             System.out.println("CREATE SEQ RESPONSE");
-                            System.out
-                                    .println("******** Sending the message**************");
+                           //System.out
+                           //         .println("******** Sending the message**************");
                             System.out
                                     .println(rmMessageContext.getMsgContext()
                                             .getResponseMessage()
                                             .getSOAPPartAsString());
-                            System.out
-                                    .println("******** Sending the message**************");
+                            //System.out
+                            //        .println("******** Sending the message**************");
                             Service service = new Service();
                             Call call = (Call) service.createCall();
                             System.out.println(rmMessageContext
@@ -150,7 +146,7 @@ public class Sender implements Runnable {
                                     .getOutGoingAddress());
                             if (rmMessageContext.getMsgContext()
                                     .getResponseMessage() == null)
-                                System.out.println("It is null man");
+                                System.out.println("NULL RESPONSE MESSAGE");
 
                             call.setRequestMessage(rmMessageContext
                                     .getMsgContext().getResponseMessage());

@@ -37,317 +37,306 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 
 public class ServerStorageManager implements IStorageManager {
 
-	protected static Log log =
-		 LogFactory.getLog(ServerStorageManager.class.getName());
-		 
-		 
-	private String tempSeqId=null;   // used by getNextMessageToProcess();
-	
-	
-	/**
-	 * A very important method.
-	 * Makes life easy for the thread or thread pool that is using this.
-	 * Every thread just have to create an instance of ServerStorageManager and
-	 * keep calling getNextMessageToProcess() and processing messages.
-	 * The method will try to give the messages from the same sequence id.
-	 * But if that doesnt hv processable messages it will go 4 a new sequence.
-	 * 
-	 */
-	public RMMessageContext getNextMessageToProcess() {
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-				
-		if(tempSeqId==null)		
-		    tempSeqId = accessor.getRandomSeqIdToProcess();
-		
-		if(tempSeqId==null)
-		    return null;
-		 
-		RMMessageContext nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);
-		    		
-		if(nextMsg==null){
-			tempSeqId = accessor.getRandomSeqIdToProcess();
-			nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);    		
-		}
-		
-		return nextMsg;
-	}
+    protected static Log log = LogFactory.getLog(ServerStorageManager.class
+            .getName());
 
-
-
-	public void setAcknowledged(String seqID,long msgNumber) {
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		//TODO decide this in implementing the ServerSender.
-		
-		accessor.moveOutgoingMessageToBin(seqID,new Long(msgNumber));
-	}
-
-	public void init() {
-		//:TODO Complete	
-	}
-
+    private String tempSeqId = null; // used by getNextMessageToProcess();
 
     /**
-     * This will insert the message to the sequence in the InqQueue
-     * identified by sequenceId.
-     * If sequence is not present will create a new one.
+     * A very important method. Makes life easy for the thread or thread pool
+     * that is using this. Every thread just have to create an instance of
+     * ServerStorageManager and keep calling getNextMessageToProcess() and
+     * processing messages. The method will try to give the messages from the
+     * same sequence id. But if that doesnt hv processable messages it will go 4
+     * a new sequence.
+     *  
      */
-	public void insertRequestMessage(RMMessageContext rmMessageContext) {
-		
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
+    public RMMessageContext getNextMessageToProcess() {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
 
-		//No need to use this property
-		//RMHeaders rmHeaders =
-		//	(RMHeaders) rmMessageContext.getMsgContext().getProperty(
-		//		org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
-		
-		RMHeaders rmHeaders =rmMessageContext.getRMHeaders();
-	
-	    String sequenceId = rmHeaders.getSequence().getIdentifier().getIdentifier();
-     
-		boolean exists = accessor.isIncomingSequenceExists(sequenceId);
+        if (tempSeqId == null)
+            tempSeqId = accessor.getRandomSeqIdToProcess();
 
-		if (!exists)
-			addSequence(sequenceId);  //Creating new sequence
-			
+        if (tempSeqId == null)
+            return null;
 
-        //TODO: add getRmHeaders method to  MessageContext
-        long messageNumber = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
-	
-	    if(messageNumber<=0)
-	        return;  //TODO: throw some exception
-	        
-	     Long msgNo = new Long(messageNumber);
-	     accessor.addMessageToIncomingSequence(sequenceId,msgNo,rmMessageContext);   
-	}
+        RMMessageContext nextMsg = accessor
+                .getNextMsgContextToProcess(tempSeqId);
 
+        if (nextMsg == null) {
+            tempSeqId = accessor.getRandomSeqIdToProcess();
+            nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);
+        }
 
-    public void insertResponseMessage(RMMessageContext msg){
-		IServerDAO accessor =
-		ServerDAOFactory.getStorageAccessor(
-			Constants.SERVER_QUEUE_ACCESSOR);
-		String sequenceId = msg.getSequenceID();
-		//RMHeaders rmHeaders =msg.getRMHeaders();	
-		//String sequenceId = rmHeaders.getSequence().getIdentifier().getIdentifier();
-		
-		boolean exists = accessor.isOutgoingSequenceExists(sequenceId);
-		if(!exists)
-		   accessor.addOutgoingSequence(sequenceId);
-		
-		accessor.addMessageToOutgoingSequence(sequenceId,msg);	
-    
+        return nextMsg;
     }
-    
-    /**
-     * Used to find out weather the sequence with this id
-     * has already been created.
-     */
-	public boolean isSequenceExist(String sequenceID) {
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		return accessor.isIncomingSequenceExists(sequenceID);
-	}
 
-	public boolean isResponseSequenceExist(String sequenceID) {
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		//return accessor.isIncomingSequenceExists(sequenceID);
-		return accessor.isOutgoingSequenceExists(sequenceID);
-	}
-	
-    /**
-     * This is used to get a random message from the out queue
-     * Basically server sender will use this.
-     */
-	public RMMessageContext getNextMessageToSend() {
-	   IServerDAO accessor =
-					ServerDAOFactory.getStorageAccessor(
-						Constants.SERVER_QUEUE_ACCESSOR);	
-       RMMessageContext msg;
-       
-       msg = accessor.getNextPriorityMessageContextToSend();
-       
-       if(msg==null)
-           msg = accessor.getNextOutgoingMsgContextToSend();
-		
-		return msg;
-	}
+    public void setAcknowledged(String seqID, long msgNumber) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        //TODO decide this in implementing the ServerSender.
+
+        accessor.moveOutgoingMessageToBin(seqID, new Long(msgNumber));
+    }
+
+    public void init() {
+        //:TODO Complete
+    }
 
     /**
-     * This is used to add a new message to  the out queue.
-     * Will be used by various processors.
+     * This will insert the message to the sequence in the InqQueue identified
+     * by sequenceId. If sequence is not present will create a new one.
      */
-	/*public void addMessageToOutQueue(RMMessageContext rmMessageContext) {
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		boolean result = accessor.addOutQueueMessage(rmMessageContext);
-		
-		if(!result)
-		   log.error("Message was not added to the out queue");
-	}*/
+    public void insertRequestMessage(RMMessageContext rmMessageContext) {
 
-	/**
-	 * Will be used to add a new Sequence Hash to the 
-	 * In Queue.
- 	*/
-	public void addSequence(String sequenceId) {
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		boolean result = accessor.addIncomingSequence(sequenceId);
-		
-		if(!result)
-		   log.error("Sequence was not created correcly in the in queue");
-	}
-	
-	/**
-	 * This gives a sorted(by keys) map of messageIds present for a 
-	 * sequence. This will be used to send Acks. 
-	 */
-	public Map getListOfMessageNumbers(String sequenceID){
-		
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-				
-		Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(sequenceID);
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
 
-		Iterator it = st.iterator();
-		
-		//To find the largest id present
-		long largest=0;
-		while(it.hasNext()){
-			Long key = (Long) it.next();
-			if(key==null)
-			    continue;
-			    
-			long l = key.longValue();
-			if(l>largest)
-				largest = l;
-		}
-		
-		
-		HashMap results = new HashMap();
-		//Add Keys to the results in order.
-		long currentPosition=1;
-		for(long l=1;l<=largest;l++){
-			boolean present = st.contains(new Long(l));
-			if(present){
-				results.put(new Long(currentPosition),new Long(l));
-				currentPosition++;
-			}
-		}	
-		return results;	
-	}
+        //No need to use this property
+        //RMHeaders rmHeaders =
+        //	(RMHeaders) rmMessageContext.getMsgContext().getProperty(
+        //		org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
 
-	public boolean isMessageExist(String sequenceID,long messageNumber){
-		IServerDAO accessor =
-			ServerDAOFactory.getStorageAccessor(
-				Constants.SERVER_QUEUE_ACCESSOR);
-		return accessor.isIncomingMessageExists(sequenceID,new Long(messageNumber));		
-	}
+        RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#addCreateSequenceResponse(org.apache.sandesha.RMMessageContext)
-	 */
-	public void addCreateSequenceResponse(RMMessageContext rmMessageContext) {
-		addPriorityMessage(rmMessageContext);
-	}
-	
-	public void addCreateSequenceRequest(RMMessageContext rmMessageContext) {
-		addPriorityMessage(rmMessageContext);
-	}
+        String sequenceId = rmHeaders.getSequence().getIdentifier()
+                .getIdentifier();
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#addAcknowledgement(org.apache.sandesha.RMMessageContext)
-	 */
-	public void addAcknowledgement(RMMessageContext rmMessageContext) {
-		addPriorityMessage(rmMessageContext);
-	}
-	
-	private void addPriorityMessage(RMMessageContext msg){
-		IServerDAO accessor = ServerDAOFactory.getStorageAccessor(
-		Constants.SERVER_QUEUE_ACCESSOR);
-		
-		accessor.addPriorityMessage(msg);		
-	}
+        boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#getNextResponseMessageToSend()
-	 */
-	/*public RMMessageContext getNextResponseMessageToSend() {
-		// TODO Auto-generated method stub
-		return null;
-	}*/
-	
-	
-	//Simple method to sort an object array.
-	/*private Object[] sortObjArray(Object[] objs){
-		
-		Object temp;
-		for(int i=0;i<objs.length;i++){
-			for(int j=(i+1);j<objs.length;j++){
-				long l1 = ((Long) objs[i]).longValue();
-				long l2 = ((Long) objs[j]).longValue();
-				
-				if(l1>l2){
-					//swaping
-					temp=objs[i];
-					objs[i]=objs[j];
-					objs[j]=temp;
-				}
-			}
-		}
-		
-		return objs;
-	}*/
-	
-	
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#setOutSequence(java.lang.String, java.lang.String)
-	 */
-	public void setTemporaryOutSequence(String sequenceId,String outSequenceId) {
-		IServerDAO accessor = ServerDAOFactory.getStorageAccessor(
-		Constants.SERVER_QUEUE_ACCESSOR);	
-		
-		accessor.setOutSequence(sequenceId,outSequenceId);
-        accessor.setOutSequenceApproved(sequenceId,false);
-	}
-	
-	public boolean setApprovedOutSequence(String oldOutsequenceId,String newOutSequenceId){
-		IServerDAO accessor = ServerDAOFactory.getStorageAccessor(
-		Constants.SERVER_QUEUE_ACCESSOR);	
-		
-		boolean done = false;
-		String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
-		
-		if(sequenceID==null){
-		    System.out.println("REOVING REMOVING REMOVING REMO " +oldOutsequenceId);
-		    return false;
-		}
-		System.out.println("REOVING REMOVING  " +oldOutsequenceId);    
-		accessor.setOutSequence(sequenceID,newOutSequenceId);
-		accessor.setOutSequenceApproved(sequenceID,true);  
-		
-		//Deleting create sequence message from the priority queue.
-		accessor.removeCreateSequenceMsg(oldOutsequenceId);
-		return true;    		    		
-	}
+        if (!exists)
+            addSequence(sequenceId); //Creating new sequence
 
-    /* (non-Javadoc)
+        //TODO: add getRmHeaders method to MessageContext
+        long messageNumber = rmHeaders.getSequence().getMessageNumber()
+                .getMessageNumber();
+
+        if (messageNumber <= 0)
+            return; //TODO: throw some exception
+
+        Long msgNo = new Long(messageNumber);
+        accessor.addMessageToIncomingSequence(sequenceId, msgNo,
+                rmMessageContext);
+    }
+
+    public void insertResponseMessage(RMMessageContext msg) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        String sequenceId = msg.getSequenceID();
+        //RMHeaders rmHeaders =msg.getRMHeaders();
+        //String sequenceId =
+        // rmHeaders.getSequence().getIdentifier().getIdentifier();
+
+        boolean exists = accessor.isOutgoingSequenceExists(sequenceId);
+        if (!exists)
+            accessor.addOutgoingSequence(sequenceId);
+
+        accessor.addMessageToOutgoingSequence(sequenceId, msg);
+
+    }
+
+    /**
+     * Used to find out weather the sequence with this id has already been
+     * created.
+     */
+    public boolean isSequenceExist(String sequenceID) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        return accessor.isIncomingSequenceExists(sequenceID);
+    }
+
+    public boolean isResponseSequenceExist(String sequenceID) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        //return accessor.isIncomingSequenceExists(sequenceID);
+        return accessor.isOutgoingSequenceExists(sequenceID);
+    }
+
+    /**
+     * This is used to get a random message from the out queue Basically server
+     * sender will use this.
+     */
+    public RMMessageContext getNextMessageToSend() {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        RMMessageContext msg;
+
+        msg = accessor.getNextPriorityMessageContextToSend();
+
+        if (msg == null)
+            msg = accessor.getNextOutgoingMsgContextToSend();
+
+        return msg;
+    }
+
+    /**
+     * This is used to add a new message to the out queue. Will be used by
+     * various processors.
+     */
+    /*
+     * public void addMessageToOutQueue(RMMessageContext rmMessageContext) {
+     * IServerDAO accessor = ServerDAOFactory.getStorageAccessor(
+     * Constants.SERVER_QUEUE_ACCESSOR); boolean result =
+     * accessor.addOutQueueMessage(rmMessageContext);
+     * 
+     * if(!result) log.error("Message was not added to the out queue"); }
+     */
+
+    /**
+     * Will be used to add a new Sequence Hash to the In Queue.
+     */
+    public void addSequence(String sequenceId) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        boolean result = accessor.addIncomingSequence(sequenceId);
+
+        if (!result)
+            log.error("Sequence was not created correcly in the in queue");
+    }
+
+    /**
+     * This gives a sorted(by keys) map of messageIds present for a sequence.
+     * This will be used to send Acks.
+     */
+    public Map getListOfMessageNumbers(String sequenceID) {
+
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+
+        Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(sequenceID);
+
+        Iterator it = st.iterator();
+
+        //To find the largest id present
+        long largest = 0;
+        while (it.hasNext()) {
+            Long key = (Long) it.next();
+            if (key == null)
+                continue;
+
+            long l = key.longValue();
+            if (l > largest)
+                largest = l;
+        }
+
+        HashMap results = new HashMap();
+        //Add Keys to the results in order.
+        long currentPosition = 1;
+        for (long l = 1; l <= largest; l++) {
+            boolean present = st.contains(new Long(l));
+            if (present) {
+                results.put(new Long(currentPosition), new Long(l));
+                currentPosition++;
+            }
+        }
+        return results;
+    }
+
+    public boolean isMessageExist(String sequenceID, long messageNumber) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        return accessor.isIncomingMessageExists(sequenceID, new Long(
+                messageNumber));
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.sandesha.IStorageManager#addCreateSequenceResponse(org.apache.sandesha.RMMessageContext)
+     */
+    public void addCreateSequenceResponse(RMMessageContext rmMessageContext) {
+        addPriorityMessage(rmMessageContext);
+    }
+
+    public void addCreateSequenceRequest(RMMessageContext rmMessageContext) {
+        addPriorityMessage(rmMessageContext);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.sandesha.IStorageManager#addAcknowledgement(org.apache.sandesha.RMMessageContext)
+     */
+    public void addAcknowledgement(RMMessageContext rmMessageContext) {
+        addPriorityMessage(rmMessageContext);
+    }
+
+    private void addPriorityMessage(RMMessageContext msg) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+
+        accessor.addPriorityMessage(msg);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.sandesha.IStorageManager#getNextResponseMessageToSend()
+     */
+    /*
+     * public RMMessageContext getNextResponseMessageToSend() { // TODO
+     * Auto-generated method stub return null; }
+     */
+
+    //Simple method to sort an object array.
+    /*
+     * private Object[] sortObjArray(Object[] objs){
+     * 
+     * Object temp; for(int i=0;i <objs.length;i++){ for(int j=(i+1);j
+     * <objs.length;j++){ long l1 = ((Long) objs[i]).longValue(); long l2 =
+     * ((Long) objs[j]).longValue();
+     * 
+     * if(l1>l2){ //swaping temp=objs[i]; objs[i]=objs[j]; objs[j]=temp; } } }
+     * 
+     * return objs; }
+     */
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.sandesha.IStorageManager#setOutSequence(java.lang.String,
+     *      java.lang.String)
+     */
+    public void setTemporaryOutSequence(String sequenceId, String outSequenceId) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+
+        accessor.setOutSequence(sequenceId, outSequenceId);
+        accessor.setOutSequenceApproved(sequenceId, false);
+    }
+
+    public boolean setApprovedOutSequence(String oldOutsequenceId,
+            String newOutSequenceId) {
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+
+        boolean done = false;
+        String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
+
+        if (sequenceID == null) {
+            // System.out.println("REOVING REMOVING REMOVING REMO "
+            // +oldOutsequenceId);
+            return false;
+        }
+        System.out.println("REOVING REMOVING  " + oldOutsequenceId);
+        accessor.setOutSequence(sequenceID, newOutSequenceId);
+        accessor.setOutSequenceApproved(sequenceID, true);
+
+        //Deleting create sequence message from the priority queue.
+        accessor.removeCreateSequenceMsg(oldOutsequenceId);
+        return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.IStorageManager#getNextMessageNumber(java.lang.String)
      */
     public long getNextMessageNumber(String sequenceID) {
-		IServerDAO accessor = ServerDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);	
-        long l = accessor.getNextOutgoingMessageNumber (sequenceID);
+        IServerDAO accessor = ServerDAOFactory
+                .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        long l = accessor.getNextOutgoingMessageNumber(sequenceID);
         return l;
     }
 }
