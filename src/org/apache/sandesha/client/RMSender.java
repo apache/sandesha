@@ -58,6 +58,7 @@ import org.apache.sandesha.ws.rm.Sequence;
 import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
 import org.apache.sandesha.ws.utility.Identifier;
+import org.omg.CORBA.portable.RemarshalException;
 
 import com.sun.jndi.url.rmi.rmiURLContext;
 
@@ -66,60 +67,61 @@ public class RMSender extends BasicHandler {
     private static boolean senderStarted = false;
     private static boolean serverStarted = false;
     private IStorageManager storageManager;
-    private SimpleAxisServer sas = null;
-    private Sender sender = null;
-
+    private static SimpleAxisServer sas = null;
+    private static Sender sender = null;
+    private static Thread senderThread=null;
     public void invoke(MessageContext msgContext) throws AxisFault {
-     
-        RMMessageContext requestMesssageContext = getRMMessageContext(msgContext);
+
+        //TODO This we need to check.
+        MessageContext newMsgContext = cloneMsgContext(msgContext);
+
+        RMMessageContext requestMesssageContext = getRMMessageContext(newMsgContext);
         //Initialize the storage manager. We are in the client side
         //So initialize the client Storage Manager.
         storageManager = new ClientStorageManager();
-        initializeRMSender(msgContext, storageManager, requestMesssageContext.getSync());
-
+        initializeRMSender(storageManager, requestMesssageContext.getSync());
         try {
-          
-            //System.out.println("nextMsgNumber  "+nextMsgNumber);
-            System.out.println("sequnecID" + requestMesssageContext.getSequenceID());
-            
-            String sequenceID=requestMesssageContext.getSequenceID();
-            
-            //Currently we override the message number taken from the user
-            //This should should be changed in order to support multiple sequences of messages for client.
-            //requestMesssageContext.setMsgNumber(nextMsgNumber);
+            String sequenceID = requestMesssageContext.getSequenceID();
             AddressingHeaders addrHeaders = getAddressingHeaders(requestMesssageContext);
 
             if (requestMesssageContext.getMsgNumber() == 1) {
-                requestMesssageContext = processFirstMessage(
-                        requestMesssageContext, addrHeaders,
+                requestMesssageContext = processFirstMessage(requestMesssageContext, addrHeaders,
                         requestMesssageContext.getSync());
             } else {
-                requestMesssageContext = processNonFirstMessage(
-                        requestMesssageContext,  addrHeaders, requestMesssageContext.getSync());
+                requestMesssageContext = processNonFirstMessage(requestMesssageContext,
+                        addrHeaders, requestMesssageContext.getSync());
             }
 
-            if (requestMesssageContext.isHasResponse()) {
+            if (requestMesssageContext.isHasResponse() && !requestMesssageContext.getSync()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
-                    
-                    System.out.println("CHECKING K   "+sequenceID);
-                    responseMessageContext = checkTheQueueForResponse(sequenceID,requestMesssageContext.getMessageID());
-                    Thread.sleep(500);
-                    System.out.println("Checking for Responses");
-
+                    //TODO Need to check for errors in the queue.
+                    //If the queue has an error message, then need to report it
+                    // to client.
+                    responseMessageContext = checkTheQueueForResponse(sequenceID,
+                            requestMesssageContext.getMessageID());
+                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
-
-                msgContext.setResponseMessage(responseMessageContext
-                        .getMsgContext().getRequestMessage());
-                
+                msgContext.setResponseMessage(responseMessageContext.getMsgContext()
+                        .getRequestMessage());
                 //SEND TERMINATE SEQ
-                
             } else {
                 boolean gotAck = false;
                 while (!gotAck) {
-                    gotAck = checkTheQueueForAck(requestMesssageContext.getSequenceID(),requestMesssageContext.getMessageID());
-                    Thread.sleep(500);
-                    System.out.println("Checking for Acks");
+                    gotAck = checkTheQueueForAck(requestMesssageContext.getSequenceID(),
+                            requestMesssageContext.getMessageID());
+                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+                }
+                if(requestMesssageContext.isLastMessage()){
+                    while(!storageManager.isAckComplete(requestMesssageContext.getSequenceID())){
+                        Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+                    }
+                   storageManager.insertTerminateSeqMessage(getTerminateSeqMessage()); 	
+                   
+                   if(storageManager.isAllSequenceComplete()){
+                       senderThread.stop();
+                       sas.stop(); 
+                   }
                 }
                 msgContext.setResponseMessage(null);
                 //SEND TERMINATE SEQ
@@ -132,23 +134,41 @@ public class RMSender extends BasicHandler {
     }
 
     /**
+     * @return
+     */
+    private RMMessageContext getTerminateSeqMessage() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
      * @param msgContext
+     * @return @throws
+     *         AxisFault
+     */
+    private MessageContext cloneMsgContext(MessageContext msgContext) throws AxisFault {
+
+        MessageContext clone = new MessageContext(msgContext.getAxisEngine());
+        String str = msgContext.getRequestMessage().getSOAPPartAsString();
+        Message msg = new Message(str);
+        clone.setRequestMessage(msg);
+        RMMessageContext.copyMessageContext(msgContext, clone);
+        return clone;
+    }
+
+    /**
+     * @param msgContext   
      * @param addrHeaders
      * @return
      */
     private RMMessageContext getReqRMContext(MessageContext msgContext,
             AddressingHeaders addrHeaders, String uuid, long msgNo) {
-
         //Get the URL to send the message.
-        String toAddress = (String) msgContext
-                .getProperty(MessageContext.TRANS_URL);
-
+        String toAddress = (String) msgContext.getProperty(MessageContext.TRANS_URL);
         // Create the RMMessageContext to hold the Request message.
         RMMessageContext reqRMMsgContext = new RMMessageContext();
-        MessageContext messageContext = new MessageContext(msgContext
-                .getAxisEngine());
+        MessageContext messageContext = new MessageContext(msgContext.getAxisEngine());
         RMMessageContext.copyMessageContext(msgContext, messageContext);
-
         reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
 
         //RMHeaders for the message.
@@ -164,7 +184,6 @@ public class RMSender extends BasicHandler {
         MessageNumber msgNumber = new MessageNumber();
         msgNumber.setMessageNumber(msgNo);
         seq.setMessageNumber(msgNumber);
-
         rmHeaders.setSequence(seq);
 
         reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
@@ -174,23 +193,18 @@ public class RMSender extends BasicHandler {
         reqRMMsgContext.setAddressingHeaders(addrHeaders);
 
         reqRMMsgContext.setOutGoingAddress(toAddress);
-        //SOAPEnvelope resEnvelope = EnvelopeCreator
-        //        .createServiceRequestEnvelope(uuid, reqRMMsgContext,
-        //                Constants.CLIENT);
-        //Add the message to the request message.
-        //messageContext.setRequestMessage(new Message(resEnvelope));
         reqRMMsgContext.setMsgContext(messageContext);
         return reqRMMsgContext;
     }
 
     private RMMessageContext getCreateSeqRMContext(RMMessageContext rmMsgContext,
-            AddressingHeaders addrHeaders, String uuid)
-            throws MalformedURIException {
+            AddressingHeaders addrHeaders, String uuid) throws MalformedURIException {
 
-        //String toAddress = (String) msgContext.getProperty(MessageContext.TRANS_URL);
-        MessageContext msgContext=rmMsgContext.getMsgContext();
-        String toAddress=rmMsgContext.getOutGoingAddress();
-        
+        //String toAddress = (String)
+        // msgContext.getProperty(MessageContext.TRANS_URL);
+        MessageContext msgContext = rmMsgContext.getMsgContext();
+        String toAddress = rmMsgContext.getOutGoingAddress();
+
         //Set the action
         Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE));
         addrHeaders.setAction(action);
@@ -198,32 +212,31 @@ public class RMSender extends BasicHandler {
         //Create the RMMessageContext to hold the create Sequence Request.
         RMMessageContext createSeqRMMsgContext = new RMMessageContext();
         createSeqRMMsgContext.setAddressingHeaders(addrHeaders);
+        createSeqRMMsgContext.setSync(rmMsgContext.getSync());
 
         //Set the outgoing address these need to be corrected.
         createSeqRMMsgContext.setOutGoingAddress(toAddress);
-        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid, createSeqRMMsgContext,
-                        Constants.CLIENT);
+        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid,
+                createSeqRMMsgContext, Constants.CLIENT);
 
-        MessageContext createSeqMsgContext = new MessageContext(msgContext
-                .getAxisEngine());
+        MessageContext createSeqMsgContext = new MessageContext(msgContext.getAxisEngine());
 
+        //This should be a clone operation.
         RMMessageContext.copyMessageContext(msgContext, createSeqMsgContext);
         createSeqMsgContext.setRequestMessage(new Message(resEnvelope));
         createSeqRMMsgContext.setMsgContext(createSeqMsgContext);
 
         //Set the message type
-        createSeqRMMsgContext
-                .setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
+        createSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
         return createSeqRMMsgContext;
     }
 
-    private void initializeRMSender(MessageContext msgContext,
-            IStorageManager storageManager, boolean sync) {
+    private void initializeRMSender(IStorageManager storageManager, boolean sync) {
 
         if (!senderStarted) {
             //Pass the storageManager to the Sender.
             sender = new Sender(storageManager);
-            Thread senderThread = new Thread(sender);
+            senderThread = new Thread(sender);
             //senderThread.setDaemon(true);
             senderThread.start();
         }
@@ -238,11 +251,9 @@ public class RMSender extends BasicHandler {
                 SimpleChain shc = new SimpleChain();
                 //We need these two handlers in the request path to the client.
                 //Actually the response messages coming asynchronously should
-                // come
-                //through the SimpleAxisServer instance.
+                //come through the SimpleAxisServer instance.
                 //We need to load the response handlers specified by the users
-                // in addtion to the
-                //the above two.
+                // in addtion to the the above two.
                 Handler addrHanlder = new AddressingHandler();
                 Handler rmHandler = new RMServerRequestHandler();
                 shc.addHandler(addrHanlder);
@@ -258,8 +269,7 @@ public class RMSender extends BasicHandler {
                 SOAPService myService = new SOAPService(shc, rmProvider, null);
 
                 JavaServiceDesc desc = new JavaServiceDesc();
-                myService.setOption("className",
-                        "samples.userguide.example3.MyService");
+                myService.setOption("className", "samples.userguide.example3.MyService");
                 myService.setOption("allowedMethods", "*");
 
                 //Add Handlers ; Addressing and ws-rm before the service.
@@ -270,8 +280,7 @@ public class RMSender extends BasicHandler {
                 sp.deployService("MyService", myService);
                 //finally start the server
                 //Start the simple axis server in port 8090
-                sas.setServerSocket(new ServerSocket(
-                        Constants.SOURCE_LISTEN_PORT));
+                sas.setServerSocket(new ServerSocket(Constants.SOURCE_LISTEN_PORT));
 
                 Thread serverThread = new Thread(sas);
                 //serverThread.setDaemon(true);
@@ -286,122 +295,100 @@ public class RMSender extends BasicHandler {
 
     private AddressingHeaders getAddressingHeaders(RMMessageContext rmMsgContext)
             throws MalformedURIException {
-        
-        MessageContext msgContext= rmMsgContext.getMsgContext();
+
+        // MessageContext msgContext= rmMsgContext.getMsgContext();
         //Variable to hold the status of the asynchronous or synchronous state.
         boolean sync = rmMsgContext.getSync();
-     
         AddressingHeaders addrHeaders = new AddressingHeaders();
-
         From from = null;
+        ReplyTo replyTo = null;
+        String fromURL = rmMsgContext.getFrom();
+        String replyToURL = rmMsgContext.getReplyTo();
 
         //Need to use the anonymous_URI if the client is synchronous.
-        if (!sync){
+        if (!sync) {
             from = new From(new Address(rmMsgContext.getSourceURL()));
             addrHeaders.setFrom(from);
-            ReplyTo replyTo = new ReplyTo(new Address(rmMsgContext.getSourceURL()));
-            addrHeaders.setReplyTo(replyTo);
+
+            if (replyToURL != null) {
+                replyTo = new ReplyTo(new Address(replyToURL));
+                addrHeaders.setReplyTo(replyTo);
+            } else {
+                replyTo = new ReplyTo(new Address(rmMsgContext.getSourceURL()));
+                addrHeaders.setReplyTo(replyTo);
+            }
+
         } else {
             from = new From(new Address(Constants.ANONYMOUS_URI));
             addrHeaders.setFrom(from);
+            if (rmMsgContext.isHasResponse()) {
+                replyTo = new ReplyTo(new Address(replyToURL));
+                addrHeaders.setReplyTo(replyTo);
+            }
 
-            ReplyTo replyTo = new ReplyTo(new Address(Constants.ANONYMOUS_URI));
-            addrHeaders.setReplyTo(replyTo);
         }
-
         //Set the target endpoint URL
         To to = new To(new Address(rmMsgContext.getOutGoingAddress()));
         addrHeaders.setTo(to);
         return addrHeaders;
     }
 
-    private RMMessageContext processFirstMessage(
-            RMMessageContext reqRMMsgContext,AddressingHeaders addrHeaders, boolean sync) throws Exception {
-        
-        long nextMsgNumber=reqRMMsgContext.getMsgNumber();
-
+    private RMMessageContext processFirstMessage(RMMessageContext reqRMMsgContext,
+            AddressingHeaders addrHeaders, boolean sync) throws Exception {
+        long nextMsgNumber = reqRMMsgContext.getMsgNumber();
         System.out.println(nextMsgNumber);
-
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-
         //Set the tempUUID
         String tempUUID = uuidGen.nextUUID();
-        RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(
-                reqRMMsgContext, addrHeaders, tempUUID);
+        RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(reqRMMsgContext,
+                addrHeaders, tempUUID);
         createSeqRMMsgContext.setMessageID("uuid:" + tempUUID);
         //Create a sequence first.
         //storageManager.addSequence(Constants.CLIENT_DEFAULD_SEQUENCE_ID);
         //storageManager.setTemporaryOutSequence(
         //        Constants.CLIENT_DEFAULD_SEQUENCE_ID, "uuid:" + tempUUID);
-        
+
         storageManager.addSequence(reqRMMsgContext.getSequenceID());
-        storageManager.setTemporaryOutSequence(
-                reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
+        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
 
         //Set the processing state to the RMMessageContext
         createSeqRMMsgContext.setSync(sync);
 
         storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-
         reqRMMsgContext.setAddressingHeaders(addrHeaders);
         reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
         reqRMMsgContext.setMsgNumber(nextMsgNumber);
         reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
         reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
-
         storageManager.insertOutgoingMessage(reqRMMsgContext);
-
         return reqRMMsgContext;
     }
 
-    private RMMessageContext processNonFirstMessage(
-            RMMessageContext reqRMMsgContext, AddressingHeaders addrHeaders, boolean sync)
-            throws Exception {
-
-  
+    private RMMessageContext processNonFirstMessage(RMMessageContext reqRMMsgContext,
+            AddressingHeaders addrHeaders, boolean sync) throws Exception {
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-
-      
         reqRMMsgContext.setAddressingHeaders(addrHeaders);
         reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
-        //reqRMMsgContext.setMsgNumber(storageManager
-        //        .getNextMessageNumber(Constants.CLIENT_DEFAULD_SEQUENCE_ID));
-      
-
         reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
         reqRMMsgContext.setMessageID("uuid:" + uuidGen.nextUUID());
         //Set the processing state of the RMMessageContext
         reqRMMsgContext.setSync(sync);
         storageManager.insertOutgoingMessage(reqRMMsgContext);
-        //System.out.println("This is NOT the first
-        // message..........................");
-
         return reqRMMsgContext;
     }
 
-    private boolean getAckExpected(String synchronous, String hasResponse,
-            String sourceURI) {
+    private boolean getAckExpected(String synchronous, String hasResponse, String sourceURI) {
         boolean ackExpected = false;
 
-        if (synchronous.equals("true") && hasResponse.equals("false")
-                && sourceURI.equals(""))
+        if (synchronous.equals("true") && hasResponse.equals("false") && sourceURI.equals(""))
             ackExpected = true;
 
-        if (synchronous.equals("true") && hasResponse.equals("false")
-                && !sourceURI.equals(""))
+        if (synchronous.equals("true") && hasResponse.equals("false") && !sourceURI.equals(""))
             ackExpected = true;
-
-        //With synchronous we cannot expect an application response.
-        //if(synchronous.equals("true") && hasResponse.equals("true") &&
-        // !sourceURI.equals(""))
-        //	ackExpected = true;
-
         return ackExpected;
-
     }
 
-    private boolean getResponseExpected(String synchronous, String hasResponse,
-            String sourceURI) {
+    private boolean getResponseExpected(String synchronous, String hasResponse, String sourceURI) {
         boolean responseExpeceted = false;
 
         if (synchronous.equals("true") && hasResponse.equals("true"))
@@ -417,29 +404,25 @@ public class RMSender extends BasicHandler {
         return storageManager.checkForAcknowledgement(sequenceId, reqMessageID);
     }
 
-    private RMMessageContext checkTheQueueForResponse(String sequenceId,String reqMessageID) {
+    private RMMessageContext checkTheQueueForResponse(String sequenceId, String reqMessageID) {
         return storageManager.checkForResponseMessage(sequenceId, reqMessageID);
-
     }
 
-    private void setProcessingState(RMMessageContext rmMessageContext,
-            boolean sync) {
-
+    private void setProcessingState(RMMessageContext rmMessageContext, boolean sync) {
     }
-    
-    private RMMessageContext getRMMessageContext(MessageContext msgContext) throws AxisFault{
-       
-        RMMessageContext requestMesssageContext= new RMMessageContext();
+
+    private RMMessageContext getRMMessageContext(MessageContext msgContext) throws AxisFault {
+        RMMessageContext requestMesssageContext = new RMMessageContext();
         //Get the message information from the client.
         Call call = (Call) msgContext.getProperty(MessageContext.CALL);
         //If the property specified by the client is not valid
         //an AxisFault will be sent at this point.
         requestMesssageContext = ClientPropertyValidator.validate(call);
-        requestMesssageContext.setOutGoingAddress((String)msgContext.getProperty(MessageContext.TRANS_URL));
+        requestMesssageContext.setOutGoingAddress((String) msgContext
+                .getProperty(MessageContext.TRANS_URL));
         requestMesssageContext.setMsgContext(msgContext);
-        
         return requestMesssageContext;
-        
+
     }
 
 }
