@@ -201,5 +201,16 @@ public interface Constants {
      */
     public static final String RM_SEQUENCE_ACKNOWLEDMENT_ACTION =    "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
 
+	 public int SERVER_QUEUE_CACHE =100;
+	 
+	 public int SERVER_QUEUE_ACCESSOR = 1;
+	 
+	public int SERVER_DATABASE_ACCESSOR = 2;
+	
+	//Constant for the RMInvoker sleep time in ms.
+	public static final long RMINVOKER_SLEEP_TIME=2000;
+	
+	//Constant for the Sender sleep time in ms.
+	public static final long SENDER_SLEEP_TIME=2000;
 }
 
