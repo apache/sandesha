@@ -48,13 +48,13 @@ public abstract class RMHandler extends BasicHandler {
 
         rmHeaders.fromSOAPEnvelope(msgContext.getCurrentMessage().getSOAPEnvelope());
        if((rmHeaders.getAckRequest()!=null) ||
-       		(rmHeaders.getCreateSequence()!=null) ||
-       		(rmHeaders.getCreateSequenceResponse()!=null) ||
-       		(rmHeaders.getSequence()!= null) ||
-       		(rmHeaders.getSequenceAcknowledgement()!=null) ||
-       		(rmHeaders.getTerminateSequence()!=null)){
-				msgContext.setProperty(property, rmHeaders);
-       		}
+               (rmHeaders.getCreateSequence()!=null) ||
+               (rmHeaders.getCreateSequenceResponse()!=null) ||
+               (rmHeaders.getSequence()!= null) ||
+               (rmHeaders.getSequenceAcknowledgement()!=null) ||
+               (rmHeaders.getTerminateSequence()!=null)){
+                msgContext.setProperty(property, rmHeaders);
+               }
         
     }
 

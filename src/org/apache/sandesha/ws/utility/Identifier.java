@@ -107,10 +107,10 @@ public class Identifier extends URI {
         return identifier;
     }
 
-	/**
-	 * Method setIdentifier
-	 * 
-	 */
+    /**
+     * Method setIdentifier
+     * 
+     */
     public void setIdentifier(String string) {
         identifier = string;
     }

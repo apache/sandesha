@@ -36,41 +36,41 @@ import org.apache.sandesha.Constants;
  * @author Sudar Nimalan
  */
 public class Scenario_2_3_Client {
-	public static void main(String[] args) {
-		System.out.println("Client started......");
-		try {
+    public static void main(String[] args) {
+        System.out.println("Client started......");
+        try {
 
-			Service service = new Service();
+            Service service = new Service();
 
-			Call call = (Call) service.createCall();
-			if (args.length == 0 || args[0].equals("")) {
-				throw new Exception("Error: pass Target End Point Address as a Parametter");
-			}
+            Call call = (Call) service.createCall();
+            if (args.length == 0 || args[0].equals("")) {
+                throw new Exception("Error: pass Target End Point Address as a Parametter");
+            }
 
-			call.setTargetEndpointAddress(args[0]);
-			call.setOperationName(new QName("EchoStringService", "echoString"));
-			call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
-			call.addParameter("Sequence", XMLType.XSD_STRING, ParameterMode.IN);
-			call.setReturnType(XMLType.SOAP_STRING);
+            call.setTargetEndpointAddress(args[0]);
+            call.setOperationName(new QName("EchoStringService", "echoString"));
+            call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
+            call.addParameter("Sequence", XMLType.XSD_STRING, ParameterMode.IN);
+            call.setReturnType(XMLType.SOAP_STRING);
 
-			UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
-			call.setProperty(
-				Constants.CLIENT_RESPONSE_EXPECTED,
-				(new Boolean(true)));
+            call.setProperty(
+                Constants.CLIENT_RESPONSE_EXPECTED,
+                (new Boolean(true)));
 
-			String seq = uuidGen.nextUUID();
-			System.out.println(call.invoke(new Object[] { "Hello", seq }));
-			System.out.println(call.invoke(new Object[] { "World", seq }));
-			call.setProperty(
-				Constants.CLIENT_LAST_MESSAGE,
-				(new Boolean(true)));
-			//call.setLastMessage(true);
-			System.out.println(call.invoke(new Object[] { "Bye", seq }));
+            String seq = uuidGen.nextUUID();
+            System.out.println(call.invoke(new Object[] { "Hello", seq }));
+            System.out.println(call.invoke(new Object[] { "World", seq }));
+            call.setProperty(
+                Constants.CLIENT_LAST_MESSAGE,
+                (new Boolean(true)));
+            //call.setLastMessage(true);
+            System.out.println(call.invoke(new Object[] { "Bye", seq }));
 
-		} catch (Exception e) {
-			//System.err.println(e.toString());
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            //System.err.println(e.toString());
+            e.printStackTrace();
+        }
+    }
 }

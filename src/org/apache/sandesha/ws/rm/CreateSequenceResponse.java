@@ -137,13 +137,13 @@ public class CreateSequenceResponse implements IRmElement {
         createSequenceResponse.addChildElement(element);
     }
 
-	/**
-	 * Method getIdentifier
-	 * 
-	 * @param element 
-	 * @return 
-	 * @throws SOAPException 
-	 */
+    /**
+     * Method getIdentifier
+     * 
+     * @param element 
+     * @return 
+     * @throws SOAPException 
+     */
     public Identifier getIdentifier() {
         return identifier;
     }

@@ -35,34 +35,34 @@ import org.apache.sandesha.Constants;
  */
 
 public class Scenario_2_1_Client {
-	public static void main(String[] args) {
-		System.out.println("Client started......");
-		try {
+    public static void main(String[] args) {
+        System.out.println("Client started......");
+        try {
 
-			Service service = new Service();
-			Call call = (Call) service.createCall();
-			if (args.length == 0 || args[0].equals("")) {
-				throw new Exception("Error: pass Target End Point Address as a Parametter");
-			}
-			call.setTargetEndpointAddress(args[0]);
-			call.setOperationName(new QName("PingService", "Ping"));
-			call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
-			call.setReturnType(XMLType.AXIS_VOID);
+            Service service = new Service();
+            Call call = (Call) service.createCall();
+            if (args.length == 0 || args[0].equals("")) {
+                throw new Exception("Error: pass Target End Point Address as a Parametter");
+            }
+            call.setTargetEndpointAddress(args[0]);
+            call.setOperationName(new QName("PingService", "Ping"));
+            call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
+            call.setReturnType(XMLType.AXIS_VOID);
 
-			call.setProperty(
-				Constants.CLIENT_RESPONSE_EXPECTED,
-				(new Boolean(false)));
+            call.setProperty(
+                Constants.CLIENT_RESPONSE_EXPECTED,
+                (new Boolean(false)));
 
-			call.invoke(new Object[] { "Ping 1" });
-			call.invoke(new Object[] { "Ping 2" });
-			call.setProperty(
-				Constants.CLIENT_LAST_MESSAGE,
-				(new Boolean(true)));
-			call.invoke(new Object[] { "Ping 3" });
+            call.invoke(new Object[] { "Ping 1" });
+            call.invoke(new Object[] { "Ping 2" });
+            call.setProperty(
+                Constants.CLIENT_LAST_MESSAGE,
+                (new Boolean(true)));
+            call.invoke(new Object[] { "Ping 3" });
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -18,7 +18,6 @@
 package org.apache.sandesha.client;
 
 import org.apache.axis.message.addressing.MessageID;
-
 import org.apache.sandesha.RMMessage;
 import org.apache.sandesha.RMSequence;
 import org.apache.sandesha.ws.utility.Identifier;
@@ -36,37 +35,37 @@ import java.util.Map;
  *
  */
 public class ClientMessageController {
-	/**
-	 * Field instance
-	 */
+    /**
+     * Field instance
+     */
     private static ClientMessageController instance;
-	/**
-	 * Field messageMap
-	 */
+    /**
+     * Field messageMap
+     */
     private Map messageMap;
-	/**
-	 * Field sequenceMap
-	 */
+    /**
+     * Field sequenceMap
+     */
     private Map sequenceMap;
-	/**
-	 * Field seqAck
-	 */
+    /**
+     * Field seqAck
+     */
  
     private Identifier sequenceIdentifier;
-	
-	/**
-	 * Constructor ClientMessageController
-	 */  
+    
+    /**
+     * Constructor ClientMessageController
+     */  
     private ClientMessageController() {
         sequenceMap = new HashMap();
         messageMap = new HashMap();
     }
     
-	/**
-	 * Method getInstance
-	 * 
-	 * @return ClientMessageController
-	 */
+    /**
+     * Method getInstance
+     * 
+     * @return ClientMessageController
+     */
      public static ClientMessageController getInstance() {
        
         if (instance == null) {
@@ -76,21 +75,21 @@ public class ClientMessageController {
         return instance;
     }
     
-	/**
-	 * Method retrieveIfMessageExists
-	 *
-	 * returns a RMMessage if a message for the message id exists.
-	 * else return a null value
-	 * <b>developer must handle the null value returned</b>
-	 * 
-	 * @param messageID
-	 * @return RMMessage
-	 *
-	 * 
-	 */
+    /**
+     * Method retrieveIfMessageExists
+     *
+     * returns a RMMessage if a message for the message id exists.
+     * else return a null value
+     * <b>developer must handle the null value returned</b>
+     * 
+     * @param messageID
+     * @return RMMessage
+     *
+     * 
+     */
 
     public RMMessage retrieveIfMessageExists(MessageID messageID) {
-    	RMMessage rmMessage = (RMMessage)messageMap.get(messageID.toString());
+        RMMessage rmMessage = (RMMessage)messageMap.get(messageID.toString());
         if (rmMessage!= null) {
             return rmMessage;
         } else {
@@ -115,16 +114,16 @@ public class ClientMessageController {
         sequenceMap.put(sequence.getSequenceIdetifer().toString(), sequence);
     }
     
-	/**
-	 * Method storeMessage
-	 * 
-	 * stores a message object in the map. 
-	 * The message are stored as the message id as a key
-	 *
-	 * @param message
-	 *
-	 * 
-	 */
+    /**
+     * Method storeMessage
+     * 
+     * stores a message object in the map. 
+     * The message are stored as the message id as a key
+     *
+     * @param message
+     *
+     * 
+     */
 
     public void storeMessage(RMMessage message) {
         messageMap.put(message.getMessageID().toString(), message);
@@ -144,7 +143,7 @@ public class ClientMessageController {
      * 
      */
     public RMSequence retrieveIfSequenceExists(Identifier identifier) {
-    	RMSequence rmSequence = (RMSequence)sequenceMap.get(identifier.getIdentifier().toString());
+        RMSequence rmSequence = (RMSequence)sequenceMap.get(identifier.getIdentifier().toString());
         if (rmSequence != null) {
             return rmSequence;
         } else {
@@ -154,38 +153,38 @@ public class ClientMessageController {
 
 
     
-	/**
-	 * Method removeIfSequenceExists
-	 * 
-	 * Search for a sequence and if it exists(means it is in the map),
-	 * remove it from the map
-	 * 
-	 * @param identifier
-	 * 
-	 * 
-	 */
-	public void removeIfSequenceExists(Identifier identifier) {
-		if (sequenceMap.get(identifier.toString()) != null) {
-			sequenceMap.remove(identifier.toString());
-		}
-	}
-	/**
-	 * Method getSequenceIdentifier
-	 * 
-	 * @return Identifier
-	 */
-	public Identifier getSequenceIdentifier() {
-		return sequenceIdentifier;
-	}
+    /**
+     * Method removeIfSequenceExists
+     * 
+     * Search for a sequence and if it exists(means it is in the map),
+     * remove it from the map
+     * 
+     * @param identifier
+     * 
+     * 
+     */
+    public void removeIfSequenceExists(Identifier identifier) {
+        if (sequenceMap.get(identifier.toString()) != null) {
+            sequenceMap.remove(identifier.toString());
+        }
+    }
+    /**
+     * Method getSequenceIdentifier
+     * 
+     * @return Identifier
+     */
+    public Identifier getSequenceIdentifier() {
+        return sequenceIdentifier;
+    }
 
-	/**
-	 * Method setSequenceIdentifier
-	 * 
-	 * @param  identifier
-	 * 
-	 */
-	public void setSequenceIdentifier(Identifier identifier) {
-		sequenceIdentifier = identifier;
-	}
+    /**
+     * Method setSequenceIdentifier
+     * 
+     * @param  identifier
+     * 
+     */
+    public void setSequenceIdentifier(Identifier identifier) {
+        sequenceIdentifier = identifier;
+    }
 
 }

@@ -20,7 +20,6 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.sandesha.Constants;
 
-
 import javax.xml.soap.SOAPException;
 
 /**
@@ -43,16 +42,16 @@ public class RMServerRequestHandler extends RMHandler {
      * @param msgContext 
      * @throws AxisFault 
      */
-	public void invoke(MessageContext msgContext) throws AxisFault {
-		try {
-			
-			setPropertyToMessageContext(
-				msgContext,
-				Constants.ENV_RM_REQUEST_HEADERS);
-		}  catch (SOAPException e) {
-			throw AxisFault.makeFault(e);
-		}
-	}
-	
-	
+    public void invoke(MessageContext msgContext) throws AxisFault {
+        try {
+            
+            setPropertyToMessageContext(
+                msgContext,
+                Constants.ENV_RM_REQUEST_HEADERS);
+        }  catch (SOAPException e) {
+            throw AxisFault.makeFault(e);
+        }
+    }
+    
+    
 }

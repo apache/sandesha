@@ -23,16 +23,16 @@ import java.util.Map;
  * @author SNimalan
  */
 public class EchoStringService {
-	private static Map sequences=new HashMap();
-	public String echoString(String text,String sequence){
+    private static Map sequences=new HashMap();
+    public String echoString(String text,String sequence){
 
-		if(sequences.get(sequence)!=null){
-			text=(String) sequences.get(sequence)+text;
-			sequences.put(sequence,new String(text));
-		}else{
-			sequences.put(sequence,(new String(text)));
+        if(sequences.get(sequence)!=null){
+            text=(String) sequences.get(sequence)+text;
+            sequences.put(sequence,new String(text));
+        }else{
+            sequences.put(sequence,(new String(text)));
 
-		}
-		return text;
-	}
+        }
+        return text;
+    }
 }

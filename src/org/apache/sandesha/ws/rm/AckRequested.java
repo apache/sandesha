@@ -177,38 +177,38 @@ public class AckRequested extends MessageElement implements IRmElement {
         ackRequested.addChildElement(element);
     }
 
-	/**
-	 * Method getIdentifier
-	 * 
-	 * @return Identifier
-	 */
+    /**
+     * Method getIdentifier
+     * 
+     * @return Identifier
+     */
     public Identifier getIdentifier() {
         return identifier;
     }
 
-	/**
-	 * Method getMessageNumber
-	 * 
-	 * @return MessageNumber
-	 */
+    /**
+     * Method getMessageNumber
+     * 
+     * @return MessageNumber
+     */
     public MessageNumber getMessageNumber() {
         return messageNumber;
     }
 
-	/**
-	 * Method setIdentifier
-	 * 
-	 * @param identifier
-	 */
+    /**
+     * Method setIdentifier
+     * 
+     * @param identifier
+     */
     public void setIdentifier(Identifier identifier) {
         this.identifier = identifier;
     }
 
-	/**
-	 * Method setMessageNumber
-	 * 
-	 * @param number
-	 */
+    /**
+     * Method setMessageNumber
+     * 
+     * @param number
+     */
     public void setMessageNumber(MessageNumber number) {
         messageNumber = number;
     }
