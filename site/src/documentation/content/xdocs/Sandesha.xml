@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.2//EN" "http://apache.org/forrest/dtd/document-v12.dtd">
+<document> 
+  <header> 
+    <title>Architecture of Sandesha</title> 
+   </header> 
+   <body> 
+<section>
+      <title>Sandesha - Introduction</title>
+    
+    <p>Apache <strong>Sandesha</strong> is an implementation of the Web Services Reliable Messaging Protocol (WS-ReliableMessaging Protocol), published by the IBM, Microsoft, BEA and Tibco as a joint specification, on top of Apache Axis (The Next Generation SOAP).
+	</p>
+	
+	<p><strong>From the draft WS-RM specification:</strong> 
+	</p>
+	
+	<p>It is often a requirement for two Web services that wish to communicate to do so reliably in the presence of software component, system, or network failures. The primary goal of this specification is to create a modular mechanism for reliable message delivery. It defines a messaging protocol to identify, track, and manage the reliable delivery of messages between exactly two parties, a source and a destination. It also defines a SOAP binding which is required for interoperability. Additional bindings may be defined.
+	</p>
+	
+	<p>This mechanism is extensible allowing additional functionality, such as security, to be tightly integrated. This specification integrates with and compliments the WS-Security, WS-Policy, and other Web services specifications. Combined, these allow for a broad range of reliable, secure messaging options.
+	</p>
+	
+	<p>This specification (WS-ReliableMessaging) describes a protocol that allows messages to be delivered reliably between distributed applications in the presence of software component, system, or network failures. The protocol is described in this specification in an independent manner allowing it to be implemented using different network transport technologies. To support interoperable Web services, a SOAP binding is defined within this specification.
+	</p>
+	
+	<p>As the first step of implementing the WS-Reliable Messaging protocol we mainly focused our development to cater for the following scenario which is provided by the specification.
+	</p>
+ 
+	 <figure src="images/Scenario.bmp" alt="" width="445" height="307"/>
+
+	<ul>
+	<li>The Source establishes a new sequence by assigning a unique identifier and begins sending messages beginning with MessageNumber 1. In the figure the Source sends 3 messages.	</li>
+	<li>Since the 3rd message is the last in this exchange, the Source includes a LastMessage token.</li>
+	<li>The 2nd message is lost in transit.</li>
+	<li>The Destination acknowledges receipt of message numbers 1 and 3.</li>
+	<li>The Source retransmits the 2nd message. This is a new message on the underlying transport, but since it has the same sequence identifier and message number so the Destination can recognize it as equivalent to the earlier message, in case both are received.</li>
+	<li>The Source includes an AckRequested element so the Destination will expedite an acknowledgement.</li>
+	<li>The Destination receives the second transmission of the message with MessageNumber 2 and acknowledges receipt of message numbers 1, 2, and 3.</li>
+	<li>The Source receives this acknowledgement and knows the sequence is completed.</li>
+
+
+	</ul>
+	
+ </section>
+ <section>
+	<title>Sandesha - Architecture</title>
+	<p>The following diagram describes the architecture that we used for the reliable messaging service. The architecture used for implementing the WS-RM provides axis client to use web services implemented on different platforms, ( e.g. .NET, WebSphere or any other server) in addition to axis, reliably. This architecture also supports the server to use WS-RM on AXIS to provide reliable web services that can be accessed by any client reliably (provided that client use WS-RM compliant protocol).</p>
+ 	<figure src="images/SandeshaArchitecture.jpg" alt="" width="765" height="575"/>
+	<p>The message passing procedure can be described using the following steps. These are the steps that will occur under <strong>no error</strong> situation.</p>
+	<ul>
+	<li>Initial Sender(Client) sends a SOAP message (for the simplicity this SOAP message is referred as "message") to the Web Service.</li>
+	<li>This message is passed through the <strong>Client Request Handler (A)</strong> which will wrap the incoming message in a new SOAP envelop and forward the message to the <strong>Client End Point Manager(ClientEPM)</strong> with the following additional parameters. 
+		<ul>
+		<li>Destination URI </li>
+		<li>Source URI </li>	
+		<li>SequenceID</li>
+		</ul>
+	<strong>ClientEPM</strong> itself is a web service running in the AXIS on Tomcat server.
+	</li>
+	<li><strong>ClientEPM</strong> will store the message in the Client Database and add the necessary reliable headers to the original message. Then the message is passed to target service. This message is completely independent of the architecture used in the client side processing and only depends on the WS Reliable Messaging specification. So the inter-operability with other implementations is maintained.</li>
+	<li>Message is received by the server AXIS on Tomcat. Since the reliable headers are present in the message this message is to the <strong>Server End Point Manager(ServerEPM)</strong> by the <strong>Server Global Handler (P).</strong></li>
+	<li>If the "&lt;LastMessage&gt;" or "&lt;AckRequest&gt;" is present in the message then the <strong>ServerEPM</strong> will send an acknowledgement message to the <strong>ClientEPM</strong> including the acknowledgement ranges. This message is also entirely depends on the WS-Reliable Messaging specification.</li>
+	<li>ServerEPM stores the message in the Server Database. Then it removes the reliable headers from the message and invoke the Ultimate Receiver(web service) using this message.</li>
+	<li>After receiving the resultant message from the web service (if any) the <strong>ServerEPM</strong> will send the reply message.</li>
+	<li>This message is transformed to the original reply message (as if invoked the web service <strong>without</strong> End Point Managers) by the <strong>Server Response Handler (Q)</strong> and send to the client. This is used again to maintain the inter-operability.</li>
+	<li>The response will initially reach the ClientEPM and then redirect to the actual client as if coming from the actual web service using the <strong>Client Response Handler (A).</strong></li>
+	</ul>
+	<p>However this ideal message passing may not occur in the actual scenario. Due to various conditions the message may be lost in the network. The endpoint managers solve this problem using retransmission. That is when there is no acknowledgement or a response from the web service until the retransmission interval is elapsed the ClientEPM will send a retransmission message to the web service using the message stored in the Client Database. This process will continue several times depending on the re-transmission count specified by the <strong>WS-Policy</strong> used by the client and the server.
+</p>
+<p>When ever there is a retransmission received by the <strong>serverEPM</strong> it will first check the Server Database to verify whether the message is there in the Server Database. If it is a duplicate then  the message will be dropped. However when the result(if any) arrives from the web service that result is sent to all the duplicate messages (if any) present.</p>
+<p>ClientEPM will use only the first response message received by the ServerEPM to generate the actual response to the Client.</p>
+<p>The above scenario only describes the single message incident. But normally there may be several messages passing between the web service and the Client. The service provided to each of these messages can be explained using the above steps. BUT If the messages are received by the ServerEPM in out of order then the ServerEPM will re arrange the messages in <strong>"IN ORDER"</strong> sequence and invoked the web service according to that sequence. According to the specification this is mentioned under the <strong>WSPolicyAssertions.</strong></p>
+
+ </section>
+
+<section>
+	<title>Sandesha - Modification to Axis</title>
+	<p>In-order to provide the above facilities several minor modifications were done to the "Call.class" in AXIS. These can be listed as follows.</p>
+	
+ <table>
+ 	<tr>
+		<th>Method</th>
+		<th>Return Type</th>
+		<th>Description</th>
+	</tr> 
+	<tr>
+		<td><strong>public Call(Service service)</strong></td>
+		<td>-</td>
+		<td>The default constructor is added with some code to generate a UUID with each call object created. In order to generate the UUID <strong>org.apache.axis.components.uuid.SimpleUUIDGen.class</strong> is used.</td>
+	</tr> 
+
+	<tr>
+		<td><strong>public Call(String url) throws MalformedURLException</strong></td>
+		<td>-</td>
+		<td>The overloaded constructor is added with some code to generate a UUID with each call object created. In order to generate the UUID <strong>org.apache.axis.components.uuid.SimpleUUIDGen.class</strong> is used.</td>
+	</tr> 
+
+	<tr>
+		<td><strong>public Call(URL url)</strong></td>
+		<td>-</td>
+		<td>The overloaded constructor is added with some code to generate a UUID with each call object created. In order to generate the UUID <strong>org.apache.axis.components.uuid.SimpleUUIDGen.class</strong> is used.</td>
+	</tr> 
+
+	<tr>
+		<td><strong>setClientURI(String Client URI)</strong></td>
+		<td><strong>void</strong></td>
+		<td>This method was added for the usage of the client to add his URI to be used in the SequenceID</td>
+	</tr> 
+
+	<tr>
+		<td><strong>getClientURI()</strong></td>
+		<td><strong>String</strong></td>
+		<td>This allows us to get the client URI from the Call object.</td>
+	</tr> 
+
+	<tr>
+		<td><strong>setLastMessage(boolean)</strong></td>
+		<td><strong>void</strong></td>
+		<td>This will set the LastMessage property in the Call object into true or false. </td>
+	</tr> 
+	
+	<tr>
+		<td><strong>getLastMessage()</strong></td>
+		<td><strong>boolean</strong></td>
+		<td>This will return the LastMessage property of the Call object.</td>
+	</tr>
+ 
+	<tr>
+		<td><strong>getSequenceID()</strong></td>
+		<td><strong>String</strong></td>
+		<td>This will return the SequenceID associated with the particular Call object. A Universally Unique Identifier (UUID) is generated with each Call object created by the client. This is used with the client URI to get a unique SequenceID for a client. </td>
+	</tr> 
+
+	<tr>
+		<td><strong>setSequenceID(String)</strong></td>
+		<td><strong>void</strong></td>
+		<td>This will set the SequenceID associated with the particular Call object. This method can be used by the client to use several different Call objects with a same Sequence.</td>
+	</tr>
+	
+ </table>
+<p>In addtion to the above <strong>org.apache.axis.components.uuid.SimpleUUIDGen.class</strong> is made singleton to support a unique UUID for a given call object.</p>
+</section>
+
+<section>
+	<title>Sandesha - What We Support</title>	
+	<p>With this prototype Sandesha supports many of the sub specifications comes with WS-Reliable Messaging Protocol specification. These supports comes with <strong>JAX-RPC services which is the AXIS's default and using the HTTP as the transport protocol.</strong> These can be listed as follows.</p>
+	<ul>
+		<li><strong>3. RM Protocol Elements</strong></li>
+		<li>3.1 Sequences</li>	
+		<li>3.2. Sequence Acknowledgement</li>	
+		<li>3.3. Request Acknowledgement</li>	
+		<li><strong>4. Policy Assertions</strong></li>
+		<li>4.1. Spec Version</li>	
+		<li>4.2. Delivery Assurance</li>	
+		<li>4.3. Sequence Expiration</li>	
+		<li>4.4. InactivityTimeout</li>	
+		<li>4.5. Retransmission Interval</li>	
+		<li>4.6. Acknowledgement Interval</li>
+	</ul>
+
+	<p>Sandesha architecture supports both Client End Point Manger (ClientEPM) and the Server End Point Manager (ServerEPM) to be used with any other End Point Mangers. i.e. Sandesha supports following three arrangements. In these scenarios we assume that other implementations are also complying with the WS-Reliable Messaging Protocol.</p>
+	<table>
+		<tr>
+			<th>Client Endpoint Manager</th>
+			<th>Server Endpoint Manager</th>
+		</tr>
+		<tr>
+			<td>Sandesha ClientEPM </td>
+			<td>Sandesha ServerEPM</td>
+		</tr>
+		<tr>
+			<td>Sandesha ClientEPM </td>
+			<td>Any other implementation of Server End Point manager</td>
+		</tr>
+		<tr>
+			<td>Any other Client End point Manager </td>
+			<td>Sandesha ServerEPM</td>
+		</tr>
+	
+	</table>
+</section>
+
+<section>
+	<title>Sandesha - Yet to Come</title>
+	<p>Next step of sandesha will focus on a complete support to WS Policy as well as WS Addressing.</p>
+	
+</section>
+
+<section>
+	<title>Sandesha - Improvements</title>
+	<p>It is our intention to improve the existing prototype to a complete product that supports JAX -M Services in addition to JAX-RPC as well as all the transport protocols that axis supports. </p>
+</section>
+
+<section>
+	<title>Sandesha - Credits</title>
+	<p>Author : Jaliya Ekanayake
+Sandesha Coordinator : Dr Sanjiva Weerawarna.
+The Sandesha Development Team 
+Amila Nilantha ,Amila Navarathana , Jaliya Ekanayake, Sudar Nimalan.
+</p>
+</section>
+
+<section>
+	<title>API Documentation</title>
+	<p>Sandesha API Documentation is a program generated documentation that will help developers to gain some idea about the classes and methods used.</p>
+	<p><fork href ="docs/index.html" title="Sandesha API Documentation">API Documentation</fork></p>
+	
+</section>
+
+
+  </body>
+</document>
+
+

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.2//EN" "http://apache.org/forrest/dtd/document-v12.dtd">
+<document> 
+	<header> 
+		<title>Configuration Guide</title> 
+	</header> 
+	<body> 
+		<section>
+			<title>Introduction</title>
+			<p>This document describes how to configure Sandesha with Apache Axis .It assumes that you have already configured Apache Axis on Tomcat server. The other components that you need to configure Sandesha can be listed as follows.
+			</p>
+		<note>Please Note: Author assumes that user is configuring it on Windows platform. If you are using other platforms please make the changes whatever necessary to Environment Variables.</note>
+			<ul>
+				<li>MySQL Database</li>
+				<li>jdbc connector for MySQL database (mysql-connector-java-3.0.8-stable-bin.jar) </li>
+				<li>XML parser (xerces.jar) </li>
+			</ul>
+			<p>For the following discussion we assume that the MySQL database is configured properly in your machine and in running condition, also the AXIS_HOME and CATALINA_HOME environment variables are set properly.	</p>
+		</section>
+
+		<section>
+			<title>Step 0: Concepts</title>
+			<p><strong>Sandesha</strong> comprises of mainly two RPC web services that acts as endpoint managers and a set of axis handlers to help the two services. So the configuration with respect to <strong>Sandesha</strong> is merely deploying the two services in the client and the server machines. In addition to above to provide with the persistent storage <strong>Sandesha</strong> needs a database server to be running on both machines.</p>
+			<p>Configuration required users to copy the <strong>Sandesha</strong> files to required location and setting up the database.</p> 
+		</section>
+
+		<section>
+			<title>Step 1: Creating Tables Using MySQL</title>
+			<p><strong>Sandesha</strong> require a database named <strong>WSRMDB</strong> to present in both client and server sides. For this purpose use the following command in the MySQL prompt.</p> 
+			<p><code>create database WSRMDB;</code></p>
+			<p>Then you need to create the following set of tables. Use the given commands to create tables. You can easily copy and paste these commands in MySQL prompt. </p>
+			<p><strong>Client Side Tables.</strong></p>
+			<p><code>create table tblConnectionTest(testField double);</code></p>
+			<p><code>create table tblWSRMSequences(WSRMsequence VARCHAR(100));</code></p>
+			<p><code>create table tblSeqNos(WSRMSequence VARCHAR(100), NextSeqNo double);</code></p>
+			<p><code>create table tblWSRMClient(WSRMSequence VARCHAR(100), Source VARCHAR(100), Destination VARCHAR(100), MessageNo double, SOAPMessage BLOB, Acknowledged int);</code></p>
+		
+			<p><strong>Server Side Tables.</strong></p>
+			<p><code>create table tblWSRMServer(WSRMSequence VARCHAR(100), Source VARCHAR(100), Destination VARCHAR(100), MessageNo double, SOAPMessage BLOB, Invoked BOOL, IsReturned int, ReturnedMessage BLOB); </code></p>
+			<p><code>create table tblMsgInfo(WSRMSequence VARCHAR(100),MessageNo double,Invoked BOOL, IsReturned int, SequenceExpiration VARCHAR(100), LastMsg int);</code></p>
+			<p> A detailed description of all the tables used in <strong>Sandesha</strong> can be found in the <strong>tables.txt</strong> in the <strong>Sandesha folder.</strong></p>
+		</section>
+		
+		<section>
+			<title>Step 2: Setting up Libraries</title>
+			<ul>
+				<li><p>All the classes associated with <strong>Sandesha</strong> comes in a folder named <strong>Sandesha</strong> with a following package structure. </p>
+					<p><strong>org.apache.sandesha</strong></p>
+					<p>So the user is required to copy <strong>sandesha\webapps\org</strong> folder to the following location.</p>
+					<p><strong>CATALINA_HOME\webapps\axis\WEB-INF\classes\</strong></p>
+				</li>
+				<li>
+					<p>Copy the <strong>sandesha\lib\axis.jar</strong> to the <strong>CATALINA_HOME\webapps\axis\lib\</strong> and <strong>AXIS_HOME\lib\</strong> </p>
+					<p>This is required because the <strong>axis.jar</strong> has been modified in order to support WS-RM Protocol. These modifications are mentioned in a following step. </p>
+				</li>	
+				<li>
+					<p>The other two libraries required are the jdbc connector<strong>(mysql-connector-java-3.0.8-stable-bin.jar) </strong>for MySQL database and the XML Parser (<strong>xerces.jar</strong>). These should be copied to the following directory. </p>
+				<p><strong>CATALINA_HOME\common\lib\</strong></p>
+				</li>
+				<li>
+				   <p>Copy the <strong>sandesha\lib\axis.jar</strong> to the <strong>CATALINA_HOME\webapps\axis\lib\</strong> and <strong>AXIS_HOME\lib\</strong></p>
+				     <p>This is required because the <strong>axis.jar</strong> has been modified in order to support WS-RM Protocol. These modifications are mentioned in a following step. </p>
+			      </li>
+				
+				<li>
+					<p>The other two libraries required are the jdbc connector<strong>(mysql-connector-java-3.0.8-stable-bin.jar)</strong> for MySQL database and the XML Parser (<strong>xerces.jar</strong>). These should be copied to the following directory. </p>
+				<p><strong>CATALINA_HOME\common\lib\</strong></p>
+				
+				</li>
+
+			</ul>
+		</section>
+
+		<section>
+			<title>Step 3: Deploying the Endpoint Managers</title>
+			<ul>
+				<li>Modify the paths set in all the bat files located at <strong>Sandesha\org\apache\sandesha</strong> folder. These will help the user to deploy the endpoint manager easily and to test the WS-RM Protocol with <strong>SandeshaTestService</strong> and <strong>Client.</strong> In these files user has to set the path to AXIS_HOME correctly and in some files user has to specify the current classpath.</li>
+				<li>Start the Tomcat (Assume you have already configured Axis on top of Tomcat) </li>	
+			</ul>
+				<p>Go to <strong>Sandesha\org\apache\sandesha</strong> and run the <strong>serverEPM_deploy.bat</strong> file. Make sure that you edit this <strong>serverEPM_deploy.bat</strong> and set the correct paths for the given libraries before running the bat file. </p>
+				<p>If you wish to run both the client and the service in a single machine then run the <strong>clientEPM_deploy.bat</strong> also to deploy the Client Endpoint Manager. </p>
+				<p>Check <link href="http://localhost:8080/axis/servlet/AxisServlet">&lt;http://localhost:8080/axis/servlet/AxisServlet&gt;</link>to verify that the End Point Managers and the "WSRMTestservice" are configured properly. </p>
+				<p>The out put of this location may be as follows. </p>
+		<source>
+	<strong>And now... Some Services</strong>
+		AdminService 
+		Version (wsdl) 
+		getVersion 
+		SandeshaTestService (wsdl) 
+		Message1Method 
+		Message2Method 
+		Message3Method 
+		Message4Method 
+		Message5Method 
+		ClientEndPointManager (wsdl) 
+		WSRMClientServiceMethod 
+		WSRMClientHandleAck 
+		ServerEndPointManager (wsdl) 
+		WSRMServerServiceMethod 
+		
+		</source>
+		
+		<p>Also edit the paths in the <strong>clientEPM_deploy.bat</strong> file and run that bat file as well.</p>
+	
+		</section>
+
+		<section>		
+			<title>Step 4: Testing the Sandesha</title>
+			<p>Run the MySQL database server</p>
+			<p>Now you are ready to run the Client application to test <strong>Sandesha.</strong> Make sure that you follow all the steps up to this point correctly before running the client application.</p>
+			<p>Run the client application by running <strong>Test.bat</strong> and verify that you get the correct responses.</p>
+
+		</section>
+
+		<section>
+			<title>Step 5: Testing the Reliability with SandeshaMonitor</title>
+			<p>SandeshaMonitor is a program that is developed by the <strong>Sandesha</strong> team to test and verify that the <strong>Sandesha</strong> meets its objectives. You can deploy the monitor using the <strong>monitor.bat</strong>.</p>
+			<p>The usage of the <strong>SandeshaMonitor</strong> is as follows.</p>
+			
+			<figure src="images/MonitorDrawing.jpg" alt="" width="645" height="338"/>
+			
+			<p>SandeshaMonitor acts as a reflector to most of the messages but it also provides a GUI to create an artificial network failure. User can specify the followings with SandeshaMonitor. </p>
+			<ul>
+				<li>Order of the messages to be sent to the server (that is to create a unordered set of messages) </li>
+				<li>Messages can be dropped. </li>
+				<li>Re transmissions can also be dropped if necessary.</li>
+			</ul>
+			<p>For more information about the SandeshaMonitor please refer <link href="SandeshaMonitor.html">SandeshaMonitor.html</link></p>
+			<p>In order to run SandeshaMonitor you first need to edit the "<strong>server.xml</strong>" in the <strong>CATALINA_HOME\conf\</strong> directory. Change the Tomcat's listening port to <strong>8070</strong>. </p>
+			<p>Run the SandeshaMonitor first </p>
+			<p>Then run the Client Application.</p>
+		</section>
+		
+		<section>
+			<title>Step 6: Testing</title>
+			<p>Test the <strong>Sandesha</strong> with the Client and Server Endpoint managers in different machines with multiple clients connecting at the same time. </p>
+
+		</section>		
+		
+		<section>
+			<title>Step 7: Summery</title>
+			<p><strong>Sandesha</strong> is simply an implementation of <strong>WS Reliable Messaging Protocol</strong> which can be added to Apache Axis as two services. These two services acts as the Endpoint Managers in our architecture. You can consume web services reliably using these two Endpoint Managers. </p>
+		</section>	
+	</body>
+</document>
+
+

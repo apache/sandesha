@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V1.2//EN" "http://apache.org/forrest/dtd/document-v12.dtd">
+<document> 
+  <header> 
+    <title>SandeshaMonitor</title> 
+   </header> 
+   <body> 
+	
+	<section>
+		<title>SandeshaMonitor - Introduction</title>
+		<p>Sandesha <strong>SandeshaMonitor</strong> is an implementation to control and monitor the message passing form one endpoint to another. It is implemented to simulate the Sandesha WS-RM protocol as well. In the server side user has to configure the SandeshaMonitor and can simulate the protocol. User will be able to view the messages through the SandeshaMonitor. While doing control on the messages, Monitor keeps a log file to will have the history of the message flow with time.</p>
+	</section>
+	<section>
+		<title>SandeshaMonitor - Architecture</title>
+		<p>The following diagram describes the architecture that we had with the SandeshaMonitor. This will listen to the port 8080 and it will redirect the message path to localhost:8070. In common every request to the Tomcat in the server side will come to the port 8080. So in order to control the message flow the monitor should be listening to the port 8080. So in this case user has to run the Tomcat at port 8070. Then the monitor will redirect the message to Tomcat. To run the Tomcat at port 8070 refer the Tomcat Documentation.
+While redirecting, Monitor will check whether the message has "Sequence" header. If it has the header then it the monitor will control the message flow and it will display the messages as well. At the same time it records the details in a log file with the sent time.
+Additional to that, Monitor has to wait for the response form the server. The monitor can display the received messages for every request message as well.</p>
+
+	</section>
+
+	<section>
+		<title>SandeshaMonitor - User Interface</title>
+		<p>The main window of the Monitor has there Taps as follows:</p>
+		<ol>
+			<li>Simple</li>
+			<li>Advanced</li>
+			<li>Message</li>
+		</ol>
+		<p><strong>1.Simple Tap:</strong></p>
+		<p>The following window displays the Simple tap. The user want to give the orders to the corresponding message number in the corresponding textboxes. Then the monitor will allow to go the message according to the order that user has set. After sent the message a "sent.." label will appear near the textboxes.</p>
+		<figure src="images/WSRMMo1.jpg" alt="" width="389" height="427"/>
+		<p><strong>2.Advanced Tap:</strong></p>
+		<p>The following window displays the Advanced tap. In default every checkboxes will be checked. That means, by default the monitor will allow all the retransmissions from the client endpoint manager. If the user wish not to allow the retransmissions, then user will uncheck the checkboxes corresponding to the messages. After sent a retransmission the corresponding retransmission color will change. </p>
+		<figure src="images/WSRMMo2.jpg" alt="" width="605" height="427"/>
+		<p><strong>3.Message Tap:</strong></p>
+		<p>The following window displays the Message tap. Message tap has taps named with message numbers. The taps with message number will dynamically create taps first to display the messages belongs to actual invoke, then the taps named with number of the retransmission is to display the messages belongs to retransmissions.</p>
+		<figure src="images/WSRMMo3.jpg" alt="" width="605" height="425"/>
+
+	</section>
+
+
+		
+
+  </body>
+</document>
+
+
