@@ -17,14 +17,7 @@
 
 package org.apache.sandesha.client;
 
-/**
- * @author Amila Navarathna <br>
- *         Jaliya Ekanayaka <br>
- *         Sudar Nimalan <br>
- *         (Apache Sandesha Project)
- *  
- */
-
-public class RMClientReference {
-
+public class RMService {
+    //The service is used as a dummy entity in
+    //the client side only.
 }
