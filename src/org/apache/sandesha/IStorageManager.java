@@ -109,5 +109,9 @@ public interface IStorageManager {
     public RMMessageContext checkForResponseMessage(String sequenceId,String requestMsgId);
     
     public boolean checkForAcknowledgement(String sequenceId,String requestMsgId);
-
+    
+    
+    public boolean isAckComplete(String sequenceID);
+    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage);
+    public boolean isAllSequenceComplete();
 }
