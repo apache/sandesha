@@ -355,7 +355,9 @@ public class RMProvider extends RPCProvider {
 			}
 
 		}
-
+		//msgContext.setUseSOAPAction(true);
+		//msgContext.setSOAPActionURI("fdfdf");
+		
 	}
 
 	/**
