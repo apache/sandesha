@@ -309,25 +309,7 @@ public class RMProvider extends RPCProvider {
 								msgContext.setResponseMessage(rmMsg.getResponseMessage());
 								}
 
-							while (true) {
-								lastProcessedMsgNo =
-									serverSeq.getLastProcessedMessageNumber();
-
-								if (msgNo == lastProcessedMsgNo + 1) {
-									super.processMessage(
-										msgContext,
-										reqEnv,
-										resEnv,
-										obj);
-									lastProcessedMsgNo++;
-									serverSeq.setLastProcessedMessageNumber(
-										lastProcessedMsgNo);
-
-									break;
-								}
-
-								Thread.sleep(Constants.SERVICE_INVOKE_INTERVAL);
-							}
+					
 
 							// //////
 						} else {
