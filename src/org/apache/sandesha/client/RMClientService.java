@@ -233,7 +233,12 @@ public class RMClientService {
                     Service service = new Service();
                     Call call = (Call) service.createCall();
                     call.setTargetEndpointAddress(destinationURL);
-                    call.invoke(envelopToSend);
+                    try{
+						call.invoke(envelopToSend);
+                    }catch(Exception e){
+                        log.error(e);
+                    }
+                    
 
                     boolean gotResponse = false;
                     int count = 0;
@@ -275,7 +280,12 @@ public class RMClientService {
                                 (Call) service.createCall();
                             retransmissionCall.setTargetEndpointAddress(
                                 destinationURL);
-                            retransmissionCall.invoke(envelopToSend);
+                                try{
+									retransmissionCall.invoke(envelopToSend);
+                                }catch(Exception e){
+                                	log.error(e);                                	                                	
+                                }
+                            
 
                         }
 
