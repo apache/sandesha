@@ -229,8 +229,8 @@ public class RMSender extends BasicHandler {
         createSeqRMMsgContext.setMessageID("uuid:" + tempUUID);
         //Create a sequence first.
 
-        storageManager.addSequence(reqRMMsgContext.getSequenceID());
-        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
+        //storageManager.addSequence(reqRMMsgContext.getSequenceID());
+        //storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
 
         //Set the processing state to the RMMessageContext
         createSeqRMMsgContext.setSync(sync);
