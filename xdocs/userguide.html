@@ -50,19 +50,26 @@ scenarios we only need to type simple ant commands in a command line.</p>
     <td width="87%">&nbsp;Description</td>
   </tr>
   <tr>
-    <td width="13%">run_sync_ping&nbsp</td>
+    <td width="13%">ping_sync&nbsp</td>
     <td width="87%">The scenario tests the simple one way Ping operation with 
     acknowledgements coming in same HTTP connection</td>
   </tr>
   <tr>
-    <td width="13%">run_async_ping</td>
+    <td width="13%">ping_async</td>
     <td width="87%">The scenario tests the simple one way Ping operation with 
     acknowledgements coming in a different&nbsp; HTTP connection</td>
   </tr>
   <tr>
-    <td width="13%">run_echo_string </td>
+    <td width="13%">echo_sync_ack</td>
     <td width="87%">This scenario tests the simple two way Echo String 
-    operation. Here the request, acknowledgement and the response all come in&nbsp; 
+    operation. Here the request and the response&nbsp; come in&nbsp; 
+different HTTP Connections. Acknowledgements are coming in the response path of 
+    the request's HTTP connection</td>
+  </tr>
+  <tr>
+    <td width="13%">echo_async_ack</td>
+    <td width="87%">This scenario tests the simple two way Echo String 
+    operation. Here the request Acknowledgement and the response&nbsp; come in&nbsp; 
 different HTTP Connections.</td>
   </tr>
 </table>
@@ -75,11 +82,8 @@ monitors are not running in the back ground, before every test.</p>
 (Assume that you have build Sandesha using Maven)</p>
 <ul type="square">
   <li>Copy the <b>Sandesha-1.0.jar</b> to your class path</li>
-  <li>Copy the <b>config/client-config.wsdd</b> to the class path of your client. This 
-  <b>client-config.wsdd</b> is a default configuration file for Sandesha client. If the user needs to 
-modify the client side configuration file, just modify the <b>ClientDeploy.wsdd
-  </b>and then use the 
-<b>DeployClient.bat</b> to generate the <b>client-config,wsdd. </b></li>
+  <li>Copy the <b>config/client-config.wsdd</b> to the class path of your 
+  client. </li>
 </ul>
 <p>To enable Sandesha in the client side, the only requirement is to use 
 <b>RMTransport</b> as the transport in the <b>client-config.wsdd</b></p>
@@ -92,11 +96,10 @@ path</p>
   <li>Copy the <b>Sandesha-1.0.jar</b> to the <b>CATALINA_HOME/webapps/axis/WEB-INF/lib</b> along 
 with the other new jars that can be found in <b>target/lib</b> folder of Sandesha.</li>
   <li>To configure Sandesha for a particular service( say MyService) change the 
-  <b>deploy.wsdd</b> of <b>MyService</b> according to the following.</li>
+  <b>deploy.wsdd</b> of <b>&nbsp;MyService</b> according to the following.</li>
 </ul>
 <source>
-<p>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot;</p>
-<p>xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;</p>
+<p>&lt;deployment xmlns=&quot;<a href="http://xml.apache.org/axis/wsdd/">http://xml.apache.org/axis/wsdd/</a>&quot; xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;</p>
 <p>&lt;service name=&quot;MyService&quot; provider=&quot;Handler&quot;&gt;</p>
 <p>&lt;requestFlow&gt;</p>
 <p>&lt;handler type=&quot;java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler&quot;&gt;&lt;/handler&gt;</p>
@@ -112,7 +115,10 @@ with the other new jars that can be found in <b>target/lib</b> folder of Sandesh
 request handlers. A sample of this <b>deploy.wsdd</b> can be found in the interop 
 directory named <b>RMInteropServiceDeploy</b> with the required bat file to deploy the 
 service. (make sure that the classes for the <b>MyService</b> is copied to 
-<b>CATALINA_HOME/webapps/axis/WEB-INF/classes</b></p>
+<b>CATALINA_HOME/webapps/axis/WEB-INF/classes. RMProvider</b> by default will 
+use the <b>RPCProvider</b> to invoke the services, however user can specify the 
+actual provider that is required to invoke a particular service in <b>
+sandesha.properties</b> file that can be found in <b>config</b> directory.</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
