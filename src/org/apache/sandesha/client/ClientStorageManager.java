@@ -191,10 +191,10 @@ public class ClientStorageManager implements IStorageManager {
      */
     public void setTemporaryOutSequence(String sequenceId, String outSequenceId) {
 
-        if (!sequenceId.equals(Constants.CLIENT_DEFAULD_SEQUENCE_ID)) {
+        /*if (!sequenceId.equals(Constants.CLIENT_DEFAULD_SEQUENCE_ID)) {
             System.out.println("Error: Wrong sequence id for client");
             return;
-        }
+        }*/
 
         IServerDAO accessor = ServerDAOFactory
                 .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
@@ -254,7 +254,7 @@ public class ClientStorageManager implements IStorageManager {
      * This sholud be called by the RMSender when adding request messages.
      *  
      */
-    private void insertClientRequestMessage(RMMessageContext msg) {
+    /*private void insertClientRequestMessage(RMMessageContext msg) {
         IServerDAO accessor = ServerDAOFactory
                 .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
 
@@ -267,7 +267,7 @@ public class ClientStorageManager implements IStorageManager {
             accessor.addOutgoingSequence(sequenceId);
 
         accessor.addMessageToOutgoingSequence(sequenceId, msg);
-    }
+    }*/
 
     /*
      * (non-Javadoc)
@@ -284,7 +284,9 @@ public class ClientStorageManager implements IStorageManager {
 
         //This is the seuqnceid used to create the map entry.
         // (not the actual seq id of the msg).
-        String sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+        String sequenceId = msg.getSequenceID();  
+		if(sequenceId==null)
+		    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
 
         boolean exists = accessor.isOutgoingSequenceExists(sequenceId);
         if (!exists)
@@ -306,10 +308,8 @@ public class ClientStorageManager implements IStorageManager {
                 .getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-
-        String sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;//rmHeaders.getSequence().getIdentifier().getIdentifier();
-
-        //String sequenceId = rmMessageContext.getSequenceID();
+    	
+        String sequenceId = rmMessageContext.getSequenceID();
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
         if (!exists) {
@@ -329,21 +329,35 @@ public class ClientStorageManager implements IStorageManager {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#checkForResponseMessage(java.lang.String, java.lang.String)
-     */
-    public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
-        // TODO Auto-generated method stub
-        return null;
+    public RMMessageContext checkForResponseMessage(String sequenceId,String requestMsgId){
+        
+		IServerDAO accessor =
+			ServerDAOFactory.getStorageAccessor(
+				Constants.SERVER_QUEUE_ACCESSOR);
+		
+		if(sequenceId==null)
+		    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+		
+		RMMessageContext response = accessor.checkForResponseMessage(requestMsgId,sequenceId);
+        return response; 
+        
     }
-
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#checkForAcknowledgement(java.lang.String, java.lang.String)
-     */
-    public boolean checkForAcknowledgement(String sequenceId, String requestMsgId) {
-        // TODO Auto-generated method stub
-        return false;
+    
+    public boolean checkForAcknowledgement(String sequenceId,String requestMsgId){
+        
+		IServerDAO accessor =
+			ServerDAOFactory.getStorageAccessor(
+				Constants.SERVER_QUEUE_ACCESSOR);
+		
+		//Request message will be present in the queue only if the ack has not been
+		//receive. It will be deleted by the AckProcessor when an ack get received.
+		if(sequenceId==null)
+		    sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
+		
+		boolean requestPresent = accessor.isRequestMessagePresent(sequenceId,requestMsgId);
+		return !requestPresent;
     }
+    
 
 
 }
