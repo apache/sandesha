@@ -46,8 +46,7 @@ public class ClientPropertyValidator {
 
         try {
             sourceURL = getSourceURL(call);
-            System.out.println("Souce URI " + sourceURL);
-        } catch (UnknownHostException e) {
+           } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             throw new AxisFault(e.getMessage());
         }

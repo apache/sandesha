@@ -78,7 +78,7 @@ public class FaultProcessor implements IRMMessageProcessor {
         }
             */
 
-         soapFault = new SOAPFault(this.axisFault);
+        soapFault = new SOAPFault(this.axisFault);
         return sendFault(rmMessageContext, soapFault);
 
 

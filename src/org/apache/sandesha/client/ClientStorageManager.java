@@ -163,8 +163,7 @@ public class ClientStorageManager implements IStorageManager {
     public boolean setApprovedOutSequence(String oldOutsequenceId, String newOutSequenceId) {
 
         boolean done = false;
-        System.out.println(oldOutsequenceId+"        "+newOutSequenceId);
-        String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
+          String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
 
         if (sequenceID == null) {
             log.error("ERROR: setApprovedOutSequence()");
@@ -308,8 +307,7 @@ public class ClientStorageManager implements IStorageManager {
 	 * @see org.apache.sandesha.IStorageManager#addSendMsgNo(java.lang.String, long)
 	 */
 	public void addSendMsgNo(String seqId, long msgNo) {
-        System.out.println( accessor.getSequenceOfOutSequence(seqId));
-		accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId),msgNo);
+      		accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId),msgNo);
 	}
 
     public void addOutgoingSequence(String sequenceId) {

@@ -97,9 +97,6 @@ public class EnvelopeCreator {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //System.out.println(envelope.toString());
-
         return envelope;
 
     }
@@ -407,8 +404,7 @@ public class EnvelopeCreator {
 
             //Set the addressing headers to the SOAPEnvelope.
             outGoingAddressingHaders.toEnvelope(requestEnvelope, null);
-            //System.out.println(requestEnvelope.toString());
-
+          
         } catch (SOAPException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

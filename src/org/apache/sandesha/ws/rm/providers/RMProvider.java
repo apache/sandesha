@@ -54,7 +54,6 @@ public class RMProvider extends RPCProvider {
     public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)
             throws Exception {
 
-        System.out.println("RMProvider Received a SOAP REQUEST.....\n");
         RMProvider.log.info("RMProvider Received a SOAP REQUEST");
 
 
@@ -95,8 +94,7 @@ public class RMProvider extends RPCProvider {
                 msgContext.setResponseMessage(null);
             }
          } catch (AxisFault af) {
-            System.out.println("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
-            RMProvider.log.error(af);
+                  RMProvider.log.error(af);
 
         	FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
 

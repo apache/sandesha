@@ -88,7 +88,6 @@ public class RMSender extends BasicHandler {
                 Iterator ite = headers.iterator();
 
                 while (ite.hasNext()) {
-                    System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
                     SOAPHeaderElement headerElement = (SOAPHeaderElement) ite.next();
                     headerElement.setMustUnderstand(false);
                     headerElement.setProcessed(true);
@@ -99,8 +98,7 @@ public class RMSender extends BasicHandler {
             } else {
                 boolean gotAck = false;
                 while (!gotAck) {
-                    System.out.println("");
-                    gotAck = checkTheQueueForAck(requestMesssageContext.getSequenceID(),
+                                       gotAck = checkTheQueueForAck(requestMesssageContext.getSequenceID(),
                             requestMesssageContext.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
@@ -221,8 +219,7 @@ public class RMSender extends BasicHandler {
     private RMMessageContext processFirstMessage(RMMessageContext reqRMMsgContext,
                                                  AddressingHeaders addrHeaders, boolean sync) throws Exception {
         long nextMsgNumber = reqRMMsgContext.getMsgNumber();
-        System.out.println(nextMsgNumber);
-        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         //Set the tempUUID
         String tempUUID = uuidGen.nextUUID();
         RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(reqRMMsgContext, addrHeaders, tempUUID);

@@ -73,8 +73,7 @@ public class RMInvoker implements Runnable {
 
                     if (rmMessageContext.isLastMessage()) {
                         //Insert Terminate Sequnce.
-                        System.out.println("LAST MESSAGE IS THERE");
-                        storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(rmMessageContext));
+                                               storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(rmMessageContext));
                     }
                     rpcProvider.invoke(rmMessageContext.getMsgContext());
                 

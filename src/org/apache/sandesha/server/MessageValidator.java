@@ -68,8 +68,7 @@ public final class MessageValidator {
         if (sequence != null) {
             String seqId = sequence.getIdentifier().getIdentifier();
             if (!storageMgr.isRequestedSeqPresent(seqId)){
-                  System.out.println("I am Here lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
-                    throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
+              throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
             }
             if (sequence.getMessageNumber() != null) {
                 long msgNo = sequence.getMessageNumber().getMessageNumber();

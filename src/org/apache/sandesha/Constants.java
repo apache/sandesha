@@ -267,6 +267,8 @@ public interface Constants {
     public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
 
     public interface FaultMessages {
+        public static final String SERVER_INTERNAL_ERROR="Server Interanal Error";
+
         public static final String NO_ADDRESSING_HEADERS = "No Addressing Headers Available in this Message";
         public static final String NO_MESSAGE_ID = "MessageID should be present in the message";
 
