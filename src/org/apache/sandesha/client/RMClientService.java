@@ -98,7 +98,7 @@ public class RMClientService {
                                String destinationURL,
                                String toClientServiceURL, String isOneWay,
                                String isLastMessage, String isCreateSequence,
-                               String isResponseExpected) {
+                               String isResponseExpected) throws AxisFault {
 
         // create a Identifier object from the sequenceID
         Identifier identifier = new Identifier();
@@ -354,12 +354,15 @@ public class RMClientService {
                         // Not handle let finlly to handle it.
                     } catch (ServiceException e) {
                         log.error(e);
+                        throw AxisFault.makeFault(e);
                     } catch (SOAPException e) {
                         log.error(e);
+                        throw AxisFault.makeFault(e);
                     } catch (Exception e) {
                         // If it is comming to this location then there will be an severe error than the
                         // HTTP termination.
                         log.error(e);
+                        throw AxisFault.makeFault(e);
                     }
                 }
             }
