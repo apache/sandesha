@@ -17,6 +17,7 @@
 package org.apache.sandesha.server;
 
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.AxisFault;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
@@ -37,6 +38,11 @@ public class RMMessageProcessorIdentifier {
      */
     public static IRMMessageProcessor getMessageProcessor(
             RMMessageContext rmMessageContext, IStorageManager storageManager) {
+       try{
+           MessageValidator.validate(rmMessageContext);
+       }catch(AxisFault af){
+          return new FaultProcessor(storageManager,af);
+       }
 
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
@@ -52,8 +58,7 @@ public class RMMessageProcessorIdentifier {
             return new TerminateSequenceProcessor(storageManager);
         } else if ((rmHeaders.getSequenceAcknowledgement() != null)
                 || (rmHeaders.getSequence().getMessageNumber() != null)) {
-
-            return new CompositeProcessor(storageManager);
+                return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);
     }

@@ -16,22 +16,22 @@
  */
 package org.apache.sandesha.ws.rm.providers;
 
-import org.apache.axis.MessageContext;
 import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.IRMMessageProcessor;
+import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
+import org.apache.sandesha.server.dao.ServerQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
-
-import java.util.Vector;
-import java.util.Iterator;
 
 /**
  * class RMProvider
@@ -44,91 +44,59 @@ import java.util.Iterator;
 public class RMProvider extends RPCProvider {
 
     private static boolean rmInvokerStarted = false;
+    private static boolean senderStarted;
+    private boolean client;
+    private static final Log log = LogFactory.getLog(ServerQueueDAO.class.getName());
 
-    private static boolean senderStarted = false;
 
-    private static boolean client = false;
+    public void processMessage(
+            MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)
+            throws Exception {
 
-    /**
-     * Method processMessage
-     *
-     * @param msgContext
-     * @param reqEnv
-     * @param resEnv
-     * @param obj
-     * @throws Exception
-     */
+        System.out.println("RMProvider Received a SOAP REQUEST.....\n");
+        RMProvider.log.info("RMProvider Received a SOAP REQUEST");
 
-    public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv,
-            SOAPEnvelope resEnv, Object obj) throws Exception {
-
-        /** ********************************************************************* */
-        System.out.println("RMProvider GOT SOAP REQUEST.....\n");
-
-        // System.out.println(reqEnv.toString());
-        //Initiates the StorageManager
         IStorageManager storageManager = RMInitiator.init(client);
         storageManager.init();
 
-        //Get the addressing headers.
-        AddressingHeaders addressingHeaders = null;
-        addressingHeaders = (AddressingHeaders) msgContext
-                .getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
-
-        //Get the RM headers
-        RMHeaders rmHeaders = new RMHeaders();
-        rmHeaders.fromSOAPEnvelope(reqEnv);
-
-
-        //Set the RMMessageContext
         RMMessageContext rmMessageContext = new RMMessageContext();
-
-        if (rmHeaders.getSequence() != null) {
-            rmMessageContext.setSequenceID(rmHeaders.getSequence().getIdentifier().toString());
-
-            if(rmHeaders.getSequence().getLastMessage()!=null){
-               System.out.println("SETTING THE LAST MESSAGE");
-               rmMessageContext.setLastMessage(true);
-             }
-        }
-
-        if (addressingHeaders.getMessageID() != null) {
-            rmMessageContext.setMessageID(addressingHeaders.getMessageID()
-                    .toString());
-            //System.out.println("MSG ID :
-            // "+addressingHeaders.getMessageID().toString());
-        }
-        //This should be there in the final version.
-        else {
-            System.out
-                    .println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~111");
-            throw new RMException("MessageID should be present in the message.");
-        }
-
         rmMessageContext.setMsgContext(msgContext);
-        rmMessageContext.setAddressingHeaders(addressingHeaders);
-        rmMessageContext.setRMHeaders(rmHeaders);
+        try {
+            MessageValidator.validate(rmMessageContext);
+        } catch (AxisFault af) {
+            //send the falut
+        }
 
-        new RMMessageProcessorIdentifier();
-        IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier
-                .getMessageProcessor(rmMessageContext, storageManager);
-        //Process message.
+        RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
+        AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
+
+        if (null != rmHeaders.getSequence()) {
+            rmMessageContext.setSequenceID(rmHeaders.getSequence().getIdentifier().toString());
+            if (null != rmHeaders.getSequence().getLastMessage()) {
+                rmMessageContext.setLastMessage(true);
+            }
+        }
+
+        if (null != addrHeaders.getMessageID()) {
+            rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
+        }
+
+        IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(
+                rmMessageContext, storageManager);
         try {
             if (!rmMessageProcessor.processMessage(rmMessageContext)) {
                 msgContext.setResponseMessage(null);
             }
         } catch (RMException rmEx) {
             rmEx.printStackTrace();
-            throw new AxisFault(rmEx.getStackTrace().toString());
-            //TODO
-            //throw a SOAPFault.
+            RMProvider.log.error(rmEx);
         }
     }
 
-   //This is used by the Client to set the
-   //set the side that the RMProvider is used.
+    //This is used by the Client to set the
+    //set the side that the RMProvider is used.
     public void setClient(boolean client) {
-        RMProvider.client = client;
+        this.client = client;
     }
 
 }

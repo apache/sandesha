@@ -157,13 +157,6 @@ public class RMMessageContext {
         return rmHeaders;
     }
 
-    /**
-     * @param rmHeaders
-     *            The rmHeaders to set.
-     */
-    public void setRmHeaders(RMHeaders rmHeaders) {
-        this.rmHeaders = rmHeaders;
-    }
 
     /**
      * @return Returns the sourceURL.
