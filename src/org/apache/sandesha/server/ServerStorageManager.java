@@ -158,7 +158,8 @@ public class ServerStorageManager implements IStorageManager {
 		IServerDAO accessor =
 			ServerDAOFactory.getStorageAccessor(
 				Constants.SERVER_QUEUE_ACCESSOR);
-		return accessor.isIncomingSequenceExists(sequenceID);
+		//return accessor.isIncomingSequenceExists(sequenceID);
+		return accessor.isOutgoingSequenceExists(sequenceID);
 	}
 	
     /**
@@ -328,13 +329,15 @@ public class ServerStorageManager implements IStorageManager {
 		boolean done = false;
 		String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
 		
-		if(sequenceID==null)
+		if(sequenceID==null){
+		    System.out.println("REOVING REMOVING REMOVING REMO " +oldOutsequenceId);
 		    return false;
-		    
+		}
+		System.out.println("REOVING REMOVING  " +oldOutsequenceId);    
 		accessor.setOutSequence(sequenceID,newOutSequenceId);
 		accessor.setOutSequenceApproved(sequenceID,true);  
 		
-		//Deleting create sequence message from the priority queue.  
+		//Deleting create sequence message from the priority queue.
 		accessor.removeCreateSequenceMsg(oldOutsequenceId);
 		return true;    		    		
 	}

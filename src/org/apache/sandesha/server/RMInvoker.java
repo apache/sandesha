@@ -131,14 +131,16 @@ public class RMInvoker implements Runnable {
                             System.out.println("NO RESPONSE SEQUENCE");
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);
-
+                            
                             MessageContext msgContext = new MessageContext(
                                     rmMessageContext.getMsgContext()
                                             .getAxisEngine());
-                            RMMessageContext.copyMessageContext(
-                                    rmMessageContext.getMsgContext(),
-                                    msgContext);
+                            
+                           // RMMessageContext.copyMessageContext(
+                           //         rmMessageContext.getMsgContext(),
+                           //         msgContext);
                             //Set this new msgContext to the rmMsgContext.
+                                                       
                             rmMessageContext.setMsgContext(msgContext);
 
                             rmMsgContext
@@ -156,9 +158,8 @@ public class RMInvoker implements Runnable {
                             SOAPEnvelope createSequenceEnvelope = EnvelopeCreator
                                     .createCreateSequenceEnvelope(id,
                                             rmMsgContext, Constants.SERVER);
-                            System.out.println("aaaaa");
 
-                            System.out.println("bbbbb");
+                            
                             rmMsgContext.getMsgContext().setRequestMessage(
                                     new Message(createSequenceEnvelope));
 
@@ -167,7 +168,7 @@ public class RMInvoker implements Runnable {
                                     .getAddressingHeaders().getReplyTo()
                                     .getAddress().toString());
 
-                            System.out.println("ddddd");
+                    
                             
                             rmMsgContext.setMessageID("uuid:"+id);
                             storageManager

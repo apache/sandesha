@@ -28,6 +28,7 @@ import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.server.queue.ServerQueue;
 
 /**
  * @author JEkanayake
@@ -62,9 +63,9 @@ public class Sender implements Runnable {
                     if (rmMessageContext.getMsgContext() == null)
                         System.out
                                 .println("rmMessageContext.getMsgContext()  == null");
-                    if (rmMessageContext.getMsgContext().getResponseMessage() == null)
+                    if (rmMessageContext.getMsgContext().getRequestMessage() == null)
                         System.out
-                                .println("rmMessageContext.getMsgContext().getResponseMessage()  == null");
+                                .println("rmMessageContext.getMsgContext().getRequestMessage()  == null");
 
                     switch (rmMessageContext.getMessageType()) {
                     case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST: {
@@ -204,14 +205,25 @@ public class Sender implements Runnable {
                         //RMMessageContext a field to store the long
                         // lastProcessedTime
                         //Another field to hold retransmission count.
-
+                        
+                        System.out
+                        .println("SENDING RESPONSE MESSAGE .....\n");
+                        
+                        ServerQueue sq = ServerQueue.getInstance();
+                        sq.displayPriorityQueue();
+                        sq.displayOutgoingMap();
+                        sq.displayIncomingMap();
+                        
                         SOAPEnvelope responseEnvelope = null;
 
                         if (rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT) {
                             if ((System.currentTimeMillis() - rmMessageContext
                                     .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL) {
-
-                                if (rmMessageContext.getReTransmissionCount() == 0) {
+                                
+                                //TODO
+                                //We should do this only once and then need to 
+                                //Save the respones message.
+                                //if (rmMessageContext.getReTransmissionCount() == 0) {
                                     //Need to create the response envelope.
                                     responseEnvelope = EnvelopeCreator
                                             .createServiceResponseEnvelope(rmMessageContext);
@@ -219,14 +231,14 @@ public class Sender implements Runnable {
                                             .setRequestMessage(
                                                     new Message(
                                                             responseEnvelope));
-                                }
+                                    System.out.println(responseEnvelope);
+                                //}
 
-                                System.out
-                                        .println("SENDING RESPONSE MESSAGE .....\n");
+                              
                                 System.out.println(rmMessageContext
                                         .getAddressingHeaders().getReplyTo()
                                         .getAddress().toString());
-                                System.out.println(responseEnvelope);
+
                                 try {
                                     Service service = new Service();
                                     Call call = (Call) service.createCall();
@@ -239,6 +251,8 @@ public class Sender implements Runnable {
 
                                     //NOTE: WE USE THE REQUEST MESSAGE TO SEND
                                     // THE RESPONSE.
+                                    
+
                                     call.setRequestMessage(rmMessageContext
                                             .getMsgContext()
                                             .getRequestMessage());
@@ -255,6 +269,7 @@ public class Sender implements Runnable {
                                         //We are not expecting the ack over the
                                         // same HTTP connection.
                                         call.invoke();
+                                        //System.out.println(call.getResponseMessage().getSOAPPartAsString());                                        
                                     } catch (AxisFault e) {
                                         e.printStackTrace();
                                         break;

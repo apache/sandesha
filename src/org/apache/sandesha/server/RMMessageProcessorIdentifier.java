@@ -32,7 +32,7 @@ public class RMMessageProcessorIdentifier {
 
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-
+      
         if (addrHeaders.getAction().toString().equals(
                 Constants.ACTION_CREATE_SEQUENCE)) {
             return new CreateSequenceProcessor(storageManager);
@@ -44,6 +44,7 @@ public class RMMessageProcessorIdentifier {
             return new TerminateSequenceProcessor(storageManager);
         } else if ((rmHeaders.getSequenceAcknowledgement() != null)
                 || (rmHeaders.getSequence().getMessageNumber() != null)) {
+            
             return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);
