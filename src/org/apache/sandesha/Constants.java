@@ -26,7 +26,7 @@ package org.apache.sandesha;
  */
 public interface Constants {
 
-    /**
+	/**
 	 * Namespace for wsu.
 	 */
 	public static final String NS_URI_WSU="http://schemas.xmlsoap.org/ws/2002/07/utility";
@@ -212,5 +212,12 @@ public interface Constants {
 	
 	//Constant for the Sender sleep time in ms.
 	public static final long SENDER_SLEEP_TIME=2000;
+	
+	public static final int MSG_TYPE_CREATE_SEQUENCE_REQUEST =1;
+	public static final int MSG_TYPE_CREATE_SEQUENCE_RESPONSE=2;
+	public static final int MSG_TYPE_SERVICE_REQUEST =3;
+	public static final int MSG_TYPE_SERVICE_RESPONSE =4;
+	public static final int MSG_TYPE_ACKNOWLEDGEMENT =5;
+	public static final int MSG_TYPE_TERMINATE_SEQUENCE =6;
 }
 
