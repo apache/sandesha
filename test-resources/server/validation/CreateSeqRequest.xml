@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"> 
+      <soapenv:Header>  
+         <wsa:MessageID soapenv:mustUnderstand="0">uuid:d64d30800a0301d801bb9696fdacedb0</wsa:MessageID>  
+         <wsa:To soapenv:mustUnderstand="0">http://192.248.18.50:8080/axis/services/EchoStringService</wsa:To>  
+         <wsa:Action soapenv:mustUnderstand="0">http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequence</wsa:Action>
+         <wsa:From>
+            <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+            <wsa:ReferenceProperties>
+               <ns1:dummyFrom xmlns:ns1="http://tempuri.org/"/>
+            </wsa:ReferenceProperties>
+         </wsa:From>
+         <wsa:ReplyTo>
+            <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+            <wsa:ReferenceProperties>
+               <ns2:dummyReply xmlns:ns2="http://tempuri.org/"/>
+            </wsa:ReferenceProperties>
+         </wsa:ReplyTo> 
+      </soapenv:Header> 
+      <soapenv:Body>  
+         <CreateSequence xmlns="http://schemas.xmlsoap.org/ws/2004/03/rm"/> 
+      </soapenv:Body>
+   </soapenv:Envelope>
