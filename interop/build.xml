@@ -2,7 +2,7 @@
 
 <project name="Apache Sandesha" default="usage" basedir=".">
     <!-- =================================================================== -->
-   <description>
+    <description>
    Build file for Apache Sandesha
 
    This file is intended for ANT, a Java based build tool.
@@ -241,12 +241,9 @@ Build Instructions:
     </target>
 
 
-
-
     <target name="compile"
         depends="compile.library"
         description="compile everything"/>
-
 
 
     <target name="compile.library" depends="prepare-src">
@@ -265,7 +262,6 @@ Build Instructions:
             </fileset>
         </copy>
     </target>
-
 
 
     <target name="compile.interop"
@@ -306,7 +302,7 @@ Build Instructions:
             <arg value="8080"/>
             <classpath refid="classpath.library"/>
         </java>
-     </target>
+    </target>
     <target name="run_tcp2" depends="init">
         <java classname="org.apache.axis.utils.tcpmon" fork="true" spawn="true">
             <arg value="9070"/>
@@ -334,22 +330,27 @@ Build Instructions:
     <target name="run_interop_async_ping" depends="compile.interop,run_tcp1,run_tcp2,run_server">
         <java classname="org.apache.sandesha.samples.interop.AsyncPingClient">
             <classpath refid="classpath.interop"/>
-         </java>
+        </java>
 
     </target>
 
     <target name="run_interop_sync_ping" depends="compile.interop,run_tcp1,run_server">
         <java classname="org.apache.sandesha.samples.interop.SyncPingClient">
             <classpath refid="classpath.interop"/>
-         </java>
+        </java>
 
     </target>
 
-    <target name="run_interop_echo_string" depends="compile.interop,run_tcp1,run_tcp2,run_server">
-        <java classname="org.apache.sandesha.samples.interop.EchoClient">
+    <target name="run_interop_echo_string_async_ack" depends="compile.interop,run_tcp1,run_tcp2,run_server">
+        <java classname="org.apache.sandesha.samples.interop.EchoClientAsyncAck">
             <classpath refid="classpath.interop"/>
-         </java>
+        </java>
+    </target>
 
+    <target name="run_interop_echo_string_sync_ack" depends="compile.interop,run_tcp1,run_tcp2,run_server">
+        <java classname="org.apache.sandesha.samples.interop.EchoClientSyncAck">
+            <classpath refid="classpath.interop"/>
+        </java>
     </target>
 
     <target name="shutdown_server" depends="run_server">
@@ -359,8 +360,9 @@ Build Instructions:
         </java>
     </target>
 
-    <target name="run_sync_ping" depends="run_interop_sync_ping,shutdown_server"> </target>
-     <target name="run_async_ping" depends="run_interop_async_ping,shutdown_server"> </target>
-     <target name="run_echo_string" depends="run_interop_echo_string,shutdown_server"> </target>
+    <target name="ping_sync" depends="run_interop_sync_ping,shutdown_server"> </target>
+    <target name="ping_async" depends="run_interop_async_ping,shutdown_server"> </target>
+    <target name="echo_sync_ack" depends="run_interop_echo_string_sync_ack,shutdown_server"> </target>
+    <target name="echo_async_ack" depends="run_interop_echo_string_async_ack,shutdown_server"> </target>
 
 </project>

@@ -18,12 +18,12 @@ package org.apache.sandesha.client;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.util.PropertyLoader;
 
 import javax.xml.namespace.QName;
 import java.net.InetAddress;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 /**
@@ -57,10 +57,7 @@ public class ClientPropertyValidator {
         String errorMsg = getValidated(msgNumber, action, replyTo, sync, inOut);
         if (errorMsg == null) {
             rmMessageContext = new RMMessageContext();
-            //Assume that the service invocations with respect to client is done
-            //in synchronus manner in all the cases. This has to be changed when 
-            //a callback mechanism is introduced.
-            //TODO
+
             rmMessageContext.setSync(sync);
             rmMessageContext.setHasResponse(inOut);
             rmMessageContext.setMsgNumber(msgNumber);
@@ -78,7 +75,7 @@ public class ClientPropertyValidator {
 
     /**
      * This will decide whether we have an IN-OUT style service request
-     * or IN-ONLY service request by checking the value of the QNane
+     * or IN-ONLY service request by checking the value of the QName
      * returned by the call.getReturnType().
      *
      * @param call
@@ -93,13 +90,9 @@ public class ClientPropertyValidator {
 
     }
 
-    /**
-     * @param call
-     * @return
-     * @throws URISyntaxException
-     */
+
     private static String getAction(Call call) {
-        String action = (String) call.getProperty("action");
+        String action = (String) call.getProperty(Constants.ClientProperties.ACTION);
         if (action != null)
             return action;
         else
@@ -108,36 +101,21 @@ public class ClientPropertyValidator {
     }
 
     private static boolean getSync(Call call) {
-        Boolean synchronous = (Boolean) call.getProperty("sync");
+        Boolean synchronous = (Boolean) call.getProperty(Constants.ClientProperties.SYNC);
         if (synchronous != null) {
             return synchronous.booleanValue();
         } else
             return true;//If the user has not specified the synchronous
     }
 
-    /*  private static boolean getHasResponse(Call call) {
-          String hasResponse = (String) call.getProperty("hasResponse");
-          boolean hasRes = false;
-          if (hasResponse != null) {
-              if (hasResponse.equals("true"))
-                  hasRes = true;
-              else
-                  hasRes = false;
-          } else
-              hasRes = false;//If the user has not specified the hasResponse
-          // property hasRes=false
-          return hasRes;
 
-      }
-  */
     private static String getSourceURL(Call call) throws UnknownHostException {
         String sourceURI = null;
         InetAddress addr = InetAddress.getLocalHost();
 
-        sourceURI = "http://" + addr.getHostAddress() + ":" + PropertyLoader.getClientSideListenerPort()
-                + "/axis/services/RMService";
-
-        //sourceURI="http://192.248.18.51:8080/axis/services/RMService";
+        sourceURI = Constants.HTTP + Constants.COLON + Constants.SLASH + Constants.SLASH +
+                addr.getHostAddress() + Constants.COLON + PropertyLoader.getClientSideListenerPort()
+                + Constants.URL_RM_SERVICE;
 
         return sourceURI;
     }
@@ -147,7 +125,7 @@ public class ClientPropertyValidator {
      * @return
      */
     private static long getMessageNumber(Call call) {
-        Object temp = call.getProperty("msgNumber");
+        Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
         long msgNumber = 0;
         if (temp != null)
             msgNumber = ((Long) temp).longValue();
@@ -155,7 +133,7 @@ public class ClientPropertyValidator {
     }
 
     private static boolean getLastMessage(Call call) {
-        Boolean lastMessage = (Boolean) call.getProperty("lastMessage");
+        Boolean lastMessage = (Boolean) call.getProperty(Constants.ClientProperties.LAST_MESSAGE);
         if (lastMessage != null)
             return lastMessage.booleanValue();
         else
@@ -167,14 +145,12 @@ public class ClientPropertyValidator {
         String errorMsg = null;
 
         if (sync && inOut && replyTo == null) {
-            errorMsg = "ERROR: To perform the operation, ReplyTo address must be specified." +
-                    " This EPR will not be the Sandesha end point. " +
-                    "If it should be Sandesha end point, please set the propety 'sync' to false in call.";
+            errorMsg = Constants.ErrorMessages.CLIENT_PROPERTY_VALIDATION_ERROR;
             return errorMsg;
         }
 
         if ((msgNumber == 0) || (action == null)) {
-            errorMsg = "ERROR: Message Number Not Specified or Action is null";
+            errorMsg = Constants.ErrorMessages.MESSAGE_NUMBER_NOT_SPECIFIED;
             return errorMsg;
         }
         return errorMsg;
@@ -182,12 +158,12 @@ public class ClientPropertyValidator {
 
 
     private static String getFrom(Call call) {
-        return (String) call.getProperty("from");
+        return (String) call.getProperty(Constants.ClientProperties.FROM);
 
     }
 
     private static String getReplyTo(Call call) {
-        return (String) call.getProperty("replyTo");
+        return (String) call.getProperty(Constants.ClientProperties.REPLY_TO);
 
     }
 

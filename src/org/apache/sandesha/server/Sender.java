@@ -17,14 +17,12 @@
 package org.apache.sandesha.server;
 
 import org.apache.axis.AxisFault;
-import org.apache.axis.Handler;
 import org.apache.axis.Message;
 import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.handler.AddressingHandler;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
@@ -33,7 +31,6 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
-import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.soap.SOAPEnvelope;
@@ -48,25 +45,24 @@ public class Sender implements Runnable {
     public boolean running = true;
     private IStorageManager storageManager;
 
-    private static  SimpleChain requestChain=null;
+    private SimpleChain requestChain = null;
+    private SimpleChain responseChain = null;
 
-    public static SimpleChain getRequestChain() {
+    public SimpleChain getRequestChain() {
         return requestChain;
     }
 
-    public static void setRequestChain(SimpleChain requestChain) {
-        Sender.requestChain = requestChain;
+    public void setRequestChain(SimpleChain requestChain) {
+        this.requestChain = requestChain;
     }
 
-    public static SimpleChain getResponseChanin() {
-        return responseChanin;
+    public SimpleChain getResponseChain() {
+        return responseChain;
     }
 
-    public static void setResponseChanin(SimpleChain responseChanin) {
-        Sender.responseChanin = responseChanin;
+    public void setResponseChain(SimpleChain responseChanin) {
+        this.responseChain = responseChanin;
     }
-
-    private static  SimpleChain responseChanin=null;
 
     public Sender() {
         storageManager = new ServerStorageManager();
@@ -168,13 +164,12 @@ public class Sender implements Runnable {
     private void sendCreateSequenceRequest(RMMessageContext rmMessageContext) throws Exception {
         if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
             //The code should not come to this point.
-            System.err.println("ERROR: NULL REQUEST MESSAGE");
+            System.err.println(Constants.ErrorMessages.NULL_REQUEST_MSG);
         } else {
             Call call;
 
             rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-            rmMessageContext
-                    .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+            rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             call = prepareCall(rmMessageContext);
             call.invoke();
 
@@ -188,11 +183,10 @@ public class Sender implements Runnable {
         //i.e. we are not expecting any response for this.
         if (rmMessageContext.getMsgContext().getResponseMessage() == null) {
             //The code should not come to this point.
-            System.err.println("ERROR: NULL REQUEST MESSAGE");
+            System.err.println(Constants.ErrorMessages.NULL_REQUEST_MSG);
         } else {
             rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-            rmMessageContext
-                    .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+            rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             Call call = prepareCall(rmMessageContext);
             call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
             call.invoke();
@@ -203,7 +197,7 @@ public class Sender implements Runnable {
         // Here there is no concept of sending synchronous CreateSequenceRequest
         // resposne.
         if (rmMessageContext.getMsgContext().getResponseMessage() == null) {
-            log.error("ERROR: NULL RESPONSE MESSAGE");
+            log.error(Constants.ErrorMessages.NULL_REQUEST_MSG);
         } else {
             rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
             rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
@@ -218,16 +212,7 @@ public class Sender implements Runnable {
         Call call = (Call) service.createCall();
         call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
 
-        //We need these two handlers in our
-        //SimpleChain sc = new SimpleChain();
-        //Handler serverRequestHandler = new RMServerRequestHandler();
-       // Handler addressingHandler = new AddressingHandler();
-
-       // sc.addHandler(addressingHandler);
-        //sc.addHandler(serverRequestHandler);
-
-        call.setClientHandlers(requestChain,responseChanin);
-
+        call.setClientHandlers(requestChain, responseChain);
         if (rmMessageContext.getMsgContext().getRequestMessage() != null) {
             String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
             call.setRequestMessage(new Message(soapMsg));
@@ -253,51 +238,49 @@ public class Sender implements Runnable {
 
         } else {
             Call call = prepareCall(rmMessageContext);
-            //Send the createSequnceRequest Asynchronously.
             storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
             call.invoke();
+            processResponseMessage(call, rmMessageContext);
 
         }
-
-
     }
 
     private void sendMessage(RMMessageContext rmMessageContext) throws Exception {
         switch (rmMessageContext.getMessageType()) {
             case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
                 {
-                    System.out.println("INFO: SENDING CREATE SEQUENCE REQUEST ....");
+                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ);
                     sendCreateSequenceRequest(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
                 {
-                    System.out.println("INFO: SENDING CREATE SEQUENCE RESPONSE ....");
+                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ_RES);
                     sendCreateSequenceResponse(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
                 {
-                    System.out.println("INFO: SENDING TERMINATE SEQUENCE REQUEST ....");
+                    System.out.println(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
                     sendTerminateSequenceRequest(rmMessageContext);
                     storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(rmMessageContext.getSequenceID()));
                     break;
                 }
             case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
                 {
-                    System.out.println("INFO: SENDING ACKNOWLEDGEMENT ....\n");
+                    System.out.println(Constants.InfomationMessage.SENDING_ACK);
                     sendAcknowldgement(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_SERVICE_REQUEST:
                 {
-                    System.out.println("INFO: SENDING REQUEST MESSAGE ....\n");
+                    System.out.println(Constants.InfomationMessage.SENDING_REQ);
                     sendServiceRequest(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_SERVICE_RESPONSE:
                 {
-                    System.out.println("INFO: SENDING RESPONSE MESSAGE ....\n");
+                    System.out.println(Constants.InfomationMessage.SENDING_RES);
                     sendServiceResponse(rmMessageContext);
                     break;
                 }
@@ -309,8 +292,7 @@ public class Sender implements Runnable {
             RMHeaders rmHeaders = new RMHeaders();
             rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
             rmMessageContext.setRMHeaders(rmHeaders);
-            AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage()
-                    .getSOAPEnvelope());
+            AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage().getSOAPEnvelope());
             rmMessageContext.setAddressingHeaders(addrHeaders);
             rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
             IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier

@@ -27,185 +27,75 @@ package org.apache.sandesha;
  */
 public interface Constants {
 
-    public static final int DEFAULR_CLIENT_SIDE_LISTENER_PORT = 8090;
+    public static final int DEFAULR_CLIENT_SIDE_LISTENER_PORT = 9090;
+    public static final int DEFAULT_SIMPLE_AXIS_SERVER_PORT = 8080;
 
-    public static final String CLIENT_LISTENER_CONFIG = "config/client-listener-config.wsdd";
+    public static final String HTTP = "http";
+    public static final String COLON = ":";
+    public static final String SLASH = "/";
+    public static final String UUID = "uuid:";
+    public static final String ASTERISK="*";
 
-    public static final String PROPERTIES_CONFIG = "config/sandesha.properties";
+    public static final String URL_RM_SERVICE = "/axis/services/RMService";
+    public static final String IGNORE_ACTION = "ignoreAction";
 
-    public static final String SIMPLE_AXIS_SERVER_PORT_POPERTY = "SIMPLE_AXIS_SERVER_PORT";
 
-    /**
-     * Namespace for wsu.
-     */
-    public static final String NS_URI_WSU = "http://schemas.xmlsoap.org/ws/2002/07/utility";
-
-    /**
-     * Field RM_CLIENT_SERVICE
-     */
-    public static final String RM_CLIENT_SERVICE = "RMClientService";
-
-    /**
-     * Field CLIENT_METHOD
-     */
-    public static final String CLIENT_METHOD = "clientMethod";
-
-    /**
-     * Field AXIS_SERVICES
-     */
-    public static final String AXIS_SERVICES = "/axis/services/";
-
-    /**
-     * Field QUESTION_WSDL
-     */
-    public static final String QUESTION_WSDL = "?wsdl";
-
-    /**
-     * Field CLIENT_REFERANCE
-     */
-    public static final String CLIENT_REFERENCE = "RMClientReference";
-
-    // Policy related constants.
-    // public static final EXPIRATION=new Date();
-
-    // double the expectd for breaking of the network in ms.
-
-    /**
-     * Field RETRANSMISSION_INTERVAL
-     */
     public static final long RETRANSMISSION_INTERVAL = 4000;
-
-    // Set to two 2000ms
-
-    /**
-     * Field MAXIMUM_RETRANSMISSION_COUNT
-     */
     public static final int MAXIMUM_RETRANSMISSION_COUNT = 20;
-
-    /**
-     * Field ANONYMOUS_URI
-     */
-    public static final String ANONYMOUS_URI = "http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous";
-
-    /**
-     * Field NS_PREFIX_RM
-     */
-    public static final String NS_PREFIX_RM = "wsrm";
-
-    /**
-     * Field NS_URI_RM
-     */
-    public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2004/03/rm";
-
-    /**
-     * Field WSU_PREFIX
-     */
-    public static final String WSU_PREFIX = "wsu";
-
-    /**
-     * Field WSU_NS
-     */
-    public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-
-    /**
-     * Field ENV_RM_REQUEST_HEADERS
-     */
-    public static final String ENV_RM_REQUEST_HEADERS = "org.apache.sandesha.ws.rm.REQUEST.HEADERS";
-
-    /**
-     * Field CLIENT_SEQUENCE_IDENTIFIER
-     */
-    public static final String CLIENT_SEQUENCE_IDENTIFIER = "SequenceIdetifier";
-
-    /**
-     * Field CLIENT_RESPONSE_EXPECTED
-     */
-    public static final String CLIENT_RESPONSE_EXPECTED = "ResponseExpected";
-
-    /**
-     * Field CLIENT_LAST_MESSAGE
-     */
-    public static final String CLIENT_LAST_MESSAGE = "LastMessage";
-
-    /**
-     * Field ACTION_CREATE_SEQUENCE
-     */
-    public static final String ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequence";
-
-    /**
-     * Field WSA_NS
-     */
-    public static final String WSA_NS = "http://schemas.xmlsoap.org/ws/2003/03/addressing";
-
-    /**
-     * Field WSA_PREFIX
-     */
-    public static final String WSA_PREFIX = "wsa";
-
-    /**
-     * Field ACTION_CREATE_SEQUENCE_RESPONSE
-     */
-    public static final String ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequenceResponse";
-
-    /**
-     * Field ACTION_TERMINATE_SEQUENCE
-     */
-    public static final String ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2004/03/rm/TerminateSequence";
-
-    /**
-     * Field WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION
-     */
-    public static final String WSRM_SEQUENCE_ACKNOWLEDGEMENT_ACTION = "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
-
-    /**
-     * Field RESPONSE_NAME_SPACE
-     */
-    public static final String RESPONSE_NAME_SPACE = "http://www.w3.org/2001/XMLSchema";
-
-    /**
-     * Field RM_SEQUENCE_ACKNOWLEDMENT_ACTION
-     */
-    public static final String RM_SEQUENCE_ACKNOWLEDMENT_ACTION = "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
-
-    public static final String IGNORE_ACTION="ignoreAction";
-       
+    public static final long RMINVOKER_SLEEP_TIME = 2000;
+    public static final long SENDER_SLEEP_TIME = 2000;
+    public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
+    public static final long CLIENT_WAIT_PERIOD_FOR_COMPLETE = 1000l;
 
     public int SERVER_QUEUE_ACCESSOR = 1;
-
     public int SERVER_DATABASE_ACCESSOR = 2;
 
-    //Constant for the RMInvoker sleep time in ms.
-    public static final long RMINVOKER_SLEEP_TIME = 2000;
-
-    //Constant for the Sender sleep time in ms.
-    public static final long SENDER_SLEEP_TIME = 2000;
-
     public static final int MSG_TYPE_CREATE_SEQUENCE_REQUEST = 1;
-
     public static final int MSG_TYPE_CREATE_SEQUENCE_RESPONSE = 2;
-
     public static final int MSG_TYPE_SERVICE_REQUEST = 3;
-
     public static final int MSG_TYPE_SERVICE_RESPONSE = 4;
-
     public static final int MSG_TYPE_ACKNOWLEDGEMENT = 5;
-
     public static final int MSG_TYPE_TERMINATE_SEQUENCE = 6;
 
-    public static final String CLIENT_DEFAULD_SEQUENCE_ID = "ClientDefSeq";
 
     //To identify the end point
     public static final int SERVER = 1;
-
     public static final int CLIENT = 0;
 
-    public static final String LAST_MSG = "lastMessage";
 
-    public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
+    public interface WSRM {
+        public static final String NS_PREFIX_RM = "wsrm";
+        public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2004/03/rm";
+        public static final String ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequence";
+        public static final String ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequenceResponse";
+        public static final String ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2004/03/rm/TerminateSequence";
+        public static final String SEQUENCE_ACKNOWLEDGEMENT_ACTION = "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
 
 
-    public static final long CLIENT_WAIT_PERIOD_FOR_COMPLETE = 1000l;
+        public static final String ACK_RANGE = "AcknowledgementRange";
+        public static final String UPPER = "Upper";
+        public static final String LOWER = "Lower";
+        public static final String ACK_REQUESTED = "AckRequested";
+        public static final String MSG_NUMBER = "MessageaNumber";
+        public static final String CREATE_SEQUENCE = "CreateSequence";
+        public static final String CREATE_SEQUENCE_RESPONSE = "CreateSequenceResponse";
+        public static final String FAULT_CODE = "FaultCode";
+        public static final String LAST_MSG = "LastMessage";
+        public static final String NACK = "Nack";
+        public static final String SEQUENCE = "Sequence";
+        public static final String SEQUENCE_ACK = "SequenceAcknowledgement";
+        public static final String TERMINATE_DEQUENCE = "TerminateSequence";
+        public static final String SEQUENCE_FAULT = "SequenceFault";
 
+        public static final double MAX_MSG_NO = 18446744073709551615d;
+
+    }
+
+    public interface WSU {
+        public static final String WSU_PREFIX = "wsu";
+        public static final String WSU_NS = "http://schemas.xmlsoap.org/ws/2002/07/utility";
+        public static final String IDENTIFIER = "Identifier";
+    }
 
     public interface FaultMessages {
         public static final String SERVER_INTERNAL_ERROR = "Server Interanal Error";
@@ -219,13 +109,10 @@ public interface Constants {
         public static final String UNKNOWN_SEQUENCE = "The value of wsrm:Identifier is not a known Sequence identifier.";
         public static final String MSG_NO_ROLLOVER = "The maximum value for wsrm:MessageNumber has been exceeded.";
         public static final String LAST_MSG_NO_EXCEEDED = "The value for wsrm:MessageNumber exceeds the value of the MessageNumber accompanying a LastMessage element in this Sequence.";
-
-
     }
 
     public interface FaultCodes {
         public static final String WSRM_SERVER_INTERNAL_ERROR = "ServerInternalError";
-
 
         public static final String IN_CORRECT_MESSAGE = "Incorrect Message";
         public static final String WSRM_FAULT_INVALID_ACKNOWLEDGEMENT = "wsrm:InvalidAcknowledgement";
@@ -235,17 +122,34 @@ public interface Constants {
     }
 
     public interface ErrorMessages {
+        public static final String CLIENT_PROPERTY_VALIDATION_ERROR = "ERROR: To perform the operation, " +
+                "ReplyTo address must be specified. This EPR will not be the Sandesha end point. " +
+                "If it should be Sandesha end point, please set the propety 'sync' to false in call.";
+        public static final String MESSAGE_NUMBER_NOT_SPECIFIED = "ERROR: Message Number Not Specified or Action is null";
 
+        public static final String SET_APPROVED_OUT_SEQ = "ERROR: setApprovedOutSequence()";
+
+        public static final String CANNOT_SEND_THE_CREATE_SEQ = "SERVER ERROR: Cannot send the CreateSequenceRequest from Server";
+        public static final String NULL_REQUEST_MSG = "ERROR: NULL REQUEST MESSAGE";
+
+        public static final String SEQ_IS_NOT_CREATED = "ERROR: Sequence was not created correcly in the in queue";
     }
 
     public interface InfomationMessage {
+        public static final String SENDING_CREATE_SEQ = "INFO: SENDING CREATE SEQUENCE REQUEST ....\n";
+        public static final String SENDING_CREATE_SEQ_RES = "INFO: SENDING CREATE SEQUENCE RESPONSE ....\n";
+        public static final String SENDING_TERMINATE_SEQ = "INFO: SENDING TERMINATE SEQUENCE REQUEST ....\n";
+        public static final String SENDING_ACK = "INFO: SENDING ACKNOWLEDGEMENT ....\n";
+        public static final String SENDING_REQ = "INFO: SENDING REQUEST MESSAGE ....\n";
+        public static final String SENDING_RES = "INFO: SENDING RESPONSE MESSAGE ....\n";
+        public static final String PROVIDER_RECEIVED_MSG = "INFO: RMPROVIDER RECEIVED A SOAP REQUEST....\n";
+        public static final String SENDER_STARTED="INFO: SENDER STARTED ....\n";
+        public static final String RMINVOKER_STARTED="INFO: RMINVOKER STARTED ....\n";
+         public static final String WAITING_TO_STOP_CLIENT="INFO: WATING TO STOP CLIENT ....\n";
+        public static final String CLIENT_LISTENER_STARTED ="NFO: CLIENT LISTENER STARTED ....\n";
 
     }
 
-
-    public static final double MAX_MSG_NO = 18446744073709551615d;
-
-    public static final String UUID = "uuid:";
 
     //Constants related to the queue.
     public interface Queue {
@@ -260,5 +164,33 @@ public interface Constants {
     }
 
 
+    public interface ClientProperties {
+
+        public static final String PROPERTY_FILE = "sandesha.properties";
+
+        public static final String CLIENT_LISTENER_PORT = "CLIENT_LISTENER_PORT";
+        public static final String SIMPLE_AXIS_SERVER_PORT_POPERTY = "SIMPLE_AXIS_SERVER_PORT";
+
+        public static final String FROM = "from";
+        public static final String REPLY_TO = "replyTo";
+        public static final String MSG_NUMBER = "msgNumber";
+        public static final String LAST_MESSAGE = "lastMessage";
+        public static final String SYNC = "sync";
+        public static final String ACTION = "action";
+
+
+        public static final String REQUEST_HANDLER = "requestHandler";
+        public static final String RESPONSE_HANDLER = "responseHandler";
+        public static final String LISTENER_REQUEST_HANDLER = "listenerRequestHandler";
+        public static final String LISTENER_RESPONSE_HANDLER = "listenerResponseHandler";
+
+        public static final String PROVIDER_NAME = "providerClass";
+        public static final String PROVIDER_CLASS = "org.apache.axis.providers.java.RPCProvider";
+
+        public static final String CLASS_NAME="className";
+         public static final String RMSERVICE="RMService";
+        public static final String RMSERVICE_CLASS="org.apache.sandesha.client.RMService";
+        public static final String ALLOWED_METHODS="allowedMethods";
+    }
 }
 

@@ -45,7 +45,7 @@ public class CreateSequence implements IRmElement {
      */
     public CreateSequence() {
         createSequence = new MessageElement();
-        createSequence.setName("wsrm:CreateSequence");
+        createSequence.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE);
     }
 
     /*
@@ -80,10 +80,10 @@ public class CreateSequence implements IRmElement {
             env.addBody();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
         SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody().addBodyElement(name);
 
-        bodyElement.setName("CreateSequence");
+        bodyElement.setName(Constants.WSRM.CREATE_SEQUENCE);
 
         return env;
     }

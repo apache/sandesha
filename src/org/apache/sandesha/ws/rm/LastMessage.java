@@ -42,7 +42,7 @@ public class LastMessage extends MessageElement implements IRmElement {
     public LastMessage() {
         lastMsgElement = new MessageElement();
 
-        lastMsgElement.setName("wsrm:LastMessage");
+        lastMsgElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.LAST_MSG);
     }
 
     /*
@@ -79,7 +79,7 @@ public class LastMessage extends MessageElement implements IRmElement {
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
-        msgElement.addChildElement("LastMessage", Constants.NS_PREFIX_RM);
+        msgElement.addChildElement(Constants.WSRM.LAST_MSG, Constants.WSRM.NS_PREFIX_RM);
         return msgElement;
     }
 

@@ -47,7 +47,7 @@ public class RMSender extends BasicHandler {
         try {
             RMMessageContext requestMesssageContext = RMMessageCreator.createServiceRequestMsg(msgContext);
             String sequenceID = requestMesssageContext.getSequenceID();
-            //AddressingHeaders addrHeaders = getAddressingHeaders(requestMesssageContext);
+
             long msgNo = requestMesssageContext.getMsgNumber();
 
             if (msgNo == 1) {

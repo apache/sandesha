@@ -1,3 +1,20 @@
+/*
+ * Copyright  1999-2004 The Apache Software Foundation.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package org.apache.sandesha.util;
 
 import org.apache.axis.AxisFault;
@@ -14,13 +31,6 @@ import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.client.ClientPropertyValidator;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Jaliya
- * Date: Feb 24, 2005
- * Time: 3:16:52 PM
- * To change this template use File | Settings | File Templates.
- */
 public class RMMessageCreator {
 
     public static RMMessageContext createCreateSeqMsg(RMMessageContext rmMsgCtx) throws Exception {
@@ -38,7 +48,7 @@ public class RMMessageCreator {
         String toAddress = rmMsgCtx.getOutGoingAddress();
 
         //Set the action
-        Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE));
+        Action action = new Action(new URI(Constants.WSRM.ACTION_CREATE_SEQUENCE));
         addrHeaders.setAction(action);
 
 
@@ -84,19 +94,6 @@ public class RMMessageCreator {
         return new RMMessageContext();
     }
 
-//    public static RMMessageContext createServiceRequestMsg(RMMessageContext rmMsgCtx) throws Exception {
-//        long nextMsgNumber = rmMsgCtx.getMsgNumber();
-//        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-//        reqRMMsgContext.setAddressingHeaders(addrHeaders);
-//        reqRMMsgContext.setOutGoingAddress(addrHeaders.getTo().toString());
-//        reqRMMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
-//        reqRMMsgContext.setMessageID(Constants.UUID + uuidGen.nextUUID());
-//        reqRMMsgContext.setMsgNumber(nextMsgNumber);
-//        //Set the processing state of the RMMessageContext
-//        reqRMMsgContext.setSync(sync);
-//    }
-
-
     public static RMMessageContext createServiceRequestMsg(MessageContext msgCtx) throws Exception {
         MessageContext newMsgContext = cloneMsgContext(msgCtx);
 
@@ -117,11 +114,6 @@ public class RMMessageCreator {
         requestMesssageContext.setOutGoingAddress(addrHeaders.getTo().toString());
         requestMesssageContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
         requestMesssageContext.setMessageID(Constants.UUID + uuidGen.nextUUID());
-        //requestMesssageContext.setMsgNumber(nextMsgNumber);
-        //Set the processing state of the RMMessageContext
-        //requestMesssageContext.setSync(sync);
-
-
         return requestMesssageContext;
     }
 

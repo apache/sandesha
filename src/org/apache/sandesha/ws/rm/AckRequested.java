@@ -57,7 +57,7 @@ public class AckRequested extends MessageElement implements IRmElement {
      */
     public AckRequested() {
         ackRequested = new MessageElement();
-        ackRequested.setName("wsrm:AckRequested");
+        ackRequested.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_REQUESTED);
     }
 
     /*
@@ -101,14 +101,14 @@ public class AckRequested extends MessageElement implements IRmElement {
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM,
-                Constants.NS_URI_RM);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
+                Constants.WSRM.NS_URI_RM);
         SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
                 .addHeaderElement(name);
 
         // .setActor(null);
         headerElement.setActor(null);
-        headerElement.setName("AckRequested");
+        headerElement.setName(Constants.WSRM.ACK_REQUESTED);
         headerElement.setMustUnderstand(true);
 
         if (identifier != null) {
@@ -136,25 +136,25 @@ public class AckRequested extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals("wsu:Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("wsrm:MessageaNumber")) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
                 messageNumber = new MessageNumber();
 
                 messageNumber.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("MessageaNumber")) {
+            if (childElement.getName().equals(Constants.WSRM.MSG_NUMBER)) {
                 messageNumber = new MessageNumber();
 
                 messageNumber.fromSOAPEnvelope(childElement);

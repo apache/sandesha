@@ -74,8 +74,7 @@ public class RMInvoker implements Runnable {
                                 terminateMsg.setOutGoingAddress(replyTo);
                                 storageManager.insertTerminateSeqMessage(terminateMsg);
                             } else {
-                                System.out.println("SERVER ERROR, CANNOT SEND THE TERMINTATION");
-                                log.error("SERVER ERROR: Cannot send the CreateSequenceRequest from Server");
+                              log.error(Constants.ErrorMessages.CANNOT_SEND_THE_CREATE_SEQ);
                             }
                         }
                         //Store the message in the response queue. If there is an application response then that

@@ -52,7 +52,7 @@ public class AcknowledgementRange implements IRmElement {
      */
     public AcknowledgementRange() {
         ackRangeElement = new MessageElement();
-        ackRangeElement.setName("wsrm:AcknowledgementRange");
+        ackRangeElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.ACK_RANGE);
     }
 
     /**
@@ -86,8 +86,8 @@ public class AcknowledgementRange implements IRmElement {
      */
     public MessageElement getSoapElement() {
 
-        ackRangeElement.setAttribute("Upper", new Long(maxValue).toString());
-        ackRangeElement.setAttribute("Lower", new Long(minValue).toString());
+        ackRangeElement.setAttribute(Constants.WSRM.UPPER, new Long(maxValue).toString());
+        ackRangeElement.setAttribute(Constants.WSRM.LOWER, new Long(minValue).toString());
 
         return ackRangeElement;
     }
@@ -102,10 +102,10 @@ public class AcknowledgementRange implements IRmElement {
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        SOAPElement ackRange = msgElement.addChildElement("AcknowledgementRange", Constants.NS_PREFIX_RM);
+        SOAPElement ackRange = msgElement.addChildElement(Constants.WSRM.ACK_RANGE, Constants.WSRM.NS_PREFIX_RM);
 
-        ackRange.setAttribute("Upper", new Long(maxValue).toString());
-        ackRange.setAttribute("Lower", new Long(minValue).toString());
+        ackRange.setAttribute(Constants.WSRM.UPPER, new Long(maxValue).toString());
+        ackRange.setAttribute(Constants.WSRM.LOWER, new Long(minValue).toString());
 
         return msgElement;
     }
@@ -118,8 +118,8 @@ public class AcknowledgementRange implements IRmElement {
      */
     public AcknowledgementRange fromSOAPEnvelope(MessageElement element) {
 
-        minValue = (new Long(element.getAttribute("Lower").trim())).longValue();
-        maxValue = (new Long(element.getAttribute("Upper").trim())).longValue();
+        minValue = (new Long(element.getAttribute(Constants.WSRM.LOWER).trim())).longValue();
+        maxValue = (new Long(element.getAttribute(Constants.WSRM.UPPER).trim())).longValue();
 
         return this;
     }

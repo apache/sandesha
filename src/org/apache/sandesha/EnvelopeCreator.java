@@ -45,7 +45,7 @@ public class EnvelopeCreator {
         SOAPEnvelope envelope = createBasicEnvelop();
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(envelope);
-        Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE_RESPONSE));
+        Action action = new Action(new URI(Constants.WSRM.ACTION_CREATE_SEQUENCE_RESPONSE));
         //TODO actor??
         SOAPHeaderElement actionElement = action.toSOAPHeaderElement(envelope, null);
         //actionElement.setMustUnderstand(true);
@@ -66,7 +66,9 @@ public class EnvelopeCreator {
 
         //RelatesTo
         MessageID incommingMessageId = addressingHeaders.getMessageID();
-        outGoingAddressingHaders.addRelatesTo(incommingMessageId.toString(), new QName(Constants.WSA_PREFIX, Constants.WSA_NS));
+        outGoingAddressingHaders.addRelatesTo(incommingMessageId.toString(),
+                new QName(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING,
+                        org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT));
 
         //SettingTo
         if (!rmMessageContext.getSync()) {
@@ -103,7 +105,7 @@ public class EnvelopeCreator {
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(envelope);
 
-        Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE));
+        Action action = new Action(new URI(Constants.WSRM.ACTION_CREATE_SEQUENCE));
         SOAPHeaderElement acionElement = action.toSOAPHeaderElement(envelope, null);
         outGoingAddressingHaders.setAction(action);
 
@@ -159,9 +161,9 @@ public class EnvelopeCreator {
 
     public static void addNamespaceDeclarations(SOAPEnvelope soapEnv) throws Exception {
 
-        soapEnv.addNamespaceDeclaration(Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
+        soapEnv.addNamespaceDeclaration(Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
         soapEnv.addNamespaceDeclaration(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING, org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT);
-        soapEnv.addNamespaceDeclaration(Constants.WSU_PREFIX, Constants.NS_URI_WSU);
+        soapEnv.addNamespaceDeclaration(Constants.WSU.WSU_PREFIX, Constants.WSU.WSU_NS);
 
     }
 
@@ -172,7 +174,7 @@ public class EnvelopeCreator {
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(envelope);
         //Action for sequence acknowledgement.
-        Action action = new Action(new URI(Constants.RM_SEQUENCE_ACKNOWLEDMENT_ACTION));
+        Action action = new Action(new URI(Constants.WSRM.SEQUENCE_ACKNOWLEDGEMENT_ACTION));
 
         SOAPHeaderElement actionElement = action.toSOAPHeaderElement(envelope, null);
         //actionElement.setMustUnderstand(true);
@@ -341,7 +343,7 @@ public class EnvelopeCreator {
         Identifier seqId = new Identifier();
         seqId.setIdentifier(rmMessageContext.getSequenceID());
 
-        Action terSeqAction = new Action(new URI(Constants.ACTION_TERMINATE_SEQUENCE));
+        Action terSeqAction = new Action(new URI(Constants.WSRM.ACTION_TERMINATE_SEQUENCE));
         outGoingAddressingHaders.setAction(terSeqAction);
 
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();

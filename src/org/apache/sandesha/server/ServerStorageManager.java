@@ -124,7 +124,7 @@ public class ServerStorageManager implements IStorageManager {
     public void addSequence(String sequenceId) {
         boolean result = accessor.addIncomingSequence(sequenceId);
         if (!result)
-            log.error("Sequence was not created correcly in the in queue");
+            log.error(Constants.ErrorMessages.SEQ_IS_NOT_CREATED);
     }
 
     /**
@@ -202,8 +202,7 @@ public class ServerStorageManager implements IStorageManager {
         accessor.setOutSequenceApproved(sequenceId, false);
     }
 
-    public boolean setApprovedOutSequence(String oldOutsequenceId,
-                                          String newOutSequenceId) {
+    public boolean setApprovedOutSequence(String oldOutsequenceId, String newOutSequenceId) {
 
         boolean done = false;
         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);

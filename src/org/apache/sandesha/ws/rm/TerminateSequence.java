@@ -51,7 +51,7 @@ public class TerminateSequence implements IRmElement {
      */
     public TerminateSequence() {
         terminateSequence = new MessageElement();
-        terminateSequence.setName("wsrm:TerminateSequence");
+        terminateSequence.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.TERMINATE_DEQUENCE);
     }
 
     /*
@@ -89,12 +89,12 @@ public class TerminateSequence implements IRmElement {
             env.addBody();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM,
-                Constants.NS_URI_RM);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
+                Constants.WSRM.NS_URI_RM);
         SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody()
                 .addBodyElement(name);
 
-        bodyElement.setName("TerminateSequence");
+        bodyElement.setName(Constants.WSRM.TERMINATE_DEQUENCE);
 
         if (identifier != null) {
             identifier.toSOAPEnvelope(bodyElement);
@@ -118,13 +118,13 @@ public class TerminateSequence implements IRmElement {
 
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals("wsu:Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX+Constants.COLON+Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);

@@ -41,8 +41,8 @@
           Service service = new Service();
           Call call = (Call) service.createCall();
 
-          call.setProperty("sync", new Boolean(false));
-          call.setProperty("action", "sandesha:ping");
+          call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
+          call.setProperty(Constants.ClientProperties.ACTION, "sandesha:ping");
 
           //These two are additional
           call.setProperty("from","http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
@@ -56,16 +56,16 @@
           call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
 
           //First Message
-          call.setProperty("msgNumber", new Long(1));
+          call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(1));
           call.invoke(new Object[]{"Ping Message Number One"});
 
           //Second Message
-          call.setProperty("msgNumber", new Long(2));
+          call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(2));
           call.invoke(new Object[]{"Ping Message Number Two"});
 
           //Third Message
-          call.setProperty("msgNumber", new Long(3));
-          call.setProperty(Constants.LAST_MSG, new Boolean(true)); //For last message.
+          call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(3));
+          call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true)); //For last message.
           call.invoke(new Object[]{"Ping Message Number Three"});
 
           RMInitiator.stopClient();

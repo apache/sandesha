@@ -21,6 +21,7 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.sandesha.Constants;
 
 import java.util.Iterator;
 
@@ -117,21 +118,21 @@ public class RMHeaders {
             while (iterator.hasNext()) {
                 headerElement = (SOAPHeaderElement) iterator.next();
 
-                if (headerElement.getName().equals("Sequence")) {
+                if (headerElement.getName().equals(Constants.WSRM.SEQUENCE)) {
                     sequence = new Sequence();
                     headerElement.setProcessed(true);
                     headerElement.setMustUnderstand(false);
                     sequence.fromSOAPEnveploe(headerElement);
                 }
 
-                if (headerElement.getName().equals("SequenceAcknowledgement")) {
+                if (headerElement.getName().equals(Constants.WSRM.SEQUENCE_ACK)) {
                     sequenceAcknowledgement = new SequenceAcknowledgement();
                     headerElement.setProcessed(true);
                     headerElement.setMustUnderstand(false);
                     sequenceAcknowledgement.fromSOAPEnveploe(headerElement);
                 }
 
-                if (headerElement.getName().equals("AckRequested")) {
+                if (headerElement.getName().equals(Constants.WSRM.ACK_REQUESTED)) {
                     ackRequest = new AckRequested();
                     headerElement.setProcessed(true);
                     headerElement.setMustUnderstand(false);
@@ -146,19 +147,19 @@ public class RMHeaders {
             while (iterator.hasNext()) {
                 bodyElement = (SOAPBodyElement) iterator.next();
 
-                if (bodyElement.getName().equals("CreateSequence")) {
+                if (bodyElement.getName().equals(Constants.WSRM.CREATE_SEQUENCE)) {
                     createSequence = new CreateSequence();
 
                     createSequence.fromSOAPEnveploe(bodyElement);
                 }
 
-                if (bodyElement.getName().equals("CreateSequenceResponse")) {
+                if (bodyElement.getName().equals(Constants.WSRM.CREATE_SEQUENCE_RESPONSE)) {
                     createSequenceResponse = new CreateSequenceResponse();
 
                     createSequenceResponse.fromSOAPEnveploe(bodyElement);
                 }
 
-                if (bodyElement.getName().equals("TerminateSequence")) {
+                if (bodyElement.getName().equals(Constants.WSRM.TERMINATE_DEQUENCE)) {
                     terminateSequence = new TerminateSequence();
 
                     terminateSequence.fromSOAPEnveploe(bodyElement);
@@ -285,15 +286,15 @@ public class RMHeaders {
             while (iterator.hasNext()) {
                 headerElement = (SOAPHeaderElement) iterator.next();
 
-                if (headerElement.getName().equals("Sequence")) {
+                if (headerElement.getName().equals(Constants.WSRM.SEQUENCE)) {
                     headerElement.detachNode();
                 }
 
-                if (headerElement.getName().equals("SequenceAcknowledgement")) {
+                if (headerElement.getName().equals(Constants.WSRM.SEQUENCE_ACK)) {
                     headerElement.detachNode();
                 }
 
-                if (headerElement.getName().equals("AckRequested")) {
+                if (headerElement.getName().equals(Constants.WSRM.ACK_REQUESTED)) {
                     headerElement.detachNode();
                 }
             }

@@ -57,7 +57,7 @@ public class RMProvider extends RPCProvider {
     public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)
             throws Exception {
 
-        RMProvider.log.info("RMProvider Received a SOAP REQUEST");
+        RMProvider.log.info(Constants.InfomationMessage.PROVIDER_RECEIVED_MSG);
         //Some actions may need to be ignored. e.g.  http://schemas.xmlsoap.org/ws/2005/02/trust/RST/SCT
         //user can specify them in the server-config.wsdd as parameters to the service
         //parameter names should be in  ignoreAction1, ignoreAction2 format.
@@ -151,7 +151,7 @@ public class RMProvider extends RPCProvider {
         while (ite.hasNext()) {
             String key = (String) ite.next();
 
-            if (key.regionMatches(0,Constants.IGNORE_ACTION,0,Constants.IGNORE_ACTION.length()))
+            if (key.regionMatches(0, Constants.IGNORE_ACTION, 0, Constants.IGNORE_ACTION.length()))
                 actionList.add(options.get(key));
         }
 

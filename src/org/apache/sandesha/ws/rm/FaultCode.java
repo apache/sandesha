@@ -24,7 +24,7 @@ public class FaultCode extends MessageElement implements IRmElement {
      */
     public FaultCode() {
         faultCode = new MessageElement();
-        faultCode.setName("wsrm:FaultCode");
+        faultCode.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.FAULT_CODE);
     }
 
     /*
@@ -61,7 +61,7 @@ public class FaultCode extends MessageElement implements IRmElement {
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
-        msgElement.addChildElement("FaultCode", Constants.NS_PREFIX_RM);
+        msgElement.addChildElement(Constants.WSRM.FAULT_CODE, Constants.WSRM.NS_PREFIX_RM);
         return msgElement;
     }
 

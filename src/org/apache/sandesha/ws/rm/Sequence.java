@@ -62,7 +62,7 @@ public class Sequence extends MessageElement implements IRmElement {
      */
     public Sequence() {
         seqElement = new MessageElement();
-        seqElement.setName("wsrm:Sequence");
+        seqElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE);
     }
 
     /*
@@ -101,13 +101,13 @@ public class Sequence extends MessageElement implements IRmElement {
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM,
-                Constants.NS_URI_RM);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
+                Constants.WSRM.NS_URI_RM);
         SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
                 .addHeaderElement(name);
 
         headerElement.setActor(null);
-        headerElement.setName("Sequence");
+        headerElement.setName(Constants.WSRM.SEQUENCE);
         headerElement.setMustUnderstand(true);
 
         if (lastMessage != null) {
@@ -139,39 +139,33 @@ public class Sequence extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals("wsu:Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
-
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
-
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("wsrm:MessageNumber")) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
                 messageNumber = new MessageNumber();
-
                 messageNumber.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("MessageNumber")) {
+            if (childElement.getName().equals(Constants.WSRM.MSG_NUMBER)) {
                 messageNumber = new MessageNumber();
-
                 messageNumber.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("wsrm:LastMessage")) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.LAST_MSG)) {
                 lastMessage = new LastMessage();
-
                 lastMessage.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("LastMessage")) {
+            if (childElement.getName().equals(Constants.WSRM.LAST_MSG)) {
                 lastMessage = new LastMessage();
-
                 lastMessage.fromSOAPEnvelope(childElement);
             }
         }

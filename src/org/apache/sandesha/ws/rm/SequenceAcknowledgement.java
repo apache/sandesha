@@ -68,7 +68,7 @@ public class SequenceAcknowledgement extends MessageElement implements
         nackList = new LinkedList();
         seqAck = new MessageElement();
 
-        seqAck.setName("wsrm:SequenceAcknowledgement");
+        seqAck.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_ACK);
     }
 
     /*
@@ -122,13 +122,13 @@ public class SequenceAcknowledgement extends MessageElement implements
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM,
-                Constants.NS_URI_RM);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
+                Constants.WSRM.NS_URI_RM);
         SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
                 .addHeaderElement(name);
 
         headerElement.setActor(null);
-        headerElement.setName("SequenceAcknowledgement");
+        headerElement.setName(Constants.WSRM.SEQUENCE_ACK);
         headerElement.setMustUnderstand(true);
 
         Iterator iterator = ackRanges.iterator();
@@ -170,36 +170,36 @@ public class SequenceAcknowledgement extends MessageElement implements
 
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals("wsu:Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("wsrm:AcknowledgementRange")) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_RANGE)) {
                 AcknowledgementRange ackRange = new AcknowledgementRange();
 
                 ackRange.fromSOAPEnvelope(childElement);
                 ackRanges.add(ackRange);
             }
 
-            if (childElement.getName().equals("AcknowledgementRange")) {
+            if (childElement.getName().equals(Constants.WSRM.ACK_RANGE)) {
                 AcknowledgementRange ackRange = new AcknowledgementRange();
                 ackRange.fromSOAPEnvelope(childElement);
                 ackRanges.add(ackRange);
             }
 
-            if (childElement.getName().equals("wsrm:Nack")) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.NACK)) {
                 Nack nack = new Nack();
                 nack.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("Nack")) {
+            if (childElement.getName().equals(Constants.WSRM.NACK)) {
                 Nack nack = new Nack();
                 nack.fromSOAPEnvelope(childElement);
             }

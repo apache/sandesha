@@ -51,7 +51,7 @@ public class CreateSequenceResponse implements IRmElement {
      */
     public CreateSequenceResponse() {
         createSequenceResponse = new MessageElement();
-        createSequenceResponse.setName("wsrm:CreateSequenceResponse");
+        createSequenceResponse.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE_RESPONSE);
     }
 
     /*
@@ -84,11 +84,11 @@ public class CreateSequenceResponse implements IRmElement {
         if (env.getBody() == null) {
             env.addBody();
         }
-        Name name = env.createName("", Constants.NS_PREFIX_RM,
-                Constants.NS_URI_RM);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
+                Constants.WSRM.NS_URI_RM);
         SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody()
                 .addBodyElement(name);
-        bodyElement.setName("CreateSequenceResponse");
+        bodyElement.setName(Constants.WSRM.CREATE_SEQUENCE_RESPONSE);
         if (identifier != null) {
             identifier.toSOAPEnvelope(bodyElement);
         }
@@ -109,12 +109,12 @@ public class CreateSequenceResponse implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals("wsu:Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals("Identifier")) {
+            if (childElement.getName().equals(Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }

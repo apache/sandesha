@@ -168,7 +168,7 @@ public class ClientStorageManager implements IStorageManager {
         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
 
         if (sequenceID == null) {
-            log.error("ERROR: setApprovedOutSequence()");
+            log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
             return false;
         }
         accessor.setOutSequence(sequenceID, newOutSequenceId);
@@ -245,9 +245,7 @@ public class ClientStorageManager implements IStorageManager {
 
         //Request message will be present in the queue only if the ack has not been
         //receive. It will be deleted by the AckProcessor when an ack get received.
-        if (sequenceId == null)
-            sequenceId = Constants.CLIENT_DEFAULD_SEQUENCE_ID;
-
+    
         boolean requestPresent = accessor.isRequestMessagePresent(sequenceId, requestMsgId);
         return !requestPresent;
     }

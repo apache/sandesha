@@ -32,23 +32,11 @@ import javax.xml.soap.SOAPException;
  */
 public class RMServerRequestHandler extends BasicHandler {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
-     */
-
-    /**
-     * Method invoke
-     *
-     * @param msgContext
-     * @throws AxisFault
-     */
     public void invoke(MessageContext msgContext) throws AxisFault {
         try {
             RMHeaders rmHeaders = new RMHeaders();
             rmHeaders.fromSOAPEnvelope(msgContext.getRequestMessage().getSOAPEnvelope());
-           
+
         } catch (SOAPException e) {
             throw AxisFault.makeFault(e);
         } catch (Exception e) {

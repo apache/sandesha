@@ -50,7 +50,7 @@ public class MessageNumber implements IRmElement {
 
         messageNoElement = new MessageElement();
 
-        messageNoElement.setName("wsrm:MessageaNumber");
+        messageNoElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.MSG_NUMBER);
     }
 
     /**
@@ -90,7 +90,7 @@ public class MessageNumber implements IRmElement {
     public MessageNumber fromSOAPEnvelope(MessageElement element) throws AxisFault {
 
         double tempMsgNo = (new Double(element.getValue())).doubleValue();
-        if (tempMsgNo >= Constants.MAX_MSG_NO)
+        if (tempMsgNo >= Constants.WSRM.MAX_MSG_NO)
             throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_MSG_NO_ROLLOVER), Constants.FaultMessages.MSG_NO_ROLLOVER, null, null);
 
         messageNumber = (new Long(element.getValue())).longValue();
@@ -107,7 +107,7 @@ public class MessageNumber implements IRmElement {
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("MessageNumber", Constants.NS_PREFIX_RM)
+        msgElement.addChildElement(Constants.WSRM.MSG_NUMBER, Constants.WSRM.NS_PREFIX_RM)
                 .addTextNode((new Long(messageNumber)).toString());
 
         return msgElement;

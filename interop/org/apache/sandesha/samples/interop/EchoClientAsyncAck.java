@@ -27,52 +27,61 @@ import org.apache.sandesha.RMTransport;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
-public class SyncPingClient {
+public class EchoClientAsyncAck {
 
     private static String defaultServerPort = "8070";
-
+    private static String defaultClientPort = "9070";
     private static String targetURL = "http://127.0.0.1:" + defaultServerPort + "/axis/services/RMInteropService?wsdl";
 
     public static void main(String[] args) {
-        System.out.println("Client started...... Synchronous ");
-        try {
 
-            RMInitiator.initClient(true);
+        System.out.println("EchoClientAsyncAck Started ........");
+
+        try {
+            //A separate listner will be started if the value of the input parameter for the mehthod
+            // initClient is "false". If the service is of type request/response the parameter value shoule be "false"
+            RMInitiator.initClient(false);
+
+            //UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
+            //String str = uuidGen.nextUUID();
+
+            String str = "ABCDEF1234";
 
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
-            call.setProperty(Constants.ClientProperties.ACTION, "sandesha:ping");
+            //To obtain the
+            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
+            call.setProperty(Constants.ClientProperties.ACTION, "sandesha:echo");
 
             //These two are additional
             //call.setProperty("from","http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous");
-            //call.setProperty("replyTo","http://10.10.0.4:8080/axis/services/MyService");
-            //http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous
+            call.setProperty(Constants.ClientProperties.FROM,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+            call.setProperty(Constants.ClientProperties.REPLY_TO,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
 
             call.setTargetEndpointAddress(targetURL);
-            call.setOperationName(new QName("RMInteropService", "ping"));
+            call.setOperationName(new QName("RMInteropService", "echoString"));
             call.setTransport(new RMTransport(targetURL, ""));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
+            call.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
+            call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
 
-            //First Message
             call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(1));
-            call.invoke(new Object[]{"Ping Message Number One"});
+            String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", str});
+            System.out.println("The Response for First Messsage is  :" + ret);
 
-            //Second Message
             call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(2));
-            call.invoke(new Object[]{"Ping Message Number Two"});
+            ret = (String) call.invoke(new Object[]{"Sandesha Echo 2", str});
+            System.out.println("The Response for Second Messsage is  :" + ret);
 
-            //Third Message
             call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(3));
             call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true)); //For last message.
-            call.invoke(new Object[]{"Ping Message Number Three"});
+            ret = (String) call.invoke(new Object[]{"Sandesha Echo 3", str});
+            System.out.println("The Response for Third Messsage is  :" + ret);
 
             RMInitiator.stopClient();
-
         } catch (Exception e) {
-            //System.err.println(e.toString());
             e.printStackTrace();
         }
     }

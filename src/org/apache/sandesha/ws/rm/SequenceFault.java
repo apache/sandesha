@@ -18,7 +18,7 @@ public class SequenceFault extends MessageElement implements IRmElement {
 
     public SequenceFault() {
         sequenceFault = new MessageElement();
-        sequenceFault.setName("wsrm:SequenceFault");
+        sequenceFault.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.SEQUENCE_FAULT);
     }
 
 
@@ -39,13 +39,13 @@ public class SequenceFault extends MessageElement implements IRmElement {
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM,
-                Constants.NS_URI_RM);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
+                Constants.WSRM.NS_URI_RM);
         SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
                 .addHeaderElement(name);
 
         headerElement.setActor(null);
-        headerElement.setName("SequenceFault");
+        headerElement.setName(Constants.WSRM.SEQUENCE_FAULT);
         headerElement.setMustUnderstand(true);
 
         if (faultCode != null) {
@@ -63,7 +63,7 @@ public class SequenceFault extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals("wsrm:FaultCode")) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.FAULT_CODE)) {
                 faultCode = new FaultCode();
                 faultCode.fromSOAPEnvelope(childElement);
             }

@@ -18,34 +18,26 @@ package org.apache.sandesha;
 
 import org.apache.axis.Handler;
 import org.apache.axis.SimpleChain;
-import org.apache.axis.deployment.wsdd.WSDDDeployment;
-import org.apache.axis.deployment.wsdd.WSDDDocument;
-import org.apache.axis.description.JavaServiceDesc;
-import org.apache.axis.handlers.soap.SOAPService;
-import org.apache.axis.message.addressing.handler.AddressingHandler;
-import org.apache.axis.server.AxisServer;
-import org.apache.axis.transport.http.SimpleAxisServer;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.configuration.SimpleProvider;
+import org.apache.axis.description.JavaServiceDesc;
+import org.apache.axis.handlers.soap.SOAPService;
+import org.apache.axis.transport.http.SimpleAxisServer;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
-import org.apache.sandesha.util.PropertyLoader;
-import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
-import org.apache.sandesha.ws.rm.providers.RMProvider;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
-import org.apache.commons.logging.Log;
-import org.w3c.dom.Document;
+import org.apache.sandesha.util.PropertyLoader;
+import org.apache.sandesha.ws.rm.providers.RMProvider;
 
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.InputStream;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Jaliya
@@ -69,8 +61,15 @@ public class RMInitiator {
         if (client) {
             IStorageManager storageManager = new ClientStorageManager();
             if (!senderStarted) {
-                System.out.println("INFO: Sender Thread started .....\n");
+                System.out.println(Constants.InfomationMessage.SENDER_STARTED);
                 sender = new Sender(storageManager);
+                SimpleChain reqChain = getRequestChain();
+                SimpleChain resChain = getResponseChain();
+                if (reqChain != null)
+                    sender.setRequestChain(reqChain);
+                if (resChain != null)
+                    sender.setResponseChain(resChain);
+
                 thSender = new Thread(sender);
                 thSender.setDaemon(false);
                 senderStarted = true;
@@ -79,7 +78,7 @@ public class RMInitiator {
             return storageManager;
         } else {
             if (!senderStarted) {
-                System.out.println("INFO: Sender Thread started .....\n");
+                System.out.println(Constants.InfomationMessage.SENDER_STARTED);
                 Sender sender = new Sender();
                 Thread thSender = new Thread(sender);
                 thSender.setDaemon(false);
@@ -87,7 +86,7 @@ public class RMInitiator {
                 thSender.start();
             }
             if (!rmInvokerStarted) {
-                System.out.println("INFO: RMInvoker thread started ....\n");
+                System.out.println(Constants.InfomationMessage.RMINVOKER_STARTED);
                 RMInvoker rmInvoker = new RMInvoker();
                 thInvoker = new Thread(rmInvoker);
                 thInvoker.setDaemon(true);
@@ -113,7 +112,7 @@ public class RMInitiator {
 
         while (!storageManager.isAllSequenceComplete()) {
             try {
-                System.out.println("INFO : Waiting to Stop Client .....");
+                System.out.println(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
                 Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
             } catch (InterruptedException e) {
                 log.error(e);
@@ -131,143 +130,87 @@ public class RMInitiator {
     private static void startListener() {
 
         try {
-            System.out.println("INFO : Sandesha Client Side Listener Started ....");
+            System.out.println(Constants.InfomationMessage.CLIENT_LISTENER_STARTED);
             sas = new SimpleAxisServer();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
 
-
-            //CHANGE FOR SECURITY ADDITION
-
-
             SimpleProvider sp = new SimpleProvider();
             sas.setMyConfig(sp);
 
-            SimpleChain reqHandlers = new SimpleChain();
-            SimpleChain resHandlers = new SimpleChain();
+            SimpleChain reqHandlers = getListenerRequestChain();
+            SimpleChain resHandlers = getListenerResponseChain();
 
-            Handler addrHanlder = new AddressingHandler();
-            Handler rmHandler = new RMServerRequestHandler();
-            reqHandlers.addHandler(rmHandler);
-            reqHandlers.addHandler(addrHanlder);
+            RMProvider rmp = new RMProvider();
+            rmp.setClient(true);
+            SOAPService rmService = new SOAPService(reqHandlers, rmp, resHandlers);
 
-            ArrayList arr = PropertyLoader.getRequestHandlerNames();
-            Iterator it = arr.iterator();
+            JavaServiceDesc desc = new JavaServiceDesc();
+            rmService.setOption(Constants.ClientProperties.CLASS_NAME, Constants.ClientProperties.RMSERVICE_CLASS);
+            rmService.setOption(Constants.ClientProperties.ALLOWED_METHODS,Constants.ASTERISK);
 
-            while(it.hasNext()){
+            desc.setName(Constants.ClientProperties.RMSERVICE);
+            rmService.setServiceDescription(desc);
+            sp.deployService(Constants.ClientProperties.RMSERVICE, rmService);
+            sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
+
+            Thread serverThread = new Thread(sas);
+            serverThread.start();
+
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+    }
+
+
+    public static SimpleChain getHandlerChain(List arr) {
+        SimpleChain reqHandlers = new SimpleChain();
+        Iterator it = arr.iterator();
+        boolean hasReqHandlers = false;
+        try {
+            while (it.hasNext()) {
+                hasReqHandlers = true;
                 String strClass = (String) it.next();
                 Class c = Class.forName(strClass);
                 Handler h = (Handler) c.newInstance();
                 reqHandlers.addHandler(h);
             }
-
-            arr = PropertyLoader.getResponseHandlerNames();
-            it = arr.iterator();
-
-            while(it.hasNext()){
-                String strClass = (String) it.next();
-                Class c = Class.forName(strClass);
-                Handler h = (Handler) c.newInstance();
-                resHandlers.addHandler(h);
-            }
-
-            RMProvider rmp = new RMProvider();
-            rmp.setClient(true);
-            SOAPService rmService = new SOAPService(reqHandlers,rmp,resHandlers);
-
-            JavaServiceDesc desc = new JavaServiceDesc();
-            rmService.setOption("className", "org.apache.sandesha.client.RMService");
-            rmService.setOption("allowedMethods", "*");
-
-            desc.setName("RMService");
-            rmService.setServiceDescription(desc);
-            sp.deployService("RMService", rmService);
-            sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
-
-            Thread serverThread = new Thread(sas);
-            serverThread.start();
-
-            //END CHANGE FOR SECURITY ADDITION
-
-
-            /*
-            InputStream in=Thread.currentThread().getContextClassLoader().getResourceAsStream("client-listener-config.wsdd");
-
-            //Document doc = db.parse(new File(Constants.CLIENT_LISTENER_CONFIG));
-            Document doc = db.parse(in);
-            WSDDDocument wsdddoc = new WSDDDocument(doc);
-            WSDDDeployment wsdddep = wsdddoc.getDeployment();
-            sas.setMyConfig(wsdddep);
-            //Set the port 9090 to the SimpleAxisServer.
-            sas.getMyConfig().configureEngine(new AxisServer());
-            SOAPService service = sas.getMyConfig().getService(new QName("RMService"));
-            RMProvider rmP = (RMProvider) service.getPivotHandler();
-            rmP.setClient(true);
-
-            sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
-            Thread serverThread = new Thread(sas);
-            serverThread.start();*/
-
-
         } catch (Exception e) {
-           log.error(e);
+            log.error(e);
+            return null;
         }
-
-
-
-
-
-/*
-
-
-        sas = new SimpleAxisServer();
-        try {
-            SimpleProvider sp = new SimpleProvider();
-            sas.setMyConfig(sp);
-
-            SimpleChain shc = new SimpleChain();
-            //We need these two handlers in the request path to the client.
-            //Actually the response messages coming asynchronously should
-            //come through the SimpleAxisServer instance.
-            //We need to load the response handlers specified by the users
-            // in addtion to the the above two.
-            Handler addrHanlder = new AddressingHandler();
-            Handler rmHandler = new RMServerRequestHandler();
-
-            shc.addHandler(addrHanlder);
-            shc.addHandler(rmHandler);
-
-            //Need to use the RMProvider at the client side to handle the
-            //Asynchronous responses.
-            RMProvider rmProvider = new RMProvider();
-            //This is the switch used to inform the RMProvider about the
-            // side that it operates.
-            rmProvider.setClient(true);
-
-            SOAPService rmService = new SOAPService(shc, rmProvider, null);
-
-            JavaServiceDesc desc = new JavaServiceDesc();
-            rmService.setOption("className", "org.apache.sandesha.client.RMService");
-            rmService.setOption("allowedMethods", "*");
-
-            //Add Handlers ; Addressing and ws-rm before the service.
-            desc.setName("RMService");
-            rmService.setServiceDescription(desc);
-
-            //deploy the service to server
-            sp.deployService("RMService", rmService);
-            //finally start the server
-            //Start the simple axis server in port 8090
-            sas.setServerSocket(new ServerSocket(Constants.SOURCE_LISTEN_PORT));
-
-            Thread serverThread = new Thread(sas);
-            //serverThread.setDaemon(true);
-            serverThread.start();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-   */
+        if (hasReqHandlers)
+            return reqHandlers;
+        else
+            return null;
     }
+
+
+    private static SimpleChain getRequestChain() {
+        ArrayList arr = PropertyLoader.getRequestHandlerNames();
+        return getHandlerChain(arr);
+    }
+
+
+    private static SimpleChain getResponseChain() {
+
+        ArrayList arr = PropertyLoader.getResponseHandlerNames();
+        return getHandlerChain(arr);
+    }
+
+    private static SimpleChain getListenerRequestChain() {
+
+        ArrayList arr = PropertyLoader.getListenerRequestHandlerNames();
+        return getHandlerChain(arr);
+    }
+
+    private static SimpleChain getListenerResponseChain() {
+
+        ArrayList arr = PropertyLoader.getListenerResponseHandlerNames();
+        return getHandlerChain(arr);
+    }
+
+
 }

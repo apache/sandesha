@@ -11,6 +11,6 @@
         <parameter name="className" value="org.apache.sandesha.samples.interop.RMInteropService"/>
         <parameter name="allowedMethods" value="*"/>
         <parameter name="scope" value="request"/>
-    </service>
+	  </service>
 
 </deployment>
