@@ -54,7 +54,23 @@ public class RMMessageContext {
     private long lastPrecessedTime = 0;
 
     private long lastSentTime = 0;
+    
+    //This will be used to handle the relates to field.
+    //When sending the response messages from the server
+    private String oldSequenceID=null;
 
+    /**
+     * @return Returns the oldSequenceID.
+     */
+    public String getOldSequenceID() {
+        return oldSequenceID;
+    }
+    /**
+     * @param oldSequenceID The oldSequenceID to set.
+     */
+    public void setOldSequenceID(String oldSequenceID) {
+        this.oldSequenceID = oldSequenceID;
+    }
     /**
      * @return
      */
