@@ -81,7 +81,9 @@ public class ClientStorageManager implements IStorageManager {
         //No hard checking. User may insert the real sequence.
 
         String sequenceId = seqID;
-        accessor.moveOutgoingMessageToBin(sequenceId, new Long(msgNumber));
+        //accessor.moveOutgoingMessageToBin(sequenceId, new Long(msgNumber));
+
+        accessor.markOutgoingMessageToDelete(sequenceId, new Long(msgNumber));
 
     }
 
@@ -367,6 +369,30 @@ public class ClientStorageManager implements IStorageManager {
 		
 		boolean requestPresent = accessor.isRequestMessagePresent(sequenceId,requestMsgId);
 		return !requestPresent;
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#isAckComplete(java.lang.String)
+     */
+    public boolean isAckComplete(String sequenceID) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
+     */
+    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.IStorageManager#isAllSequenceComplete()
+     */
+    public boolean isAllSequenceComplete() {
+        // TODO Auto-generated method stub
+        return false;
     }
     
 
