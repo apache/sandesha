@@ -16,27 +16,22 @@
 */
 package org.apache.sandesha;
 
-import org.apache.axis.Handler;
-import org.apache.axis.SimpleChain;
-import org.apache.axis.deployment.wsdd.WSDDDocument;
 import org.apache.axis.deployment.wsdd.WSDDDeployment;
-import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.description.JavaServiceDesc;
+import org.apache.axis.deployment.wsdd.WSDDDocument;
 import org.apache.axis.handlers.soap.SOAPService;
-import org.apache.axis.message.addressing.handler.AddressingHandler;
+import org.apache.axis.server.AxisServer;
 import org.apache.axis.transport.http.SimpleAxisServer;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
-import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
+import org.apache.util.PropertyLoader;
 import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.namespace.QName;
-import java.io.IOException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.net.ServerSocket;
 
@@ -53,14 +48,17 @@ public class RMInitiator {
     private static boolean senderStarted = false;
     private static boolean listenerStarted = false;
     private static SimpleAxisServer sas = null;
+    private static Thread thSender;
+    private static Thread thInvoker;
+    private static Sender sender;
 
     public static IStorageManager init(boolean client) {
         if (client) {
             IStorageManager storageManager = new ClientStorageManager();
             if (!senderStarted) {
                 System.out.println("INFO: Sender Thread started .....\n");
-                Sender sender = new Sender(storageManager);
-                Thread thSender = new Thread(sender);
+                sender = new Sender(storageManager);
+                thSender = new Thread(sender);
                 thSender.setDaemon(false);
                 senderStarted = true;
                 thSender.start();
@@ -78,7 +76,7 @@ public class RMInitiator {
             if (!rmInvokerStarted) {
                 System.out.println("INFO: RMInvoker thread started ....\n");
                 RMInvoker rmInvoker = new RMInvoker();
-                Thread thInvoker = new Thread(rmInvoker);
+                thInvoker = new Thread(rmInvoker);
                 thInvoker.setDaemon(true);
                 rmInvokerStarted = true;
                 thInvoker.start();
@@ -95,33 +93,65 @@ public class RMInitiator {
         }
     }
 
+    public static RMStatus stopClient() {
+
+        //This should check whether we have received all the acks or reponses if any
+        IStorageManager storageManager = new ClientStorageManager();
+
+//        while(!storageManager.isAllSequenceComplete()){
+//            try {
+//                System.out.println("Checking to stop the client......................");
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//            }
+//        }
+
+        if (listenerStarted)
+            sas.stop();
+        try {
+            Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        sender.setRunning(false);
+        return new RMStatus();
+
+
+    }
+
     private static void startListener() {
-      /*
-     try {
-            SimpleAxisServer sas = new SimpleAxisServer();
+
+        try {
+            System.out.println("Sandesha Client Side Listener Started ....");
+            sas = new SimpleAxisServer();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
 
-            //Need to change the path
-           Document doc = db.parse(new File("config\\listener-config.wsdd"));
-            //"C:/SandeshaPrj/SandeshaIMPL/PrjWorkspace/bin/server-config.wsdd"));
+            Document doc = db.parse(new File("config/client-listener-config.wsdd"));
             WSDDDocument wsdddoc = new WSDDDocument(doc);
             WSDDDeployment wsdddep = wsdddoc.getDeployment();
             sas.setMyConfig(wsdddep);
-           //Set the port 9090 to the SimpleAxisServer.
+            //Set the port 9090 to the SimpleAxisServer.
+            sas.getMyConfig().configureEngine(new AxisServer());
+            SOAPService service = sas.getMyConfig().getService(new QName("RMService"));
+            RMProvider rmP = (RMProvider) service.getPivotHandler();
+            rmP.setClient(true);
+            System.out.println(" Service " + service.getPivotHandler());
 
-            sas.getMyConfig().getServiceByNamespaceURI("RMService");
-
-
-            sas.setServerSocket(new ServerSocket(9090));
+            sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
             Thread serverThread = new Thread(sas);
             serverThread.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-       */
+
+
+
+
+/*
 
 
         sas = new SimpleAxisServer();
@@ -170,7 +200,7 @@ public class RMInitiator {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-     
 
+   */
     }
 }

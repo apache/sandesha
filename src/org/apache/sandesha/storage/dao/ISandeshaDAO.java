@@ -20,6 +20,7 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
 
 import java.util.Set;
+import java.util.Iterator;
 
 /**
  * @author Chamikara Jayalath
@@ -108,7 +109,9 @@ public interface ISandeshaDAO {
     //Two methods below will be used to get this key from the actual sequenceid.
     public String getKeyFromIncomingSequenceId(String incomingSeqID); 
     
-    public String getKeyFromOutgoingSequenceId(String outgoingSeqID); 
-    
-    
+    public String getKeyFromOutgoingSequenceId(String outgoingSeqID);
+
+    public Iterator getAllOutgoingSequences();
+
+
 }

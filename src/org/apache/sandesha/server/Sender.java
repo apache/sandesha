@@ -40,6 +40,8 @@ import javax.xml.soap.SOAPException;
  * @author JEkanayake
  */
 public class Sender implements Runnable {
+    public boolean running = true;
+
     private IStorageManager storageManager;
 
     public Sender() {
@@ -50,9 +52,17 @@ public class Sender implements Runnable {
         this.storageManager = storageManager;
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
     public void run() {
 
-        while (true) {
+        while (running) {
             long startTime = System.currentTimeMillis();
             boolean hasMessages = true;
             //Take a messge from the storage and check whether we can send it.
@@ -62,94 +72,33 @@ public class Sender implements Runnable {
                     hasMessages = false;
                 } else {
                     //Send the message.
-                    switch (rmMessageContext.getMessageType()) {
-                        case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
-                            {
-                                System.out.println("INFO: SENDING CREATE SEQUENCE REQUEST ....");
-                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                        && ((System.currentTimeMillis() - rmMessageContext
-                                        .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                                    sendCreateSequenceRequest(rmMessageContext);
-                                } else {
-                                    //TODO REPORT ERROR
-                                }
-                                break;
-                            }
-                        case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
-                            {
-                                System.out.println("INFO: SENDING CREATE SEQUENCE RESPONSE ....");
-                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                        && ((System.currentTimeMillis() - rmMessageContext
-                                        .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                                    sendCreateSequenceResponse(rmMessageContext);
-                                } else {
-                                    //TODO REPORT ERROR
-                                }
-                                break;
-                            }
-                        case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
-                            {
-                                System.out.println("INFO: SENDING TERMINATE SEQUENCE REQUEST ....");
-                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                        && ((System.currentTimeMillis() - rmMessageContext
-                                        .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                                    sendTerminateSequenceRequest(rmMessageContext);
-                                } else {
-                                    //TODO REPORT ERROR
-                                }
-                                break;
-                            }
-                        case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
-                            {
-                                System.out.println("INFO: SENDING ACKNOWLEDGEMENT ....\n");
-                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                        && ((System.currentTimeMillis() - rmMessageContext
-                                        .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                                    sendAcknowldgement(rmMessageContext);
-                                } else {
-                                    //TODO REPORT ERROR
-                                }
-                                break;
-                            }
-                        case Constants.MSG_TYPE_SERVICE_REQUEST:
-                            {
-                                System.out.println("INFO: SENDING REQUEST MESSAGE ....\n");
-                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                        && ((System.currentTimeMillis() - rmMessageContext
-                                        .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                                    sendServiceRequest(rmMessageContext);
-                                } else { //TODO REPORT ERROR
-                                }
-                                break;
-                            }
-                        case Constants.MSG_TYPE_SERVICE_RESPONSE:
-                            {
-                                System.out.println("INFO: SENDING RESPONSE MESSAGE ....\n");
-                                if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
-                                        && ((System.currentTimeMillis() - rmMessageContext
-                                        .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
-                                    sendServiceResponse(rmMessageContext);
-                                } else {
-                                    //TODO REPORT ERROR
-                                }
-                                break;
-                            }
+                    if ((rmMessageContext.getReTransmissionCount() <= Constants.MAXIMUM_RETRANSMISSION_COUNT)
+                            && ((System.currentTimeMillis() - rmMessageContext
+                            .getLastPrecessedTime()) > Constants.RETRANSMISSION_INTERVAL)) {
+                        try {
+                            sendMessage(rmMessageContext);
+                        } catch (AxisFault e) {
+                            e.printStackTrace();
+                        } catch (SOAPException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        //TODO REPORT ERROR
                     }
-
                 }
             } while (hasMessages);
 
             long timeGap = System.currentTimeMillis() - startTime;
             if ((timeGap - Constants.SENDER_SLEEP_TIME) <= 0) {
                 try {
-
                     System.out.print("|"); //Sender THREAD IS SLEEPING
                     // -----------XXX----------\n");
                     Thread.sleep(Constants.SENDER_SLEEP_TIME - timeGap);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
             }
         }
     }
@@ -157,120 +106,60 @@ public class Sender implements Runnable {
     /**
      * @param rmMessageContext
      */
-    private void sendTerminateSequenceRequest(RMMessageContext rmMessageContext) {
+    private void sendTerminateSequenceRequest(RMMessageContext rmMessageContext) throws Exception {
         SOAPEnvelope terSeqEnv = EnvelopeCreator.createTerminatSeqMessage(rmMessageContext);
         Message terSeqMsg = new Message(terSeqEnv);
         rmMessageContext.getMsgContext().setRequestMessage(terSeqMsg);
 
         Call call;
-        try {
-            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-            rmMessageContext
-                    .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
-            call = prepareCall(rmMessageContext);
-            call.invoke();
-            if (call.getResponseMessage() != null) {
-                RMHeaders rmHeaders = new RMHeaders();
-                rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
-                rmMessageContext.setRMHeaders(rmHeaders);
-                AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage()
-                        .getSOAPEnvelope());
-                rmMessageContext.setAddressingHeaders(addrHeaders);
-                rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
-                IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
-                        .getMessageProcessor(rmMessageContext, storageManager);
-                messagePrcessor.processMessage(rmMessageContext);
-            }
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SOAPException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+        rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+        call = prepareCall(rmMessageContext);
+        call.invoke();
 
-
+        processResponseMessage(call, rmMessageContext);
     }
 
-    private void sendServiceResponse(RMMessageContext rmMessageContext) {
+    private void sendServiceResponse(RMMessageContext rmMessageContext) throws Exception {
         SOAPEnvelope responseEnvelope = null;
         responseEnvelope = EnvelopeCreator.createServiceResponseEnvelope(rmMessageContext);
-        //org.apache.axis.MessageContext resMsgCtx=new org.apache.axis.MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
         rmMessageContext.getMsgContext().setRequestMessage(new Message(responseEnvelope));
         rmMessageContext.getMsgContext().setResponseMessage(new Message(responseEnvelope));
-        //resMsgCtx.setRequestMessage(new Message(responseEnvelope));
-        try {
-            Service service = new Service();
-            Call call = (Call) service.createCall();
-            //call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
-            call.setTargetEndpointAddress(rmMessageContext.getAddressingHeaders().getReplyTo()
-                    .getAddress().toString());
-            //NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
-            String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
-            call.setRequestMessage(new Message(soapMsg));
 
-            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-            rmMessageContext
-                    .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
-            //We are not expecting the ack over the
-            // same HTTP connection.
-            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),rmMessageContext.getMsgNumber());
+        Service service = new Service();
+        Call call = (Call) service.createCall();
 
-            call.invoke();
-            //System.out.println(call.getResponseMessage().getSOAPPartAsString());
+        call.setTargetEndpointAddress(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
+        //NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
+        String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
+        call.setRequestMessage(new Message(soapMsg));
 
-
-        } catch (ServiceException e1) {
-            System.err.println("ERROR: SENDING RESPONSE MESSAGE ....");
-            e1.printStackTrace();
-        } catch (AxisFault af) {
-            af.printStackTrace();
-        }
-
+        rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+        rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+        //We are not expecting the ack over the  same connection
+        storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+        call.invoke();
 
     }
 
-    private void sendCreateSequenceRequest(RMMessageContext rmMessageContext) {
+    private void sendCreateSequenceRequest(RMMessageContext rmMessageContext) throws Exception {
         if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
             //The code should not come to this point.
             System.err.println("ERROR: NULL REQUEST MESSAGE");
         } else {
             Call call;
-            try {
-                rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-                rmMessageContext
-                        .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
-                call = prepareCall(rmMessageContext);
-                call.invoke();
-                if (call.getResponseMessage() != null) {
-                    RMHeaders rmHeaders = new RMHeaders();
-                    rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
-                    rmMessageContext.setRMHeaders(rmHeaders);
-                    AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage()
-                            .getSOAPEnvelope());
-                    rmMessageContext.setAddressingHeaders(addrHeaders);
-                    rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
-                    IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
-                            .getMessageProcessor(rmMessageContext, storageManager);
-                    messagePrcessor.processMessage(rmMessageContext);
-                }
-            } catch (AxisFault e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SOAPException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+
+            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+            rmMessageContext
+                    .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+            call = prepareCall(rmMessageContext);
+            call.invoke();
+
+            processResponseMessage(call, rmMessageContext);
         }
     }
 
-    private void sendCreateSequenceResponse(RMMessageContext rmMessageContext) {
+    private void sendCreateSequenceResponse(RMMessageContext rmMessageContext) throws Exception {
         //Here there is no concept of sending synchronous CreateSequenceRequest
         // response.
         //i.e. we are not expecting any response for this.
@@ -278,23 +167,16 @@ public class Sender implements Runnable {
             //The code should not come to this point.
             System.err.println("ERROR: NULL REQUEST MESSAGE");
         } else {
-            try {
-                rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-                rmMessageContext
-                        .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
-                Call call = prepareCall(rmMessageContext);
-                call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
-                call.invoke();
-
-            } catch (ServiceException e) {
-                e.printStackTrace();
-            } catch (AxisFault e) {
-                e.printStackTrace();
-            }
+            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+            rmMessageContext
+                    .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+            Call call = prepareCall(rmMessageContext);
+            call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
+            call.invoke();
         }
     }
 
-    private void sendAcknowldgement(RMMessageContext rmMessageContext) {
+    private void sendAcknowldgement(RMMessageContext rmMessageContext) throws Exception {
         // Here there is no concept of sending synchronous CreateSequenceRequest
         // resposne.
         if (rmMessageContext.getMsgContext().getResponseMessage() == null) {
@@ -302,19 +184,12 @@ public class Sender implements Runnable {
         } else {
             rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
             rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
-            try {
-                Call call = prepareCall(rmMessageContext);
-                call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
-                call.invoke();
-                if (call.getResponseMessage() != null) {
-                    System.out.println("RESPONSE MESSAGE IS NOT NULL");
-                    System.out.println(call.getResponseMessage().getSOAPEnvelope().toString());
-                }
-            } catch (ServiceException e1) {
-                System.err.println("ERROR: SERVICE EXCEPTION WHEN SENDING RESPONSE");
-                e1.printStackTrace();
-            } catch (AxisFault e) {
-                e.printStackTrace();
+            Call call = prepareCall(rmMessageContext);
+            call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
+            call.invoke();
+            if (call.getResponseMessage() != null) {
+                System.out.println("RESPONSE MESSAGE IS NOT NULL");
+                System.out.println(call.getResponseMessage().getSOAPEnvelope().toString());
             }
         }
     }
@@ -334,8 +209,6 @@ public class Sender implements Runnable {
 
         call.setClientHandlers(null, sc);
 
-        //call.setRequestMessage(rmMessageContext.getMsgContext().getRequestMessage());
-
         if (rmMessageContext.getMsgContext().getRequestMessage() != null) {
             String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
             call.setRequestMessage(new Message(soapMsg));
@@ -343,7 +216,7 @@ public class Sender implements Runnable {
         return call;
     }
 
-    private void sendServiceRequest(RMMessageContext rmMessageContext) {
+    private void sendServiceRequest(RMMessageContext rmMessageContext) throws Exception {
         if (rmMessageContext.getMsgContext().getRequestMessage() == null) {
             System.err.println("ERROR: NULL REQUEST MESSAGE");
         } else {
@@ -355,56 +228,79 @@ public class Sender implements Runnable {
             rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             if (rmMessageContext.getSync()) {
                 Call call;
-                try {
-                    call = prepareCall(rmMessageContext);
+                call = prepareCall(rmMessageContext);
+                //CHECK THIS
+                storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+                call.invoke();
+                processResponseMessage(call, rmMessageContext);
 
-                    //CHECK THIS
-                    storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),rmMessageContext.getMsgNumber());
-                    call.invoke();
-                    if (call.getResponseMessage() != null) {
-                        System.out.println("RESPONSE MESSAGE IS NOT NULL");
-                        RMHeaders rmHeaders = new RMHeaders();
-                        rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
-                        rmMessageContext.setRMHeaders(rmHeaders);
-                        AddressingHeaders addrHeaders = new AddressingHeaders(call
-                                .getResponseMessage().getSOAPEnvelope());
-                        rmMessageContext.setAddressingHeaders(addrHeaders);
-                        rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
-                        IRMMessageProcessor messageProcessor = RMMessageProcessorIdentifier
-                                .getMessageProcessor(rmMessageContext, storageManager);
-                        messageProcessor.processMessage(rmMessageContext);
-                        System.out.println(messageProcessor);
-                    }
 
-                } catch (AxisFault e) {
-                    // TODO Auto-generated catch block
-                    System.err.println("ERROR: SENDING REQUEST ....");
-                    e.printStackTrace();
-                } catch (SOAPException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
             } else {
-                try {
-                    Call call = prepareCall(rmMessageContext);
-                    //Send the createSequnceRequest Asynchronously.
-                    storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),rmMessageContext.getMsgNumber());
-                    call.invoke();
-                } catch (AxisFault e) {
-                    System.err.println("ERROR: SENDING REQUEST ....");
-                    e.printStackTrace();
-                } catch (ServiceException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                Call call = prepareCall(rmMessageContext);
+                //Send the createSequnceRequest Asynchronously.
+                storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+                call.invoke();
 
             }
 
         }
 
+    }
+
+    private void sendMessage(RMMessageContext rmMessageContext) throws Exception {
+        switch (rmMessageContext.getMessageType()) {
+            case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
+                {
+                    System.out.println("INFO: SENDING CREATE SEQUENCE REQUEST ....");
+                    sendCreateSequenceRequest(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
+                {
+                    System.out.println("INFO: SENDING CREATE SEQUENCE RESPONSE ....");
+                    sendCreateSequenceResponse(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
+                {
+                    System.out.println("INFO: SENDING TERMINATE SEQUENCE REQUEST ....");
+                    sendTerminateSequenceRequest(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
+                {
+                    System.out.println("INFO: SENDING ACKNOWLEDGEMENT ....\n");
+                    sendAcknowldgement(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_SERVICE_REQUEST:
+                {
+                    System.out.println("INFO: SENDING REQUEST MESSAGE ....\n");
+                    sendServiceRequest(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_SERVICE_RESPONSE:
+                {
+                    System.out.println("INFO: SENDING RESPONSE MESSAGE ....\n");
+                    sendServiceResponse(rmMessageContext);
+                    break;
+                }
+        }
+    }
+
+    private void processResponseMessage(Call call, RMMessageContext rmMessageContext) throws Exception {
+        if (call.getResponseMessage() != null) {
+            RMHeaders rmHeaders = new RMHeaders();
+            rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
+            rmMessageContext.setRMHeaders(rmHeaders);
+            AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage()
+                    .getSOAPEnvelope());
+            rmMessageContext.setAddressingHeaders(addrHeaders);
+            rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
+            IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
+                    .getMessageProcessor(rmMessageContext, storageManager);
+            messagePrcessor.processMessage(rmMessageContext);
+        }
     }
 
 }

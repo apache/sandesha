@@ -22,6 +22,7 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.queue.IncomingSequence;
 
 import java.util.Set;
+import java.util.Iterator;
 
 /**
  * @author Chamikara Jayalath
@@ -385,5 +386,9 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public String getKeyFromOutgoingSequenceId(String seqID) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public Iterator getAllOutgoingSequences() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

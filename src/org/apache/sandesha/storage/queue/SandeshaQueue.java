@@ -65,6 +65,11 @@ public class SandeshaQueue {
     /**
      * This will not replace messages automatically.
      */
+
+    public Iterator getAllOutgoingSequences(){
+        return outgoingMap.keySet().iterator();
+    }
+
     public boolean addMessageToIncomingSequence(String seqId, Long messageNo,
             RMMessageContext msgCon) throws QueueException {
         boolean successful = false;

@@ -44,6 +44,8 @@ public interface Constants {
      */
     public static final int SOURCE_LISTEN_PORT = 8090;
 
+    public static final int DEFAULR_CLIENT_SIDE_LISTENER_PORT=8090;
+
     /**
      * Namespace for wsu.
      */
@@ -265,6 +267,10 @@ public interface Constants {
     public static final String DEFAULT_URI = "uri:defaultWSRM";
 
     public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
+
+
+    public static final long CLIENT_WAIT_PERIOD_FOR_COMPLETE=10000l;
+
 
     public interface FaultMessages {
         public static final String SERVER_INTERNAL_ERROR="Server Interanal Error";

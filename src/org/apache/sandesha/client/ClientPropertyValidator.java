@@ -20,6 +20,7 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.util.PropertyLoader;
 
 import javax.xml.namespace.QName;
 import java.net.InetAddress;
@@ -45,7 +46,10 @@ public class ClientPropertyValidator {
         String replyTo = getReplyTo(call);
 
         try {
-            sourceURL = getSourceURL(call);
+            if(from==null)
+                sourceURL = getSourceURL(call);
+            else
+                sourceURL=from;
            } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             throw new AxisFault(e.getMessage());
@@ -105,7 +109,6 @@ public class ClientPropertyValidator {
 
     private static boolean getSync(Call call) {
         Boolean synchronous = (Boolean) call.getProperty("sync");
-
         if (synchronous != null) {
             return synchronous.booleanValue();
         } else
@@ -131,7 +134,7 @@ public class ClientPropertyValidator {
         String sourceURI = null;
         InetAddress addr = InetAddress.getLocalHost();
 
-        sourceURI = "http://" + addr.getHostAddress() + ":" + Constants.SOURCE_ADDRESS_PORT
+        sourceURI = "http://" + addr.getHostAddress() + ":" + PropertyLoader.getClientSideListenerPort()
                 + "/axis/services/RMService";
 
         //sourceURI="http://192.248.18.51:8080/axis/services/RMService";

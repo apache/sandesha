@@ -26,6 +26,7 @@ import org.apache.sandesha.storage.queue.IncomingSequence;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Iterator;
 
 /**
  * @author Chamikara Jayalath
@@ -442,5 +443,10 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public String getKeyFromOutgoingSequenceId(String seqID) {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         return sq.getKeyFromOutgoingSequenceId(seqID);
+    }
+
+    public Iterator getAllOutgoingSequences() {
+       SandeshaQueue sq=SandeshaQueue.getInstance();
+       return sq.getAllOutgoingSequences();
     }
 }

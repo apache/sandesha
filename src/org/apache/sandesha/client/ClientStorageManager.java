@@ -28,6 +28,7 @@ import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * @author Jaliya
@@ -141,7 +142,9 @@ public class ClientStorageManager implements IStorageManager {
             msg = accessor.getNextOutgoingMsgContextToSend();
 
         if (msg == null) {
-            msg = accessor.getNextLowPriorityMessageContextToSend();   // checks whether all the request messages hv been acked
+            msg = accessor.getNextLowPriorityMessageContextToSend();
+
+            // checks whether all the request messages hv been acked
         }
         return msg;
     }
@@ -271,8 +274,13 @@ public class ClientStorageManager implements IStorageManager {
      * @see org.apache.sandesha.IStorageManager#isAllSequenceComplete()
      */
     public boolean isAllSequenceComplete() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean result=false;
+        Iterator ite=accessor.getAllOutgoingSequences();
+       while(ite.hasNext()){
+            result=isAckComplete((String)ite.next());
+       }
+
+        return result;
     }
 
     /* (non-Javadoc)
