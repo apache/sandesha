@@ -38,10 +38,12 @@ import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
 import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.CreateSequenceResponse;
+import org.apache.sandesha.ws.rm.LastMessage;
 import org.apache.sandesha.ws.rm.MessageNumber;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.Sequence;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
+import org.apache.sandesha.ws.rm.TerminateSequence;
 import org.apache.sandesha.ws.utility.Identifier;
 
 /**
@@ -388,6 +390,10 @@ public class EnvelopeCreator {
         Identifier id = new Identifier();
         id.setIdentifier(rmMessageContext.getSequenceID());
         seq.setIdentifier(id);
+        
+        if(rmMessageContext.isLastMessage()){
+        seq.setLastMessage(new LastMessage());        
+        }
 
         //Message Number for the new message.
         MessageNumber msgNumber = new MessageNumber();
@@ -396,6 +402,8 @@ public class EnvelopeCreator {
 
         rmHeaders.setSequence(seq);
         rmMessageContext.setRMHeaders(rmHeaders);
+        
+   
 
         try {
 
@@ -432,7 +440,8 @@ public class EnvelopeCreator {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+        
+          
             //Set the addressing headers to the SOAPEnvelope.
             outGoingAddressingHaders.toEnvelope(requestEnvelope, null);
             //System.out.println(requestEnvelope.toString());
@@ -451,9 +460,41 @@ public class EnvelopeCreator {
      * @param sequenceID
      * @return
      */
-    public static SOAPEnvelope createTerminatSeqMessage(String sequenceID) {
-        // TODO Auto-generated method stub
-        return null;
+    public static SOAPEnvelope createTerminatSeqMessage(RMMessageContext rmMessageContext) {
+        AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
+        SOAPEnvelope terSeqEnv = createBasicEnvelop();
+        try {
+            AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(terSeqEnv,
+                    null, true, false, true, false, null);
+            Identifier seqId = new Identifier();
+            seqId.setIdentifier(rmMessageContext.getSequenceID());
+            Sequence seq = new Sequence();
+            seq.setIdentifier(seqId);
+            seq.toSoapEnvelop(terSeqEnv);
+            
+            
+            Action terSeqAction = new Action(new URI(Constants.ACTION_TERMINATE_SEQUENCE));
+            outGoingAddressingHaders.setAction(terSeqAction);
+            
+            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+            MessageID messageId = new MessageID(new URI("uuid:"+ uuidGen.nextUUID()));
+            outGoingAddressingHaders.setMessageID(messageId);
+            
+            outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
+            outGoingAddressingHaders.setTo(addressingHeaders.getTo());
+            
+            outGoingAddressingHaders.toEnvelope(terSeqEnv, null);
+            
+            
+            TerminateSequence terSeq= new TerminateSequence();
+            terSeq.toSoapEnvelop( terSeqEnv);
+            
+            
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return terSeqEnv;
     }
 
 }
