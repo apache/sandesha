@@ -30,6 +30,7 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.IRMMessageProcessor;
 import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
+import org.apache.sandesha.server.FaultProcessor;
 import org.apache.sandesha.server.dao.ServerQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
@@ -64,7 +65,12 @@ public class RMProvider extends RPCProvider {
         try {
             MessageValidator.validate(rmMessageContext);
         } catch (AxisFault af) {
-            //send the falut
+            FaultProcessor faultProcessor = new FaultProcessor(storageManager,af);
+            if(!faultProcessor.processMessage(rmMessageContext)){
+                msgContext.setResponseMessage(null);
+                return;
+            }
+            return;
         }
 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();

@@ -26,7 +26,7 @@ import java.net.URI;
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
  */
-public interface Constants {
+public interface  Constants {
 
     /**
      * This is the port that is used when generating the source address. Two
@@ -270,6 +270,10 @@ public interface Constants {
        public static final String NO_ADDRESSING_HEADERS="No Addressing Headers Available in this Message";
        public static final String NO_MESSAGE_ID="MessageID should be present in the message";
 
+    }
+
+    public interface InvalidMessageErrors{
+       public static final String IN_CORRECT_MESSAGE="Incorrect Message";
     }
 
 
