@@ -16,10 +16,10 @@
  */
 package org.apache.sandesha.ws.utility;
 
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-
-import javax.xml.soap.SOAPException;
 
 /**
  * class Identifier
@@ -51,8 +51,8 @@ public class Identifier extends URI {
     /**
      * Method setUri
      * 
-     * @param uri 
-     * @throws SOAPException 
+     * @param uri
+     * @throws SOAPException
      */
     public void setUri(String uri) throws SOAPException {
         identifierElement.addTextNode(uri);
@@ -61,8 +61,8 @@ public class Identifier extends URI {
     /**
      * Method fromSOAPEnvelope
      * 
-     * @param element 
-     * @return 
+     * @param element
+     * @return
      */
     public Identifier fromSOAPEnvelope(MessageElement element) {
 
@@ -73,9 +73,9 @@ public class Identifier extends URI {
     /**
      * Method toSOAPEnvelope
      * 
-     * @param msgElement 
-     * @return 
-     * @throws SOAPException 
+     * @param msgElement
+     * @return @throws
+     *         SOAPException
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
@@ -87,8 +87,8 @@ public class Identifier extends URI {
     /**
      * Method getSoapElement
      * 
-     * @return 
-     * @throws SOAPException 
+     * @return @throws
+     *         SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
 
@@ -109,7 +109,7 @@ public class Identifier extends URI {
 
     /**
      * Method setIdentifier
-     * 
+     *  
      */
     public void setIdentifier(String string) {
         identifier = string;
@@ -118,14 +118,14 @@ public class Identifier extends URI {
     /**
      * Method equals
      * 
-     * @param obj 
+     * @param obj
      * @return boolean
      */
     public boolean equals(Object obj) {
 
         if (obj instanceof Identifier) {
-            if (this.identifier
-                    == ((String) (((Identifier) obj).getIdentifier()))) {
+            if (this.identifier == ((String) (((Identifier) obj)
+                    .getIdentifier()))) {
                 return true;
             } else {
                 return false;

@@ -17,14 +17,15 @@
 
 package org.apache.sandesha.ws.rm;
 
+import java.util.Iterator;
+
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-import java.util.Iterator;
 
 /**
  * class CreateSequence
@@ -50,6 +51,7 @@ public class CreateSequence implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -65,9 +67,9 @@ public class CreateSequence implements IRmElement {
     /**
      * Method toSoapEnvelop
      * 
-     * @param envelope 
+     * @param envelope
      * @return SOAPEnvelope
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
             throws SOAPException {
@@ -79,12 +81,12 @@ public class CreateSequence implements IRmElement {
             env.addBody();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
-        SOAPBodyElement bodyElement =
-                (SOAPBodyElement) env.getBody().addBodyElement(name);
+        Name name = env.createName("", Constants.NS_PREFIX_RM,
+                Constants.NS_URI_RM);
+        SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody()
+                .addBodyElement(name);
 
         bodyElement.setName("CreateSequence");
-       
 
         return env;
     }
@@ -92,7 +94,7 @@ public class CreateSequence implements IRmElement {
     /**
      * Method fromSOAPEnveploe
      * 
-     * @param bodyElement 
+     * @param bodyElement
      * 
      * @return CreateSequence
      */
@@ -101,7 +103,7 @@ public class CreateSequence implements IRmElement {
         Iterator iterator = bodyElement.getChildElements();
 
         while (iterator.hasNext()) {
-            
+
         }
 
         return this;
@@ -109,13 +111,14 @@ public class CreateSequence implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
+     * @param element
      */
     public void addChildElement(MessageElement element) {
     }

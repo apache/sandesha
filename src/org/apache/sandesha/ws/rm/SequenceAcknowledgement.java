@@ -17,17 +17,18 @@
 
 package org.apache.sandesha.ws.rm;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * class SequenceAcknowledgement
@@ -36,13 +37,13 @@ import java.util.List;
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
  */
-public class SequenceAcknowledgement extends MessageElement
-        implements IRmElement {
+public class SequenceAcknowledgement extends MessageElement implements
+        IRmElement {
 
     /**
      * Field seqAck
      */
-    private MessageElement seqAck;    // this element
+    private MessageElement seqAck; // this element
 
     /**
      * Field ackRanges
@@ -73,6 +74,7 @@ public class SequenceAcknowledgement extends MessageElement
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -81,7 +83,7 @@ public class SequenceAcknowledgement extends MessageElement
      * 
      * @return MessageElement
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
 
@@ -109,11 +111,11 @@ public class SequenceAcknowledgement extends MessageElement
     /**
      * Method toSoapEnvelop
      * 
-     * @param envelope 
+     * @param envelope
      * 
      * @return SOAPEnvelope
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
             throws SOAPException {
@@ -124,11 +126,11 @@ public class SequenceAcknowledgement extends MessageElement
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
-        SOAPHeaderElement headerElement =
-                (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
+        Name name = env.createName("", Constants.NS_PREFIX_RM,
+                Constants.NS_URI_RM);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
+                .addHeaderElement(name);
 
-       
         headerElement.setActor(null);
         headerElement.setName("SequenceAcknowledgement");
         headerElement.setMustUnderstand(true);
@@ -137,8 +139,8 @@ public class SequenceAcknowledgement extends MessageElement
 
         while (iterator.hasNext()) {
 
-            AcknowledgementRange ackRange =
-                    (AcknowledgementRange) iterator.next();
+            AcknowledgementRange ackRange = (AcknowledgementRange) iterator
+                    .next();
             ackRange.toSOAPEnvelope(headerElement);
         }
 
@@ -160,13 +162,12 @@ public class SequenceAcknowledgement extends MessageElement
     /**
      * Method fromSOAPEnveploe
      * 
-     * @param headerElement 
+     * @param headerElement
      * 
      * @return SequenceAcknowledgement
      */
-    public SequenceAcknowledgement fromSOAPEnveploe(SOAPHeaderElement headerElement) {
-
-       
+    public SequenceAcknowledgement fromSOAPEnveploe(
+            SOAPHeaderElement headerElement) {
 
         Iterator iterator = headerElement.getChildElements();
         MessageElement childElement;
@@ -215,15 +216,16 @@ public class SequenceAcknowledgement extends MessageElement
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
+     * @param element
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public void addChildElement(MessageElement element) throws SOAPException {
         seqAck.addChildElement(element);
@@ -259,7 +261,7 @@ public class SequenceAcknowledgement extends MessageElement
     /**
      * method addAckRanges
      * 
-     * @param ackRange 
+     * @param ackRange
      * 
      * @return AcknowledgementRange
      */
@@ -273,7 +275,7 @@ public class SequenceAcknowledgement extends MessageElement
     /**
      * Method addNackRanges
      * 
-     * @param nack 
+     * @param nack
      * 
      * @return Nack
      */
@@ -284,23 +286,19 @@ public class SequenceAcknowledgement extends MessageElement
         return nack;
     }
 
- 
-
     /**
      * Method setIdentifier
      * 
-     * @param identifier 
+     * @param identifier
      */
     public void setIdentifier(Identifier identifier) {
         this.identifier = identifier;
     }
 
-
-
     /**
      * Method setAckRanges
      * 
-     * @param list 
+     * @param list
      */
     public void setAckRanges(List list) {
         ackRanges = list;

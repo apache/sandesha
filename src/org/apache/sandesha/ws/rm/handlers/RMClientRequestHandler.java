@@ -17,75 +17,80 @@
 
 package org.apache.sandesha.ws.rm.handlers;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.MessageContext;
-import org.apache.axis.client.Call;
-import org.apache.axis.message.SOAPEnvelope;
-import org.apache.sandesha.Constants;
-
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 
+import org.apache.axis.AxisFault;
+import org.apache.axis.MessageContext;
+import org.apache.axis.client.Call;
+import org.apache.axis.message.SOAPEnvelope;
+import org.apache.sandesha.Constants;
+
 /**
- * @author
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna <br>
+ *         Jaliya Ekanayaka <br>
+ *         Sudar Nimalan <br>
+ *         (Apache Sandesha Project)
+ *  
  */
 
-
 public class RMClientRequestHandler extends RMHandler {
-    
+
     /**
      * Method invoke
      * 
-     * @param messageContext 
-     * @throws AxisFault 
+     * @param messageContext
+     * @throws AxisFault
      * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      */
 
     public void invoke(MessageContext messageContext) throws AxisFault {
 
         //Get the options from the client-config.wsdd.
-        //Client should specify the URL of the client host and the port number of the Tomcat sever
-        
+        //Client should specify the URL of the client host and the port number
+        // of the Tomcat sever
+
         String sourceURI = (String) getOption("sourceURI");
         String action = (String) getOption("action");
         String replyTo = (String) getOption("replyTo");
         String isSynchronized = (String) getOption("synchronized");
 
-        //Get the properties set by the client by accessing the call object using the message context.
+        //Get the properties set by the client by accessing the call object
+        // using the message context.
         Call call = (Call) messageContext.getProperty(MessageContext.CALL);
-        
-        String sequenceID=null;// = call.getSequenceIdentifier();
-        if(call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER)!=null){
-            sequenceID=(String) call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER);
-        }else{
-            sequenceID="";
+
+        String sequenceID = null;// = call.getSequenceIdentifier();
+        if (call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER) != null) {
+            sequenceID = (String) call
+                    .getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER);
+        } else {
+            sequenceID = "";
         }
 
         boolean isLastMessage = false;
-        
+
         boolean isResponseExpected = false;
 
-        
         if (call.getProperty(Constants.CLIENT_LAST_MESSAGE) != null) {
-            isLastMessage=((Boolean) (call.getProperty(Constants.CLIENT_LAST_MESSAGE))).booleanValue();
-        }
-        
-        if (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED) != null) {
-            isResponseExpected=((Boolean) (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED))).booleanValue();
+            isLastMessage = ((Boolean) (call
+                    .getProperty(Constants.CLIENT_LAST_MESSAGE)))
+                    .booleanValue();
         }
 
-        //Get the SOAP envelope of the request message and send it as a string parameter to the
+        if (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED) != null) {
+            isResponseExpected = ((Boolean) (call
+                    .getProperty(Constants.CLIENT_RESPONSE_EXPECTED)))
+                    .booleanValue();
+        }
+
+        //Get the SOAP envelope of the request message and send it as a string
+        // parameter to the
         //clientService
-        SOAPEnvelope requestSOAPEnvelope =
-            messageContext.getCurrentMessage().getSOAPEnvelope();
+        SOAPEnvelope requestSOAPEnvelope = messageContext.getCurrentMessage()
+                .getSOAPEnvelope();
         requestSOAPEnvelope.setSchemaVersion(messageContext.getSchemaVersion());
         requestSOAPEnvelope.setSoapConstants(messageContext.getSOAPConstants());
 
@@ -93,46 +98,43 @@ public class RMClientRequestHandler extends RMHandler {
         String strRequestSOAPEnvelope = requestSOAPEnvelope.toString();
 
         //Get the destination URL from the message context.
-        String destinationURL =
-            (String) messageContext.getProperty(MessageContext.TRANS_URL);
+        String destinationURL = (String) messageContext
+                .getProperty(MessageContext.TRANS_URL);
 
-        //Set the destination URL of the message context to the Client Endpoint Manager (Re-directing)
-        String toClientServiceURL =
-            sourceURI
+        //Set the destination URL of the message context to the Client Endpoint
+        // Manager (Re-directing)
+        String toClientServiceURL = sourceURI
                 + org.apache.sandesha.Constants.AXIS_SERVICES
                 + org.apache.sandesha.Constants.RM_CLIENT_SERVICE
                 + org.apache.sandesha.Constants.QUESTION_WSDL;
 
-        //Set the URL of the client side reference that can be used to send the asynchronous responses
+        //Set the URL of the client side reference that can be used to send the
+        // asynchronous responses
         //by the services.
-        String clientReferenceURL =
-            sourceURI
+        String clientReferenceURL = sourceURI
                 + org.apache.sandesha.Constants.AXIS_SERVICES
                 + org.apache.sandesha.Constants.CLIENT_REFERENCE
                 + org.apache.sandesha.Constants.QUESTION_WSDL;
 
-        messageContext.setProperty(
-            MessageContext.TRANS_URL,
-            toClientServiceURL);
+        messageContext
+                .setProperty(MessageContext.TRANS_URL, toClientServiceURL);
         try {
             //to the envelploe with CALL String
-            SOAPEnvelope soapEnvelope =
-                messageContext.getCurrentMessage().getSOAPEnvelope();
+            SOAPEnvelope soapEnvelope = messageContext.getCurrentMessage()
+                    .getSOAPEnvelope();
             SOAPBody soapBody = soapEnvelope.getBody();
 
             soapEnvelope.clearBody();
             soapEnvelope.removeHeaders();
 
-            Name name =
-                soapEnvelope.createName(
-                    org.apache.sandesha.Constants.CLIENT_METHOD,
-                    "ns1",
+            Name name = soapEnvelope.createName(
+                    org.apache.sandesha.Constants.CLIENT_METHOD, "ns1",
                     org.apache.sandesha.Constants.RM_CLIENT_SERVICE);
             SOAPBodyElement soapBodyElement = soapBody.addBodyElement(name);
 
             //Add the SOAP envelope as a string parameter.
-            SOAPElement soapElement =
-                soapBodyElement.addChildElement("arg1", "");
+            SOAPElement soapElement = soapBodyElement.addChildElement("arg1",
+                    "");
             soapElement.addTextNode(strRequestSOAPEnvelope);
 
             //Add the sequenceIdnetifier
@@ -143,15 +145,15 @@ public class RMClientRequestHandler extends RMHandler {
             soapElement = soapBodyElement.addChildElement("arg3", "");
             soapElement.addTextNode(destinationURL);
 
-            //Add the toClientServiceURL. This can be used by the asynchronous server to reference the Client Service
+            //Add the toClientServiceURL. This can be used by the asynchronous
+            // server to reference the Client Service
             soapElement = soapBodyElement.addChildElement("arg4", "");
             soapElement.addTextNode(clientReferenceURL);
 
             //Add the isOneWay as a string value.
             soapElement = soapBodyElement.addChildElement("arg5", "");
             soapElement.addTextNode(isSynchronized);
-            
-            
+
             //Add the isLastMessage as a string value
             soapElement = soapBodyElement.addChildElement("arg6", "");
             if (isLastMessage == true) {
@@ -161,7 +163,7 @@ public class RMClientRequestHandler extends RMHandler {
 
                 //Add the isCreateSequence as a string value
             }
-            
+
             soapElement = soapBodyElement.addChildElement("arg7", "");
             if (isResponseExpected == true) {
                 soapElement.addTextNode("true");
@@ -171,10 +173,11 @@ public class RMClientRequestHandler extends RMHandler {
             }
             soapElement = soapBodyElement.addChildElement("arg8", "");
             soapElement.addTextNode(action);
-            
-            String strReplyTo=replyTo+ org.apache.sandesha.Constants.AXIS_SERVICES
-            + org.apache.sandesha.Constants.CLIENT_REFERENCE
-            + org.apache.sandesha.Constants.QUESTION_WSDL;
+
+            String strReplyTo = replyTo
+                    + org.apache.sandesha.Constants.AXIS_SERVICES
+                    + org.apache.sandesha.Constants.CLIENT_REFERENCE
+                    + org.apache.sandesha.Constants.QUESTION_WSDL;
 
             soapElement = soapBodyElement.addChildElement("arg9", "");
             soapElement.addTextNode(strReplyTo);

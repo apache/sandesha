@@ -17,23 +17,22 @@
 
 package org.apache.sandesha.ws.rm;
 
-import org.apache.axis.message.MessageElement;
-
 import javax.xml.soap.SOAPException;
+
+import org.apache.axis.message.MessageElement;
 
 /**
  * class IRmElement
  * 
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
- * @author Sudar Nimalan
- *         <p/>
- *         <p/>
- *         This is the parent interface for the rm-protocol elements except the element who are
- *         in the format of a URI<br>
- *         <p/>
- *         <b>If require to add the attributes, extend the concrete class with MessageElement</b><br>
- *         <b>If require to add child elements, extend the concrete class with MessageElement</b><br>
+ * @author Sudar Nimalan <p/><p/>This is the parent interface for the
+ *         rm-protocol elements except the element who are in the format of a
+ *         URI <br>
+ *         <p/><b>If require to add the attributes, extend the concrete class
+ *         with MessageElement </b> <br>
+ *         <b>If require to add child elements, extend the concrete class with
+ *         MessageElement </b> <br>
  */
 public interface IRmElement {
 
@@ -45,18 +44,18 @@ public interface IRmElement {
      * related soap element
      * 
      * @return the soap element
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     MessageElement getSoapElement() throws SOAPException;
 
     /**
-     * Method addChildElement
-     * Adds an element to this element as a child element.
-     * If not required to add a child element, just provide an empty
+     * Method addChildElement Adds an element to this element as a child
+     * element. If not required to add a child element, just provide an empty
      * implementation in the concrete class
      * 
-     * @param element the child element
-     * @throws SOAPException 
+     * @param element
+     *            the child element
+     * @throws SOAPException
      */
     void addChildElement(MessageElement element) throws SOAPException;
 }

@@ -17,10 +17,10 @@
 
 package org.apache.sandesha.ws.rm;
 
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
-
-import javax.xml.soap.SOAPException;
 
 /**
  * class Nack
@@ -53,6 +53,7 @@ public class Nack implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -61,7 +62,7 @@ public class Nack implements IRmElement {
      * 
      * @return MessageElement
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
 
@@ -73,7 +74,7 @@ public class Nack implements IRmElement {
     /**
      * Method fromSOAPEnvelope
      * 
-     * @param element 
+     * @param element
      * @return Nack
      */
     public Nack fromSOAPEnvelope(MessageElement element) {
@@ -86,27 +87,29 @@ public class Nack implements IRmElement {
     /**
      * Method toSOAPEnvelope
      * 
-     * @param msgElement 
+     * @param msgElement
      * @return MessageElement
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("Nack", Constants.NS_PREFIX_RM).addTextNode((new Long(notAckNum)).toString());
+        msgElement.addChildElement("Nack", Constants.NS_PREFIX_RM).addTextNode(
+                (new Long(notAckNum)).toString());
 
         return msgElement;
     }
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
+     * @param element
      */
     public void addChildElement(MessageElement element) {
 
@@ -114,7 +117,7 @@ public class Nack implements IRmElement {
     }
 
     /**
-     * @param notAckNo 
+     * @param notAckNo
      */
     public void setNotAckNum(long notAckNo) {
         notAckNum = notAckNo;

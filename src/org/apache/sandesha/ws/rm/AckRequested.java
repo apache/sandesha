@@ -17,15 +17,16 @@
 
 package org.apache.sandesha.ws.rm;
 
+import java.util.Iterator;
+
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-import java.util.Iterator;
 
 /**
  * class AckRequested
@@ -61,6 +62,7 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -69,7 +71,7 @@ public class AckRequested extends MessageElement implements IRmElement {
      * 
      * @return MessageElement
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
 
@@ -84,7 +86,7 @@ public class AckRequested extends MessageElement implements IRmElement {
      * 
      * @param envelope
      * @return SOAPEnvelope
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
             throws SOAPException {
@@ -94,15 +96,16 @@ public class AckRequested extends MessageElement implements IRmElement {
         /*
          * ackRequested.addChildElement(identifier.getSoapElement());
          * ackRequested.addChildElement(messageNumber.getSoapElement());
-         *   env.addHeader((SOAPHeaderElement)ackRequested);
+         * env.addHeader((SOAPHeaderElement)ackRequested);
          */
         if (env.getHeader() == null) {
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
-        SOAPHeaderElement headerElement =
-                (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
+        Name name = env.createName("", Constants.NS_PREFIX_RM,
+                Constants.NS_URI_RM);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
+                .addHeaderElement(name);
 
         // .setActor(null);
         headerElement.setActor(null);
@@ -123,7 +126,7 @@ public class AckRequested extends MessageElement implements IRmElement {
     /**
      * Method fromSOAPEnveploe
      * 
-     * @param headerElement 
+     * @param headerElement
      * 
      * @return AckRequested
      */
@@ -165,14 +168,15 @@ public class AckRequested extends MessageElement implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
-     * @throws SOAPException 
+     * @param element
+     * @throws SOAPException
      */
     public void addChildElement(MessageElement element) throws SOAPException {
         ackRequested.addChildElement(element);

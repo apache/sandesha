@@ -17,15 +17,16 @@
 
 package org.apache.sandesha.ws.rm;
 
+import java.util.Iterator;
+
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-import java.util.Iterator;
 
 /**
  * class Sequence
@@ -66,6 +67,7 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -74,7 +76,7 @@ public class Sequence extends MessageElement implements IRmElement {
      * 
      * @return MessageElement
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
 
@@ -88,31 +90,29 @@ public class Sequence extends MessageElement implements IRmElement {
     /**
      * Method toSoapEnvelop
      * 
-     * @param envelope 
+     * @param envelope
      * 
      * @return SOAPEnvelope
      * 
-     * @throws Exception 
+     * @throws Exception
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws Exception {
 
         SOAPEnvelope env = envelope;
 
-     
         if (env.getHeader() == null) {
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
-        SOAPHeaderElement headerElement =
-                (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
+        Name name = env.createName("", Constants.NS_PREFIX_RM,
+                Constants.NS_URI_RM);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
+                .addHeaderElement(name);
 
-     
         headerElement.setActor(null);
         headerElement.setName("Sequence");
         headerElement.setMustUnderstand(true);
 
-      
         if (lastMessage != null) {
             lastMessage.toSOAPEnvelope(headerElement);
         }
@@ -131,7 +131,7 @@ public class Sequence extends MessageElement implements IRmElement {
     /**
      * Method fromSOAPEnveploe
      * 
-     * @param headerElement 
+     * @param headerElement
      * 
      * @return Sequence
      */
@@ -143,7 +143,6 @@ public class Sequence extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-           
             if (childElement.getName().equals("wsu:Identifier")) {
                 identifier = new Identifier();
 
@@ -186,14 +185,15 @@ public class Sequence extends MessageElement implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
-     * @throws SOAPException 
+     * @param element
+     * @throws SOAPException
      */
     public void addChildElement(MessageElement element) throws SOAPException {
         seqElement.addChildElement(element);
@@ -229,7 +229,7 @@ public class Sequence extends MessageElement implements IRmElement {
     /**
      * Method setIdentifier
      * 
-     * @param identifer 
+     * @param identifer
      */
     public void setIdentifier(Identifier identifer) {
         identifier = identifer;
@@ -238,7 +238,7 @@ public class Sequence extends MessageElement implements IRmElement {
     /**
      * Method setLastMessage
      * 
-     * @param message 
+     * @param message
      */
     public void setLastMessage(LastMessage message) {
         lastMessage = message;
@@ -247,7 +247,7 @@ public class Sequence extends MessageElement implements IRmElement {
     /**
      * Method setMessageNumber
      * 
-     * @param number 
+     * @param number
      */
     public void setMessageNumber(MessageNumber number) {
         messageNumber = number;

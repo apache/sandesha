@@ -18,13 +18,14 @@ package org.apache.sandesha;
 
 /**
  * @author JEkanayake
- *
+ *  
  */
 public class RMException extends Exception {
-	public RMException() {
-	}
-	public RMException(String ex) {
-		super(ex);
-	}
+    public RMException() {
+    }
+
+    public RMException(String ex) {
+        super(ex);
+    }
 
 }

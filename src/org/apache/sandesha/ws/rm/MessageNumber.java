@@ -17,10 +17,10 @@
 
 package org.apache.sandesha.ws.rm;
 
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
-
-import javax.xml.soap.SOAPException;
 
 /**
  * class MessageNumber
@@ -62,6 +62,7 @@ public class MessageNumber implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -70,7 +71,7 @@ public class MessageNumber implements IRmElement {
      * 
      * @return MessageElement
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement getSoapElement() throws SOAPException {
 
@@ -83,7 +84,7 @@ public class MessageNumber implements IRmElement {
     /**
      * Method fromSOAPEnvelope
      * 
-     * @param element 
+     * @param element
      * 
      * @return MessageNumber
      */
@@ -97,25 +98,27 @@ public class MessageNumber implements IRmElement {
     /**
      * Method toSOAPEnvelope
      * 
-     * @param msgElement 
+     * @param msgElement
      * 
      * @return MessageElement
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("MessageNumber", Constants.NS_PREFIX_RM).addTextNode((new Long(messageNumber)).toString());
+        msgElement.addChildElement("MessageNumber", Constants.NS_PREFIX_RM)
+                .addTextNode((new Long(messageNumber)).toString());
 
         return msgElement;
     }
 
     /**
-     * Method setMessageNumber
-     * Set the message no in the soap message element create
+     * Method setMessageNumber Set the message no in the soap message element
+     * create
      * 
-     * @param msgNo the message no
+     * @param msgNo
+     *            the message no
      */
     public void setMessageNumber(long msgNo) {
         messageNumber = msgNo;
@@ -123,13 +126,14 @@ public class MessageNumber implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
+     * @param element
      */
     public void addChildElement(MessageElement element) {
 

@@ -17,13 +17,14 @@
 
 package org.apache.sandesha.ws.rm;
 
+import java.util.Iterator;
+
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
-
-import javax.xml.soap.SOAPException;
-import java.util.Iterator;
 
 /**
  * class RMHeaders
@@ -67,11 +68,11 @@ public class RMHeaders {
     /**
      * Method toSoapEnvelop
      * 
-     * @param envelope 
+     * @param envelope
      * 
      * @return SOAPEnvelope
      * 
-     * @throws Exception 
+     * @throws Exception
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws Exception {
 
@@ -107,15 +108,15 @@ public class RMHeaders {
     /**
      * Method fromSOAPEnvelope
      * 
-     * @param env 
+     * @param env
      * 
      * @return RMHeaders
      * 
-     * @throws AxisFault     
-     * @throws SOAPException 
+     * @throws AxisFault
+     * @throws SOAPException
      */
-    public RMHeaders fromSOAPEnvelope(SOAPEnvelope env)
-            throws AxisFault, SOAPException {
+    public RMHeaders fromSOAPEnvelope(SOAPEnvelope env) throws AxisFault,
+            SOAPException {
 
         if (env != null) {
             Iterator iterator = env.getHeaders().iterator();
@@ -124,7 +125,6 @@ public class RMHeaders {
             while (iterator.hasNext()) {
                 headerElement = (SOAPHeaderElement) iterator.next();
 
-                
                 if (headerElement.getName().equals("Sequence")) {
                     sequence = new Sequence();
                     headerElement.setMustUnderstand(false);
@@ -212,7 +212,8 @@ public class RMHeaders {
 
     /**
      * Method setCreateSequence
-     * @param sequence 
+     * 
+     * @param sequence
      */
     public void setCreateSequence(CreateSequence sequence) {
         createSequence = sequence;
@@ -220,7 +221,8 @@ public class RMHeaders {
 
     /**
      * Method setCreateSequenceResponse
-     * @param response 
+     * 
+     * @param response
      */
     public void setCreateSequenceResponse(CreateSequenceResponse response) {
         createSequenceResponse = response;
@@ -229,7 +231,7 @@ public class RMHeaders {
     /**
      * Method setSequence
      * 
-     * @param sequence 
+     * @param sequence
      */
     public void setSequence(Sequence sequence) {
         this.sequence = sequence;
@@ -238,16 +240,17 @@ public class RMHeaders {
     /**
      * Method setSequenceAcknowledgement
      * 
-     * @param acknowledgement 
+     * @param acknowledgement
      */
-    public void setSequenceAcknowledgement(SequenceAcknowledgement acknowledgement) {
+    public void setSequenceAcknowledgement(
+            SequenceAcknowledgement acknowledgement) {
         sequenceAcknowledgement = acknowledgement;
     }
 
     /**
      * Method setSequenceAcknowledgement
      * 
-     * @param sequence 
+     * @param sequence
      */
     public void c(TerminateSequence sequence) {
         terminateSequence = sequence;
@@ -256,7 +259,7 @@ public class RMHeaders {
     /**
      * Method setAckRequest
      * 
-     * @param requested 
+     * @param requested
      */
     public void setAckRequest(AckRequested requested) {
         ackRequest = requested;

@@ -17,34 +17,35 @@
 package org.apache.sandesha.server;
 
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-
-import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
- * @author 
- * 
+ * @author  
  */
 public class RMMessageProcessorIdentifier {
 
-	public static IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext, IStorageManager storageManager) {
+    public static IRMMessageProcessor getMessageProcessor(
+            RMMessageContext rmMessageContext, IStorageManager storageManager) {
 
-		AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
-		RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
+        AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
+        RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
-		if (addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE)) {
-			return new CreateSequenceProcessor(storageManager);
-		} else if (
-			addrHeaders.getAction().toString().equals(Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
-			return new CreateSequenceResponseProcessor(storageManager);
-		} else if (
-			addrHeaders.getAction().toString().equals(Constants.ACTION_TERMINATE_SEQUENCE)) {
-			return new TerminateSequenceProcessor(storageManager);
-		} else if ((rmHeaders.getSequenceAcknowledgement() != null)||(rmHeaders.getSequence().getMessageNumber() != null)){
-			return new CompositeProcessor(storageManager);
-		}else
-			return new FaultProcessor(storageManager);
-	}
+        if (addrHeaders.getAction().toString().equals(
+                Constants.ACTION_CREATE_SEQUENCE)) {
+            return new CreateSequenceProcessor(storageManager);
+        } else if (addrHeaders.getAction().toString().equals(
+                Constants.ACTION_CREATE_SEQUENCE_RESPONSE)) {
+            return new CreateSequenceResponseProcessor(storageManager);
+        } else if (addrHeaders.getAction().toString().equals(
+                Constants.ACTION_TERMINATE_SEQUENCE)) {
+            return new TerminateSequenceProcessor(storageManager);
+        } else if ((rmHeaders.getSequenceAcknowledgement() != null)
+                || (rmHeaders.getSequence().getMessageNumber() != null)) {
+            return new CompositeProcessor(storageManager);
+        } else
+            return new FaultProcessor(storageManager);
+    }
 }

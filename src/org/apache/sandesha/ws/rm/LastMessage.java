@@ -17,10 +17,10 @@
 
 package org.apache.sandesha.ws.rm;
 
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
-
-import javax.xml.soap.SOAPException;
 
 /**
  * class LastMessage
@@ -47,6 +47,7 @@ public class LastMessage extends MessageElement implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -62,7 +63,7 @@ public class LastMessage extends MessageElement implements IRmElement {
     /**
      * Method fromSOAPEnvelope
      * 
-     * @param element 
+     * @param element
      * 
      * @return LastMessage
      */
@@ -74,10 +75,10 @@ public class LastMessage extends MessageElement implements IRmElement {
      * Method toSOAPEnvelope
      * 
      * @param msgElement
-     *  
+     * 
      * @return MessageElement
      * 
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
@@ -89,13 +90,14 @@ public class LastMessage extends MessageElement implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
+     * @param element
      */
     public void addChildElement(MessageElement element) {
 
@@ -114,7 +116,7 @@ public class LastMessage extends MessageElement implements IRmElement {
     /**
      * Method setLastMsgElement
      * 
-     * @param element 
+     * @param element
      */
     public void setLastMsgElement(MessageElement element) {
         lastMsgElement = element;

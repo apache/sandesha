@@ -17,62 +17,61 @@
 
 package org.apache.sandesha.ws.rm.handlers;
 
+import java.util.Iterator;
+
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import java.util.Iterator;
-
-
 /**
- * @author
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
+ * @author Amila Navarathna <br>
+ *         Jaliya Ekanayaka <br>
+ *         Sudar Nimalan <br>
+ *         (Apache Sandesha Project)
+ *  
  */
 public class RMClientResponseHandler extends RMHandler {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.axis.Handler#invoke(org.apache.axis.MessageContext)
      */
-     
+
     /**
      * Method invoke
      * 
-     * @param messageContext 
-     * @throws AxisFault 
-    */
-     
+     * @param messageContext
+     * @throws AxisFault
+     */
+
     public void invoke(MessageContext messageContext) throws AxisFault {
         try {
-            
-            SOAPEnvelope soapEnvelope = messageContext.getResponseMessage().
-                                        getSOAPEnvelope();
+
+            SOAPEnvelope soapEnvelope = messageContext.getResponseMessage()
+                    .getSOAPEnvelope();
             SOAPBody soapBody = soapEnvelope.getBody();
 
-            
-
             if (soapBody.getValue() == null) {
-                
+
             } else {
-                
+
                 Iterator iterator = soapBody.getChildElements();
                 SOAPBodyElement soapBodyElement;
 
                 while (iterator.hasNext()) {
                     soapBodyElement = (SOAPBodyElement) iterator.next();
-                    
+
                     if (soapBodyElement.getLocalName().equals(
                             "clientMethodResponse")) {
-                        
+
                         Iterator ite = soapBodyElement.getChildElements();
                         MessageElement sbe;
                         while (ite.hasNext()) {
@@ -81,18 +80,18 @@ public class RMClientResponseHandler extends RMHandler {
 
                                 if (sbe.getValue() != null) {
 
-                                    messageContext.setCurrentMessage(new
-                                            Message(sbe.getValue()));
-                               
+                                    messageContext
+                                            .setCurrentMessage(new Message(sbe
+                                                    .getValue()));
 
                                 }
                             }
                         }
                     }
                 }
-              
-                if (messageContext.getCurrentMessage().getSOAPEnvelope().
-                    getBody().getFault() != null) {
+
+                if (messageContext.getCurrentMessage().getSOAPEnvelope()
+                        .getBody().getFault() != null) {
 
                     soapBodyElement = (SOAPBodyElement) iterator.next();
 
@@ -105,9 +104,7 @@ public class RMClientResponseHandler extends RMHandler {
 
             }
 
-            
-
-        }catch (SOAPException e) {
+        } catch (SOAPException e) {
             throw AxisFault.makeFault(e);
         }
 

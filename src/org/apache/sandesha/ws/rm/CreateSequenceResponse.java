@@ -17,15 +17,16 @@
 
 package org.apache.sandesha.ws.rm;
 
+import java.util.Iterator;
+
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-import java.util.Iterator;
 
 /**
  * class CreateSequenceResponse
@@ -56,6 +57,7 @@ public class CreateSequenceResponse implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
      */
 
@@ -73,19 +75,20 @@ public class CreateSequenceResponse implements IRmElement {
      * 
      * @param envelope
      * @return SOAPEnvelope
-     * @throws SOAPException 
+     * @throws SOAPException
      */
     public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
             throws SOAPException {
 
         SOAPEnvelope env = envelope;
-        
+
         if (env.getBody() == null) {
             env.addBody();
         }
-        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
-        SOAPBodyElement bodyElement =
-                (SOAPBodyElement) env.getBody().addBodyElement(name);
+        Name name = env.createName("", Constants.NS_PREFIX_RM,
+                Constants.NS_URI_RM);
+        SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody()
+                .addBodyElement(name);
         bodyElement.setName("CreateSequenceResponse");
         if (identifier != null) {
             identifier.toSOAPEnvelope(bodyElement);
@@ -96,7 +99,7 @@ public class CreateSequenceResponse implements IRmElement {
     /**
      * Method fromSOAPEnveploe
      * 
-     * @param bodyElement 
+     * @param bodyElement
      * 
      * @return CreateSequenceResponse
      */
@@ -107,12 +110,12 @@ public class CreateSequenceResponse implements IRmElement {
 
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
-          
+
             if (childElement.getName().equals("wsu:Identifier")) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }
-          
+
             if (childElement.getName().equals("Identifier")) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
@@ -124,14 +127,15 @@ public class CreateSequenceResponse implements IRmElement {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
      */
 
     /**
      * Method addChildElement
      * 
-     * @param element 
-     * @throws SOAPException 
+     * @param element
+     * @throws SOAPException
      */
     public void addChildElement(MessageElement element) throws SOAPException {
         createSequenceResponse.addChildElement(element);
@@ -147,7 +151,7 @@ public class CreateSequenceResponse implements IRmElement {
     /**
      * Method setIdentifier
      * 
-     * @param identifier 
+     * @param identifier
      */
     public void setIdentifier(Identifier identifier) {
         this.identifier = identifier;
