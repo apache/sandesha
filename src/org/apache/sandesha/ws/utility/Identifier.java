@@ -120,22 +120,6 @@ public class Identifier extends URI {
         identifier = string;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
-
-    /**
-     * Method addChildElement
-     * 
-     * @param element 
-     * @throws SOAPException 
-     */
-    public void addChildElement(MessageElement element) throws SOAPException {
-
-        // TODO Auto-generated method stub
-    }
-
     /**
      * Method equals
      * 

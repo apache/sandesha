@@ -48,14 +48,8 @@ public class RMServerRequestHandler extends RMHandler {
         try {
             setPropertyToMessageContext(msgContext,
                     Constants.ENV_RM_REQUEST_HEADERS);
-        } catch (AxisFault e) {
-
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SOAPException e) {
-
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw AxisFault.makeFault(e);            
         }
     }
 }

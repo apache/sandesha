@@ -85,12 +85,12 @@ public interface Constants {
      * Field NS_URI_RM
      */
     public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2004/03/rm";
-    
+
     /**
      * Field WSU_PREFIX
      */
     public static final String WSU_PREFIX = "wsu";
-    
+
     /**
      * Field WSU_NS
      */

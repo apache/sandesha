@@ -18,6 +18,7 @@
 package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPException;
 
@@ -91,8 +92,7 @@ public class Nack implements IRmElement {
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("Nack", "wsrm").addTextNode((new Long(notAckNum)).toString());
-        ;
+        msgElement.addChildElement("Nack", Constants.NS_PREFIX_RM).addTextNode((new Long(notAckNum)).toString());
 
         return msgElement;
     }

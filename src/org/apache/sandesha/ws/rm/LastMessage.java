@@ -18,6 +18,7 @@
 package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPException;
 
@@ -88,7 +89,7 @@ public class LastMessage extends MessageElement implements IRmElement {
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("LastMessage", "wsrm");
+        msgElement.addChildElement("LastMessage", Constants.NS_PREFIX_RM);
 
         return msgElement;
     }

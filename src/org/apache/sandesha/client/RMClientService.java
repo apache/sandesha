@@ -22,6 +22,7 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.Action;
@@ -40,6 +41,7 @@ import org.apache.sandesha.ws.rm.MessageNumber;
 import org.apache.sandesha.ws.rm.Sequence;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;
+import org.apache.commons.logging.Log;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.soap.SOAPException;
@@ -57,11 +59,15 @@ import java.util.Vector;
  * @author Sudar Nimalan
  */
 public class RMClientService {
+    /**
+     * Field log
+     */
+    protected static Log log = LogFactory.getLog(RMClientService.class.getName());
 
     /**
      * Field retransmissinInterval
      */
-    private long retransmissinInterval;
+    private long retransmissionInterval;
 
     /**
      * Field retransmissionCount
@@ -72,7 +78,7 @@ public class RMClientService {
      * Constructor RMClientService
      */
     public RMClientService() {
-        retransmissinInterval = Constants.RETRANSMISSION_INTERVAL;
+        retransmissionInterval = Constants.RETRANSMISSION_INTERVAL;
     }
 
     /**
@@ -321,9 +327,7 @@ public class RMClientService {
                                         stringReturn =
                                                 rmMessage.getResponseMessage().getSOAPPartAsString();
                                     } catch (AxisFault e2) {
-
-                                        // TODO Auto-generated catch block
-                                        e2.printStackTrace();
+                                        log.error(e2);
                                     }
 
                                     break;
@@ -342,25 +346,20 @@ public class RMClientService {
                                 System.out.println("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
                                 System.out.println(stringReturn);
                             } catch (Exception e1) {
-
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
+                                log.error(e1);
                             }
                         }
 
                         // /System.out.println(stringReturn);
                         // Not handle let finlly to handle it.
                     } catch (ServiceException e) {
-
-                        // TODO Auto-generated catch block
+                        log.error(e);
                     } catch (SOAPException e) {
-
-                        // TODO Auto-generated catch block
+                        log.error(e);
                     } catch (Exception e) {
-
-                        // TODO Auto-generated catch block
                         // If it is comming to this location then there will be an severe error than the
                         // HTTP termination.
+                        log.error(e);
                     }
                 }
             }
@@ -406,7 +405,7 @@ public class RMClientService {
      * put them back in the data structure
      * 
      * @param identifier 
-     * @param message 
+     * @param message    
      * @throws AxisFault 
      */
     private void setAckedMessages(Identifier identifier, Message message)

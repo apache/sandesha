@@ -17,6 +17,7 @@
 package org.apache.sandesha.ws.rm.providers;
 
 import org.apache.axis.MessageContext;
+import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
@@ -200,7 +201,7 @@ public class RMProvider extends RPCProvider {
                             resMsg.setResponseMessage(message.getRequestMessage());
                         }
 
-                        responsedSeq.setResponceMessage(message);
+                        responsedSeq.setResponseMessage(message);
                     }
                 }
 
@@ -218,9 +219,7 @@ public class RMProvider extends RPCProvider {
                     try {
                         ackResRMHeaders.toSoapEnvelop(msgContext.getResponseMessage().getSOAPEnvelope());
                     } catch (Exception e1) {
-
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
+                        throw AxisFault.makeFault(e1);
                     }
                 }
             }

@@ -18,6 +18,7 @@
 package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
@@ -103,7 +104,7 @@ public class AcknowledgementRange implements IRmElement {
             throws SOAPException {
 
         SOAPElement ackRange =
-                msgElement.addChildElement("AcknowledgementRange", "wsrm");
+                msgElement.addChildElement("AcknowledgementRange", Constants.NS_PREFIX_RM);
 
         ackRange.setAttribute("Upper", new Long(maxValue).toString());
         ackRange.setAttribute("Lower", new Long(minValue).toString());

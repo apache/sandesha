@@ -18,6 +18,7 @@
 package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPException;
 
@@ -101,7 +102,7 @@ public class MessageNumber implements IRmElement {
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("MessageNumber", "wsrm").addTextNode((new Long(messageNumber)).toString());
+        msgElement.addChildElement("MessageNumber", Constants.NS_PREFIX_RM).addTextNode((new Long(messageNumber)).toString());
 
         return msgElement;
     }

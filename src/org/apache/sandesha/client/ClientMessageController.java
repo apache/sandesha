@@ -82,7 +82,7 @@ public class ClientMessageController {
     public void storeSequence(RMSequence sequence) {
 
         // System.out.println("----------------storeSequence::"+sequence.getSequenceIdetifer());
-        sequenceMap.put(sequence.getSequenceIdetifer().toString(), sequence);
+        sequenceMap.put(sequence.getSequenceIdentifier().toString(), sequence);
     }
 
     /**
