@@ -61,7 +61,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     String messageId = relatesTo.getURI().toString();
                     seqId = storageManager.getOutgoingSeqOfMsg(messageId);
                 }
-                if (!hasSequence) {
+                if (!hasSequence ) {
                     storageManager.addIncomingSequence(seqId);
                 }
                 if (storageManager.isMessageExist(seqId, messageNumber) != true) {

@@ -235,13 +235,14 @@ public class OutgoingSequence {
 
     public boolean hasMessageWithId(String msgId) {
         Iterator it = hash.keySet().iterator();
+        boolean result=false;
         while (it.hasNext()) {
-
-            RMMessageContext msg = (RMMessageContext) hash.get(it.next());
-            if (msg.getMessageID().equals(msgId))
-                return true;
+         RMMessageContext msg = (RMMessageContext) hash.get(it.next());
+            if (msg.getMessageID().equals(msgId)){
+                result = true;
+                break;  }
         }
-        return false;
+        return result;
     }
 
     public Vector getReceivedMsgNumbers() {

@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.InputStream;
 import java.net.ServerSocket;
 
 /**
@@ -124,7 +125,11 @@ public class RMInitiator {
             dbf.setNamespaceAware(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
 
-            Document doc = db.parse(new File(Constants.CLIENT_LISTENER_CONFIG));
+
+            InputStream in=Thread.currentThread().getContextClassLoader().getResourceAsStream("client-listener-config.wsdd");
+
+            //Document doc = db.parse(new File(Constants.CLIENT_LISTENER_CONFIG));
+            Document doc = db.parse(in);
             WSDDDocument wsdddoc = new WSDDDocument(doc);
             WSDDDeployment wsdddep = wsdddoc.getDeployment();
             sas.setMyConfig(wsdddep);

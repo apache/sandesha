@@ -62,6 +62,15 @@
 
     <!-- who the developers are for the project -->
     <developers>
+    
+       <developer>
+            <name>Sanjiva Weerawarana</name>
+            <id>sanjiva</id>
+            <email>sanjiva@opensource.lk</email>
+            <organization>
+            </organization>
+        </developer>
+    
         <developer>
             <name>Davanum Srinivas</name>
             <id>dims</id>
@@ -85,6 +94,7 @@
             <organization>
             </organization>
         </developer>
+     
     </developers>
 
     <licenses>

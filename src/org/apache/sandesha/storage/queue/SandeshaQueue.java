@@ -231,6 +231,7 @@ public class SandeshaQueue {
             throw new QueueException(Constants.Queue.SEQUENCE_ID_NULL);
 
         synchronized (outgoingMap) {
+            System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF "+sequenceId);
             OutgoingSequence rsh = new OutgoingSequence(sequenceId);
             outgoingMap.put(sequenceId, rsh);
         }

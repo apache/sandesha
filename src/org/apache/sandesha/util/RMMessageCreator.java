@@ -144,7 +144,7 @@ public class RMMessageCreator {
         AddressingHeaders addrHeaders = new AddressingHeaders();
         From from = null;
         ReplyTo replyTo = null;
-        String fromURL = rmMsgContext.getFrom();
+        //String fromURL = rmMsgContext.getFrom();
         String replyToURL = rmMsgContext.getReplyTo();
 
         //Need to use the anonymous_URI if the client is synchronous.
@@ -161,7 +161,7 @@ public class RMMessageCreator {
             }
 
         } else {
-            from = new From(new Address(Constants.ANONYMOUS_URI));
+            from = new From(new Address(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS));
             addrHeaders.setFrom(from);
             if (rmMsgContext.isHasResponse()) {
                 replyTo = new ReplyTo(new Address(replyToURL));

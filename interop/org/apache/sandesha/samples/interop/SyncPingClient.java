@@ -1,4 +1,4 @@
-  /*
+/*
 * Copyright 1999-2004 The Apache Software Foundation.
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -29,7 +29,9 @@ import javax.xml.rpc.ParameterMode;
 
 public class SyncPingClient {
 
-    private static String targetURL = "http://127.0.0.1:9090/axis/services/RMInteropService?wsdl";
+    private static String defaultServerPort = "8070";
+
+    private static String targetURL = "http://127.0.0.1:" + defaultServerPort + "/axis/services/RMInteropService?wsdl";
 
     public static void main(String[] args) {
         System.out.println("Client started...... Synchronous ");

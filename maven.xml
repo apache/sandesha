@@ -24,10 +24,10 @@
              debug="${maven.compile.debug}"
 	     optimize="${optimize}"
 	     deprecation="${maven.compile.deprecation}">
-      <ant:classpath>
+      <classpath>
         <pathelement location="${maven.build.dest}"/>
         <path refid="maven.dependency.classpath"/>
-      </ant:classpath>
+      </classpath>
     </ant:javac>
     </goal>
 

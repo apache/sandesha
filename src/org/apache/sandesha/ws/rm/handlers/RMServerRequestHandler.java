@@ -53,6 +53,7 @@ public class RMServerRequestHandler extends RMHandler {
             while (iterator.hasNext()) {
                 elements = (SOAPHeaderElement) iterator.next();
                 elements.setProcessed(true);
+                
             }
 
             setPropertyToMessageContext(msgContext, Constants.ENV_RM_REQUEST_HEADERS);

@@ -5,6 +5,7 @@ import org.apache.sandesha.Constants;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -36,8 +37,8 @@ public class PropertyLoader {
     private static Properties loadProperties() {
         Properties properties = new Properties();
         try {
-            System.out.println((new File(".")).getAbsolutePath());
-            properties.load(new FileInputStream(Constants.PROPERTIES_CONFIG));
+            InputStream in=Thread.currentThread().getContextClassLoader().getResourceAsStream("sandesha.properties") ;
+            properties.load(in);
             return properties;
         } catch (IOException e) {
             e.printStackTrace();
