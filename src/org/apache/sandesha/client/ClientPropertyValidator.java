@@ -44,17 +44,18 @@ public class ClientPropertyValidator {
         boolean sync=getSync(call);
         String action = getAction(call);
         String sourceURL = null;
+        String from=getFrom(call);
+        String replyTo=getReplyTo(call);
  
         try {
-            if (inOut)
-                sourceURL = getSourceURL(call);
+            sourceURL = getSourceURL(call);
             System.out.println("Souce URI " + sourceURL);
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             throw new AxisFault(e.getMessage());
         }
 
-        String errorMsg = getValidated(msgNumber,action);
+        String errorMsg = getValidated(msgNumber,action, replyTo,sync,inOut);
         if (errorMsg == null) {
             rmMessageContext = new RMMessageContext();
             //Assume that the service invocations with respect to client is done
@@ -67,7 +68,8 @@ public class ClientPropertyValidator {
             rmMessageContext.setLastMessage(lastMessage);
             rmMessageContext.setSourceURL(sourceURL);
             rmMessageContext.setSequenceID(action);
-          
+            rmMessageContext.setReplyTo(replyTo);
+            rmMessageContext.setFrom(from);
             return rmMessageContext;
         } else
             throw new AxisFault(errorMsg);
@@ -152,26 +154,40 @@ public class ClientPropertyValidator {
     }
 
     private static boolean getLastMessage(Call call) {
-        String lastMessage = (String) call.getProperty("lastMessage");
-        boolean lastMsg = false;
-        if (lastMessage != null) {
-            if (lastMessage.equals("true"))
-                lastMsg = true;
-            else
-                lastMsg = false;
-        }
-        return lastMsg;
+        Boolean lastMessage = (Boolean) call.getProperty("lastMessage");
+        if(lastMessage!=null)        
+        return lastMessage.booleanValue();
+        else
+        return false;
 
     }
 
-    private static String getValidated(long msgNumber,String action) {
+    private static String getValidated(long msgNumber,String action, String replyTo, boolean sync, boolean inOut) {
         String errorMsg = null;
-
-        if ((msgNumber == 0)||(action==null))
-            errorMsg = "ERROR: Message Number Not Specified or Action is null";
-      
         
-        return errorMsg;
+        if(sync && inOut && replyTo==null){
+            errorMsg="ERROR: To perform the operation, ReplyTo address must be specified." +
+            		" This EPR will not be the Sandesha end point. " +
+            		"If it should be Sandesha end point, please set the propety 'sync' to false in call.";
+            return errorMsg;   
+        }
+        
+        if ((msgNumber == 0)||(action==null)){
+            errorMsg = "ERROR: Message Number Not Specified or Action is null";
+            return errorMsg;   
+        }
+        return errorMsg;  
     }
+    
+    
+    private static String getFrom(Call call){
+       return  (String)call.getProperty("from");
+    
+    }
+    
+    private static String getReplyTo(Call call){
+        return  (String)call.getProperty("replyTo");
+     
+     }
 
 }
