@@ -1,0 +1,2 @@
+# copy this file to build.properties and chnage path locations to webapps/axis (AXIS 1.2)
+webapp_install=C:\\Offnet\\jakarta-tomcat\\jakarta-tomcat-4.1.29\\webapps\\axis\\
