@@ -12,17 +12,17 @@
 
 
 <handler name="PingRequestHandler" type="java:org.apache.sandesha.ws.rm.handlers.RMClientRequestHandler">
-   <parameter name="sourceURI" value="http://127.0.0.1:8070"/>
+   <parameter name="sourceURI" value="http://127.0.0.1:7080"/>
    <parameter name="action" value="wsrm:Ping"/>
    <parameter name="synchronized" value="false"/>
-   <parameter name="replyTo" value="http://127.0.0.1:8070"/>
+   <parameter name="replyTo" value="http://127.0.0.1:7080"/>
 </handler>
 
 <handler name="EchoStringRequestHandler" type="java:org.apache.sandesha.ws.rm.handlers.RMClientRequestHandler">
-   <parameter name="sourceURI" value="http://127.0.0.1:8070"/>
+   <parameter name="sourceURI" value="http://127.0.0.1:7080"/>
    <parameter name="action" value="wsrm:echoString"/>
    <parameter name="synchronized" value="false"/>
-   <parameter name="replyTo" value="http://127.0.0.1:8070"/>
+   <parameter name="replyTo" value="http://127.0.0.1:7090"/>
 </handler>
 
 

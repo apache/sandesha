@@ -47,8 +47,9 @@ public class Scenario_1_1_Client {
             if(args.length == 0 || args[0].equals("")){
                 throw new Exception("Error: pass Target End Point Address as a Parametter");
             }
-            
-            call.setTargetEndpointAddress(args[0]);
+            String loc = args[0];
+            System.out.println("Sending ping messages to "+loc);
+            call.setTargetEndpointAddress(loc);
             call.setOperationName(new QName("PingService", "Ping"));
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
             call.setReturnType(XMLType.AXIS_VOID);
@@ -57,11 +58,10 @@ public class Scenario_1_1_Client {
             
             call.setProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER,"uuid:" + uuidGen.nextUUID());
             call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(false)));
-          
+            
             call.invoke(new Object[] {"Ping 1"});
             call.invoke(new Object[] {"Ping 2"});
             call.setProperty(Constants.CLIENT_LAST_MESSAGE,(new Boolean(true)));
-            //call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
             call.invoke(new Object[] {"Ping 3"});
             
         } catch (Exception e) {

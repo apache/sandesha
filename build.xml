@@ -370,7 +370,78 @@ org.apache.sandesha.ws.rm.providers
         </ant-->
     </target>
 
-    <target name="systemTests"
+<target name="client.interop" depends="compile.interop">
+
+    <java classname="org.apache.axis.utils.Admin" 
+               fork="true" 
+               dir="${basedir}">
+
+      <arg value="client" />
+      <arg value="${basedir}/${dir.interop}/org/apache/sandesha/samples/interop/ClientDeploy.wsdd" />
+
+      <classpath>
+         <path refid="classpath.library"/>
+      </classpath>
+
+    </java>
+
+    <java classname="org.apache.sandesha.samples.interop.Scenario_1_1_Client" fork="true">
+      <!-- TODO: allow to take it from command line -->
+      <arg line="http://localhost:7080/axis/services/PingService"/>
+      <classpath>
+         <path refid="classpath.library"/>
+      </classpath>
+      </java>
+
+
+
+</target>
+
+
+<target name="deploy.interop" depends="compile.interop">
+
+        <copy todir="${webapp_install}/WEB-INF/classes">
+            <fileset dir="${build.classes}" includes="**"/>
+        </copy>
+
+        <copy todir="${webapp_install}/WEB-INF/lib">
+            <fileset dir="lib" includes="**/addressing*.jar"/>
+        </copy>
+
+    <java classname="org.apache.axis.utils.Admin" 
+               fork="true" 
+               dir="${webapp_install}/WEB-INF">
+
+      <arg value="server" />
+      <arg value="${basedir}/${dir.interop}/org/apache/sandesha/samples/interop/ApplicationServiceDeploy.wsdd" />
+
+      <classpath>
+         <pathelement location="${deploy_location}"/>
+         <path refid="classpath.library"/>
+      </classpath>
+
+    </java>
+
+    <java classname="org.apache.axis.utils.Admin" 
+               fork="true" 
+               dir="${webapp_install}/WEB-INF">
+
+      <arg value="server" />
+      <arg value="${basedir}/${dir.src}/org/apache/sandesha/client/ClientEndpointManagerDeploy.wsdd" />
+
+      <classpath>
+         <pathelement location="${deploy_location}"/>
+         <path refid="classpath.library"/>
+      </classpath>
+
+    </java>
+
+</target>
+
+<target name="deploy" depends="deploy.interop" />
+
+
+<target name="systemTests"
         depends="compile, unitTests"
         if="junit.present"
         description="Runs all JUnit tests">
