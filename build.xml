@@ -189,7 +189,7 @@ org.apache.sandesha.ws.rm.providers
         <echo message="   compile.library --> compiles the source code                    "/>
         <echo message="   compile.samples --> compiles the samples source code            "/>
         <echo message="   compile.tests   --> compiles the tests source code              "/>
-        <echo message="   compile.interops--> compiles the interop source code            "/>
+        <echo message="   compile.interop --> compiles the interop source code            "/>
         <echo message="                                                                   "/>
         <echo message="   javadoc         --> generates the API documentation             "/>
         <echo message="                       (needs Java > 1.2)                          "/>
@@ -205,7 +205,7 @@ org.apache.sandesha.ws.rm.providers
         <echo message="   usage           --> provides help on using the build tool       "/>
         <echo message="                       (default)                                   "/>
 <!--        <echo message="                                                                   "/>
-        <echo message="   changelog       --> generates changelog.html                    "/>
+        <echo message="   changelog        generates changelog.html                    "/>
         <echo message="                                                                   "/> -->
         <echo message=" See comments inside the build.xml file for more details.          "/>
         <echo message="-------------------------------------------------------------------"/>
@@ -306,7 +306,7 @@ org.apache.sandesha.ws.rm.providers
             description="unti tests only"/>        
 
     <target name="interop"
-            depends="interopTests"
+            depends="compile.interop,interopTests"
             description="interop tests"/>        
 
     <!-- #################################################################### -->
@@ -329,8 +329,8 @@ org.apache.sandesha.ws.rm.providers
     </target>
 
     <target name="compile.tests"
-        depends="compile.interops"
-        if="junit.present">
+        depends="compile.interop"
+        >
         <!-- Compile the java code from ${dir.src} into ${build.classes} -->
         <javac srcdir="${dir.test}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.test"/>
@@ -357,13 +357,17 @@ org.apache.sandesha.ws.rm.providers
         </copy>
     </target>
 
-    <target name="compile.interops"
+    <target name="compile.interop"
         depends="compile.library">
-        <ant dir="${dir.interop}"
+        <javac srcdir="${dir.interop}" destdir="${build.classes}" debug="on">
+            <classpath refid="classpath.library"/>
+        </javac>
+
+        <!--ant dir="${dir.interop}"
             antfile="build.xml"
             target="compile"
             inheritAll="false">
-        </ant>
+        </ant-->
     </target>
 
     <target name="systemTests"
