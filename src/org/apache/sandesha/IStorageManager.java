@@ -120,4 +120,6 @@ public interface IStorageManager {
      * @return
      */
     public boolean isResponseComplete(String sequenceID);
+    
+    public void terminateSequence(String sequenceID);
 }

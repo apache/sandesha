@@ -64,7 +64,21 @@ public class RMMessageContext {
     private String from=null;
     
     private String replyTo=null;
+    
+    private boolean responseReceived=false;
 
+    /**
+     * @return Returns the responseReceived.
+     */
+    public boolean isResponseReceived() {
+        return responseReceived;
+    }
+    /**
+     * @param responseReceived The responseReceived to set.
+     */
+    public void setResponseReceived(boolean responseReceived) {
+        this.responseReceived = responseReceived;
+    }
     /**
      * @return Returns the from.
      */
