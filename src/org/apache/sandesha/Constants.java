@@ -287,6 +287,14 @@ public interface Constants {
         public static final String WSRM_FAULT_MSG_NO_ROLLOVER="wsrm:MessageNumberRollover";
     }
 
+    public interface ErrorMessages{
+      
+    }
+
+    public interface InfomationMessage{
+
+    }
+
 
     public static final double MAX_MSG_NO=18446744073709551615d;
 

@@ -87,7 +87,6 @@ public class RMProvider extends RPCProvider {
         }
 
         rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
-       
         IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
 
         try {
@@ -95,6 +94,7 @@ public class RMProvider extends RPCProvider {
                 msgContext.setResponseMessage(null);
             }
          } catch (AxisFault af) {
+            System.out.println("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
             RMProvider.log.error(af);
 
         	FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);

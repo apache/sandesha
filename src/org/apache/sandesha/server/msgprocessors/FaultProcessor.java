@@ -64,7 +64,7 @@ public class FaultProcessor implements IRMMessageProcessor {
         //return false
         SOAPFault soapFault = null;
 
-        if (Constants.FaultCodes.IN_CORRECT_MESSAGE.equalsIgnoreCase(axisFault.getFaultCode().getLocalPart())) {
+        if (Constants.FaultCodes.IN_CORRECT_MESSAGE.equalsIgnoreCase(axisFault.getFaultCode().getLocalPart())){
             soapFault = new SOAPFault(this.axisFault);
         }
 

@@ -16,9 +16,9 @@
  */
 package org.apache.sandesha.server.msgprocessors;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.AxisFault;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.SOAPEnvelope;
@@ -26,7 +26,6 @@ import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.message.addressing.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
-import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
@@ -34,15 +33,13 @@ import org.apache.sandesha.ws.rm.RMHeaders;
  * @author
  */
 public class CreateSequenceProcessor implements IRMMessageProcessor {
-
-    IStorageManager storageManager = null;
+    IStorageManager storageManager;
 
     public CreateSequenceProcessor(IStorageManager storageManager) {
         this.storageManager = storageManager;
     }
 
-    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault  {
-
+    public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
@@ -53,7 +50,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
 
         //TODO This should be sent by looking at the offer and the rest
         //wsrm:CreateSequenceRefused
-        if(rmHeaders.getCreateSequence()!=null)
+        if (rmHeaders.getCreateSequence() == null)
             throw new AxisFault();
 
         /*
@@ -67,24 +64,11 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
          */
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
-        String outUuid = uuidGen.nextUUID();
-        
-        storageManager.addSequence("uuid:"+uuid);
-        storageManager.addSequence(rmMessageContext.getSequenceID());
-        storageManager.setTemporaryOutSequence(rmMessageContext.getSequenceID(), "uuid:" + outUuid );
-        
-        //TODO
-        //storageManger.addSequence("uuid:"+uuid);
 
-        //Create the SOAPEnvelop to send and set it to the resEnv of
-        // rmMessageCotext.
-        SOAPEnvelope resEnvelope = EnvelopeCreator
-                .createCreateSequenceResponseEnvelope(uuid,
-                        rmMessageContext);
+        storageManager.addRequestedSequence(uuid);
 
-        //Set the message type.
-        rmMessageContext
-                .setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
+        SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(uuid, rmMessageContext);
+        rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
 
         //FIX THIS FIX THIS
         //Need to change the ANONYMOUS URI to the new one after completion.
@@ -102,18 +86,15 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
             return true;
         } else {
 
-            MessageContext msgContext = new MessageContext(rmMessageContext
-                    .getMsgContext().getAxisEngine());
+            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
             msgContext.setResponseMessage(new Message(resEnvelope));
             rmMessageContext.setMsgContext(msgContext);
 
-            rmMessageContext.setOutGoingAddress(addrHeaders.getReplyTo()
-                    .getAddress().toString());
+            rmMessageContext.setOutGoingAddress(addrHeaders.getReplyTo().getAddress().toString());
             rmMessageContext.setSync(false);
             storageManager.addCreateSequenceResponse(rmMessageContext);
             return false;
         }
-
 
     }
 

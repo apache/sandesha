@@ -48,16 +48,32 @@ public class CompositeProcessor implements IRMMessageProcessor {
         }
 
         if (rmHeaders.getSequence() != null) {
+            System.out.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE 1");
             if (rmHeaders.getSequence().getMessageNumber() != null) {
-                String sequenceID = rmHeaders.getSequence().getIdentifier().getIdentifier();
+                System.out.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE 2");
+                String sequenceUUID = rmHeaders.getSequence().getIdentifier().getIdentifier();
                 long messageNumber = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
-                if (storageManger.isMessageExist(sequenceID, messageNumber) != true) {
+               // System.out.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE "+storageManger.isMessageExist(sequenceID, messageNumber));
+
+
+                String seqId = storageManger.getOutgoingSeqenceIdOfIncomingMsg(rmMessageContext);
+
+
+                boolean hasSequence = storageManger.isSequenceExist(seqId);
+
+                if(!hasSequence){
+                    storageManger.addIncomingSequence(seqId);
+                }
+
+
+
+                if (storageManger.isMessageExist(seqId, messageNumber) != true) {
                     //Create a copy of the RMMessageContext.
                     RMMessageContext rmMsgContext = new RMMessageContext();
                     //Copy the RMMEssageContext
                     rmMessageContext.copyContents(rmMsgContext);
-                    System.out.println("SETTING THE RESPONSE " + sequenceID + "  " + messageNumber);
-                    rmMsgContext.setSequenceID(sequenceID);
+                    System.out.println("SETTING THE RESPONSE " + sequenceUUID + "  " + messageNumber);
+                    rmMsgContext.setSequenceID(sequenceUUID);
                     rmMsgContext.setMsgNumber(messageNumber);
                     try {
                         //Create a new MessageContext, by pasing the axis engine.

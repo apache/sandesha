@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.queue.QueueException;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
-import org.apache.sandesha.storage.queue.SequenceHash;
+import org.apache.sandesha.storage.queue.IncomingSequence;
 
 import java.util.Random;
 import java.util.Set;
@@ -475,5 +475,15 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public long getLastMsgNo(String seqId){
     	SandeshaQueue sq = SandeshaQueue.getInstance();
     	return sq.getLastMsgNo(seqId);
+    }
+
+    public void addRequestedSequence(String seqId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        sq.addRequestedSequence(seqId);
+    }
+
+    public boolean isRequestedSeqPresent(String seqId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.isRequestedSeqPresent(seqId);
     }
 }

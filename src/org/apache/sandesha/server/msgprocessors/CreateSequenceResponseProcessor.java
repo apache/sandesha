@@ -45,8 +45,7 @@ public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
         String sequenceID = createSeqRes.getIdentifier().toString();
         //Approve the sequences. Now we can start sending the messages using
         // that sequence.
-        storageManager.setApprovedOutSequence(relatesTo.getURI().toString(),
-                sequenceID);
+        storageManager.setApprovedOutSequence(relatesTo.getURI().toString(), sequenceID);
         //No response to this message.
         return false;
     }

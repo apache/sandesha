@@ -63,8 +63,7 @@ public class RMSender extends BasicHandler {
                 requestMesssageContext = processFirstMessage(requestMesssageContext, addrHeaders,
                         requestMesssageContext.getSync());
             } else {
-                requestMesssageContext = processNonFirstMessage(requestMesssageContext,
-                        addrHeaders, requestMesssageContext.getSync());
+                requestMesssageContext = processNonFirstMessage(requestMesssageContext, addrHeaders, requestMesssageContext.getSync());
             }
 
             if (requestMesssageContext.isLastMessage()) {
@@ -224,13 +223,12 @@ public class RMSender extends BasicHandler {
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         //Set the tempUUID
         String tempUUID = uuidGen.nextUUID();
-        RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(reqRMMsgContext,
-                addrHeaders, tempUUID);
+        RMMessageContext createSeqRMMsgContext = getCreateSeqRMContext(reqRMMsgContext, addrHeaders, tempUUID);
         createSeqRMMsgContext.setMessageID("uuid:" + tempUUID);
         //Create a sequence first.
 
-        //storageManager.addSequence(reqRMMsgContext.getSequenceID());
-        //storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
+        storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
+        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), "uuid:" + tempUUID);
 
         //Set the processing state to the RMMessageContext
         createSeqRMMsgContext.setSync(sync);
@@ -275,8 +273,7 @@ public class RMSender extends BasicHandler {
         //If the property specified by the client is not valid
         //an AxisFault will be sent at this point.
         requestMesssageContext = ClientPropertyValidator.validate(call);
-        requestMesssageContext.setOutGoingAddress((String) msgContext
-                .getProperty(MessageContext.TRANS_URL));
+        requestMesssageContext.setOutGoingAddress((String) msgContext.getProperty(MessageContext.TRANS_URL));
         requestMesssageContext.setMsgContext(msgContext);
         return requestMesssageContext;
 

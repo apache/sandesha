@@ -40,6 +40,14 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
 
     }
 
+    public void addRequestedSequence(String seqId) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean isRequestedSeqPresent(String seqId) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#markOutgoingMessageToDelete(java.lang.String, java.lang.Long)
      */

@@ -395,4 +395,30 @@ public class ServerStorageManager implements IStorageManager {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
+    public void addOutgoingSequence(String sequenceId) {
+        accessor.addOutgoingSequence(sequenceId);
+    }
+
+    public void addIncomingSequence(String sequenceId){
+         accessor.addIncomingSequence(sequenceId);
+    }
+
+    public String getOutgoingSeqOfMsg(String msgId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void addRequestedSequence(String seqId) {
+        accessor.addRequestedSequence(seqId);
+    }
+
+    public boolean isRequestedSeqPresent(String seqId) {
+        return accessor.isRequestedSeqPresent(seqId);
+    }
+
+    public String getOutgoingSeqenceIdOfIncomingMsg(RMMessageContext msg) {
+
+        return msg.getSequenceID();
+    }
 }

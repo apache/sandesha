@@ -47,6 +47,10 @@ public class SandeshaQueue {
     HashMap queueBin; // Messaged processed from out queue will be moved
 
     ArrayList lowPriorityQueue;
+
+    private List requestedSequences;
+
+    //private Vector requestedSequences
     // to this.
 
     // to this.
@@ -57,6 +61,8 @@ public class SandeshaQueue {
         highPriorityQueue = new ArrayList();
         queueBin = new HashMap();
         lowPriorityQueue = new ArrayList();
+
+        requestedSequences = new ArrayList();
     }
 
     public static SandeshaQueue getInstance() {
@@ -76,7 +82,7 @@ public class SandeshaQueue {
             throw new QueueException("Error in adding message");
 
         if (isIncomingSequenceExists(seqId)) {
-            SequenceHash seqHash = (SequenceHash) incomingMap.get(seqId);
+            IncomingSequence seqHash = (IncomingSequence) incomingMap.get(seqId);
 
             synchronized (seqHash) {
 
@@ -105,18 +111,17 @@ public class SandeshaQueue {
             throw new QueueException("Error in adding message");
 
         if (isOutgoingSequenceExists(seqId)) {
-            ResponseSequenceHash resSeqHash = (ResponseSequenceHash) outgoingMap
-                    .get(seqId);
+            OutgoingSequence resSeqHash = (OutgoingSequence) outgoingMap.get(seqId);
 
             synchronized (resSeqHash) {
-
                 if (resSeqHash == null)
                     throw new QueueException("Inconsistent queue");
-                resSeqHash.putNewMessage(msgCon);
-                
+              resSeqHash.putNewMessage(msgCon);
+              successful=true;
+
                 //if last message
-                if(msgCon.isLastMessage())
-                	resSeqHash.setLastMsg(msgCon.getMsgNumber());
+                //if(msgCon.isLastMessage())
+                //	resSeqHash.setLastMsg(msgCon.getMsgNumber());
                 	
             }
         }
@@ -127,7 +132,7 @@ public class SandeshaQueue {
     public boolean messagePresentInIncomingSequence(String sequenceId,
                                                     Long messageNo) throws QueueException {
 
-        SequenceHash seqHash = (SequenceHash) incomingMap.get(sequenceId);
+        IncomingSequence seqHash = (IncomingSequence) incomingMap.get(sequenceId);
 
         if (seqHash == null)
             throw new QueueException("Sequence not present");
@@ -159,12 +164,12 @@ public class SandeshaQueue {
 
             int count = incomingMap.size();
             Iterator it = incomingMap.keySet().iterator();
-            SequenceHash sh = null;
+            IncomingSequence sh = null;
             String seqId = null;
 
             whileLoop: while (it.hasNext()) {
                 String tempSeqId = (String) it.next();
-                sh = (SequenceHash) incomingMap.get(tempSeqId);
+                sh = (IncomingSequence) incomingMap.get(tempSeqId);
                 if (sh.hasProcessableMessages()) {
                     seqId = tempSeqId;
                     break whileLoop;
@@ -181,7 +186,7 @@ public class SandeshaQueue {
         if (sequenceId == null)
             return null;
 
-        SequenceHash sh = (SequenceHash) incomingMap.get(sequenceId);
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
 
         synchronized (sh) {
 
@@ -208,7 +213,7 @@ public class SandeshaQueue {
             whileLoop: while (it.hasNext()) {
                 RMMessageContext tempMsg;
                 String tempKey = (String) it.next();
-                ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
+                OutgoingSequence rsh = (OutgoingSequence) outgoingMap
                         .get(tempKey);
                 if (rsh.isOutSeqApproved()) {
                     tempMsg = rsh.getNextMessageToSend();
@@ -231,7 +236,7 @@ public class SandeshaQueue {
 
         synchronized (incomingMap) {
 
-            SequenceHash sh = new SequenceHash(sequenceId);
+            IncomingSequence sh = new IncomingSequence(sequenceId);
             incomingMap.put(sequenceId, sh);
 
         }
@@ -244,7 +249,7 @@ public class SandeshaQueue {
 
         synchronized (outgoingMap) {
 
-            ResponseSequenceHash rsh = new ResponseSequenceHash(sequenceId);
+            OutgoingSequence rsh = new OutgoingSequence(sequenceId);
             outgoingMap.put(sequenceId, rsh);
         }
 
@@ -333,7 +338,7 @@ public class SandeshaQueue {
 
     /*
      * public RMMessageContext getNextToProcessIfHasNew(String sequenceId){
-     * SequenceHash sh = (SequenceHash) incomingMap.get(sequenceId);
+     * IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
      * if(sh==null) return null;
      * 
      * synchronized (sh) { if(!sh.hasNewMessages()) return null;
@@ -343,7 +348,7 @@ public class SandeshaQueue {
 
     public Vector nextAllMessagesToProcess(String sequenceId)
             throws QueueException {
-        SequenceHash sh = (SequenceHash) incomingMap.get(sequenceId);
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
 
         synchronized (sh) {
             Vector v = sh.getNextMessagesToProcess();
@@ -354,7 +359,7 @@ public class SandeshaQueue {
     //Folowing func. may cause errors.
     /*
      * public Vector nextAllResponseMessagesToSend(String sequenceId) throws
-     * QueueException{ ResponseSequenceHash rsh = (ResponseSequenceHash)
+     * QueueException{ OutgoingSequence rsh = (OutgoingSequence)
      * outgoingMap.get(sequenceId); Vector v = new Vector(); synchronized (rsh){
      * RMMessageContext msg = nextAllResponseMessagesToSend()
      * 
@@ -370,7 +375,7 @@ public class SandeshaQueue {
 
             while (it.hasNext()) {
                 Object tempKey = it.next();
-                SequenceHash sh = (SequenceHash) incomingMap.get(tempKey);
+                IncomingSequence sh = (IncomingSequence) incomingMap.get(tempKey);
                 if (sh.hasProcessableMessages() && !sh.isSequenceLocked())
                     ids.add(sh.getSequenceId());
             }
@@ -384,8 +389,8 @@ public class SandeshaQueue {
      * synchronized (outgoingMap){ Iterator it =
      * outgoingMap.keySet().iterator();
      * 
-     * while(it.hasNext()){ Object tempKey = it.next(); ResponseSequenceHash sh =
-     * (ResponseSequenceHash) outgoingMap.get(tempKey);
+     * while(it.hasNext()){ Object tempKey = it.next(); OutgoingSequence sh =
+     * (OutgoingSequence) outgoingMap.get(tempKey);
      * if(sh.hasProcessableMessages()) ids.add(sh.getSequenceId()); } } return
      * ids; }
      */
@@ -404,7 +409,7 @@ public class SandeshaQueue {
         if (!yes)
             return;
 
-        SequenceHash sh = (SequenceHash) incomingMap.get(seqId);
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(seqId);
         sh.clearSequence(yes);
     }
 
@@ -412,7 +417,7 @@ public class SandeshaQueue {
         if (!yes)
             return;
 
-        ResponseSequenceHash sh = (ResponseSequenceHash) outgoingMap.get(seqId);
+        OutgoingSequence sh = (OutgoingSequence) outgoingMap.get(seqId);
         sh.clearSequence(yes);
     }
 
@@ -433,13 +438,13 @@ public class SandeshaQueue {
     }
 
     public void setSequenceLock(String sequenceId, boolean lock) {
-        SequenceHash sh = (SequenceHash) incomingMap.get(sequenceId);
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
         sh.setProcessLock(lock);
     }
 
     public Set getAllReceivedMsgNumsOfIncomingSeq(String sequenceId) {
         Vector v = new Vector();
-        SequenceHash sh = (SequenceHash) incomingMap.get(sequenceId);
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
         if (sh != null)
             return sh.getAllKeys();
         else
@@ -448,7 +453,7 @@ public class SandeshaQueue {
 
     public Set getAllReceivedMsgNumsOfOutgoingSeq(String sequenceId) {
         Vector v = new Vector();
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap
                 .get(sequenceId);
         synchronized (rsh) {
             return rsh.getAllKeys();
@@ -456,7 +461,7 @@ public class SandeshaQueue {
     }
 
     public boolean isIncomingMessageExists(String sequenceId, Long messageNo) {
-        SequenceHash sh = (SequenceHash) incomingMap.get(sequenceId);
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
         //sh can be null if there are no messages at the initial point.
         if (sh != null)
             return sh.hasMessage(messageNo);
@@ -465,8 +470,7 @@ public class SandeshaQueue {
     }
 
     public void setOutSequence(String seqId, String outSeqId) {
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
-                .get(seqId);
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
 
         if (rsh == null) {
             System.out.println("ERROR: RESPONSE SEQ IS NULL");
@@ -479,7 +483,7 @@ public class SandeshaQueue {
     }
 
     public void setOutSequenceApproved(String seqId, boolean approved) {
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap
                 .get(seqId);
 
         if (rsh == null) {
@@ -506,7 +510,7 @@ public class SandeshaQueue {
             while (it.hasNext()) {
 
                 String tempSeqId = (String) it.next();
-                ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
+                OutgoingSequence rsh = (OutgoingSequence) outgoingMap
                         .get(tempSeqId);
                 String tempOutSequence = rsh.getOutSequenceId();
                 if (outSequence.equals(tempOutSequence))
@@ -525,7 +529,7 @@ public class SandeshaQueue {
         while (it.hasNext()) {
             String s = (String) it.next();
             System.out.println("\n Sequence id - " + s);
-            ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
+            OutgoingSequence rsh = (OutgoingSequence) outgoingMap
                     .get(s);
 
             Iterator it1 = rsh.getAllKeys().iterator();
@@ -547,7 +551,7 @@ public class SandeshaQueue {
         while (it.hasNext()) {
             String s = (String) it.next();
             System.out.println("\n Sequence id - " + s);
-            SequenceHash sh = (SequenceHash) incomingMap.get(s);
+            IncomingSequence sh = (IncomingSequence) incomingMap.get(s);
 
             Iterator it1 = sh.getAllKeys().iterator();
             while (it1.hasNext()) {
@@ -579,7 +583,7 @@ public class SandeshaQueue {
 
     public void moveOutgoingMsgToBin(String sequenceId, Long messageNo) {
         String sequence = getSequenceOfOutSequence(sequenceId);
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap
                 .get(sequence);
 
         if (rsh == null) {
@@ -607,7 +611,7 @@ public class SandeshaQueue {
 
     public void markOutgoingMessageToDelete(String sequenceId, Long messageNo) {
         String sequence = getSequenceOfOutSequence(sequenceId);
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap
                 .get(sequence);
 
         if (rsh == null) {
@@ -641,7 +645,7 @@ public class SandeshaQueue {
     }
 
     public long getNextOutgoingMessageNumber(String seq) {
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seq);
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seq);
 
         if (rsh == null) { //saquence not created yet.
             try {
@@ -650,7 +654,7 @@ public class SandeshaQueue {
                 System.out.println(q.getStackTrace());
             }
         }
-        rsh = (ResponseSequenceHash) outgoingMap.get(seq);
+        rsh = (OutgoingSequence) outgoingMap.get(seq);
         synchronized (rsh) {
             Iterator keys = rsh.getAllKeys().iterator();
 
@@ -672,7 +676,7 @@ public class SandeshaQueue {
     }
 
     public RMMessageContext checkForResponseMessage(String requestId, String seqId) {
-        SequenceHash sh = (SequenceHash) incomingMap.get(seqId);
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(seqId);
         System.out.println("DEFAULT : " + requestId + " SEQ " + seqId);
 
         if (sh == null) {
@@ -687,7 +691,7 @@ public class SandeshaQueue {
     }
 
     public boolean isRequestMsgPresent(String seqId, String messageId) {
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
 
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL");
@@ -712,7 +716,7 @@ public class SandeshaQueue {
             key = (String) it.next();
             Object obj = outgoingMap.get(key);
             if (obj != null) {
-                ResponseSequenceHash hash = (ResponseSequenceHash) obj;
+                OutgoingSequence hash = (OutgoingSequence) obj;
                 boolean hasMsg = hash.hasMessageWithId(messageId);
                 if (!hasMsg)
                     key = null;
@@ -760,7 +764,7 @@ public class SandeshaQueue {
     public Vector getAllOutgoingMsgNumbers(String seqId) {
         Vector msgNumbers = new Vector();
 
-        ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
 
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL " + seqId);
@@ -784,7 +788,7 @@ public class SandeshaQueue {
             key = (String) it.next();
             Object obj = outgoingMap.get(key);
             if (obj != null) {
-                ResponseSequenceHash hash = (ResponseSequenceHash) obj;
+                OutgoingSequence hash = (OutgoingSequence) obj;
                 boolean hasMsg = hash.hasMessageWithId(requestMsgID);
                 if (!hasMsg)
                 //set the property response received
@@ -805,11 +809,10 @@ public class SandeshaQueue {
 
 
             if (obj != null) {
-                ResponseSequenceHash hash = (ResponseSequenceHash) obj;
-                //System.out.println("************** HASH SEQ IS " + hash.getSequenceId() + "      SEQ IS " + seqId + " OUT SEQ IS  " + hash.getOutSequenceId());
+                OutgoingSequence hash = (OutgoingSequence) obj;
+                System.out.println("************** HASH SEQ IS " + hash.getSequenceId() + "      SEQ IS " + seqId + " OUT SEQ IS  " + hash.getOutSequenceId());
                 if (hash.getOutSequenceId().equals(seqId)) {
-
-                    hash.setAckReceived(msgNo);
+                      hash.setAckReceived(msgNo);
                 }
             }
         }
@@ -837,15 +840,15 @@ public class SandeshaQueue {
             String seqId = temp.getSequenceID();
             // System.out.println(" HASH NOT FOUND SEQ ID " + seqId);
 
-            ResponseSequenceHash hash = null;
-            hash = (ResponseSequenceHash) outgoingMap.get(seqId);
+            OutgoingSequence hash = null;
+            hash = (OutgoingSequence) outgoingMap.get(seqId);
             if (hash == null) {
                 System.out.println("SandeshaQueue: ERROR: HASH NOT FOUND SEQ ID " + seqId);
             }
 
             /*Iterator it1 = outgoingMap.keySet().iterator();
             while(it1.hasNext()){
-                hash = (ResponseSequenceHash) it1.next();
+                hash = (OutgoingSequence) it1.next();
                 if(hash.getOutSequenceId().equals(seqId)){
                     System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FOUND SEQ "+ seqId);
                     foundSeq = true;
@@ -871,7 +874,7 @@ public class SandeshaQueue {
     }
     
     public void addSendMsgNo(String seqId,long msgNo){
-    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
     	
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL");
@@ -883,7 +886,7 @@ public class SandeshaQueue {
     }
     
     public boolean isSentMsg(String seqId,long msgNo){
-    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
     	
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL");
@@ -895,7 +898,7 @@ public class SandeshaQueue {
     }
     
     public boolean hasLastMsgReceived(String seqId){
-    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
     	
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL");
@@ -907,7 +910,7 @@ public class SandeshaQueue {
     }
 
     public long getLastMsgNo(String seqId){
-    	ResponseSequenceHash rsh = (ResponseSequenceHash) outgoingMap.get(seqId);
+    	OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
     	
         if (rsh == null) {
             System.out.println("ERROR: SEQ IS NULL");
@@ -917,7 +920,15 @@ public class SandeshaQueue {
         	return rsh.getLastMsgNumber();
         } 
     }
-    
-    
+
+    public void addRequestedSequence(String seqId){
+        requestedSequences.add(seqId);
+    }
+
+    public boolean isRequestedSeqPresent(String seqId){
+        return requestedSequences.contains(seqId); 
+    }
+
+
 }
 

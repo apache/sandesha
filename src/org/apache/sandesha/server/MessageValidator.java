@@ -66,11 +66,11 @@ public final class MessageValidator {
         RMHeaders rmHeaders = rmMsgCtx.getRMHeaders();
         Sequence sequence = rmHeaders.getSequence();
        
-        if (sequence != null) {
-            if (!storageMgr.isSequenceExist(sequence.getIdentifier().getIdentifier()))
-                throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
+      //  if (sequence != null) {
+       //     if (!storageMgr.isSequenceExist(sequence.getIdentifier().getIdentifier()))
+       //         throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
 
-        }
+     //   }
 
         if (rmHeaders.getSequenceAcknowledgement() != null) {
            // if (!storageMgr.isSequenceExist(sequence.getIdentifier().getIdentifier()))

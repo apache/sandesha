@@ -136,5 +136,16 @@ public interface IStorageManager {
 
     public long getLastMsgNo(String seqId);
 
+    public void addOutgoingSequence(String seqId);
+
+    public void addIncomingSequence(String seqId);
+
+    public String getOutgoingSeqOfMsg(String msgId);
+
+    public void addRequestedSequence(String seqId);
+
+    public boolean isRequestedSeqPresent(String seqId);
+
+    public String getOutgoingSeqenceIdOfIncomingMsg(RMMessageContext msg);
 
 }

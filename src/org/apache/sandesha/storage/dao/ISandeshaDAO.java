@@ -100,4 +100,8 @@ public interface ISandeshaDAO {
     public boolean hasLastMsgReceived(String seqId);
 
     public long getLastMsgNo(String seqId);
+
+    public void addRequestedSequence(String seqId);
+
+    public boolean isRequestedSeqPresent(String seqId);
 }
