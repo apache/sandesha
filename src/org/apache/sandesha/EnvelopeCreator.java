@@ -154,6 +154,8 @@ public class EnvelopeCreator {
                 //Setting from the Client
                 outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
                 outGoingAddressingHaders.setTo(addressingHeaders.getTo());
+             
+                if(addressingHeaders.getReplyTo()!=null)
                 outGoingAddressingHaders.setReplyTo(addressingHeaders
                         .getReplyTo());
 
