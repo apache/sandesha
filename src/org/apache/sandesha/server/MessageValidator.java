@@ -2,13 +2,16 @@ package org.apache.sandesha.server;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.Sequence;
+import org.apache.commons.logging.Log;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -16,7 +19,7 @@ import javax.xml.soap.SOAPException;
 
 public final class MessageValidator {
     private static IStorageManager storageMgr = null;
-
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public static void validate(final RMMessageContext rmMsgContext, boolean client) throws AxisFault {
 
@@ -38,7 +41,7 @@ public final class MessageValidator {
 
             validateForFaults(rmMsgContext);
         } catch (SOAPException e) {
-            e.printStackTrace();
+          log.error(e);
             //TODO Do we need to throw a Sequence Fault at this level.
         }
     }

@@ -18,12 +18,15 @@ package org.apache.sandesha.client;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.RMMessageCreator;
+import org.apache.commons.logging.Log;
 
 import java.util.Vector;
 import java.util.Iterator;
@@ -31,6 +34,7 @@ import java.util.Iterator;
 public class RMSender extends BasicHandler {
 
     private IStorageManager storageManager;
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public void invoke(MessageContext msgContext) throws AxisFault {
 
@@ -80,7 +84,7 @@ public class RMSender extends BasicHandler {
                 msgContext.setResponseMessage(null);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+           log.error(ex);
         }
     }
 

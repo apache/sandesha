@@ -18,8 +18,11 @@ package org.apache.sandesha;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
+import org.apache.commons.logging.Log;
 
 import java.util.Iterator;
 
@@ -67,6 +70,8 @@ public class RMMessageContext {
     private boolean responseReceived = false;
 
     private boolean ackReceived = false;
+
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     /**
      * @return Returns the responseReceived.
@@ -461,7 +466,7 @@ public class RMMessageContext {
 
         } catch (AxisFault e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(e);
         }
 
     }

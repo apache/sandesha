@@ -21,12 +21,15 @@ import org.apache.axis.deployment.wsdd.WSDDDocument;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.server.AxisServer;
 import org.apache.axis.transport.http.SimpleAxisServer;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
 import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
+import org.apache.commons.logging.Log;
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
@@ -52,6 +55,7 @@ public class RMInitiator {
     private static Thread thSender;
     private static Thread thInvoker;
     private static Sender sender;
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public static IStorageManager init(boolean client) {
         if (client) {
@@ -104,7 +108,7 @@ public class RMInitiator {
                 System.out.println("INFO : Waiting to Stop Client .....");
                 Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
             } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                log.error(e);
             }
         }
 
@@ -143,7 +147,7 @@ public class RMInitiator {
             Thread serverThread = new Thread(sas);
             serverThread.start();
         } catch (Exception e) {
-            e.printStackTrace();
+           log.error(e);
         }
 
 

@@ -19,11 +19,14 @@ package org.apache.sandesha.server.msgprocessors;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.message.addressing.RelatesTo;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import javax.xml.namespace.QName;
@@ -34,6 +37,7 @@ import javax.xml.namespace.QName;
 public class CompositeProcessor implements IRMMessageProcessor {
 
     private IStorageManager storageManager = null;
+    private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public CompositeProcessor(IStorageManager storageManger) {
         this.storageManager = storageManger;
@@ -61,7 +65,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     String messageId = relatesTo.getURI().toString();
                     seqId = storageManager.getOutgoingSeqOfMsg(messageId);
                 }
-                if (!hasSequence ) {
+                if (!hasSequence) {
                     storageManager.addIncomingSequence(seqId);
                 }
                 if (storageManager.isMessageExist(seqId, messageNumber) != true) {
@@ -81,7 +85,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
                         rmMsgContext.setMsgContext(msgContext);
                         rmMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error(e);
                         throw new AxisFault(new QName(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR), Constants.FaultMessages.SERVER_INTERNAL_ERROR, null, null);
                     }
                     storageManager.insertIncomingMessage(rmMsgContext);

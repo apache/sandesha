@@ -116,10 +116,8 @@ public class RMInvoker implements Runnable {
                     }
                 }
             } catch (InterruptedException error) {
-                error.printStackTrace();
                 log.error(error);
             } catch (Exception error) {
-                error.printStackTrace();
                 log.error(error);
             }
         }

@@ -82,11 +82,11 @@ public class Sender implements Runnable {
                         try {
                             sendMessage(rmMessageContext);
                         } catch (AxisFault e) {
-                            e.printStackTrace();
+                           log.error(e);
                         } catch (SOAPException e) {
-                            e.printStackTrace();
+                           log.error(e);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                           log.error(e);
                         }
                     } else {
                         //TODO REPORT ERROR
@@ -100,7 +100,7 @@ public class Sender implements Runnable {
                     //System.out.print("|"); //Sender THREAD IS SLEEPING
                     Thread.sleep(Constants.SENDER_SLEEP_TIME - timeGap);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                  log.error(ex);
                 }
             }
         }

@@ -133,7 +133,6 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             //Set the messsage type
             rmMsgContext.setMessageType(Constants.MSG_TYPE_ACKNOWLEDGEMENT);
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e);
         }
         return rmMsgContext;
