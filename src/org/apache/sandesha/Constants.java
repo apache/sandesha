@@ -87,6 +87,7 @@ public interface Constants {
         public static final String TERMINATE_DEQUENCE = "TerminateSequence";
         public static final String SEQUENCE_FAULT = "SequenceFault";
         public static final String ACKS_TO="AcksTo";
+        public static final String SEQUENCE_OFFER = "Offer";
 
         public static final double MAX_MSG_NO = 18446744073709551615d;
 

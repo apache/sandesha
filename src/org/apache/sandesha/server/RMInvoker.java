@@ -91,7 +91,6 @@ public class RMInvoker implements Runnable {
                         rmMessageContext.setMsgNumber(storageManager.getNextMessageNumber(rmMessageContext
                                 .getSequenceID()));
                         storageManager.insertOutgoingMessage(rmMessageContext);
-
                         if (firstMsgOfResponseSeq) {
                             RMMessageContext rmMsgContext = new RMMessageContext();
                             rmMessageContext.copyContents(rmMsgContext);

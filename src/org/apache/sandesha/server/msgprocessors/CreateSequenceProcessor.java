@@ -27,7 +27,10 @@ import org.apache.axis.message.addressing.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.sandesha.ws.rm.SequenceOffer;
+import org.apache.sandesha.ws.utility.Identifier;
 
 /**
  * @author
@@ -40,6 +43,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
     }
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
+        
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
@@ -55,6 +59,8 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
             rmMessageContext.setSync(false);
 
         //TODO This should be sent by looking at the offer and the rest
+        
+   
         //wsrm:CreateSequenceRefused
         if (rmHeaders.getCreateSequence() == null)
             throw new AxisFault();
@@ -62,8 +68,31 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
 
+        
         storageManager.addRequestedSequence(org.apache.sandesha.Constants.UUID + uuid);
 
+        //To support offer
+        CreateSequence createSeq = rmMessageContext.getRMHeaders().getCreateSequence();
+        SequenceOffer offer = createSeq.getOffer();
+        
+        String responseSeqId=null;
+        
+        if(offer!=null){    
+            Identifier id = offer.getIdentifier();
+            if(id!=null)
+               responseSeqId = id.getIdentifier();
+        }
+        
+        String incomingSeqId = org.apache.sandesha.Constants.UUID + uuid;
+        if(responseSeqId!=null){
+            storageManager.addOutgoingSequence(incomingSeqId);
+            storageManager.setTemporaryOutSequence(incomingSeqId,responseSeqId);
+            storageManager.setApprovedOutSequence(responseSeqId,responseSeqId);
+            //Now it has a approved out sequence of responseSeqId   
+        }
+        
+        //END OFFER PROCESSING
+        
         SOAPEnvelope resEnvelope = null;
         try {
             resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(uuid, rmMessageContext);
