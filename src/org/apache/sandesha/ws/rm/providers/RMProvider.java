@@ -31,7 +31,7 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
  * class RMProvider
- * 
+ *
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
@@ -47,7 +47,7 @@ public class RMProvider extends RPCProvider {
 
     /**
      * Method processMessage
-     * 
+     *
      * @param msgContext
      * @param reqEnv
      * @param resEnv
