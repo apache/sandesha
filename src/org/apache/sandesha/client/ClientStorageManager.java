@@ -19,6 +19,7 @@ package org.apache.sandesha.client;
 import java.util.Map;
 
 import org.apache.axis.components.logger.LogFactory;
+import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
@@ -216,17 +217,17 @@ public class ClientStorageManager implements IStorageManager {
 
         boolean done = false;
         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
-
+       
         if (sequenceID == null) {
             System.out.println("ERROR: setApprovedOutSequence()");
             return false;
         }
         //sequenceid should be the default one.
-        if (!sequenceID.equals(Constants.CLIENT_DEFAULD_SEQUENCE_ID)) {
+        /* if (!sequenceID.equals(Constants.CLIENT_DEFAULD_SEQUENCE_ID)) {
             System.out.println("Error: Wrong sequence id for client");
             return false;
         }
-
+        */
         accessor.setOutSequence(sequenceID, newOutSequenceId);
         accessor.setOutSequenceApproved(sequenceID, true);
 
@@ -309,7 +310,17 @@ public class ClientStorageManager implements IStorageManager {
 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
     	
-        String sequenceId = rmMessageContext.getSequenceID();
+        RelatesTo relatesTo = (RelatesTo) rmMessageContext
+        .getAddressingHeaders().getRelatesTo().get(0);
+        String messageId = relatesTo.getURI().toString();
+        //CHANGE THIS. SEARCH FOR THE SEQ USING MESID
+        //String sequenceId = rmMessageContext.getSequenceID();
+        System.out.println("******** SEARCH FOR THIS MSG ID "+messageId);
+        
+        String sequenceId = null;
+        sequenceId = accessor.searchForSequenceId(messageId);
+        
+        System.out.println("******** SEARCH OBTAINED SEQ ID IS : "+sequenceId);
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
         if (!exists) {
@@ -357,6 +368,8 @@ public class ClientStorageManager implements IStorageManager {
 		boolean requestPresent = accessor.isRequestMessagePresent(sequenceId,requestMsgId);
 		return !requestPresent;
     }
+    
+
     
 
 
