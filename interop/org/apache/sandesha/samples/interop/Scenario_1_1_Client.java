@@ -17,15 +17,6 @@
 package org.apache.sandesha.samples.interop;
 
 
-/**
- * @author
- * Amila Navarathna<br>
- * Jaliya Ekanayaka<br>
- * Sudar Nimalan<br>
- * (Apache Sandesha Project)
- *
- */
-
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
@@ -36,38 +27,47 @@ import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.encoding.XMLType;
 import org.apache.sandesha.Constants;
 
+/**
+ * Run client for
+ * <a href="http://www-106.ibm.com/developerworks/offers/WS-Specworkshops/ws-rm200405.html">interop scenario 1.1</a>
+ *
+ * @author Aleksander Slominski
+ * @author Amila Navarathna
+ * @author Jaliya Ekanayaka
+ * @author Sudar Nimalan
+ */
 public class Scenario_1_1_Client {
     public static void main(String[] args) {
         System.out.println("Client started......");
         try {
-
+            
             Service service = new Service();
-
+            
             Call call = (Call) service.createCall();
-            if(args[0].equals("")){
-            	System.out.println("Pass Target End Point Address as a Parametter");
-            	throw new Exception("Target End Point Address did not Set");
+            if(args.length == 0 || args[0].equals("")){
+                throw new Exception("Error: pass Target End Point Address as a Parametter");
             }
-
+            
             call.setTargetEndpointAddress(args[0]);
             call.setOperationName(new QName("PingService", "Ping"));
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
             call.setReturnType(XMLType.AXIS_VOID);
-
+            
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-
+            
             call.setProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER,"uuid:" + uuidGen.nextUUID());
-			call.setProperty(Constants.CLIENT_ONE_WAY_INVOKE,(new Boolean(true)));
-			call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(false)));
-			call.setProperty(Constants.CLIENT_CREATE_SEQUENCE,(new Boolean(false)));
-
+            call.setProperty(Constants.CLIENT_ONE_WAY_INVOKE,(new Boolean(true)));
+            call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(false)));
+            call.setProperty(Constants.CLIENT_CREATE_SEQUENCE,(new Boolean(false)));
+            
             call.invoke(new Object[] {"Ping 1"});
             call.invoke(new Object[] {"Ping 2"});
-	    //call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
+            //call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
             call.invoke(new Object[] {"Ping 3"});
-
+            
         } catch (Exception e) {
-            System.err.println(e.toString());
+            //System.err.println(e.toString());
+            e.printStackTrace();
         }
     }
 }
