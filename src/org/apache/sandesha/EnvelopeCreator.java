@@ -16,9 +16,11 @@
  */
 package org.apache.sandesha;
 
+import java.util.List;
 import java.util.Vector;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeaderElement;
 
@@ -31,12 +33,18 @@ import org.apache.axis.message.addressing.Address;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.message.addressing.From;
 import org.apache.axis.message.addressing.MessageID;
+import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.axis.message.addressing.ReplyTo;
 import org.apache.axis.message.addressing.To;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
+import org.apache.log4j.lf5.viewer.configure.MRUFileManager;
+import org.apache.sandesha.server.ServerStorageManager;
 import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.CreateSequenceResponse;
+import org.apache.sandesha.ws.rm.MessageNumber;
+import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.sandesha.ws.rm.Sequence;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;
 
@@ -286,7 +294,30 @@ public class EnvelopeCreator {
                     responseEnvelope, null, true, false, true, false, null);
             //TODO Action for RESPONSE MESSAGE
             //Do we need this????
-
+            Identifier seqId= new Identifier();
+            seqId.setIdentifier(rmMessageContext.getSequenceID());
+            Sequence seq= new Sequence();
+            seq.setIdentifier(seqId);
+           
+          
+            MessageNumber msgNumber = new MessageNumber();
+            ServerStorageManager ssm = new ServerStorageManager();
+            msgNumber.setMessageNumber(ssm.getNextMessageNumber(rmMessageContext.getOldSequenceID()));
+            
+            //System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!! "+msgNumber.getMessageNumber());
+            seq.setMessageNumber(msgNumber);
+            seq.toSoapEnvelop(responseEnvelope);
+            
+            //TODO
+            //Adding relatesTo header
+            //List relatesToList = addressingHeaders.getRelatesTo();
+            //List relatesToList.set(0,rmMessageContext.getOldSequenceID());
+            //outGoingAddressingHaders.setRelatesTo(relatesToList);
+            ///RelatesTo relatesTo = new RelatesTo();
+            if(rmMessageContext.getOldSequenceID()!=null)
+            outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(),new QName("aa","bb"));
+            
+            
             //Set the messageID
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
             MessageID messageId = new MessageID(new URI("uuid:"
@@ -337,38 +368,58 @@ public class EnvelopeCreator {
      * @param endPoint
      * @return
      */
-    public static SOAPEnvelope createServiceRequestEnvelope(
-            String uuid,RMMessageContext rmMessageContext, int endPoint) {
+    public static SOAPEnvelope createServiceRequestEnvelope(RMMessageContext rmMessageContext) {
         //Variable for SOAPEnvelope
         SOAPEnvelope requestEnvelope = null;
         //Get the AddressingHeaders
         AddressingHeaders addressingHeaders = rmMessageContext
                 .getAddressingHeaders();
 
-        try {
-            //Get the request envelope from the incoming message context.
-            requestEnvelope = rmMessageContext.getMsgContext()
-                    .getRequestMessage().getSOAPEnvelope();
+        
+        //RMHeaders for the message.
+        RMHeaders rmHeaders = new RMHeaders();
+        //Sequence for the new message.
+        Sequence seq = new Sequence();
+        Identifier id = new Identifier();
+        id.setIdentifier(rmMessageContext.getSequenceID());
+        seq.setIdentifier(id);
+        
+        
+      
+        //Message Number for the new message.
+        MessageNumber msgNumber = new MessageNumber();
+        msgNumber.setMessageNumber(rmMessageContext.getMsgNumber());
+        seq.setMessageNumber(msgNumber);
+        
+        rmHeaders.setSequence(seq);
+        rmMessageContext.setRMHeaders(rmHeaders);
+                
+        try {     
+            
+            //requestEnvelope = new SOAPEnvelope();
+            requestEnvelope = rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope();
+            
             
             rmMessageContext.getRMHeaders().toSoapEnvelop(requestEnvelope);
             AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(
                     requestEnvelope, null, true, false, true, false, null);
              
-    	//Set the messageID
-    	MessageID messageId = new MessageID(new URI("uuid:"
-            + uuid));
-    	outGoingAddressingHaders.setMessageID(messageId);
-    	    	
-    	//This method is called from the client only.
-    	if(endPoint==0){
-             //Setting from the Client
-             outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
-             outGoingAddressingHaders.setTo(addressingHeaders.getTo());
-             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
-         }
+    	    //Set the messageID
+            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+            MessageID messageId = new MessageID(new URI("uuid:"
+                    + uuidGen.nextUUID()));
+            outGoingAddressingHaders.setMessageID(messageId);
+
+            
+            //Setting from the Client
+            outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
+            outGoingAddressingHaders.setTo(addressingHeaders.getTo());
+            outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
+        
 
     	//Set the addressing headers to the SOAPEnvelope.
     	outGoingAddressingHaders.toEnvelope(requestEnvelope, null);
+    	//System.out.println(requestEnvelope.toString());
     	        
         } catch (SOAPException e) {
             // TODO Auto-generated catch block
