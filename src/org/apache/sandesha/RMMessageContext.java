@@ -60,7 +60,35 @@ public class RMMessageContext {
     private String sourceURL = null;
     
     private String action=null;
+    
+    private String from=null;
+    
+    private String replyTo=null;
 
+    /**
+     * @return Returns the from.
+     */
+    public String getFrom() {
+        return from;
+    }
+    /**
+     * @param from The from to set.
+     */
+    public void setFrom(String from) {
+        this.from = from;
+    }
+    /**
+     * @return Returns the replyTo.
+     */
+    public String getReplyTo() {
+        return replyTo;
+    }
+    /**
+     * @param replyTo The replyTo to set.
+     */
+    public void setReplyTo(String replyTo) {
+        this.replyTo = replyTo;
+    }
     /**
      * @return Returns the action.
      */
@@ -331,8 +359,8 @@ public class RMMessageContext {
             if (msgContext1.getClassLoader() != null)
                 msgContext2.setClassLoader(msgContext1.getClassLoader());
 
-            if (msgContext1.getCurrentMessage() != null)
-                msgContext2.setCurrentMessage(msgContext1.getCurrentMessage());
+            //if (msgContext1.getCurrentMessage() != null)
+            //    msgContext2.setCurrentMessage(msgContext1.getCurrentMessage());
 
             if (msgContext1.getEncodingStyle() != null)
                 msgContext2.setEncodingStyle(msgContext1.getEncodingStyle());
@@ -343,11 +371,11 @@ public class RMMessageContext {
             //if(msgContext1.getMaintainSession()!=null)
             msgContext2.setMaintainSession(msgContext1.getMaintainSession());
 
-            if (msgContext1.getMessage() != null)
-                msgContext2.setMessage(msgContext1.getMessage());
+           // if (msgContext1.getMessage() != null)
+           //     msgContext2.setMessage(msgContext1.getMessage());
 
-            if (msgContext1.getOperation() != null)
-                msgContext2.setOperation(msgContext1.getOperation());
+           // if (msgContext1.getOperation() != null)
+           //     msgContext2.setOperation(msgContext1.getOperation());
 
             if (msgContext1.getPassword() != null)
                 msgContext2.setPassword(msgContext1.getPassword());
@@ -355,12 +383,12 @@ public class RMMessageContext {
             //if(msgContext1.getPastPivot()!=null)
             msgContext2.setPastPivot(msgContext1.getPastPivot());
 
-            if (msgContext1.getRequestMessage() != null)
-                msgContext2.setRequestMessage(msgContext1.getRequestMessage());
+           // if (msgContext1.getRequestMessage() != null)
+           //     msgContext2.setRequestMessage(msgContext1.getRequestMessage());
 
-            if (msgContext1.getResponseMessage() != null)
-                msgContext2
-                        .setResponseMessage(msgContext1.getResponseMessage());
+           // if (msgContext1.getResponseMessage() != null)
+           //     msgContext2
+           //             .setResponseMessage(msgContext1.getResponseMessage());
 
             if (msgContext1.getRoles() != null)
                 msgContext2.setRoles(msgContext1.getRoles());
@@ -368,8 +396,8 @@ public class RMMessageContext {
             if (msgContext1.getSchemaVersion() != null)
                 msgContext2.setSchemaVersion(msgContext1.getSchemaVersion());
 
-            if (msgContext1.getService() != null)
-                msgContext2.setService(msgContext1.getService());
+           // if (msgContext1.getService() != null)
+           //     msgContext2.setService(msgContext1.getService());
 
             if (msgContext1.getSession() != null)
                 msgContext2.setSession(msgContext1.getSession());
