@@ -229,29 +229,34 @@ public class RMProvider extends RPCProvider {
                             // becouse the response is going in the same HTTP connection
                             // just to have a in-order invoketion
                             // we have to reffer the last message number
-                            Identifier seqAckID = rmHeaders.getSequenceAcknowledgement().getIdentifier();
-                            RMSequence serverSeq = serverMessageController.retrieveIfSequenceExists(seqAckID);
+                            Identifier seqID = rmHeaders.getSequenceAcknowledgement().getIdentifier();
+                            RMSequence serverSeq = serverMessageController.retrieveIfSequenceExists(seqID);
+                            
+							if (serverSeq == null) {
+								serverSeq=new RMSequence();
+								serverSeq.setSequenceIdentifier(seqID);
+								serverSeq.setLastProcessedMessageNumber(0);
+								serverMessageController.storeSequence(serverSeq);
+							}
 
-                            if (serverSeq != null) {
-                                long msgNo = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
-                                long lastProcessedMsgNo;
+							long msgNo = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
+							   long lastProcessedMsgNo;
 
-                                serverSeq.getMessageList().put(new Long(msgNo), message);
+							   serverSeq.getMessageList().put(new Long(msgNo), message);
 
-                                while (true) {
-                                    lastProcessedMsgNo = serverSeq.getLastProcessedMessageNumber();
+							   while (true) {
+								   lastProcessedMsgNo = serverSeq.getLastProcessedMessageNumber();
 
-                                    if (msgNo + 1 == lastProcessedMsgNo) {
-                                        super.processMessage(msgContext, reqEnv, resEnv, obj);
+								   if (msgNo  == lastProcessedMsgNo+1) {
+									   super.processMessage(msgContext, reqEnv, resEnv, obj);
+									   lastProcessedMsgNo++;
+									   serverSeq.setLastProcessedMessageNumber(lastProcessedMsgNo);
 
-                                        lastProcessedMsgNo++;
+									   break;
+								   }
 
-                                        break;
-                                    }
-
-                                    Thread.sleep(Constants.SERVICE_INVOKE_INTERVAL);
-                                }
-                            }
+								   Thread.sleep(Constants.SERVICE_INVOKE_INTERVAL);
+							   }
 
                             // //////
                         } else {
