@@ -231,6 +231,7 @@ public interface Constants {
     public static final int MSG_TYPE_ACKNOWLEDGEMENT = 5;
 
     public static final int MSG_TYPE_TERMINATE_SEQUENCE = 6;
-
+    
+    public static final String CLIENT_DEFAULD_SEQUENCE_ID = "ClientDefSeq";
 }
 
