@@ -48,6 +48,26 @@ public class Sender implements Runnable {
     public boolean running = true;
     private IStorageManager storageManager;
 
+    private static  SimpleChain requestChain=null;
+
+    public static SimpleChain getRequestChain() {
+        return requestChain;
+    }
+
+    public static void setRequestChain(SimpleChain requestChain) {
+        Sender.requestChain = requestChain;
+    }
+
+    public static SimpleChain getResponseChanin() {
+        return responseChanin;
+    }
+
+    public static void setResponseChanin(SimpleChain responseChanin) {
+        Sender.responseChanin = responseChanin;
+    }
+
+    private static  SimpleChain responseChanin=null;
+
     public Sender() {
         storageManager = new ServerStorageManager();
     }
@@ -206,7 +226,7 @@ public class Sender implements Runnable {
        // sc.addHandler(addressingHandler);
         //sc.addHandler(serverRequestHandler);
 
-        //call.setClientHandlers(null, sc);
+        call.setClientHandlers(requestChain,responseChanin);
 
         if (rmMessageContext.getMsgContext().getRequestMessage() != null) {
             String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();

@@ -167,6 +167,9 @@ public interface Constants {
      */
     public static final String RM_SEQUENCE_ACKNOWLEDMENT_ACTION = "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
 
+    public static final String IGNORE_ACTION="ignoreAction";
+       
+
     public int SERVER_QUEUE_ACCESSOR = 1;
 
     public int SERVER_DATABASE_ACCESSOR = 2;

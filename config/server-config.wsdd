@@ -30,6 +30,7 @@
   <parameter name="allowedMethods" value="getVersion"/>
   <parameter name="className" value="org.apache.axis.Version"/>
  </service>
+
  <service name="RMInteropService" provider="Handler">
   <requestFlow>
    <handler type="java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler"/>
@@ -39,7 +40,10 @@
   <parameter name="scope" value="request"/>
   <parameter name="className" value="org.apache.sandesha.samples.interop.RMInteropService"/>
   <parameter name="handlerClass" value="org.apache.sandesha.ws.rm.providers.RMProvider"/>
- </service>
+  <parameter name="ignoreAction1" value="http://schemas.xmlsoap.org/ws/2005/02/trust/RST/SCT"/>
+  </service>
+
+
  <transport name="http">
   <requestFlow>
    <handler type="URLMapper"/>

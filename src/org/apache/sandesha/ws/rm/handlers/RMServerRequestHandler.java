@@ -48,7 +48,7 @@ public class RMServerRequestHandler extends BasicHandler {
         try {
             RMHeaders rmHeaders = new RMHeaders();
             rmHeaders.fromSOAPEnvelope(msgContext.getRequestMessage().getSOAPEnvelope());
-
+           
         } catch (SOAPException e) {
             throw AxisFault.makeFault(e);
         } catch (Exception e) {
