@@ -27,8 +27,13 @@ import org.apache.axis.encoding.XMLType;
 import org.apache.sandesha.Constants;
 
 /**
- * @author SNimalan
+ * Run client for
+ * <a href="http://www-106.ibm.com/developerworks/offers/WS-Specworkshops/ws-rm200405.html">interop scenario 2.2</a>
  *
+ * @author Aleksander Slominski
+ * @author Amila Navarathna
+ * @author Jaliya Ekanayaka
+ * @author Sudar Nimalan
  */
 public class Scenario_2_2_Client {
 	public static void main(String[] args) {
@@ -38,9 +43,8 @@ public class Scenario_2_2_Client {
 			Service service = new Service();
 
 			Call call = (Call) service.createCall();
-			if(args[0].equals("")){
-				System.out.println("Pass Target End Point Address as a Parametter");
-				throw new Exception("Target End Point Address did not Set");
+			if(args.length == 0 || args[0].equals("")){
+				throw new Exception("Error: pass Target End Point Address as a Parametter");
 			}
 
 			call.setTargetEndpointAddress(args[0]);
@@ -52,18 +56,20 @@ public class Scenario_2_2_Client {
 			UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
 			call.setProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER,"uuid:" + uuidGen.nextUUID());
-			call.setProperty(Constants.CLIENT_ONE_WAY_INVOKE,(new Boolean(true)));
+			//call.setProperty(Constants.CLIENT_ONE_WAY_INVOKE,(new Boolean(true)));
 			call.setProperty(Constants.CLIENT_RESPONSE_EXPECTED,(new Boolean(false)));
-			call.setProperty(Constants.CLIENT_CREATE_SEQUENCE,(new Boolean(false)));
+			//call.setProperty(Constants.CLIENT_CREATE_SEQUENCE,(new Boolean(false)));
 
 			String seq=uuidGen.nextUUID();
 			System.out.println(call.invoke(new Object[] {"Hello",seq}));
 			System.out.println(call.invoke(new Object[] {"World",seq}));
+			call.setProperty(Constants.CLIENT_LAST_MESSAGE,(new Boolean(false)));
 			//call.setLastMessage(true); //ALEK: was AXIS Call patched for it?
 			System.out.println(call.invoke(new Object[] {"Bye",seq}));
 
 		} catch (Exception e) {
-			System.err.println(e.toString());
+			//System.err.println(e.toString());
+			e.printStackTrace();
 		}
 
 	}
