@@ -24,19 +24,25 @@ import javax.xml.soap.SOAPHeaderElement;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.message.SOAPBody;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.Address;
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.EndpointReference;
 import org.apache.axis.message.addressing.From;
 import org.apache.axis.message.addressing.MessageID;
 import org.apache.axis.message.addressing.ReplyTo;
 import org.apache.axis.message.addressing.To;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
+import org.apache.sandesha.server.queue.ServerQueue;
+import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.CreateSequenceResponse;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 import org.apache.sandesha.ws.utility.Identifier;
+
+import sun.security.action.GetBooleanAction;
 
 /**
  * @author JEkanayake
@@ -103,7 +109,6 @@ public class EnvelopeCreator {
 			id.setIdentifier("uuid:" + uuid);
 			response.setIdentifier(id);
 			response.toSoapEnvelop(envelope);
-
 		} catch (MalformedURIException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -114,6 +119,57 @@ public class EnvelopeCreator {
 
 		return envelope;
 
+	}
+	
+	//TODO: Recheck this method.
+	public static SOAPEnvelope createCreateSequenceEnvelope(String uuid,RMMessageContext message){
+		
+		AddressingHeaders addressingHeaders = message.getAddressingHeaders();
+		SOAPEnvelope envelope = createBasicEnvelop();
+
+		try{
+			AddressingHeaders outGoingAddressingHaders =
+				new AddressingHeaders(envelope, null, true, false, true, false, null);			
+		
+		    Action action = new Action(new URI(Constants.ACTION_CREATE_SEQUENCE));
+		    SOAPHeaderElement acionElement = action.toSOAPHeaderElement(envelope);
+		    outGoingAddressingHaders.setAction(action);
+		    
+			MessageID messageId = new MessageID(new URI("uuid:" + uuid));
+		    outGoingAddressingHaders.setMessageID(messageId);
+		    	
+		    //setting FROM and REPLY TO	    
+		    To incommingTo = addressingHeaders.getTo();
+			URI fromURI = new URI(incommingTo.toString());
+			Address addr = new Address(fromURI);
+			From from = new From(addr);
+			outGoingAddressingHaders.setFrom(from);
+			//Reply to is the same. 
+		    outGoingAddressingHaders.setReplyTo(from);
+		    
+		    
+		    //Setting To
+			ReplyTo incommingReplyTo = (ReplyTo) addressingHeaders.getReplyTo();
+			Address incommingAddress = incommingReplyTo.getAddress();
+			To to = new To(new URI(incommingAddress.toString()));
+			outGoingAddressingHaders.setTo(to);
+		    
+		    outGoingAddressingHaders.toEnvelope(envelope);
+		    
+		    
+		    CreateSequence createSeq = new CreateSequence();
+		    createSeq.toSoapEnvelop(envelope);
+		   
+			System.out.println("+++++++DISPLAYING ENVOLOP++++++++");
+			System.out.println(envelope.getAsString());
+		    
+		} catch (MalformedURIException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return envelope;
 	}
 	
 	
@@ -203,7 +259,50 @@ public class EnvelopeCreator {
 	 * @param rmMessageContext
 	 */
 	public static SOAPEnvelope createServiceResponseEnvelope(RMMessageContext rmMessageContext) {
+		AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
 		SOAPEnvelope responseEnvelope = createBasicEnvelop();
+		try {
+			AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(responseEnvelope, null, true, false, true, false, null);
+			//TODO	Action for RESPONSE MESSAGE
+			//Do we need this????
+			
+			//Set the messageID
+			UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+			MessageID messageId = new MessageID(new URI("uuid:" + uuidGen.nextUUID()));
+			outGoingAddressingHaders.setMessageID(messageId);
+			
+			//Set the <wsa:From> address from the incoming <wsa:To>
+			To incommingTo = addressingHeaders.getTo();
+			URI fromAddressURI = new URI(incommingTo.toString());
+
+			Address fromAddress = new Address(fromAddressURI);
+			From from = new From(fromAddress);
+			outGoingAddressingHaders.setFrom(from);
+			
+			//TODO
+			//HARD CODED REPLYTO
+			//THIS SHOULD BE SET USING A PROPERTY FOR THE SEVER SIDE
+			ReplyTo replyTo = new ReplyTo(new Address("http://localhost:8080/axis/services/EchoStringService?wsdl"));
+			outGoingAddressingHaders.setReplyTo(from);
+			
+	    
+			//Add to <To>
+			Address inFrom = addressingHeaders.getFrom().getAddress();
+			To to = new To(new URI(inFrom.toString()));
+			outGoingAddressingHaders.setTo(to);
+		
+			//Set the addressing headers to the SOAPEnvelope.
+			outGoingAddressingHaders.toEnvelope(responseEnvelope, null);
+			
+			responseEnvelope.setBody( (SOAPBody) rmMessageContext.getResEnv().getBody());
+			
+		} catch (SOAPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return responseEnvelope;
 	}
 
