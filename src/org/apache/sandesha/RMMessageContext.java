@@ -101,4 +101,18 @@ public class RMMessageContext {
 		this.sequenceID = sequenceID;
 	}
 
+	/**
+	 * @return
+	 */
+	public String getMessageID() {
+		return messageID;
+	}
+
+	/**
+	 * @param string
+	 */
+	public void setMessageID(String string) {
+		messageID = string;
+	}
+
 }
