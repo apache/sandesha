@@ -34,10 +34,10 @@ import org.apache.sandesha.ws.rm.RMHeaders;
  */
 public class CreateSequenceProcessor implements IRMMessageProcessor {
 
-    IStorageManager storageManger = null;
+    IStorageManager storageManager = null;
 
-    public CreateSequenceProcessor(IStorageManager storageManger) {
-        this.storageManger = storageManger;
+    public CreateSequenceProcessor(IStorageManager storageManager) {
+        this.storageManager = storageManager;
     }
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws RMException {
@@ -61,7 +61,12 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
          */
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
-
+        String outUuid = uuidGen.nextUUID();
+        
+        storageManager.addSequence("uuid:"+uuid);
+        storageManager.addSequence(rmMessageContext.getSequenceID());
+        storageManager.setTemporaryOutSequence(rmMessageContext.getSequenceID(), "uuid:" + outUuid );
+        
         //TODO
         //storageManger.addSequence("uuid:"+uuid);
 
@@ -99,7 +104,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
             rmMessageContext.setOutGoingAddress(addrHeaders.getReplyTo()
                     .getAddress().toString());
             rmMessageContext.setSync(false);
-            storageManger.addCreateSequenceResponse(rmMessageContext);
+            storageManager.addCreateSequenceResponse(rmMessageContext);
             return false;
         }
 
