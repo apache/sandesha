@@ -154,10 +154,10 @@ public class EnvelopeCreator {
                 //Setting from the Client
                 outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
                 outGoingAddressingHaders.setTo(addressingHeaders.getTo());
-             
-                if(addressingHeaders.getReplyTo()!=null)
-                outGoingAddressingHaders.setReplyTo(addressingHeaders
-                        .getReplyTo());
+
+                if (addressingHeaders.getReplyTo() != null)
+                    outGoingAddressingHaders.setReplyTo(addressingHeaders
+                            .getReplyTo());
 
             } else if (endPoint == 1) {
                 //Setting from the Server
@@ -350,9 +350,8 @@ public class EnvelopeCreator {
 
             //Set the addressing headers to the SOAPEnvelope.
             outGoingAddressingHaders.toEnvelope(responseEnvelope, null);
-
-            responseEnvelope.setBody((SOAPBody) rmMessageContext.getResEnv()
-                    .getBody());
+            responseEnvelope.setBody((SOAPBody) rmMessageContext.getMsgContext().getResponseMessage().getSOAPBody());
+               
 
         } catch (SOAPException e) {
             // TODO Auto-generated catch block
