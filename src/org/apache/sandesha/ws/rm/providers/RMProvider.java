@@ -68,6 +68,8 @@ public class RMProvider extends RPCProvider {
      * @throws Exception
      */
 
+    private static boolean client = false;
+    
     public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv,
             SOAPEnvelope resEnv, Object obj) throws Exception {
 
@@ -484,5 +486,9 @@ public class RMProvider extends RPCProvider {
 
         return envelope;
     }
-
+    //TODO
+    //NEED TO CHECK THIS METHOD.
+    public void setClient(boolean client) {
+        RMProvider.client = client;
+    }
 }
