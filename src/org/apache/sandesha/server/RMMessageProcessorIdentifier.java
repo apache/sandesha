@@ -52,6 +52,7 @@ public class RMMessageProcessorIdentifier {
             return new TerminateSequenceProcessor(storageManager);
         } else if ((rmHeaders.getSequenceAcknowledgement() != null)
                 || (rmHeaders.getSequence().getMessageNumber() != null)) {
+
             return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);
