@@ -68,11 +68,33 @@ public class RMClientRequestHandler extends RMHandler {
         Call call = (Call) messageContext.getProperty(MessageContext.CALL);
 
         // Three parameters: sequenceIdentifier, isOneWay and isLastMessage.
-        String sequenceID = call.getSequenceIdentifier();
+        /*String sequenceID = call.getSequenceIdentifier();
         boolean isOneWay = call.isOneWayInvoke();
         boolean isLastMessage = call.isLastMessage();
         boolean isCreateSequence = call.isCreateSequence();
-        boolean isResponseExpected = call.isResponseExpected();
+        boolean isResponseExpected = call.isResponseExpected();*/
+		if(call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER)!=null){
+					sequenceID=(String) call.getProperty(Constants.CLIENT_SEQUENCE_IDENTIFIER);
+				}
+
+				boolean isOneWay = false;
+				boolean isLastMessage = false;
+				boolean isCreateSequence = false;
+				boolean isResponseExpected = false;
+
+				if (call.getProperty(Constants.CLIENT_ONE_WAY_INVOKE) != null) {
+					isOneWay=((Boolean) (call.getProperty(Constants.CLIENT_ONE_WAY_INVOKE))).booleanValue();
+				}
+				if (call.getProperty(Constants.CLIENT_LAST_MESSAGE) != null) {
+					isLastMessage=((Boolean) (call.getProperty(Constants.CLIENT_LAST_MESSAGE))).booleanValue();
+				}
+				if (call.getProperty(Constants.CLIENT_CREATE_SEQUENCE) != null) {
+					isCreateSequence=((Boolean) (call.getProperty(Constants.CLIENT_CREATE_SEQUENCE))).booleanValue();
+				}
+				if (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED) != null) {
+					isResponseExpected=((Boolean) (call.getProperty(Constants.CLIENT_RESPONSE_EXPECTED))).booleanValue();
+				}
+        
 
         // Get the SOAP envelop of the request message and send it as a string parameter to the
         // clientService
