@@ -33,6 +33,20 @@ public class EchoStringService {
             sequences.put(sequence,(new String(text)));
 
         }
+        System.out.println("ECHO-STRING SERVICE "+ text);
         return text;
+    }
+
+     public void pingString(String text,String sequence){
+
+        if(sequences.get(sequence)!=null){
+            text=(String) sequences.get(sequence)+text;
+            sequences.put(sequence,new String(text));
+        }else{
+            sequences.put(sequence,(new String(text)));
+
+        }
+        System.out.println("PING-STRING SERVICE "+ text);
+
     }
 }

@@ -67,7 +67,7 @@ public interface IStorageManager {
     public void addAcknowledgement(RMMessageContext rmMessageContext);
 
     //Need to implement this
-    public boolean isMessageExist(String sequenceID, long messageNumber);
+    public boolean  isMessageExist(String sequenceID, long messageNumber);
 
     //Try to send me a sorted map as we disucssed.
     public Map getListOfMessageNumbers(String sequenceID);

@@ -174,9 +174,11 @@ public class ServerStorageManager implements IStorageManager {
         return results;
     }
 
-    public boolean isMessageExist(String sequenceID, long messageNumber) {
-        return accessor.isIncomingMessageExists(sequenceID, new Long(
+    public boolean  isMessageExist(String sequenceID, long messageNumber) {
+        synchronized(accessor){
+         return accessor.isIncomingMessageExists(sequenceID, new Long(
                 messageNumber));
+        }
     }
 
     /*

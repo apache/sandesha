@@ -48,17 +48,16 @@ public class RMServerRequestHandler extends RMHandler {
      */
     public void invoke(MessageContext msgContext) throws AxisFault {
         try {
-
-            Iterator iterator = msgContext.getRequestMessage()
+     Iterator iterator = msgContext.getRequestMessage()
                     .getSOAPEnvelope().getHeader().getChildElements();
             SOAPHeaderElement elements;
             while (iterator.hasNext()) {
                 elements = (SOAPHeaderElement) iterator.next();
                 elements.setProcessed(true);
-            }
+              }
 
-            setPropertyToMessageContext(msgContext,
-                    Constants.ENV_RM_REQUEST_HEADERS);
+            setPropertyToMessageContext(msgContext, Constants.ENV_RM_REQUEST_HEADERS);
+
         } catch (SOAPException e) {
             throw AxisFault.makeFault(e);
         }

@@ -19,6 +19,7 @@ package org.apache.sandesha.ws.rm.providers;
 import org.apache.axis.MessageContext;
 import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.sandesha.IStorageManager;
@@ -28,6 +29,9 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.IRMMessageProcessor;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.ws.rm.RMHeaders;
+
+import java.util.Vector;
+import java.util.Iterator;
 
 /**
  * class RMProvider
@@ -60,6 +64,7 @@ public class RMProvider extends RPCProvider {
 
         /** ********************************************************************* */
         System.out.println("RMProvider GOT SOAP REQUEST.....\n");
+
         // System.out.println(reqEnv.toString());
         //Initiates the StorageManager
         IStorageManager storageManager = RMInitiator.init(client);
@@ -73,6 +78,7 @@ public class RMProvider extends RPCProvider {
         //Get the RM headers
         RMHeaders rmHeaders = new RMHeaders();
         rmHeaders.fromSOAPEnvelope(reqEnv);
+
 
         //Set the RMMessageContext
         RMMessageContext rmMessageContext = new RMMessageContext();

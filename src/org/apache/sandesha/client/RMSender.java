@@ -18,6 +18,8 @@ package org.apache.sandesha.client;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Vector;
+import java.util.Iterator;
 
 import javax.wsdl.extensions.soap.SOAPFault;
 import javax.xml.namespace.QName;
@@ -35,6 +37,7 @@ import org.apache.axis.description.JavaServiceDesc;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.Address;
 import org.apache.axis.message.addressing.AddressingHeaders;
@@ -104,7 +107,19 @@ public class RMSender extends BasicHandler {
                             requestMesssageContext.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
-                msgContext.setResponseMessage(responseMessageContext.getMsgContext()
+
+
+            Vector headers=responseMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope().getHeaders();
+            Iterator ite=headers.iterator();
+
+            while(ite.hasNext()){
+                System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                SOAPHeaderElement headerElement = (SOAPHeaderElement)ite.next();
+                headerElement.setMustUnderstand(false);
+                headerElement.setProcessed(true);
+            }
+
+            msgContext.setResponseMessage(responseMessageContext.getMsgContext()
                         .getRequestMessage());
             } else {
                 boolean gotAck = false;

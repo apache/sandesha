@@ -46,6 +46,7 @@ public abstract class RMHandler extends BasicHandler {
 
         RMHeaders rmHeaders = new RMHeaders();
 
+        if(msgContext.getCurrentMessage()!=null){
         rmHeaders.fromSOAPEnvelope(msgContext.getCurrentMessage()
                 .getSOAPEnvelope());
         if ((rmHeaders.getAckRequest() != null)
@@ -55,6 +56,7 @@ public abstract class RMHandler extends BasicHandler {
                 || (rmHeaders.getSequenceAcknowledgement() != null)
                 || (rmHeaders.getTerminateSequence() != null)) {
             msgContext.setProperty(property, rmHeaders);
+        }
         }
 
     }

@@ -133,13 +133,13 @@ public class RMHeaders {
 
                 if (headerElement.getName().equals("SequenceAcknowledgement")) {
                     sequenceAcknowledgement = new SequenceAcknowledgement();
-
+                     headerElement.setMustUnderstand(false);
                     sequenceAcknowledgement.fromSOAPEnveploe(headerElement);
                 }
 
                 if (headerElement.getName().equals("AckRequested")) {
                     ackRequest = new AckRequested();
-
+                     headerElement.setMustUnderstand(false);
                     ackRequest.fromSOAPEnveploe(headerElement);
                 }
             }
@@ -153,7 +153,7 @@ public class RMHeaders {
 
                 if (bodyElement.getName().equals("CreateSequence")) {
                     createSequence = new CreateSequence();
-
+                   
                     createSequence.fromSOAPEnveploe(bodyElement);
                 }
 

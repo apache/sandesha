@@ -22,15 +22,20 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
+import org.apache.axis.SimpleChain;
+import org.apache.axis.Handler;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.handler.AddressingHandler;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMException;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.sandesha.ws.rm.handlers.RMHandler;
+import org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler;
 
 /**
  * @author JEkanayake
@@ -193,9 +198,11 @@ public class Sender implements Runnable {
 
     private void sendServiceResponse(RMMessageContext rmMessageContext) {
         SOAPEnvelope responseEnvelope = null;
-        //This sho
         responseEnvelope = EnvelopeCreator.createServiceResponseEnvelope(rmMessageContext);
-        rmMessageContext.getMsgContext().setRequestMessage(new Message(responseEnvelope));
+        //org.apache.axis.MessageContext resMsgCtx=new org.apache.axis.MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
+         rmMessageContext.getMsgContext().setRequestMessage(new Message(responseEnvelope));
+        rmMessageContext.getMsgContext().setResponseMessage(new Message(responseEnvelope));
+        //resMsgCtx.setRequestMessage(new Message(responseEnvelope));
         try {
             Service service = new Service();
             Call call = (Call) service.createCall();
@@ -203,8 +210,9 @@ public class Sender implements Runnable {
             call.setTargetEndpointAddress(rmMessageContext.getAddressingHeaders().getReplyTo()
                     .getAddress().toString());
             //NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
-            call.setRequestMessage(rmMessageContext.getMsgContext().getRequestMessage());
-            try {
+            String soapMsg=rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
+            call.setRequestMessage(new Message(soapMsg));
+
                 rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
                 rmMessageContext
                         .setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
@@ -212,14 +220,17 @@ public class Sender implements Runnable {
                 // same HTTP connection.
                 call.invoke();
                 //System.out.println(call.getResponseMessage().getSOAPPartAsString());
-            } catch (AxisFault e) {
-                e.printStackTrace();
-            }
+
 
         } catch (ServiceException e1) {
             System.err.println("ERROR: SENDING RESPONSE MESSAGE ....");
             e1.printStackTrace();
         }
+        catch(AxisFault af){
+            af.printStackTrace();
+        }
+
+
     }
 
     private void sendCreateSequenceRequest(RMMessageContext rmMessageContext) {
@@ -274,6 +285,7 @@ public class Sender implements Runnable {
                 Call call = prepareCall(rmMessageContext);
                 call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
                 call.invoke();
+
             } catch (ServiceException e) {
                 e.printStackTrace();
             } catch (AxisFault e) {
@@ -294,6 +306,10 @@ public class Sender implements Runnable {
                 Call call = prepareCall(rmMessageContext);
                 call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
                 call.invoke();
+                 if (call.getResponseMessage() != null) {
+                        System.out.println("RESPONSE MESSAGE IS NOT NULL");
+                     System.out.println(call.getResponseMessage().getSOAPEnvelope().toString());
+                 }
             } catch (ServiceException e1) {
                 System.err.println("ERROR: SERVICE EXCEPTION WHEN SENDING RESPONSE");
                 e1.printStackTrace();
@@ -307,10 +323,23 @@ public class Sender implements Runnable {
         Service service = new Service();
         Call call = (Call) service.createCall();
         call.setTargetEndpointAddress(rmMessageContext.getOutGoingAddress());
+
+       //We need these two handlers in our
+        SimpleChain sc= new SimpleChain();
+        Handler serverRequestHandler= new RMServerRequestHandler();
+        Handler addressingHandler = new AddressingHandler();
+
+        sc.addHandler(addressingHandler);
+        sc.addHandler(serverRequestHandler);
+
+        call.setClientHandlers(null,sc);
+
         //call.setRequestMessage(rmMessageContext.getMsgContext().getRequestMessage());
-        if (rmMessageContext.getMsgContext().getRequestMessage() != null)
-            call.setRequestMessage(new Message(rmMessageContext.getMsgContext().getRequestMessage()
-                    .getSOAPPartAsString()));
+
+        if (rmMessageContext.getMsgContext().getRequestMessage() != null){
+            String soapMsg=rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
+            call.setRequestMessage(new Message(soapMsg));
+        }
         return call;
     }
 

@@ -58,8 +58,7 @@ public class RMInvoker implements Runnable {
                 //Get the next message to invoke.
                 //storeManager is responsible of giving the correct message to
                 // invoke.
-                RMMessageContext rmMessageContext = storageManager
-                        .getNextMessageToProcess();
+                RMMessageContext rmMessageContext = storageManager.getNextMessageToProcess();
 
                 //If not return is null then proceed with invokation.
                 if (rmMessageContext != null) {
@@ -78,11 +77,10 @@ public class RMInvoker implements Runnable {
                         storageManager.insertTerminateSeqMessage(getTerminateSeqMessage(rmMessageContext));
                     }
                     rpcProvider.invoke(rmMessageContext.getMsgContext());
-
+                
                     //Check whether we have an output (response) or not.
 
-                    if (rmMessageContext.getMsgContext().getOperation()
-                            .getMethod().getReturnType() != Void.TYPE) {
+                    if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() != Void.TYPE) {
                         //System.out
                         //        .println("STORING THE RESPONSE MESSAGE.....\n");
                         //Store the message in the response queue.
@@ -91,8 +89,7 @@ public class RMInvoker implements Runnable {
                         //a new HTTP connection and the <replyTo> header is
                         // used in this case.
                         //This is done by the RMSender.
-                        rmMessageContext
-                                .setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
+                        rmMessageContext.setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
 
                         //System.out.println("TESTING FOR RESPONSE SEQUENCE");
                         boolean firstMsgOfResponseSeq = !storageManager
@@ -124,9 +121,9 @@ public class RMInvoker implements Runnable {
                             MessageContext msgContext = new MessageContext(
                                     rmMessageContext.getMsgContext()
                                             .getAxisEngine());
-                            // RMMessageContext.copyMessageContext(
-                            //         rmMessageContext.getMsgContext(),
-                            //         msgContext);
+                             RMMessageContext.copyMessageContext(
+                                     rmMessageContext.getMsgContext(),
+                                     msgContext);
                             //Set this new msgContext to the rmMsgContext.
 
                             rmMsgContext.setMsgContext(msgContext);
