@@ -68,7 +68,7 @@ public class LastMessage extends MessageElement implements IRmElement {
      * @return LastMessage
      */
     public LastMessage fromSOAPEnvelope(MessageElement element) {
-        return this;
+       return this;
     }
 
     /**

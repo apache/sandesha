@@ -77,11 +77,14 @@ public class RMProvider extends RPCProvider {
         RMMessageContext rmMessageContext = new RMMessageContext();
 
         if (rmHeaders.getSequence() != null) {
-            rmMessageContext.setSequenceID(rmHeaders.getSequence()
-                    .getIdentifier().toString());
-            //System.out.println("SEQ ID :
-            // "+rmHeaders.getSequence().getIdentifier().toString());
+            rmMessageContext.setSequenceID(rmHeaders.getSequence().getIdentifier().toString());
+
+            if(rmHeaders.getSequence().getLastMessage()!=null){
+               System.out.println("SETTING THE LAST MESSAGE");
+               rmMessageContext.setLastMessage(true);
+             }
         }
+
         if (addressingHeaders.getMessageID() != null) {
             rmMessageContext.setMessageID(addressingHeaders.getMessageID()
                     .toString());
@@ -98,8 +101,7 @@ public class RMProvider extends RPCProvider {
         rmMessageContext.setMsgContext(msgContext);
         rmMessageContext.setAddressingHeaders(addressingHeaders);
         rmMessageContext.setRMHeaders(rmHeaders);
-        if(rmHeaders.getSequence()!=null  && rmHeaders.getSequence().getLastMessage()!=null)
-            rmMessageContext.setLastMessage(true);
+
 
         new RMMessageProcessorIdentifier();
         IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier
