@@ -109,6 +109,7 @@ public class RMSender extends BasicHandler {
             } else {
                 boolean gotAck = false;
                 while (!gotAck) {
+                    System.out.println("");
                     gotAck = checkTheQueueForAck(requestMesssageContext.getSequenceID(),
                             requestMesssageContext.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);

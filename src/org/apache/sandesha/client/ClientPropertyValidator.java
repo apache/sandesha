@@ -109,7 +109,7 @@ public class ClientPropertyValidator {
 
     private static boolean getSync(Call call) {
         Boolean synchronous = (Boolean) call.getProperty("sync");
-       
+
         if (synchronous != null) {
            return synchronous.booleanValue();
         } else
