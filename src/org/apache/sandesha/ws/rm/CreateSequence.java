@@ -20,6 +20,7 @@ package org.apache.sandesha.ws.rm;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
@@ -80,9 +81,7 @@ public class CreateSequence implements IRmElement {
             env.addBody();
         }
 
-        Name name =
-                env.createName("", "wsrm",
-                        "http://schemas.xmlsoap.org/ws/2004/03/rm");
+        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
         SOAPBodyElement bodyElement =
                 (SOAPBodyElement) env.getBody().addBodyElement(name);
 

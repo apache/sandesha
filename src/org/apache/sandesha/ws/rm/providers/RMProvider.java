@@ -65,7 +65,7 @@ public class RMProvider extends RPCProvider {
         System.out.println("-----------------------------------------------------------");
 
         RMHeaders rmHeaders =
-                (RMHeaders) msgContext.getProperty(org.apache.sandesha.ws.rm.Constants.ENV_RM_REQUEST_HEADERS);
+                (RMHeaders) msgContext.getProperty(org.apache.sandesha.Constants.ENV_RM_REQUEST_HEADERS);
         AddressingHeaders addressingHeaders = (AddressingHeaders) msgContext.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
 
         if (rmHeaders == null) {

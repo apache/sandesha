@@ -18,7 +18,7 @@ package org.apache.sandesha.ws.rm.handlers;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
-import org.apache.sandesha.ws.rm.Constants;
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPException;
 

@@ -20,6 +20,7 @@ package org.apache.sandesha.ws.rm;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
 
 import javax.xml.soap.Name;
@@ -120,9 +121,7 @@ public class SequenceAcknowledgement extends MessageElement
             env.addHeader();
         }
 
-        Name name =
-                env.createName("", "wsrm",
-                        "http://schemas.xmlsoap.org/ws/2004/03/rm");
+        Name name = env.createName("", Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
         SOAPHeaderElement headerElement =
                 (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
 

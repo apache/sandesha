@@ -179,11 +179,11 @@ public class RMClientService {
                         envelopToSend.setSchemaVersion(requestEnvelop.getSchemaVersion());
                         envelopToSend.setSoapConstants(requestEnvelop.getSOAPConstants());
                         envelopToSend.setBody((org.apache.axis.message.SOAPBody) requestEnvelop.getBody());
-                        envelopToSend.addNamespaceDeclaration("wsrm", "http://schemas.xmlsoap.org/ws/2003/03/rm");
-                        envelopToSend.addNamespaceDeclaration("wsa",
-                                "http://schemas.xmlsoap.org/ws/2003/03/addressing");
-                        envelopToSend.addNamespaceDeclaration("wsu",
-                                "http://schemas.xmlsoap.org/ws/2003/07/utility");
+                        envelopToSend.addNamespaceDeclaration(Constants.NS_PREFIX_RM, Constants.NS_URI_RM);
+                        envelopToSend.addNamespaceDeclaration(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING,
+                                org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING);
+                        envelopToSend.addNamespaceDeclaration(Constants.WSU_PREFIX,
+                                Constants.WSU_NS);
 
                         // New envelop to create the SOAP envelop to send. Why use of two envelop is not clear.
                         // adding the name spaces to the env

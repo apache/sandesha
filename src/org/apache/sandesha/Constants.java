@@ -77,7 +77,33 @@ public interface Constants {
             "http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous";
 
     /**
+     * Field NS_PREFIX_RM
+     */
+    public static final String NS_PREFIX_RM = "wsrm";
+
+    /**
+     * Field NS_URI_RM
+     */
+    public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2004/03/rm";
+    
+    /**
+     * Field WSU_PREFIX
+     */
+    public static final String WSU_PREFIX = "wsu";
+    
+    /**
+     * Field WSU_NS
+     */
+    public static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+
+    /**
      * Field MAX_CHECKING_TIME
      */
     public static final int MAX_CHECKING_TIME = 2;
+
+    /**
+     * Field ENV_RM_REQUEST_HEADERS
+     */
+    public static final String ENV_RM_REQUEST_HEADERS =
+            "org.apache.sandesha.ws.rm.REQUEST.HEADERS";
 }
