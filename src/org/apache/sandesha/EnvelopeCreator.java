@@ -157,7 +157,15 @@ public class EnvelopeCreator {
 //        offer.setIdentifier(id);
 //        createSeq.setOffer(offer);
         //end offer
-        
+
+        //AcksTo
+        if(message.getAcksTo()!=null) {
+        Address address= new Address(message.getAcksTo());
+        AcksTo acksTo= new AcksTo(address);
+        createSeq.setAcksTo(acksTo);
+        }
+        //End AcksTo
+
         createSeq.toSoapEnvelop(envelope);
 
         return envelope;

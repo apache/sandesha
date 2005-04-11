@@ -66,11 +66,11 @@ public interface Constants {
 
     public interface WSRM {
         public static final String NS_PREFIX_RM = "wsrm";
-        public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2004/03/rm";
-        public static final String ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequence";
-        public static final String ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequenceResponse";
-        public static final String ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2004/03/rm/TerminateSequence";
-        public static final String SEQUENCE_ACKNOWLEDGEMENT_ACTION = "http://schemas.xmlsoap.org/ws/2004/03/rm/SequenceAcknowledgement";
+        public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2005/02/rm";
+        public static final String ACTION_CREATE_SEQUENCE = NS_URI_RM+"/CreateSequence";
+        public static final String ACTION_CREATE_SEQUENCE_RESPONSE = NS_URI_RM+"/CreateSequenceResponse";
+        public static final String ACTION_TERMINATE_SEQUENCE = NS_URI_RM+"/TerminateSequence";
+        public static final String SEQUENCE_ACKNOWLEDGEMENT_ACTION = NS_URI_RM+"/SequenceAcknowledgement";
 
 
         public static final String ACK_RANGE = "AcknowledgementRange";
@@ -89,6 +89,7 @@ public interface Constants {
         public static final String SEQUENCE_FAULT = "SequenceFault";
         public static final String ACKS_TO = "AcksTo";
         public static final String SEQUENCE_OFFER = "Offer";
+
 
         public static final double MAX_MSG_NO = 18446744073709551615d;
 
@@ -181,6 +182,7 @@ public interface Constants {
         public static final String LAST_MESSAGE = "lastMessage";
         public static final String SYNC = "sync";
         public static final String ACTION = "action";
+        public static final String ACKS_TO="acksTo";
 
 
         public static final String REQUEST_HANDLER = "requestHandler";

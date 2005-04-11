@@ -43,6 +43,7 @@ public class ClientPropertyValidator {
         String sourceURL = null;
         String from = getFrom(call);
         String replyTo = getReplyTo(call);
+        String acksTo=getAcksTo(call);
 
         try {
             if (from == null)
@@ -67,7 +68,9 @@ public class ClientPropertyValidator {
             rmMessageContext.setReplyTo(replyTo);
             rmMessageContext.setFrom(from);
             rmMessageContext.setAction(action);
+            rmMessageContext.setAcksTo(acksTo);
             return rmMessageContext;
+
         } else
             throw new AxisFault(errorMsg);
 
@@ -97,8 +100,15 @@ public class ClientPropertyValidator {
             return action;
         else
             return null;
+     }
 
-    }
+     private static String getAcksTo(Call call) {
+        String acksTo = (String) call.getProperty(Constants.ClientProperties.ACKS_TO);
+        if (acksTo != null)
+            return acksTo;
+        else
+            return null;
+     }
 
     private static boolean getSync(Call call) {
         Boolean synchronous = (Boolean) call.getProperty(Constants.ClientProperties.SYNC);

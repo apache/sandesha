@@ -43,7 +43,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
     }
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
-        
+
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
 
@@ -68,26 +68,25 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
 
-        
         storageManager.addRequestedSequence(org.apache.sandesha.Constants.UUID + uuid);
 
         //To support offer
         CreateSequence createSeq = rmMessageContext.getRMHeaders().getCreateSequence();
         SequenceOffer offer = createSeq.getOffer();
-        
-        String responseSeqId=null;
-        
-        if(offer!=null){    
+
+        String responseSeqId = null;
+
+        if (offer != null) {
             Identifier id = offer.getIdentifier();
-            if(id!=null)
-               responseSeqId = id.getIdentifier();
+            if (id != null)
+                responseSeqId = id.getIdentifier();
         }
-        
+
         String incomingSeqId = org.apache.sandesha.Constants.UUID + uuid;
-        if(responseSeqId!=null){
+        if (responseSeqId != null) {
             storageManager.addOutgoingSequence(incomingSeqId);
-            storageManager.setTemporaryOutSequence(incomingSeqId,responseSeqId);
-            storageManager.setApprovedOutSequence(responseSeqId,responseSeqId);
+            storageManager.setTemporaryOutSequence(incomingSeqId, responseSeqId);
+            storageManager.setApprovedOutSequence(responseSeqId, responseSeqId);
             //Now it has a approved out sequence of responseSeqId   
         }
         
@@ -101,20 +100,28 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         }
         rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
 
-        //FIX THIS FIX THIS
-        //Need to change the ANONYMOUS URI to the new one after completion.
-        //We have some synchronous stuff here
-        //TODO  Do we need to support the null replyZo case?
-        //If the from is also missing, and the reply to is alos null then we will assume it is
-        //synchornous.
-        if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString()
+        if ((createSeq.getAcksTo() != null)) {
+            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.NS_URI_ANONYMOUS))) {
+                rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
+                rmMessageContext.setSync(true);
+                return true;
+            } else {
+                MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
+                msgContext.setResponseMessage(new Message(resEnvelope));
+                rmMessageContext.setMsgContext(msgContext);
+
+                rmMessageContext.setOutGoingAddress(addrHeaders.getReplyTo().getAddress().toString());
+                rmMessageContext.setSync(false);
+                storageManager.addCreateSequenceResponse(rmMessageContext);
+                return false;
+            }
+       } else if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString()
                 .equals(Constants.NS_URI_ANONYMOUS)) {
             //Inform that we have a synchronous response.
             rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
             rmMessageContext.setSync(true);
             return true;
         } else {
-
             MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
             msgContext.setResponseMessage(new Message(resEnvelope));
             rmMessageContext.setMsgContext(msgContext);
@@ -124,7 +131,5 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
             storageManager.addCreateSequenceResponse(rmMessageContext);
             return false;
         }
-
-    }
-
-}
+     }
+ }

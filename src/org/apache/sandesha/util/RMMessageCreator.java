@@ -55,6 +55,8 @@ public class RMMessageCreator {
         createSeqRMMsgContext.setAddressingHeaders(addrHeaders);
         createSeqRMMsgContext.setSync(rmMsgCtx.getSync());
 
+        createSeqRMMsgContext.setAcksTo(rmMsgCtx.getAcksTo());
+
         //Set the outgoing address these need to be corrected.
         createSeqRMMsgContext.setOutGoingAddress(toAddress);
         SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid, createSeqRMMsgContext, Constants.CLIENT);

@@ -21,7 +21,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.ws.utility.Identifier;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
@@ -40,8 +39,10 @@ public class CreateSequence implements IRmElement {
      * Field createSequence
      */
     private MessageElement createSequence;
-    
+
     private SequenceOffer offer;
+
+    private AcksTo acksTo;
 
     /**
      * Constructor CreateSequence
@@ -49,7 +50,7 @@ public class CreateSequence implements IRmElement {
     public CreateSequence() {
         createSequence = new MessageElement();
         createSequence.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE);
-   
+
         //TEST - added for offer
         //offer = new SequenceOffer ();
         //END TEST
@@ -69,6 +70,7 @@ public class CreateSequence implements IRmElement {
      */
     public MessageElement getSoapElement() throws SOAPException {
         createSequence.addChildElement(offer.getSoapElement());
+        createSequence.addChildElement(acksTo.getSoapElement());
         return createSequence;
     }
 
@@ -79,12 +81,9 @@ public class CreateSequence implements IRmElement {
      * @return SOAPEnvelope
      * @throws SOAPException
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
-            throws SOAPException {
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)  throws SOAPException {
 
         SOAPEnvelope env = envelope;
-
-        // env.addHeader((SOAPHeaderElement)createSequence);
         if (env.getBody() == null) {
             env.addBody();
         }
@@ -94,9 +93,11 @@ public class CreateSequence implements IRmElement {
 
         bodyElement.setName(Constants.WSRM.CREATE_SEQUENCE);
 
-        if(offer!=null)
+        if (offer != null)
             offer.toSOAPEnvelope(bodyElement);
-        
+        if (acksTo != null)
+            acksTo.toSOAPEnvelope(bodyElement);
+
         return env;
     }
 
@@ -106,28 +107,31 @@ public class CreateSequence implements IRmElement {
      * @param bodyElement
      * @return CreateSequence
      */
-    public CreateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) {
+    public CreateSequence fromSOAPEnveploe(SOAPBodyElement bodyElement) throws Exception {
 
         Iterator iterator = bodyElement.getChildElements();
         MessageElement childElement;
         while (iterator.hasNext()) {
-            
+
             //TODO  add offer processing code here
             //TEST OFFER
             childElement = (MessageElement) iterator.next();
             if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
-                offer = new SequenceOffer ();
+                offer = new SequenceOffer();
                 offer.fromSOAPEnvelope(childElement);
-            }else if (childElement.getName().equals(Constants.WSRM.SEQUENCE_OFFER)) {
-                offer = new SequenceOffer ();
+            } else if (childElement.getName().equals(Constants.WSRM.SEQUENCE_OFFER)) {
+                offer = new SequenceOffer();
                 offer.fromSOAPEnvelope(childElement);
-            }
-            
-            //END TEST
-            
-        }
+            } else if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSRM.ACKS_TO)) {
+                acksTo = new AcksTo();
+                acksTo.fromSOAPEnvelope(childElement);
+            } else if (childElement.getName().equals(Constants.WSRM.ACKS_TO)) {
+                acksTo = new AcksTo();
+                acksTo.fromSOAPEnvelope(childElement);
+                        }
 
-        return this;
+          }
+           return this;
     }
 
     /*
@@ -144,7 +148,7 @@ public class CreateSequence implements IRmElement {
     public void addChildElement(MessageElement element) {
     }
 
-  
+
     public SequenceOffer getOffer() {
         return offer;
     }
@@ -152,5 +156,13 @@ public class CreateSequence implements IRmElement {
 
     public void setOffer(SequenceOffer offer) {
         this.offer = offer;
+    }
+
+    public AcksTo getAcksTo() {
+        return acksTo;
+    }
+
+    public void setAcksTo(AcksTo acksTo) {
+        this.acksTo = acksTo;
     }
 }

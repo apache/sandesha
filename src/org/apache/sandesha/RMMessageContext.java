@@ -63,6 +63,14 @@ public class RMMessageContext {
 
     private String action = null;
 
+    public String getAcksTo() {
+        return acksTo;
+    }
+
+    public void setAcksTo(String acksTo) {
+        this.acksTo = acksTo;
+    }
+
     private String from = null;
 
     private String replyTo = null;
@@ -70,6 +78,8 @@ public class RMMessageContext {
     private boolean responseReceived = false;
 
     private boolean ackReceived = false;
+
+    private String acksTo=null;
 
     private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
 
@@ -336,6 +346,9 @@ public class RMMessageContext {
             rmMsgContext.setOutGoingAddress(this.outGoingAddress);
         if (msgContext != null)
             rmMsgContext.setMsgContext(this.msgContext);
+        if(acksTo!=null){
+            rmMsgContext.setAcksTo(this.acksTo);
+        }
         rmMsgContext.setReTransmissionCount(this.reTransmissionCount);
         rmMsgContext.setLastPrecessedTime(this.lastPrecessedTime);
         rmMsgContext.setLastMessage(this.isLastMessage());

@@ -26,15 +26,15 @@ public class SimpleServerImpl {
 
         try {
             SimpleAxisServer sas = new SimpleAxisServer();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-
-            Document doc = db.parse(new File("config/server-config.wsdd"));
-            WSDDDocument wsdddoc = new WSDDDocument(doc);
-            WSDDDeployment wsdddep = wsdddoc.getDeployment();
-            sas.setMyConfig(wsdddep);
-            sas.getMyConfig().configureEngine(new AxisServer());
+//            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            dbf.setNamespaceAware(true);
+//            DocumentBuilder db = dbf.newDocumentBuilder();
+//
+//            Document doc = db.parse(new File("config/server-config.wsdd"));
+//            WSDDDocument wsdddoc = new WSDDDocument(doc);
+//            WSDDDeployment wsdddep = wsdddoc.getDeployment();
+//            sas.setMyConfig(wsdddep);
+//            sas.getMyConfig().configureEngine(new AxisServer());
 
             sas.setServerSocket(new ServerSocket(PropertyLoader.getSimpleAxisServerPort()));
             Thread serverThread = new Thread(sas);

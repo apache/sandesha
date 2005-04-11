@@ -44,9 +44,14 @@
           call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
           call.setProperty(Constants.ClientProperties.ACTION, "sandesha:ping");
 
-          //These two are additional
+          //These Three are additional
           call.setProperty("from","http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+          //<was:ReplyTo> needs to be set by the client, only if the response to a particular
+          //invocation needs to be sent to a some other endpoint other than client endpoint.
           //call.setProperty("replyTo","http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+          //<wsrm:AcksTo> is used, if the user needs the CreateSequence response or the faults related to
+          //that to be sent to a specific endpoint.
+          //call.setProperty("acksTo","http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
           //http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous
 
           call.setTargetEndpointAddress(targetURL);

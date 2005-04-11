@@ -47,7 +47,6 @@ public class Nack implements IRmElement {
     public Nack() {
 
         nackElement = new MessageElement();
-
         nackElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.NACK);
     }
 

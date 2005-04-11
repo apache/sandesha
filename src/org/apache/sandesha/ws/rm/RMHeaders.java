@@ -64,6 +64,7 @@ public class RMHeaders {
      */
     private TerminateSequence terminateSequence = null;
 
+
     /**
      * Method toSoapEnvelop
      *
