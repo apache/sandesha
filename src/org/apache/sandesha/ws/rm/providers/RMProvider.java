@@ -78,6 +78,7 @@ public class RMProvider extends RPCProvider {
                 FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
 
                 if (!faultProcessor.processMessage(rmMessageContext)) {
+                    msgContext.setPastPivot(true);
                     msgContext.setResponseMessage(null);
                     return;
                 }
@@ -99,9 +100,11 @@ public class RMProvider extends RPCProvider {
 
             try {
                 if (!rmMessageProcessor.processMessage(rmMessageContext)) {
+                    msgContext.setPastPivot(true);
                     msgContext.setResponseMessage(null);
                 } else {
-                    // TODO Get the from envecreator
+                    msgContext.setPastPivot(true);
+                    // TODO Get the from envCreator
 
                     // SOAPEnvelope resEn=EnvelopeCreator.createAcknowledgementEnvelope()
                 }
@@ -111,6 +114,7 @@ public class RMProvider extends RPCProvider {
                 FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
 
                 if (!faultProcessor.processMessage(rmMessageContext)) {
+                    msgContext.setPastPivot(true);
                     msgContext.setResponseMessage(null);
                     return;
                 }
