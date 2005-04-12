@@ -17,6 +17,7 @@
 
 package org.apache.sandesha;
 
+import org.apache.axis.message.addressing.util.AddressingUtils;
 
 /**
  * class Constants
@@ -64,7 +65,7 @@ public interface Constants {
     public static final int CLIENT = 0;
 
     public interface WSA{
-        public static final String NS_ADDRSSING_ANONYMOUS ="http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
+        public static final String NS_ADDRESSING_ANONYMOUS = AddressingUtils.getAnonymousRoleURI();
     }
 
 
