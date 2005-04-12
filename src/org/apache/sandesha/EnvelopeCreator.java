@@ -21,11 +21,25 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.SOAPBody;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.addressing.*;
+import org.apache.axis.message.addressing.Action;
+import org.apache.axis.message.addressing.Address;
+import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.AttributedURI;
+import org.apache.axis.message.addressing.From;
+import org.apache.axis.message.addressing.MessageID;
+import org.apache.axis.message.addressing.ReplyTo;
+import org.apache.axis.message.addressing.To;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
-import org.apache.sandesha.ws.rm.*;
+import org.apache.sandesha.ws.rm.AcksTo;
+import org.apache.sandesha.ws.rm.CreateSequence;
+import org.apache.sandesha.ws.rm.CreateSequenceResponse;
+import org.apache.sandesha.ws.rm.LastMessage;
+import org.apache.sandesha.ws.rm.MessageNumber;
+import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.sandesha.ws.rm.Sequence;
+import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
+import org.apache.sandesha.ws.rm.TerminateSequence;
 import org.apache.sandesha.ws.utility.Identifier;
 
 import javax.xml.namespace.QName;
@@ -117,7 +131,7 @@ public class EnvelopeCreator {
             outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
             outGoingAddressingHaders.setTo(addressingHeaders.getTo());
             if (message.getSync()) {
-                outGoingAddressingHaders.setReplyTo(new ReplyTo(new Address(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS)));
+                outGoingAddressingHaders.setReplyTo(new ReplyTo(new Address(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)));
             } else {
                 if (addressingHeaders.getReplyTo() != null)
                     outGoingAddressingHaders.setReplyTo(addressingHeaders

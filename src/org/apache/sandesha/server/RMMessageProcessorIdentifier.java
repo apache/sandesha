@@ -20,7 +20,12 @@ import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.server.msgprocessors.*;
+import org.apache.sandesha.server.msgprocessors.CompositeProcessor;
+import org.apache.sandesha.server.msgprocessors.CreateSequenceProcessor;
+import org.apache.sandesha.server.msgprocessors.CreateSequenceResponseProcessor;
+import org.apache.sandesha.server.msgprocessors.FaultProcessor;
+import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
+import org.apache.sandesha.server.msgprocessors.TerminateSequenceProcessor;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**

@@ -91,7 +91,7 @@ public class FaultProcessor implements IRMMessageProcessor {
         if (rmMessageContext.getAddressingHeaders() != null) {
             addrHeaders = rmMessageContext.getAddressingHeaders();
             if (addrHeaders.getFaultTo() != null) {
-                if (addrHeaders.getFaultTo().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS)) {
+                if (addrHeaders.getFaultTo().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)) {
                     msgContext.setResponseMessage(new Message(soapFault));
                     return true;
                 } else {
@@ -99,7 +99,7 @@ public class FaultProcessor implements IRMMessageProcessor {
                     return false;
                 }
             } else if (addrHeaders.getReplyTo() != null) {
-                if (addrHeaders.getReplyTo().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS)) {
+                if (addrHeaders.getReplyTo().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)) {
                     msgContext.setResponseMessage(new Message(soapFault));
                     return true;
                 } else {
@@ -107,7 +107,7 @@ public class FaultProcessor implements IRMMessageProcessor {
                     return false;
                 }
             } else if (addrHeaders.getFrom() != null) {
-                if (addrHeaders.getFrom().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS)) {
+                if (addrHeaders.getFrom().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)) {
                     msgContext.setResponseMessage(new Message(soapFault));
                     return true;
                 } else {

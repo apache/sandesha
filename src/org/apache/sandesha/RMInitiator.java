@@ -28,7 +28,6 @@ import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
 

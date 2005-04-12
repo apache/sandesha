@@ -24,7 +24,12 @@ import org.apache.axis.client.Call;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.addressing.*;
+import org.apache.axis.message.addressing.Action;
+import org.apache.axis.message.addressing.Address;
+import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.From;
+import org.apache.axis.message.addressing.ReplyTo;
+import org.apache.axis.message.addressing.To;
 import org.apache.axis.types.URI;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
@@ -155,7 +160,7 @@ public class RMMessageCreator {
             }
 
         } else {
-            from = new From(new Address(org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS));
+            from = new From(new Address(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT));
             addrHeaders.setFrom(from);
             if (rmMsgContext.isHasResponse()) {
                 replyTo = new ReplyTo(new Address(replyToURL));

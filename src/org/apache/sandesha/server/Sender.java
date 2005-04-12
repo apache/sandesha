@@ -29,7 +29,6 @@ import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.ws.rm.RMHeaders;
 

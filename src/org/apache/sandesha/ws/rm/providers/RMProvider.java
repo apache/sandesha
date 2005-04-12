@@ -32,7 +32,6 @@ import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.server.msgprocessors.FaultProcessor;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.ArrayList;

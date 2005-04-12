@@ -18,21 +18,18 @@ package org.apache.sandesha.server;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.Handler;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.providers.java.RPCProvider;
 import org.apache.axis.providers.java.JavaProvider;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
-import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.util.PropertyLoader;
+import org.apache.sandesha.util.RMMessageCreator;
 
 import javax.xml.soap.SOAPEnvelope;
 

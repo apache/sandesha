@@ -101,7 +101,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
 
         if ((createSeq.getAcksTo() != null)) {
-            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.NS_URI_ANONYMOUS))) {
+            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.NS_URI_ADDRESSING_DEFAULT))) {
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
                 rmMessageContext.setSync(true);
                 return true;
@@ -116,7 +116,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
                 return false;
             }
        } else if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString()
-                .equals(Constants.NS_URI_ANONYMOUS)) {
+                .equals(Constants.NS_URI_ADDRESSING_DEFAULT)) {
             //Inform that we have a synchronous response.
             rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
             rmMessageContext.setSync(true);

@@ -17,16 +17,12 @@
 
 package org.apache.sandesha.ws.rm;
 
-import java.util.Iterator;
-
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.utility.Identifier;
+
+import javax.xml.soap.SOAPException;
+import java.util.Iterator;
 
 /**
  * class SequenceOffer

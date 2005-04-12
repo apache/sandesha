@@ -23,21 +23,18 @@ package org.apache.sandesha.util;
 
 
 
-import java.io.InputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-
+import org.apache.axis.components.logger.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.sandesha.Constants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import org.apache.axis.components.logger.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.sandesha.Constants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.InputStream;
 
 
 public class PolicyLoader{

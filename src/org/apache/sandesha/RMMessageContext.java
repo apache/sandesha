@@ -20,9 +20,8 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.sandesha.ws.rm.RMHeaders;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.commons.logging.Log;
+import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.Iterator;
 
