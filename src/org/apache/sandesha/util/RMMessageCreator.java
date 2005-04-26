@@ -24,12 +24,7 @@ import org.apache.axis.client.Call;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.addressing.Action;
-import org.apache.axis.message.addressing.Address;
-import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.From;
-import org.apache.axis.message.addressing.ReplyTo;
-import org.apache.axis.message.addressing.To;
+import org.apache.axis.message.addressing.*;
 import org.apache.axis.types.URI;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
@@ -107,10 +102,9 @@ public class RMMessageCreator {
         RMMessageContext requestMesssageContext = new RMMessageContext();
         //Get the message information from the client.
         Call call = (Call) newMsgContext.getProperty(MessageContext.CALL);
-        //If the property specified by the client is not valid
-        //an AxisFault will be sent at this point.
+        //If the property specified by the client is not valid an AxisFault will be sent at this point.
         requestMesssageContext = ClientPropertyValidator.validate(call);
-        requestMesssageContext.setOutGoingAddress((String) newMsgContext.getProperty(MessageContext.TRANS_URL));
+        requestMesssageContext.setOutGoingAddress((String) msgCtx.getProperty(MessageContext.TRANS_URL));
         requestMesssageContext.setMsgContext(newMsgContext);
 
         // long nextMsgNumber = reqRMMsgContext.getMsgNumber();
@@ -118,7 +112,6 @@ public class RMMessageCreator {
 
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         requestMesssageContext.setAddressingHeaders(addrHeaders);
-        requestMesssageContext.setOutGoingAddress(addrHeaders.getTo().toString());
         requestMesssageContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
         requestMesssageContext.setMessageID(Constants.UUID + uuidGen.nextUUID());
         return requestMesssageContext;
@@ -160,7 +153,7 @@ public class RMMessageCreator {
             }
 
         } else {
-            from = new From(new Address(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT));
+            from = new From(new Address(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
             addrHeaders.setFrom(from);
             if (rmMsgContext.isHasResponse()) {
                 replyTo = new ReplyTo(new Address(replyToURL));
@@ -169,8 +162,14 @@ public class RMMessageCreator {
 
         }
         //Set the target endpoint URL
-        To to = new To(new Address(rmMsgContext.getOutGoingAddress()));
-        addrHeaders.setTo(to);
+        if (rmMsgContext.getTo() != null) {
+            To to = new To(new Address(rmMsgContext.getTo()));
+            addrHeaders.setTo(to);
+        } else {
+            To to = new To(new Address(rmMsgContext.getOutGoingAddress()));
+            addrHeaders.setTo(to);
+        }
+
         return addrHeaders;
     }
 

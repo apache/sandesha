@@ -131,9 +131,6 @@ public class RMInitiator {
         try {
             System.out.println(Constants.InfomationMessage.CLIENT_LISTENER_STARTED);
             sas = new SimpleAxisServer();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
 
             SimpleProvider sp = new SimpleProvider();
             sas.setMyConfig(sp);

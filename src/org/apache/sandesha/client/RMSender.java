@@ -38,7 +38,7 @@ public class RMSender extends BasicHandler {
 
         //Initialize the storage manager. We are in the client side So initialize the client Storage Manager.
         storageManager = new ClientStorageManager();
-        //  RMInitiator.initClient(requestMesssageContext.getSync());
+
         try {
             RMMessageContext requestMesssageContext = RMMessageCreator.createServiceRequestMsg(msgContext);
             String sequenceID = requestMesssageContext.getSequenceID();

@@ -31,8 +31,8 @@ public class SyncPingClient {
 
     private static String defaultServerPort = "8070";
 
-    //private static String targetURL = "http://127.0.0.1:" + defaultServerPort + "/axis/services/RMInteropService?wsdl";
-    private static String targetURL ="http://soap.systinet.net:6060/wsrm/round1/ping";
+    private static String targetURL = "http://127.0.0.1:" + defaultServerPort + "/axis/services/RMInteropService?wsdl";
+
     public static void main(String[] args) {
         System.out.println("Client started...... Synchronous ");
         try {
@@ -51,7 +51,7 @@ public class SyncPingClient {
             //http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous
 
             call.setTargetEndpointAddress(targetURL);
-            call.setOperationName(new QName("urn:wsrm:Ping", "PingOneWay"));
+            call.setOperationName(new QName("urn:wsrm:Ping", "Ping"));
             call.setTransport(new RMTransport(targetURL, ""));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);

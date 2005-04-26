@@ -15,6 +15,7 @@ import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
@@ -99,7 +100,7 @@ public class FaultProcessor implements IRMMessageProcessor {
                     return false;
                 }
             } else if (addrHeaders.getReplyTo() != null) {
-                if (addrHeaders.getReplyTo().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)) {
+                if (addrHeaders.getReplyTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
                     msgContext.setResponseMessage(new Message(soapFault));
                     return true;
                 } else {
@@ -107,7 +108,7 @@ public class FaultProcessor implements IRMMessageProcessor {
                     return false;
                 }
             } else if (addrHeaders.getFrom() != null) {
-                if (addrHeaders.getFrom().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)) {
+                if (addrHeaders.getFrom().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
                     msgContext.setResponseMessage(new Message(soapFault));
                     return true;
                 } else {

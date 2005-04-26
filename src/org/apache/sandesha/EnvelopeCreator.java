@@ -131,7 +131,7 @@ public class EnvelopeCreator {
             outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
             outGoingAddressingHaders.setTo(addressingHeaders.getTo());
             if (message.getSync()) {
-                outGoingAddressingHaders.setReplyTo(new ReplyTo(new Address(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)));
+                outGoingAddressingHaders.setReplyTo(new ReplyTo(new Address(Constants.WSA.NS_ADDRESSING_ANONYMOUS)));
             } else {
                 if (addressingHeaders.getReplyTo() != null)
                     outGoingAddressingHaders.setReplyTo(addressingHeaders

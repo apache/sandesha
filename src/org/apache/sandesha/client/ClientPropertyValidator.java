@@ -43,7 +43,8 @@ public class ClientPropertyValidator {
         String sourceURL = null;
         String from = getFrom(call);
         String replyTo = getReplyTo(call);
-        String acksTo=getAcksTo(call);
+        String acksTo = getAcksTo(call);
+        String to = getTo(call);
 
         try {
             if (from == null)
@@ -69,12 +70,22 @@ public class ClientPropertyValidator {
             rmMessageContext.setFrom(from);
             rmMessageContext.setAction(action);
             rmMessageContext.setAcksTo(acksTo);
+            rmMessageContext.setTo(to);
             return rmMessageContext;
 
         } else
             throw new AxisFault(errorMsg);
 
     }
+
+    private static String getTo(Call call) {
+        String to = (String) call.getProperty(Constants.ClientProperties.TO);
+        if (to != null)
+            return to;
+        else
+            return null;
+    }
+
 
     /**
      * This will decide whether we have an IN-OUT style service request
@@ -100,15 +111,15 @@ public class ClientPropertyValidator {
             return action;
         else
             return null;
-     }
+    }
 
-     private static String getAcksTo(Call call) {
+    private static String getAcksTo(Call call) {
         String acksTo = (String) call.getProperty(Constants.ClientProperties.ACKS_TO);
         if (acksTo != null)
             return acksTo;
         else
             return null;
-     }
+    }
 
     private static boolean getSync(Call call) {
         Boolean synchronous = (Boolean) call.getProperty(Constants.ClientProperties.SYNC);
@@ -166,15 +177,12 @@ public class ClientPropertyValidator {
         return errorMsg;
     }
 
-
-    private static String getFrom(Call call) {
+     private static String getFrom(Call call) {
         return (String) call.getProperty(Constants.ClientProperties.FROM);
-
-    }
+      }
 
     private static String getReplyTo(Call call) {
         return (String) call.getProperty(Constants.ClientProperties.REPLY_TO);
-
     }
 
 }
