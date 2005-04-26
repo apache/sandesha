@@ -90,7 +90,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         RMMessageContext rmMsgContext = getAckRMMsgCtx(rmMessageContext, ackRangeVector);
 
         if (true == (rmMessageContext.getAddressingHeaders().getFrom().getAddress().toString()
-                .equals(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT))) {
+                .equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
 //                || ("http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous".equals(rmMessageContext.getAddressingHeaders().getFrom()
 //                .getAddress().toString()))) {
             //Now we have synchronized ack.

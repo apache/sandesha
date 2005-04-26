@@ -23,10 +23,10 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.SequenceOffer;
@@ -51,15 +51,6 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         if (rmHeaders.getSequenceAcknowledgement() != null) {
             ackProcessor.processMessage(rmMessageContext);
         }
-
-
-        if (addrHeaders.getReplyTo() == null)
-            rmMessageContext.setSync(true);
-        else
-            rmMessageContext.setSync(false);
-
-        //TODO This should be sent by looking at the offer and the rest
-        
    
         //wsrm:CreateSequenceRefused
         if (rmHeaders.getCreateSequence() == null)
@@ -101,7 +92,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
 
         if ((createSeq.getAcksTo() != null)) {
-            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.NS_URI_ADDRESSING_DEFAULT))) {
+            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
                 rmMessageContext.setSync(true);
                 return true;
@@ -116,7 +107,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
                 return false;
             }
        } else if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString()
-                .equals(Constants.NS_URI_ADDRESSING_DEFAULT)) {
+                .equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
             //Inform that we have a synchronous response.
             rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
             rmMessageContext.setSync(true);
