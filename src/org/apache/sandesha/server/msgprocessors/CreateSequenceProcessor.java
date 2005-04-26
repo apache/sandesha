@@ -23,10 +23,10 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.Constants;
 import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.SequenceOffer;
@@ -51,7 +51,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         if (rmHeaders.getSequenceAcknowledgement() != null) {
             ackProcessor.processMessage(rmMessageContext);
         }
-   
+
         //wsrm:CreateSequenceRefused
         if (rmHeaders.getCreateSequence() == null)
             throw new AxisFault();
@@ -82,7 +82,21 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         }
         
         //END OFFER PROCESSING
-        
+
+        if ((createSeq.getAcksTo() != null)) {
+            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
+                rmMessageContext.setSync(true);
+            } else {
+                rmMessageContext.setSync(false);
+                rmMessageContext.setOutGoingAddress(createSeq.getAcksTo().getAddress().toString());
+            }
+        } else if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
+            rmMessageContext.setSync(true);
+        } else {
+            rmMessageContext.setSync(false);
+             rmMessageContext.setOutGoingAddress(addrHeaders.getReplyTo().getAddress().toString());
+        }
+
         SOAPEnvelope resEnvelope = null;
         try {
             resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(uuid, rmMessageContext);
@@ -91,7 +105,22 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         }
         rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
 
-        if ((createSeq.getAcksTo() != null)) {
+        if (rmMessageContext.getSync()) {
+            rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
+            return true;
+
+        } else {
+               MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
+                msgContext.setResponseMessage(new Message(resEnvelope));
+                rmMessageContext.setMsgContext(msgContext);
+
+                rmMessageContext.setSync(false);
+                storageManager.addCreateSequenceResponse(rmMessageContext);
+                return false;
+        }
+
+
+      /*  if ((createSeq.getAcksTo() != null)) {
             if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
                 rmMessageContext.setSync(true);
@@ -106,7 +135,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
                 storageManager.addCreateSequenceResponse(rmMessageContext);
                 return false;
             }
-       } else if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString()
+        } else if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString()
                 .equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
             //Inform that we have a synchronous response.
             rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
@@ -122,5 +151,6 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
             storageManager.addCreateSequenceResponse(rmMessageContext);
             return false;
         }
-     }
- }
+        */
+    }
+}

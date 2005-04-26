@@ -51,7 +51,7 @@
           //call.setProperty("replyTo","http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
           //<wsrm:AcksTo> is used, if the user needs the CreateSequence response or the faults related to
           //that to be sent to a specific endpoint.
-          //call.setProperty("acksTo","http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+          call.setProperty("acksTo","http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
           //http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous
 
           call.setTargetEndpointAddress(targetURL);
