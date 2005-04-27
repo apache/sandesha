@@ -119,6 +119,7 @@ public class RMMessageCreator {
         requestMesssageContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
         requestMesssageContext.setMessageID(Constants.UUID + uuidGen.nextUUID());
         return requestMesssageContext;
+
     }
 
     private static MessageContext cloneMsgContext(MessageContext msgContext) throws AxisFault {

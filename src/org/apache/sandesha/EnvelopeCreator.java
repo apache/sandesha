@@ -30,6 +30,7 @@ import org.apache.axis.message.addressing.MessageID;
 import org.apache.axis.message.addressing.ReplyTo;
 import org.apache.axis.message.addressing.To;
 import org.apache.axis.types.URI;
+import org.apache.axis.Message;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.ws.rm.AcksTo;
 import org.apache.sandesha.ws.rm.CreateSequence;
@@ -343,8 +344,8 @@ public class EnvelopeCreator {
         rmMessageContext.setRMHeaders(rmHeaders);
 
         //requestEnvelope = new SOAPEnvelope();
-        requestEnvelope = rmMessageContext.getMsgContext()
-                .getRequestMessage().getSOAPEnvelope();
+        String str= rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
+        requestEnvelope = new Message(str).getSOAPEnvelope();
 
         rmMessageContext.getRMHeaders().toSoapEnvelop(requestEnvelope);
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(requestEnvelope);

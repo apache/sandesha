@@ -20,9 +20,6 @@ package org.apache.sandesha.storage.queue;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.MessageID;
-import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
@@ -92,16 +89,11 @@ public class SandeshaQueue {
 
                 if (seqHash.hasMessage(messageNo))
                     throw new QueueException(Constants.Queue.MESSAGE_EXISTS);
-                //Messages will not be replaced automatically.
 
-                //setting last message
                 if (msgCon.isLastMessage())
                     seqHash.setLastMsg(msgCon.getMsgNumber());
 
-                //setting sequence id
-                //TODO: Do this in create seq response processor
                 seqHash.setSequenceId(msgCon.getSequenceID());
-
                 seqHash.putNewMessage(messageNo, msgCon);
                 successful = true;
             }
@@ -132,7 +124,6 @@ public class SandeshaQueue {
 
                 if (msgCon.isHasResponse())
                     resSeqHash.setHasResponse(true);
-
             }
         }
         return successful;
@@ -301,43 +292,17 @@ public class SandeshaQueue {
                                     newOutSeqId = newCreateSeqId;
 
 
-                                    //MessageContext msgContext = tempMsg.getMsgContext();
-                                    //String toAddress = tempMsg.getOutGoingAddress();
-
                                     try {
-                                        AddressingHeaders addrHeaders = new AddressingHeaders(tempMsg.getMsgContext().getRequestMessage().getSOAPEnvelope());
-                                        addrHeaders.setMessageID(new MessageID(new URI(newCreateSeqId)));
-                                        addrHeaders.toEnvelope(tempMsg.getMsgContext().getRequestMessage().getSOAPEnvelope());
 
-
-
-                                        //SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid, tempMsg, Constants.CLIENT);
-                                        //MessageContext createSeqMsgContext = tempMsg.getMsgContext(); //new MessageContext(msgContext.getAxisEngine());
-
-                                        //createSeqMsgContext.setRequestMessage(new Message(resEnvelope));
-                                        //tempMsg.setMsgContext(createSeqMsgContext);
-
-                                        //changing the out sequence to the messageid of new create sequence.
-                                        //String seqId = getSequenceOfOutSequence(oldOutSeqId);
-                                        //setOutSequence(seqId,newOutSeqId);
                                         tempMsg.setLastSentTime(currentTime);
                                         msg = tempMsg;
 
-                                        if (msg != null) {
-                                            msg.addToMsgIdList(msg.getMessageID().toString());
-                                            List msgIdList = msg.getMessageIdList();
-                                            Iterator it = msgIdList.iterator();
-
-                                        }
 
                                         break forLoop;
 
                                     } catch (Exception ex) {
                                         ex.printStackTrace();
                                     }
-
-                                    //END EDITED
-
 
                                 }
                                 break;

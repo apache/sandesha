@@ -100,11 +100,10 @@ public class Sequence extends MessageElement implements IRmElement {
         if (env.getHeader() == null) {
             env.addHeader();
         }
+        removeHeaders(envelope);
 
-        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
-                Constants.WSRM.NS_URI_RM);
-        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
-                .addHeaderElement(name);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
 
         headerElement.setActor(null);
         headerElement.setName(Constants.WSRM.SEQUENCE);
@@ -171,6 +170,21 @@ public class Sequence extends MessageElement implements IRmElement {
         }
 
         return this;
+    }
+
+    public void removeHeaders(SOAPEnvelope soapEnvelope) throws Exception {
+
+        Iterator iterator = soapEnvelope.getHeader().getChildElements();
+        MessageElement childElement;
+
+        while (iterator.hasNext()) {
+            childElement = (MessageElement) iterator.next();
+
+            if (Constants.WSRM.SEQUENCE.equals(childElement.getName()) && (Constants.WSRM.NS_URI_RM.equals(childElement.getNamespaceURI()))) {
+                childElement.detachNode();
+                break;
+            }
+        }
     }
 
     /*

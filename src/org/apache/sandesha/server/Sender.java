@@ -22,7 +22,11 @@ import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.components.logger.LogFactory;
+import org.apache.axis.components.uuid.UUIDGen;
+import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.MessageID;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
@@ -35,6 +39,7 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 import javax.xml.rpc.ServiceException;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
+import java.util.List;
 
 /**
  * @author JEkanayake
@@ -168,6 +173,35 @@ public class Sender implements Runnable {
         } else {
             Call call;
 
+
+
+            //EDITED FOR MSG NO REPITITION
+            String oldOutSeqId, newOutSeqId;
+
+            String oldCreateSeqId = rmMessageContext.getMessageID().toString();
+            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+            String uuid = uuidGen.nextUUID();
+
+
+            String newCreateSeqId = Constants.UUID + uuid;
+            rmMessageContext.setMessageID(newCreateSeqId);
+
+            oldOutSeqId = oldCreateSeqId;
+            newOutSeqId = newCreateSeqId;
+
+
+            //MessageContext msgContext = tempMsg.getMsgContext();
+            //String toAddress = tempMsg.getOutGoingAddress();
+
+
+            AddressingHeaders addrHeaders = new AddressingHeaders(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
+            addrHeaders.setMessageID(new MessageID(new URI(newCreateSeqId)));
+            addrHeaders.toEnvelope(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
+
+
+            rmMessageContext.addToMsgIdList(rmMessageContext.getMessageID().toString());
+            List msgIdList = rmMessageContext.getMessageIdList();
+            //Iterator it = msgIdList.iterator();
             rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
             rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             call = prepareCall(rmMessageContext);
