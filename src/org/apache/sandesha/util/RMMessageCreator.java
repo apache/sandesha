@@ -42,8 +42,12 @@ public class RMMessageCreator {
 
         //Create the RMMessageContext to hold the create Sequence Request.
         RMMessageContext createSeqRMMsgContext = new RMMessageContext();
-        createSeqRMMsgContext.setMessageID(Constants.UUID + uuid);
+        
+        String msgId = Constants.UUID + uuid;
+        createSeqRMMsgContext.setMessageID(msgId);
 
+        createSeqRMMsgContext.addToMsgIdList(msgId);
+        
         MessageContext msgContext = rmMsgCtx.getMsgContext();
         String toAddress = rmMsgCtx.getOutGoingAddress();
 

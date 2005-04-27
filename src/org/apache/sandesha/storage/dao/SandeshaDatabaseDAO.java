@@ -30,6 +30,13 @@ import java.util.Set;
 
 public class SandeshaDatabaseDAO implements ISandeshaDAO {
 
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getFirstCreateSequenceMsgId(java.lang.String)
+     */
+    public String getFirstCreateSequenceMsgId(String createSeqId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
     private static final Log log = LogFactory.getLog(SandeshaDatabaseDAO.class.getName());
 
     public void setAckReceived(String seqId, long msgNo) {

@@ -18,19 +18,19 @@
 package org.apache.sandesha.storage.queue;
 
 import org.apache.axis.components.logger.LogFactory;
+import org.apache.axis.components.uuid.UUIDGen;
+import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.MessageID;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.AcknowledgementRange;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
+
 
 /*
  * Created on Aug 4, 2004 at 4:49:49 PM
@@ -285,11 +285,63 @@ public class SandeshaQueue {
                                 Date d = new Date();
                                 long currentTime = d.getTime();
                                 if (currentTime >= lastSentTime + Constants.RETRANSMISSION_INTERVAL) {
-                                    tempMsg.setLastSentTime(currentTime);
-                                    msg = tempMsg;
-                                    break forLoop;
+
+                                    //EDITED FOR MSG NO REPITITION
+                                    String oldOutSeqId, newOutSeqId;
+
+                                    String oldCreateSeqId = tempMsg.getMessageID().toString();
+                                    UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+                                    String uuid = uuidGen.nextUUID();
+
+
+                                    String newCreateSeqId = Constants.UUID + uuid;
+                                    tempMsg.setMessageID(newCreateSeqId);
+
+                                    oldOutSeqId = oldCreateSeqId;
+                                    newOutSeqId = newCreateSeqId;
+
+
+                                    //MessageContext msgContext = tempMsg.getMsgContext();
+                                    //String toAddress = tempMsg.getOutGoingAddress();
+
+                                    try {
+                                        AddressingHeaders addrHeaders = new AddressingHeaders(tempMsg.getMsgContext().getRequestMessage().getSOAPEnvelope());
+                                        addrHeaders.setMessageID(new MessageID(new URI(newCreateSeqId)));
+                                        addrHeaders.toEnvelope(tempMsg.getMsgContext().getRequestMessage().getSOAPEnvelope());
+
+
+
+                                        //SOAPEnvelope resEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(uuid, tempMsg, Constants.CLIENT);
+                                        //MessageContext createSeqMsgContext = tempMsg.getMsgContext(); //new MessageContext(msgContext.getAxisEngine());
+
+                                        //createSeqMsgContext.setRequestMessage(new Message(resEnvelope));
+                                        //tempMsg.setMsgContext(createSeqMsgContext);
+
+                                        //changing the out sequence to the messageid of new create sequence.
+                                        //String seqId = getSequenceOfOutSequence(oldOutSeqId);
+                                        //setOutSequence(seqId,newOutSeqId);
+                                        tempMsg.setLastSentTime(currentTime);
+                                        msg = tempMsg;
+
+                                        if (msg != null) {
+                                            msg.addToMsgIdList(msg.getMessageID().toString());
+                                            List msgIdList = msg.getMessageIdList();
+                                            Iterator it = msgIdList.iterator();
+
+                                        }
+
+                                        break forLoop;
+
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                    //END EDITED
+
+
                                 }
                                 break;
+
                             default:
                                 highPriorityQueue.remove(i);
                                 queueBin.put(tempMsg.getMessageID(), tempMsg);
@@ -299,6 +351,8 @@ public class SandeshaQueue {
                     }
                 }
             }
+
+
             return msg;
 
         }
@@ -423,7 +477,6 @@ public class SandeshaQueue {
     }
 
     public String getSequenceOfOutSequence(String outSequence) {
-
         if (outSequence == null) {
             return null;
         }
@@ -547,7 +600,8 @@ public class SandeshaQueue {
             int size = highPriorityQueue.size();
             for (int i = 0; i < size; i++) {
                 RMMessageContext msg = (RMMessageContext) highPriorityQueue.get(i);
-                if (msg.getMessageID().equals(messageId)) {
+                String tempMsgId = (String) msg.getMessageIdList().get(0);
+                if (tempMsgId.equals(messageId)) {
                     highPriorityQueue.remove(i);
                     queueBin.put(messageId, msg);
                     return;
@@ -884,6 +938,24 @@ public class SandeshaQueue {
     public void setTerminateReceived(String seqId) {
         IncomingSequence ics = (IncomingSequence) incomingMap.get(getKeyFromIncomingSequenceId(seqId));
         ics.setTerminateReceived(true);
+    }
+
+    public String getFirstCreateSequenceMsgId(String createSeqId) {
+
+        synchronized (highPriorityQueue) {
+
+            Iterator it = highPriorityQueue.iterator();
+            while (it.hasNext()) {
+                RMMessageContext msg = (RMMessageContext) it.next();
+                boolean contains = msg.getMessageIdList().contains(createSeqId);
+                if (contains) {
+                    return ((String) msg.getMessageIdList().get(0));
+                }
+            }
+        }
+
+        return null;
+
     }
 
 

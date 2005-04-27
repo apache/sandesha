@@ -101,7 +101,12 @@ public class RMInvoker implements Runnable {
                             UUIDGen uuid = UUIDGenFactory.getUUIDGen();
                             String id = uuid.nextUUID();
 
-                            storageManager.setTemporaryOutSequence(rmMsgContext.getSequenceID(), Constants.UUID + id);
+
+                            String msgIdStr = Constants.UUID + id;
+                            rmMsgContext.addToMsgIdList(msgIdStr);
+
+
+                            storageManager.setTemporaryOutSequence(rmMsgContext.getSequenceID(), msgIdStr);
                             SOAPEnvelope createSequenceEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(id,
                                     rmMsgContext, Constants.SERVER);
 

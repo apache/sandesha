@@ -119,5 +119,7 @@ public interface ISandeshaDAO {
     public boolean isAllOutgoingTerminateSent();
 
     public boolean isAllIncommingTerminateReceived();
+    
+    public String getFirstCreateSequenceMsgId(String createSeqId);
 
 }

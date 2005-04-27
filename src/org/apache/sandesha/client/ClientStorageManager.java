@@ -162,11 +162,17 @@ public class ClientStorageManager implements IStorageManager {
      * This will be used by the SimpleAxisServer and the Sender to set the
      * proper sequenceID
      */
-    public boolean setApprovedOutSequence(String oldOutsequenceId, String newOutSequenceId) {
+    public boolean setApprovedOutSequence(String createSeqId, String newOutSequenceId) {
 
         boolean done = false;
-        String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
+        String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
 
+        if(oldOutsequenceId==null){
+            return false;
+        }
+        
+        String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
+        
         if (sequenceID == null) {
             log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
             return false;
@@ -175,6 +181,7 @@ public class ClientStorageManager implements IStorageManager {
         accessor.setOutSequenceApproved(sequenceID, true);
         accessor.removeCreateSequenceMsg(oldOutsequenceId);
         return true;
+    
     }
 
     /**

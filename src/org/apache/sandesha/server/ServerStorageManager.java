@@ -202,19 +202,17 @@ public class ServerStorageManager implements IStorageManager {
         accessor.setOutSequenceApproved(sequenceId, false);
     }
 
-    public boolean setApprovedOutSequence(String oldOutsequenceId, String newOutSequenceId) {
+    public boolean setApprovedOutSequence(String createSeqId, String newOutSequenceId) {
 
-        boolean done = false;
-        String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
+        String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
+                         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
 
         if (sequenceID == null) {
-
+            log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
             return false;
         }
         accessor.setOutSequence(sequenceID, newOutSequenceId);
         accessor.setOutSequenceApproved(sequenceID, true);
-
-        //Deleting create sequence message from the priority queue.
         accessor.removeCreateSequenceMsg(oldOutsequenceId);
         return true;
     }

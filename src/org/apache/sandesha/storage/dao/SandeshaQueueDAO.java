@@ -468,5 +468,10 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         sq.setTerminateReceived(seqId);
     }
+    
 
+    public String getFirstCreateSequenceMsgId(String createSeqId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.getFirstCreateSequenceMsgId(createSeqId);
+    }
 }

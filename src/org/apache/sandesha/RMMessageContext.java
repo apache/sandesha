@@ -23,6 +23,7 @@ import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -50,12 +51,22 @@ public class RMMessageContext {
     private String replyTo = null;
     private boolean responseReceived = false;
     private boolean ackReceived = false;
+    
 
 
     private String acksTo = null;
     private String to = null;
     private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
-
+    private ArrayList msgIdList = new ArrayList ();
+    
+    public void addToMsgIdList(String msgId){
+        msgIdList.add(msgId);
+    }
+    
+    public ArrayList getMessageIdList(){
+        return msgIdList;
+    }
+    
     public String getTo() {
         return to;
     }
