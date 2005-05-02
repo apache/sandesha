@@ -21,7 +21,7 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.ws.utility.Identifier;
+
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;

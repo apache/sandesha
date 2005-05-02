@@ -19,7 +19,6 @@ package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.ws.utility.Identifier;
 
 import javax.xml.soap.SOAPException;
 import java.util.Iterator;
