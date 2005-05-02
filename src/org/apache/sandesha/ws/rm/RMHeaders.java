@@ -79,23 +79,18 @@ public class RMHeaders {
         if (createSequence != null) {
             createSequence.toSoapEnvelop(env);
         }
-
         if (createSequenceResponse != null) {
             createSequenceResponse.toSoapEnvelop(env);
         }
-
-        if (ackRequest != null) {
-            ackRequest.toSoapEnvelop(env);
-        }
-
         if (sequenceAcknowledgement != null) {
             sequenceAcknowledgement.toSoapEnvelop(env);
         }
-
         if (sequence != null) {
             sequence.toSoapEnvelop(env);
         }
-
+        if (ackRequest != null) {
+            ackRequest.toSoapEnvelop(env);
+        }
         if (terminateSequence != null) {
             terminateSequence.toSoapEnvelop(env);
         }

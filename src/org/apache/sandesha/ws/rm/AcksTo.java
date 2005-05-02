@@ -72,7 +72,7 @@ public class AcksTo implements IRmElement {
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
         MessageElement messageElement = new MessageElement("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
-        messageElement.setName("AcksTo");
+        messageElement.setName(Constants.WSRM.ACKS_TO);
         address.append(messageElement);
         msgElement.addChildElement(messageElement);
         return msgElement;

@@ -296,7 +296,7 @@ public class EnvelopeCreator {
         //Setting from the Client
         outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
         outGoingAddressingHaders.setTo(addressingHeaders.getTo());
-        if (addressingHeaders.getReplyTo() != null)
+        if (addressingHeaders.getReplyTo() != null && rmMessageContext.isHasResponse())
             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
         try {
             Action action = new Action(new URI(rmMessageContext.getAction()));

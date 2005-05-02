@@ -85,9 +85,12 @@ public class RMMessageCreator {
         if (endPoint == Constants.CLIENT) {
             csAddrHeaders.setTo(addrHeaders.getTo());
             csAddrHeaders.setFaultTo(addrHeaders.getFaultTo());
+            csAddrHeaders.setReplyTo(addrHeaders.getReplyTo());
+            csAddrHeaders.setFrom(addrHeaders.getFrom());
         } else {
             csAddrHeaders.setTo(new To(addrHeaders.getReplyTo().getAddress().toString()));
             csAddrHeaders.setFaultTo(new FaultTo(new Address(rmMsgCtx.getAddressingHeaders().getTo().toString())));
+            csAddrHeaders.setFrom(new From(new Address(rmMsgCtx.getAddressingHeaders().getTo().toString())));
         }
         csAddrHeaders.setAction(new Action(new URI(Constants.WSRM.ACTION_CREATE_SEQUENCE)));
 
@@ -209,18 +212,20 @@ public class RMMessageCreator {
             //Need to use the anonymous_URI if the client is synchronous.
             if (!sync) {
                 if (fromURL != null) {
-                    from = new From(new Address(fromURL));
+                  from = new From(new Address(fromURL));
                 } else {
                     from = new From(new Address(rmMsgContext.getSourceURL()));
                 }
                 addrHeaders.setFrom(from);
-                if (replyToURL != null) {
-                    replyTo = new ReplyTo(new Address(replyToURL));
-                    addrHeaders.setReplyTo(replyTo);
-                } else {
-                    replyTo = new ReplyTo(new Address(rmMsgContext.getSourceURL()));
-                    addrHeaders.setReplyTo(replyTo);
-                }
+               // if (rmMsgContext.isHasResponse()) {
+                    if (replyToURL != null) {
+                        replyTo = new ReplyTo(new Address(replyToURL));
+                        addrHeaders.setReplyTo(replyTo);
+                    } else {
+                        replyTo = new ReplyTo(new Address(rmMsgContext.getSourceURL()));
+                        addrHeaders.setReplyTo(replyTo);
+                    }
+               // }
 
             } else {
                 if (fromURL != null) {

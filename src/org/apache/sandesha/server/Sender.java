@@ -262,6 +262,7 @@ public class Sender implements Runnable {
 
         SOAPEnvelope requestEnvelope = null;
         //Need to create the response envelope.
+       
         requestEnvelope = EnvelopeCreator.createServiceRequestEnvelope(rmMessageContext);
         rmMessageContext.getMsgContext().setRequestMessage(new Message(requestEnvelope));
         rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
