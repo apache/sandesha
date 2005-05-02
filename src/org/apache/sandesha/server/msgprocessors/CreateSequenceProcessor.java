@@ -30,7 +30,7 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.SequenceOffer;
-import org.apache.sandesha.ws.utility.Identifier;
+import org.apache.sandesha.ws.rm.Identifier;
 
 /**
  * @author

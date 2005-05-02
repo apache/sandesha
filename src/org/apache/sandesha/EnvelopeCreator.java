@@ -26,7 +26,7 @@ import org.apache.axis.message.addressing.*;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.ws.rm.*;
-import org.apache.sandesha.ws.utility.Identifier;
+import org.apache.sandesha.ws.rm.Identifier;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPHeaderElement;
