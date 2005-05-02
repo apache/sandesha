@@ -87,11 +87,10 @@ public class AckRequested extends MessageElement implements IRmElement {
      * @return SOAPEnvelope
      * @throws SOAPException
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
-            throws SOAPException {
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws Exception {
 
         SOAPEnvelope env = envelope;
-
+        removeHeaders(env);
         /*
          * ackRequested.addChildElement(identifier.getSoapElement());
          * ackRequested.addChildElement(messageNumber.getSoapElement());
@@ -214,5 +213,20 @@ public class AckRequested extends MessageElement implements IRmElement {
      */
     public void setMessageNumber(MessageNumber number) {
         messageNumber = number;
+    }
+
+    public void removeHeaders(SOAPEnvelope soapEnvelope) throws Exception {
+
+        Iterator iterator = soapEnvelope.getHeader().getChildElements();
+        MessageElement childElement;
+
+        while (iterator.hasNext()) {
+            childElement = (MessageElement) iterator.next();
+
+            if (Constants.WSRM.ACK_REQUESTED.equals(childElement.getName()) && (Constants.WSRM.NS_URI_RM.equals(childElement.getNamespaceURI()))) {
+                childElement.detachNode();
+                break;
+            }
+        }
     }
 }

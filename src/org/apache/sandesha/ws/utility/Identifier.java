@@ -45,7 +45,7 @@ public class Identifier extends URI {
      */
     public Identifier() {
         identifierElement = new MessageElement();
-        identifierElement.setName("wsu:Identifier");
+        identifierElement.setName("wsrm:Identifier");
     }
 
     /**
@@ -80,7 +80,7 @@ public class Identifier extends URI {
     public MessageElement toSOAPEnvelope(MessageElement msgElement)
             throws SOAPException {
 
-        msgElement.addChildElement("Identifier", "wsu").addTextNode(identifier);
+        msgElement.addChildElement("Identifier", "wsrm").addTextNode(identifier);
         return msgElement;
     }
 

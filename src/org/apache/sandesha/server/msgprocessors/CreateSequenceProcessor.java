@@ -38,6 +38,8 @@ import org.apache.sandesha.ws.utility.Identifier;
 public class CreateSequenceProcessor implements IRMMessageProcessor {
     IStorageManager storageManager;
 
+    public static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+
     public CreateSequenceProcessor(IStorageManager storageManager) {
         this.storageManager = storageManager;
     }
@@ -56,7 +58,6 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         if (rmHeaders.getCreateSequence() == null)
             throw new AxisFault();
 
-        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
         String uuid = uuidGen.nextUUID();
 
         storageManager.addRequestedSequence(org.apache.sandesha.Constants.UUID + uuid);

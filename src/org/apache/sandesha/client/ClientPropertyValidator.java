@@ -45,6 +45,7 @@ public class ClientPropertyValidator {
         String replyTo = getReplyTo(call);
         String acksTo = getAcksTo(call);
         String to = getTo(call);
+        String faultTo=getFaultTo(call);
 
         try {
             if (from == null)
@@ -71,11 +72,20 @@ public class ClientPropertyValidator {
             rmMessageContext.setAction(action);
             rmMessageContext.setAcksTo(acksTo);
             rmMessageContext.setTo(to);
+            rmMessageContext.setFaultTo(faultTo);
             return rmMessageContext;
 
         } else
             throw new AxisFault(errorMsg);
 
+    }
+
+    private static String getFaultTo(Call call) {
+          String faultTo = (String) call.getProperty(Constants.ClientProperties.FAULT_TO);
+        if (faultTo != null)
+            return faultTo;
+        else
+            return null;
     }
 
     private static String getTo(Call call) {

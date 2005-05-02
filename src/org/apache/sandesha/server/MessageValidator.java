@@ -106,7 +106,7 @@ public final class MessageValidator {
         if (addrHeaders == null) {
             throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
         }
-        if (addrHeaders.getMessageID() == null)
-            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_MESSAGE_ID, null, null);
+        //if (addrHeaders.getMessageID() == null)
+        //    throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_MESSAGE_ID, null, null);
     }
 }

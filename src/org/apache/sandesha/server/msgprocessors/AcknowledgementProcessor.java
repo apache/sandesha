@@ -72,6 +72,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
     public boolean sendAcknowledgement(RMMessageContext rmMessageContext) throws AxisFault {
         //EnvelopCreater createAcknowledgement.  If async then add message to the queue
         //else set the response env of the messageContext.
+
         String seqID = rmMessageContext.getSequenceID();
 
         long messageNumber = rmMessageContext.getRMHeaders().getSequence().getMessageNumber().getMessageNumber();
@@ -91,12 +92,6 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
 
         if (true == (rmMessageContext.getAddressingHeaders().getFrom().getAddress().toString()
                 .equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
-//                || ("http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous".equals(rmMessageContext.getAddressingHeaders().getFrom()
-//                .getAddress().toString()))) {
-            //Now we have synchronized ack.
-            //The original message context is used to send the ack
-            // asynchronously to the client.
-            //So the response message is replaced by the new ack message.
             try {
                 String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPPartAsString();
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(soapMsg));

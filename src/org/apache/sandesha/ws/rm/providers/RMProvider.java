@@ -64,9 +64,7 @@ public class RMProvider extends RPCProvider {
         if (isIgnorableMessage(msgContext)) {
             RPCProvider rpcProvider = new RPCProvider();
             rpcProvider.invoke(msgContext);
-
         } else {
-
             IStorageManager storageManager = RMInitiator.init(client);
             storageManager.init();
 
@@ -95,7 +93,11 @@ public class RMProvider extends RPCProvider {
                 }
             }
 
-            rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
+            if (addrHeaders.getMessageID() == null) {
+                rmMessageContext.setMessageID((new Long(System.currentTimeMillis())).toString());
+            } else {
+                rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
+            }
             IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
 
             try {
@@ -105,7 +107,6 @@ public class RMProvider extends RPCProvider {
                 } else {
                     msgContext.setPastPivot(true);
                     // TODO Get the from envCreator
-
                     // SOAPEnvelope resEn=EnvelopeCreator.createAcknowledgementEnvelope()
                 }
             } catch (AxisFault af) {
@@ -120,7 +121,6 @@ public class RMProvider extends RPCProvider {
                 }
                 return;
             }
-
         }
     }
 
@@ -157,7 +157,6 @@ public class RMProvider extends RPCProvider {
             if (key.regionMatches(0, Constants.IGNORE_ACTION, 0, Constants.IGNORE_ACTION.length()))
                 actionList.add(options.get(key));
         }
-
         return actionList;
     }
 

@@ -44,11 +44,9 @@ public class SyncPingClient {
 
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
+            
+            call.setProperty(Constants.ClientProperties.FAULT_TO,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
 
-            //These two are additional
-            //call.setProperty("from","http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous");
-            //call.setProperty("replyTo","http://10.10.0.4:8080/axis/services/MyService");
-            //http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous
 
             call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("urn:wsrm:Ping", "Ping"));

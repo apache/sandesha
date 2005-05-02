@@ -109,9 +109,6 @@ public class Sequence extends MessageElement implements IRmElement {
         headerElement.setName(Constants.WSRM.SEQUENCE);
         headerElement.setMustUnderstand(true);
 
-        if (lastMessage != null) {
-            lastMessage.toSOAPEnvelope(headerElement);
-        }
 
         if (identifier != null) {
             identifier.toSOAPEnvelope(headerElement);
@@ -119,6 +116,10 @@ public class Sequence extends MessageElement implements IRmElement {
 
         if (messageNumber != null) {
             messageNumber.toSOAPEnvelope(headerElement);
+        }
+
+        if (lastMessage != null) {
+            lastMessage.toSOAPEnvelope(headerElement);
         }
 
         return env;

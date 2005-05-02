@@ -51,11 +51,10 @@ public class RMMessageContext {
     private String replyTo = null;
     private boolean responseReceived = false;
     private boolean ackReceived = false;
-    
-
-
+    private String faultTo=null;
     private String acksTo = null;
     private String to = null;
+
     private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
     private ArrayList msgIdList = new ArrayList ();
     
@@ -475,4 +474,10 @@ public class RMMessageContext {
         return sync;
     }
 
+    public void setFaultTo(String faultTo) {
+        this.faultTo=faultTo;
+            }
+    public String getFaultTo(){
+        return this.faultTo;
+    }
 }

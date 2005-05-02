@@ -92,7 +92,7 @@ public class FaultProcessor implements IRMMessageProcessor {
         if (rmMessageContext.getAddressingHeaders() != null) {
             addrHeaders = rmMessageContext.getAddressingHeaders();
             if (addrHeaders.getFaultTo() != null) {
-                if (addrHeaders.getFaultTo().getAddress().toString().equals(org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT)) {
+                if (addrHeaders.getFaultTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
                     msgContext.setResponseMessage(new Message(soapFault));
                     return true;
                 } else {

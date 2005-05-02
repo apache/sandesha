@@ -16,22 +16,19 @@
  */
 package org.apache.sandesha.server;
 
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.addressing.MessageID;
 import org.apache.axis.providers.java.JavaProvider;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
-
-import javax.xml.soap.SOAPEnvelope;
 
 /**
  * @author JEkanayake
@@ -43,6 +40,7 @@ import javax.xml.soap.SOAPEnvelope;
 public class RMInvoker implements Runnable {
     private IStorageManager storageManager = null;
     private static final Log log = LogFactory.getLog(RMInvoker.class.getName());
+    private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
     public RMInvoker() {
         storageManager = new ServerStorageManager();
@@ -54,16 +52,10 @@ public class RMInvoker implements Runnable {
         while (true) {
             try {
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);
-
                 RMMessageContext rmMessageContext = storageManager.getNextMessageToProcess();
-
                 if (rmMessageContext != null) {
-                    //Currently RPCProvider is used as the default provider and this is used to actually invoke the service.
-                    //To provide a maximum flexibility the actual provider should be a configurable entity
-                    // where the class can be loaded at runtime.
-
                     Class c = Class.forName(PropertyLoader.getProvider());
-                    JavaProvider provider=(JavaProvider)c.newInstance();
+                    JavaProvider provider = (JavaProvider) c.newInstance();
                     provider.invoke(rmMessageContext.getMsgContext());
 
                     if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() != Void.TYPE) {
@@ -76,7 +68,7 @@ public class RMInvoker implements Runnable {
                                 terminateMsg.setOutGoingAddress(replyTo);
                                 storageManager.insertTerminateSeqMessage(terminateMsg);
                             } else {
-                              log.error(Constants.ErrorMessages.CANNOT_SEND_THE_CREATE_SEQ);
+                                log.error(Constants.ErrorMessages.CANNOT_SEND_THE_TERMINATE_SEQ);
                             }
                         }
                         //Store the message in the response queue. If there is an application response then that
@@ -89,35 +81,18 @@ public class RMInvoker implements Runnable {
                                 .getSequenceID()));
                         storageManager.insertOutgoingMessage(rmMessageContext);
                         if (firstMsgOfResponseSeq) {
-                            RMMessageContext rmMsgContext = new RMMessageContext();
-                            rmMessageContext.copyContents(rmMsgContext);
-                            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
-                            RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(), msgContext);
-                            //Set this new msgContext to the rmMsgContext.
 
-                            rmMsgContext.setMsgContext(msgContext);
-                            rmMsgContext.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
+                            RMMessageContext csRMMsgCtx = RMMessageCreator.createCreateSeqMsg(rmMessageContext, Constants.SERVER);
+                            csRMMsgCtx.setOutGoingAddress(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
 
-                            UUIDGen uuid = UUIDGenFactory.getUUIDGen();
-                            String id = uuid.nextUUID();
-
-
+                            String id = uuidGen.nextUUID();
                             String msgIdStr = Constants.UUID + id;
-                            rmMsgContext.addToMsgIdList(msgIdStr);
+                            csRMMsgCtx.addToMsgIdList(msgIdStr);
+                            csRMMsgCtx.setMessageID(msgIdStr);
 
-
-                            storageManager.setTemporaryOutSequence(rmMsgContext.getSequenceID(), msgIdStr);
-                            SOAPEnvelope createSequenceEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(id,
-                                    rmMsgContext, Constants.SERVER);
-
-                            
-                            rmMsgContext.getMsgContext().setRequestMessage(new Message(createSequenceEnvelope));
-
-                            //TODO Check : Are We are sending only to the ReplyTo?
-                            rmMsgContext.setOutGoingAddress(rmMsgContext.getAddressingHeaders().getReplyTo()
-                                    .getAddress().toString());
-                            rmMsgContext.setMessageID(Constants.UUID + id);
-                            storageManager.addCreateSequenceRequest(rmMsgContext);
+                            csRMMsgCtx.getAddressingHeaders().setMessageID(new MessageID(new URI(msgIdStr)));
+                            storageManager.setTemporaryOutSequence(csRMMsgCtx.getSequenceID(), msgIdStr);
+                            storageManager.addCreateSequenceRequest(csRMMsgCtx);
                         }
                     }
                 }

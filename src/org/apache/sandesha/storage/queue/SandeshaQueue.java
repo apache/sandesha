@@ -49,6 +49,8 @@ public class SandeshaQueue {
     private List requestedSequences;
     private static final Log log = LogFactory.getLog(SandeshaQueue.class.getName());
 
+    public static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+
     private SandeshaQueue() {
         incomingMap = new HashMap();
         outgoingMap = new HashMap();
@@ -281,7 +283,6 @@ public class SandeshaQueue {
                                     String oldOutSeqId, newOutSeqId;
 
                                     String oldCreateSeqId = tempMsg.getMessageID().toString();
-                                    UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
                                     String uuid = uuidGen.nextUUID();
 
 

@@ -61,8 +61,8 @@ public interface Constants {
 
 
     //To identify the end point
-    public static final int SERVER = 1;
-    public static final int CLIENT = 0;
+    public static final byte SERVER = 1;
+    public static final byte CLIENT = 0;
 
     public interface WSA{
         public static final String NS_ADDRESSING_ANONYMOUS = AddressingUtils.getAnonymousRoleURI();
@@ -82,7 +82,7 @@ public interface Constants {
         public static final String UPPER = "Upper";
         public static final String LOWER = "Lower";
         public static final String ACK_REQUESTED = "AckRequested";
-        public static final String MSG_NUMBER = "MessageaNumber";
+        public static final String MSG_NUMBER = "MessageNumber";
         public static final String CREATE_SEQUENCE = "CreateSequence";
         public static final String CREATE_SEQUENCE_RESPONSE = "CreateSequenceResponse";
         public static final String FAULT_CODE = "FaultCode";
@@ -101,8 +101,8 @@ public interface Constants {
     }
 
     public interface WSU {
-        public static final String WSU_PREFIX = "wsu";
-        public static final String WSU_NS = "http://schemas.xmlsoap.org/ws/2002/07/utility";
+        public static final String WSU_PREFIX = "wsrm";
+        public static final String WSU_NS = "http://schemas.xmlsoap.org/ws/2005/02/rm";
         public static final String IDENTIFIER = "Identifier";
     }
 
@@ -139,6 +139,8 @@ public interface Constants {
         public static final String SET_APPROVED_OUT_SEQ = "ERROR: setApprovedOutSequence()";
 
         public static final String CANNOT_SEND_THE_CREATE_SEQ = "SERVER ERROR: Cannot send the CreateSequenceRequest from Server";
+        public static final String CANNOT_SEND_THE_TERMINATE_SEQ = "SERVER ERROR: Cannot send the TerminateSequence from Server";
+
         public static final String NULL_REQUEST_MSG = "ERROR: NULL REQUEST MESSAGE";
 
         public static final String SEQ_IS_NOT_CREATED = "ERROR: Sequence was not created correcly in the in queue";
@@ -189,6 +191,7 @@ public interface Constants {
         public static final String ACTION = "action";
         public static final String ACKS_TO="acksTo";
         public static final String TO="To";
+        public static final String FAULT_TO="faultTo";
 
         public static final String REQUEST_HANDLER = "requestHandler";
         public static final String RESPONSE_HANDLER = "responseHandler";

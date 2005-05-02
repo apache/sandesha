@@ -40,26 +40,26 @@ public class RMSender extends BasicHandler {
         storageManager = new ClientStorageManager();
 
         try {
-            RMMessageContext requestMesssageContext = RMMessageCreator.createServiceRequestMsg(msgContext);
-            String sequenceID = requestMesssageContext.getSequenceID();
+            RMMessageContext reqMsgCtx = RMMessageCreator.createServiceRequestMsg(msgContext);
+            String tempSeqID = reqMsgCtx.getSequenceID();
 
-            long msgNo = requestMesssageContext.getMsgNumber();
+            long msgNo = reqMsgCtx.getMsgNumber();
 
             if (msgNo == 1) {
-                requestMesssageContext = processFirstRequestMessage(requestMesssageContext, requestMesssageContext.getSync());
+                reqMsgCtx = processFirstRequestMessage(reqMsgCtx, reqMsgCtx.getSync());
             } else {
-                requestMesssageContext = processRequestMessage(requestMesssageContext);
+                reqMsgCtx = processRequestMessage(reqMsgCtx);
             }
 
-            if (requestMesssageContext.isLastMessage()) {
-                storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(requestMesssageContext));
+            if (reqMsgCtx.isLastMessage()) {
+                storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(reqMsgCtx));
             }
 
 
-            if (requestMesssageContext.isHasResponse()) {
+            if (reqMsgCtx.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
-                    responseMessageContext = checkTheQueueForResponse(sequenceID, requestMesssageContext.getMessageID());
+                    responseMessageContext = checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
 
@@ -73,7 +73,6 @@ public class RMSender extends BasicHandler {
                 msgContext.setResponseMessage(null);
             }
 
-
         } catch (Exception ex) {
             log.error(ex);
         }
@@ -81,7 +80,7 @@ public class RMSender extends BasicHandler {
 
 
     private RMMessageContext processFirstRequestMessage(RMMessageContext reqRMMsgContext, boolean sync) throws Exception {
-        RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(reqRMMsgContext);
+        RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(reqRMMsgContext,Constants.CLIENT);
         storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
         storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), createSeqRMMsgContext.getMessageID());
 
@@ -106,7 +105,6 @@ public class RMSender extends BasicHandler {
     private RMMessageContext checkTheQueueForResponse(String sequenceId, String reqMessageID) {
         return storageManager.checkForResponseMessage(sequenceId, reqMessageID);
     }
-
 
 }
 
