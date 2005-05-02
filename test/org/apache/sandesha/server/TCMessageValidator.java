@@ -26,10 +26,9 @@ import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.AbstractTestCase;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
-import org.apache.sandesha.ws.utility.Identifier;
+import org.apache.sandesha.ws.rm.Identifier;
 
 
 public class TCMessageValidator extends AbstractTestCase {
