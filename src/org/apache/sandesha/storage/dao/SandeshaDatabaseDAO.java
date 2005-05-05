@@ -31,6 +31,20 @@ import java.util.Set;
 public class SandeshaDatabaseDAO implements ISandeshaDAO {
 
     /* (non-Javadoc)
+     * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getAcksTo(java.lang.String)
+     */
+    public String getAcksTo(String seqId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    /* (non-Javadoc)
+     * @see org.apache.sandesha.storage.dao.ISandeshaDAO#setAcksTo(java.lang.String, java.lang.String)
+     */
+    public void setAcksTo(String seqId, String acksTo) {
+        // TODO Auto-generated method stub
+
+    }
+    /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getFirstCreateSequenceMsgId(java.lang.String)
      */
     public String getFirstCreateSequenceMsgId(String createSeqId) {

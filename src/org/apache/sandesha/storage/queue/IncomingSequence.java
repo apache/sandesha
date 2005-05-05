@@ -45,8 +45,16 @@ public class IncomingSequence {
     private HashMap hash;
     private boolean beingProcessedLock = false; //When true messages are
     private long lastMsgNo = -1;
+    private String acksTo = null;
 
-
+    public void setAcksTo(String ack){
+        acksTo = ack;
+    }
+    
+    public String getAcksTo(){
+        return acksTo;
+    }
+    
     private boolean terminateReceived = false;
 
     public boolean isTerminateReceived() {

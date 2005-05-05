@@ -16,7 +16,10 @@
  */
 package org.apache.sandesha;
 
+import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.sandesha.storage.queue.IncomingSequence;
 
 /**
  * @author
@@ -154,5 +157,9 @@ public interface IStorageManager {
     public void setTerminateReceived(String seqId);
 
     public String getKeyFromOutgoingSeqId(String seqId);
+    
+    public void setAcksTo(String seqId,String acksTo);
+    
+    public String getAcksTo(String seqId);
 
 }

@@ -490,8 +490,9 @@ public class SandeshaQueue {
         while (it.hasNext()) {
             String s = (String) it.next();
             System.out.println("\n Sequence id - " + s);
+            
             IncomingSequence sh = (IncomingSequence) incomingMap.get(s);
-
+            
             Iterator it1 = sh.getAllKeys().iterator();
             while (it1.hasNext()) {
                 Long l = (Long) it1.next();
@@ -922,6 +923,45 @@ public class SandeshaQueue {
 
         return null;
 
+    }
+    
+    public void setAcksTo(String seqId,String acksTo){
+        
+        if(seqId==null){
+            System.out.println("ERROR: seq is null");
+            return;
+        }
+        
+        Iterator it = incomingMap.keySet().iterator();
+        
+        while(it.hasNext()){
+            String key = (String) it.next();
+            if(key.equals(seqId)){
+                IncomingSequence ics = (IncomingSequence) incomingMap.get(key);
+                if(ics!=null){
+                    ics.setAcksTo(acksTo);
+                    break;
+                }
+            }
+        }
+    }
+    
+    public String getAcksTo(String seqId){
+        
+        displayIncomingMap();
+        if(seqId==null){
+            System.out.println("ERROR: seq is null");
+            return null;
+        }
+        
+        IncomingSequence ics = (IncomingSequence) incomingMap.get(seqId);
+        
+        if(ics!=null){
+            return ics.getAcksTo();
+        }else {
+            System.out.println("ERROR: ics null");
+            return null;
+        }
     }
 
 

@@ -19,6 +19,7 @@ package org.apache.sandesha.storage.dao;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.queue.IncomingSequence;
 import org.apache.sandesha.storage.queue.QueueException;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
 
@@ -473,5 +474,18 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public String getFirstCreateSequenceMsgId(String createSeqId) {
         SandeshaQueue sq = SandeshaQueue.getInstance();
         return sq.getFirstCreateSequenceMsgId(createSeqId);
+    }
+    
+    public void setAcksTo(String seqId,String acksTo){
+        
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        sq.setAcksTo(seqId,acksTo);
+    }
+    
+    public String getAcksTo(String seqId){
+
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        return  sq.getAcksTo(seqId);
+        
     }
 }

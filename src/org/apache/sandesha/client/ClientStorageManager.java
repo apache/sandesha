@@ -24,9 +24,11 @@ import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.dao.ISandeshaDAO;
 import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
+import org.apache.sandesha.storage.queue.IncomingSequence;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -389,6 +391,14 @@ public class ClientStorageManager implements IStorageManager {
 
     public String getKeyFromOutgoingSeqId(String seqId) {
         return accessor.getKeyFromOutgoingSequenceId(seqId);
+    }
+    
+    public void setAcksTo(String seqId,String acksTo){      
+        accessor.setAcksTo(seqId,acksTo);
+    }
+    
+    public String getAcksTo(String seqId){
+        return accessor.getAcksTo(seqId);
     }
 
 }

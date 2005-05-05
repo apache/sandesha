@@ -17,6 +17,7 @@
 package org.apache.sandesha.storage.dao;
 
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.queue.IncomingSequence;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -122,4 +123,7 @@ public interface ISandeshaDAO {
     
     public String getFirstCreateSequenceMsgId(String createSeqId);
 
+    public void setAcksTo(String seqId,String acksTo);
+    
+    public String getAcksTo(String seqId);
 }
