@@ -53,8 +53,7 @@ public class ClientPropertyValidator {
             else
                 sourceURL = from;
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            throw new AxisFault(e.getMessage());
+              throw new AxisFault(e.getMessage());
         }
 
         String errorMsg = getValidated(msgNumber, action, replyTo, sync, inOut);
@@ -93,7 +92,7 @@ public class ClientPropertyValidator {
         if (to != null)
             return to;
         else
-            return null;
+            return call.getTargetEndpointAddress();
     }
 
 

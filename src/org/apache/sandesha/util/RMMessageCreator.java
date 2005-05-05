@@ -20,14 +20,13 @@ package org.apache.sandesha.util;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.client.Call;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.*;
 import org.apache.axis.types.URI;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.client.ClientPropertyValidator;
 import org.apache.sandesha.ws.rm.AcksTo;
 import org.apache.sandesha.ws.rm.CreateSequence;
 import org.apache.sandesha.ws.rm.RMHeaders;
@@ -71,7 +70,7 @@ public class RMMessageCreator {
     public static RMMessageContext createCreateSeqMsg(RMMessageContext rmMsgCtx, byte endPoint) throws Exception {
         RMMessageContext createSeqRMMsgContext = new RMMessageContext();
         rmMsgCtx.copyContents(createSeqRMMsgContext);
-        AddressingHeaders addrHeaders = getAddressingHeaders(rmMsgCtx);
+        //AddressingHeaders addrHeaders = getAddressingHeaders(rmMsgCtx);
 
         RMHeaders rmHeaders = new RMHeaders();
 
@@ -81,17 +80,19 @@ public class RMMessageCreator {
         rmHeaders.setCreateSequence(createSeq);
         createSeqRMMsgContext.setRMHeaders(rmHeaders);
 
-        AddressingHeaders csAddrHeaders = new AddressingHeaders();
-        if (endPoint == Constants.CLIENT) {
-            csAddrHeaders.setTo(addrHeaders.getTo());
-            csAddrHeaders.setFaultTo(addrHeaders.getFaultTo());
-            csAddrHeaders.setReplyTo(addrHeaders.getReplyTo());
-            csAddrHeaders.setFrom(addrHeaders.getFrom());
-        } else {
-            csAddrHeaders.setTo(new To(addrHeaders.getReplyTo().getAddress().toString()));
-            csAddrHeaders.setFaultTo(new FaultTo(new Address(rmMsgCtx.getAddressingHeaders().getTo().toString())));
-            csAddrHeaders.setFrom(new From(new Address(rmMsgCtx.getAddressingHeaders().getTo().toString())));
-        }
+        //AddressingHeaders csAddrHeaders = new AddressingHeaders();
+
+        AddressingHeaders csAddrHeaders = getAddressingHeaedersForCreateSequenceRequest(rmMsgCtx, endPoint);
+        /*  if (endPoint == Constants.CLIENT) {
+              csAddrHeaders.setTo(addrHeaders.getTo());
+              csAddrHeaders.setFaultTo(addrHeaders.getFaultTo());
+              csAddrHeaders.setReplyTo(addrHeaders.getReplyTo());
+              csAddrHeaders.setFrom(addrHeaders.getFrom());
+          } else {
+              csAddrHeaders.setTo(new To(addrHeaders.getReplyTo().getAddress().toString()));
+              csAddrHeaders.setFaultTo(new FaultTo(new Address(rmMsgCtx.getAddressingHeaders().getTo().toString())));
+              csAddrHeaders.setFrom(new From(new Address(rmMsgCtx.getAddressingHeaders().getTo().toString())));
+          }*/
         csAddrHeaders.setAction(new Action(new URI(Constants.WSRM.ACTION_CREATE_SEQUENCE)));
 
         createSeqRMMsgContext.setAddressingHeaders(csAddrHeaders);
@@ -112,6 +113,42 @@ public class RMMessageCreator {
         createSeqRMMsgContext.setMsgContext(createSeqMsgContext);
 
         return createSeqRMMsgContext;
+    }
+
+    private static AddressingHeaders getAddressingHeaedersForCreateSequenceRequest(RMMessageContext rmMsgCtx, byte endPoint) throws Exception {
+        //AddressingHeaders addrHeaders = rmMsgCtx.getAddressingHeaders();
+        AddressingHeaders csAddrHeaders = new AddressingHeaders();
+        if (endPoint == Constants.SERVER) {
+            AddressingHeaders ah = rmMsgCtx.getAddressingHeaders();
+            csAddrHeaders.setFrom(new EndpointReference(ah.getTo().toString()));
+            csAddrHeaders.setReplyTo(new EndpointReference(ah.getTo().toString()));
+            csAddrHeaders.setFaultTo(new EndpointReference(ah.getTo().toString()));
+            csAddrHeaders.setTo(ah.getReplyTo().getAddress());
+        } else {
+            csAddrHeaders.setTo(new To(rmMsgCtx.getTo()));
+            if (rmMsgCtx.getSync()) {
+                csAddrHeaders.setFrom(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+                csAddrHeaders.setFaultTo(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+                csAddrHeaders.setReplyTo(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+            } else {
+                String sourceURL = rmMsgCtx.getSourceURL();
+
+                if (rmMsgCtx.getFrom() != null)
+                    csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
+                else
+                    csAddrHeaders.setFrom(new EndpointReference(sourceURL));
+                if (rmMsgCtx.getReplyTo() != null)
+                    csAddrHeaders.setReplyTo(new EndpointReference(rmMsgCtx.getReplyTo()));
+                else
+                    csAddrHeaders.setReplyTo(new EndpointReference(sourceURL));
+                if (rmMsgCtx.getFaultTo() != null)
+                    csAddrHeaders.setFaultTo(new EndpointReference(rmMsgCtx.getFaultTo()));
+                else
+                    csAddrHeaders.setFaultTo(new EndpointReference(sourceURL));
+
+            }
+        }
+        return csAddrHeaders;
     }
 
 
@@ -142,47 +179,116 @@ public class RMMessageCreator {
         return new RMMessageContext();
     }
 
-    public static RMMessageContext createTerminateSeqMsg(RMMessageContext rmMsgCtx) throws Exception {
+    public static RMMessageContext createTerminateSeqMsg(RMMessageContext rmMsgCtx, byte endPoint) throws Exception {
+
         RMMessageContext terSeqRMMsgContext = new RMMessageContext();
         MessageContext terSeqMsgContext = new MessageContext(rmMsgCtx.getMsgContext().getAxisEngine());
         terSeqRMMsgContext.setSequenceID(rmMsgCtx.getSequenceID());
-        terSeqRMMsgContext.setAddressingHeaders(rmMsgCtx.getAddressingHeaders());
+
+        //Fix me, Need to clone the addressing headers.
+        AddressingHeaders addHeaders = getAddressingHeadersForTerminateSequence(rmMsgCtx, endPoint);
+        SOAPEnvelope soe = new SOAPEnvelope();
+        addHeaders.toEnvelope(soe);
+        AddressingHeaders terSqAddrHeaders = new AddressingHeaders(soe);
+        terSqAddrHeaders.setAction(new Action(new URI(Constants.WSRM.ACTION_TERMINATE_SEQUENCE)));
+
+        terSeqRMMsgContext.setAddressingHeaders(terSqAddrHeaders);
         terSeqRMMsgContext.setOutGoingAddress(rmMsgCtx.getOutGoingAddress());
         terSeqRMMsgContext.setMsgContext(terSeqMsgContext);
         terSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_TERMINATE_SEQUENCE);
         return terSeqRMMsgContext;
     }
 
+    private static AddressingHeaders getAddressingHeadersForTerminateSequence(RMMessageContext rmMsgCtx, byte endPoint) throws Exception {
+        AddressingHeaders csAddrHeaders = new AddressingHeaders();
+
+        if (endPoint == Constants.SERVER) {
+            AddressingHeaders ah = rmMsgCtx.getAddressingHeaders();
+            csAddrHeaders.setTo(ah.getReplyTo().getAddress());
+            csAddrHeaders.setFrom(new EndpointReference(ah.getTo().toString()));
+        } else {
+            csAddrHeaders.setTo(new To(rmMsgCtx.getTo()));
+            String sourceURL = rmMsgCtx.getSourceURL();
+            if (rmMsgCtx.getFrom() != null)
+                csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
+            else
+                csAddrHeaders.setFrom(new EndpointReference(sourceURL));
+            if (rmMsgCtx.getFaultTo() != null)
+                csAddrHeaders.setFaultTo(new EndpointReference(rmMsgCtx.getFaultTo()));
+            else
+                csAddrHeaders.setFaultTo(new EndpointReference(sourceURL));
+        }
+        return csAddrHeaders;
+    }
+
     public static RMMessageContext createAcknowledgementMsg(RMMessageContext rmMessageContext) throws Exception {
         return new RMMessageContext();
     }
 
-    public static RMMessageContext createServiceResponseMsg(RMMessageContext rmMsgCtx) throws Exception {
+    public static RMMessageContext createServiceResponseMessage(RMMessageContext rmMsgCtx) throws Exception {
         return new RMMessageContext();
     }
 
-    public static RMMessageContext createServiceRequestMsg(MessageContext msgCtx) throws Exception {
-        //Get a copy of the MessageContext. This is required when sending multiple messages from
-        //one call object
-        MessageContext newMsgContext = cloneMsgContext(msgCtx);
-        RMMessageContext requestMesssageContext = new RMMessageContext();
-        //Get the message information from the client.
-        Call call = (Call) newMsgContext.getProperty(MessageContext.CALL);
-        //If the property specified by the client is not valid an AxisFault will be sent at this point.
-        requestMesssageContext = ClientPropertyValidator.validate(call);
-        requestMesssageContext.setOutGoingAddress((String) msgCtx.getProperty(MessageContext.TRANS_URL));
-        requestMesssageContext.setMsgContext(newMsgContext);
-        AddressingHeaders addrHeaders = getAddressingHeaders(requestMesssageContext);
-        if (requestMesssageContext.getAction() != null)
-            addrHeaders.setAction(new Action(new URI(requestMesssageContext.getAction())));
-        requestMesssageContext.setAddressingHeaders(addrHeaders);
-        requestMesssageContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
-        requestMesssageContext.setMessageID(Constants.UUID + uuidGen.nextUUID());
-        return requestMesssageContext;
+    public static RMMessageContext createServiceRequestMessage(RMMessageContext rmMsgCtx) throws Exception {
+        /* //Get a copy of the MessageContext. This is required when sending multiple messages from
+         //one call object
+         MessageContext newMsgContext = cloneMsgContext(msgCtx);
+         RMMessageContext requestMesssageContext = new RMMessageContext();
+         //Get the message information from the client.
+         Call call = (Call) newMsgContext.getProperty(MessageContext.CALL);
+         //If the property specified by the client is not valid an AxisFault will be sent at this point.
+         requestMesssageContext = ClientPropertyValidator.validate(call);
+         requestMesssageContext.setOutGoingAddress((String) msgCtx.getProperty(MessageContext.TRANS_URL));
+         requestMesssageContext.setMsgContext(newMsgContext);
+         AddressingHeaders addrHeaders = getAddressingHeaders(requestMesssageContext);*/
+
+        AddressingHeaders addrHeaders = getAddressingHeaedersForServiceRequest(rmMsgCtx);
+        if (rmMsgCtx.getAction() != null)
+            addrHeaders.setAction(new Action(new URI(rmMsgCtx.getAction())));
+        rmMsgCtx.setAddressingHeaders(addrHeaders);
+        rmMsgCtx.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
+        rmMsgCtx.setMessageID(Constants.UUID + uuidGen.nextUUID());
+        return rmMsgCtx;
 
     }
 
-    private static MessageContext cloneMsgContext(MessageContext msgContext) throws AxisFault {
+    private static AddressingHeaders getAddressingHeaedersForServiceRequest(RMMessageContext rmMsgCtx) throws Exception {
+
+
+        AddressingHeaders csAddrHeaders = new AddressingHeaders();
+        csAddrHeaders.setTo(new To(rmMsgCtx.getTo()));
+        if (rmMsgCtx.getSync()) {
+            csAddrHeaders.setFrom(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+            csAddrHeaders.setFaultTo(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+            if (rmMsgCtx.isHasResponse())
+                csAddrHeaders.setReplyTo(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+        } else {
+            String sourceURL = rmMsgCtx.getSourceURL();
+
+            if (rmMsgCtx.getFrom() != null)
+                csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
+            else
+                csAddrHeaders.setFrom(new EndpointReference(sourceURL));
+
+            if (rmMsgCtx.isHasResponse()) {
+                if (rmMsgCtx.getReplyTo() != null)
+
+                    csAddrHeaders.setReplyTo(new EndpointReference(rmMsgCtx.getReplyTo()));
+                else
+                    csAddrHeaders.setReplyTo(new EndpointReference(sourceURL));
+            }
+            if (rmMsgCtx.getFaultTo() != null)
+                csAddrHeaders.setFaultTo(new EndpointReference(rmMsgCtx.getFaultTo()));
+            else
+                csAddrHeaders.setFaultTo(new EndpointReference(sourceURL));
+
+        }
+        return csAddrHeaders;
+
+
+    }
+
+    public static MessageContext cloneMsgContext(MessageContext msgContext) throws AxisFault {
         MessageContext clone = new MessageContext(msgContext.getAxisEngine());
         String str = msgContext.getRequestMessage().getSOAPPartAsString();
         Message msg = new Message(str);
@@ -209,6 +315,22 @@ public class RMMessageCreator {
             String fromURL = rmMsgContext.getFrom();
             String faultToURL = rmMsgContext.getFaultTo();
 
+            if (replyToURL != null)
+                addrHeaders.setReplyTo(new ReplyTo(new EndpointReference(replyToURL)));
+            if (fromURL != null)
+                addrHeaders.setFrom(new From(new EndpointReference(fromURL)));
+            if (faultToURL != null)
+                addrHeaders.setFaultTo(new FaultTo(new EndpointReference(faultToURL)));
+            if (rmMsgContext.getTo() != null) {
+                To to = new To(new Address(rmMsgContext.getTo()));
+                addrHeaders.setTo(to);
+            } else {
+                To to = new To(new Address(rmMsgContext.getOutGoingAddress()));
+                addrHeaders.setTo(to);
+            }
+
+
+/*
             //Need to use the anonymous_URI if the client is synchronous.
             if (!sync) {
                 if (fromURL != null) {
@@ -254,7 +376,8 @@ public class RMMessageCreator {
             } else {
                 To to = new To(new Address(rmMsgContext.getOutGoingAddress()));
                 addrHeaders.setTo(to);
-            }
+            }*/
+
 
             return addrHeaders;
         }

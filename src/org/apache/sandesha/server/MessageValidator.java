@@ -45,7 +45,8 @@ public final class MessageValidator {
 
         MessageContext msgContext = rmMsgContext.getMsgContext();
         try {
-            AddressingHeaders addrHeaders = (AddressingHeaders) msgContext.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+            AddressingHeaders addrHeaders=new AddressingHeaders(msgContext.getRequestMessage().getSOAPEnvelope());
+            //ddressingHeaders addrHeaders = (AddressingHeaders) msgContext.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
             validateAddrHeaders(addrHeaders);
             rmMsgContext.setAddressingHeaders(addrHeaders);
 
