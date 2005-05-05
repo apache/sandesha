@@ -74,7 +74,6 @@ public class RMProvider extends RPCProvider {
                 MessageValidator.validate(rmMessageContext, client);
             } catch (AxisFault af) {
                 FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
-
                 if (!faultProcessor.processMessage(rmMessageContext)) {
                     msgContext.setPastPivot(true);
                     msgContext.setResponseMessage(null);
@@ -106,14 +105,10 @@ public class RMProvider extends RPCProvider {
                     msgContext.setResponseMessage(null);
                 } else {
                     msgContext.setPastPivot(true);
-                    // TODO Get the from envCreator
-                    // SOAPEnvelope resEn=EnvelopeCreator.createAcknowledgementEnvelope()
                 }
             } catch (AxisFault af) {
                 RMProvider.log.error(af);
-
                 FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
-
                 if (!faultProcessor.processMessage(rmMessageContext)) {
                     msgContext.setPastPivot(true);
                     msgContext.setResponseMessage(null);

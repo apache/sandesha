@@ -59,12 +59,14 @@ public class RMInvoker implements Runnable {
                     provider.invoke(rmMessageContext.getMsgContext());
 
                     if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() != Void.TYPE) {
+                      String oldAction=rmMessageContext.getAddressingHeaders().getAction().toString();
+                      rmMessageContext.getAddressingHeaders().setAction(oldAction+Constants.RESPONSE);  
                         if (rmMessageContext.isLastMessage()) {
                             //Insert Terminate Sequnce.
                             AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
                             if (addrHeaders.getReplyTo() != null) {
                                 String replyTo = addrHeaders.getReplyTo().getAddress().toString();
-                                RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(rmMessageContext,Constants.SERVER);
+                                RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(rmMessageContext, Constants.SERVER);
                                 terminateMsg.setOutGoingAddress(replyTo);
                                 storageManager.insertTerminateSeqMessage(terminateMsg);
                             } else {

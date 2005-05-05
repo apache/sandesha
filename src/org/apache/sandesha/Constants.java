@@ -39,6 +39,7 @@ public interface Constants {
 
     public static final String URL_RM_SERVICE = "/axis/services/RMService";
     public static final String IGNORE_ACTION = "ignoreAction";
+    public static final String RESPONSE="Response";
 
     public static final long RETRANSMISSION_INTERVAL = 4000;
     public static final long ACKNOWLEDGEMENT_INTERVAL = 200;
@@ -94,6 +95,7 @@ public interface Constants {
         public static final String SEQUENCE_FAULT = "SequenceFault";
         public static final String ACKS_TO = "AcksTo";
         public static final String SEQUENCE_OFFER = "Offer";
+        public static final String ACCEPT="Accept";
 
 
         public static final double MAX_MSG_NO = 18446744073709551615d;
@@ -111,6 +113,8 @@ public interface Constants {
 
         public static final String NO_ADDRESSING_HEADERS = "No Addressing Headers Available in this Message";
         public static final String NO_MESSAGE_ID = "MessageID should be present in the message";
+        public static final String NO_TO="Required header <wsa:To> NOT found.";
+        public static final String NO_ACTION="Required header <wsa:Action> NOT found.";
 
         public static final String NO_RM_HEADES = "No RM Headers Available in this Message";
 

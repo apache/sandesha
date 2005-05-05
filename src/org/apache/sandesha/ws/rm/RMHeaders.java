@@ -285,11 +285,9 @@ public class RMHeaders {
                 if (headerElement.getName().equals(Constants.WSRM.SEQUENCE)) {
                     headerElement.detachNode();
                 }
-
                 if (headerElement.getName().equals(Constants.WSRM.SEQUENCE_ACK)) {
                     headerElement.detachNode();
                 }
-
                 if (headerElement.getName().equals(Constants.WSRM.ACK_REQUESTED)) {
                     headerElement.detachNode();
                 }

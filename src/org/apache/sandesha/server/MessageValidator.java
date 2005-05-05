@@ -46,7 +46,6 @@ public final class MessageValidator {
         MessageContext msgContext = rmMsgContext.getMsgContext();
         try {
             AddressingHeaders addrHeaders=new AddressingHeaders(msgContext.getRequestMessage().getSOAPEnvelope());
-            //ddressingHeaders addrHeaders = (AddressingHeaders) msgContext.getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
             validateAddrHeaders(addrHeaders);
             rmMsgContext.setAddressingHeaders(addrHeaders);
 
@@ -58,9 +57,11 @@ public final class MessageValidator {
             validateForFaults(rmMsgContext);
         } catch (SOAPException e) {
             log.error(e);
-            //TODO Do we need to throw a Sequence Fault at this level.
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), e.getMessage(), null, null);
         } catch (Exception e) {
             log.error(e);
+             throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), e.getMessage(), null, null);
+
         }
     }
 
@@ -107,7 +108,9 @@ public final class MessageValidator {
         if (addrHeaders == null) {
             throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
         }
-        //if (addrHeaders.getMessageID() == null)
-        //    throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_MESSAGE_ID, null, null);
+        if (addrHeaders.getTo() == null)
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_TO, null, null);
+         if (addrHeaders.getAction() == null)
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_TO, null, null);
     }
 }

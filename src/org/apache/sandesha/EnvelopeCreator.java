@@ -39,25 +39,20 @@ public class EnvelopeCreator {
     private static final Log log = LogFactory.getLog(EnvelopeCreator.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
-    public static SOAPEnvelope createCreateSequenceResponseEnvelope(String uuid, RMMessageContext rmMessageContext) throws Exception {
+    public static SOAPEnvelope createCreateSequenceResponseEnvelope(String uuid, RMMessageContext rmMessageContext,boolean hasOffer, boolean offerAccepted) throws Exception {
 
-        //Set the SOAPEnvelope to the resEnv of the rmMessageContext.
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
         SOAPEnvelope envelope = createBasicEnvelop();
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(envelope);
         Action action = new Action(new URI(Constants.WSRM.ACTION_CREATE_SEQUENCE_RESPONSE));
-        //TODO actor??
-        SOAPHeaderElement actionElement = action.toSOAPHeaderElement(envelope, null);
-        //actionElement.setMustUnderstand(true);
+
         outGoingAddressingHaders.setAction(action);
 
-        //Set the messageID
         MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
         outGoingAddressingHaders.setMessageID(messageId);
 
-        //Set the <wsa:From> address from the incoming <wsa:To>
         To incommingTo = addressingHeaders.getTo();
         URI fromAddressURI = new URI(incommingTo.toString());
 
@@ -93,6 +88,15 @@ public class EnvelopeCreator {
         Identifier id = new Identifier();
         id.setIdentifier(Constants.UUID + uuid);
         response.setIdentifier(id);
+
+        if(hasOffer&&offerAccepted){
+            Accept accept= new Accept();
+            AcksTo acksTo= new AcksTo();
+            acksTo.setAddress(new Address(addressingHeaders.getTo().toString()));
+            accept.setAcksTo(acksTo);
+            response.setAccept(accept);
+        }
+
         response.toSoapEnvelop(envelope);
         return envelope;
     }
@@ -103,19 +107,21 @@ public class EnvelopeCreator {
         AddressingHeaders addressingHeaders = rmMsgCtx.getAddressingHeaders();
         SOAPEnvelope envelope = createBasicEnvelop();
         addressingHeaders.toEnvelope(envelope);
-        rmMsgCtx.getRMHeaders().getCreateSequence().toSoapEnvelop(envelope);
+        CreateSequence crSeq= rmMsgCtx.getRMHeaders().getCreateSequence();
 
         //uncommenting following will send the sequence with a offer (for response seq) to the create seq msg.
         //offer
-//        SequenceOffer offer = new SequenceOffer ();
-//        Identifier id = new Identifier ();
-//        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-//        String offerUuid = Constants.UUID + uuidGen.nextUUID();
-//        id.setIdentifier(offerUuid);
-//
-//        offer.setIdentifier(id);
-//        createSeq.setOffer(offer);
+       /* SequenceOffer offer = new SequenceOffer ();
+        Identifier id = new Identifier ();
+        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+        String offerUuid = Constants.UUID + uuidGen.nextUUID();
+        id.setIdentifier(offerUuid);
+
+        offer.setIdentifier(id);
+        crSeq.setOffer(offer);*/
         //end offer
+
+        crSeq.toSoapEnvelop(envelope);
         return envelope;
     }
 
@@ -203,7 +209,7 @@ public class EnvelopeCreator {
         //outGoingAddressingHaders.setRelatesTo(relatesToList);
         ///RelatesTo relatesTo = new RelatesTo();
         if (rmMessageContext.getOldSequenceID() != null)
-            outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(), new QName("aa", "bb"));
+            outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(), null);
 
         //Set the messageID
         MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
@@ -233,8 +239,8 @@ public class EnvelopeCreator {
         //Set the action
         //TODO
         //Action shuld also be taken from the server-config.wsdd
-        if (rmMessageContext.getAction() != null) {
-            Action action = new Action(new URI(rmMessageContext.getAction()));
+        if (addressingHeaders.getAction() != null) {
+            Action action = new Action(new URI(addressingHeaders.getAction().toString()));
             outGoingAddressingHaders.setAction(action);
         }
 

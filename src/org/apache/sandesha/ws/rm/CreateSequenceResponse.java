@@ -21,7 +21,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.ws.rm.Identifier;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
@@ -45,6 +44,8 @@ public class CreateSequenceResponse implements IRmElement {
      * Field identifier
      */
     private Identifier identifier;
+
+    private Accept accept;
 
     /**
      * Constructor CreateSequenceResponse
@@ -84,14 +85,14 @@ public class CreateSequenceResponse implements IRmElement {
         if (env.getBody() == null) {
             env.addBody();
         }
-        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
-                Constants.WSRM.NS_URI_RM);
-        SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody()
-                .addBodyElement(name);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+        SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody().addBodyElement(name);
         bodyElement.setName(Constants.WSRM.CREATE_SEQUENCE_RESPONSE);
         if (identifier != null) {
             identifier.toSOAPEnvelope(bodyElement);
         }
+        if (accept != null)
+            accept.toSOAPEnvelope(bodyElement);
         return env;
     }
 
@@ -101,7 +102,7 @@ public class CreateSequenceResponse implements IRmElement {
      * @param bodyElement
      * @return CreateSequenceResponse
      */
-    public CreateSequenceResponse fromSOAPEnveploe(SOAPBodyElement bodyElement) {
+    public CreateSequenceResponse fromSOAPEnveploe(SOAPBodyElement bodyElement) throws Exception {
 
         Iterator iterator = bodyElement.getChildElements();
         MessageElement childElement;
@@ -117,6 +118,16 @@ public class CreateSequenceResponse implements IRmElement {
             if (childElement.getName().equals(Constants.WSU.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
+            }
+
+            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSRM.ACCEPT)) {
+                accept = new Accept();
+                accept.fromSOAPEnvelope(childElement);
+            }
+
+            if (childElement.getName().equals(Constants.WSRM.ACCEPT)) {
+                accept = new Accept();
+                accept.fromSOAPEnvelope(childElement);
             }
         }
 
@@ -144,6 +155,14 @@ public class CreateSequenceResponse implements IRmElement {
      */
     public Identifier getIdentifier() {
         return identifier;
+    }
+
+    public Accept getAccept() {
+        return accept;
+    }
+
+    public void setAccept(Accept accept) {
+        this.accept = accept;
     }
 
     /**

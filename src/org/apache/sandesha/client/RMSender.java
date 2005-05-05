@@ -56,7 +56,6 @@ public class RMSender extends BasicHandler {
                 storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(reqMsgCtx, Constants.CLIENT));
             }
 
-
             if (reqMsgCtx.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
@@ -84,13 +83,9 @@ public class RMSender extends BasicHandler {
         storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
         storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), createSeqRMMsgContext.getMessageID());
 
-        //Set the processing state to the RMMessageContext
         createSeqRMMsgContext.setSync(sync);
-
         storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-
         RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(reqRMMsgContext);
-
         processRequestMessage(serviceRequestMsg);
         return reqRMMsgContext;
     }
@@ -111,22 +106,14 @@ public class RMSender extends BasicHandler {
     }
 
     private RMMessageContext getRMMessageContext(MessageContext msgCtx) throws Exception {
-        //Get a copy of the MessageContext. This is required when sending multiple messages from
-        //one call object
+        //Get a copy of the MessageContext. This is required when sending multiple messages from one call object
         MessageContext newMsgContext = RMMessageCreator.cloneMsgContext(msgCtx);
         RMMessageContext requestMesssageContext = new RMMessageContext();
-        //Get the message information from the client.
         Call call = (Call) newMsgContext.getProperty(MessageContext.CALL);
-        //If the property specified by the client is not valid an AxisFault will be sent at this point.
+
         requestMesssageContext = ClientPropertyValidator.validate(call);
         requestMesssageContext.setOutGoingAddress((String) msgCtx.getProperty(MessageContext.TRANS_URL));
         requestMesssageContext.setMsgContext(newMsgContext);
-        /*     AddressingHeaders addrHeaders = RMMessageCreator.getAddressingHeaders(requestMesssageContext);
-            if (requestMesssageContext.getAction() != null)
-                 addrHeaders.setAction(new Action(new URI(requestMesssageContext.getAction())));
-             requestMesssageContext.setAddressingHeaders(addrHeaders);
-             requestMesssageContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
-             requestMesssageContext.setMessageID(Constants.UUID + uuidGen.nextUUID());*/
         return requestMesssageContext;
     }
 
