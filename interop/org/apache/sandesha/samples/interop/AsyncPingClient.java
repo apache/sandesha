@@ -55,10 +55,10 @@
           //http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous
 
           call.setTargetEndpointAddress(targetURL);
-          call.setOperationName(new QName("RMInteropService", "ping"));
+          call.setOperationName(new QName("http://tempuri.org", "Ping"));
           call.setTransport(new RMTransport(targetURL, ""));
 
-          call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
+          call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
 
           //First Message
           call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(1));
