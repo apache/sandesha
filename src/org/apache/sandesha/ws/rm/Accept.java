@@ -77,6 +77,9 @@ public class Accept extends MessageElement implements IRmElement {
                 acksTo.fromSOAPEnvelope(childElement);
             }
 
+               if (childElement.getName().equals(Constants.WSRM.ACKS_TO)) {
+                acksTo = new AcksTo();
+                acksTo.fromSOAPEnvelope(childElement);}
 
         }
 
@@ -134,6 +137,10 @@ public class Accept extends MessageElement implements IRmElement {
 
     public void setAcksTo(AcksTo acksTo){
         this.acksTo=acksTo;
+    }
+
+    public AcksTo getAcksTo(){
+        return this.acksTo;
     }
 
 

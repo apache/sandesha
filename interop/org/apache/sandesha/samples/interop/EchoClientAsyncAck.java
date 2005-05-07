@@ -58,6 +58,7 @@ public class EchoClientAsyncAck {
             //call.setProperty("from","http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous");
             call.setProperty(Constants.ClientProperties.FROM,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
             call.setProperty(Constants.ClientProperties.REPLY_TO,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+            call.setProperty(Constants.ClientProperties.SEND_OFFER,new Boolean(true));
 
             call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("RMInteropService", "echoString"));

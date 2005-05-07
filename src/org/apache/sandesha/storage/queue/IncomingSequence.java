@@ -46,6 +46,15 @@ public class IncomingSequence {
     private boolean beingProcessedLock = false; //When true messages are
     private long lastMsgNo = -1;
     private String acksTo = null;
+    private String offer;
+
+    public String getOffer() {
+        return offer;
+    }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
 
     public void setAcksTo(String ack){
         acksTo = ack;

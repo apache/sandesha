@@ -47,6 +47,8 @@ public class SandeshaQueue {
     HashMap queueBin; // Messaged processed from out queue will be moved
     ArrayList lowPriorityQueue;
     private List requestedSequences;
+    HashMap acksToMap;
+    HashMap offerMap;
     private static final Log log = LogFactory.getLog(SandeshaQueue.class.getName());
 
     public static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
@@ -58,6 +60,8 @@ public class SandeshaQueue {
         queueBin = new HashMap();
         lowPriorityQueue = new ArrayList();
         requestedSequences = new ArrayList();
+        acksToMap = new HashMap();
+        offerMap = new HashMap();
     }
 
     public static SandeshaQueue getInstance() {
@@ -472,6 +476,7 @@ public class SandeshaQueue {
             System.out.println("\n Sequence id - " + s);
             OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(s);
 
+            System.out.println("out seq id:" + rsh.getOutSequenceId());
             Iterator it1 = rsh.getAllKeys().iterator();
             while (it1.hasNext()) {
                 Long l = (Long) it1.next();
@@ -490,9 +495,9 @@ public class SandeshaQueue {
         while (it.hasNext()) {
             String s = (String) it.next();
             System.out.println("\n Sequence id - " + s);
-            
+
             IncomingSequence sh = (IncomingSequence) incomingMap.get(s);
-            
+
             Iterator it1 = sh.getAllKeys().iterator();
             while (it1.hasNext()) {
                 Long l = (Long) it1.next();
@@ -924,46 +929,68 @@ public class SandeshaQueue {
         return null;
 
     }
-    
-    public void setAcksTo(String seqId,String acksTo){
-        
-        if(seqId==null){
+
+    public void setAcksTo(String seqId, String acksTo) {
+
+        if (seqId == null) {
             System.out.println("ERROR: seq is null");
             return;
         }
-        
-        Iterator it = incomingMap.keySet().iterator();
-        
-        while(it.hasNext()){
-            String key = (String) it.next();
-            if(key.equals(seqId)){
-                IncomingSequence ics = (IncomingSequence) incomingMap.get(key);
-                if(ics!=null){
-                    ics.setAcksTo(acksTo);
-                    break;
-                }
-            }
-        }
+
+        /* Iterator it = incomingMap.keySet().iterator();
+
+         while(it.hasNext()){
+             String key = (String) it.next();
+             if(key.equals(seqId)){
+                 IncomingSequence ics = (IncomingSequence) incomingMap.get(key);
+                 if(ics!=null){
+                     ics.setAcksTo(acksTo);
+                     break;
+                 }
+             }
+         }   */
+
+        acksToMap.put(seqId, acksTo);
     }
-    
-    public String getAcksTo(String seqId){
-        
-        displayIncomingMap();
-        if(seqId==null){
+
+    public String getAcksTo(String seqId) {
+
+        if (seqId == null) {
             System.out.println("ERROR: seq is null");
             return null;
         }
         
-        IncomingSequence ics = (IncomingSequence) incomingMap.get(seqId);
+        /*IncomingSequence ics = (IncomingSequence) incomingMap.get(seqId);
         
         if(ics!=null){
             return ics.getAcksTo();
         }else {
             System.out.println("ERROR: ics null");
             return null;
-        }
+        } */
+
+        String str = (String) acksToMap.get(seqId);
+        String strTemp = str.toString();
+        // return (String) acksToMap.get(seqId);
+        return strTemp;
     }
 
+
+    public void addOffer(String msgID, String offerID) {
+
+        if (msgID == null) {
+            System.out.println("ERROR: seq is null");
+        }
+        offerMap.put(msgID, offerID);
+    }
+
+    public String getOffer(String msgID) {
+        if (msgID == null) {
+            System.out.println("ERROR: seq is null");
+            return null;
+        }
+        return (String) offerMap.get(msgID);
+    }
 
 }
 

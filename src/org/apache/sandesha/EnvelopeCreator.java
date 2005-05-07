@@ -27,6 +27,7 @@ import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.ws.rm.*;
 import org.apache.sandesha.ws.rm.Identifier;
+import org.apache.sandesha.client.ClientStorageManager;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPHeaderElement;
@@ -39,7 +40,7 @@ public class EnvelopeCreator {
     private static final Log log = LogFactory.getLog(EnvelopeCreator.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
-    public static SOAPEnvelope createCreateSequenceResponseEnvelope(String uuid, RMMessageContext rmMessageContext,boolean hasOffer, boolean offerAccepted) throws Exception {
+    public static SOAPEnvelope createCreateSequenceResponseEnvelope(String seqId, RMMessageContext rmMessageContext,boolean hasOffer, boolean offerAccepted) throws Exception {
 
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
@@ -86,7 +87,7 @@ public class EnvelopeCreator {
         //now set the body elements
         CreateSequenceResponse response = new CreateSequenceResponse();
         Identifier id = new Identifier();
-        id.setIdentifier(Constants.UUID + uuid);
+        id.setIdentifier(seqId);
         response.setIdentifier(id);
 
         if(hasOffer&&offerAccepted){
@@ -111,14 +112,18 @@ public class EnvelopeCreator {
 
         //uncommenting following will send the sequence with a offer (for response seq) to the create seq msg.
         //offer
-       /* SequenceOffer offer = new SequenceOffer ();
-        Identifier id = new Identifier ();
-        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-        String offerUuid = Constants.UUID + uuidGen.nextUUID();
-        id.setIdentifier(offerUuid);
+//        SequenceOffer offer = new SequenceOffer ();
+//        Identifier id = new Identifier ();
+//        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+//        String offerUuid = Constants.UUID + uuidGen.nextUUID();
+//        id.setIdentifier(offerUuid);
+//
+//        offer.setIdentifier(id);
+//        crSeq.setOffer(offer);
 
-        offer.setIdentifier(id);
-        crSeq.setOffer(offer);*/
+        //offered sequence will be considered as a requested one and will be added. So that the validation wont fail in response
+        //path
+
         //end offer
 
         crSeq.toSoapEnvelop(envelope);
@@ -141,7 +146,7 @@ public class EnvelopeCreator {
 
     }
 
-    public static SOAPEnvelope createAcknowledgementEnvelope(RMMessageContext rmMessageContext, Vector ackRangeVector) throws Exception {
+    public static SOAPEnvelope createAcknowledgementEnvelope(RMMessageContext rmMessageContext, String toAddress,Vector ackRangeVector) throws Exception {
 
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
         SOAPEnvelope envelope = createBasicEnvelop();
@@ -167,8 +172,8 @@ public class EnvelopeCreator {
         outGoingAddressingHaders.setFrom(from);
 
         //Add to <To>
-        AttributedURI inFrom = addressingHeaders.getFrom().getAddress();
-        To to = new To(new URI(inFrom.toString()));
+
+        To to = new To(new URI(toAddress));
         outGoingAddressingHaders.setTo(to);
 
         //Set the addressing headers to the SOAPEnvelope.
@@ -232,8 +237,10 @@ public class EnvelopeCreator {
         //outGoingAddressingHaders.setReplyTo(from);
 
         //Add to <To>
-        AttributedURI inFrom = addressingHeaders.getFrom().getAddress();
-        To to = new To(new URI(inFrom.toString()));
+        if(addressingHeaders.getReplyTo()==null)
+        throw new Exception("ReplyTo is required to send Responses");
+        AttributedURI inReplyTo = addressingHeaders.getReplyTo().getAddress();
+        To to = new To(new URI(inReplyTo.toString()));
         outGoingAddressingHaders.setTo(to);
 
         //Set the action

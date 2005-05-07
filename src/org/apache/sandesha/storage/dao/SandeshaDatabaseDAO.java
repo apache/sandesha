@@ -37,6 +37,19 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         // TODO Auto-generated method stub
         return null;
     }
+
+    public void addOffer(String msgID, String offerID) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setOffer(String seqID, String Offer) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getOffer(String seqID) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#setAcksTo(java.lang.String, java.lang.String)
      */

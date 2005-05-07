@@ -21,9 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.storage.dao.ISandeshaDAO;
 import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
+import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.HashMap;
@@ -205,8 +205,16 @@ public class ServerStorageManager implements IStorageManager {
 
     public boolean setApprovedOutSequence(String createSeqId, String newOutSequenceId) {
 
-        String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
-                         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
+        // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
+        String oldOutsequenceId1 = createSeqId;
+
+        String tempOutSeq = oldOutsequenceId1;
+        if (tempOutSeq == null)
+            tempOutSeq = createSeqId;
+
+
+        SandeshaQueue.getInstance().displayOutgoingMap();
+        String sequenceID = accessor.getSequenceOfOutSequence(tempOutSeq);
 
         if (sequenceID == null) {
             log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
@@ -214,7 +222,7 @@ public class ServerStorageManager implements IStorageManager {
         }
         accessor.setOutSequence(sequenceID, newOutSequenceId);
         accessor.setOutSequenceApproved(sequenceID, true);
-        accessor.removeCreateSequenceMsg(oldOutsequenceId);
+        accessor.removeCreateSequenceMsg(tempOutSeq);
         return true;
     }
 
@@ -396,14 +404,22 @@ public class ServerStorageManager implements IStorageManager {
     public String getKeyFromOutgoingSeqId(String seqId) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
-    
-    public void setAcksTo(String seqId,String acksTo){      
-        accessor.setAcksTo(seqId,acksTo);
+
+    public void setAcksTo(String seqId, String acksTo) {
+        accessor.setAcksTo(seqId, acksTo);
     }
-    
-    public String getAcksTo(String seqId){
+
+    public String getAcksTo(String seqId) {
         return accessor.getAcksTo(seqId);
     }
-    
-   
+
+    public void addOffer(String msgID, String offerID) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getOffer(String msgID) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
 }

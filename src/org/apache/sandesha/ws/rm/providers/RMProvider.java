@@ -61,6 +61,7 @@ public class RMProvider extends RPCProvider {
         //user can specify them in the server-config.wsdd as parameters to the service
         //parameter names should be in  ignoreAction1, ignoreAction2 format.
 
+
         if (isIgnorableMessage(msgContext)) {
             RPCProvider rpcProvider = new RPCProvider();
             rpcProvider.invoke(msgContext);
@@ -73,6 +74,7 @@ public class RMProvider extends RPCProvider {
             try {
                 MessageValidator.validate(rmMessageContext, client);
             } catch (AxisFault af) {
+                af.printStackTrace();
                 FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
                 if (!faultProcessor.processMessage(rmMessageContext)) {
                     msgContext.setPastPivot(true);
@@ -81,7 +83,6 @@ public class RMProvider extends RPCProvider {
                 }
                 return;
             }
-
             RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
             AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
 
@@ -97,6 +98,7 @@ public class RMProvider extends RPCProvider {
             } else {
                 rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
             }
+
             IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
 
             try {

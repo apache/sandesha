@@ -126,4 +126,8 @@ public interface ISandeshaDAO {
     public void setAcksTo(String seqId,String acksTo);
     
     public String getAcksTo(String seqId);
+
+    void addOffer(String msgID, String offerID);
+
+    public String getOffer(String msgID);
 }

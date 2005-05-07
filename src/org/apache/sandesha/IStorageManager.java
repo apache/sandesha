@@ -162,4 +162,7 @@ public interface IStorageManager {
     
     public String getAcksTo(String seqId);
 
+    void addOffer(String msgID, String offerID);
+
+    String getOffer(String msgID);
 }

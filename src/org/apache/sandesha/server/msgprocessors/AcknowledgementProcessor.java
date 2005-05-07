@@ -90,8 +90,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         }
         RMMessageContext rmMsgContext = getAckRMMsgCtx(rmMessageContext, ackRangeVector);
 
-        if (true == (rmMessageContext.getAddressingHeaders().getFrom().getAddress().toString()
-                .equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
+        if (true == (storageManager.getAcksTo(seqID).equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
             try {
                 String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPPartAsString();
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(soapMsg));
@@ -107,10 +106,13 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         }
     }
 
-    private static RMMessageContext getAckRMMsgCtx(RMMessageContext rmMessageContext, Vector ackRangeVector) {
+    private  RMMessageContext getAckRMMsgCtx(RMMessageContext rmMessageContext, Vector ackRangeVector) {
         RMMessageContext rmMsgContext = new RMMessageContext();
         try {
-            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext, ackRangeVector);
+
+            String to=storageManager.getAcksTo(rmMessageContext.getRMHeaders().getSequence().getIdentifier().getIdentifier());
+
+            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext,to,ackRangeVector);
             //Create a new message using the ackEnvelope
             Message resMsg = new Message(ackEnvelope);
             //Create a new message context to store the ack message.
@@ -124,7 +126,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
 
             //Get the from address to send the Ack. Doesn't matter whether we have Sync or ASync messages.
             //If we have Sync them this property is not used.
-            rmMsgContext.setOutGoingAddress(rmMessageContext.getAddressingHeaders().getFrom().getAddress().toString());
+            rmMsgContext.setOutGoingAddress(to);
             //Set the messsage type
             rmMsgContext.setMessageType(Constants.MSG_TYPE_ACKNOWLEDGEMENT);
         } catch (Exception e) {

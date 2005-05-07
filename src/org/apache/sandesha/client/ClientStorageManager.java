@@ -167,8 +167,8 @@ public class ClientStorageManager implements IStorageManager {
     public boolean setApprovedOutSequence(String createSeqId, String newOutSequenceId) {
 
         boolean done = false;
-        String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
-
+       // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
+        String oldOutsequenceId = createSeqId;
         if(oldOutsequenceId==null){
             return false;
         }
@@ -399,6 +399,14 @@ public class ClientStorageManager implements IStorageManager {
     
     public String getAcksTo(String seqId){
         return accessor.getAcksTo(seqId);
+    }
+
+    public void addOffer(String msgID, String offerID) {
+        accessor.addOffer(msgID,offerID);
+    }
+
+    public String getOffer(String msgID) {
+       return accessor.getOffer(msgID);
     }
 
 }

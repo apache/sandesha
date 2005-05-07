@@ -27,14 +27,12 @@ import org.apache.axis.message.addressing.*;
 import org.apache.axis.types.URI;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.ws.rm.AcksTo;
-import org.apache.sandesha.ws.rm.CreateSequence;
-import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.sandesha.ws.rm.*;
 
 public class RMMessageCreator {
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
-    public static RMMessageContext createCreateSeqMsg(RMMessageContext rmMsgCtx, byte endPoint) throws Exception {
+    public static RMMessageContext createCreateSeqMsg(RMMessageContext rmMsgCtx, byte endPoint, String msgID, String offer) throws Exception {
         RMMessageContext createSeqRMMsgContext = new RMMessageContext();
         rmMsgCtx.copyContents(createSeqRMMsgContext);
 
@@ -43,17 +41,26 @@ public class RMMessageCreator {
         CreateSequence createSeq = new CreateSequence();
         AcksTo acksTo = getAcksTo(rmMsgCtx, endPoint);
         createSeq.setAcksTo(acksTo);
+
+        if (offer != null) {
+             SequenceOffer seqOffer = new SequenceOffer();
+            Identifier id = new Identifier();
+            id.setIdentifier(offer);
+
+            seqOffer.setIdentifier(id);
+            createSeq.setOffer(seqOffer);
+        }
+
         rmHeaders.setCreateSequence(createSeq);
         createSeqRMMsgContext.setRMHeaders(rmHeaders);
 
-        AddressingHeaders csAddrHeaders = getAddressingHeaedersForCreateSequenceRequest(rmMsgCtx, endPoint);
+        AddressingHeaders csAddrHeaders = getAddressingHeaedersForCreateSequenceRequest(rmMsgCtx, endPoint, msgID);
 
         csAddrHeaders.setAction(new Action(new URI(Constants.WSRM.ACTION_CREATE_SEQUENCE)));
         createSeqRMMsgContext.setAddressingHeaders(csAddrHeaders);
 
-        String msgId = Constants.UUID + uuidGen.nextUUID();
-        createSeqRMMsgContext.setMessageID(msgId);
-        createSeqRMMsgContext.addToMsgIdList(msgId);
+        createSeqRMMsgContext.setMessageID(msgID);
+        createSeqRMMsgContext.addToMsgIdList(msgID);
         createSeqRMMsgContext.setSync(rmMsgCtx.getSync());
         createSeqRMMsgContext.setMessageType(Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST);
 
@@ -68,8 +75,9 @@ public class RMMessageCreator {
         return createSeqRMMsgContext;
     }
 
-    private static AddressingHeaders getAddressingHeaedersForCreateSequenceRequest(RMMessageContext rmMsgCtx, byte endPoint) throws Exception {
+    private static AddressingHeaders getAddressingHeaedersForCreateSequenceRequest(RMMessageContext rmMsgCtx, byte endPoint, String msgID) throws Exception {
         AddressingHeaders csAddrHeaders = new AddressingHeaders();
+        csAddrHeaders.setMessageID(new MessageID(new URI(msgID)));
         if (endPoint == Constants.SERVER) {
             AddressingHeaders ah = rmMsgCtx.getAddressingHeaders();
             csAddrHeaders.setFrom(new EndpointReference(ah.getTo().toString()));

@@ -49,11 +49,32 @@ public class RMMessageContext {
     private String action = null;
     private String from = null;
     private String replyTo = null;
+
+    public String getOffer() {
+        return offer;
+    }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
     private boolean responseReceived = false;
     private boolean ackReceived = false;
     private String faultTo=null;
     private String acksTo = null;
     private String to = null;
+    private String offer=null;
+
+
+    public boolean isSendOffer() {
+        return sendOffer;
+    }
+
+    public void setSendOffer(boolean sendOffer) {
+        this.sendOffer = sendOffer;
+    }
+
+    private boolean sendOffer;
 
     private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
     private ArrayList msgIdList = new ArrayList ();

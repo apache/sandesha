@@ -45,7 +45,8 @@ public class ClientPropertyValidator {
         String replyTo = getReplyTo(call);
         String acksTo = getAcksTo(call);
         String to = getTo(call);
-        String faultTo=getFaultTo(call);
+        String faultTo = getFaultTo(call);
+        boolean sendOffer = getOffer(call);
 
         try {
             if (from == null)
@@ -53,7 +54,7 @@ public class ClientPropertyValidator {
             else
                 sourceURL = from;
         } catch (UnknownHostException e) {
-              throw new AxisFault(e.getMessage());
+            throw new AxisFault(e.getMessage());
         }
 
         String errorMsg = getValidated(msgNumber, action, replyTo, sync, inOut);
@@ -72,6 +73,7 @@ public class ClientPropertyValidator {
             rmMessageContext.setAcksTo(acksTo);
             rmMessageContext.setTo(to);
             rmMessageContext.setFaultTo(faultTo);
+            rmMessageContext.setSendOffer(sendOffer);
             return rmMessageContext;
 
         } else
@@ -79,8 +81,16 @@ public class ClientPropertyValidator {
 
     }
 
+    private static boolean getOffer(Call call) {
+        Boolean sendOffer = (Boolean) call.getProperty(Constants.ClientProperties.SEND_OFFER);
+        if (sendOffer != null) {
+            return sendOffer.booleanValue();
+        } else
+            return false;
+    }
+
     private static String getFaultTo(Call call) {
-          String faultTo = (String) call.getProperty(Constants.ClientProperties.FAULT_TO);
+        String faultTo = (String) call.getProperty(Constants.ClientProperties.FAULT_TO);
         if (faultTo != null)
             return faultTo;
         else
@@ -186,9 +196,9 @@ public class ClientPropertyValidator {
         return errorMsg;
     }
 
-     private static String getFrom(Call call) {
+    private static String getFrom(Call call) {
         return (String) call.getProperty(Constants.ClientProperties.FROM);
-      }
+    }
 
     private static String getReplyTo(Call call) {
         return (String) call.getProperty(Constants.ClientProperties.REPLY_TO);

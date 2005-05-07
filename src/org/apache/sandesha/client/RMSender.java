@@ -21,6 +21,8 @@ import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
 import org.apache.axis.components.logger.LogFactory;
+import org.apache.axis.components.uuid.UUIDGen;
+import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
@@ -34,6 +36,7 @@ public class RMSender extends BasicHandler {
 
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMSender.class.getName());
+    private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
     public void invoke(MessageContext msgContext) throws AxisFault {
 
@@ -79,7 +82,18 @@ public class RMSender extends BasicHandler {
 
 
     private RMMessageContext processFirstRequestMessage(RMMessageContext reqRMMsgContext, boolean sync) throws Exception {
-        RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(reqRMMsgContext, Constants.CLIENT);
+
+        String msgID = Constants.UUID + uuidGen.nextUUID();
+        String offerID = null;
+        if (reqRMMsgContext.isHasResponse()) {
+            offerID = Constants.UUID + uuidGen.nextUUID();
+            storageManager.addRequestedSequence(offerID);
+            storageManager.addOffer(msgID,offerID);
+
+        }
+
+
+        RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(reqRMMsgContext, Constants.CLIENT, msgID, offerID);
         storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
         storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), createSeqRMMsgContext.getMessageID());
 

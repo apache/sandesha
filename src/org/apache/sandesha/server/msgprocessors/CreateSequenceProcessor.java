@@ -57,11 +57,17 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         if (rmHeaders.getCreateSequence() == null)
             throw new AxisFault();
 
-        String uuid = uuidGen.nextUUID();
-        storageManager.addRequestedSequence(org.apache.sandesha.Constants.UUID + uuid);
+        String seqId =Constants.UUID+ uuidGen.nextUUID();
+        storageManager.addRequestedSequence(seqId);
 
-        //To support offer
+
         CreateSequence createSeq = rmMessageContext.getRMHeaders().getCreateSequence();
+        //Support AcksTo
+        if(createSeq.getAcksTo()!=null){
+            storageManager.setAcksTo(seqId,createSeq.getAcksTo().getAddress().toString());
+        }
+
+         //Support offer
         SequenceOffer offer = createSeq.getOffer();
         boolean offerAccepted = false;
         boolean hasOffer=false;
@@ -75,7 +81,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
                     if (id != null)
                         responseSeqId = id.getIdentifier();
                 }
-                String incomingSeqId = Constants.UUID + uuid;
+                String incomingSeqId = seqId;
                 if (responseSeqId != null) {
                     storageManager.addOutgoingSequence(incomingSeqId);
                     storageManager.setTemporaryOutSequence(incomingSeqId, responseSeqId);
@@ -90,7 +96,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
 
         SOAPEnvelope resEnvelope = null;
         try {
-            resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(uuid, rmMessageContext,hasOffer,offerAccepted);
+            resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(seqId, rmMessageContext,hasOffer,offerAccepted);
         } catch (Exception e) {
             throw new AxisFault(org.apache.sandesha.Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);
         }
@@ -126,16 +132,17 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         ackProcessor.processMessage(rmMsgCtx);
     }
 
-    private void setOutGoingAddress(RMMessageContext rmMsgCtx, AddressingHeaders addrHeaders) {
+    private void setOutGoingAddress(RMMessageContext rmMsgCtx, AddressingHeaders addrHeaders) throws AxisFault{
         CreateSequence createSeq = rmMsgCtx.getRMHeaders().getCreateSequence();
-        if ((createSeq.getAcksTo() != null)) {
-            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
-                rmMsgCtx.setSync(true);
-            } else {
-                rmMsgCtx.setSync(false);
-                rmMsgCtx.setOutGoingAddress(createSeq.getAcksTo().getAddress().toString());
-            }
-        } else if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
+//        if ((createSeq.getAcksTo() != null)) {
+//            if ((createSeq.getAcksTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
+//                rmMsgCtx.setSync(true);
+//            } else {
+//                rmMsgCtx.setSync(false);
+//                rmMsgCtx.setOutGoingAddress(createSeq.getAcksTo().getAddress().toString());
+//            }
+//        } else
+         if (addrHeaders.getReplyTo() == null || addrHeaders.getReplyTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
             rmMsgCtx.setSync(true);
         } else {
             rmMsgCtx.setSync(false);

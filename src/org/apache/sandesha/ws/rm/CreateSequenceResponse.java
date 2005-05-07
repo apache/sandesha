@@ -120,7 +120,7 @@ public class CreateSequenceResponse implements IRmElement {
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSRM.ACCEPT)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACCEPT)) {
                 accept = new Accept();
                 accept.fromSOAPEnvelope(childElement);
             }

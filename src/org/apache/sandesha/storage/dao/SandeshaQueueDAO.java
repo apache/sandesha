@@ -488,4 +488,16 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         return  sq.getAcksTo(seqId);
         
     }
+
+    public void addOffer(String msgID, String offerID) {
+        SandeshaQueue sq = SandeshaQueue.getInstance();
+        sq.addOffer(msgID,offerID);
+    }
+
+    public String getOffer(String msgID) {
+         SandeshaQueue sq = SandeshaQueue.getInstance();
+        return sq.getOffer(msgID);
+    }
+
+
 }

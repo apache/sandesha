@@ -44,7 +44,7 @@ public interface Constants {
     public static final long RETRANSMISSION_INTERVAL = 4000;
     public static final long ACKNOWLEDGEMENT_INTERVAL = 200;
     public static final long INACTIVITY_TIMEOUT = 600000;
-    public static final int MAXIMUM_RETRANSMISSION_COUNT = 20;
+    public static final int MAXIMUM_RETRANSMISSION_COUNT = 4;
     public static final long RMINVOKER_SLEEP_TIME = 2000;
     public static final long SENDER_SLEEP_TIME = 2000;
     public static final int CLIENT_RESPONSE_CHECKING_INTERVAL = 500;
@@ -196,6 +196,7 @@ public interface Constants {
         public static final String ACKS_TO="acksTo";
         public static final String TO="To";
         public static final String FAULT_TO="faultTo";
+        public static final String SEND_OFFER="offer";
 
         public static final String REQUEST_HANDLER = "requestHandler";
         public static final String RESPONSE_HANDLER = "responseHandler";

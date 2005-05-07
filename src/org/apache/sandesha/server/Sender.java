@@ -155,6 +155,10 @@ public class Sender implements Runnable {
         Service service = new Service();
         Call call = (Call) service.createCall();
 
+        if (rmMessageContext.getAddressingHeaders().getAction() != null) {
+            call.setSOAPActionURI(rmMessageContext.getAddressingHeaders().getAction().toString());
+        }
+
         call.setTargetEndpointAddress(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
         //NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
         String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
@@ -173,43 +177,43 @@ public class Sender implements Runnable {
 //            //The code should not come to this point.
 //            System.err.println(Constants.ErrorMessages.NULL_REQUEST_MSG);
 //        } else {
-            Call call;
+        Call call;
 
-            //EDITED FOR MSG NO REPITITION
-            String oldOutSeqId, newOutSeqId;
+        //EDITED FOR MSG NO REPITITION
+        //String oldOutSeqId, newOutSeqId;
 
-            String oldCreateSeqId = rmMsgCtx.getMessageID().toString();
-            String uuid = uuidGen.nextUUID();
-
-
-            String newCreateSeqId = Constants.UUID + uuid;
-            rmMsgCtx.setMessageID(newCreateSeqId);
-
-            oldOutSeqId = oldCreateSeqId;
-            newOutSeqId = newCreateSeqId;
+       // String oldCreateSeqId = rmMsgCtx.getMessageID().toString();
+       // String uuid = uuidGen.nextUUID();
 
 
-            //MessageContext msgContext = tempMsg.getMsgContext();
-            //String toAddress = tempMsg.getOutGoingAddress();
+       // String newCreateSeqId = Constants.UUID + uuid;
+      //  rmMsgCtx.setMessageID(newCreateSeqId);
+
+      //  oldOutSeqId = oldCreateSeqId;
+      //  newOutSeqId = newCreateSeqId;
 
 
-            //AddressingHeaders addrHeaders = new AddressingHeaders(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
-            rmMsgCtx.getAddressingHeaders().setMessageID(new MessageID(new URI(newCreateSeqId)));
-            //addrHeaders.toEnvelope(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
+        //MessageContext msgContext = tempMsg.getMsgContext();
+        //String toAddress = tempMsg.getOutGoingAddress();
 
-            SOAPEnvelope reqEnvelope = EnvelopeCreator.createCreateSequenceEnvelope( rmMsgCtx);
-            rmMsgCtx.getMsgContext().setRequestMessage(new Message(reqEnvelope));
 
-            rmMsgCtx.addToMsgIdList(rmMsgCtx.getMessageID().toString());
-            List msgIdList = rmMsgCtx.getMessageIdList();
-            //Iterator it = msgIdList.iterator();
-            rmMsgCtx.setLastPrecessedTime(System.currentTimeMillis());
-            rmMsgCtx.setReTransmissionCount(rmMsgCtx.getReTransmissionCount() + 1);
-            call = prepareCall(rmMsgCtx);
-            call.invoke();
+        //AddressingHeaders addrHeaders = new AddressingHeaders(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
+       // rmMsgCtx.getAddressingHeaders().setMessageID(new MessageID(new URI(newCreateSeqId)));
+        //addrHeaders.toEnvelope(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
 
-            processResponseMessage(call, rmMsgCtx);
-     //   }
+        SOAPEnvelope reqEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(rmMsgCtx);
+        rmMsgCtx.getMsgContext().setRequestMessage(new Message(reqEnvelope));
+
+     //   rmMsgCtx.addToMsgIdList(rmMsgCtx.getMessageID().toString());
+      //  List msgIdList = rmMsgCtx.getMessageIdList();
+        //Iterator it = msgIdList.iterator();
+        rmMsgCtx.setLastPrecessedTime(System.currentTimeMillis());
+        rmMsgCtx.setReTransmissionCount(rmMsgCtx.getReTransmissionCount() + 1);
+        call = prepareCall(rmMsgCtx);
+        call.invoke();
+
+        processResponseMessage(call, rmMsgCtx);
+        //   }
     }
 
     private void sendCreateSequenceResponse(RMMessageContext rmMessageContext) throws Exception {

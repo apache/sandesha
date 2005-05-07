@@ -54,6 +54,15 @@ public class OutgoingSequence {
     private static final Log log = LogFactory.getLog(OutgoingSequence.class.getName());
     public boolean terminateSent = false;
     private boolean hasResponse = false;
+    private String offer;
+
+    public String getOffer() {
+        return offer;
+    }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
 
     public boolean hasResponse() {
         return hasResponse;

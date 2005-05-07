@@ -36,8 +36,8 @@ public class SequenceOffer extends MessageElement implements IRmElement {
     private Identifier identifier;
     
     public SequenceOffer (){
-        offerElement = new MessageElement();
-        offerElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.SEQUENCE_OFFER);
+        offerElement = new MessageElement(Constants.WSRM.SEQUENCE_OFFER,Constants.WSRM.NS_PREFIX_RM,Constants.WSRM.NS_URI_RM);
+        //offerElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.SEQUENCE_OFFER);
     }
     
     public void addChildElement(MessageElement element) throws SOAPException {
