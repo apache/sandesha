@@ -19,6 +19,7 @@ package org.apache.sandesha;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.queue.IncomingSequence;
 
 /**
@@ -161,6 +162,10 @@ public interface IStorageManager {
     public void setAcksTo(String seqId,String acksTo);
     
     public String getAcksTo(String seqId);
+
+	public void setCallback(Callback callBack);
+	
+	public void removeCallback();
 
     void addOffer(String msgID, String offerID);
 

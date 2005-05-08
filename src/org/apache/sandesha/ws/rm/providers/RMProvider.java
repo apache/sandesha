@@ -21,6 +21,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.commons.logging.Log;
@@ -32,6 +33,9 @@ import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.server.msgprocessors.FaultProcessor;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
+import org.apache.sandesha.storage.Callback;
+import org.apache.sandesha.storage.CallbackData;
+import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.ArrayList;
@@ -51,8 +55,15 @@ public class RMProvider extends RPCProvider {
 
     private boolean client;
     private static final Log log = LogFactory.getLog(RMProvider.class.getName());
+	private static Callback callback = null;
 
+	public static void setCallback(Callback cb){
+		callback = cb;
+	}
 
+	public static void removeCallback(){
+		callback = null;
+	}	
     public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)
             throws Exception {
 
@@ -100,6 +111,11 @@ public class RMProvider extends RPCProvider {
             }
 
             IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
+
+			if(callback != null){
+				CallbackData cbData = getCallbackData(rmMessageContext);
+				callback.onIncomingMessage(cbData);
+			}
 
             try {
                 if (!rmMessageProcessor.processMessage(rmMessageContext)) {
@@ -156,5 +172,24 @@ public class RMProvider extends RPCProvider {
         }
         return actionList;
     }
+
+    //for callback
+    
+    private CallbackData getCallbackData(RMMessageContext rmMsgContext){
+    	CallbackData cbData = new CallbackData ();
+    	
+    	//  setting callback data;
+    	cbData.setSequenceId( rmMsgContext.getSequenceID());
+    	cbData.setMessageId(rmMsgContext.getMessageID());
+    	cbData.setMessageType(rmMsgContext.getMessageType());
+    	
+    	Action action = rmMsgContext.getAddressingHeaders().getAction();
+    	if(action!=null){
+    		cbData.setAction(action.toString());
+    	}
+    	
+    	return cbData;
+    }
+    //end callback
 
 }

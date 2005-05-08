@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.dao.ISandeshaDAO;
 import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
@@ -51,6 +52,8 @@ public class ServerStorageManager implements IStorageManager {
     private String tempSeqId = null; // used by getNextMessageToProcess();
     ISandeshaDAO accessor;
 
+	private static Callback callBack = null;
+	
     public ServerStorageManager() {
         accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
     }
@@ -411,6 +414,14 @@ public class ServerStorageManager implements IStorageManager {
 
     public String getAcksTo(String seqId) {
         return accessor.getAcksTo(seqId);
+    }
+
+    public void setCallback(Callback cb){
+	callBack = cb;
+    }
+	
+    public void removeCallback(){
+	 callBack = null;
     }
 
     public void addOffer(String msgID, String offerID) {

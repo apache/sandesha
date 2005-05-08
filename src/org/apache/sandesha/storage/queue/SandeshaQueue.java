@@ -636,11 +636,17 @@ public class SandeshaQueue {
             if (obj != null) {
                 OutgoingSequence hash = (OutgoingSequence) obj;
                 boolean hasMsg = hash.hasMessageWithId(messageId);
+
                 if (!hasMsg)
                     key = null;
+                
+//                if(hasMsg){
+//                    break;
+//                }
             }
 
         }
+
         return key;
     }
 

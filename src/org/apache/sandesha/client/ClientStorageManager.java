@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.Callback;
+import org.apache.sandesha.storage.CallbackData;
 import org.apache.sandesha.storage.dao.ISandeshaDAO;
 import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
 import org.apache.sandesha.storage.queue.IncomingSequence;
@@ -43,6 +45,7 @@ public class ClientStorageManager implements IStorageManager {
             .getName());
 
     private ISandeshaDAO accessor;
+	private static Callback callBack = null;
 
     /*
      * (non-Javadoc)
@@ -147,6 +150,10 @@ public class ClientStorageManager implements IStorageManager {
 
             // checks whether all the request messages hv been acked
         }
+        System.out.println("GET NEXT MSG TO SEND: invoking callback");
+        if(callBack != null && msg!=null)
+        	informOutgoingMessage(msg);
+        System.out.println("GET NEXT MSG TO SEND: end callback");
         return msg;
     }
 
@@ -218,7 +225,10 @@ public class ClientStorageManager implements IStorageManager {
                 .getAddressingHeaders().getRelatesTo().get(0);
         String messageId = relatesTo.getURI().toString();
         String sequenceId = null;
+        
+        SandeshaQueue.getInstance().displayOutgoingMap();
         sequenceId = accessor.searchForSequenceId(messageId);
+        
         SandeshaQueue sq = SandeshaQueue.getInstance();
         //sq.displayOutgoingMap();
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
@@ -408,5 +418,30 @@ public class ClientStorageManager implements IStorageManager {
     public String getOffer(String msgID) {
        return accessor.getOffer(msgID);
     }
+
+	public  void setCallback(Callback cb){
+			callBack = cb;
+	}
+
+	public void removeCallback(){
+		callBack = null;
+	}
+
+	private void informOutgoingMessage(RMMessageContext rmMsgContext){
+	
+		CallbackData cbData = new CallbackData ();
+		
+		//  setting callback data;
+		if(rmMsgContext!=null){
+			cbData.setSequenceId(rmMsgContext.getSequenceID());
+			cbData.setMessageId(rmMsgContext.getMessageID());
+			cbData.setMessageType(rmMsgContext.getMessageType());	 
+	    	
+		}
+		
+		if(callBack != null)
+			callBack.onOutgoingMessage(cbData);
+	}
+
 
 }
