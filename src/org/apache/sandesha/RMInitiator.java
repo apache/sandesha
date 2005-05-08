@@ -118,9 +118,20 @@ public class RMInitiator {
             }
         }
 
-        if (listenerStarted)
+        if (listenerStarted){
             sas.stop();
+            
+            
+            //FOR JSP
+            listenerStarted = false;
+            //END JSP
+            listenerStarted = false;
+        }
         sender.setRunning(false);
+        
+        //FOR JSP
+        senderStarted = false;
+        //END JSP
         return new RMStatus();
 
 
