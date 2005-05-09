@@ -78,7 +78,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     try {
                         MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
                         RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(), msgContext);
-                        String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
+                        String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope().toString();
                         Message reqMsg = new Message(soapMsg);
 
                         msgContext.setRequestMessage(reqMsg);

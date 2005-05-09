@@ -122,6 +122,7 @@ public interface Constants {
         public static final String UNKNOWN_SEQUENCE = "The value of wsrm:Identifier is not a known Sequence identifier.";
         public static final String MSG_NO_ROLLOVER = "The maximum value for wsrm:MessageNumber has been exceeded.";
         public static final String LAST_MSG_NO_EXCEEDED = "The value for wsrm:MessageNumber exceeds the value of the MessageNumber accompanying a LastMessage element in this Sequence.";
+        public static final String INVALID_MESSAGE="Invalid Message";
     }
 
     public interface FaultCodes {

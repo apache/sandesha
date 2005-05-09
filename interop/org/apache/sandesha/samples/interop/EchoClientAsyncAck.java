@@ -52,16 +52,16 @@ public class EchoClientAsyncAck {
 
             //To obtain the
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
-            call.setProperty(Constants.ClientProperties.ACTION, "sandesha:echo");
+            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:echoString");
 
             //These two are additional
-            //call.setProperty("from","http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous");
-            call.setProperty(Constants.ClientProperties.FROM,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+            call.setProperty(Constants.ClientProperties.ACKS_TO,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
             call.setProperty(Constants.ClientProperties.REPLY_TO,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+            //<wsrm:Offer> is also an configurable option.
             call.setProperty(Constants.ClientProperties.SEND_OFFER,new Boolean(true));
 
             call.setTargetEndpointAddress(targetURL);
-            call.setOperationName(new QName("RMInteropService", "echoString"));
+            call.setOperationName(new QName("http://tempuri.org/", "echoString"));
             call.setTransport(new RMTransport(targetURL, ""));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);

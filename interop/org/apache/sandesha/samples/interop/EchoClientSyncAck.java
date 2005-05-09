@@ -31,7 +31,8 @@ public class EchoClientSyncAck {
 
     private static String defaultServerPort = "8070";
     private static String defaultClientPort = "9070";
-    private static String targetURL = "http://127.0.0.1:" + defaultServerPort + "/axis/services/RMInteropService?wsdl";
+    private static String targetURL = "http://127.0.0.1:" + defaultServerPort +
+            "/axis/services/RMInteropService?wsdl";
 
     public static void main(String[] args) {
 
@@ -39,7 +40,8 @@ public class EchoClientSyncAck {
 
         try {
             //A separate listner will be started if the value of the input parameter for the mehthod
-            // initClient is "false". If the service is of type request/response the parameter value shoule be "false"
+            // initClient is "false". If the service is of type request/response the parameter value
+            // shoule be "false"
             RMInitiator.initClient(false);
 
             //UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
@@ -52,14 +54,17 @@ public class EchoClientSyncAck {
 
             //Action is required.
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
-            call.setProperty(Constants.ClientProperties.ACTION, "sandesha:echo");
+            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:echoString");
 
-            //These two are additional, We need them since we need to monitor the messages using TCPMonitor.
-            call.setProperty(Constants.ClientProperties.FROM,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
-            call.setProperty(Constants.ClientProperties.REPLY_TO,"http://127.0.0.1:"+defaultClientPort+"/axis/services/RMService");
+            //These two are additional, We need them since we need to monitor the messages using
+            // TCPMonitor.
+            call.setProperty(Constants.ClientProperties.ACKS_TO,
+                    Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            call.setProperty(Constants.ClientProperties.REPLY_TO,
+                    "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
 
             call.setTargetEndpointAddress(targetURL);
-            call.setOperationName(new QName("RMInteropService", "echoString"));
+            call.setOperationName(new QName("http://tempuri.org/", "echoString"));
             call.setTransport(new RMTransport(targetURL, ""));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
@@ -75,7 +80,8 @@ public class EchoClientSyncAck {
             System.out.println("The Response for Second Messsage is  :" + ret);
 
             call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(3));
-            call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true)); //For last message.
+            //For last message.
+            call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
             ret = (String) call.invoke(new Object[]{"Sandesha Echo 3", str});
             System.out.println("The Response for Third Messsage is  :" + ret);
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2004/03/rm" xmlns:wsuu="http://schemas.xmlsoap.org/ws/2002/07/utility">
+   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm">
       <soapenv:Header>
          <wsa:MessageID soapenv:mustUnderstand="0">uuid:d64cbdd10a0301d801bb96966b33b28b</wsa:MessageID>
          <wsa:To soapenv:mustUnderstand="0">http://192.248.18.50:8080/axis/services/EchoStringService</wsa:To>
@@ -17,9 +17,9 @@
             </wsa:ReferenceProperties>
          </wsa:ReplyTo>
          <wsrm:Sequence soapenv:mustUnderstand="1">
-            <wsuu:Identifier>uuid:38c46700-7596-11d9-bc0a-e04431962602</wsuu:Identifier>
+            <wsrm:Identifier>uuid:38c46700-7596-11d9-bc0a-e04431962602</wsrm:Identifier>
             <wsrm:MessageNumber>18446744073709551615</wsrm:MessageNumber>
-            <wsuu:Expires>2005-02-03T03:40:39.125Z</wsuu:Expires>
+            <wsrm:Expires>2005-02-03T03:40:39.125Z</wsrm:Expires>
          </wsrm:Sequence>
       </soapenv:Header>
       <soapenv:Body>

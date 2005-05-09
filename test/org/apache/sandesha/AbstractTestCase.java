@@ -68,6 +68,7 @@ public abstract class AbstractTestCase
         SOAPEnvelope sEnv = new SOAPEnvelope(fin);
         MessageContext msgCtx = new MessageContext(null);
         msgCtx.setRequestMessage(new Message(sEnv));
+        msgCtx.setResponseMessage(new Message(new SOAPEnvelope()));
         RMMessageContext rmMsgCtx = new RMMessageContext();
         rmMsgCtx.setMsgContext(msgCtx);
         return rmMsgCtx;

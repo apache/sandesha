@@ -36,7 +36,8 @@ public final class MessageValidator {
     private static IStorageManager storageMgr = null;
     private static final Log log = LogFactory.getLog(MessageValidator.class.getName());
 
-    public static void validate(final RMMessageContext rmMsgContext, boolean client) throws AxisFault {
+    public static void validate(final RMMessageContext rmMsgContext, boolean client)
+            throws AxisFault {
 
         if (client)
             storageMgr = new ClientStorageManager();
@@ -45,7 +46,14 @@ public final class MessageValidator {
 
         MessageContext msgContext = rmMsgContext.getMsgContext();
         try {
-            AddressingHeaders addrHeaders=new AddressingHeaders(msgContext.getRequestMessage().getSOAPEnvelope());
+            AddressingHeaders aHeaders = (AddressingHeaders) rmMsgContext.getMsgContext()
+                    .getProperty(
+                            org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+            if (aHeaders == null)
+                throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
+                        Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
+            AddressingHeaders addrHeaders = new AddressingHeaders(
+                    msgContext.getRequestMessage().getSOAPEnvelope());
             validateAddrHeaders(addrHeaders);
             rmMsgContext.setAddressingHeaders(addrHeaders);
 
@@ -57,10 +65,12 @@ public final class MessageValidator {
             validateForFaults(rmMsgContext);
         } catch (SOAPException e) {
             log.error(e);
-            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), e.getMessage(), null, null);
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), e.getMessage(),
+                    null, null);
         } catch (Exception e) {
             log.error(e);
-             throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), e.getMessage(), null, null);
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), e.getMessage(),
+                    null, null);
 
         }
     }
@@ -80,7 +90,8 @@ public final class MessageValidator {
         if (rmHeaders.getCreateSequenceResponse() != null)
             return;
 
-        throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_RM_HEADES, null, null);
+        throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
+                Constants.FaultMessages.NO_RM_HEADES, null, null);
     }
 
     private static void validateForFaults(RMMessageContext rmMsgCtx) throws AxisFault {
@@ -90,14 +101,17 @@ public final class MessageValidator {
         if (sequence != null) {
             String seqId = sequence.getIdentifier().getIdentifier();
             if (!storageMgr.isRequestedSeqPresent(seqId)) {
-                throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE), Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
+                throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_UNKNOWN_SEQUENCE),
+                        Constants.FaultMessages.UNKNOWN_SEQUENCE, null, null);
             }
             if (sequence.getMessageNumber() != null) {
                 long msgNo = sequence.getMessageNumber().getMessageNumber();
                 if (storageMgr.hasLastIncomingMsgReceived(sequence.getIdentifier().getIdentifier())) {
                     long lastMsg = storageMgr.getLastIncomingMsgNo(seqId);
                     if (msgNo > lastMsg)
-                        throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULR_LAST_MSG_NO_EXCEEDED), Constants.FaultMessages.LAST_MSG_NO_EXCEEDED, null, null);
+                        throw new AxisFault(
+                                new QName(Constants.FaultCodes.WSRM_FAULR_LAST_MSG_NO_EXCEEDED),
+                                Constants.FaultMessages.LAST_MSG_NO_EXCEEDED, null, null);
                 }
             }
         }
@@ -105,12 +119,14 @@ public final class MessageValidator {
 
 
     private static void validateAddrHeaders(AddressingHeaders addrHeaders) throws AxisFault {
-        if (addrHeaders == null) {
-            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
-        }
+        if (addrHeaders == null)
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
+                    Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
         if (addrHeaders.getTo() == null)
-            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_TO, null, null);
-         if (addrHeaders.getAction() == null)
-            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE), Constants.FaultMessages.NO_TO, null, null);
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
+                    Constants.FaultMessages.NO_TO, null, null);
+        if (addrHeaders.getAction() == null)
+            throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
+                    Constants.FaultMessages.NO_TO, null, null);
     }
 }

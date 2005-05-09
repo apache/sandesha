@@ -35,7 +35,6 @@ import org.apache.sandesha.server.msgprocessors.FaultProcessor;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
 import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.CallbackData;
-import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.ArrayList;
@@ -55,17 +54,18 @@ public class RMProvider extends RPCProvider {
 
     private boolean client;
     private static final Log log = LogFactory.getLog(RMProvider.class.getName());
-	private static Callback callback = null;
+    private static Callback callback = null;
 
-	public static void setCallback(Callback cb){
-		callback = cb;
-	}
+    public static void setCallback(Callback cb) {
+        callback = cb;
+    }
 
-	public static void removeCallback(){
-		callback = null;
-	}	
-    public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv, Object obj)
-            throws Exception {
+    public static void removeCallback() {
+        callback = null;
+    }
+
+    public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv,
+                               Object obj) throws Exception {
 
         RMProvider.log.info(Constants.InfomationMessage.PROVIDER_RECEIVED_MSG);
         //Some actions may need to be ignored. e.g.  http://schemas.xmlsoap.org/ws/2005/02/trust/RST/SCT
@@ -85,9 +85,8 @@ public class RMProvider extends RPCProvider {
             try {
                 MessageValidator.validate(rmMessageContext, client);
             } catch (AxisFault af) {
-                af.printStackTrace();
                 FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
-                if (!faultProcessor.processMessage(rmMessageContext)) {
+                if (!faultProcessor.sendFault(rmMessageContext)) {
                     msgContext.setPastPivot(true);
                     msgContext.setResponseMessage(null);
                     return;
@@ -110,12 +109,13 @@ public class RMProvider extends RPCProvider {
                 rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
             }
 
-            IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
+            IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(
+                    rmMessageContext, storageManager);
 
-			if(callback != null){
-				CallbackData cbData = getCallbackData(rmMessageContext);
-				callback.onIncomingMessage(cbData);
-			}
+            if (callback != null) {
+                CallbackData cbData = getCallbackData(rmMessageContext);
+                callback.onIncomingMessage(cbData);
+            }
 
             try {
                 if (!rmMessageProcessor.processMessage(rmMessageContext)) {
@@ -127,7 +127,7 @@ public class RMProvider extends RPCProvider {
             } catch (AxisFault af) {
                 RMProvider.log.error(af);
                 FaultProcessor faultProcessor = new FaultProcessor(storageManager, af);
-                if (!faultProcessor.processMessage(rmMessageContext)) {
+                if (!faultProcessor.sendFault(rmMessageContext)) {
                     msgContext.setPastPivot(true);
                     msgContext.setResponseMessage(null);
                     return;
@@ -145,7 +145,8 @@ public class RMProvider extends RPCProvider {
 
     private boolean isIgnorableMessage(MessageContext msgContext) throws Exception {
         boolean result = false;
-        AddressingHeaders addrH = new AddressingHeaders(msgContext.getRequestMessage().getSOAPEnvelope());
+        AddressingHeaders addrH = new AddressingHeaders(
+                msgContext.getRequestMessage().getSOAPEnvelope());
         List lst = getIgnorableActions(msgContext);
         if (lst != null && addrH.getAction() != null) {
             Iterator ite = lst.iterator();
@@ -175,20 +176,20 @@ public class RMProvider extends RPCProvider {
 
     //for callback
     
-    private CallbackData getCallbackData(RMMessageContext rmMsgContext){
-    	CallbackData cbData = new CallbackData ();
-    	
-    	//  setting callback data;
-    	cbData.setSequenceId( rmMsgContext.getSequenceID());
-    	cbData.setMessageId(rmMsgContext.getMessageID());
-    	cbData.setMessageType(rmMsgContext.getMessageType());
-    	
-    	Action action = rmMsgContext.getAddressingHeaders().getAction();
-    	if(action!=null){
-    		cbData.setAction(action.toString());
-    	}
-    	
-    	return cbData;
+    private CallbackData getCallbackData(RMMessageContext rmMsgContext) {
+        CallbackData cbData = new CallbackData();
+
+        //  setting callback data;
+        cbData.setSequenceId(rmMsgContext.getSequenceID());
+        cbData.setMessageId(rmMsgContext.getMessageID());
+        cbData.setMessageType(rmMsgContext.getMessageType());
+
+        Action action = rmMsgContext.getAddressingHeaders().getAction();
+        if (action != null) {
+            cbData.setAction(action.toString());
+        }
+
+        return cbData;
     }
     //end callback
 

@@ -92,7 +92,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
 
         if (true == (storageManager.getAcksTo(seqID).equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
             try {
-                String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPPartAsString();
+                String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPEnvelope().toString();
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(soapMsg));
             } catch (AxisFault af) {
                 af.setFaultCodeAsString(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);

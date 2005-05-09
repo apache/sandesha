@@ -1,23 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"> 
-      <soapenv:Header>  
-         <wsa:MessageID soapenv:mustUnderstand="0">uuid:d64d30800a0301d801bb9696fdacedb0</wsa:MessageID>  
-         <wsa:To soapenv:mustUnderstand="0">http://192.248.18.50:8080/axis/services/EchoStringService</wsa:To>  
-         <wsa:Action soapenv:mustUnderstand="0">http://schemas.xmlsoap.org/ws/2004/03/rm/CreateSequence</wsa:Action>
-         <wsa:From>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+   <soapenv:Header>
+      <wsa:MessageID soapenv:mustUnderstand="0">uuid:606f3660-c053-11d9-abec-904a0d5a39a4</wsa:MessageID>
+      <wsa:To soapenv:mustUnderstand="0">http://127.0.0.1:8070/axis/services/RMInteropService?wsdl</wsa:To>
+      <wsa:Action soapenv:mustUnderstand="0">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</wsa:Action>
+      <wsa:From soapenv:mustUnderstand="0">
+         <Address xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</Address>
+      </wsa:From>
+      <wsa:ReplyTo soapenv:mustUnderstand="0">
+         <Address xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</Address>
+      </wsa:ReplyTo>
+      <wsa:FaultTo soapenv:mustUnderstand="0">
+         <Address xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</Address>
+      </wsa:FaultTo>
+   </soapenv:Header>
+   <soapenv:Body>
+      <wsrm:CreateSequence>
+         <wsrm:AcksTo>
             <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
-            <wsa:ReferenceProperties>
-               <ns1:dummyFrom xmlns:ns1="http://tempuri.org/"/>
-            </wsa:ReferenceProperties>
-         </wsa:From>
-         <wsa:ReplyTo>
-            <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
-            <wsa:ReferenceProperties>
-               <ns2:dummyReply xmlns:ns2="http://tempuri.org/"/>
-            </wsa:ReferenceProperties>
-         </wsa:ReplyTo> 
-      </soapenv:Header> 
-      <soapenv:Body>  
-         <CreateSequence xmlns="http://schemas.xmlsoap.org/ws/2004/03/rm"/> 
-      </soapenv:Body>
-   </soapenv:Envelope>
+         </wsrm:AcksTo>
+      </wsrm:CreateSequence>
+   </soapenv:Body></soapenv:Envelope>

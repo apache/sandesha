@@ -10,14 +10,17 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
+import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPFault;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.Constants;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
 import org.apache.sandesha.ws.rm.RMHeaders;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author JEkanayake
@@ -37,6 +40,7 @@ public class FaultProcessor implements IRMMessageProcessor {
     public FaultProcessor(IStorageManager storageManager, AxisFault axisFault) {
         this.storageManager = storageManager;
         this.axisFault = axisFault;
+
     }
 
     public IStorageManager getStorageManager() {
@@ -53,50 +57,40 @@ public class FaultProcessor implements IRMMessageProcessor {
      * @see org.apache.sandesha.server.msgprocessors.IRMMessageProcessor#processMessage(org.apache.sandesha.RMMessageContext)
      */
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
-
-        //Check the fault type.
-        //Create the fault envelop
-        //identify the target endpoin i.e whether async or sync
-        //if sync, rmMessageContext.getmsgctx.setresopnes(new msg(fault));
-        //return true
-        //else inset to the storage
-        //return false
-        SOAPFault soapFault = null;
-
-        soapFault = new SOAPFault(this.axisFault);
-        return sendFault(rmMessageContext, soapFault);
-
+        this.axisFault = new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
+                Constants.FaultMessages.INVALID_MESSAGE, null, null);
+        try {
+            return sendFault(rmMessageContext);
+        } catch (Exception e) {
+            log.error(e);
+            return true;
+        }
 
     }
 
-    private boolean sendFault(RMMessageContext rmMessageContext, SOAPFault soapFault) {
+    public boolean sendFault(RMMessageContext rmMessageContext) throws Exception {
 
         AddressingHeaders addrHeaders;
         RMHeaders rmHeaders;
         MessageContext msgContext = rmMessageContext.getMsgContext();
 
+        if (rmMessageContext.getRMHeaders() != null) {
+            rmHeaders = rmMessageContext.getRMHeaders();
+            String acksTo = getAcksTo(rmHeaders);
+            if (acksTo != null && acksTo.equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
+                return sendFaultSync(msgContext);
+            } else if (acksTo != null) {
+                storageManager.insertFault(rmMessageContext);
+                return false;
+            }
+        }
+
         if (rmMessageContext.getAddressingHeaders() != null) {
             addrHeaders = rmMessageContext.getAddressingHeaders();
             if (addrHeaders.getFaultTo() != null) {
-                if (addrHeaders.getFaultTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
-                    msgContext.setResponseMessage(new Message(soapFault));
-                    return true;
-                } else {
-                    storageManager.insertFault(rmMessageContext);
-                    return false;
-                }
-            } else if (addrHeaders.getReplyTo() != null) {
-                if (addrHeaders.getReplyTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
-                    msgContext.setResponseMessage(new Message(soapFault));
-                    return true;
-                } else {
-                    storageManager.insertFault(rmMessageContext);
-                    return false;
-                }
-            } else if (addrHeaders.getFrom() != null) {
-                if (addrHeaders.getFrom().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
-                    msgContext.setResponseMessage(new Message(soapFault));
-                    return true;
+                if (addrHeaders.getFaultTo().getAddress().toString().equals(
+                        Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
+                    return sendFaultSync(msgContext);
                 } else {
                     storageManager.insertFault(rmMessageContext);
                     return false;
@@ -104,10 +98,27 @@ public class FaultProcessor implements IRMMessageProcessor {
             }
         } else {
             FaultProcessor.log.error(this.axisFault);
-            msgContext.setResponseMessage(new Message(soapFault));
-            return true;
+            return sendFaultSync(msgContext);
         }
         return true;
+    }
+
+    private boolean sendFaultSync(MessageContext msgContext) throws Exception {
+        SOAPFault soapFault = new SOAPFault(this.axisFault);
+        SOAPEnvelope sEnv = new SOAPEnvelope();
+        sEnv.getBody().addChildElement(soapFault);
+        msgContext.setResponseMessage(new Message(sEnv));
+        return true;
+    }
+
+    private String getAcksTo(RMHeaders rmHeaders) {
+        if (rmHeaders.getSequence() != null)
+            return storageManager.getAcksTo(
+                    rmHeaders.getSequence().getIdentifier().getIdentifier());
+        else if (rmHeaders.getCreateSequence() != null)
+            return rmHeaders.getCreateSequence().getAcksTo().getAddress().toString();
+        else
+            return null;
     }
 
 }

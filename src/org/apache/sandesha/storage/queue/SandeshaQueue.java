@@ -975,10 +975,7 @@ public class SandeshaQueue {
             return null;
         } */
 
-        String str = (String) acksToMap.get(seqId);
-        String strTemp = str.toString();
-        // return (String) acksToMap.get(seqId);
-        return strTemp;
+       return (String) acksToMap.get(seqId);
     }
 
 

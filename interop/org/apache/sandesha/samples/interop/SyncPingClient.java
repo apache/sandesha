@@ -31,7 +31,8 @@ public class SyncPingClient {
 
     private static String defaultServerPort = "8070";
 
-    private static String targetURL = "http://127.0.0.1:" + defaultServerPort + "/axis/services/RMInteropService?wsdl";
+    private static String targetURL = "http://127.0.0.1:" + defaultServerPort +
+            "/axis/services/RMInteropService?wsdl";
 
     public static void main(String[] args) {
         System.out.println("Client started...... Synchronous ");
@@ -44,12 +45,12 @@ public class SyncPingClient {
 
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
-            
-            call.setProperty(Constants.ClientProperties.FAULT_TO,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
 
+            call.setProperty(Constants.ClientProperties.ACKS_TO,
+                    Constants.WSA.NS_ADDRESSING_ANONYMOUS);
 
             call.setTargetEndpointAddress(targetURL);
-            call.setOperationName(new QName("urn:wsrm:Ping", "Ping"));
+            call.setOperationName(new QName("http://tempuri.org/", "Ping"));
             call.setTransport(new RMTransport(targetURL, ""));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
@@ -64,7 +65,8 @@ public class SyncPingClient {
 
             //Third Message
             call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(3));
-            call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true)); //For last message.
+            //For last message.
+            call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
             call.invoke(new Object[]{"Ping Message Number Three"});
 
             RMInitiator.stopClient();
