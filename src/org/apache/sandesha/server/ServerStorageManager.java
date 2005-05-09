@@ -24,7 +24,6 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.dao.ISandeshaDAO;
 import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
-import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.HashMap;
@@ -47,13 +46,12 @@ public class ServerStorageManager implements IStorageManager {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    protected static Log log = LogFactory.getLog(ServerStorageManager.class
-            .getName());
+    protected static Log log = LogFactory.getLog(ServerStorageManager.class.getName());
     private String tempSeqId = null; // used by getNextMessageToProcess();
     ISandeshaDAO accessor;
 
-	private static Callback callBack = null;
-	
+    private static Callback callBack = null;
+
     public ServerStorageManager() {
         accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
     }
@@ -73,8 +71,7 @@ public class ServerStorageManager implements IStorageManager {
         if (tempSeqId == null)
             return null;
 
-        RMMessageContext nextMsg = accessor
-                .getNextMsgContextToProcess(tempSeqId);
+        RMMessageContext nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);
 
         if (nextMsg == null) {
             tempSeqId = accessor.getRandomSeqIdToProcess();
@@ -214,9 +211,6 @@ public class ServerStorageManager implements IStorageManager {
         String tempOutSeq = oldOutsequenceId1;
         if (tempOutSeq == null)
             tempOutSeq = createSeqId;
-
-
-        SandeshaQueue.getInstance().displayOutgoingMap();
         String sequenceID = accessor.getSequenceOfOutSequence(tempOutSeq);
 
         if (sequenceID == null) {
@@ -251,22 +245,19 @@ public class ServerStorageManager implements IStorageManager {
 
     public void insertIncomingMessage(RMMessageContext rmMessageContext) {
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-        String sequenceId = rmHeaders.getSequence().getIdentifier()
-                .getIdentifier();
+        String sequenceId = rmHeaders.getSequence().getIdentifier().getIdentifier();
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
         if (!exists)
             addSequence(sequenceId); //Creating new sequence
 
         //TODO: add getRmHeaders method to MessageContext
-        long messageNumber = rmHeaders.getSequence().getMessageNumber()
-                .getMessageNumber();
+        long messageNumber = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
 
         if (messageNumber <= 0)
             return; //TODO: throw some exception
 
         Long msgNo = new Long(messageNumber);
-        accessor.addMessageToIncomingSequence(sequenceId, msgNo,
-                rmMessageContext);
+        accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
 
     }
 
@@ -416,12 +407,12 @@ public class ServerStorageManager implements IStorageManager {
         return accessor.getAcksTo(seqId);
     }
 
-    public void setCallback(Callback cb){
-	callBack = cb;
+    public void setCallback(Callback cb) {
+        callBack = cb;
     }
-	
-    public void removeCallback(){
-	 callBack = null;
+
+    public void removeCallback() {
+        callBack = null;
     }
 
     public void addOffer(String msgID, String offerID) {

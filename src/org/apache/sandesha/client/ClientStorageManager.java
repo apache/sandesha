@@ -36,7 +36,7 @@ public class ClientStorageManager implements IStorageManager {
     protected static Log log = LogFactory.getLog(ClientStorageManager.class.getName());
 
     private ISandeshaDAO accessor;
-	private static Callback callBack = null;
+    private static Callback callBack = null;
 
     public void init() {
     }
@@ -135,10 +135,8 @@ public class ClientStorageManager implements IStorageManager {
 
             // checks whether all the request messages hv been acked
         }
-        System.out.println("GET NEXT MSG TO SEND: invoking callback");
-        if(callBack != null && msg!=null)
-        	informOutgoingMessage(msg);
-        System.out.println("GET NEXT MSG TO SEND: end callback");
+        if (callBack != null && msg != null)
+            informOutgoingMessage(msg);
         return msg;
     }
 
@@ -207,14 +205,13 @@ public class ClientStorageManager implements IStorageManager {
 
     public void insertIncomingMessage(RMMessageContext rmMessageContext) {
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-        RelatesTo relatesTo = (RelatesTo) rmMessageContext.getAddressingHeaders().getRelatesTo().get(
-                0);
+        RelatesTo relatesTo = (RelatesTo) rmMessageContext.getAddressingHeaders().getRelatesTo()
+                .get(0);
         String messageId = relatesTo.getURI().toString();
         String sequenceId = null;
-        
-        SandeshaQueue.getInstance().displayOutgoingMap();
+
         sequenceId = accessor.searchForSequenceId(messageId);
-        
+
         SandeshaQueue sq = SandeshaQueue.getInstance();
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
@@ -380,29 +377,29 @@ public class ClientStorageManager implements IStorageManager {
         return accessor.getOffer(msgID);
     }
 
-	public  void setCallback(Callback cb){
-			callBack = cb;
-	}
+    public void setCallback(Callback cb) {
+        callBack = cb;
+    }
 
-	public void removeCallback(){
-		callBack = null;
-	}
+    public void removeCallback() {
+        callBack = null;
+    }
 
-	private void informOutgoingMessage(RMMessageContext rmMsgContext){
-	
-		CallbackData cbData = new CallbackData ();
-		
-		//  setting callback data;
-		if(rmMsgContext!=null){
-			cbData.setSequenceId(rmMsgContext.getSequenceID());
-			cbData.setMessageId(rmMsgContext.getMessageID());
-			cbData.setMessageType(rmMsgContext.getMessageType());	 
-	    	
-		}
-		
-		if(callBack != null)
-			callBack.onOutgoingMessage(cbData);
-	}
+    private void informOutgoingMessage(RMMessageContext rmMsgContext) {
+
+        CallbackData cbData = new CallbackData();
+
+        //  setting callback data;
+        if (rmMsgContext != null) {
+            cbData.setSequenceId(rmMsgContext.getSequenceID());
+            cbData.setMessageId(rmMsgContext.getMessageID());
+            cbData.setMessageType(rmMsgContext.getMessageType());
+
+        }
+
+        if (callBack != null)
+            callBack.onOutgoingMessage(cbData);
+    }
 
 
 }
