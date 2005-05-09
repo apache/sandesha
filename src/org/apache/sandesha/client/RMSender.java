@@ -32,15 +32,40 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
+/**
+ * In the client side of axis there is a flexibility of using custom sender to send SOAP messages.
+ * However axis's use of senders are mainly to handle transport related funtionalites.
+ * <code>RMSender</code>has to be used by the users who wish to use WS-ReliableMessaging capability
+ * in their clients.<P>
+ * The main funtionality of <code>RMSender</code> is to insert the messages coming from client and
+ * also the generated messages to the <code>SandeshaQueue</code>.
+ * If the message coming in from the client is request/response in nature then <code>RMSender</code>
+ * will wait polling <code>SandeshaQueue</code> till it gets an appropriate response.
+ * Due to the above reason, if the client is sending several messages
+ * (of request/response in nature) to be sent reliably, they will be sent reliably by
+ * <b>Sandesha</b> however the client will wait at each message till it gets the response, to send
+ * the next. To avoid this client can use callbacks provided by axis
+ * in <code>org.apache.axis.client.async</code> package.
+ */
 public class RMSender extends BasicHandler {
 
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMSender.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
+    /**
+     * This is the main method that is invoked by the axis engine. This method will add the reqest
+     * messages from the client to <code>SandeshaQueue</code> with the generated messages such as
+     * Create Sequence message and Terminate Sequence message.
+     *
+     * @param msgContext
+     * @throws AxisFault
+     */
+
     public void invoke(MessageContext msgContext) throws AxisFault {
 
-        //Initialize the storage manager. We are in the client side So initialize the client Storage Manager.
+        //Initialize the storage manager. We are in the client side So initialize the
+        //Client Storage Manager.
         storageManager = new ClientStorageManager();
 
         try {
@@ -56,19 +81,22 @@ public class RMSender extends BasicHandler {
             }
 
             if (reqMsgCtx.isLastMessage()) {
-                storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(reqMsgCtx, Constants.CLIENT));
+                storageManager.insertTerminateSeqMessage(
+                        RMMessageCreator.createTerminateSeqMsg(reqMsgCtx, Constants.CLIENT));
             }
 
             if (reqMsgCtx.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
                 while (responseMessageContext == null) {
-                    responseMessageContext = checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
+                    responseMessageContext =
+                            checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
                 //We need these steps to filter all addressing and rm related headers.
                 Message resMsg = responseMessageContext.getMsgContext().getRequestMessage();
                 RMHeaders.removeHeaders(resMsg.getSOAPEnvelope());
-                AddressingHeaders addHeaders = new AddressingHeaders(resMsg.getSOAPEnvelope(), null, true, false, false, null);
+                AddressingHeaders addHeaders = new AddressingHeaders(resMsg.getSOAPEnvelope(),
+                        null, true, false, false, null);
 
                 msgContext.setResponseMessage(resMsg);
             } else {
@@ -80,39 +108,45 @@ public class RMSender extends BasicHandler {
         }
     }
 
-
-    private RMMessageContext processFirstRequestMessage(RMMessageContext reqRMMsgContext, boolean sync) throws Exception {
-
+    /**
+     * This method will process the first request message.
+     *
+     * @param reqRMMsgContext
+     * @param sync
+     * @return
+     * @throws Exception
+     */
+    private RMMessageContext processFirstRequestMessage(RMMessageContext reqRMMsgContext,
+                                                        boolean sync) throws Exception {
         String msgID = Constants.UUID + uuidGen.nextUUID();
         String offerID = null;
         if (reqRMMsgContext.isHasResponse()) {
             offerID = Constants.UUID + uuidGen.nextUUID();
             storageManager.addRequestedSequence(offerID);
-            storageManager.addOffer(msgID,offerID);
+            storageManager.addOffer(msgID, offerID);
 
         }
 
-
-        RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(reqRMMsgContext, Constants.CLIENT, msgID, offerID);
+        RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(
+                reqRMMsgContext, Constants.CLIENT, msgID, offerID);
         storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
-        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(), createSeqRMMsgContext.getMessageID());
+        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(),
+                createSeqRMMsgContext.getMessageID());
 
         createSeqRMMsgContext.setSync(sync);
         storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-        RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(reqRMMsgContext);
+        RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(
+                reqRMMsgContext);
         processRequestMessage(serviceRequestMsg);
         return reqRMMsgContext;
     }
 
-    private RMMessageContext processRequestMessage(RMMessageContext reqRMMsgContext) throws Exception {
-        RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(reqRMMsgContext);
+    private RMMessageContext processRequestMessage(RMMessageContext reqRMMsgContext)
+            throws Exception {
+        RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(
+                reqRMMsgContext);
         storageManager.insertOutgoingMessage(serviceRequestMsg);
         return reqRMMsgContext;
-    }
-
-
-    private boolean checkTheQueueForAck(String sequenceId, String reqMessageID) {
-        return storageManager.checkForAcknowledgement(sequenceId, reqMessageID);
     }
 
     private RMMessageContext checkTheQueueForResponse(String sequenceId, String reqMessageID) {
@@ -120,13 +154,15 @@ public class RMSender extends BasicHandler {
     }
 
     private RMMessageContext getRMMessageContext(MessageContext msgCtx) throws Exception {
-        //Get a copy of the MessageContext. This is required when sending multiple messages from one call object
+        //Get a copy of the MessageContext. This is required when sending multiple messages from
+        //one call object
         MessageContext newMsgContext = RMMessageCreator.cloneMsgContext(msgCtx);
         RMMessageContext requestMesssageContext = new RMMessageContext();
         Call call = (Call) newMsgContext.getProperty(MessageContext.CALL);
 
         requestMesssageContext = ClientPropertyValidator.validate(call);
-        requestMesssageContext.setOutGoingAddress((String) msgCtx.getProperty(MessageContext.TRANS_URL));
+        requestMesssageContext.setOutGoingAddress(
+                (String) msgCtx.getProperty(MessageContext.TRANS_URL));
         requestMesssageContext.setMsgContext(newMsgContext);
         return requestMesssageContext;
     }

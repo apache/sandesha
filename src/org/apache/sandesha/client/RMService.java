@@ -16,8 +16,12 @@
  */
 
 package org.apache.sandesha.client;
-
+/**
+ * This class is used as a web service in the client side.
+ * This is the <b>addressible endpoint<b> for Sandesha client side. All the "reply"
+ * messages coming from server should be addressed to this endpoint unless they are of the type
+ * anonymous.
+ */
 public class RMService {
     //The service is used as a dummy entity in the client side only.
-
 }

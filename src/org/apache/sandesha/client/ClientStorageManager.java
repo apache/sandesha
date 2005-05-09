@@ -26,34 +26,19 @@ import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.CallbackData;
 import org.apache.sandesha.storage.dao.ISandeshaDAO;
 import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
-import org.apache.sandesha.storage.queue.IncomingSequence;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
-import java.util.Iterator;
 import java.util.Map;
 
-/**
- * @author Jaliya
- *         <p/>
- *         TODO To change the template for this generated type comment go to Window -
- *         Preferences - Java - Code Style - Code Templates
- */
 public class ClientStorageManager implements IStorageManager {
 
-    protected static Log log = LogFactory.getLog(ClientStorageManager.class
-            .getName());
+    protected static Log log = LogFactory.getLog(ClientStorageManager.class.getName());
 
     private ISandeshaDAO accessor;
 	private static Callback callBack = null;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.IStorageManager#init()
-     */
     public void init() {
-        // TODO Auto-generated method stub
     }
 
     public ClientStorageManager() {
@@ -142,7 +127,7 @@ public class ClientStorageManager implements IStorageManager {
     public RMMessageContext getNextMessageToSend() {
         RMMessageContext msg;
         msg = accessor.getNextPriorityMessageContextToSend();
-        if (msg == null)
+        if (null == msg)
             msg = accessor.getNextOutgoingMsgContextToSend();
 
         if (msg == null) {
@@ -174,14 +159,14 @@ public class ClientStorageManager implements IStorageManager {
     public boolean setApprovedOutSequence(String createSeqId, String newOutSequenceId) {
 
         boolean done = false;
-       // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
+        // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
         String oldOutsequenceId = createSeqId;
-        if(oldOutsequenceId==null){
+        if (null == oldOutsequenceId) {
             return false;
         }
-        
+
         String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
-        
+
         if (sequenceID == null) {
             log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
             return false;
@@ -190,7 +175,7 @@ public class ClientStorageManager implements IStorageManager {
         accessor.setOutSequenceApproved(sequenceID, true);
         accessor.removeCreateSequenceMsg(oldOutsequenceId);
         return true;
-    
+
     }
 
     /**
@@ -204,8 +189,9 @@ public class ClientStorageManager implements IStorageManager {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.IStorageManager#insertOutgoingMessage(org.apache.sandesha.RMMessageContext)
+     *
+     * @see org.apache.sandesha.IStorageManager#insertOutgoingMessage
+     * (org.apache.sandesha.RMMessageContext)
      */
     public void insertOutgoingMessage(RMMessageContext msg) {
         String sequenceId = msg.getSequenceID();
@@ -214,15 +200,15 @@ public class ClientStorageManager implements IStorageManager {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.IStorageManager#insertIncomingMessage(org.apache.sandesha.RMMessageContext)
+     *
+     * @see org.apache.sandesha.IStorageManager#insertIncomingMessage
+     *(org.apache.sandesha.RMMessageContext)
      */
 
-    //IN THE CLIENT RESPONSE HASH HAS THE ID OF RESPONSE MESSAGES.
     public void insertIncomingMessage(RMMessageContext rmMessageContext) {
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
-        RelatesTo relatesTo = (RelatesTo) rmMessageContext
-                .getAddressingHeaders().getRelatesTo().get(0);
+        RelatesTo relatesTo = (RelatesTo) rmMessageContext.getAddressingHeaders().getRelatesTo().get(
+                0);
         String messageId = relatesTo.getURI().toString();
         String sequenceId = null;
         
@@ -230,21 +216,17 @@ public class ClientStorageManager implements IStorageManager {
         sequenceId = accessor.searchForSequenceId(messageId);
         
         SandeshaQueue sq = SandeshaQueue.getInstance();
-        //sq.displayOutgoingMap();
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
         if (!exists) {
             accessor.addIncomingSequence(sequenceId);
         }
 
-        //TODO: add getRmHeaders method to MessageContext
-        long messageNumber = rmHeaders.getSequence().getMessageNumber()
-                .getMessageNumber();
-        if (messageNumber <= 0)
-            return; //TODO: throw some exception
+        long messageNumber = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
+        if (0 >= messageNumber)
+            return;
         Long msgNo = new Long(messageNumber);
-        accessor.addMessageToIncomingSequence(sequenceId, msgNo,
-                rmMessageContext);
+        accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
     }
 
 
@@ -278,42 +260,28 @@ public class ClientStorageManager implements IStorageManager {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
-     */
+
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
         accessor.addLowPriorityMessage(terminateSeqMessage);
-
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#isAllSequenceComplete()
-     */
+
     public boolean isAllSequenceComplete() {
-
         boolean outTerminateSent = accessor.isAllOutgoingTerminateSent();
-
         boolean incomingTerminateReceived = accessor.isAllIncommingTerminateReceived();
-
         if (outTerminateSent && incomingTerminateReceived)
             return true;
         else
             return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#isResponseComplete(java.lang.String)
-     */
+
     public boolean isResponseComplete(String sequenceID) {
-        // TODO Auto-generated method stub
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#terminateSequence(java.lang.String)
-     */
+
     public void terminateSequence(String sequenceID) {
-        // TODO Auto-generated method stub
     }
 
     public void setAckReceived(String seqId, long msgNo) {
@@ -325,13 +293,6 @@ public class ClientStorageManager implements IStorageManager {
     }
 
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#addSentMsgNo(java.lang.String, long)
-     */
-
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#addSendMsgNo(java.lang.String, long)
-     */
     public void addSendMsgNo(String seqId, long msgNo) {
         accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId), msgNo);
     }
@@ -402,21 +363,21 @@ public class ClientStorageManager implements IStorageManager {
     public String getKeyFromOutgoingSeqId(String seqId) {
         return accessor.getKeyFromOutgoingSequenceId(seqId);
     }
-    
-    public void setAcksTo(String seqId,String acksTo){      
-        accessor.setAcksTo(seqId,acksTo);
+
+    public void setAcksTo(String seqId, String acksTo) {
+        accessor.setAcksTo(seqId, acksTo);
     }
-    
-    public String getAcksTo(String seqId){
+
+    public String getAcksTo(String seqId) {
         return accessor.getAcksTo(seqId);
     }
 
     public void addOffer(String msgID, String offerID) {
-        accessor.addOffer(msgID,offerID);
+        accessor.addOffer(msgID, offerID);
     }
 
     public String getOffer(String msgID) {
-       return accessor.getOffer(msgID);
+        return accessor.getOffer(msgID);
     }
 
 	public  void setCallback(Callback cb){
