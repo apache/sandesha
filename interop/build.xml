@@ -54,7 +54,7 @@ Build Instructions:
 
         <property name="dir.doc" value="..\doc"/>
         <property name="dir.dist" value="..\dist"/>
-        <property name="dir.libs" value="..\target\lib"/>
+        <property name="dir.libs" value="..\lib"/>
         <property name="dir.src" value="..\src"/>
         <property name="dir.samples" value="..\samples"/>
         <property name="dir.test" value="..\test"/>
@@ -84,9 +84,8 @@ Build Instructions:
         <property name="build.javadoc" value="${build.doc.html}/api"/>
         <property name="build.junit.xml" value="${build.doc.xml}/junit"/>
         <property name="build.junit.html" value="${build.doc.html}/junit"/>
-
-
-        <!-- 
+    	
+    	<!-- 
 
          for the time being following path id uses the libs in the sandesha
          lib directory only This is done to test if we really don't need
@@ -239,8 +238,7 @@ Build Instructions:
         <!-- create directories -->
         <mkdir dir="${build.classes}"/>
     </target>
-
-
+	
     <target name="compile"
         depends="compile.library"
         description="compile everything"/>
@@ -265,7 +263,7 @@ Build Instructions:
 
 
     <target name="compile.interop"
-        depends="compile.library">
+        depends="compile.library,interop_prepare">
         <javac srcdir="${dir.interop}" destdir="${build.interop}" debug="on">
             <classpath refid="classpath.library"/>
         </javac>
@@ -365,4 +363,51 @@ Build Instructions:
     <target name="echo_sync_ack" depends="run_interop_echo_string_sync_ack,shutdown_server"> </target>
     <target name="echo_async_ack" depends="run_interop_echo_string_async_ack,shutdown_server"> </target>
 
+	<target name="prepare-dist">
+		<mkdir dir="${dir.dist}" />
+	</target>
+	
+	<target name="prepare-jar" depends="compile.library,prepare-dist" description="prepares for creating jar">
+
+    	<property name="build.temp-jar" value="${build.dir}/temp-jar" />
+    	<property name="sandesha.jar.name" value="sandesha.jar" />
+		<property name="dir.dist.jar" value="${dir.dist}/jar" />
+		<property name="sandesha.jar" value="${dir.dist.jar}/${sandesha.jar.name}" />
+		<mkdir dir="${dir.dist.jar}" />
+			
+	</target>
+	
+	<target name="jar" depends="prepare-jar" description="creates the sandesha jar">
+
+		<jar basedir="${build.classes}" destfile="${sandesha.jar}" />
+	
+	</target>
+		
+	<target name="prepare-war" depends="jar,compile.interop" description="prepares for creating war">
+    	
+		<property name="sandesha.war.name" value="sandesha.war" />
+		<property name="webxml" value="${dir.interop}/webapp/web.xml" />
+		<property name="dir.dist.war" value="${dir.dist}/war" />
+		<property name="sandesha.war" value="${dir.dist.war}/${sandesha.war.name}" />
+		<mkdir dir="${dir.dist.war}" />
+		
+	</target>
+	
+	<target name="create.war" depends="prepare-war" description="creates the sandesha war">
+
+		<war destfile="${sandesha.war}" webxml="${webxml}">
+			<fileset dir="${dir.interop}/jsp" />
+			<classes dir="${build.interop}" />
+			<lib dir="${dir.libs}" />
+			<lib file="${sandesha.jar}" />
+		</war>
+
+	</target>
+	
+	<target name="clean.war" description="cleans the temporary files">
+		<delete dir="${build.dir}" />
+	</target>
+	
+	<target name="war" depends="create.war,clean.war" description="creates the war file" />
+	
 </project>
