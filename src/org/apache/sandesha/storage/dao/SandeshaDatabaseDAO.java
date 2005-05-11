@@ -29,6 +29,10 @@ import java.util.Set;
  */
 
 public class SandeshaDatabaseDAO implements ISandeshaDAO {
+       private byte endPoint;
+    SandeshaDatabaseDAO(byte endPoint){
+        this.endPoint= endPoint;
+    }
 
     /* (non-Javadoc)
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getAcksTo(java.lang.String)

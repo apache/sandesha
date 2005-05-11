@@ -42,7 +42,7 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public ClientStorageManager() {
-        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,Constants.CLIENT);
     }
 
     public boolean isSequenceExist(String sequenceID) {
@@ -212,7 +212,6 @@ public class ClientStorageManager implements IStorageManager {
 
         sequenceId = accessor.searchForSequenceId(messageId);
 
-        SandeshaQueue sq = SandeshaQueue.getInstance();
         boolean exists = accessor.isIncomingSequenceExists(sequenceId);
 
         if (!exists) {

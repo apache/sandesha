@@ -53,7 +53,7 @@ public class ServerStorageManager implements IStorageManager {
     private static Callback callBack = null;
 
     public ServerStorageManager() {
-        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR);
+        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,Constants.SERVER);
     }
 
     /**

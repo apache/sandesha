@@ -19,6 +19,7 @@ package org.apache.sandesha.storage.dao;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.storage.queue.IncomingSequence;
 import org.apache.sandesha.storage.queue.QueueException;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
@@ -36,11 +37,17 @@ import java.util.Vector;
 public class SandeshaQueueDAO implements ISandeshaDAO {
 
     private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
+    private byte endPoint;
+
+         public SandeshaQueueDAO(byte endPoint){
+             this.endPoint=endPoint;
+         }
+
 
     public boolean addIncomingSequence(String sequenceId) {
         boolean result = false;
         try {
-            SandeshaQueue sq = SandeshaQueue.getInstance();
+            SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
             sq.createNewIncomingSequence(sequenceId);
             result = true;
         } catch (QueueException e) {
@@ -52,7 +59,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public boolean addPriorityMessage(RMMessageContext msg) {
         boolean result = false;
         try {
-            SandeshaQueue sq = SandeshaQueue.getInstance();
+            SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
             sq.addPriorityMessage(msg);
         } catch (QueueException e) {
             log.error(e);
@@ -63,7 +70,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public RMMessageContext getNextPriorityMessageContextToSend() {
         RMMessageContext msg = null;
         try {
-            SandeshaQueue sq = SandeshaQueue.getInstance();
+            SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
             msg = sq.nextPriorityMessageToSend();
         } catch (QueueException e) {
             log.error(e);
@@ -82,7 +89,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
                                                 RMMessageContext rmMessageContext) {
         boolean result = false;
         try {
-            SandeshaQueue sq = SandeshaQueue.getInstance();
+            SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
             sq.addMessageToIncomingSequence(sequenceId, msgNo,
                     rmMessageContext);
             result = true;
@@ -99,7 +106,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#isSequenceExists(java.lang.String)
      */
     public boolean isIncomingSequenceExists(String sequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         boolean exists = sq.isIncomingSequenceExists(sequenceId);
         return exists;
     }
@@ -110,7 +117,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getNextMsgContextToProcess(java.lang.String)
      */
     public RMMessageContext getNextMsgContextToProcess(String sequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         RMMessageContext msg = null;
         try {
             msg = sq.nextIncomingMessageToProcess(sequenceId);
@@ -138,7 +145,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      */
     public String getRandomSeqIdToProcess() {
         // TODO Auto-generated method stub
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         Vector ids = sq.nextAllSeqIdsToProcess();
         int size = ids.size();
         if (size <= 0)
@@ -157,7 +164,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getAllReceivedMsgNumsOfSeq(java.lang.String)
      */
     public Set getAllReceivedMsgNumsOfIncomingSeq(String sequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getAllReceivedMsgNumsOfIncomingSeq(sequenceId);
     }
 
@@ -168,7 +175,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      *      java.lang.String)
      */
     public boolean isIncomingMessageExists(String sequenceId, Long msgNo) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.isIncomingMessageExists(sequenceId, msgNo);
     }
 
@@ -182,7 +189,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
                                                 RMMessageContext rmMessageContext) {
         boolean result = false;
         try {
-            SandeshaQueue sq = SandeshaQueue.getInstance();
+            SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
             sq.addMessageToOutgoingSequence(sequenceId, rmMessageContext);
             result = true;
         } catch (QueueException e) {
@@ -200,7 +207,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public boolean addOutgoingSequence(String sequenceId) {
         boolean result = false;
         try {
-            SandeshaQueue sq = SandeshaQueue.getInstance();
+            SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
             sq.createNewOutgoingSequence(sequenceId);
             result = true;
         } catch (QueueException e) {
@@ -215,7 +222,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#isResponseSequenceExists(java.lang.String)
      */
     public boolean isOutgoingSequenceExists(String sequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         boolean exists = sq.isOutgoingSequenceExists(sequenceId);
         return exists;
     }
@@ -226,7 +233,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getAllReceivedMsgNumsOfResponseSeq(java.lang.String)
      */
     public Set getAllReceivedMsgNumsOfOutgoingSeq(String sequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getAllReceivedMsgNumsOfOutgoingSeq(sequenceId);
     }
 
@@ -238,7 +245,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public RMMessageContext getNextOutgoingMsgContextToSend() {
         RMMessageContext msg = null;
         try {
-            SandeshaQueue sq = SandeshaQueue.getInstance();
+            SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
             msg = sq.nextOutgoingMessageToSend();
         } catch (QueueException e) {
             log.error(e);
@@ -247,12 +254,12 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     }
 
     public void setOutSequence(String seqId, String outSeqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.setOutSequence(seqId, outSeqId);
     }
 
     public void setOutSequenceApproved(String seqId, boolean approved) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.setOutSequenceApproved(seqId, approved);
 
     }
@@ -263,7 +270,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getSequenceOfOutSequence(java.lang.String)
      */
     public String getSequenceOfOutSequence(String outsequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getSequenceOfOutSequence(outsequenceId);
     }
 
@@ -275,7 +282,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      */
     public void moveOutgoingMessageToBin(String sequenceId, Long msgNo) {
         // TODO Auto-generated method stub
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.moveOutgoingMsgToBin(sequenceId, msgNo);
     }
 
@@ -286,7 +293,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      */
     public void removeCreateSequenceMsg(String messageId) {
         // TODO Auto-generated method stub
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.movePriorityMsgToBin(messageId);
     }
 
@@ -297,27 +304,27 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getNextOutgoingMessageNumber(java.lang.String)
      */
     public long getNextOutgoingMessageNumber(String sequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getNextOutgoingMessageNumber(sequenceId);
     }
 
     //Only for client.
     public RMMessageContext checkForResponseMessage(String requestId, String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         RMMessageContext msg = sq.checkForResponseMessage(requestId, seqId);
         return msg;
     }
 
     public boolean isRequestMessagePresent(String sequenceId, String msgId) {
         // TODO Auto-generated method stub
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         boolean p = sq.isRequestMsgPresent(sequenceId, msgId);
         return p;
 
     }
 
     public String searchForSequenceId(String messageId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         String seqId = sq.searchForSequenceId(messageId);
         return seqId;
     }
@@ -327,7 +334,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#markOutgoingMessageToDelete(java.lang.String, java.lang.Long)
      */
     public void markOutgoingMessageToDelete(String seqId, Long msgNo) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.markOutgoingMessageToDelete(seqId, msgNo);
     }
 
@@ -336,7 +343,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#isAckComplete(java.lang.String)
      */
     public boolean compareAcksWithSequence(String sequenceId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         Vector acks = sq.getAllAckedMsgNumbers(sequenceId);
         Vector outGoingMsgs = sq.getAllOutgoingMsgNumbers(sequenceId);
 
@@ -354,7 +361,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     }
 
     public void setResponseReceived(RMMessageContext msg) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.setResponseReceived(msg);
     }
 
@@ -362,7 +369,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#addLowPriorityMessage(org.apache.sandesha.RMMessageContext)
      */
     public void addLowPriorityMessage(RMMessageContext msg) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         try {
             sq.addLowPriorityMessage(msg);
         } catch (QueueException e) {
@@ -376,7 +383,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getNextLowPriorityMessageContextToSend()
      */
     public RMMessageContext getNextLowPriorityMessageContextToSend() {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         try {
             return sq.getLowPriorityMessageIfAcked();
         } catch (Exception e) {
@@ -387,47 +394,47 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     }
 
     public void setAckReceived(String seqId, long msgNo) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.setAckReceived(seqId, msgNo);
     }
 
     public void addSendMsgNo(String seqId, long msgNo) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.addSendMsgNo(seqId, msgNo);
     }
 
     public boolean isSentMsg(String seqId, long msgNo) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.isSentMsg(seqId, msgNo);
     }
 
     public boolean hasLastOutgoingMsgReceived(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.hasLastOutgoingMsgReceived(seqId);
     }
 
     public long getLastOutgoingMsgNo(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getLastOutgoingMsgNo(seqId);
     }
 
     public boolean hasLastIncomingMsgReceived(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.hasLastIncomingMsgReceived(seqId);
     }
 
     public long getLastIncomingMsgNo(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getLastIncomingMsgNo(seqId);
     }
 
     public void addRequestedSequence(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.addRequestedSequence(seqId);
     }
 
     public boolean isRequestedSeqPresent(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.isRequestedSeqPresent(seqId);
     }
 
@@ -436,66 +443,66 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
      * @see org.apache.sandesha.storage.dao.ISandeshaDAO#getKeyFromIncomingSequenceId(java.lang.String)
      */
     public String getKeyFromIncomingSequenceId(String seqID) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getKeyFromIncomingSequenceId(seqID);
     }
 
     public String getKeyFromOutgoingSequenceId(String seqID) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getKeyFromOutgoingSequenceId(seqID);
     }
 
     public Iterator getAllOutgoingSequences() {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getAllOutgoingSequences();
     }
 
     public boolean isAllOutgoingTerminateSent() {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.isAllOutgoingTerminateSent();
     }
 
     public boolean isAllIncommingTerminateReceived() {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.isAllIncommingTerminateReceived();
     }
 
     public void setTerminateSend(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.setTerminateSend(seqId);
     }
 
     public void setTerminateReceived(String seqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.setTerminateReceived(seqId);
     }
     
 
     public String getFirstCreateSequenceMsgId(String createSeqId) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getFirstCreateSequenceMsgId(createSeqId);
     }
     
     public void setAcksTo(String seqId,String acksTo){
         
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.setAcksTo(seqId,acksTo);
     }
     
     public String getAcksTo(String seqId){
 
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return  sq.getAcksTo(seqId);
         
     }
 
     public void addOffer(String msgID, String offerID) {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         sq.addOffer(msgID,offerID);
     }
 
     public String getOffer(String msgID) {
-         SandeshaQueue sq = SandeshaQueue.getInstance();
+         SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.getOffer(msgID);
     }
 

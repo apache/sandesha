@@ -56,7 +56,7 @@ public class InteropStub {
 			//call.setProperty("replyTo","http://10.10.0.4:8080/axis/services/MyService");
 			//http://schemas.xmlsoap.org/ws/2003/03/addressing/role/anonymous
 
-			call.setProperty(Constants.ClientProperties.FROM,org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS);
+			call.setProperty(Constants.ClientProperties.FROM,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
 			
 			call.setTargetEndpointAddress(target);
 			call.setOperationName(new QName("RMInteropService", operation));
@@ -172,7 +172,7 @@ public class InteropStub {
 	            call.setProperty(Constants.ClientProperties.ACTION, "sandesha:echo");
 
 	            //These two are additional, We need them since we need to monitor the messages using TCPMonitor.
-	            call.setProperty(Constants.ClientProperties.FROM,org.apache.axis.message.addressing.Constants.NS_URI_ANONYMOUS);
+	            call.setProperty(Constants.ClientProperties.FROM,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
 	            call.setProperty(Constants.ClientProperties.REPLY_TO,"http://127.0.0.1:" + "9070" + "/axis/services/RMService");
 				
 				

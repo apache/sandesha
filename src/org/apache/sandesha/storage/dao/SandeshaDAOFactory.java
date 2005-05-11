@@ -29,12 +29,12 @@ public class SandeshaDAOFactory {
 
     private static final Log log = LogFactory.getLog(SandeshaDAOFactory.class.getName());
 
-    public static ISandeshaDAO getStorageAccessor(int accessor) {
+    public static ISandeshaDAO getStorageAccessor(int accessor, byte endPoint) {
 
         if (accessor == Constants.SERVER_QUEUE_ACCESSOR)
-            return new SandeshaQueueDAO();
+            return new SandeshaQueueDAO(endPoint);
         else if (accessor == Constants.SERVER_DATABASE_ACCESSOR)
-            return new SandeshaDatabaseDAO();
+            return new SandeshaDatabaseDAO(endPoint);
         else
             return null;
 

@@ -34,7 +34,7 @@ public class TCClientStorageManager extends TestCase {
     
     //tests functions related to outgoing messages.
     public void testOutGoingMessages() throws QueueException {
-        SandeshaQueue sq = SandeshaQueue.getInstance();
+        SandeshaQueue sq = SandeshaQueue.getInstance(Constants.CLIENT);
         ClientStorageManager csm = new ClientStorageManager();
         
         //setup and add 4 messages
@@ -224,7 +224,7 @@ public class TCClientStorageManager extends TestCase {
     protected void setUp() throws Exception {
          super.setUp();
          
-         SandeshaQueue sq = SandeshaQueue.getInstance();
+         SandeshaQueue sq = SandeshaQueue.getInstance(Constants.CLIENT);
          
          sq.clear(true);
          

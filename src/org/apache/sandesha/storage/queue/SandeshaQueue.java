@@ -40,7 +40,8 @@ import java.util.*;
 
 public class SandeshaQueue {
 
-    private static SandeshaQueue queue = null;
+    private static SandeshaQueue clientQueue = null;
+    private static SandeshaQueue serverQueue = null;
     HashMap incomingMap; //In comming messages.
     HashMap outgoingMap; //Response messages
     ArrayList highPriorityQueue; // Acks and create seq. responses.
@@ -64,13 +65,20 @@ public class SandeshaQueue {
         offerMap = new HashMap();
     }
 
-    public static SandeshaQueue getInstance() {
-        if (queue == null) {
-            queue = new SandeshaQueue();
+  public static SandeshaQueue getInstance(byte endPoint) {
+        if (endPoint == Constants.CLIENT) {
+            if (clientQueue == null) {
+                clientQueue = new SandeshaQueue();
+            }
+            return clientQueue;
+        } else {
+            if (serverQueue == null) {
+                serverQueue = new SandeshaQueue();
+            }
+            return serverQueue;
         }
-        return queue;
-    }
 
+    }
     /**
      * This will not replace messages automatically.
      */
