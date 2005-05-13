@@ -43,15 +43,19 @@ public class SyncPingClient {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
+            //By setting the SYNC property as true and false, the user can select between
+            //the synchronous version and asynchronous version of invocations.
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
+
+            //Sandesha uses action to differentitiate services initially (when there are no
+            //sequence identifiers are available. This is a REQUIRED option for Sandesha.
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
 
-            call.setProperty(Constants.ClientProperties.ACKS_TO,
-                    Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            //This line is used to set the transport for Sandesha
+            call.setTransport(new RMTransport(targetURL, ""));
 
             call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("http://tempuri.org/", "Ping"));
-            call.setTransport(new RMTransport(targetURL, ""));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
 

@@ -275,7 +275,6 @@ Build Instructions:
         </ant-->
         <copy todir="${build.interop}">
             <fileset dir="${dir.interop}" includes="client-config.wsdd"/>
-            <fileset dir="${dir.config}" includes="client-listener-config.wsdd"/>
             <fileset dir="${dir.config}" includes="sandesha.properties"/>
         </copy>
 

@@ -37,7 +37,8 @@ public class PropertyLoader {
     public static int getSimpleAxisServerPort() {
         Properties prop = loadProperties();
         if (prop != null) {
-            return new Integer(prop.getProperty(Constants.ClientProperties.SIMPLE_AXIS_SERVER_PORT_POPERTY)).intValue();
+            return new Integer(
+                    prop.getProperty(Constants.ClientProperties.SIMPLE_AXIS_SERVER_PORT_POPERTY)).intValue();
         } else
             return Constants.DEFAULT_SIMPLE_AXIS_SERVER_PORT;
 
@@ -46,7 +47,8 @@ public class PropertyLoader {
     private static Properties loadProperties() {
         Properties properties = new Properties();
         try {
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.ClientProperties.PROPERTY_FILE);
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                    Constants.ClientProperties.PROPERTY_FILE);
             properties.load(in);
             return properties;
         } catch (IOException e) {
@@ -54,7 +56,6 @@ public class PropertyLoader {
             return null;
         }
     }
-
 
     //CHANGE FOR SECURITY ADDITION
     public static ArrayList getRequestHandlerNames() {
@@ -70,7 +71,8 @@ public class PropertyLoader {
         ArrayList ret = new ArrayList();
 
         try {
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.ClientProperties.PROPERTY_FILE);
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                    Constants.ClientProperties.PROPERTY_FILE);
             properties.load(in);
 
             int temp = 0;

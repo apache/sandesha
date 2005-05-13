@@ -18,6 +18,7 @@ package org.apache.sandesha;
 
 import org.apache.axis.Handler;
 import org.apache.axis.SimpleChain;
+import org.apache.axis.client.Call;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.description.JavaServiceDesc;
@@ -31,8 +32,6 @@ import org.apache.sandesha.server.ServerStorageManager;
 import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -118,7 +117,7 @@ public class RMInitiator {
             }
         }
 
-        if (listenerStarted){
+        if (listenerStarted) {
             sas.stop();
             
             
@@ -154,8 +153,9 @@ public class RMInitiator {
             SOAPService rmService = new SOAPService(reqHandlers, rmp, resHandlers);
 
             JavaServiceDesc desc = new JavaServiceDesc();
-            rmService.setOption(Constants.ClientProperties.CLASS_NAME, Constants.ClientProperties.RMSERVICE_CLASS);
-            rmService.setOption(Constants.ClientProperties.ALLOWED_METHODS,Constants.ASTERISK);
+            rmService.setOption(Constants.ClientProperties.CLASS_NAME,
+                    Constants.ClientProperties.RMSERVICE_CLASS);
+            rmService.setOption(Constants.ClientProperties.ALLOWED_METHODS, Constants.ASTERISK);
 
             desc.setName(Constants.ClientProperties.RMSERVICE);
             rmService.setServiceDescription(desc);
@@ -219,5 +219,5 @@ public class RMInitiator {
         return getHandlerChain(arr);
     }
 
-
+  
 }
