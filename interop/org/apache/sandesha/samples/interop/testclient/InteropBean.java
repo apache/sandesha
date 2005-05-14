@@ -12,48 +12,36 @@ public class InteropBean implements Serializable {
 	private int noOfMsgs;
 	private String terminate;
 	private String acks;
+	private String acksTo;
 	
-	
-	
+    public String getAcksTo() {
+        return acksTo;
+    }
 
-	/**
-	 * @return
-	 */
+    public void setAcksTo(String acksTo) {
+        this.acksTo = acksTo;
+    }
+
 	public String getAcks() {
 		return acks;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getFrom() {
 		return from;
 	}
 
-	/**
-	 * @return
-	 */
 	public int getNoOfMsgs() {
 		return noOfMsgs;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getOperation() {
 		return operation;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getReplyto() {
 		return replyto;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getTarget() {
 		return target;
 	}

@@ -53,9 +53,15 @@ public class InteropCallback extends Callback {
 	    	    	msgType = "acknowledgement";
 	    	}else{
 	    		msgType = "service response";
+	    		
 	    	}
 	    	
-			String entry = "<br /><font color='red'> Got " + msgType +" message. ID : " + result.getMessageId() + "</font>";  // + result.getSequenceId() + " </font>";
+	    	String entry = "";
+	    	if(result.getMessageId()!=null && result.getMessageId()!="")
+			    entry = "<br /><font color='red' size='2' > Got " + msgType +" message. ID : " + result.getMessageId() + "</font>";  // + result.getSequenceId() + " </font>";
+			else
+			    entry = "<br /><font color='red' size='2' > Got " + msgType + "</font>";
+
 			
 			boolean b = writer.write(entry);
 			if(!b)
@@ -80,7 +86,13 @@ public class InteropCallback extends Callback {
     	else if(type==Constants.MSG_TYPE_SERVICE_RESPONSE)
     	    msgType = "service response";  
     	
-    	String entry = "<br /><font color='blue'> Sent " + msgType +" message. ID : " + result.getMessageId() + "</font>";// + result.getSequenceId() + " </font>";
+    	String entry = "";
+    	if(result.getMessageId()!=null && result.getMessageId()!="")
+    	    entry = "<br /><font color='blue' size='2' > Sent " + msgType +" message. ID : " + result.getMessageId() + "</font>";// + result.getSequenceId() + " </font>";
+		else {
+		    entry = "<br /><font color='blue' size='2' > Sent " + msgType + "</font>";
+		}
+
 		
 		boolean b = writer.write(entry);
 		if(!b)

@@ -33,24 +33,12 @@ public class TestRunnerThread extends Thread {
 		
 		
 		if(operation.equalsIgnoreCase("ping")){
-			//JOptionPane.showMessageDialog(null,"RUNNING PING");
-			String from = bean.getFrom();
-			if(from==null || from.equalsIgnoreCase("anonymous URI")){
-				//JOptionPane.showMessageDialog(null,"RUNNING SYNC");
-				stub.runPingSync(bean);
-			}else {
-				//JOptionPane.showMessageDialog(null,"RUNNING ASYNC");
-				stub.runPingAsync(bean);
-			}
+
+		    stub.runPing(bean);
 			
 		}else if(operation.equalsIgnoreCase("echoString") ){
-			String from = bean.getFrom();
-			if(from==null || from.equalsIgnoreCase("anonymous URI")){
-				stub.runEchoStringSync(bean);
-			}else {
-				stub.runEchoStringAsync(bean);
-			}
-			
+		    
+		    stub.runEcho(bean);
 		}
 		
 	}
