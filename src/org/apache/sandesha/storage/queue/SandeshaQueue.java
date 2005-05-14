@@ -90,10 +90,12 @@ public class SandeshaQueue {
     public boolean addMessageToIncomingSequence(String seqId, Long messageNo,
                                                 RMMessageContext msgCon) throws QueueException {
         boolean successful = false;
-
+        
         if (seqId == null || msgCon == null)
             throw new QueueException(Constants.Queue.ADD_ERROR);
 
+
+        
         if (isIncomingSequenceExists(seqId)) {
             IncomingSequence seqHash = (IncomingSequence) incomingMap.get(seqId);
 
@@ -361,12 +363,15 @@ public class SandeshaQueue {
     }
 
     public void clear(boolean yes) {
+        
         if (!yes)
             return;
+        
         incomingMap.clear();
         highPriorityQueue.clear();
         outgoingMap.clear();
         queueBin.clear();
+       
     }
 
     public void removeAllMsgsFromIncomingSeqence(String seqId, boolean yes) {
@@ -648,9 +653,9 @@ public class SandeshaQueue {
                 if (!hasMsg)
                     key = null;
                 
-//                if(hasMsg){
-//                    break;
-//                }
+                if(hasMsg){
+                    return key;
+                }
             }
 
         }

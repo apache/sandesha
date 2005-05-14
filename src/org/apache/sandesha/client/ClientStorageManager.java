@@ -222,6 +222,7 @@ public class ClientStorageManager implements IStorageManager {
         if (0 >= messageNumber)
             return;
         Long msgNo = new Long(messageNumber);
+        
         accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
     }
 

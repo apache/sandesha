@@ -119,18 +119,14 @@ public class RMInitiator {
 
         if (listenerStarted) {
             sas.stop();
-            
-            
-            //FOR JSP
+          
             listenerStarted = false;
-            //END JSP
             listenerStarted = false;
         }
         sender.setRunning(false);
-        
-        //FOR JSP
         senderStarted = false;
-        //END JSP
+        
+        storageManager.clearStorage();
         return new RMStatus();
 
 
