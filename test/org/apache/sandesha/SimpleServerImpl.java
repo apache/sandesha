@@ -11,7 +11,8 @@ public class SimpleServerImpl {
 
         try {
             SimpleAxisServer sas = new SimpleAxisServer();
-            sas.setServerSocket(new ServerSocket(PropertyLoader.getSimpleAxisServerPort()));
+            //sas.setServerSocket(new ServerSocket(PropertyLoader.getSimpleAxisServerPort()));
+            sas.setServerSocket(new ServerSocket(7070));
             Thread serverThread = new Thread(sas);
             serverThread.start();
         } catch (Exception e) {

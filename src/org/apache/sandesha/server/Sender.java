@@ -33,8 +33,12 @@ import org.apache.sandesha.EnvelopeCreator;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
+import org.apache.sandesha.storage.Callback;
+import org.apache.sandesha.storage.CallbackData;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.ws.rm.RMHeaders;
+
+import sun.util.calendar.CalendarDate;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.soap.SOAPEnvelope;
@@ -48,10 +52,19 @@ public class Sender implements Runnable {
 
     private static final Log log = LogFactory.getLog(Sender.class.getName());
     public static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-
+    public static Callback callback;
     public boolean running = true;
     private IStorageManager storageManager;
 
+    
+    public static synchronized Callback getCallback() {
+        return callback;
+    }
+
+    public static synchronized void setCallback(Callback cb) {
+        callback = cb;
+    }
+    
     private SimpleChain requestChain = null;
     private SimpleChain responseChain = null;
 
@@ -331,6 +344,9 @@ public class Sender implements Runnable {
     }
 
     private void processResponseMessage(Call call, RMMessageContext rmMessageContext) throws Exception {
+        
+
+        
         if (call.getResponseMessage() != null) {
             RMHeaders rmHeaders = new RMHeaders();
             rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
@@ -342,6 +358,15 @@ public class Sender implements Runnable {
                     .getMessageProcessor(rmMessageContext, storageManager);
             messagePrcessor.processMessage(rmMessageContext);
         }
+        
+        if(getCallback()!=null){
+            CallbackData data = new CallbackData ();
+            data.setMessageId(rmMessageContext.getMessageID());
+            data.setMessageType(rmMessageContext.getMessageType());
+            data.setSequenceId(rmMessageContext.getSequenceID());
+            callback.onIncomingMessage(data);
+        }
+        
     }
 
 }

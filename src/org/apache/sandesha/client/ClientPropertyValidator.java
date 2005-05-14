@@ -30,7 +30,6 @@ import java.net.UnknownHostException;
  * @author Jaliya
  */
 public class ClientPropertyValidator {
-    private static long messageNumber=0;
 
     public static RMMessageContext validate(Call call) throws AxisFault {
 
@@ -170,7 +169,7 @@ public class ClientPropertyValidator {
         long msgNumber = 0;
         if (temp != null)
             msgNumber = ((Long) temp).longValue();
-        return messageNumber++;
+        return msgNumber;
     }
 
     private static boolean getLastMessage(Call call) {

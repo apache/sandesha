@@ -506,5 +506,9 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         return sq.getOffer(msgID);
     }
 
+    public void clear(){
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
+        sq.clear(true);
+    }
 
 }

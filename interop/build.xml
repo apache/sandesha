@@ -85,6 +85,9 @@ Build Instructions:
         <property name="build.junit.xml" value="${build.doc.xml}/junit"/>
         <property name="build.junit.html" value="${build.doc.html}/junit"/>
     	
+    	
+    	<property environment="env1" />
+    	
     	<!-- 
 
          for the time being following path id uses the libs in the sandesha
@@ -253,11 +256,23 @@ Build Instructions:
             <exclude name="**/BouncyCastle.java" unless="bc.present"/>
         </javac>
         <!-- Copy Property files -->
+    	
         <copy todir="${build.classes}">
-            <fileset dir="${dir.src}">
+            
+        	<!--
+        	<fileset dir="${dir.src}">
                 <include name="**/*.properties"/>
                 <exclude name="**/axis/**/*.properties"/>
             </fileset>
+        	-->
+        	
+        	<fileset dir="${dir.config}">
+        		<include name="sandesha.properties" />
+        		<include name="log4j.properties" />
+        		<include name="WSRMPolicy.xml" />
+        		<include name="commons-logging.properties" />
+        	</fileset>
+        	
         </copy>
     </target>
 
@@ -275,6 +290,7 @@ Build Instructions:
         </ant-->
         <copy todir="${build.interop}">
             <fileset dir="${dir.interop}" includes="client-config.wsdd"/>
+            <fileset dir="${dir.config}" includes="client-listener-config.wsdd"/>
             <fileset dir="${dir.config}" includes="sandesha.properties"/>
         </copy>
 
@@ -388,6 +404,7 @@ Build Instructions:
 		<property name="webxml" value="${dir.interop}/webapp/web.xml" />
 		<property name="dir.dist.war" value="${dir.dist}/war" />
 		<property name="sandesha.war" value="${dir.dist.war}/${sandesha.war.name}" />
+		<property name="webapps" value="${env1.CATALINA_HOME}/webapps" />
 		<mkdir dir="${dir.dist.war}" />
 		
 	</target>
@@ -395,7 +412,7 @@ Build Instructions:
 	<target name="create.war" depends="prepare-war" description="creates the sandesha war">
 
 		<war destfile="${sandesha.war}" webxml="${webxml}">
-			<fileset dir="${dir.interop}/jsp" />
+			<fileset dir="${dir.interop}/webapp/jsp" />
 			<classes dir="${build.interop}" />
 			<lib dir="${dir.libs}" />
 			<lib file="${sandesha.jar}" />
@@ -403,10 +420,15 @@ Build Instructions:
 
 	</target>
 	
-	<target name="clean.war" description="cleans the temporary files">
-		<delete dir="${build.dir}" />
+	<target name="war.copy.clean" depends="war.copy" description="cleans the temporary files">
+		<delete dir="${dir.dist}" />
+		<delete dir="${build.interop}" />
 	</target>
 	
-	<target name="war" depends="create.war,clean.war" description="creates the war file" />
+	<target name="war.copy" depends="war" >
+		<copy file="${sandesha.war}" todir="${webapps}" />
+	</target>
+	
+	<target name="war" depends="create.war" description="creates the war file" />
 	
 </project>

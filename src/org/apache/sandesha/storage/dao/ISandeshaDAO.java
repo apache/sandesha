@@ -130,4 +130,6 @@ public interface ISandeshaDAO {
     void addOffer(String msgID, String offerID);
 
     public String getOffer(String msgID);
+    
+    void clear();
 }

@@ -170,4 +170,6 @@ public interface IStorageManager {
     void addOffer(String msgID, String offerID);
 
     String getOffer(String msgID);
+    
+    void clearStorage();
 }

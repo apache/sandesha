@@ -399,6 +399,10 @@ public class ClientStorageManager implements IStorageManager {
         if (callBack != null)
             callBack.onOutgoingMessage(cbData);
     }
+    
+    public void clearStorage(){
+        accessor.clear();
+    }
 
 
 }
