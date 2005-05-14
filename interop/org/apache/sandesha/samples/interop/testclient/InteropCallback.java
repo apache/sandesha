@@ -52,7 +52,7 @@ public class InteropCallback extends Callback {
 	    		else if(action.equals(Constants.WSRM.SEQUENCE_ACKNOWLEDGEMENT_ACTION))
 	    	    	msgType = "acknowledgement";
 	    	}else{
-	    		msgType = "service response";
+	    		msgType = "";
 	    		
 	    	}
 	    	
