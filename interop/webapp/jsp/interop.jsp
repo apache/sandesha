@@ -9,13 +9,13 @@ response.getWriter().println("<head>");
 response.getWriter().flush();
 %>
 
-<title>Hi!! Welcome to Apache Sandesha interop test</title>
+<title>Hi!! Welcome to Apache Sandesha Innterop Test</title>
 <script>
-    
+
        function displayServer(){
               document.getElementById('server').style.display = '';
         }
-        
+
         function hideServer(){
               document.getElementById('server').style.display = 'none';
         }
@@ -23,22 +23,22 @@ response.getWriter().flush();
        function displayClient(){
               document.getElementById('client').style.display = '';
         }
-        
+
         function hideClient(){
               document.getElementById('client').style.display = 'none';
         }
-        
+
         function displayEchoText(){
               document.getElementById('echo').style.display = '';
         }
-        
+
         function hideEchoText(){
               document.getElementById('echo').style.display = 'none';
         }
-		
+
 		function changeSelect(itm,val){
 			txtItem = itm;
-			
+
 			if(val.value=="none"){
 				document.getElementById(txtItem).value = "";
 				//document.getElementById(txtItem).disabled = true;
@@ -46,11 +46,11 @@ response.getWriter().flush();
 				document.getElementById(txtItem).value = "anonymous";
 				//document.getElementById(txtItem).disabled = true;
 			}else if(val.value=="async"){
-				document.getElementById(txtItem).value = "http://127.0.0.1:9070/axis/services/RMService";
+				document.getElementById(txtItem).value = "http://127.0.0.1:9090/axis/services/RMService";
 				//document.getElementById(txtItem).disabled = false;
 			}
 		}
-		
+
 		function setOperation (itm){
 		//document.getElementById("txtfrom").value = itm.value;
 			if(itm.value=="ping" || itm.value=="Ping"){
@@ -61,7 +61,7 @@ response.getWriter().flush();
 				document.getElementById('offerTR').style.display = '';
 			}
 		}
-		
+
     </script>
 <script language="JavaScript" type="text/JavaScript">
 <!--
@@ -75,33 +75,35 @@ MM_reloadPage(true);
 </script>
 </head>
 <body>
+<h1>Apache Sandesha Interop Testing</h1>
+
 <%
-	
+
 	String endPoint         = request.getParameter("endPoint");
 	String method = request.getParameter("method");
 	String run = request.getParameter("running");
-	
+
     if(endPoint == null)
         endPoint = "server";
-        
+
 	String displayServerArea,displayClientArea,serverSelected,clientSelected;
 	displayServerArea = "\'\'";
 	displayClientArea = "none";
 	serverSelected = "true";
 	clientSelected = "false";
-	
+
     if(endPoint.equals("client")){
     	displayServerArea = "none";
-    	displayClientArea = "\'\'";	
+    	displayClientArea = "\'\'";
         serverSelected = "false";
 	    clientSelected = "true";
-    } 
-	
+    }
+
 	/*out.println( "client variable sorc is " + endPoint);
 	out.println( "client variable method is " + endPoint);
 	out.println( "running is " + run); */
 
-	
+
 %>
 <form method="post" name="InteropTesting" action="interop.jsp">
 
@@ -109,110 +111,110 @@ MM_reloadPage(true);
 	<tr id='server' style="display:''">
 		<td>
 		<table width="100%">
-		<tr><td><h3><u>Server endpoint</u></h3></td></tr>
+		<tr><td><h3><u>Server Endpoint</u></h3></td></tr>
 		<tr><td>
-		http://sandeshaSL.org:8080/interoptest
+		http://replace.by.actual.url
 		<br /><hr />
 		</td></tr>
 		</table>
 		</td>
 	</tr>
-	
-	<tr > 
-      <td> 
-      
+
+	<tr >
+      <td>
+
       <table id='client' width='100%' style="display:''" >
-          <tr> 
+          <tr>
             <td colspan='5'><h3><u>Test Client</u></h3></td>
           </tr>
-          <tr> 
+          <tr>
             <td>Target</td>
             <td colspan="4"><input type='text' size='80' name='target'  /></td>
           </tr>
-          <tr> 
+          <tr>
             <td width='20%'>Operation</td>
             <td colspan="4"><select name='operation' onchange="setOperation(this)">
                 <option value="Ping">Ping</option>
                 <option value="echoString">echoString</option>
               </select></td>
           </tr>
-          <tr id="fromTR"> 
+          <tr id="fromTR">
             <td width='20%' >Acks to</td>
-            <td > 
+            <td >
                 <table width="100%">
-                        <tr> 
+                        <tr>
                                 <td> <select name='acksTo1' onchange="changeSelect('acksTo',this)">
                                         <option value="sync">Synchronous</option>
                                         <option value="async">Asynchronous</option>
-                                        </select> 
+                                        </select>
                                 </td>
-                                <td> 
-                                        <input type='text' size='80' name='acksTo'  id='acksTo' value='anonymous' /> 
+                                <td>
+                                        <input type='text' size='80' name='acksTo'  id='acksTo' value='anonymous' />
                                 </td>
                         </tr>
                 </table>
            </td>
            </tr>
-          <tr id="fromTR"> 
+          <tr id="fromTR">
             <td width='20%' >From</td>
-            <td > 
+            <td >
                 <table width="100%">
-                        <tr> 
+                        <tr>
                                 <td> <select name='from1' onchange="changeSelect('from',this)">
                                         <option value="none">none</option>
                                         <option value="sync">Synchronous</option>
                                         <option value="async">Asynchronous</option>
-                                        </select> 
+                                        </select>
                                 </td>
-                                <td> 
-                                        <input type='text' size='80' name='from'  id='from' /> 
+                                <td>
+                                        <input type='text' size='80' name='from'  id='from' />
                                 </td>
                         </tr>
                 </table>
            </td>
         </tr>
-          <tr id="replytoTR" style="display:none"> 
+          <tr id="replytoTR" style="display:none">
             <td width='20%' >Reply to</td>
-            <td > 
+            <td >
                 <table width="100%">
-                        <tr> 
-                                <td> 
+                        <tr>
+                                <td>
                                 <select name='replyto1' onchange="changeSelect('replyto',this)">
                       				<option value="none">none</option>
                       				<option value="sync">Synchronous</option>
                       				<option value="async">Asynchronous</option>
-                    			</select>  
+                    			</select>
                                 </td>
-                                <td> 
+                                <td>
                                         <input type='text' size='80' name='replyto'  id='replyto' />
                                 </td>
                         </tr>
                 </table>
            </td>
         </tr>
-        
-        <tr id="offerTR" style="display:none" > 
+
+        <tr id="offerTR" style="display:none" >
             <td width='20%' >Offer seq</td>
-            <td > 
+            <td >
                 <table width="100%">
-                        <tr> 
-                                <td> 
+                        <tr>
+                                <td>
                                 <select name='offer'>
                       				<option value="no">no</option>
                       				<option value="yes">yes</option>
-                    			</select> 
+                    			</select>
                                 </td>
                         </tr>
                 </table>
            </td>
         </tr>
-        
-        
-         <tr> 
+
+
+         <tr>
             <td width='20%' >Send messages</td>
-            <td > 
+            <td >
                 <table width="100%">
-                        <tr> 
+                        <tr>
  							<td width="4%">acks</td>
            					 <td width="13%"><input type="checkbox" name="acks" value="checked" checked></td>
             				<td width="14%">Terminate seq</td>
@@ -221,7 +223,7 @@ MM_reloadPage(true);
                 </table>
            </td>
         </tr>
-        <tr> 
+        <tr>
             <td colspan='1'>no. of Msgs</td>
             <td colspan ='10' ><select name='noOfMsgs'>
                 <option value="1">1</option>
@@ -236,21 +238,23 @@ MM_reloadPage(true);
                 <option value="10">10</option>
               </select></td>
           </tr>
-        
-        
+
+
         </table></td>
 	</tr>
+    <tr></tr>
 </table>
 
   <input name="submit" type='submit' value='Run test' />
 </form>
 
 <hr />
-
+<span>
 <%
-	
-	runTest(interopBean,response);
+  	runTest(interopBean,response);
 %>
+</span>
+
 
 </body>
 </html>
@@ -260,7 +264,7 @@ MM_reloadPage(true);
 <%!
 
 public void runTest(InteropBean bean,HttpServletResponse res) throws Exception {
- 
+
 	String to = null;
 	if(bean!=null){
 		to = bean.getTarget();
@@ -269,7 +273,7 @@ public void runTest(InteropBean bean,HttpServletResponse res) throws Exception {
 	if(to!=null) {
 			//session.setParameter("runTest");
 			ResponseWriter writer = new ResponseWriter (res.getWriter());
-			 
+
 			writer.write(" <br /> Starting test ....... <br /> ");
 			writer.flush();
 
@@ -286,42 +290,47 @@ public void runTest(InteropBean bean,HttpServletResponse res) throws Exception {
 
 			//run the service
 
-	
+
 			// ***********  code to run client test
 
 			//create callback classe and register
 			InteropCallback callback = new InteropCallback (writer);
-			
 
-			
-			ClientStorageManager csm = new ClientStorageManager ();
+            ClientStorageManager csm = new ClientStorageManager ();
 			csm.setCallback(callback);
 			RMProvider.setCallback(callback);
 			Sender.setCallback(callback);
 
-			
+
 			//start the test
-			TestRunnerThread runner = new TestRunnerThread ();
+			//TestRunnerThread runner = new TestRunnerThread ();
 			//runner.setDaemon(true);
 			//runner.setMethod (method);
-			runner.setBean(bean);
-			
+			//runner.setBean(bean);
 
-			
-			runner.start();
-						
-			while(!callback.isTestFinished()){
 
-				Thread.sleep(100);			
-			}	
-			
-	
-			writer.write ("  <br /> <br />Test finished... ");	
-			writer.write ("<hr /><br />");	
+
+			//runner.start();
+
+			//while(!callback.isTestFinished()){
+
+			//	Thread.sleep(100);
+			//}
+           InteropStub stub= new InteropStub();
+        	if(operation.equalsIgnoreCase("ping")){
+		    stub.runPing(bean);
+
+		}else if(operation.equalsIgnoreCase("echoString") ){
+   		    stub.runEcho(bean);
+		}
+
+
+			writer.write ("  <br /> <br />Test finished... ");
+			writer.write ("<hr /><br />");
 			writer.flush();
-			
+
 			csm.removeCallback();
 			RMProvider.removeCallback();
 		}
 }
-%> 
+%>
