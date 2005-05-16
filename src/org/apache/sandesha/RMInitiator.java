@@ -104,7 +104,7 @@ public class RMInitiator {
         }
     }
 
-    public static RMStatus stopClient() throws AxisFault{
+    public static RMStatus stopClient() throws AxisFault {
         //This should check whether we have received all the acks or reponses if any
         IStorageManager storageManager = new ClientStorageManager();
         storageManager.isAllSequenceComplete();
@@ -122,20 +122,15 @@ public class RMInitiator {
             }
         }
 
+
         if (listenerStarted) {
             sas.stop();
-            
-            
-            //FOR JSP
-            listenerStarted = false;
-            //END JSP
             listenerStarted = false;
         }
         sender.setRunning(false);
-        
-        //FOR JSP
         senderStarted = false;
-        //END JSP
+
+        storageManager.clearStorage();
         return new RMStatus();
 
     }

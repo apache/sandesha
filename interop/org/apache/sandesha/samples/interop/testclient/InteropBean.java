@@ -13,7 +13,8 @@ public class InteropBean implements Serializable {
 	private String terminate;
 	private String acks;
 	private String acksTo;
-	
+    private boolean sendOffer;
+
     public String getAcksTo() {
         return acksTo;
     }
@@ -41,6 +42,14 @@ public class InteropBean implements Serializable {
 	public String getReplyto() {
 		return replyto;
 	}
+
+    public boolean isSendOffer() {
+        return sendOffer;
+    }
+
+    public void setSendOffer(boolean sendOffer) {
+        this.sendOffer = sendOffer;
+    }
 
 	public String getTarget() {
 		return target;

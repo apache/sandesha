@@ -2,58 +2,52 @@
 
 <!-- $Revision$ $Date$ -->
 
-<project default="jar"
-    xmlns:j="jelly:core"
-    xmlns:maven="jelly:maven"
-    xmlns:deploy="deploy"
-    xmlns:ant="jelly:ant">
+<project default="jar" xmlns:j="jelly:core" xmlns:maven="jelly:maven" xmlns:deploy="deploy" xmlns:ant="jelly:ant">
 
     <goal name="setclasspath">
         <path id="test.classpath">
             <path refid="maven.dependency.classpath"/>
         </path>
     </goal>
-    
-     <preGoal name="java:compile">
-     	<copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
-     	<copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
-     	<copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
-	<copy file="config/WSRMPolicy.xml" todir="${maven.build.dir}/classes"/>
-     </preGoal>
 
- 	<preGoal name="interop:compile">
-     	<copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
-     	<copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
-     	<copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
-	<copy file="config/WSRMPolicy.xml" todir="${maven.build.dir}/classes"/>
-     </preGoal>
+    <preGoal name="java:compile">
+        <copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
+        <copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
+        <copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
+        <copy file="config/WSRMPolicy.xml" todir="${maven.build.dir}/classes"/>
+    </preGoal>
 
     <postGoal name="jar">
         <ant:mkdir dir="${basedir}/target/lib"/>
         <deploy:copy-deps todir="${basedir}/target/lib"/>
         <copy file="lib/xerces.jar" todir="${basedir}/target/lib"/>
     </postGoal>
-    
-    <preGoal name="interop:compile">
-    	  <ant:mkdir dir="${basedir}/target/interop-classes"/>
+
+    <preGoal name="interop.jar">
+        <copy file="config/sandesha.properties" todir="${maven.build.dir}/classes"/>
+        <copy file="config/client-config.wsdd" todir="${maven.build.dir}/classes"/>
+        <copy file="config/server-config.wsdd" todir="${maven.build.dir}/classes"/>
+        <copy file="config/log4j.properties" todir="${maven.build.dir}/classes"/>
+        <copy file="config/commons-logging.properties" todir="${maven.build.dir}/classes"/>
+        <copy file="config/WSRMPolicy.xml" todir="${maven.build.dir}/classes"/>
+        <ant:javac srcdir="interop" destdir="${maven.build.dir}/classes" includes="**/*.java" debug="${maven.compile.debug}" optimize="${optimize}" deprecation="${maven.compile.deprecation}">
+            <classpath>
+                <pathelement location="${maven.build.dest}"/>
+                <path refid="maven.dependency.classpath"/>
+            </classpath>
+        </ant:javac>
     </preGoal>
 
-    <goal name="interop:compile" prereqs="java:compile">
-        <ant:javac  srcdir="interop" destdir="${maven.build.dir}/interop-classes"  includes="**/*.java"
-             debug="${maven.compile.debug}"
-	     optimize="${optimize}"
-	     deprecation="${maven.compile.deprecation}">
-      <classpath>
-        <pathelement location="${maven.build.dest}"/>
-        <path refid="maven.dependency.classpath"/>
-      </classpath>
-    </ant:javac>
+    <!-- to transforme htmls to xdocs -->
+    <preGoal name="xdoc:jelly-transform">
+        <attainGoal name="html2xdoc"/>
+    </preGoal>
+
+    <goal name="interop.jar" prereqs="java:compile">
+        <ant:property name="sandesha.jar.name" value="sandesha-interop.jar"/>
+        <ant:mkdir dir="${basedir}/dist/jar"/>
+        <ant:jar basedir="${maven.build.dir}/classes" destfile="${sandesha.jar.name}"/>
     </goal>
 
-    <!-- to transforme htmls to xdocs -->
-  <preGoal name="xdoc:jelly-transform">
-    <attainGoal name="html2xdoc"/>
-  </preGoal>
-      
 
 </project>

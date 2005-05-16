@@ -67,8 +67,8 @@ Build Instructions:
         
         <!-- Following two were added on 01-03-2005-->
         <property name="dir.config" value="..\config"/>
-        <property name="test.report" value="${build.dir}\test-reports"/>
-        <property name="build.interop" value="${build.dir}\interop-classes"/>
+        <property name="test.report" value="${build.dir}/test-reports"/>
+        <property name="build.interop" value="${build.dir}/interop-classes"/>
 
 
         <property name="build.classes" value="${build.dir}/classes"/>
@@ -243,9 +243,7 @@ Build Instructions:
         <mkdir dir="${build.classes}"/>
     </target>
 	
-    <target name="compile"
-        depends="compile.library"
-        description="compile everything"/>
+    <target name="compile" depends="compile.library" description="compile everything"/>
 
 
     <target name="compile.library" depends="prepare-src">
@@ -256,18 +254,20 @@ Build Instructions:
             <!-- <exclude name="**/MerlinPFX.java" unless="jdk14.present"/> -->
             <exclude name="**/BouncyCastle.java" unless="bc.present"/>
         </javac>
+
+        <javac srcdir="${dir.interop}" destdir="${build.classes}" debug="on">
+            <classpath refid="classpath.library"/>
+            <exclude name="**/Merlin.java" unless="jdk14.present"/>
+            <!-- <exclude name="**/MerlinPFX.java" unless="jdk14.present"/> -->
+            <exclude name="**/BouncyCastle.java" unless="bc.present"/>
+        </javac>
         <!-- Copy Property files -->
     	
         <copy todir="${build.classes}">
-            
-        	<!--
-        	<fileset dir="${dir.src}">
-                <include name="**/*.properties"/>
-                <exclude name="**/axis/**/*.properties"/>
-            </fileset>
-        	-->
-        	
+
         	<fileset dir="${dir.config}">
+                <include name="client-config.wsdd"/>
+                <include name="server-config.wsdd"/>
         		<include name="sandesha.properties" />
         		<include name="log4j.properties" />
         		<include name="WSRMPolicy.xml" />
@@ -284,11 +284,7 @@ Build Instructions:
             <classpath refid="classpath.library"/>
         </javac>
 
-        <!--ant dir="${dir.interop}"
-            antfile="build.xml"
-            target="compile"
-            inheritAll="false">
-        </ant-->
+
         <copy todir="${build.interop}">
             <fileset dir="${dir.interop}" includes="client-config.wsdd"/>
             <fileset dir="${dir.config}" includes="sandesha.properties"/>
@@ -378,13 +374,13 @@ Build Instructions:
     <target name="echo_sync_ack" depends="run_interop_echo_string_sync_ack,shutdown_server"> </target>
     <target name="echo_async_ack" depends="run_interop_echo_string_async_ack,shutdown_server"> </target>
 
+
 	<target name="prepare-dist">
 		<mkdir dir="${dir.dist}" />
 	</target>
 	
 	<target name="prepare-jar" depends="compile.library,prepare-dist" description="prepares for creating jar">
 
-    	<property name="build.temp-jar" value="${build.dir}/temp-jar" />
     	<property name="sandesha.jar.name" value="sandesha-1.0.jar" />
 		<property name="dir.dist.jar" value="${dir.dist}/jar" />
 		<property name="sandesha.jar" value="${dir.dist.jar}/${sandesha.jar.name}" />
@@ -399,7 +395,7 @@ Build Instructions:
 	</target>
 		
 	<target name="prepare-war" depends="jar,compile.interop" description="prepares for creating war">
-    	
+
 		<property name="sandesha.war.name" value="sandesha.war" />
 		<property name="webxml" value="${dir.interop}/webapp/web.xml" />
 		<property name="dir.dist.war" value="${dir.dist}/war" />
@@ -434,5 +430,5 @@ Build Instructions:
 	</target>
 
 	<target name="war" depends="create.war" description="creates the war file" />
-	
+
 </project>

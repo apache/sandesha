@@ -129,12 +129,11 @@ public class RMSender extends BasicHandler {
                                                         boolean sync) throws Exception {
         String msgID = Constants.UUID + uuidGen.nextUUID();
         String offerID = null;
-        if (reqRMMsgContext.isHasResponse()) {
+        if (reqRMMsgContext.isHasResponse() && reqRMMsgContext.isSendOffer()) {
             offerID = Constants.UUID + uuidGen.nextUUID();
             storageManager.addRequestedSequence(offerID);
             storageManager.addOffer(msgID, offerID);
-
-        }
+         }
 
         RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(
                 reqRMMsgContext, Constants.CLIENT, msgID, offerID);

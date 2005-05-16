@@ -209,7 +209,16 @@ public class EnvelopeCreator {
             seq.setLastMessage(new LastMessage());
         }
 
+
+
         seq.toSoapEnvelop(responseEnvelope);
+
+        if (rmMessageContext.getReTransmissionCount() > 0) {
+                  AckRequested ackReq = new AckRequested();
+                  ackReq.setIdentifier(seqId);
+                 ackReq.toSoapEnvelop(responseEnvelope);
+          }
+
 
                 //TODO
         //Adding relatesTo header
@@ -278,7 +287,7 @@ public class EnvelopeCreator {
         id.setIdentifier(rmMessageContext.getSequenceID());
         seq.setIdentifier(id);
 
-        if (rmMessageContext.getReTransmissionCount() != 0) {
+        if (rmMessageContext.getReTransmissionCount() > 0) {
             AckRequested ackReq = new AckRequested();
             ackReq.setIdentifier(id);
             rmHeaders.setAckRequest(ackReq);

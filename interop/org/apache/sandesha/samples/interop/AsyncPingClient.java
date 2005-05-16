@@ -43,7 +43,7 @@ public class AsyncPingClient {
             Call call = (Call) service.createCall();
 
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
-            call.setProperty(Constants.ClientProperties.ACTION, "sandesha:ping");
+            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:ping");
 
             call.setProperty(Constants.ClientProperties.ACKS_TO,
                     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
