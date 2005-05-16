@@ -18,7 +18,9 @@
 package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.Address;
+import org.apache.axis.types.URI;
 import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPException;
@@ -46,9 +48,11 @@ public class AcksTo implements IRmElement {
      * @param element
      * @return Nack
      */
-    public AcksTo fromSOAPEnvelope(MessageElement element) throws Exception {
+    public AcksTo fromSOAPEnvelope(MessageElement element) throws SOAPException{
+
         Iterator iterator = element.getChildElements();
         MessageElement childElement;
+        try{
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
             if (childElement.getName().equals(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING + Constants.COLON + org.apache.axis.message.addressing.Constants.ADDRESS)) {
@@ -59,6 +63,9 @@ public class AcksTo implements IRmElement {
                 String uri = childElement.getFirstChild().getNodeValue();
                 address = new Address(uri);
             }
+        }
+        }catch(Exception e){
+            throw new SOAPException(e);
         }
         return this;
     }
@@ -112,5 +119,6 @@ public class AcksTo implements IRmElement {
     public void setAddress(Address address) {
         this.address = address;
     }
+
 
 }

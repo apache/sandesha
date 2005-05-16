@@ -16,9 +16,9 @@
 */
 package org.apache.sandesha;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.Handler;
 import org.apache.axis.SimpleChain;
-import org.apache.axis.client.Call;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.description.JavaServiceDesc;
@@ -29,6 +29,7 @@ import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.RMInvoker;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.server.ServerStorageManager;
+import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
 
@@ -103,15 +104,19 @@ public class RMInitiator {
         }
     }
 
-    public static RMStatus stopClient() {
+    public static RMStatus stopClient() throws AxisFault{
         //This should check whether we have received all the acks or reponses if any
         IStorageManager storageManager = new ClientStorageManager();
         storageManager.isAllSequenceComplete();
-
+        long startingTime = System.currentTimeMillis();
+        long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
         while (!storageManager.isAllSequenceComplete()) {
             try {
                 System.out.println(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
                 Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
+                if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
+                    RMInitiator.stopClientByForce();
+                }
             } catch (InterruptedException e) {
                 log.error(e);
             }
@@ -119,17 +124,37 @@ public class RMInitiator {
 
         if (listenerStarted) {
             sas.stop();
-          
+            
+            
+            //FOR JSP
             listenerStarted = false;
+            //END JSP
             listenerStarted = false;
         }
         sender.setRunning(false);
-        senderStarted = false;
         
-        storageManager.clearStorage();
+        //FOR JSP
+        senderStarted = false;
+        //END JSP
         return new RMStatus();
 
+    }
 
+    public static void stopClientByForce() throws AxisFault {
+        if (listenerStarted) {
+            sas.stop();
+
+            //FOR JSP
+            listenerStarted = false;
+            //END JSP
+            listenerStarted = false;
+        }
+        sender.setRunning(false);
+
+        //FOR JSP
+        senderStarted = false;
+        //END JSP
+        throw new AxisFault("Inactivity Timeout Reached, No Response from the Server");
     }
 
     private static void startListener() {
@@ -215,5 +240,5 @@ public class RMInitiator {
         return getHandlerChain(arr);
     }
 
-  
+
 }

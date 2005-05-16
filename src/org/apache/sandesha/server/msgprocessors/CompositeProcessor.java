@@ -93,7 +93,11 @@ public class CompositeProcessor implements IRMMessageProcessor {
 
                 //Send an Ack for every message received by the server.
                 //This should be changed according to the WS-policy.
-                return ackProcessor.sendAcknowledgement(rmMessageContext);
+                 if(rmHeaders.getAckRequest()!=null ||rmHeaders.getSequence().getLastMessage()!=null){
+                      return ackProcessor.sendAcknowledgement(rmMessageContext);
+                 } else{
+                     return false;
+                 }
             }
         }
         return false;

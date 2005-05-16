@@ -20,6 +20,8 @@ package org.apache.sandesha.samples.interop;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
+import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMTransport;
@@ -44,10 +46,8 @@ public class EchoClientSyncAck {
             // shoule be "false"
             RMInitiator.initClient(false);
 
-            //UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
-            //String str = uuidGen.nextUUID();
-
-            String str = "ABCDEF1234";
+            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
+            String str = uuidGen.nextUUID();
 
             Service service = new Service();
             Call call = (Call) service.createCall();

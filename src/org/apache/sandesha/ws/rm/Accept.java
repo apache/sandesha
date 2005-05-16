@@ -64,7 +64,7 @@ public class Accept extends MessageElement implements IRmElement {
         return acceptElement;
     }
 
-    public Accept fromSOAPEnvelope(MessageElement bodyElement) throws Exception{
+    public Accept fromSOAPEnvelope(MessageElement bodyElement) throws SOAPException{
 
         Iterator iterator = bodyElement.getChildElements();
         MessageElement childElement;

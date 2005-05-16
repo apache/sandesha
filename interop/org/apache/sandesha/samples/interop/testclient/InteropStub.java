@@ -126,6 +126,8 @@ public class InteropStub {
 		    acksTo = AddressingUtils.getAnonymousRoleURI();
 		
 		
+        String seq=new Long(System.currentTimeMillis()).toString();
+
 		try {
 		    boolean sync = false;
 		    
@@ -169,7 +171,7 @@ public class InteropStub {
 					call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
 				}
 				
-				String ret = (String) call.invoke(new Object[]{msg,"abcdef"});
+				String ret = (String) call.invoke(new Object[]{msg,seq});
 				System.out.println("Got response from server " + ret);
 			}
 

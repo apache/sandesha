@@ -20,9 +20,7 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.MessageID;
 import org.apache.axis.providers.java.JavaProvider;
-import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
@@ -59,14 +57,18 @@ public class RMInvoker implements Runnable {
                     JavaProvider provider = (JavaProvider) c.newInstance();
                     provider.invoke(rmMessageContext.getMsgContext());
 
-                    if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() != Void.TYPE) {
-                        String oldAction = rmMessageContext.getAddressingHeaders().getAction().toString();
-                        rmMessageContext.getAddressingHeaders().setAction(oldAction + Constants.RESPONSE);
+                    if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() !=
+                            Void.TYPE) {
+                        String oldAction = rmMessageContext.getAddressingHeaders().getAction()
+                                .toString();
+                        rmMessageContext.getAddressingHeaders().setAction(
+                                oldAction + Constants.RESPONSE);
                         if (rmMessageContext.isLastMessage()) {
                             //Insert Terminate Sequnce.
                             if (addrHeaders.getReplyTo() != null) {
                                 String replyTo = addrHeaders.getReplyTo().getAddress().toString();
-                                RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(rmMessageContext, Constants.SERVER);
+                                RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(
+                                        rmMessageContext, Constants.SERVER);
                                 terminateMsg.setOutGoingAddress(replyTo);
                                 storageManager.insertTerminateSeqMessage(terminateMsg);
                             } else {
@@ -78,31 +80,37 @@ public class RMInvoker implements Runnable {
                         // used in this case. This is done by the RMSender.
                         rmMessageContext.setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
 
-                        boolean hasResponseSeq = storageManager.isResponseSequenceExist(rmMessageContext.getSequenceID());
+                        boolean hasResponseSeq = storageManager.isResponseSequenceExist(
+                                rmMessageContext.getSequenceID());
                         boolean firstMsgOfResponseSeq = false;
-                        if (hasResponseSeq == true && rmMessageContext.getRMHeaders().getSequence().getMessageNumber().getMessageNumber() == 1){
-
-                        }
-                        else
+                        if (!(hasResponseSeq &&
+                                rmMessageContext.getRMHeaders().getSequence().getMessageNumber()
+                                .getMessageNumber() ==
+                                1)) {
                             firstMsgOfResponseSeq = !hasResponseSeq;
+                        }
 
-
-                        rmMessageContext.setMsgNumber(storageManager.getNextMessageNumber(rmMessageContext.getSequenceID()));
+                        rmMessageContext.setMsgNumber(
+                                storageManager.getNextMessageNumber(
+                                        rmMessageContext.getSequenceID()));
                         storageManager.insertOutgoingMessage(rmMessageContext);
 
 
                         if (firstMsgOfResponseSeq) {
+                            String msgIdStr = Constants.UUID + uuidGen.nextUUID();
 
-
-                            String msgIdStr = Constants.UUID +uuidGen.nextUUID();
-
-                            RMMessageContext csRMMsgCtx = RMMessageCreator.createCreateSeqMsg(rmMessageContext, Constants.SERVER,msgIdStr,null);
-                            csRMMsgCtx.setOutGoingAddress(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
+                            RMMessageContext csRMMsgCtx = RMMessageCreator.createCreateSeqMsg(
+                                    rmMessageContext, Constants.SERVER, msgIdStr, null);
+                            csRMMsgCtx.setOutGoingAddress(
+                                    rmMessageContext.getAddressingHeaders().getReplyTo()
+                                    .getAddress()
+                                    .toString());
 
                             csRMMsgCtx.addToMsgIdList(msgIdStr);
                             csRMMsgCtx.setMessageID(msgIdStr);
 
-                            storageManager.setTemporaryOutSequence(csRMMsgCtx.getSequenceID(), msgIdStr);
+                            storageManager.setTemporaryOutSequence(csRMMsgCtx.getSequenceID(),
+                                    msgIdStr);
                             storageManager.addCreateSequenceRequest(csRMMsgCtx);
                         }
                     }

@@ -26,10 +26,12 @@ import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.CallbackData;
 import org.apache.sandesha.storage.dao.ISandeshaDAO;
 import org.apache.sandesha.storage.dao.SandeshaDAOFactory;
-import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public class ClientStorageManager implements IStorageManager {
 
@@ -42,7 +44,9 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public ClientStorageManager() {
-        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,Constants.CLIENT);
+        accessor =
+                SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,
+                        Constants.CLIENT);
     }
 
     public boolean isSequenceExist(String sequenceID) {
@@ -118,7 +122,33 @@ public class ClientStorageManager implements IStorageManager {
      * Get a Map of messages.
      */
     public Map getListOfMessageNumbers(String sequenceID) {
-        return null;
+
+        String seq = getKeyFromOutgoingSeqId(sequenceID);
+        Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(seq);
+        Iterator it = st.iterator();
+        //To find the largest id present
+        long largest = 0;
+        while (it.hasNext()) {
+            Long key = (Long) it.next();
+            if (key == null)
+                continue;
+
+            long l = key.longValue();
+            if (l > largest)
+                largest = l;
+        }
+
+        HashMap results = new HashMap();
+        //Add Keys to the results in order.
+        long currentPosition = 1;
+        for (long l = 1; l <= largest; l++) {
+            boolean present = st.contains(new Long(l));
+            if (present) {
+                results.put(new Long(currentPosition), new Long(l));
+                currentPosition++;
+            }
+        }
+        return results;
     }
 
     /**
@@ -222,7 +252,6 @@ public class ClientStorageManager implements IStorageManager {
         if (0 >= messageNumber)
             return;
         Long msgNo = new Long(messageNumber);
-        
         accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
     }
 
@@ -345,7 +374,9 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public String getOutgoingSeqenceIdOfIncomingMsg(RMMessageContext msg) {
-        String msgId = msg.getMessageID();
+        //String msgId = msg.getMessageID();
+        RelatesTo relatesTo= (RelatesTo)msg.getAddressingHeaders().getRelatesTo().get(0);
+        String msgId=relatesTo.getURI().toString();
         return accessor.searchForSequenceId(msgId);
     }
 
@@ -400,8 +431,8 @@ public class ClientStorageManager implements IStorageManager {
         if (callBack != null)
             callBack.onOutgoingMessage(cbData);
     }
-    
-    public void clearStorage(){
+
+    public void clearStorage() {
         accessor.clear();
     }
 

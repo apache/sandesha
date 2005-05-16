@@ -8,8 +8,9 @@
 		<wsp:UsingPolicy wsdl:required="true" /> 
 		<wsp:Policy wsu:Id="MyPolicy" > 
 			<wsrm:RMAssertion> 
-				<wsrm:InactivityTimeout Milliseconds="600000" /> 
-				<wsrm:BaseRetransmissionInterval Milliseconds="3000" /> 
+			<!--	<wsrm:InactivityTimeout Milliseconds="600000" /> -->
+                <wsrm:InactivityTimeout Milliseconds="30000" />
+				<wsrm:BaseRetransmissionInterval Milliseconds="3000" />
 				<wsrm:ExponentialBackoff /> 
 				<wsrm:AcknowledgementInterval Milliseconds="200" /> 
 			</wsrm:RMAssertion> 

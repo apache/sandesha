@@ -96,6 +96,7 @@ public interface Constants {
         public static final String ACKS_TO = "AcksTo";
         public static final String SEQUENCE_OFFER = "Offer";
         public static final String ACCEPT="Accept";
+        public static final String IDENTIFIER="Identifier";
 
 
         public static final double MAX_MSG_NO = 18446744073709551615d;

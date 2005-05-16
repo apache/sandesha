@@ -3,9 +3,10 @@ package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-
+import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPException;
+import java.util.Iterator;
 
 /**
  * class Identifier
@@ -31,7 +32,8 @@ public class Identifier extends URI {
      */
     public Identifier() {
         identifierElement = new MessageElement();
-        identifierElement.setName("wsrm:Identifier");
+        identifierElement.setName(
+                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER);
     }
 
     /**
@@ -63,10 +65,10 @@ public class Identifier extends URI {
      * @return @throws
      *         SOAPException
      */
-    public MessageElement toSOAPEnvelope(MessageElement msgElement)
-            throws SOAPException {
-
-        msgElement.addChildElement("Identifier", "wsrm").addTextNode(identifier);
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
+        removeIdentifierElementIfAny(msgElement);
+        msgElement.addChildElement(Constants.WSRM.IDENTIFIER, Constants.WSRM.NS_PREFIX_RM)
+                .addTextNode(identifier);
         return msgElement;
     }
 
@@ -109,8 +111,8 @@ public class Identifier extends URI {
     public boolean equals(Object obj) {
 
         if (obj instanceof org.apache.sandesha.ws.rm.Identifier) {
-            if (this.identifier == ((String) (((org.apache.sandesha.ws.rm.Identifier) obj)
-                    .getIdentifier()))) {
+            if (this.identifier ==
+                    ((String) (((org.apache.sandesha.ws.rm.Identifier) obj).getIdentifier()))) {
                 return true;
             } else {
                 return false;
@@ -136,5 +138,17 @@ public class Identifier extends URI {
      */
     public String toString() {
         return identifier;
+    }
+
+    private void removeIdentifierElementIfAny(MessageElement msgElement) {
+
+        Iterator ite = msgElement.getChildElements();
+        while (ite.hasNext()) {
+            MessageElement childElement = (MessageElement) ite.next();
+            if (Constants.WSRM.IDENTIFIER.equals(childElement.getName()) &&
+                    (Constants.WSRM.NS_URI_RM.equals(childElement.getNamespaceURI()))) {
+                childElement.detachNode();
+            }
+        }
     }
 }

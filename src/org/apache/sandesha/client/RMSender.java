@@ -28,7 +28,9 @@ import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
+import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
@@ -87,9 +89,14 @@ public class RMSender extends BasicHandler {
 
             if (reqMsgCtx.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
+                long startingTime = System.currentTimeMillis();
+                long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
                 while (responseMessageContext == null) {
                     responseMessageContext =
                             checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
+                    if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
+                        RMInitiator.stopClientByForce();
+                    }
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
                 //We need these steps to filter all addressing and rm related headers.
@@ -105,6 +112,8 @@ public class RMSender extends BasicHandler {
 
         } catch (Exception ex) {
             log.error(ex);
+            throw new AxisFault(ex.getLocalizedMessage());
+
         }
     }
 

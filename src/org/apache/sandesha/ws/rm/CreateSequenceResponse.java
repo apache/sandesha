@@ -102,7 +102,7 @@ public class CreateSequenceResponse implements IRmElement {
      * @param bodyElement
      * @return CreateSequenceResponse
      */
-    public CreateSequenceResponse fromSOAPEnveploe(SOAPBodyElement bodyElement) throws Exception {
+    public CreateSequenceResponse fromSOAPEnveploe(SOAPBodyElement bodyElement) throws SOAPException {
 
         Iterator iterator = bodyElement.getChildElements();
         MessageElement childElement;

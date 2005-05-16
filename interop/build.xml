@@ -177,9 +177,10 @@ Build Instructions:
         <echo message="-------------------------------------------------------------------"/>
         <echo message="                                                                   "/>
         <echo message=" available targets are:                                            "/>
-        <echo message="   run_async_ping  -->runs interop test for AsyncPing              "/>
-        <echo message="   run_sync_ping   -->runs interop test for SyncPing               "/>
-        <echo message="   run_echo_string -->runs interop test for EchoStirng             "/>
+        <echo message="   ping_sync       -->runs interop test for AsyncPing              "/>
+        <echo message="   ping_async      -->runs interop test for SyncPing               "/>
+        <echo message="   echo_sync_ack   -->runs interop test for EchoStirng             "/>
+        <echo message="   echo_async_ack  -->runs interop test for EchoStirng             "/>
         <echo message="   compile.interop --> compiles the interop source code            "/>
         <echo message="   clean           --> cleans up all generated files and           "/>
         <echo message="   jar             --> creates the JAR file                        "/>
@@ -290,7 +291,6 @@ Build Instructions:
         </ant-->
         <copy todir="${build.interop}">
             <fileset dir="${dir.interop}" includes="client-config.wsdd"/>
-            <fileset dir="${dir.config}" includes="client-listener-config.wsdd"/>
             <fileset dir="${dir.config}" includes="sandesha.properties"/>
         </copy>
 
@@ -385,16 +385,16 @@ Build Instructions:
 	<target name="prepare-jar" depends="compile.library,prepare-dist" description="prepares for creating jar">
 
     	<property name="build.temp-jar" value="${build.dir}/temp-jar" />
-    	<property name="sandesha.jar.name" value="sandesha.jar" />
+    	<property name="sandesha.jar.name" value="sandesha-1.0.jar" />
 		<property name="dir.dist.jar" value="${dir.dist}/jar" />
 		<property name="sandesha.jar" value="${dir.dist.jar}/${sandesha.jar.name}" />
+        <property name="axishome" value="${env1.CATALINA_HOME}/webapps/axis/WEB-INF/lib" />
 		<mkdir dir="${dir.dist.jar}" />
 			
 	</target>
 	
 	<target name="jar" depends="prepare-jar" description="creates the sandesha jar">
-
-		<jar basedir="${build.classes}" destfile="${sandesha.jar}" />
+ 		<jar basedir="${build.classes}" destfile="${sandesha.jar}" />
 	
 	</target>
 		
@@ -428,7 +428,11 @@ Build Instructions:
 	<target name="war.copy" depends="war" >
 		<copy file="${sandesha.war}" todir="${webapps}" />
 	</target>
-	
+
+    <target name="jar.copy" depends="jar" >
+		<copy file="${sandesha.jar}" todir="${axishome}" />
+	</target>
+
 	<target name="war" depends="create.war" description="creates the war file" />
 	
 </project>

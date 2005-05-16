@@ -22,11 +22,7 @@ import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 /*
  * Created on Aug 4, 2004 at 5:08:29 PM
@@ -47,6 +43,7 @@ public class IncomingSequence {
     private long lastMsgNo = -1;
     private String acksTo = null;
     private String offer;
+    //private Set msgNumbers;
 
     public String getOffer() {
         return offer;
@@ -56,14 +53,14 @@ public class IncomingSequence {
         this.offer = offer;
     }
 
-    public void setAcksTo(String ack){
+    public void setAcksTo(String ack) {
         acksTo = ack;
     }
-    
-    public String getAcksTo(){
+
+    public String getAcksTo() {
         return acksTo;
     }
-    
+
     private boolean terminateReceived = false;
 
     public boolean isTerminateReceived() {
@@ -81,6 +78,7 @@ public class IncomingSequence {
         hasProcessableMessages = false;
         this.sequenceId = sequenceId;
         hash = new HashMap();
+        //msgNumbers= new HashSet();
     }
 
     public boolean hasProcessableMessages() {
@@ -100,6 +98,7 @@ public class IncomingSequence {
      */
     public Object putNewMessage(Long key, RMMessageContext value) {
         Object obj = hash.put(key, value);
+        //this.msgNumbers.add(key);
         refreshHasProcessableMessages();
         return obj;
     }
@@ -181,6 +180,8 @@ public class IncomingSequence {
 
     public Set getAllKeys() {
         return hash.keySet();
+        //return msgNumbers;
+
     }
 
     public void setProcessLock(boolean lock) {
@@ -212,9 +213,10 @@ public class IncomingSequence {
             if (lst != null) {
                 RelatesTo rl = (RelatesTo) lst.get(0);
                 String uri = rl.getURI().toString();
-                if (uri.equals(relatesTo))
+                if (uri.equals(relatesTo)) {
                     msgToSend = msg;
-                break;
+                    break;
+                }
             }
         }
 

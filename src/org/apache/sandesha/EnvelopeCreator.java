@@ -205,9 +205,13 @@ public class EnvelopeCreator {
         msgNumber.setMessageNumber(rmMessageContext.getMsgNumber());
 
         seq.setMessageNumber(msgNumber);
+        if(rmMessageContext.isLastMessage()){
+            seq.setLastMessage(new LastMessage());
+        }
+
         seq.toSoapEnvelop(responseEnvelope);
 
-        //TODO
+                //TODO
         //Adding relatesTo header
         //List relatesToList = addressingHeaders.getRelatesTo();
         //List relatesToList.set(0,rmMessageContext.getOldSequenceID());
