@@ -39,7 +39,7 @@ public interface Constants {
 
     public static final String URL_RM_SERVICE = "/axis/services/RMService";
     public static final String IGNORE_ACTION = "ignoreAction";
-    public static final String RESPONSE="Response";
+    public static final String RESPONSE = "Response";
 
     public static final long RETRANSMISSION_INTERVAL = 4000;
     public static final long ACKNOWLEDGEMENT_INTERVAL = 200;
@@ -60,24 +60,23 @@ public interface Constants {
     public static final int MSG_TYPE_ACKNOWLEDGEMENT = 5;
     public static final int MSG_TYPE_TERMINATE_SEQUENCE = 6;
 
-
     //To identify the end point
     public static final byte SERVER = 1;
     public static final byte CLIENT = 0;
 
-    public interface WSA{
+    public interface WSA {
         public static final String NS_ADDRESSING_ANONYMOUS = AddressingUtils.getAnonymousRoleURI();
     }
-
 
     public interface WSRM {
         public static final String NS_PREFIX_RM = "wsrm";
         public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2005/02/rm";
-        public static final String ACTION_CREATE_SEQUENCE = NS_URI_RM+"/CreateSequence";
-        public static final String ACTION_CREATE_SEQUENCE_RESPONSE = NS_URI_RM+"/CreateSequenceResponse";
-        public static final String ACTION_TERMINATE_SEQUENCE = NS_URI_RM+"/TerminateSequence";
-        public static final String SEQUENCE_ACKNOWLEDGEMENT_ACTION = NS_URI_RM+"/SequenceAcknowledgement";
-
+        public static final String ACTION_CREATE_SEQUENCE = NS_URI_RM + "/CreateSequence";
+        public static final String ACTION_CREATE_SEQUENCE_RESPONSE = NS_URI_RM +
+                "/CreateSequenceResponse";
+        public static final String ACTION_TERMINATE_SEQUENCE = NS_URI_RM + "/TerminateSequence";
+        public static final String SEQUENCE_ACKNOWLEDGEMENT_ACTION = NS_URI_RM +
+                "/SequenceAcknowledgement";
 
         public static final String ACK_RANGE = "AcknowledgementRange";
         public static final String UPPER = "Upper";
@@ -95,18 +94,10 @@ public interface Constants {
         public static final String SEQUENCE_FAULT = "SequenceFault";
         public static final String ACKS_TO = "AcksTo";
         public static final String SEQUENCE_OFFER = "Offer";
-        public static final String ACCEPT="Accept";
-        public static final String IDENTIFIER="Identifier";
-
+        public static final String ACCEPT = "Accept";
+        public static final String IDENTIFIER = "Identifier";
 
         public static final double MAX_MSG_NO = 18446744073709551615d;
-
-    }
-
-    public interface WSU {
-        public static final String WSU_PREFIX = "wsrm";
-        public static final String WSU_NS = "http://schemas.xmlsoap.org/ws/2005/02/rm";
-        public static final String IDENTIFIER = "Identifier";
     }
 
     public interface FaultMessages {
@@ -114,8 +105,8 @@ public interface Constants {
 
         public static final String NO_ADDRESSING_HEADERS = "No Addressing Headers Available in this Message";
         public static final String NO_MESSAGE_ID = "MessageID should be present in the message";
-        public static final String NO_TO="Required header <wsa:To> NOT found.";
-        public static final String NO_ACTION="Required header <wsa:Action> NOT found.";
+        public static final String NO_TO = "Required header <wsa:To> NOT found.";
+        public static final String NO_ACTION = "Required header <wsa:Action> NOT found.";
 
         public static final String NO_RM_HEADES = "No RM Headers Available in this Message";
 
@@ -123,12 +114,11 @@ public interface Constants {
         public static final String UNKNOWN_SEQUENCE = "The value of wsrm:Identifier is not a known Sequence identifier.";
         public static final String MSG_NO_ROLLOVER = "The maximum value for wsrm:MessageNumber has been exceeded.";
         public static final String LAST_MSG_NO_EXCEEDED = "The value for wsrm:MessageNumber exceeds the value of the MessageNumber accompanying a LastMessage element in this Sequence.";
-        public static final String INVALID_MESSAGE="Invalid Message";
+        public static final String INVALID_MESSAGE = "Invalid Message";
     }
 
     public interface FaultCodes {
         public static final String WSRM_SERVER_INTERNAL_ERROR = "ServerInternalError";
-
         public static final String IN_CORRECT_MESSAGE = "Incorrect Message";
         public static final String WSRM_FAULT_INVALID_ACKNOWLEDGEMENT = "wsrm:InvalidAcknowledgement";
         public static final String WSRM_FAULT_UNKNOWN_SEQUENCE = "wsrm:UnknownSequence";
@@ -167,7 +157,6 @@ public interface Constants {
 
     }
 
-
     //Constants related to the queue.
     public interface Queue {
         public static final String ADD_ERROR = "Error in adding message";
@@ -195,10 +184,10 @@ public interface Constants {
         public static final String LAST_MESSAGE = "lastMessage";
         public static final String SYNC = "sync";
         public static final String ACTION = "action";
-        public static final String ACKS_TO="acksTo";
-        public static final String TO="To";
-        public static final String FAULT_TO="faultTo";
-        public static final String SEND_OFFER="offer";
+        public static final String ACKS_TO = "acksTo";
+        public static final String TO = "to";
+        public static final String FAULT_TO = "faultTo";
+        public static final String SEND_OFFER = "offer";
 
         public static final String REQUEST_HANDLER = "requestHandler";
         public static final String RESPONSE_HANDLER = "responseHandler";

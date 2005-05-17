@@ -116,13 +116,13 @@ public class CreateSequence implements IRmElement {
             //TODO  add offer processing code here
             //TEST OFFER
             childElement = (MessageElement) iterator.next();
-            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
                 offer = new SequenceOffer();
                 offer.fromSOAPEnvelope(childElement);
             } else if (childElement.getName().equals(Constants.WSRM.SEQUENCE_OFFER)) {
                 offer = new SequenceOffer();
                 offer.fromSOAPEnvelope(childElement);
-            } else if (childElement.getName().equals(Constants.WSU.WSU_PREFIX + Constants.COLON + Constants.WSRM.ACKS_TO)) {
+            } else if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO)) {
                 acksTo = new AcksTo();
                 acksTo.fromSOAPEnvelope(childElement);
             } else if (childElement.getName().equals(Constants.WSRM.ACKS_TO)) {

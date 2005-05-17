@@ -381,7 +381,7 @@ Build Instructions:
 	
 	<target name="prepare-jar" depends="compile.library,prepare-dist" description="prepares for creating jar">
 
-    	<property name="sandesha.jar.name" value="sandesha-1.0.jar" />
+    	<property name="sandesha.jar.name" value="SandeshaInterop.jar" />
 		<property name="dir.dist.jar" value="${dir.dist}/jar" />
 		<property name="sandesha.jar" value="${dir.dist.jar}/${sandesha.jar.name}" />
         <property name="axishome" value="${env1.CATALINA_HOME}/webapps/axis/WEB-INF/lib" />
@@ -422,12 +422,16 @@ Build Instructions:
 	</target>
 	
 	<target name="war.copy" depends="war" >
+         <delete file="${webapps}/${sandesha.war}" />
+          <delete dir="${webapps}/sandesha" />
 		<copy file="${sandesha.war}" todir="${webapps}" />
 	</target>
 
     <target name="jar.copy" depends="jar" >
+        <delete file="${axishome}/${sandesha.jar.name}" />
 		<copy file="${sandesha.jar}" todir="${axishome}" />
 	</target>
+
 
 	<target name="war" depends="create.war" description="creates the war file" />
 

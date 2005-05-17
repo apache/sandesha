@@ -44,7 +44,7 @@
     </preGoal>
 
     <goal name="interop.jar" prereqs="java:compile">
-        <ant:property name="sandesha.jar.name" value="sandesha-interop.jar"/>
+        <ant:property name="sandesha.jar.name" value="Sandesha-interop.jar"/>
         <ant:mkdir dir="${basedir}/dist/jar"/>
         <ant:jar basedir="${maven.build.dir}/classes" destfile="${sandesha.jar.name}"/>
     </goal>

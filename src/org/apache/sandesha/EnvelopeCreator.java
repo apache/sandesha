@@ -80,8 +80,7 @@ public class EnvelopeCreator {
 
             To to = new To(new URI(incommingAddress.toString()));
             outGoingAddressingHaders.setTo(to);
-
-        }
+                }
         outGoingAddressingHaders.toEnvelope(envelope, null);
 
         //now set the body elements
@@ -105,26 +104,10 @@ public class EnvelopeCreator {
 
     public static SOAPEnvelope createCreateSequenceEnvelope(RMMessageContext rmMsgCtx) throws Exception {
 
-        AddressingHeaders addressingHeaders = rmMsgCtx.getAddressingHeaders();
+         AddressingHeaders addressingHeaders = rmMsgCtx.getAddressingHeaders();
         SOAPEnvelope envelope = createBasicEnvelop();
         addressingHeaders.toEnvelope(envelope);
         CreateSequence crSeq= rmMsgCtx.getRMHeaders().getCreateSequence();
-
-        //uncommenting following will send the sequence with a offer (for response seq) to the create seq msg.
-        //offer
-//        SequenceOffer offer = new SequenceOffer ();
-//        Identifier id = new Identifier ();
-//        UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-//        String offerUuid = Constants.UUID + uuidGen.nextUUID();
-//        id.setIdentifier(offerUuid);
-//
-//        offer.setIdentifier(id);
-//        crSeq.setOffer(offer);
-
-        //offered sequence will be considered as a requested one and will be added. So that the validation wont fail in response
-        //path
-
-        //end offer
 
         crSeq.toSoapEnvelop(envelope);
         return envelope;
@@ -135,16 +118,14 @@ public class EnvelopeCreator {
         SOAPEnvelope soapEnv = new SOAPEnvelope();
         addNamespaceDeclarations(soapEnv);
         return soapEnv;
-
-    }
+           }
 
     public static void addNamespaceDeclarations(SOAPEnvelope soapEnv) throws Exception {
 
         soapEnv.addNamespaceDeclaration(Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
         soapEnv.addNamespaceDeclaration(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING, org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT);
-        soapEnv.addNamespaceDeclaration(Constants.WSU.WSU_PREFIX, Constants.WSU.WSU_NS);
-
-    }
+        soapEnv.addNamespaceDeclaration(Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+         }
 
     public static SOAPEnvelope createAcknowledgementEnvelope(RMMessageContext rmMessageContext, String toAddress,Vector ackRangeVector) throws Exception {
 
@@ -172,8 +153,7 @@ public class EnvelopeCreator {
         outGoingAddressingHaders.setFrom(from);
 
         //Add to <To>
-
-        To to = new To(new URI(toAddress));
+              To to = new To(new URI(toAddress));
         outGoingAddressingHaders.setTo(to);
 
         //Set the addressing headers to the SOAPEnvelope.

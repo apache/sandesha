@@ -1,15 +1,16 @@
-<%@ page import="org.apache.sandesha.server.*,org.apache.sandesha.samples.interop.testclient.*,org.apache.sandesha.client.ClientStorageManager,org.apache.sandesha.ws.rm.providers.RMProvider,javax.servlet.jsp.*"%>
+<%@ page import="org.apache.sandesha.server.*,org.apache.sandesha.samples.interop.testclient.*,org.apache.sandesha.client.ClientStorageManager,org.apache.sandesha.ws.rm.providers.RMProvider,javax.servlet.jsp.*,
+                 java.io.Writer,
+                 java.io.PrintWriter"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="interopBean" scope="request" class="org.apache.sandesha.samples.interop.testclient.InteropBean" />
 <jsp:setProperty name="interopBean" property="*" />
 
 <%
-response.getWriter().println("<html>");
-response.getWriter().println("<head>");
-response.getWriter().flush();
+out.println("<html>");
+out.println("<head>");
 %>
 
-<title>Hi!! Welcome to Apache Sandesha Innterop Test</title>
+<title>Welcome to Apache Sandesha Innterop Test</title>
 <script>
 
        function displayServer(){
@@ -78,8 +79,7 @@ MM_reloadPage(true);
 <h1>Apache Sandesha Interop Testing</h1>
 
 <%
-
-	String endPoint         = request.getParameter("endPoint");
+ 	String endPoint = request.getParameter("endPoint");
 	String method = request.getParameter("method");
 	String run = request.getParameter("running");
 
@@ -98,11 +98,7 @@ MM_reloadPage(true);
         serverSelected = "false";
 	    clientSelected = "true";
     }
-
-	/*out.println( "client variable sorc is " + endPoint);
-	out.println( "client variable method is " + endPoint);
-	out.println( "running is " + run); */
-
+   ResponseWriter writer = new ResponseWriter (response.getWriter());
 
 %>
 <form method="post" name="InteropTesting" action="interop.jsp">
@@ -217,14 +213,14 @@ MM_reloadPage(true);
                         <tr>
  							<td width="4%">acks</td>
            					 <td width="13%"><input type="checkbox" name="acks" value="checked" checked></td>
-            				<td width="14%">Terminate seq</td>
+            				<td width="14%">Terminate Sequence</td>
            					 <td width="49%"><input type="checkbox" name="terminate" value="checked" checked></td>
                         </tr>
                 </table>
            </td>
         </tr>
         <tr>
-            <td colspan='1'>no. of Msgs</td>
+            <td colspan='1'>No. of Messages</td>
             <td colspan ='10' ><select name='noOfMsgs'>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -249,9 +245,11 @@ MM_reloadPage(true);
 </form>
 
 <hr />
+<% out.flush();%>
 <span>
 <%
-  	runTest(interopBean,response);
+   	runTest(interopBean,writer);
+    writer.flush();
 %>
 </span>
 
@@ -263,7 +261,7 @@ MM_reloadPage(true);
 
 <%!
 
-public void runTest(InteropBean bean,HttpServletResponse res) throws Exception {
+public void runTest(InteropBean bean,ResponseWriter writer) throws Exception {
 
 	String to = null;
 	if(bean!=null){
@@ -272,9 +270,9 @@ public void runTest(InteropBean bean,HttpServletResponse res) throws Exception {
 
 	if(to!=null) {
 			//session.setParameter("runTest");
-			ResponseWriter writer = new ResponseWriter (res.getWriter());
+			//ResponseWriter writer = new ResponseWriter (res.getWriter());
 
-			writer.write(" <br /> Starting test ....... <br /> ");
+        	writer.write(" <span><br /><h3> Starting Test ....... <br /></h3> ");
 			writer.flush();
 
 			String target = bean.getTarget();
@@ -285,15 +283,8 @@ public void runTest(InteropBean bean,HttpServletResponse res) throws Exception {
 			String operation = bean.getOperation();
 			int messages = bean.getNoOfMsgs();
 
-			//set the callbacks
-
-
-			//run the service
-
-
-			// ***********  code to run client test
-
 			//create callback classe and register
+
 			InteropCallback callback = new InteropCallback (writer);
 
             ClientStorageManager csm = new ClientStorageManager ();
@@ -301,33 +292,16 @@ public void runTest(InteropBean bean,HttpServletResponse res) throws Exception {
 			RMProvider.setCallback(callback);
 			Sender.setCallback(callback);
 
-
-			//start the test
-			//TestRunnerThread runner = new TestRunnerThread ();
-			//runner.setDaemon(true);
-			//runner.setMethod (method);
-			//runner.setBean(bean);
-
-
-
-			//runner.start();
-
-			//while(!callback.isTestFinished()){
-
-			//	Thread.sleep(100);
-			//}
-           InteropStub stub= new InteropStub();
+            InteropStub stub= new InteropStub();
+            InteropStub.setCallback(callback); 
         	if(operation.equalsIgnoreCase("ping")){
-		    stub.runPing(bean);
+		       stub.runPing(bean);
+            }else if(operation.equalsIgnoreCase("echoString") ){
+   		      stub.runEcho(bean);
+		    }
 
-		}else if(operation.equalsIgnoreCase("echoString") ){
-   		    stub.runEcho(bean);
-		}
-
-
-			writer.write ("  <br /> <br />Test finished... ");
-			writer.write ("<hr /><br />");
-			writer.flush();
+            writer.write ("  <br /> <br /><h3>Test Finished... </h3>");
+			writer.write ("<hr /><br /></span>");
 
 			csm.removeCallback();
 			RMProvider.removeCallback();

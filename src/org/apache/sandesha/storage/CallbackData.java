@@ -6,6 +6,8 @@
  */
 package org.apache.sandesha.storage;
 
+import org.apache.axis.AxisFault;
+
 import java.util.ArrayList;
 
 /**
@@ -21,12 +23,22 @@ public class CallbackData {
 	private long messageNumber;
 	private String messageId;
 	private String sequenceId;
+
+    public AxisFault getFault() {
+        return fault;
+    }
+
+    public void setFault(AxisFault fault) {
+        this.fault = fault;
+    }
+
 	private long ackStart;
 	private long ackEnd;
 	private ArrayList ackNack;
-	
-	
-	
+    private AxisFault fault;
+
+
+
     /**
      * @return Returns the action.
      */

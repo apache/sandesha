@@ -11,14 +11,25 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
 import org.apache.axis.message.addressing.util.AddressingUtils;
+import org.apache.axis.AxisFault;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMTransport;
+import org.apache.sandesha.storage.CallbackData;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
 public class InteropStub {
+    public static InteropCallback getCallback() {
+        return callback;
+    }
+
+    public static void setCallback(InteropCallback callback) {
+        InteropStub.callback = callback;
+    }
+
+    private static InteropCallback callback=null;
     public void runPing(InteropBean bean) {
 
         String target = bean.getTarget();
@@ -79,6 +90,8 @@ public class InteropStub {
             RMInitiator.stopClient();
 
         } catch (Exception e) {
+            if(callback!=null)
+            callback.onError(e);
             e.printStackTrace();
         }
     }
@@ -161,6 +174,8 @@ public class InteropStub {
             RMInitiator.stopClient();
 
         } catch (Exception e) {
+                if(callback!=null)
+            callback.onError(e);
             e.printStackTrace();
         }
     }

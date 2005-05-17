@@ -118,13 +118,13 @@ public class TerminateSequence implements IRmElement {
 
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(Constants.WSU.WSU_PREFIX+Constants.COLON+Constants.WSU.IDENTIFIER)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(Constants.WSU.IDENTIFIER)) {
+            if (childElement.getName().equals(Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
