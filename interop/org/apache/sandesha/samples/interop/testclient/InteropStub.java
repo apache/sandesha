@@ -21,6 +21,20 @@ import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
 public class InteropStub {
+
+    private InteropStub(){}
+
+    private static InteropStub stub=null;
+
+    public static InteropStub getInstance(){
+        if(stub!=null){
+           return stub;
+        }else{
+            stub=new InteropStub();
+            return stub;
+        }
+    }
+
     public static InteropCallback getCallback() {
         return callback;
     }
@@ -30,7 +44,8 @@ public class InteropStub {
     }
 
     private static InteropCallback callback=null;
-    public void runPing(InteropBean bean) {
+
+    public synchronized void runPing(InteropBean bean) {
 
         String target = bean.getTarget();
         String from = bean.getFrom();
@@ -96,7 +111,7 @@ public class InteropStub {
         }
     }
 
-    public void runEcho(InteropBean bean) {
+    public synchronized void runEcho(InteropBean bean) {
 
         String target = bean.getTarget();
         String from = bean.getFrom();

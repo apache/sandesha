@@ -28,7 +28,7 @@ public class TestRunnerThread extends Thread {
 	
 	public void run(){
 		
-		InteropStub stub = new InteropStub ();
+		InteropStub stub = InteropStub.getInstance();
 		String operation = bean.getOperation();
 		
 		

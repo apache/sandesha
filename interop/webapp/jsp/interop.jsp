@@ -292,8 +292,8 @@ public void runTest(InteropBean bean,ResponseWriter writer) throws Exception {
 			RMProvider.setCallback(callback);
 			Sender.setCallback(callback);
 
-            InteropStub stub= new InteropStub();
-            InteropStub.setCallback(callback); 
+            InteropStub stub= InteropStub.getInstance();
+            InteropStub.setCallback(callback);
         	if(operation.equalsIgnoreCase("ping")){
 		       stub.runPing(bean);
             }else if(operation.equalsIgnoreCase("echoString") ){
