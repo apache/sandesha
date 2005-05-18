@@ -266,6 +266,7 @@ Build Instructions:
         <copy todir="${build.classes}">
 
         	<fileset dir="${dir.config}">
+                <include name="interop-properties.properties" />
                 <include name="client-config.wsdd"/>
                 <include name="server-config.wsdd"/>
         		<include name="sandesha.properties" />
@@ -273,7 +274,8 @@ Build Instructions:
         		<include name="WSRMPolicy.xml" />
         		<include name="commons-logging.properties" />
         	</fileset>
-        	
+
+
         </copy>
     </target>
 
@@ -288,6 +290,7 @@ Build Instructions:
         <copy todir="${build.interop}">
             <fileset dir="${dir.interop}" includes="client-config.wsdd"/>
             <fileset dir="${dir.config}" includes="sandesha.properties"/>
+            <fileset dir="${dir.interop}" includes="sandesha-interop.properties"/>
         </copy>
 
     </target>
@@ -395,20 +398,28 @@ Build Instructions:
 	</target>
 		
 	<target name="prepare-war" depends="jar,compile.interop" description="prepares for creating war">
-
-		<property name="sandesha.war.name" value="sandesha.war" />
+       
+        <property name="interop.prop.file.name" value="sandesha-interop.properties"/>
+        <property name="sandesha.war.name" value="sandesha-interop.war" />
 		<property name="webxml" value="${dir.interop}/webapp/web.xml" />
 		<property name="dir.dist.war" value="${dir.dist}/war" />
 		<property name="sandesha.war" value="${dir.dist.war}/${sandesha.war.name}" />
 		<property name="webapps" value="${env1.CATALINA_HOME}/webapps" />
 		<mkdir dir="${dir.dist.war}" />
-		
+
+<!--         <copy todir="${build.interop}">-->
+<!--           <fileset dir="${dir.interop}" includes="sandesha-interop.properties"/>-->
+<!--        </copy>-->
+
+
+
 	</target>
 	
 	<target name="create.war" depends="prepare-war" description="creates the sandesha war">
 
 		<war destfile="${sandesha.war}" webxml="${webxml}">
 			<fileset dir="${dir.interop}/webapp/jsp" />
+            <filename name="{$interop.prop.file.name}"/>                
 			<classes dir="${build.interop}" />
 			<lib dir="${dir.libs}" />
 			<lib file="${sandesha.jar}" />
@@ -423,7 +434,7 @@ Build Instructions:
 	
 	<target name="war.copy" depends="war" >
          <delete file="${webapps}/${sandesha.war}" />
-          <delete dir="${webapps}/sandesha" />
+          <delete dir="${webapps}/sandesha-interop" />
 		<copy file="${sandesha.war}" todir="${webapps}" />
 	</target>
 
@@ -435,6 +446,6 @@ Build Instructions:
 
 	<target name="war" depends="create.war" description="creates the war file" />
 
- 
+
 
 </project>

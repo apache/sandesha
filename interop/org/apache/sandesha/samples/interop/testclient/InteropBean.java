@@ -4,16 +4,41 @@ import java.io.Serializable;
 
 
 public class InteropBean implements Serializable {
-	
-	private String target;
-	private String operation;
-	private String from;
-	private String replyto;
-	private int noOfMsgs;
-	private String terminate;
-	private String acks;
-	private String acksTo;
+
+    private String target;
+    private String operation;
+    private String from;
+    private String replyto;
+    private int noOfMsgs;
+    private String terminate;
+    private String acks;
+    private String acksTo;
     private boolean sendOffer;
+     private String faultto;
+    private String sourceURL;
+
+    public String getFaultto() {
+        return faultto;
+    }
+
+    public void setFaultto(String faultto) {
+        this.faultto = faultto;
+    }
+
+
+
+
+
+
+
+    public String getSourceURL() {
+        return sourceURL;
+    }
+
+    public void setSourceURL(String sourceURL) {
+        this.sourceURL = sourceURL;
+    }
+
 
     public String getAcksTo() {
         return acksTo;
@@ -23,25 +48,25 @@ public class InteropBean implements Serializable {
         this.acksTo = acksTo;
     }
 
-	public String getAcks() {
-		return acks;
-	}
+    public String getAcks() {
+        return acks;
+    }
 
-	public String getFrom() {
-		return from;
-	}
+    public String getFrom() {
+        return from;
+    }
 
-	public int getNoOfMsgs() {
-		return noOfMsgs;
-	}
+    public int getNoOfMsgs() {
+        return noOfMsgs;
+    }
 
-	public String getOperation() {
-		return operation;
-	}
+    public String getOperation() {
+        return operation;
+    }
 
-	public String getReplyto() {
-		return replyto;
-	}
+    public String getReplyto() {
+        return replyto;
+    }
 
     public boolean isSendOffer() {
         return sendOffer;
@@ -51,64 +76,64 @@ public class InteropBean implements Serializable {
         this.sendOffer = sendOffer;
     }
 
-	public String getTarget() {
-		return target;
-	}
+    public String getTarget() {
+        return target;
+    }
 
-	/**
-	 * @return
-	 */
-	public String getTerminate() {
-		return terminate;
-	}
+    /**
+     * @return
+     */
+    public String getTerminate() {
+        return terminate;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setAcks(String string) {
-		acks = string;
-	}
+    /**
+     * @param string
+     */
+    public void setAcks(String string) {
+        acks = string;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setFrom(String string) {
-		from = string;
-	}
+    /**
+     * @param string
+     */
+    public void setFrom(String string) {
+        from = string;
+    }
 
-	/**
-	 * @param i
-	 */
-	public void setNoOfMsgs(int i) {
-		noOfMsgs = i;
-	}
+    /**
+     * @param i
+     */
+    public void setNoOfMsgs(int i) {
+        noOfMsgs = i;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setOperation(String string) {
-		operation = string;
-	}
+    /**
+     * @param string
+     */
+    public void setOperation(String string) {
+        operation = string;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setReplyto(String string) {
-		replyto = string;
-	}
+    /**
+     * @param string
+     */
+    public void setReplyto(String string) {
+        replyto = string;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setTarget(String string) {
-		target = string;
-	}
+    /**
+     * @param string
+     */
+    public void setTarget(String string) {
+        target = string;
+    }
 
-	/**
-	 * @param string
-	 */
-	public void setTerminate(String string) {
-		terminate = string;
-	}
+    /**
+     * @param string
+     */
+    public void setTerminate(String string) {
+        terminate = string;
+    }
 
 }

@@ -188,6 +188,7 @@ public interface Constants {
         public static final String TO = "to";
         public static final String FAULT_TO = "faultTo";
         public static final String SEND_OFFER = "offer";
+        public static final String SOURCE_URL="sourceURL";
 
         public static final String REQUEST_HANDLER = "requestHandler";
         public static final String RESPONSE_HANDLER = "responseHandler";

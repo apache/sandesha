@@ -7,30 +7,43 @@
 package org.apache.sandesha.samples.interop.testclient;
 
 
+import org.apache.axis.AxisFault;
+import org.apache.axis.Handler;
+import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
 import org.apache.axis.message.addressing.util.AddressingUtils;
-import org.apache.axis.AxisFault;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMTransport;
-import org.apache.sandesha.storage.CallbackData;
+import org.apache.sandesha.client.ClientStorageManager;
+import org.apache.sandesha.server.Sender;
+import org.apache.sandesha.util.PolicyLoader;
+import org.apache.sandesha.util.PropertyLoader;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class InteropStub {
 
-    private InteropStub(){}
+    private InteropStub() {
+    }
 
-    private static InteropStub stub=null;
+    private static Sender sender = null;
+    private static Thread thSender = null;
+    private static ClientStorageManager storageManager = new ClientStorageManager();
 
-    public static InteropStub getInstance(){
-        if(stub!=null){
-           return stub;
-        }else{
-            stub=new InteropStub();
+    private static InteropStub stub = null;
+
+    public static InteropStub getInstance() {
+
+        if (stub != null) {
+            return stub;
+        } else {
+            stub = new InteropStub();
             return stub;
         }
     }
@@ -43,7 +56,7 @@ public class InteropStub {
         InteropStub.callback = callback;
     }
 
-    private static InteropCallback callback=null;
+    private static InteropCallback callback = null;
 
     public synchronized void runPing(InteropBean bean) {
 
@@ -72,7 +85,8 @@ public class InteropStub {
             }
             System.out.println("=========== RUNNING THE \"Ping\" INTEROP TEST ==========");
 
-            RMInitiator.initClient(sync);
+            //RMInitiator.initClient(sync);
+            InteropStub.initClient();
 
             Service service = new Service();
             Call call = (Call) service.createCall();
@@ -80,6 +94,14 @@ public class InteropStub {
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(sync));
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
             call.setProperty(Constants.ClientProperties.ACKS_TO, acksTo);
+            call.setProperty(Constants.ClientProperties.SOURCE_URL,bean.getSourceURL());
+            if(bean.getReplyto()!=null){
+                call.setProperty(Constants.ClientProperties.REPLY_TO,bean.getReplyto());
+            }
+             if(bean.getFaultto()!=null){
+                 System.out.println("setting faultto");
+                call.setProperty(Constants.ClientProperties.FAULT_TO,bean.getFaultto());
+            }
 
             if (from != null && from != "")
                 call.setProperty(Constants.ClientProperties.FROM, from);
@@ -102,11 +124,11 @@ public class InteropStub {
                 call.invoke(new Object[]{msg});
             }
 
-            RMInitiator.stopClient();
+            InteropStub.stopClient();
 
         } catch (Exception e) {
-            if(callback!=null)
-            callback.onError(e);
+            if (callback != null)
+                callback.onError(e);
             e.printStackTrace();
         }
     }
@@ -146,7 +168,7 @@ public class InteropStub {
             //User may specify some external(not in sandesha endpoint) replyTo address, then
             //he/she will not be able to retrieve the responses to this client, yet they can verify
             //the reliablility of the sent messages.
-            RMInitiator.initClient(false);
+            InteropStub.initClient();
 
             Service service = new Service();
             Call call = (Call) service.createCall();
@@ -155,6 +177,13 @@ public class InteropStub {
             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(sync));
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:echoString");
             call.setProperty(Constants.ClientProperties.ACKS_TO, acksTo);
+            call.setProperty(Constants.ClientProperties.SOURCE_URL,bean.getSourceURL());
+             if(bean.getReplyto()!=null){
+                call.setProperty(Constants.ClientProperties.REPLY_TO,bean.getReplyto());
+            }
+             if(bean.getFaultto()!=null){
+                call.setProperty(Constants.ClientProperties.FAULT_TO,bean.getFaultto());
+            }
 
             if (from != null && from != "")
                 call.setProperty(Constants.ClientProperties.FROM, from);
@@ -186,12 +215,92 @@ public class InteropStub {
                 System.out.println("Got response from server " + ret);
             }
 
-            RMInitiator.stopClient();
+            InteropStub.stopClient();
 
         } catch (Exception e) {
-                if(callback!=null)
-            callback.onError(e);
+            if (callback != null)
+                callback.onError(e);
             e.printStackTrace();
         }
     }
+
+    public static void initClient() {
+        System.out.println("STARTING SENDER FOR THE CLIENT .......");
+        sender = new Sender(storageManager);
+
+        SimpleChain reqChain = getRequestChain();
+        SimpleChain resChain = getResponseChain();
+        if (reqChain != null)
+            sender.setRequestChain(reqChain);
+        if (resChain != null)
+            sender.setResponseChain(resChain);
+
+        thSender = new Thread(sender);
+        thSender.setDaemon(false);
+        thSender.start();
+    }
+
+    public static void stopClient() throws AxisFault {
+        //This should check whether we have received all the acks or reponses if any
+        storageManager.isAllSequenceComplete();
+        long startingTime = System.currentTimeMillis();
+        long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
+        while (!storageManager.isAllSequenceComplete()) {
+            try {
+                System.out.println(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
+                Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
+                if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
+                    stopClientByForce();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        sender.setRunning(false);
+        storageManager.clearStorage();
+
+
+    }
+
+    public static void stopClientByForce() throws AxisFault {
+
+        sender.setRunning(false);
+        throw new AxisFault("Inactivity Timeout Reached, No Response from the Server");
+    }
+
+    private static SimpleChain getRequestChain() {
+        ArrayList arr = PropertyLoader.getRequestHandlerNames();
+        return getHandlerChain(arr);
+    }
+
+
+    private static SimpleChain getResponseChain() {
+
+        ArrayList arr = PropertyLoader.getResponseHandlerNames();
+        return getHandlerChain(arr);
+    }
+
+    public static SimpleChain getHandlerChain(List arr) {
+        SimpleChain reqHandlers = new SimpleChain();
+        Iterator it = arr.iterator();
+        boolean hasReqHandlers = false;
+        try {
+            while (it.hasNext()) {
+                hasReqHandlers = true;
+                String strClass = (String) it.next();
+                Class c = Class.forName(strClass);
+                Handler h = (Handler) c.newInstance();
+                reqHandlers.addHandler(h);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        if (hasReqHandlers)
+            return reqHandlers;
+        else
+            return null;
+    }
+
 }

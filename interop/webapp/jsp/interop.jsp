@@ -1,6 +1,12 @@
 <%@ page import="org.apache.sandesha.server.*,org.apache.sandesha.samples.interop.testclient.*,org.apache.sandesha.client.ClientStorageManager,org.apache.sandesha.ws.rm.providers.RMProvider,javax.servlet.jsp.*,
                  java.io.Writer,
-                 java.io.PrintWriter"%>
+                 java.io.PrintWriter,
+                 org.apache.sandesha.IStorageManager,
+                 org.apache.sandesha.Constants,
+                 org.apache.axis.SimpleChain,
+                 java.util.Properties,
+                 java.io.InputStream,
+                 java.io.IOException"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="interopBean" scope="request" class="org.apache.sandesha.samples.interop.testclient.InteropBean" />
 <jsp:setProperty name="interopBean" property="*" />
@@ -8,6 +14,32 @@
 <%
 out.println("<html>");
 out.println("<head>");
+
+    /////////////////////Load Properties///////////////////////////
+    String ip=null;
+    String port=null;
+    String warName=null;
+    String defaultTarget=null;
+    String defaultAsyncEndPoint=null;
+       Properties properties = new Properties();
+        try {
+
+            ClassLoader cl = this.getClass().getClassLoader();
+            InputStream is = cl.getResourceAsStream("sandesha-interop.properties");
+            properties.load(is);
+            ip=properties.getProperty("IP");
+            port=properties.getProperty("PORT");
+            warName=properties.getProperty("WAR_NAME");
+            defaultTarget="http://"+ip+":"+port+"/"+warName+"/services/RMInteropService";
+            defaultAsyncEndPoint="http://"+ip+":"+port+"/"+warName+"/services/RMService";
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    ///////////////////////////////////////////////////////////////
+
 %>
 
 <title>Welcome to Apache Sandesha Innterop Test</title>
@@ -47,8 +79,8 @@ out.println("<head>");
 				document.getElementById(txtItem).value = "anonymous";
 				//document.getElementById(txtItem).disabled = true;
 			}else if(val.value=="async"){
-				document.getElementById(txtItem).value = "http://127.0.0.1:9090/axis/services/RMService";
-				//document.getElementById(txtItem).disabled = false;
+				document.getElementById(txtItem).value = "<%=defaultAsyncEndPoint%>";
+                //document.getElementById(txtItem).disabled = false;
 			}
 		}
 
@@ -62,6 +94,7 @@ out.println("<head>");
 				document.getElementById('offerTR').style.display = '';
 			}
 		}
+
 
     </script>
 <script language="JavaScript" type="text/JavaScript">
@@ -100,6 +133,8 @@ MM_reloadPage(true);
     }
    ResponseWriter writer = new ResponseWriter (response.getWriter());
 
+
+
 %>
 <form method="post" name="InteropTesting" action="interop.jsp">
 
@@ -125,17 +160,18 @@ MM_reloadPage(true);
           </tr>
           <tr>
             <td>Target</td>
-            <td colspan="4"><input type='text' size='80' name='target'  /></td>
+            <td colspan="4"><input type='text' size='80' name='target'  value="<%=defaultTarget%>"/></td>
           </tr>
           <tr>
             <td width='20%'>Operation</td>
+<%--            <td colspan="4"><select name='operation' onchange="setOperation(this)">--%>
             <td colspan="4"><select name='operation' onchange="setOperation(this)">
                 <option value="Ping">Ping</option>
                 <option value="echoString">echoString</option>
               </select></td>
           </tr>
           <tr id="fromTR">
-            <td width='20%' >Acks to</td>
+            <td width='20%' >wsrmAcksTo</td>
             <td >
                 <table width="100%">
                         <tr>
@@ -152,25 +188,25 @@ MM_reloadPage(true);
            </td>
            </tr>
           <tr id="fromTR">
-            <td width='20%' >From</td>
+            <td width='20%' >wsa:From</td>
             <td >
                 <table width="100%">
                         <tr>
-                                <td> <select name='from1' onchange="changeSelect('from',this)">
-                                        <option value="none">none</option>
+                                <td> <select name='from1' onchange="changeSelect('from',this)" >
+<%--                                        <option value="none">none</option>--%>
                                         <option value="sync">Synchronous</option>
                                         <option value="async">Asynchronous</option>
                                         </select>
                                 </td>
                                 <td>
-                                        <input type='text' size='80' name='from'  id='from' />
+                                        <input type='text' size='80' name='from'  id='from' value='anonymous'/>
                                 </td>
                         </tr>
                 </table>
            </td>
         </tr>
-          <tr id="replytoTR" style="display:none">
-            <td width='20%' >Reply to</td>
+          <tr id="replytoTR" >
+            <td width='20%' >wsa:ReplyTo</td>
             <td >
                 <table width="100%">
                         <tr>
@@ -183,6 +219,26 @@ MM_reloadPage(true);
                                 </td>
                                 <td>
                                         <input type='text' size='80' name='replyto'  id='replyto' />
+                                </td>
+                        </tr>
+                </table>
+           </td>
+        </tr>
+
+           <tr id="faulttoTR">
+            <td width='20%' >wsa:FaultTo</td>
+            <td >
+                <table width="100%">
+                        <tr>
+                                <td>
+                                <select name='faultto1' onchange="changeSelect('faultto',this)">
+                      				<option value="none">none</option>
+                      				<option value="sync">Synchronous</option>
+                      				<option value="async">Asynchronous</option>
+                    			</select>
+                                </td>
+                                <td>
+                                        <input type='text' size='80' name='faultto'  id='faultto' />
                                 </td>
                         </tr>
                 </table>
@@ -248,7 +304,7 @@ MM_reloadPage(true);
 <% out.flush();%>
 <span>
 <%
-   	runTest(interopBean,writer);
+   	runTest(interopBean,writer,defaultAsyncEndPoint);
     writer.flush();
 %>
 </span>
@@ -261,11 +317,12 @@ MM_reloadPage(true);
 
 <%!
 
-public void runTest(InteropBean bean,ResponseWriter writer) throws Exception {
+public void runTest(InteropBean bean,ResponseWriter writer,String defaultAsyncEndPoint) throws Exception {
 
 	String to = null;
 	if(bean!=null){
 		to = bean.getTarget();
+        bean.setSourceURL(defaultAsyncEndPoint);
 	}
 
 	if(to!=null) {
@@ -290,6 +347,7 @@ public void runTest(InteropBean bean,ResponseWriter writer) throws Exception {
             ClientStorageManager csm = new ClientStorageManager ();
 			csm.setCallback(callback);
 			RMProvider.setCallback(callback);
+            RMClientProvider.setCallback(callback);
 			Sender.setCallback(callback);
 
             InteropStub stub= InteropStub.getInstance();
@@ -306,5 +364,6 @@ public void runTest(InteropBean bean,ResponseWriter writer) throws Exception {
 			csm.removeCallback();
 			RMProvider.removeCallback();
 		}
-}
+
+    }
 %>

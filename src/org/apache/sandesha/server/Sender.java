@@ -344,9 +344,7 @@ public class Sender implements Runnable {
     }
 
     private void processResponseMessage(Call call, RMMessageContext rmMessageContext) throws Exception {
-        
-
-        
+   
         if (call.getResponseMessage() != null) {
             RMHeaders rmHeaders = new RMHeaders();
             rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());

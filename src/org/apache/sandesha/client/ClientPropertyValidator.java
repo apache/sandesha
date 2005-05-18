@@ -150,14 +150,21 @@ public class ClientPropertyValidator {
 
 
     private static String getSourceURL(Call call) throws UnknownHostException {
-        String sourceURI = null;
-        InetAddress addr = InetAddress.getLocalHost();
+        String sourceURL = null;
+        sourceURL = (String) call.getProperty(Constants.ClientProperties.SOURCE_URL);
+        if (sourceURL != null) {
+            return sourceURL;
+        } else {
 
-        sourceURI = Constants.HTTP + Constants.COLON + Constants.SLASH + Constants.SLASH +
-                addr.getHostAddress() + Constants.COLON + PropertyLoader.getClientSideListenerPort()
-                + Constants.URL_RM_SERVICE;
+            InetAddress addr = InetAddress.getLocalHost();
 
-        return sourceURI;
+            sourceURL = Constants.HTTP + Constants.COLON + Constants.SLASH + Constants.SLASH +
+                    addr.getHostAddress() + Constants.COLON +
+                    PropertyLoader.getClientSideListenerPort() +
+                    Constants.URL_RM_SERVICE;
+
+            return sourceURL;
+        }
     }
 
     /**
@@ -181,7 +188,8 @@ public class ClientPropertyValidator {
 
     }
 
-    private static String getValidated(long msgNumber, String action, String replyTo, boolean sync, boolean inOut) {
+    private static String getValidated(long msgNumber, String action, String replyTo, boolean sync,
+                                       boolean inOut) {
         String errorMsg = null;
 
         if (sync && inOut && replyTo == null) {

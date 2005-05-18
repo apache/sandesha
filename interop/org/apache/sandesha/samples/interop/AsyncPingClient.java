@@ -47,6 +47,7 @@ public class AsyncPingClient {
 
             call.setProperty(Constants.ClientProperties.ACKS_TO,
                     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+            
 
             call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("http://tempuri.org", "Ping"));
