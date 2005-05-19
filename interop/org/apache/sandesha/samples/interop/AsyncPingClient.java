@@ -22,6 +22,8 @@ import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMInitiator;
+import org.apache.sandesha.RMReport;
+import org.apache.sandesha.RMStatus;
 import org.apache.sandesha.RMTransport;
 
 import javax.xml.namespace.QName;
@@ -69,7 +71,18 @@ public class AsyncPingClient {
             call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
             call.invoke(new Object[]{"Ping Message Number Three"});
 
-            RMInitiator.stopClient();
+            RMStatus status = RMInitiator.stopClient();
+
+            if(status!=null){
+            	RMReport report = status.getReport();
+            	
+            	if(report!=null){
+            		System.out.println("\n***********Printing RM Report***********");
+            		System.out.println("Were all messages add     - " + report.isAllAcked());
+            		System.out.println("No of response messages   - " + report.getNumberOfReturnMessages());
+            		System.out.println("****************************************\n");
+            	}
+            }
 
         } catch (Exception e) {
             //System.err.println(e.toString());

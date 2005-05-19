@@ -24,6 +24,8 @@ import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMInitiator;
+import org.apache.sandesha.RMReport;
+import org.apache.sandesha.RMStatus;
 import org.apache.sandesha.RMTransport;
 
 import javax.xml.namespace.QName;
@@ -82,7 +84,19 @@ public class EchoClientAsyncAck {
             ret = (String) call.invoke(new Object[]{"Sandesha Echo 3", str});
             System.out.println("The Response for Third Messsage is  :" + ret);
 
-            RMInitiator.stopClient();
+            RMStatus status = RMInitiator.stopClient();
+
+            if(status!=null){
+            	RMReport report = status.getReport();
+            	
+            	if(report!=null){
+            		System.out.println("\n***********Printing RM Report***********");
+            		System.out.println("Were all messages add     - " + report.isAllAcked());
+            		System.out.println("No of response messages   - " + report.getNumberOfReturnMessages());
+            		System.out.println("****************************************\n");
+            	}
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
