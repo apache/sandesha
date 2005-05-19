@@ -17,12 +17,24 @@
 package org.apache.sandesha;
 
 public class RMReport {
+	
+	private boolean allAcked;
+	private int returns;
+	
     public boolean isAllAcked() {
-        return false;
+        return allAcked;
     }
 
     public int getNumberOfReturnMessages() {
-        return 0;
+        return returns;
+    }
+    
+    public void setAllAcked(boolean acked){
+    	allAcked = acked;
+    }
+    
+    public void setNoOfReturmMessages(int n){
+    	returns = n;
     }
 
 }

@@ -30,6 +30,7 @@ import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.RMStatus;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.ws.rm.RMHeaders;
@@ -99,6 +100,13 @@ public class RMSender extends BasicHandler {
                     }
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
+                
+                
+                //setting RMStatus;
+                if(responseMessageContext!=null)
+                	RMStatus.incrementResponseCount();
+                
+                
                 //We need these steps to filter all addressing and rm related headers.
                 Message resMsg = responseMessageContext.getMsgContext().getRequestMessage();
                 RMHeaders.removeHeaders(resMsg.getSOAPEnvelope());

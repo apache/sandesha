@@ -16,13 +16,29 @@
  */
 package org.apache.sandesha;
 
+import org.apache.sandesha.client.ClientStorageManager;
+
 public class RMStatus {
+	
+	private static int responseCount = 0;
+	
+	public static void incrementResponseCount(){
+		responseCount++;
+	}
+	
     public boolean isComplete() {
+    	
         return false;
     }
 
     public RMReport getReport() {
-        return new RMReport();
+    	
+    	RMReport report = new RMReport();
+    	ClientStorageManager csm = new ClientStorageManager();
+    	report.setAllAcked( csm.isAllSequenceComplete());
+    	report.setNoOfReturmMessages(responseCount);
+        return report;
+    
     }
 
 }
