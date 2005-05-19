@@ -314,6 +314,9 @@ public class EnvelopeCreator {
         //if (addressingHeaders.getReplyTo() != null && rmMessageContext.isHasResponse())
         if (addressingHeaders.getReplyTo() != null)//&& rmMessageContext.isHasResponse())
             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
+
+         if (addressingHeaders.getFaultTo() != null)//&& rmMessageContext.isHasResponse())
+            outGoingAddressingHaders.setFaultTo(addressingHeaders.getFaultTo());
         try {
             Action action = new Action(new URI(rmMessageContext.getAction()));
             outGoingAddressingHaders.setAction(action);
@@ -353,6 +356,8 @@ public class EnvelopeCreator {
 
         if(addressingHeaders.getReplyTo()!=null)
             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
+         if(addressingHeaders.getFaultTo()!=null)
+            outGoingAddressingHaders.setFaultTo(addressingHeaders.getFaultTo());
 
         outGoingAddressingHaders.toEnvelope(terSeqEnv, null);
 

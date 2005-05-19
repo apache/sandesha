@@ -90,21 +90,10 @@ public class RMMessageCreator {
         } else {
             csAddrHeaders.setTo(new To(rmMsgCtx.getTo()));
             if (rmMsgCtx.getSync()) {
-                if (rmMsgCtx.getFrom() != null)
-                    csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
-                else
-                    csAddrHeaders.setFrom(
-                            new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
-                if (rmMsgCtx.getFaultTo() != null)
-                    csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFaultTo()));
-                else
-                    csAddrHeaders.setFaultTo(
-                            new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
-                if (rmMsgCtx.getReplyTo() != null)
-                    csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getReplyTo()));
-                else
-                    csAddrHeaders.setReplyTo(
-                            new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+                setSyncAddressingHeaders(csAddrHeaders);
+                csAddrHeaders.setReplyTo(
+                        new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+
             } else {
                 String sourceURL = rmMsgCtx.getSourceURL();
                 if (rmMsgCtx.getFrom() != null)
@@ -121,6 +110,30 @@ public class RMMessageCreator {
         }
         return csAddrHeaders;
     }
+
+    private static void setSyncAddressingHeaders(AddressingHeaders csAddrHeaders)
+            throws URI.MalformedURIException {
+        csAddrHeaders.setFrom(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+        csAddrHeaders.setFaultTo(new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
+
+    }
+
+    private static void setAsyncAddressingHeaders(RMMessageContext rmMsgCtx,
+                                                  AddressingHeaders csAddrHeaders)
+            throws URI.MalformedURIException {
+        String sourceURL = rmMsgCtx.getSourceURL();
+        if (rmMsgCtx.getFrom() != null)
+            csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
+        else
+            csAddrHeaders.setFrom(new EndpointReference(sourceURL));
+
+        if (rmMsgCtx.getReplyTo() != null)
+            csAddrHeaders.setReplyTo(new EndpointReference(rmMsgCtx.getReplyTo()));
+
+        if (rmMsgCtx.getFaultTo() != null)
+            csAddrHeaders.setFaultTo(new EndpointReference(rmMsgCtx.getFaultTo()));
+    }
+
 
     private static AcksTo getAcksTo(RMMessageContext rmMsgCtx, byte endPoint) throws Exception {
         AcksTo acksTo = null;
@@ -178,16 +191,12 @@ public class RMMessageCreator {
             csAddrHeaders.setFrom(new EndpointReference(ah.getTo().toString()));
         } else {
             csAddrHeaders.setTo(new To(rmMsgCtx.getTo()));
-            String sourceURL = rmMsgCtx.getSourceURL();
-            if (rmMsgCtx.getFrom() != null)
-                csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
-            else
-                csAddrHeaders.setFrom(new EndpointReference(sourceURL));
-            if (rmMsgCtx.getFaultTo() != null)
-                csAddrHeaders.setFaultTo(new EndpointReference(rmMsgCtx.getFaultTo()));
-            if (rmMsgCtx.getReplyTo() != null)
-                csAddrHeaders.setFaultTo(new EndpointReference(rmMsgCtx.getReplyTo()));
+            if (rmMsgCtx.getSync()) {
+                setSyncAddressingHeaders(csAddrHeaders);
+            } else {
+                setAsyncAddressingHeaders(rmMsgCtx, csAddrHeaders);
 
+            }
         }
         return csAddrHeaders;
     }
@@ -205,6 +214,7 @@ public class RMMessageCreator {
     public static RMMessageContext createServiceRequestMessage(RMMessageContext rmMsgCtx)
             throws Exception {
         AddressingHeaders addrHeaders = getAddressingHeaedersForServiceRequest(rmMsgCtx);
+
         if (rmMsgCtx.getAction() != null)
             addrHeaders.setAction(new Action(new URI(rmMsgCtx.getAction())));
         rmMsgCtx.setAddressingHeaders(addrHeaders);
@@ -218,36 +228,12 @@ public class RMMessageCreator {
             RMMessageContext rmMsgCtx) throws Exception {
         AddressingHeaders csAddrHeaders = new AddressingHeaders();
         csAddrHeaders.setTo(new To(rmMsgCtx.getTo()));
-         if (rmMsgCtx.getSync()) {
-                if (rmMsgCtx.getFrom() != null)
-                    csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
-                else
-                    csAddrHeaders.setFrom(
-                            new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
-                if (rmMsgCtx.getFaultTo() != null)
-                    csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFaultTo()));
-                else
-                    csAddrHeaders.setFaultTo(
-                            new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
-                if (rmMsgCtx.getReplyTo() != null)
-                    csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getReplyTo()));
-                else
-                    csAddrHeaders.setReplyTo(
-                            new EndpointReference(Constants.WSA.NS_ADDRESSING_ANONYMOUS));
-            } else {
-            String sourceURL = rmMsgCtx.getSourceURL();
-            if (rmMsgCtx.getFrom() != null)
-                csAddrHeaders.setFrom(new EndpointReference(rmMsgCtx.getFrom()));
-            else
-                csAddrHeaders.setFrom(new EndpointReference(sourceURL));
-            if (rmMsgCtx.isHasResponse()) {
-                if (rmMsgCtx.getReplyTo() != null)
-                    csAddrHeaders.setReplyTo(new EndpointReference(rmMsgCtx.getReplyTo()));
-                else
-                    csAddrHeaders.setReplyTo(new EndpointReference(sourceURL));
-            }
-            if (rmMsgCtx.getFaultTo() != null)
-                csAddrHeaders.setFaultTo(new EndpointReference(rmMsgCtx.getFaultTo()));
+        if (rmMsgCtx.getSync()) {
+            setSyncAddressingHeaders(csAddrHeaders);
+        } else {
+            setAsyncAddressingHeaders(rmMsgCtx, csAddrHeaders);
+            if (rmMsgCtx.isHasResponse() && csAddrHeaders.getReplyTo() == null)
+                csAddrHeaders.setReplyTo(new EndpointReference(rmMsgCtx.getSourceURL()));
         }
         return csAddrHeaders;
     }

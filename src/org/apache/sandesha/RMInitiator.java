@@ -104,6 +104,14 @@ public class RMInitiator {
         }
     }
 
+        public static void initClient() {
+        init(true);
+        if (!listenerStarted) {
+            listenerStarted = true;
+            startListener();
+        }
+    }
+
     public static RMStatus stopClient() throws AxisFault {
         //This should check whether we have received all the acks or reponses if any
         IStorageManager storageManager = new ClientStorageManager();

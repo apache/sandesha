@@ -147,9 +147,10 @@ public class Sender implements Runnable {
      */
     private void sendTerminateSequenceRequest(RMMessageContext rmMessageContext) throws Exception {
         SOAPEnvelope terSeqEnv = EnvelopeCreator.createTerminatSeqMessage(rmMessageContext);
+
         Message terSeqMsg = new Message(terSeqEnv);
         rmMessageContext.getMsgContext().setRequestMessage(terSeqMsg);
-
+       
         Call call;
         rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
         rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);

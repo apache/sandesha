@@ -145,7 +145,7 @@ public class ClientPropertyValidator {
         if (synchronous != null) {
             return synchronous.booleanValue();
         } else
-            return true;//If the user has not specified the synchronous
+            return false;//If the user has not specified the synchronous
     }
 
 
