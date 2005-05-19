@@ -23,6 +23,7 @@ import org.apache.sandesha.util.PropertyLoader;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
+import javax.xml.rpc.ServiceException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,66 +59,81 @@ public class InteropStub {
 
     private static InteropCallback callback = null;
 
-    public synchronized void runPing(InteropBean bean) {
 
+    private Call getCall(InteropBean bean) throws ServiceException {
         String target = bean.getTarget();
         String from = bean.getFrom();
         String replyTo = bean.getReplyto();
         String acksTo = bean.getAcksTo();
-        String acks = bean.getAcks();
-        String terminate = bean.getTerminate();
-        String operation = bean.getOperation();
-        int messages = bean.getNoOfMsgs();
+        String faultTo = bean.getFaultto();
 
-        if (replyTo != null && replyTo.equalsIgnoreCase("anonymous"))
-            replyTo = AddressingUtils.getAnonymousRoleURI();
+        boolean sendOffer = false;
+        if (bean.getOffer().equalsIgnoreCase("yes"))
+            sendOffer = true;
 
-        if (from != null && from.equalsIgnoreCase("anonymous"))
+        Service service = new Service();
+        Call call = (Call) service.createCall();
+
+        if (replyTo != null && replyTo.equalsIgnoreCase("anonymous")) {
+            call.setProperty(Constants.ClientProperties.REPLY_TO,
+                    AddressingUtils.getAnonymousRoleURI());
+        } else if (replyTo != null) {
+            call.setProperty(Constants.ClientProperties.REPLY_TO, bean.getReplyto());
+        }
+
+        if (from != null && from.equalsIgnoreCase("anonymous")) {
             from = AddressingUtils.getAnonymousRoleURI();
+            call.setProperty(Constants.ClientProperties.FROM,
+                    AddressingUtils.getAnonymousRoleURI());
+        } else if (from != null) {
+            call.setProperty(Constants.ClientProperties.FROM, from);
+        }
 
-        if (acksTo != null && acksTo.equalsIgnoreCase("anonymous"))
+        if (acksTo != null && acksTo.equalsIgnoreCase("anonymous")) {
             acksTo = AddressingUtils.getAnonymousRoleURI();
-
-        try {
-            boolean sync = false;
-            if (acksTo.equals(AddressingUtils.getAnonymousRoleURI())) {
-                sync = true;
-            }
-            System.out.println("=========== RUNNING THE \"Ping\" INTEROP TEST ==========");
-
-            //RMInitiator.initClient(sync);
-            InteropStub.initClient();
-
-            Service service = new Service();
-            Call call = (Call) service.createCall();
-
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(sync));
-            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
+            call.setProperty(Constants.ClientProperties.ACKS_TO,
+                    AddressingUtils.getAnonymousRoleURI());
+        } else if (acksTo != null) {
             call.setProperty(Constants.ClientProperties.ACKS_TO, acksTo);
-            call.setProperty(Constants.ClientProperties.SOURCE_URL,bean.getSourceURL());
-            if(bean.getReplyto()!=null){
-                call.setProperty(Constants.ClientProperties.REPLY_TO,bean.getReplyto());
-            }
-             if(bean.getFaultto()!=null){
-                 System.out.println("setting faultto");
-                call.setProperty(Constants.ClientProperties.FAULT_TO,bean.getFaultto());
-            }
+        }
 
-            if (from != null && from != "")
-                call.setProperty(Constants.ClientProperties.FROM, from);
+        if (faultTo != null && faultTo.equalsIgnoreCase("anonymous")) {
+            faultTo = AddressingUtils.getAnonymousRoleURI();
+            call.setProperty(Constants.ClientProperties.FAULT_TO,
+                    AddressingUtils.getAnonymousRoleURI());
+        } else if (faultTo != null) {
+            call.setProperty(Constants.ClientProperties.FAULT_TO, bean.getFaultto());
+        }
 
-            if (replyTo != null && replyTo != "")
-                call.setProperty(Constants.ClientProperties.REPLY_TO, replyTo);
 
-            call.setTargetEndpointAddress(target);
+        if (sendOffer)
+            call.setProperty(Constants.ClientProperties.SEND_OFFER, new Boolean(true));
+
+        call.setTargetEndpointAddress(target);
+        call.setProperty(Constants.ClientProperties.SOURCE_URL, bean.getSourceURL());
+
+        return call;
+    }
+
+    public synchronized void runPing(InteropBean bean) {
+
+        System.out.println("=========== RUNNING THE \"Ping\" INTEROP TEST ==========");
+        String target = bean.getTarget();
+        int msgs = bean.getNoOfMsgs();
+        try {
+            InteropStub.initClient();
+            Call call = getCall(bean);
+
+            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
+
             call.setOperationName(new QName("http://tempuri.org", "Ping"));
             call.setTransport(new RMTransport(target, ""));
 
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
 
-            for (int i = 1; i <= messages; i++) {
+            for (int i = 1; i <= msgs; i++) {
                 call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long((i)));
-                if (i == messages) {
+                if (i == msgs) {
                     call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
                 }
                 String msg = "Sandesha Ping Message Number " + i;
@@ -136,32 +152,10 @@ public class InteropStub {
     public synchronized void runEcho(InteropBean bean) {
 
         String target = bean.getTarget();
-        String from = bean.getFrom();
-        String replyTo = bean.getReplyto();
-        String acksTo = bean.getAcksTo();
-        String acks = bean.getAcks();
-        String terminate = bean.getTerminate();
-        String operation = bean.getOperation();
-        boolean sendOffer = bean.isSendOffer();
-
         int messages = bean.getNoOfMsgs();
-
-        if (replyTo != null && replyTo.equalsIgnoreCase("anonymous"))
-            replyTo = AddressingUtils.getAnonymousRoleURI();
-
-        if (from != null && from.equalsIgnoreCase("anonymous"))
-            from = AddressingUtils.getAnonymousRoleURI();
-
-        if (acksTo != null && acksTo.equalsIgnoreCase("anonymous"))
-            acksTo = AddressingUtils.getAnonymousRoleURI();
-
         String seq = new Long(System.currentTimeMillis()).toString();
 
         try {
-            boolean sync = false;
-            if (acksTo.equalsIgnoreCase("anonymous"))
-                sync = true;
-
             System.out.println("=========== RUNNING THE \"echoString\" INTEROP TEST ==========");
 
             //We start the listener to be in the safe side.
@@ -170,30 +164,8 @@ public class InteropStub {
             //the reliablility of the sent messages.
             InteropStub.initClient();
 
-            Service service = new Service();
-            Call call = (Call) service.createCall();
-
-            System.out.println("Echo sync:" + sync);
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(sync));
+            Call call = getCall(bean);
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:echoString");
-            call.setProperty(Constants.ClientProperties.ACKS_TO, acksTo);
-            call.setProperty(Constants.ClientProperties.SOURCE_URL,bean.getSourceURL());
-             if(bean.getReplyto()!=null){
-                call.setProperty(Constants.ClientProperties.REPLY_TO,bean.getReplyto());
-            }
-             if(bean.getFaultto()!=null){
-                call.setProperty(Constants.ClientProperties.FAULT_TO,bean.getFaultto());
-            }
-
-            if (from != null && from != "")
-                call.setProperty(Constants.ClientProperties.FROM, from);
-
-            if (replyTo != null && replyTo != "")
-                call.setProperty(Constants.ClientProperties.REPLY_TO, replyTo);
-
-            if (sendOffer) {
-                call.setProperty(Constants.ClientProperties.SEND_OFFER, new Boolean(true));
-            }
 
             call.setTargetEndpointAddress(target);
             call.setOperationName(new QName("http://tempuri.org/", "echoString"));
@@ -223,6 +195,7 @@ public class InteropStub {
             e.printStackTrace();
         }
     }
+
 
     public static void initClient() {
         System.out.println("STARTING SENDER FOR THE CLIENT .......");

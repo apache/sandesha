@@ -165,13 +165,13 @@ MM_reloadPage(true);
           <tr>
             <td width='20%'>Operation</td>
 <%--            <td colspan="4"><select name='operation' onchange="setOperation(this)">--%>
-            <td colspan="4"><select name='operation' onchange="setOperation(this)">
+            <td colspan="4"><select name='operation' >
                 <option value="Ping">Ping</option>
                 <option value="echoString">echoString</option>
               </select></td>
           </tr>
           <tr id="fromTR">
-            <td width='20%' >wsrmAcksTo</td>
+            <td width='20%' >wsrm:AcksTo</td>
             <td >
                 <table width="100%">
                         <tr>
@@ -245,8 +245,8 @@ MM_reloadPage(true);
            </td>
         </tr>
 
-        <tr id="offerTR" style="display:none" >
-            <td width='20%' >Offer seq</td>
+        <tr id="offerTR" >
+            <td width='20%' >Send Offer</td>
             <td >
                 <table width="100%">
                         <tr>
@@ -262,19 +262,6 @@ MM_reloadPage(true);
         </tr>
 
 
-         <tr>
-            <td width='20%' >Send messages</td>
-            <td >
-                <table width="100%">
-                        <tr>
- 							<td width="4%">acks</td>
-           					 <td width="13%"><input type="checkbox" name="acks" value="checked" checked></td>
-            				<td width="14%">Terminate Sequence</td>
-           					 <td width="49%"><input type="checkbox" name="terminate" value="checked" checked></td>
-                        </tr>
-                </table>
-           </td>
-        </tr>
         <tr>
             <td colspan='1'>No. of Messages</td>
             <td colspan ='10' ><select name='noOfMsgs'>
@@ -319,6 +306,17 @@ MM_reloadPage(true);
 
 public void runTest(InteropBean bean,ResponseWriter writer,String defaultAsyncEndPoint) throws Exception {
 
+    System.out.println("AcksTo "+bean.getAcksTo());
+    System.out.println("FaultTo "+bean.getFaultto());
+    System.out.println("From "+bean.getFrom());
+    System.out.println("No of Msf "+bean.getNoOfMsgs());
+    System.out.println("Opertation "+bean.getOperation());
+    System.out.println("ReplyTo"+bean.getReplyto());
+    System.out.println("Source "+bean.getSourceURL());
+    System.out.println("Target "+bean.getTarget());
+    System.out.println("Offer "+bean.getOffer());
+
+
 	String to = null;
 	if(bean!=null){
 		to = bean.getTarget();
@@ -326,35 +324,25 @@ public void runTest(InteropBean bean,ResponseWriter writer,String defaultAsyncEn
 	}
 
 	if(to!=null) {
-			//session.setParameter("runTest");
-			//ResponseWriter writer = new ResponseWriter (res.getWriter());
-
-        	writer.write(" <span><br /><h3> Starting Test ....... <br /></h3> ");
+          	writer.write(" <span><br /><h3> Starting Test ....... <br /></h3> ");
 			writer.flush();
 
-			String target = bean.getTarget();
-			String from = bean.getFrom();
-			String replyTo = bean.getReplyto();
-			String acks = bean.getAcks();
-			String terminate = bean.getTerminate();
-			String operation = bean.getOperation();
-			int messages = bean.getNoOfMsgs();
-
-			//create callback classe and register
 
 			InteropCallback callback = new InteropCallback (writer);
 
             ClientStorageManager csm = new ClientStorageManager ();
-			csm.setCallback(callback);
+
+            csm.setCallback(callback);
 			RMProvider.setCallback(callback);
             RMClientProvider.setCallback(callback);
 			Sender.setCallback(callback);
 
             InteropStub stub= InteropStub.getInstance();
             InteropStub.setCallback(callback);
-        	if(operation.equalsIgnoreCase("ping")){
+
+        	if(bean.getOperation().equalsIgnoreCase("ping")){
 		       stub.runPing(bean);
-            }else if(operation.equalsIgnoreCase("echoString") ){
+            }else if(bean.getOperation().equalsIgnoreCase("echoString") ){
    		      stub.runEcho(bean);
 		    }
 

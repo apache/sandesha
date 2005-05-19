@@ -10,11 +10,10 @@ public class InteropBean implements Serializable {
     private String from;
     private String replyto;
     private int noOfMsgs;
-    private String terminate;
-    private String acks;
+
     private String acksTo;
-    private boolean sendOffer;
-     private String faultto;
+    private String offer;
+    private String faultto;
     private String sourceURL;
 
     public String getFaultto() {
@@ -24,11 +23,6 @@ public class InteropBean implements Serializable {
     public void setFaultto(String faultto) {
         this.faultto = faultto;
     }
-
-
-
-
-
 
 
     public String getSourceURL() {
@@ -48,9 +42,6 @@ public class InteropBean implements Serializable {
         this.acksTo = acksTo;
     }
 
-    public String getAcks() {
-        return acks;
-    }
 
     public String getFrom() {
         return from;
@@ -68,31 +59,11 @@ public class InteropBean implements Serializable {
         return replyto;
     }
 
-    public boolean isSendOffer() {
-        return sendOffer;
-    }
-
-    public void setSendOffer(boolean sendOffer) {
-        this.sendOffer = sendOffer;
-    }
 
     public String getTarget() {
         return target;
     }
 
-    /**
-     * @return
-     */
-    public String getTerminate() {
-        return terminate;
-    }
-
-    /**
-     * @param string
-     */
-    public void setAcks(String string) {
-        acks = string;
-    }
 
     /**
      * @param string
@@ -129,11 +100,13 @@ public class InteropBean implements Serializable {
         target = string;
     }
 
-    /**
-     * @param string
-     */
-    public void setTerminate(String string) {
-        terminate = string;
+    public String getOffer() {
+        return offer;
     }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
 
 }

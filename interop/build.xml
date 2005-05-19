@@ -84,20 +84,20 @@ Build Instructions:
         <property name="build.javadoc" value="${build.doc.html}/api"/>
         <property name="build.junit.xml" value="${build.doc.xml}/junit"/>
         <property name="build.junit.html" value="${build.doc.html}/junit"/>
-    	
-    	
-    	<property environment="env1" />
-    	
-    	<!-- 
 
-         for the time being following path id uses the libs in the sandesha
-         lib directory only This is done to test if we really don't need
-         any axis libs. After this is done we can include the
-         java.class.path and leave the sandesha/lib empty. This requires that
-         the CLASSPATH includes all required packages (see above
 
-	ALEK: thos does nto seems to be true as start-functional-test-http-server depends on AXIS.jar (what version?)
-         -->
+        <property environment="env1"/>
+
+        <!--
+
+for the time being following path id uses the libs in the sandesha
+lib directory only This is done to test if we really don't need
+any axis libs. After this is done we can include the
+java.class.path and leave the sandesha/lib empty. This requires that
+the CLASSPATH includes all required packages (see above
+
+    ALEK: thos does nto seems to be true as start-functional-test-http-server depends on AXIS.jar (what version?)
+        -->
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
                 <include name="**/*.jar"/>
@@ -122,8 +122,7 @@ Build Instructions:
         </path>
 
         <taskdef resource="axis-tasks.properties" classpathref="classpath.library"/>
-        <taskdef name="runaxisfunctionaltests" classname="org.apache.axis.tools.ant.axis.RunAxisFunctionalTestsTask"
-            loaderref="axis">
+        <taskdef name="runaxisfunctionaltests" classname="org.apache.axis.tools.ant.axis.RunAxisFunctionalTestsTask" loaderref="axis">
             <classpath refid="classpath.library"/>
         </taskdef>
       
@@ -191,20 +190,16 @@ Build Instructions:
         <echo message="                                                                   "/>
     </target>
 
-    <target name="clean" depends="init"
-        description="Clean up all temporary build files">
+    <target name="clean" depends="init" description="Clean up all temporary build files">
         <delete dir="${build.dir}"/>
         <delete>
             <fileset dir="." includes="before*.xml"/>
             <fileset dir="." includes="after*.xml"/>
             <fileset dir="." includes="signed*.xml"/>
-            <fileset dir="." includes="server*.wsdd"/>
-            <fileset dir="." includes="client*.wsdd"/>
         </delete>
     </target>
 
-    <target name="prepare" depends="init"
-        description="This target generates a first build directory and checks for some libraries">
+    <target name="prepare" depends="init" description="This target generates a first build directory and checks for some libraries">
         <tstamp/>
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${build.dir}/test-reports"/>
@@ -242,7 +237,7 @@ Build Instructions:
         <!-- create directories -->
         <mkdir dir="${build.classes}"/>
     </target>
-	
+
     <target name="compile" depends="compile.library" description="compile everything"/>
 
 
@@ -262,26 +257,26 @@ Build Instructions:
             <exclude name="**/BouncyCastle.java" unless="bc.present"/>
         </javac>
         <!-- Copy Property files -->
-    	
+
         <copy todir="${build.classes}">
 
-        	<fileset dir="${dir.config}">
-                <include name="interop-properties.properties" />
-                <include name="client-config.wsdd"/>
+            <fileset dir="${dir.interop}">
+                <include name="sandesha-interop.properties"/>
                 <include name="server-config.wsdd"/>
-        		<include name="sandesha.properties" />
-        		<include name="log4j.properties" />
-        		<include name="WSRMPolicy.xml" />
-        		<include name="commons-logging.properties" />
-        	</fileset>
-
-
+            </fileset>
+            <fileset dir="${dir.config}">
+                <include name="client-config.wsdd"/>
+                <include name="sandesha.properties"/>
+                <include name="log4j.properties"/>
+                <include name="WSRMPolicy.xml"/>
+                <include name="commons-logging.properties"/>
+                 <include name="sandesha.log"/>
+            </fileset>
         </copy>
     </target>
 
 
-    <target name="compile.interop"
-        depends="compile.library,interop_prepare">
+    <target name="compile.interop" depends="compile.library,interop_prepare">
         <javac srcdir="${dir.interop}" destdir="${build.interop}" debug="on">
             <classpath refid="classpath.library"/>
         </javac>
@@ -300,8 +295,7 @@ Build Instructions:
     <!-- Following targets were added to run the test   -->
     <!-- Added on 01-03-2005-->
 
-    <target name="interop_prepare" depends="init"
-        description="This target creats the interop-classses directory">
+    <target name="interop_prepare" depends="init" description="This target creats the interop-classses directory">
         <tstamp/>
         <mkdir dir="${build.dir}/interop-classes"/>
     </target>
@@ -378,74 +372,87 @@ Build Instructions:
     <target name="echo_async_ack" depends="run_interop_echo_string_async_ack,shutdown_server"> </target>
 
 
-	<target name="prepare-dist">
-		<mkdir dir="${dir.dist}" />
-	</target>
-	
-	<target name="prepare-jar" depends="compile.library,prepare-dist" description="prepares for creating jar">
+    <target name="prepare-dist">
+        <mkdir dir="${dir.dist}"/>
+    </target>
 
-    	<property name="sandesha.jar.name" value="SandeshaInterop.jar" />
-		<property name="dir.dist.jar" value="${dir.dist}/jar" />
-		<property name="sandesha.jar" value="${dir.dist.jar}/${sandesha.jar.name}" />
-        <property name="axishome" value="${env1.CATALINA_HOME}/webapps/axis/WEB-INF/lib" />
-		<mkdir dir="${dir.dist.jar}" />
-			
-	</target>
-	
-	<target name="jar" depends="prepare-jar" description="creates the sandesha jar">
- 		<jar basedir="${build.classes}" destfile="${sandesha.jar}" />
-	
-	</target>
-		
-	<target name="prepare-war" depends="jar,compile.interop" description="prepares for creating war">
-       
+    <target name="prepare-jar" depends="compile.library,prepare-dist" description="prepares for creating jar">
+
+        <property name="sandesha.jar.name" value="SandeshaInterop.jar"/>
+        <property name="dir.dist.jar" value="${dir.dist}/jar"/>
+        <property name="sandesha.jar" value="${dir.dist.jar}/${sandesha.jar.name}"/>
+        <property name="axishome" value="${env1.CATALINA_HOME}/webapps/axis/WEB-INF/lib"/>
+        <mkdir dir="${dir.dist.jar}"/>
+
+        <copy todir="${build.classes}">
+
+            <fileset dir="${dir.config}">
+                <include name="client-config.wsdd"/>
+                <include name="sandesha.properties"/>
+                <include name="log4j.properties"/>
+                <include name="WSRMPolicy.xml"/>
+                <include name="commons-logging.properties"/>
+                 <include name="sandesha.log"/>
+            </fileset>
+        </copy>
+        <copy todir="${build.classes}">
+               <fileset dir="${dir.interop}">
+                <include name="sandesha-interop.properties"/>
+                <include name="server-config.wsdd"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <target name="jar" depends="prepare-jar" description="creates the sandesha jar">
+         <jar basedir="${build.classes}" destfile="${sandesha.jar}"/>
+
+    </target>
+
+    <target name="prepare-war" depends="jar" description="prepares for creating war">
         <property name="interop.prop.file.name" value="sandesha-interop.properties"/>
-        <property name="sandesha.war.name" value="sandesha-interop.war" />
-		<property name="webxml" value="${dir.interop}/webapp/web.xml" />
-		<property name="dir.dist.war" value="${dir.dist}/war" />
-		<property name="sandesha.war" value="${dir.dist.war}/${sandesha.war.name}" />
-		<property name="webapps" value="${env1.CATALINA_HOME}/webapps" />
-		<mkdir dir="${dir.dist.war}" />
+        <property name="sandesha.war.name" value="sandesha-interop.war"/>
+        <property name="webxml" value="${dir.interop}/webapp/web.xml"/>
+        <property name="dir.dist.war" value="${dir.dist}/war"/>
+        <property name="sandesha.war" value="${dir.dist.war}/${sandesha.war.name}"/>
+        <property name="webapps" value="${env1.CATALINA_HOME}/webapps"/>
+        <mkdir dir="${dir.dist.war}"/>
 
-<!--         <copy todir="${build.interop}">-->
-<!--           <fileset dir="${dir.interop}" includes="sandesha-interop.properties"/>-->
-<!--        </copy>-->
-
-
-
-	</target>
-	
-	<target name="create.war" depends="prepare-war" description="creates the sandesha war">
-
-		<war destfile="${sandesha.war}" webxml="${webxml}">
-			<fileset dir="${dir.interop}/webapp/jsp" />
-            <filename name="{$interop.prop.file.name}"/>                
-			<classes dir="${build.interop}" />
-			<lib dir="${dir.libs}" />
-			<lib file="${sandesha.jar}" />
-		</war>
-
-	</target>
-	
-	<target name="war.copy.clean" depends="war.copy" description="cleans the temporary files">
-		<delete dir="${dir.dist}" />
-		<delete dir="${build.interop}" />
-	</target>
-	
-	<target name="war.copy" depends="war" >
-         <delete file="${webapps}/${sandesha.war}" />
-          <delete dir="${webapps}/sandesha-interop" />
-		<copy file="${sandesha.war}" todir="${webapps}" />
-	</target>
-
-    <target name="jar.copy" depends="jar" >
-        <delete file="${axishome}/${sandesha.jar.name}" />
-		<copy file="${sandesha.jar}" todir="${axishome}" />
-	</target>
+        <!--         <copy todir="${build.interop}">-->
+        <!--           <fileset dir="${dir.interop}" includes="sandesha-interop.properties"/>-->
+        <!--        </copy>-->
 
 
-	<target name="war" depends="create.war" description="creates the war file" />
+    </target>
 
+    <target name="create.war" depends="prepare-war" description="creates the sandesha war">
+
+        <war destfile="${sandesha.war}" webxml="${webxml}">
+            <fileset dir="${dir.interop}/webapp/jsp"/>
+            <lib dir="${dir.libs}"/>
+            <lib file="${sandesha.jar}"/>
+        </war>
+
+    </target>
+
+    <target name="war.copy.clean" depends="war.copy" description="cleans the temporary files">
+        <delete dir="${dir.dist}"/>
+        <delete dir="${build.interop}"/>
+    </target>
+
+    <target name="war.copy" depends="war">
+        <delete file="${webapps}/${sandesha.war}"/>
+        <delete dir="${webapps}/sandesha-interop"/>
+        <copy file="${sandesha.war}" todir="${webapps}"/>
+    </target>
+
+    <target name="jar.copy" depends="jar">
+        <delete file="${axishome}/${sandesha.jar.name}"/>
+        <copy file="${sandesha.jar}" todir="${axishome}"/>
+    </target>
+
+
+    <target name="war" depends="create.war" description="creates the war file"/>
 
 
 </project>

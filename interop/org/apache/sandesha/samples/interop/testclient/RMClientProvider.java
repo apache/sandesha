@@ -68,7 +68,6 @@ public class RMClientProvider extends RPCProvider {
 
     public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv,
                                Object obj) throws Exception {
-        System.out.println("RMClientProvider called ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
 
         RMClientProvider.log.info(Constants.InfomationMessage.PROVIDER_RECEIVED_MSG);
         //Some actions may need to be ignored. e.g.  http://schemas.xmlsoap.org/ws/2005/02/trust/RST/SCT
