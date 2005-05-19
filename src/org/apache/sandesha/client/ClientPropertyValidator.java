@@ -49,10 +49,7 @@ public class ClientPropertyValidator {
         boolean sendOffer = getOffer(call);
 
         try {
-            if (from == null)
-                sourceURL = getSourceURL(call);
-            else
-                sourceURL = from;
+            sourceURL = getSourceURL(call);
         } catch (UnknownHostException e) {
             throw new AxisFault(e.getMessage());
         }
@@ -160,8 +157,7 @@ public class ClientPropertyValidator {
 
             sourceURL = Constants.HTTP + Constants.COLON + Constants.SLASH + Constants.SLASH +
                     addr.getHostAddress() + Constants.COLON +
-                    PropertyLoader.getClientSideListenerPort() +
-                    Constants.URL_RM_SERVICE;
+                    PropertyLoader.getClientSideListenerPort() + Constants.URL_RM_SERVICE;
 
             return sourceURL;
         }

@@ -37,6 +37,7 @@ out.println("<head>");
         } catch (IOException e) {
             e.printStackTrace();
         }
+      ResponseWriter writer = new ResponseWriter (response.getWriter());
 
     ///////////////////////////////////////////////////////////////
 
@@ -44,30 +45,6 @@ out.println("<head>");
 
 <title>Welcome to Apache Sandesha Innterop Test</title>
 <script>
-
-       function displayServer(){
-              document.getElementById('server').style.display = '';
-        }
-
-        function hideServer(){
-              document.getElementById('server').style.display = 'none';
-        }
-
-       function displayClient(){
-              document.getElementById('client').style.display = '';
-        }
-
-        function hideClient(){
-              document.getElementById('client').style.display = 'none';
-        }
-
-        function displayEchoText(){
-              document.getElementById('echo').style.display = '';
-        }
-
-        function hideEchoText(){
-              document.getElementById('echo').style.display = 'none';
-        }
 
 		function changeSelect(itm,val){
 			txtItem = itm;
@@ -111,31 +88,6 @@ MM_reloadPage(true);
 <body>
 <h1>Apache Sandesha Interop Testing</h1>
 
-<%
- 	String endPoint = request.getParameter("endPoint");
-	String method = request.getParameter("method");
-	String run = request.getParameter("running");
-
-    if(endPoint == null)
-        endPoint = "server";
-
-	String displayServerArea,displayClientArea,serverSelected,clientSelected;
-	displayServerArea = "\'\'";
-	displayClientArea = "none";
-	serverSelected = "true";
-	clientSelected = "false";
-
-    if(endPoint.equals("client")){
-    	displayServerArea = "none";
-    	displayClientArea = "\'\'";
-        serverSelected = "false";
-	    clientSelected = "true";
-    }
-   ResponseWriter writer = new ResponseWriter (response.getWriter());
-
-
-
-%>
 <form method="post" name="InteropTesting" action="interop.jsp">
 
 <table width='100%'>
