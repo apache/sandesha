@@ -39,14 +39,15 @@ public class AsyncPingClient {
         System.out.println("Client started...... Asynchronous ");
         try {
 
-            RMInitiator.initClient(false);
+            RMInitiator.initClient();
 
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:ping");
 
+            //We need this since we need to see the results in the Monitor.
+            //For the actual usagd AcksTo will be set by the RM endpoint.
             call.setProperty(Constants.ClientProperties.ACKS_TO,
                     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
             

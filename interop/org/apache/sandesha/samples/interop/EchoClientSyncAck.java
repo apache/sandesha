@@ -46,7 +46,7 @@ public class EchoClientSyncAck {
             //A separate listner will be started if the value of the input parameter for the mehthod
             // initClient is "false". If the service is of type request/response the parameter value
             // shoule be "false"
-            RMInitiator.initClient(false);
+            RMInitiator.initClient();
 
             UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
             String str = uuidGen.nextUUID();
@@ -54,8 +54,6 @@ public class EchoClientSyncAck {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            //Action is required.
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
             call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:echoString");
 
             //These two are additional, We need them since we need to monitor the messages using

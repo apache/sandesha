@@ -54,8 +54,7 @@ public class InteropCallback extends Callback {
         String entry = "";
         if (result.getMessageId() != null && result.getMessageId() != "")
             entry = "<br /><font color='green' size='2' > Received " + msgType + " Message. ID : " +
-                    result.getMessageId() +
-                    "</font>";  // + result.getSequenceId() + " </font>";
+                    result.getMessageId() + "</font>";  // + result.getSequenceId() + " </font>";
         else
             entry = "<br /><font color='green' size='2' > Received " + msgType + "</font>";
 
@@ -86,8 +85,7 @@ public class InteropCallback extends Callback {
         String entry = "";
         if (result.getMessageId() != null && result.getMessageId() != "")
             entry = "<br /><font color='blue' size='2' > Sent " + msgType + " Message. ID : " +
-                    result.getMessageId() +
-                    "</font>";// + result.getSequenceId() + " </font>";
+                    result.getMessageId() + "</font>";// + result.getSequenceId() + " </font>";
         else {
             entry = "<br /><font color='blue' size='2' > Sent " + msgType + "</font>";
         }
@@ -103,8 +101,11 @@ public class InteropCallback extends Callback {
     }
 
     public synchronized void onError(Exception exp) {
-        String entry = "<br /><font color='red' size='2' > Error : " +  exp.getLocalizedMessage() +
-                "</font>";// + result.getSequenceId() + " </font>";
+        String message = "Error Occured During the Interop Test";
+        if (exp.getMessage() != null) {
+            message = exp.getMessage();
+        }
+        String entry = "<br /><font color='red' size='2' > Error : " + message + "</font>";// + result.getSequenceId() + " </font>";
         boolean b = writer.write(entry);
         if (!b)
             setTestFinished(true);
