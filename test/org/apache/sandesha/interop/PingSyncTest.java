@@ -28,7 +28,7 @@ import junit.framework.TestCase;
  */
 public class PingSyncTest extends TestCase {
 
-    private static String defaultServerPort = "8070";
+    private static String defaultServerPort = "8080";
 
     private static String targetURL = "http://127.0.0.1:" + defaultServerPort +
             "/axis/services/RMInteropService?wsdl";
