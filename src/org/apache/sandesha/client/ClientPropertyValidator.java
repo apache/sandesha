@@ -193,7 +193,8 @@ public class ClientPropertyValidator {
             return errorMsg;
         }
 
-        if ((msgNumber == 0) || (action == null)) {
+//        if ((msgNumber == 0) || (action == null)) {
+          if ((action == null)) {
             errorMsg = Constants.ErrorMessages.MESSAGE_NUMBER_NOT_SPECIFIED;
             return errorMsg;
         }

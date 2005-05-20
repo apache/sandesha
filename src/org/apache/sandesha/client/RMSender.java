@@ -55,6 +55,7 @@ public class RMSender extends BasicHandler {
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMSender.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+    private static int messageNumber=0;
 
     /**
      * This is the main method that is invoked by the axis engine. This method will add the reqest
@@ -76,6 +77,10 @@ public class RMSender extends BasicHandler {
             String tempSeqID = reqMsgCtx.getSequenceID();
 
             long msgNo = reqMsgCtx.getMsgNumber();
+            if(msgNo==0){
+                msgNo=++messageNumber;
+                reqMsgCtx.setMsgNumber(msgNo);
+            }
 
             if (msgNo == 1) {
                 reqMsgCtx = processFirstRequestMessage(reqMsgCtx, reqMsgCtx.getSync());

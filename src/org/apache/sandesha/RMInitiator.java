@@ -48,41 +48,44 @@ import java.util.List;
 
 public class RMInitiator {
     private static boolean rmInvokerStarted = false;
-    private static boolean senderStarted = false;
+    private static boolean cleintSenderStarted = false;
+    private static boolean serverSenderStarted = false;
     private static boolean listenerStarted = false;
     private static SimpleAxisServer sas = null;
-    private static Thread thSender;
+    private static Thread thCleintSender;
+     private static Thread thServerSender;
     private static Thread thInvoker;
-    private static Sender sender;
+    private static Sender cleintSender;
+    private static Sender serverSender;
     private static final Log log = LogFactory.getLog(RMInitiator.class.getName());
 
     public static IStorageManager init(boolean client) {
         if (client) {
             IStorageManager storageManager = new ClientStorageManager();
-            if (!senderStarted) {
+            if (!cleintSenderStarted) {
                 System.out.println(Constants.InfomationMessage.SENDER_STARTED);
-                sender = new Sender(storageManager);
+                cleintSender = new Sender(storageManager);
                 SimpleChain reqChain = getRequestChain();
                 SimpleChain resChain = getResponseChain();
                 if (reqChain != null)
-                    sender.setRequestChain(reqChain);
+                    cleintSender.setRequestChain(reqChain);
                 if (resChain != null)
-                    sender.setResponseChain(resChain);
+                    cleintSender.setResponseChain(resChain);
 
-                thSender = new Thread(sender);
-                thSender.setDaemon(false);
-                senderStarted = true;
-                thSender.start();
+                thCleintSender = new Thread(cleintSender);
+                thCleintSender.setDaemon(false);
+                cleintSenderStarted = true;
+                thCleintSender.start();
             }
             return storageManager;
         } else {
-            if (!senderStarted) {
+            if (!serverSenderStarted) {
                 System.out.println(Constants.InfomationMessage.SENDER_STARTED);
-                Sender sender = new Sender();
-                Thread thSender = new Thread(sender);
-                thSender.setDaemon(false);
-                senderStarted = true;
-                thSender.start();
+                serverSender = new Sender();
+                thServerSender = new Thread(serverSender);
+                thServerSender.setDaemon(false);
+                serverSenderStarted = true;
+                thServerSender.start();
             }
             if (!rmInvokerStarted) {
                 System.out.println(Constants.InfomationMessage.RMINVOKER_STARTED);
@@ -135,8 +138,8 @@ public class RMInitiator {
             sas.stop();
             listenerStarted = false;
         }
-        sender.setRunning(false);
-        senderStarted = false;
+        cleintSender.setRunning(false);
+        cleintSenderStarted = false;
 
         storageManager.clearStorage();
         return new RMStatus();
@@ -152,10 +155,10 @@ public class RMInitiator {
             //END JSP
             listenerStarted = false;
         }
-        sender.setRunning(false);
+        cleintSender.setRunning(false);
 
         //FOR JSP
-        senderStarted = false;
+        cleintSenderStarted = false;
         //END JSP
         throw new AxisFault("Inactivity Timeout Reached, No Response from the Server");
     }
