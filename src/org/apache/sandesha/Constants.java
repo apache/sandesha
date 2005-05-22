@@ -172,6 +172,9 @@ public interface Constants {
 
     public interface ClientProperties {
 
+        public static final short INOUT=1;
+        public static final short IN_ONLY=2;
+
         public static final String PROPERTY_FILE = "sandesha.properties";
         public static final String WSRM_POLICY_FILE = "WSRMPolicy.xml";
 
@@ -189,6 +192,9 @@ public interface Constants {
         public static final String FAULT_TO = "faultTo";
         public static final String SEND_OFFER = "offer";
         public static final String SOURCE_URL="sourceURL";
+        public static final String MEP="mep";
+        public static final String CALL_KEY="callKey";
+        public static final String REPORT="report";
 
         public static final String REQUEST_HANDLER = "requestHandler";
         public static final String RESPONSE_HANDLER = "responseHandler";

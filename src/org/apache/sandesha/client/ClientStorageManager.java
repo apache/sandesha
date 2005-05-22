@@ -44,9 +44,8 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public ClientStorageManager() {
-        accessor =
-                SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,
-                        Constants.CLIENT);
+        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,
+                Constants.CLIENT);
     }
 
     public boolean isSequenceExist(String sequenceID) {
@@ -70,10 +69,7 @@ public class ClientStorageManager implements IStorageManager {
      * acks.
      */
     public void setAcknowledged(String seqID, long msgNumber) {
-        //seqId is just a dummy since the client will hv only a one seq.
-        //No hard checking. User may insert the real sequence.
-        String sequenceId = seqID;
-        accessor.markOutgoingMessageToDelete(sequenceId, new Long(msgNumber));
+         accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
 
     }
 
@@ -122,8 +118,13 @@ public class ClientStorageManager implements IStorageManager {
      * Get a Map of messages.
      */
     public Map getListOfMessageNumbers(String sequenceID) {
+         System.out.println("sendAcknowledgement need to find "+sequenceID);
 
-        String seq = getKeyFromOutgoingSeqId(sequenceID);
+
+       // String seq = getKeyFromOutgoingSeqId(sequenceID);
+        //String seq=getOutgoingSeqenceIdOfIncomingMsg()
+        String seq=sequenceID;
+        System.out.println("sendAcknowledgement found "+seq);
         Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(seq);
         Iterator it = st.iterator();
         //To find the largest id present
@@ -184,24 +185,24 @@ public class ClientStorageManager implements IStorageManager {
      * This will be used by the SimpleAxisServer and the Sender to set the
      * proper sequenceID
      */
-    public boolean setApprovedOutSequence(String createSeqId, String newOutSequenceId) {
+    public boolean setApprovedOutSequence(String oldSeqId, String newSeqId) {
 
         boolean done = false;
         // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
-        String oldOutsequenceId = createSeqId;
-        if (null == oldOutsequenceId) {
+
+        if (null == oldSeqId) {
             return false;
         }
 
-        String sequenceID = accessor.getSequenceOfOutSequence(oldOutsequenceId);
+        String sequenceID = accessor.getSequenceOfOutSequence(oldSeqId);
 
         if (sequenceID == null) {
             log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
             return false;
         }
-        accessor.setOutSequence(sequenceID, newOutSequenceId);
+        accessor.setOutSequence(sequenceID, newSeqId);
         accessor.setOutSequenceApproved(sequenceID, true);
-        accessor.removeCreateSequenceMsg(oldOutsequenceId);
+        accessor.removeCreateSequenceMsg(oldSeqId);
         return true;
 
     }
@@ -375,8 +376,8 @@ public class ClientStorageManager implements IStorageManager {
 
     public String getOutgoingSeqenceIdOfIncomingMsg(RMMessageContext msg) {
         //String msgId = msg.getMessageID();
-        RelatesTo relatesTo= (RelatesTo)msg.getAddressingHeaders().getRelatesTo().get(0);
-        String msgId=relatesTo.getURI().toString();
+        RelatesTo relatesTo = (RelatesTo) msg.getAddressingHeaders().getRelatesTo().get(0);
+        String msgId = relatesTo.getURI().toString();
         return accessor.searchForSequenceId(msgId);
     }
 

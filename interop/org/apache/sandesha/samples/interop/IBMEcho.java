@@ -6,8 +6,8 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.encoding.XMLType;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMTransport;
+import org.apache.sandesha.SandeshaContext;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -29,49 +29,39 @@ public class IBMEcho {
 
         System.out.println("Client started...... Asynchronous EchoString - IBM");
 
-        try {
-            //A separate listner will be started if the value of the input parameter for the mehthod
-            // initClient is "false". If the service is of type request/response the parameter value shoule be "false"
-            RMInitiator.initClient(false);
-
-            UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
+          UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
             String str = uuidGen.nextUUID();
 
-            Service service = new Service();
+        try {
+              Service service = new Service();
             Call call = (Call) service.createCall();
 
-            //To obtain the
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
-            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:echoString");
-            call.setProperty(Constants.ClientProperties.TO, "http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos");
+            SandeshaContext ctx = new SandeshaContext();
+            ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:echoString",Constants.ClientProperties.INOUT);
 
-            call.setProperty(Constants.ClientProperties.ACKS_TO, "http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
-            call.setProperty(Constants.ClientProperties.FAULT_TO, "http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
-            call.setProperty(Constants.ClientProperties.FROM, "http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
-            call.setProperty(Constants.ClientProperties.REPLY_TO, "http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
+            ctx.setToUrl(call, "http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos");
+            ctx.setFaultToUrl(call,"http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
+            ctx.setAcksToUrl(call,"http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
+            ctx.setFromUrl(call,"http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
+            ctx.setReplyToUrl(call,"http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
 
-            call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("http://tempuri.org/", "echoString"));
-            call.setTransport(new RMTransport(targetURL, ""));
 
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
             call.addParameter("Sequence", XMLType.XSD_STRING, ParameterMode.IN);
             call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
 
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(1));
             String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", str});
             System.out.println("The Response for First Messsage is  :" + ret);
 
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(2));
             ret = (String) call.invoke(new Object[]{"Sandesha Echo 2", str});
             System.out.println("The Response for Second Messsage is  :" + ret);
 
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(3));
-            call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true)); //For last message.
+            ctx.setLastMessage(call);
             ret = (String) call.invoke(new Object[]{"Sandesha Echo 3", str});
             System.out.println("The Response for Third Messsage is  :" + ret);
 
-            RMInitiator.stopClient();
+             ctx.endSequence(call);
         } catch (Exception e) {
             e.printStackTrace();
         }

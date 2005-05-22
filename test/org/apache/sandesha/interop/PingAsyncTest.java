@@ -12,11 +12,7 @@ import javax.xml.rpc.ParameterMode;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
-import org.apache.sandesha.Constants;
-import org.apache.sandesha.RMInitiator;
-import org.apache.sandesha.RMReport;
-import org.apache.sandesha.RMStatus;
-import org.apache.sandesha.RMTransport;
+import org.apache.sandesha.*;
 
 import junit.framework.TestCase;
 
@@ -33,43 +29,27 @@ public class PingAsyncTest extends TestCase {
             "/axis/services/RMInteropService?wsdl";
 	
 	public void testPingSync(){
-        System.out.println("Client started...... Synchronous ");
+        System.out.println("Client started...... Asynchronous ");
         try {
-
-            RMInitiator.initClient(false);
 
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(false));
-            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:ping");
-
-            call.setProperty(Constants.ClientProperties.ACKS_TO,
+            SandeshaContext ctx = new SandeshaContext();
+            ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:ping",
+                    Constants.ClientProperties.IN_ONLY);
+            ctx.setAcksToUrl(call,
                     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-            
 
-            call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("http://tempuri.org", "Ping"));
-            call.setTransport(new RMTransport(targetURL, ""));
-
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
 
-            //First Message
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(1));
             call.invoke(new Object[]{"Ping Message Number One"});
-
-            //Second Message
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(2));
             call.invoke(new Object[]{"Ping Message Number Two"});
-
-            //Third Message
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(3));
-            //For last message.
-            call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
+            ctx.setLastMessage(call);
             call.invoke(new Object[]{"Ping Message Number Three"});
 
-            RMStatus status =  RMInitiator.stopClient();
-            RMReport report = status.getReport();
+            RMReport report = ctx.endSequence(call);
             
             assertEquals(report.isAllAcked(),true);
             assertEquals(report.getNumberOfReturnMessages(),0);

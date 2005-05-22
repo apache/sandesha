@@ -27,7 +27,6 @@ import org.apache.axis.providers.java.RPCProvider;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
-import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.MessageValidator;

@@ -47,6 +47,7 @@ public class ClientPropertyValidator {
         String to = getTo(call);
         String faultTo = getFaultTo(call);
         boolean sendOffer = getOffer(call);
+        String key=getKey(call);
 
         try {
             sourceURL = getSourceURL(call);
@@ -63,7 +64,7 @@ public class ClientPropertyValidator {
             rmMessageContext.setMsgNumber(msgNumber);
             rmMessageContext.setLastMessage(lastMessage);
             rmMessageContext.setSourceURL(sourceURL);
-            rmMessageContext.setSequenceID(action);
+            rmMessageContext.setSequenceID(key);
             rmMessageContext.setReplyTo(replyTo);
             rmMessageContext.setFrom(from);
             rmMessageContext.setAction(action);
@@ -76,6 +77,10 @@ public class ClientPropertyValidator {
         } else
             throw new AxisFault(errorMsg);
 
+    }
+
+    private static String getKey(Call call) {
+        return (String) call.getProperty(Constants.ClientProperties.CALL_KEY);
     }
 
     private static boolean getOffer(Call call) {
@@ -170,8 +175,13 @@ public class ClientPropertyValidator {
     private static long getMessageNumber(Call call) {
         Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
         long msgNumber = 0;
-        if (temp != null)
-            msgNumber = ((Long) temp).longValue();
+        if (temp == null){
+           call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(++msgNumber));
+        }else{
+          msgNumber=((Long)call.getProperty(Constants.ClientProperties.MSG_NUMBER)).longValue();
+          call.setProperty(Constants.ClientProperties.MSG_NUMBER,new Long(++msgNumber));
+        }
+
         return msgNumber;
     }
 
@@ -193,8 +203,8 @@ public class ClientPropertyValidator {
             return errorMsg;
         }
 
-//        if ((msgNumber == 0) || (action == null)) {
-          if ((action == null)) {
+        //        if ((msgNumber == 0) || (action == null)) {
+        if ((action == null)) {
             errorMsg = Constants.ErrorMessages.MESSAGE_NUMBER_NOT_SPECIFIED;
             return errorMsg;
         }

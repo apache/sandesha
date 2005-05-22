@@ -16,6 +16,7 @@ import org.apache.axis.encoding.XMLType;
 import org.apache.axis.message.addressing.util.AddressingUtils;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMTransport;
+import org.apache.sandesha.SandeshaContext;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.util.PolicyLoader;
@@ -115,32 +116,80 @@ public class InteropStub {
         return call;
     }
 
+
+    private void configureContext(SandeshaContext ctx,Call call, InteropBean bean) {
+        String from = bean.getFrom();
+        String replyTo = bean.getReplyto();
+        String acksTo = bean.getAcksTo();
+        String faultTo = bean.getFaultto();
+
+        boolean sendOffer = false;
+        if (bean.getOffer().equalsIgnoreCase("yes"))
+            sendOffer = true;
+
+        if (replyTo != null && replyTo.equalsIgnoreCase("anonymous")) {
+            ctx.setReplyToUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+          } else if (replyTo != null) {
+           ctx.setReplyToUrl(call, bean.getReplyto());
+        }
+
+        if (from != null && from.equalsIgnoreCase("anonymous")) {
+           ctx.setFromUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+        } else if (from != null) {
+           ctx.setFromUrl(call, from);
+        }
+
+        if (acksTo != null && acksTo.equalsIgnoreCase("anonymous")) {
+            ctx.setAcksToUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+        } else if (acksTo != null) {
+            ctx.setAcksToUrl(call, acksTo);
+        }
+
+        if (faultTo != null && faultTo.equalsIgnoreCase("anonymous")) {
+           ctx.setFaultToUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+        } else if (faultTo != null) {
+            ctx.setFaultToUrl(call, bean.getFaultto());
+        }
+
+
+        if (sendOffer)
+           ctx.setSendOffer(call,true);
+
+        call.setProperty(Constants.ClientProperties.SOURCE_URL, bean.getSourceURL());
+
+    }
+
     public synchronized void runPing(InteropBean bean) {
 
         System.out.println("=========== RUNNING THE \"Ping\" INTEROP TEST ==========");
         String target = bean.getTarget();
         int msgs = bean.getNoOfMsgs();
         try {
-            InteropStub.initClient();
-            Call call = getCall(bean);
 
-            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
+            Service service = new Service();
+            Call call = (Call) service.createCall();
+
+            SandeshaContext ctx = new SandeshaContext();
+            ctx.addNewSequeceContext(call, target, "urn:wsrm:ping", Constants.ClientProperties.IN_ONLY);
+
+            configureContext(ctx,call,bean);
+
+
 
             call.setOperationName(new QName("http://tempuri.org", "Ping"));
-            call.setTransport(new RMTransport(target, ""));
 
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
 
             for (int i = 1; i <= msgs; i++) {
-                call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long((i)));
                 if (i == msgs) {
-                    call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
+                    ctx.setLastMessage(call);
                 }
                 String msg = "Sandesha Ping Message Number " + i;
                 call.invoke(new Object[]{msg});
             }
 
-            InteropStub.stopClient();
+            //InteropStub.stopClient();
+            ctx.endSequence(call);
 
         } catch (Exception e) {
             if (callback != null)
@@ -162,14 +211,17 @@ public class InteropStub {
             //User may specify some external(not in sandesha endpoint) replyTo address, then
             //he/she will not be able to retrieve the responses to this client, yet they can verify
             //the reliablility of the sent messages.
-            InteropStub.initClient();
 
-            Call call = getCall(bean);
-            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:echoString");
 
-            call.setTargetEndpointAddress(target);
+            Service service = new Service();
+            Call call = (Call) service.createCall();
+
+            SandeshaContext ctx = new SandeshaContext();
+            ctx.addNewSequeceContext(call, target, "urn:wsrm:echoString", Constants.ClientProperties.INOUT);
+
+            configureContext(ctx,call,bean);
+
             call.setOperationName(new QName("http://tempuri.org/", "echoString"));
-            call.setTransport(new RMTransport(target, ""));
 
             call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
             call.addParameter("Sequence", XMLType.XSD_STRING, ParameterMode.IN);
@@ -180,14 +232,14 @@ public class InteropStub {
                 String msg = "Sandesha Echo String " + i;
 
                 if (i == messages) {
-                    call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
+                    ctx.setLastMessage(call);
                 }
 
                 String ret = (String) call.invoke(new Object[]{msg, seq});
                 System.out.println("Got response from server " + ret);
             }
 
-            InteropStub.stopClient();
+            ctx.endSequence(call);
 
         } catch (Exception e) {
             if (callback != null)

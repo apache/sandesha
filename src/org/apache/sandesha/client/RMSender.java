@@ -26,11 +26,7 @@ import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.Constants;
-import org.apache.sandesha.IStorageManager;
-import org.apache.sandesha.RMInitiator;
-import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.RMStatus;
+import org.apache.sandesha.*;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.ws.rm.RMHeaders;
@@ -55,7 +51,6 @@ public class RMSender extends BasicHandler {
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMSender.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-    private static int messageNumber=0;
 
     /**
      * This is the main method that is invoked by the axis engine. This method will add the reqest
@@ -77,10 +72,6 @@ public class RMSender extends BasicHandler {
             String tempSeqID = reqMsgCtx.getSequenceID();
 
             long msgNo = reqMsgCtx.getMsgNumber();
-            if(msgNo==0){
-                msgNo=++messageNumber;
-                reqMsgCtx.setMsgNumber(msgNo);
-            }
 
             if (msgNo == 1) {
                 reqMsgCtx = processFirstRequestMessage(reqMsgCtx, reqMsgCtx.getSync());
@@ -101,17 +92,29 @@ public class RMSender extends BasicHandler {
                     responseMessageContext =
                             checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
                     if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
-                        RMInitiator.stopClientByForce();
+                        SandeshaContext.stopClientByForce();
                     }
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                 }
                 
                 
-                //setting RMStatus;
-                if(responseMessageContext!=null)
-                	RMStatus.incrementResponseCount();
+                //setting RMReport;
+                if (responseMessageContext != null) {
+                    String oldSeqId = reqMsgCtx.getOldSequenceID();
+                    if (oldSeqId != null) {
+                        Call call = (Call) SandeshaContext.getCallMap().get(
+                                reqMsgCtx.getOldSequenceID());
+
+                        if (call != null) {
+                            RMReport report = (RMReport) call.getProperty(
+                                    Constants.ClientProperties.REPORT);
+                            report.incrementReturnedMsgCount();
+                        }
+                    }
+                }
                 
-                
+
+
                 //We need these steps to filter all addressing and rm related headers.
                 Message resMsg = responseMessageContext.getMsgContext().getRequestMessage();
                 RMHeaders.removeHeaders(resMsg.getSOAPEnvelope());
@@ -146,7 +149,7 @@ public class RMSender extends BasicHandler {
             offerID = Constants.UUID + uuidGen.nextUUID();
             storageManager.addRequestedSequence(offerID);
             storageManager.addOffer(msgID, offerID);
-         }
+        }
 
         RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(
                 reqRMMsgContext, Constants.CLIENT, msgID, offerID);
@@ -156,9 +159,9 @@ public class RMSender extends BasicHandler {
 
         createSeqRMMsgContext.setSync(sync);
         storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-        RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(
-                reqRMMsgContext);
-        processRequestMessage(serviceRequestMsg);
+        // RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(
+        //        reqRMMsgContext);
+        processRequestMessage(reqRMMsgContext);
         return reqRMMsgContext;
     }
 

@@ -21,11 +21,8 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.RMInitiator;
 import org.apache.sandesha.RMReport;
-import org.apache.sandesha.RMStatus;
-import org.apache.sandesha.RMTransport;
-import org.apache.sandesha.client.RMSender;
+import org.apache.sandesha.SandeshaContext;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -41,54 +38,38 @@ public class SyncPingClient {
         System.out.println("Client started...... Synchronous ");
         try {
 
-            RMInitiator.initClient(true);
 
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            //By setting the SYNC property as true and false, the user can select between
-            //the synchronous version and asynchronous version of invocations.
-            call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
+            SandeshaContext ctx = new SandeshaContext();
+            ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:Ping",
+                    Constants.ClientProperties.IN_ONLY);
+            ctx.setSynchronous(call);
+            ctx.setToUrl(call, "http://131.107.153.195/SecureReliableMessaging/ReliableOneWay.svc");
 
-            //Sandesha uses action to differentitiate services initially (when there are no
-            //sequence identifiers are available. This is a REQUIRED option for Sandesha.
-            call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
-
-            //This line is used to set the transport for Sandesha
-            call.setTransport(new RMTransport(targetURL, ""));
-
-            call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("http://tempuri.org/", "Ping"));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
 
-            //First Message
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(1));
+
             call.invoke(new Object[]{"Ping Message Number One"});
 
-            //Second Message
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(2));
             call.invoke(new Object[]{"Ping Message Number Two"});
-
-            //Third Message
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(3));
-            //For last message.
-            call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
+            ctx.setLastMessage(call);
             call.invoke(new Object[]{"Ping Message Number Three"});
 
-            RMStatus status = RMInitiator.stopClient();
+            RMReport report = ctx.endSequence(call);
 
-            if(status!=null){
-            	RMReport report = status.getReport();
-            	
-            	if(report!=null){
-            		System.out.println("\n***********Printing RM Report***********");
-            		System.out.println("Were all messages add     - " + report.isAllAcked());
-            		System.out.println("No of response messages   - " + report.getNumberOfReturnMessages());
-            		System.out.println("****************************************\n");
-            	}
+
+            if (report != null) {
+                System.out.println("\n***********Printing RM Report***********");
+                System.out.println("Were all messages add     - " + report.isAllAcked());
+                System.out.println(
+                        "No of response messages   - " + report.getNumberOfReturnMessages());
+                System.out.println("****************************************\n");
             }
-            
+
         } catch (Exception e) {
             //System.err.println(e.toString());
             e.printStackTrace();

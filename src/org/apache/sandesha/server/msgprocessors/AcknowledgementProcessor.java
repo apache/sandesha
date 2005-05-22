@@ -76,7 +76,8 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         String seqID = rmMessageContext.getSequenceID();
 
         long messageNumber = rmMessageContext.getRMHeaders().getSequence().getMessageNumber().getMessageNumber();
-        Map listOfMsgNumbers = storageManager.getListOfMessageNumbers(seqID);
+        String seq=storageManager.getOutgoingSeqenceIdOfIncomingMsg(rmMessageContext);
+        Map listOfMsgNumbers = storageManager.getListOfMessageNumbers(seq);
 
         Vector ackRangeVector = null;
         if (listOfMsgNumbers != null) {

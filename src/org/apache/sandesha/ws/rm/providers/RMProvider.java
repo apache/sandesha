@@ -25,10 +25,7 @@ import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.Constants;
-import org.apache.sandesha.IStorageManager;
-import org.apache.sandesha.RMInitiator;
-import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.*;
 import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.server.msgprocessors.FaultProcessor;
@@ -77,7 +74,7 @@ public class RMProvider extends RPCProvider {
             RPCProvider rpcProvider = new RPCProvider();
             rpcProvider.invoke(msgContext);
         } else {
-            IStorageManager storageManager = RMInitiator.init(client);
+            IStorageManager storageManager = SandeshaContext.init(client);
             storageManager.init();
 
             RMMessageContext rmMessageContext = new RMMessageContext();
