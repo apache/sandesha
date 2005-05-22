@@ -228,7 +228,6 @@ public class InteropStub {
             call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
 
             for (int i = 1; i <= messages; i++) {
-                call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long((i)));
                 String msg = "Sandesha Echo String " + i;
 
                 if (i == messages) {
