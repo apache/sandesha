@@ -118,13 +118,7 @@ public class ClientStorageManager implements IStorageManager {
      * Get a Map of messages.
      */
     public Map getListOfMessageNumbers(String sequenceID) {
-         System.out.println("sendAcknowledgement need to find "+sequenceID);
-
-
-       // String seq = getKeyFromOutgoingSeqId(sequenceID);
-        //String seq=getOutgoingSeqenceIdOfIncomingMsg()
         String seq=sequenceID;
-        System.out.println("sendAcknowledgement found "+seq);
         Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(seq);
         Iterator it = st.iterator();
         //To find the largest id present

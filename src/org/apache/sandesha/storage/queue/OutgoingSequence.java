@@ -77,8 +77,7 @@ public class OutgoingSequence {
     }
 
     public void setTerminateSent(boolean terminateSent) {
-        System.out.println("TERMINATING THIS SEQUENCE "+this.sequenceId);
-        this.terminateSent = terminateSent;
+           this.terminateSent = terminateSent;
     }
 
     public OutgoingSequence(String sequenceId) {
