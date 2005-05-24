@@ -41,12 +41,6 @@ public class TerminateSequenceProcessor implements IRMMessageProcessor {
             storageManger.setTerminateReceived(seqID);
         }
 
-
-        //TODO
-        // *****************************************************************************
-        //storageManger.terminateSequence(sequenceID);
-
-
         return false;
     }
 

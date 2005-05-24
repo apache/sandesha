@@ -53,7 +53,6 @@ public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
             storageManager.addRequestedSequence(offerID);
             storageManager.setAcksTo(offerID,createSeqRes.getAccept().getAcksTo().getAddress().toString());
 
-
         }
         //No response to this message.
         return false;

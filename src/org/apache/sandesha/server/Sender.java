@@ -25,8 +25,6 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.message.addressing.MessageID;
-import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.EnvelopeCreator;
@@ -38,12 +36,9 @@ import org.apache.sandesha.storage.CallbackData;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
-import sun.util.calendar.CalendarDate;
-
 import javax.xml.rpc.ServiceException;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
-import java.util.List;
 
 /**
  * @author JEkanayake
@@ -56,7 +51,7 @@ public class Sender implements Runnable {
     public boolean running = true;
     private IStorageManager storageManager;
 
-    
+
     public static synchronized Callback getCallback() {
         return callback;
     }
@@ -64,7 +59,7 @@ public class Sender implements Runnable {
     public static synchronized void setCallback(Callback cb) {
         callback = cb;
     }
-    
+
     private SimpleChain requestChain = null;
     private SimpleChain responseChain = null;
 
@@ -112,9 +107,10 @@ public class Sender implements Runnable {
                     hasMessages = false;
                 } else {
                     //Send the message.
-                    if ((rmMessageContext.getReTransmissionCount() <= PolicyLoader.getInstance().getRetransmissionCount())
-                            && ((System.currentTimeMillis() - rmMessageContext
-                            .getLastPrecessedTime()) > PolicyLoader.getInstance().getBaseRetransmissionInterval())) {
+                    if ((rmMessageContext.getReTransmissionCount() <=
+                            PolicyLoader.getInstance().getRetransmissionCount()) &&
+                            ((System.currentTimeMillis() - rmMessageContext.getLastPrecessedTime()) >
+                            PolicyLoader.getInstance().getBaseRetransmissionInterval())) {
                         try {
                             sendMessage(rmMessageContext);
                         } catch (AxisFault e) {
@@ -142,6 +138,51 @@ public class Sender implements Runnable {
         }
     }
 
+    private void sendMessage(RMMessageContext rmMessageContext) throws Exception {
+        switch (rmMessageContext.getMessageType()) {
+            case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
+                {
+                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ);
+                    sendCreateSequenceRequest(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
+                {
+                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ_RES);
+                    sendCreateSequenceResponse(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
+                {
+                    System.out.println(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
+                    sendTerminateSequenceRequest(rmMessageContext);
+                    storageManager.setTerminateSend(
+                            storageManager.getKeyFromOutgoingSeqId(
+                                    rmMessageContext.getSequenceID()));
+                    break;
+                }
+            case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
+                {
+                    System.out.println(Constants.InfomationMessage.SENDING_ACK);
+                    sendAcknowldgement(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_SERVICE_REQUEST:
+                {
+                    System.out.println(Constants.InfomationMessage.SENDING_REQ);
+                    sendServiceRequest(rmMessageContext);
+                    break;
+                }
+            case Constants.MSG_TYPE_SERVICE_RESPONSE:
+                {
+                    System.out.println(Constants.InfomationMessage.SENDING_RES);
+                    sendServiceResponse(rmMessageContext);
+                    break;
+                }
+        }
+    }
+
+
     /**
      * @param rmMessageContext
      */
@@ -150,7 +191,7 @@ public class Sender implements Runnable {
 
         Message terSeqMsg = new Message(terSeqEnv);
         rmMessageContext.getMsgContext().setRequestMessage(terSeqMsg);
-       
+
         Call call;
         rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
         rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
@@ -173,7 +214,8 @@ public class Sender implements Runnable {
             call.setSOAPActionURI(rmMessageContext.getAddressingHeaders().getAction().toString());
         }
 
-        call.setTargetEndpointAddress(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
+        call.setTargetEndpointAddress(
+                rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
         //NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
         String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
         call.setRequestMessage(new Message(soapMsg));
@@ -181,53 +223,25 @@ public class Sender implements Runnable {
         rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
         rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
         //We are not expecting the ack over the  same connection
-        storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+        storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),
+                rmMessageContext.getMsgNumber());
         call.invoke();
 
     }
 
     private void sendCreateSequenceRequest(RMMessageContext rmMsgCtx) throws Exception {
-//        if (rmMsgCtx.getMsgContext().getRequestMessage() == null) {
-//            //The code should not come to this point.
-//            System.err.println(Constants.ErrorMessages.NULL_REQUEST_MSG);
-//        } else {
         Call call;
-
-        //EDITED FOR MSG NO REPITITION
-        //String oldOutSeqId, newOutSeqId;
-
-       // String oldCreateSeqId = rmMsgCtx.getMessageID().toString();
-       // String uuid = uuidGen.nextUUID();
-
-
-       // String newCreateSeqId = Constants.UUID + uuid;
-      //  rmMsgCtx.setMessageID(newCreateSeqId);
-
-      //  oldOutSeqId = oldCreateSeqId;
-      //  newOutSeqId = newCreateSeqId;
-
-
-        //MessageContext msgContext = tempMsg.getMsgContext();
-        //String toAddress = tempMsg.getOutGoingAddress();
-
-
-        //AddressingHeaders addrHeaders = new AddressingHeaders(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
-       // rmMsgCtx.getAddressingHeaders().setMessageID(new MessageID(new URI(newCreateSeqId)));
-        //addrHeaders.toEnvelope(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope());
 
         SOAPEnvelope reqEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(rmMsgCtx);
         rmMsgCtx.getMsgContext().setRequestMessage(new Message(reqEnvelope));
 
-     //   rmMsgCtx.addToMsgIdList(rmMsgCtx.getMessageID().toString());
-      //  List msgIdList = rmMsgCtx.getMessageIdList();
-        //Iterator it = msgIdList.iterator();
         rmMsgCtx.setLastPrecessedTime(System.currentTimeMillis());
         rmMsgCtx.setReTransmissionCount(rmMsgCtx.getReTransmissionCount() + 1);
         call = prepareCall(rmMsgCtx);
         call.invoke();
 
         processResponseMessage(call, rmMsgCtx);
-        //   }
+
     }
 
     private void sendCreateSequenceResponse(RMMessageContext rmMessageContext) throws Exception {
@@ -267,10 +281,12 @@ public class Sender implements Runnable {
 
         call.setClientHandlers(requestChain, responseChain);
         if (rmMessageContext.getMsgContext().getRequestMessage() != null) {
-            String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
+            String soapMsg = rmMessageContext.getMsgContext().getRequestMessage()
+                    .getSOAPPartAsString();
             call.setRequestMessage(new Message(soapMsg));
             if (rmMessageContext.getAddressingHeaders().getAction() != null) {
-                call.setSOAPActionURI(rmMessageContext.getAddressingHeaders().getAction().toString());
+                call.setSOAPActionURI(
+                        rmMessageContext.getAddressingHeaders().getAction().toString());
             }
         }
         return call;
@@ -289,83 +305,45 @@ public class Sender implements Runnable {
             Call call;
             call = prepareCall(rmMessageContext);
             //CHECK THIS
-            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),
+                    rmMessageContext.getMsgNumber());
             call.invoke();
             processResponseMessage(call, rmMessageContext);
 
         } else {
             Call call = prepareCall(rmMessageContext);
-            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(), rmMessageContext.getMsgNumber());
+            storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),
+                    rmMessageContext.getMsgNumber());
             call.invoke();
             processResponseMessage(call, rmMessageContext);
 
         }
     }
 
-    private void sendMessage(RMMessageContext rmMessageContext) throws Exception {
-        switch (rmMessageContext.getMessageType()) {
-            case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
-                {
-                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ);
-                    sendCreateSequenceRequest(rmMessageContext);
-                    break;
-                }
-            case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
-                {
-                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ_RES);
-                    sendCreateSequenceResponse(rmMessageContext);
-                    break;
-                }
-            case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
-                {
-                    System.out.println(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
-                    sendTerminateSequenceRequest(rmMessageContext);
-                    storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(rmMessageContext.getSequenceID()));
-                    break;
-                }
-            case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
-                {
-                    System.out.println(Constants.InfomationMessage.SENDING_ACK);
-                    sendAcknowldgement(rmMessageContext);
-                    break;
-                }
-            case Constants.MSG_TYPE_SERVICE_REQUEST:
-                {
-                    System.out.println(Constants.InfomationMessage.SENDING_REQ);
-                    sendServiceRequest(rmMessageContext);
-                    break;
-                }
-            case Constants.MSG_TYPE_SERVICE_RESPONSE:
-                {
-                    System.out.println(Constants.InfomationMessage.SENDING_RES);
-                    sendServiceResponse(rmMessageContext);
-                    break;
-                }
-        }
-    }
+    private void processResponseMessage(Call call, RMMessageContext rmMessageContext)
+            throws Exception {
 
-    private void processResponseMessage(Call call, RMMessageContext rmMessageContext) throws Exception {
-   
         if (call.getResponseMessage() != null) {
             RMHeaders rmHeaders = new RMHeaders();
             rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
             rmMessageContext.setRMHeaders(rmHeaders);
-            AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage().getSOAPEnvelope());
+            AddressingHeaders addrHeaders = new AddressingHeaders(
+                    call.getResponseMessage().getSOAPEnvelope());
             rmMessageContext.setAddressingHeaders(addrHeaders);
             rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
-            IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier
-                    .getMessageProcessor(rmMessageContext, storageManager);
+            IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier.getMessageProcessor(
+                    rmMessageContext, storageManager);
             messagePrcessor.processMessage(rmMessageContext);
         }
-        
-        if(getCallback()!=null){
-            CallbackData data = new CallbackData ();
+
+        if (getCallback() != null) {
+            CallbackData data = new CallbackData();
             data.setMessageId(rmMessageContext.getMessageID());
             data.setMessageType(rmMessageContext.getMessageType());
             data.setSequenceId(rmMessageContext.getSequenceID());
             callback.onIncomingMessage(data);
         }
-        
+
     }
 
 }

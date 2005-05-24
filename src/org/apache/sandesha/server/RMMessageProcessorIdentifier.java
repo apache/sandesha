@@ -20,12 +20,7 @@ import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.server.msgprocessors.CompositeProcessor;
-import org.apache.sandesha.server.msgprocessors.CreateSequenceProcessor;
-import org.apache.sandesha.server.msgprocessors.CreateSequenceResponseProcessor;
-import org.apache.sandesha.server.msgprocessors.FaultProcessor;
-import org.apache.sandesha.server.msgprocessors.IRMMessageProcessor;
-import org.apache.sandesha.server.msgprocessors.TerminateSequenceProcessor;
+import org.apache.sandesha.server.msgprocessors.*;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
@@ -41,7 +36,8 @@ public class RMMessageProcessorIdentifier {
      * @param storageManager
      * @return
      */
-    public static IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext, IStorageManager storageManager) {
+    public static IRMMessageProcessor getMessageProcessor(RMMessageContext rmMessageContext,
+                                                          IStorageManager storageManager) {
 
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
@@ -49,15 +45,19 @@ public class RMMessageProcessorIdentifier {
         if (addrHeaders.getAction() != null) {
             if (addrHeaders.getAction().toString().equals(Constants.WSRM.ACTION_CREATE_SEQUENCE)) {
                 return new CreateSequenceProcessor(storageManager);
-            } else if (addrHeaders.getAction().toString().equals(Constants.WSRM.ACTION_CREATE_SEQUENCE_RESPONSE)) {
+            } else if (addrHeaders.getAction().toString().equals(
+                    Constants.WSRM.ACTION_CREATE_SEQUENCE_RESPONSE)) {
                 return new CreateSequenceResponseProcessor(storageManager);
-            } else if (addrHeaders.getAction().toString().equals(Constants.WSRM.ACTION_TERMINATE_SEQUENCE)) {
+            } else if (addrHeaders.getAction().toString().equals(
+                    Constants.WSRM.ACTION_TERMINATE_SEQUENCE)) {
                 return new TerminateSequenceProcessor(storageManager);
-            } else if ((rmHeaders.getSequenceAcknowledgement() != null) || (rmHeaders.getSequence().getMessageNumber() != null)) {
+            } else if ((rmHeaders.getSequenceAcknowledgement() != null) ||
+                    (rmHeaders.getSequence().getMessageNumber() != null)) {
                 return new CompositeProcessor(storageManager);
             } else
                 return new FaultProcessor(storageManager);
-        } else if ((rmHeaders.getSequenceAcknowledgement() != null) || (rmHeaders.getSequence().getMessageNumber() != null)) {
+        } else if ((rmHeaders.getSequenceAcknowledgement() != null) ||
+                (rmHeaders.getSequence().getMessageNumber() != null)) {
             return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);

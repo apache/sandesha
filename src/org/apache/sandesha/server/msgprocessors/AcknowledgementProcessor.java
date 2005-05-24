@@ -47,7 +47,8 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
     }
 
     public final boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
-        SequenceAcknowledgement seqAcknowledgement = rmMessageContext.getRMHeaders().getSequenceAcknowledgement();
+        SequenceAcknowledgement seqAcknowledgement = rmMessageContext.getRMHeaders()
+                .getSequenceAcknowledgement();
         String seqID = seqAcknowledgement.getIdentifier().getIdentifier();
         List ackRanges = seqAcknowledgement.getAckRanges();
         Iterator ite = ackRanges.iterator();
@@ -57,7 +58,10 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             long msgNumber = ackRange.getMinValue();
             while (ackRange.getMaxValue() >= msgNumber) {
                 if (!storageManager.isSentMsg(seqID, msgNumber)) {
-                    throw new AxisFault(new javax.xml.namespace.QName(Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT), Constants.FaultMessages.INVALID_ACKNOWLEDGEMENT, null, null);
+                    throw new AxisFault(
+                            new javax.xml.namespace.QName(
+                                    Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT),
+                            Constants.FaultMessages.INVALID_ACKNOWLEDGEMENT, null, null);
                 }
                 storageManager.setAckReceived(seqID, msgNumber);
                 storageManager.setAcknowledged(seqID, msgNumber);
@@ -70,13 +74,11 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
 
 
     public boolean sendAcknowledgement(RMMessageContext rmMessageContext) throws AxisFault {
-        //EnvelopCreater createAcknowledgement.  If async then add message to the queue
-        //else set the response env of the messageContext.
-
         String seqID = rmMessageContext.getSequenceID();
 
-        long messageNumber = rmMessageContext.getRMHeaders().getSequence().getMessageNumber().getMessageNumber();
-        String seq=storageManager.getOutgoingSeqenceIdOfIncomingMsg(rmMessageContext);
+        long messageNumber = rmMessageContext.getRMHeaders().getSequence().getMessageNumber()
+                .getMessageNumber();
+        String seq = storageManager.getOutgoingSeqenceIdOfIncomingMsg(rmMessageContext);
         Map listOfMsgNumbers = storageManager.getListOfMessageNumbers(seq);
 
         Vector ackRangeVector = null;
@@ -91,9 +93,11 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         }
         RMMessageContext rmMsgContext = getAckRMMsgCtx(rmMessageContext, ackRangeVector);
 
-        if (true == (storageManager.getAcksTo(seqID).equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
+        if (true ==
+                (storageManager.getAcksTo(seqID).equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
             try {
-                String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPEnvelope().toString();
+                String soapMsg = rmMsgContext.getMsgContext().getResponseMessage().getSOAPEnvelope()
+                        .toString();
                 rmMessageContext.getMsgContext().setResponseMessage(new Message(soapMsg));
             } catch (AxisFault af) {
                 af.setFaultCodeAsString(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);
@@ -107,28 +111,27 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         }
     }
 
-    private  RMMessageContext getAckRMMsgCtx(RMMessageContext rmMessageContext, Vector ackRangeVector) {
+    private RMMessageContext getAckRMMsgCtx(RMMessageContext rmMessageContext,
+                                            Vector ackRangeVector) {
         RMMessageContext rmMsgContext = new RMMessageContext();
         try {
 
-            String to=storageManager.getAcksTo(rmMessageContext.getRMHeaders().getSequence().getIdentifier().getIdentifier());
+            String to = storageManager.getAcksTo(
+                    rmMessageContext.getRMHeaders().getSequence().getIdentifier().getIdentifier());
 
-            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext,to,ackRangeVector);
-            //Create a new message using the ackEnvelope
+            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(
+                    rmMessageContext, to, ackRangeVector);
+
             Message resMsg = new Message(ackEnvelope);
-            //Create a new message context to store the ack message.
-            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
-            //Copy the contents of the rmMessageContext to the rmMsgContext.
+            MessageContext msgContext = new MessageContext(
+                    rmMessageContext.getMsgContext().getAxisEngine());
             rmMessageContext.copyContents(rmMsgContext);
-            //Set the response message using the Ack message
             msgContext.setResponseMessage(resMsg);
-            //Set the msgContext to the rmMsgContext
             rmMsgContext.setMsgContext(msgContext);
 
             //Get the from address to send the Ack. Doesn't matter whether we have Sync or ASync messages.
             //If we have Sync them this property is not used.
             rmMsgContext.setOutGoingAddress(to);
-            //Set the messsage type
             rmMsgContext.setMessageType(Constants.MSG_TYPE_ACKNOWLEDGEMENT);
         } catch (Exception e) {
             log.error(e);
@@ -158,27 +161,22 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
 
                 if (i + 1 > size) {
                     found = true;
-                    max = ((Long) listOfMsgNumbers.get(new Long(i)))
-                            .longValue();
+                    max = ((Long) listOfMsgNumbers.get(new Long(i))).longValue();
                 } else {
 
-                    if (1 == (((Long) listOfMsgNumbers.get(new Long(i + 1)))
-                            .longValue() - ((Long) listOfMsgNumbers
-                            .get(new Long(i))).longValue())) {
-                        max = ((Long) listOfMsgNumbers.get(new Long(i + 1)))
-                                .longValue();
+                    if (1 == (((Long) listOfMsgNumbers.get(new Long(i + 1))).longValue() - ((Long) listOfMsgNumbers.get(
+                            new Long(i))).longValue())) {
+                        max = ((Long) listOfMsgNumbers.get(new Long(i + 1))).longValue();
                         found = true;
                     } else {
                         found = false;
-                        max = ((Long) listOfMsgNumbers.get(new Long(i)))
-                                .longValue();
+                        max = ((Long) listOfMsgNumbers.get(new Long(i))).longValue();
                         AcknowledgementRange ackRange = new AcknowledgementRange();
                         ackRange.setMaxValue(max);
                         ackRange.setMinValue(min);
                         vec.add(ackRange);
 
-                        min = ((Long) listOfMsgNumbers.get(new Long(i + 1)))
-                                .longValue();
+                        min = ((Long) listOfMsgNumbers.get(new Long(i + 1))).longValue();
                     }
 
                 }

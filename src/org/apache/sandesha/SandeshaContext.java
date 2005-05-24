@@ -25,11 +25,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Jaliya
- * Date: May 20, 2005
- * Time: 5:55:16 PM
- * To change this template use File | Settings | File Templates.
+ * SandeshaContext will keep track of different Call objects that the user may use inside
+ * a single client instance. SandeshaContext provides the user with an API to initialize and
+ * end sequences. With the "endSequence(Call call) method the user is provide with the option
+ * of accepting a RMReport which contains the overall status of the message transfer.
  */
 public class SandeshaContext {
 
@@ -106,7 +105,8 @@ public class SandeshaContext {
             throw new AxisFault("TargetUrl cannot be null");
         if (call == null)
             throw new AxisFault("Call cannot be null");
-        if (!(MEP == Constants.ClientProperties.IN_ONLY || MEP == Constants.ClientProperties.INOUT))
+        if (!(MEP == Constants.ClientProperties.IN_ONLY ||
+                MEP == Constants.ClientProperties.IN_OUT))
             throw new AxisFault("Invalid MEP");
     }
 
@@ -120,7 +120,19 @@ public class SandeshaContext {
         activeSequenes++;
     }
 
-    public RMReport endSequence(Call call) throws AxisFault {
+    public void addNewSequeceContext(Call call, String targetUrl, String action, short MEP,
+                                     boolean sync) throws AxisFault {
+        String key = initialize(call, targetUrl, action, MEP);
+        setSynchronous(call);
+        init(true);
+        if (!sync) {
+            startListener();
+        }
+        callMap.put(key, call);
+        activeSequenes++;
+    }
+
+    public void endAllSequence(Call call) throws AxisFault {
 
         IStorageManager storageManager = new ClientStorageManager();
         long startingTime = System.currentTimeMillis();
@@ -138,9 +150,31 @@ public class SandeshaContext {
             }
         }
 
+        endAllSequences();
+
+    }
+
+    public RMReport endSequence(Call call) throws AxisFault {
+
+        IStorageManager storageManager = new ClientStorageManager();
+        long startingTime = System.currentTimeMillis();
+        long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
+        String seqId = (String) call.getProperty(Constants.ClientProperties.CALL_KEY);
+        while (!storageManager.isSequenceComplete(seqId)) {
+            try {
+                System.out.println(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
+                Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
+                if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
+                    stopClientByForce();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                log.error(e);
+            }
+        }
+
         RMReport rmReport = (RMReport) call.getProperty(Constants.ClientProperties.REPORT);
-        if (storageManager.isAllSequenceComplete())
-            rmReport.setAllAcked(true);
+        rmReport.setAllAcked(true);
 
         if (activeSequenes == 1) {
             if (listenerStarted) {
@@ -151,12 +185,13 @@ public class SandeshaContext {
             cleintSenderStarted = false;
             storageManager.clearStorage();
             activeSequenes--;
+            return rmReport;
         }
         activeSequenes--;
         return rmReport;
 
-
     }
+
 
     public void endAllSequences() throws AxisFault {
         IStorageManager storageManager = new ClientStorageManager();
@@ -337,8 +372,8 @@ public class SandeshaContext {
         return ((Boolean) call.getProperty(Constants.ClientProperties.SEND_OFFER)).booleanValue();
     }
 
-    public void setSendOffer(Call call, boolean sendOffer) {
-        call.setProperty(Constants.ClientProperties.SEND_OFFER, new Boolean(sendOffer));
+    public void setSendOffer(Call call) {
+        call.setProperty(Constants.ClientProperties.SEND_OFFER, new Boolean(true));
     }
 
     public void setLastMessage(Call call) {
@@ -357,11 +392,11 @@ public class SandeshaContext {
         call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(msgNumber));
     }
 
-    public void setSynchronous(Call call){
-             call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
+    public void setSynchronous(Call call) {
+        call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
     }
 
-    public boolean getSynchronous(Call call){
+    public boolean getSynchronous(Call call) {
         return ((Boolean) call.getProperty(Constants.ClientProperties.SYNC)).booleanValue();
     }
 

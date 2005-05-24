@@ -58,7 +58,7 @@ path.</p>
 <p>There are two main ways that one can use axis to write web service client 
 applications.</p>
 <ol>
-  <li>1. Using generated Stubs</li>
+  <li>1. Using Generated Stubs</li>
   <li>2. Using Dynamic Invocation Interface (DII)</li>
 </ol>
 <p>At the moment when you generate the stubs there is no way that we can inform 
@@ -73,100 +73,86 @@ existing client. Following code fragment shows the required additions that one
 should make. </p>
 <p><source>public static void main(String[] args) {
 try {
-<span style="background-color: #CCCCCC">RMInitiator.initClient</span><span style="background-color: #CCCCCC">();</span>
-
 Service service = new Service();
 Call call = (Call) service.createCall();
-
-<span style="background-color: #CCCCCC">call.setTransport(new</span><span style="background-color: #CCCCCC">
-</span><span style="background-color: #CCCCCC">RMTransport(&quot;http</span><span style="background-color: #CCCCCC">://localhost:8080/axis/services/</span><span style="background-color: #CCCCCC">RMInteropService</span><span style="background-color: #CCCCCC">&quot;, 
-&quot;&quot;));</span>
-call.setProperty(Constants.ClientProperties.ACTION, &quot;urn:wsrm:echoString&quot;);
-
-call.setTargetEndpointAddress(&quot;http://localhost:8080/axis/services/RMInteropService&quot;);
-call.setOperationName(new QName(&quot;http://tempuri.org/&quot;, &quot;echoString&quot;));
-call.addParameter(&quot;arg1&quot;, XMLType.XSD_STRING, ParameterMode.IN);
-call.addParameter(&quot;arg2&quot;, XMLType.XSD_STRING, ParameterMode.IN);
+<span style="background-color: #CCCCCC">SandeshaContext ctx = new SandeshaContext();</span>
+<span style="background-color: #CCCCCC">ctx.addNewSequeceContext(call, targetUrl,
+			 "urn:wsrm:echoString",Constants.ClientProperties.IN_OUT);</span>
+call.setOperationName(new QName("http://tempuri.org/", "echoString"));
+call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
+call.addParameter("Seq", XMLType.XSD_STRING, ParameterMode.IN);
 call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
 
-<span style="background-color: #CCCCCC">
-call.setProperty(Constants.ClientProperties.LAST_MESSAGE</span><span style="background-color: #CCCCCC">, 
-new </span><span style="background-color: #CCCCCC">Boolean(true</span><span style="background-color: #CCCCCC">));</span>
+<span style="background-color: #CCCCCC">ctx.setLastMessage(call);</span>
+String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", "abcdef"});
+System.out.println("The Response for First Messsage is :" + ret);
 
-String ret = (String) call.invoke(new Object[]{&quot;Sandesha Echo 1&quot;, &quot;abcdef&quot;});
-System.out.println(&quot;The Response for First Messsage is :&quot; + ret);
-
-<span style="background-color: #CCCCCC">RMInitiator.stopClient</span><span style="background-color: #CCCCCC">();</span>
-} catch (Exception e) {
-e.printStackTrace();
+<span style="background-color: #CCCCCC">ctx.endSequence(call);</span>
+} catch (Exception e) { e.printStackTrace();
 }
-}
-&nbsp;</source></p>
+}</source></p>
 <h4>Explanation on Additions :</h4>
 <p>
-<span style="background-color: #CCCCCC; font-weight:700">RMInitiator.initClient();</span></p>
-<p>This step initializes the&nbsp; RMSource (Client side ReliableMessaging 
-Endpoint). This will start the Sender and the client side listener for this 
-inovcation.</p>
+<span style="font-weight: 700; background-color: #CCCCCC">SandeshaContext ctx = new SandeshaContext();</span></p>
+<p>This is the initial step in initializing the&nbsp; RMSource (Client side ReliableMessaging 
+Endpoint). SandeshaContext is used to keep track of different sequences that the 
+client may create throughout the its lifecycle. Client can &quot;add&quot; any number of 
+sequences and &quot;end&quot; them in any order.</p>
 <p>
-<span style="background-color: #CCCCCC; font-weight:700">call.setTransport(new RMTransport(&quot;http://localhost:8080/axis/services/RMInteropService&quot;, 
-&quot;&quot;));</span></p>
-<p>Sandesha uses RMTransport, which will add the out going messages to Sandesha 
-Queue, in the client side. This line is used to inform the axis engine to use 
-RMTransport as the transport sender for this invocation. In addition axis 
-requires the following lines to be there in the client-config.wsdd.</p>
-<p><source>&lt;handler name=&quot;RMSender&quot; type=&quot;java:org.apache.sandesha.client.RMSender&quot;/&gt;<br>
-&lt;transport name=&quot;RMTransport&quot; pivot=&quot;RMSender&quot;/&gt;</source> </p>
-<p>
-<span style="background-color: #CCCCCC; font-weight:700">
-call.setProperty(Constants.ClientProperties.LAST_MESSAGE, 
-new Boolean(true));</span></p>
+<span style="font-weight: 700; background-color: #CCCCCC">ctx.addNewSequeceContext(call,targetUrl ,
+                    "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);</span></p>
+<p>Using this step the client can add the call object to the SandeshaContext, 
+with targetUrl,&lt;wsa:Action&gt; and the Message Exchange Pattern (MEP) as the 
+parameters. Target URL and the action are self-explanatory but may be not the 
+MEP. MEP informs Sandesha end point the behavior of the message exchange 
+expected by this call object. In other words it helps SandeshaContext to 
+understand whether the call object is used for a &quot;Request/Response&quot;&nbsp; 
+invocation or &quot;Request Only&quot; invocation. <br>
+&nbsp;</p>
+<p><span style="font-weight: 700; background-color: #CCCCCC">ctx.setLastMessage(call);</span></p>
 <p>This is to inform the RMSource that this message is the last message of a 
 particular sequence. Meaning of this statement may not be trivial in the case of 
 a single message scenario as above, however this is a &quot;REQUIRED&quot; property for 
-RMSource to add the &lt;wsrm:LastMessage&gt; header to the outgoing message.</p>
+RMSource&nbsp; and this will add the &lt;wsrm:LastMessage&gt; header to the outgoing message.</p>
 <p>
-<span style="background-color: #CCCCCC; font-weight:700">RMInitiator.stopClient();</span></p>
-<p>This is the last statment relating to this invocation sequence. RMSource will 
-wait till all the sequence to be complete before passing the control back to the 
-client code. The wait time depends on the policy assertion InactivityTimeout( &lt;wsrm:InactivityTimeout 
-Milliseconds=&quot;60000&quot; /&gt; ). Once all the messages are sent and the 
-responses (if any) are received then this will stop the client side listener and 
+<span style="font-weight: 700; background-color: #CCCCCC">ctx.endSequence(call);</span></p>
+<p>This is the last statement relating to this invocation sequence. RMSource will 
+wait till all the messages been acknowledged and the terminate sequence for this 
+particular sequence is sent, before returning the control back to the invocation 
+party (that is client). The wait time depends on the policy assertion InactivityTimeout( &lt;wsrm:InactivityTimeout 
+Milliseconds=&quot;60000&quot; /&gt; ). If this is the final sequence that is 
+available for stopping then the context will wait till all the messages are sent and the 
+responses (if any) are received and will stop the client side listener and 
 clean up the Sandesha Queue.</p>
 <p>Note : These are the minimum changes that one should do in-order to use 
 Sandesha in the client side. There are some other additions that one can use to 
 get more flexibility in Sandesha and we will see them in the following examples.</p>
-<h3>Simple  One Way Client</h3>
+<h3>Simple  One-Way Client</h3>
 <p>In this scenario we will look at how Sandesha can be used in a one-way 
 messaging operation. Again the following code fragment will explain the 
 additional code lines required. For this we use a client that will invoke a 
 service 3 times. (This for the explanation purpose only)</p>
-<p><source>
-public static void main(String[] args) {
+<p><source>public static void main(String[] args) {
 try {
-
-<span style="background-color: #CCCCCC">RMInitiator.initClient();</span>
-
 Service service = new Service();
 Call call = (Call) service.createCall();
 
-<span style="background-color: #CCCCCC">call.setTransport(new RMTransport("http://localhost:8070/axis/services/RMInteropService", ""));</span> 
-call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
-
-call.setTargetEndpointAddress("http://localhost:8070/axis/services/RMInteropService");
+SandeshaContext ctx = new SandeshaContext();
+ctx.addNewSequeceContext(call,targetUrl ,
+                    "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 call.setOperationName(new QName("http://tempuri.org/", "ping"));
 call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
-
+            
 call.invoke(new Object[]{"Sandesha Ping 1"});
 call.invoke(new Object[]{"Sandesha Ping 2"});
-<span style="background-color: #CCCCCC">call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));</span> 
+ctx.setLastMessage(call);
 call.invoke(new Object[]{"Sandesha Ping 3"});
+ctx.endSequence(call);
 
-<span style="background-color: #CCCCCC">RMInitiator.stopClient();
-</span>} catch (Exception e) { e.printStackTrace();
+} catch (Exception e) {
+   e.printStackTrace();
 }
-}
-</source></p>
+}</source></p>
 
 <p>As it can be seen, we need the same additions as above and the explanations 
 are the same.</p>
@@ -179,36 +165,33 @@ service 3 times. (This for the explanation purpose only)</p>
 <p><source>
 public static void main(String[] args) {
 try {
-
-<span style="background-color: #CCCCCC">RMInitiator.initClient(</span><span style="background-color: #FFFF99">true</span><span style="background-color: #CCCCCC">);</span>
-
 Service service = new Service();
 Call call = (Call) service.createCall();
 
-<span style="background-color: #CCCCCC">call.setTransport(new RMTransport("http://localhost:8070/axis/services/RMInteropService", ""));</span>
-<span style="background-color: #FFFF99">call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));</span> 
-call.setProperty(Constants.ClientProperties.ACTION, "urn:wsrm:Ping");
+SandeshaContext ctx = new SandeshaContext();
+<span style="background-color: #CCCCCC">ctx.addNewSequeceContext(call,targetUrl ,
+	   "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY,</span><span style="background-color: #FFFF99">true</span>);
 
-call.setTargetEndpointAddress("http://localhost:8070/axis/services/RMInteropService");
 call.setOperationName(new QName("http://tempuri.org/", "ping"));
 call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
 
 call.invoke(new Object[]{"Sandesha Ping 1"});
 call.invoke(new Object[]{"Sandesha Ping 2"});
-<span style="background-color: #CCCCCC">call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));</span> 
+ctx.setLastMessage(call);
 call.invoke(new Object[]{"Sandesha Ping 3"});
+ctx.endSequence(call);
 
-<span style="background-color: #CCCCCC">RMInitiator.stopClient();
-</span>} catch (Exception e) { e.printStackTrace();
+} catch (Exception e) {
+   e.printStackTrace();
 }
-}
-</source></p>
+}</source></p>
 
-<p>We need two more changes and the explanations are as follows.</p>
+<p>The only change we need is to set the flag &quot;sync&quot; to &quot;true&quot; when we add the 
+sequence to SandeshaContext, as shown bellow.</p>
 
-<p><b><span style="background-color: #CCCCCC">RMInitiator.initClient();</b></span>
-
-<p>By these, client can inform the RMSource, not to start a separate client side 
+<p><b>
+<span style="background-color: #CCCCCC">ctx.addNewSequeceContext(call,targetUrl ,
+                        "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY,</span><span style="background-color: #FFFF99">true</span>);</b><p>By these, client can inform the RMSource, not to start a separate client side 
 listener and send the requests with &quot;<b>anonymous URI</b>&quot; in &lt;wsa:From&gt; and &lt;wsrm:AcksTo&gt;&nbsp; 
 headers. So the server will use the same transport connection to send Create 
 Sequence Response and Acknowledgements.</p>
@@ -216,13 +199,6 @@ Sequence Response and Acknowledgements.</p>
 <p>Note: Please note that this can only be used for One-way operations. If the 
 web service request has a response then Sandesha always use a separate listener 
 to retrieve the response back.</p>
-
-<p><b><span style="background-color: #FFFF99">
-call.setProperty(Constants.ClientProperties.SYNC</span><span style="background-color: #FFFF99">, 
-new Boolean(true));</span></b></p>
-
-<p>This is the line that informs&nbsp; RMSource to use anonymous &lt;wsa&gt; headers 
-for request messages.</p>
 
 <h3>Overriding the wsa:Addressing and Other Parameters from Client</h3>
 
@@ -234,20 +210,100 @@ appropriate properties (depending on the client, either request-response or one
 way) to get the correct functionality. Following code fragment contains all the 
 parameters that the client can set inside the client code.</p>
 
-<p><sourc>
-call.setProperty(Constants.ClientProperties.TO,"http://test.organization.com:8080/wsrm/services/rmDemos");
-call.setProperty(Constants.ClientProperties.ACKS_TO,"http://our.organization.org:9070/axis/services/RMService");
-call.setProperty(Constants.ClientProperties.FAULT_TO, "http://our.organization.org:9070/axis/services/RMService"); 
-call.setProperty(Constants.ClientProperties.FROM, "http://our.organization.org:9070/axis/services/RMService");
-call.setProperty(Constants.ClientProperties.REPLY_TO, "http://our.organization.org:9070/axis/services/RMService");
-call.setProperty(Constants.ClientProperties.SEND_OFFER,new Boolean(true));
-</source></p>
+<p><source>
+ctx.setToUrl(call, "http://test.organization.com:8080/wsrm/services/rmDemos");
+ctx.setFromUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+ctx.setReplyToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+ctx.setAcksToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+ctx.setFaultToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+ctx.setSendOffer(call);</source></p>
 
 <p>These properties are very useful when debugging applications. By changing 
 them appropriately the user can route messages through TCP Monitor or some 
 monitor. These properties are self explanatory and hence let's look at one more 
 sample with properties to route all the messages through TCP Monitor. Let's use 
 Request/Response type service Invocation.</p>
+
+<h3>Invoking More Than One Service in a Single Client</h3>
+
+<p>Sandesha allows users to write clients that invokes several web services. 
+Client can add any number of sequences to the SandeshaContext and RMSouruce will 
+handle the underline sequence creation, message delivery and sequence 
+termination appropriately. In the following example we will inovke &quot;echoString&quot; 
+operation&nbsp; first and invoke &quot;ping&quot; operation passing the response of the &quot;echoString&quot; 
+operation. </p>
+
+<p>Note: Please note that in this example both &quot;echoString&quot; and &quot;ping&quot; 
+operations are in the same service &quot;RMInteropService&quot; as two different 
+operations. However these need NOT be operations of a single service.</p>
+
+<p><source>
+public void testEchoPing() throws Exception {
+System.out.println("===========Echo and Ping Combined Test Started=============");
+UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
+String str = uuidGen.nextUUID();
+
+Service service = new Service();
+Call echoCall = (Call) service.createCall();
+
+SandeshaContext ctx = new SandeshaContext();
+//------------------------ECHO------------------------------------------
+ctx.addNewSequeceContext(echoCall, targetURL, "urn:wsrm:echoString",
+                Constants.ClientProperties.IN_OUT);
+ctx.setAcksToUrl(echoCall,
+        "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+ctx.setReplyToUrl(echoCall,
+         "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+ctx.setSendOffer(echoCall);
+
+echoCall.setOperationName(new QName("http://tempuri.org/", "echoString"));
+
+echoCall.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
+echoCall.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
+echoCall.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
+//----------------------ECHO----------------------------------------------
+
+//------------------------PING--------------------------------------------
+Call pingCall = (Call) service.createCall();
+ctx.addNewSequeceContext(pingCall, targetURL, "urn:wsrm:Ping",
+      Constants.ClientProperties.IN_ONLY);
+ctx.setAcksToUrl(pingCall,
+     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+
+pingCall.setOperationName(new QName("http://tempuri.org/", "ping"));
+pingCall.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
+//----------------------PING----------------------------------------------
+
+String ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 1", str});
+System.out.println("The Response for First Messsage is  :" + ret);
+pingCall.invoke(new Object[]{ret});
+
+ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 2", str});
+System.out.println("The Response for Second Messsage is  :" + ret);
+pingCall.invoke(new Object[]{ret});
+
+ctx.setLastMessage(echoCall);
+ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 3", str});
+System.out.println("The Response for Third Messsage is  :" + ret);
+ctx.setLastMessage(pingCall);
+pingCall.invoke(new Object[]{ret});
+
+RMReport echoReport = ctx.endSequence(echoCall);
+RMReport pingReport=ctx.endSequence(pingCall);
+
+assertEquals(echoReport.isAllAcked(), true);
+assertEquals(echoReport.getNumberOfReturnMessages(), 3);
+
+assertEquals(pingReport.isAllAcked(), true);
+assertEquals(pingReport.getNumberOfReturnMessages(), 0);
+System.out.println("===========Echo and Ping Combined Test Finished==========");
+
+}
+</source></p>
+
+<p>Note: Samples of all these scenarios are available in the &quot;interop&quot; 
+directory. Sample of invoking two web services in a same client is available as 
+a test case in the &quot;test&quot; directory.</p>
 
 <h2><font size="5">To Use Sandesha in the Server Side</font></h2>
 <p>This can again be done using two steps.</p>
@@ -258,19 +314,6 @@ with the other new jars that can be found in <b>target/lib</b> directory of Sand
   <li>To configure Sandesha for a particular service( say MyService) change the 
   <b>deploy.wsdd</b> of <b>&nbsp;MyService</b> according to the following.</li>
 </ul>
-<source>
-<p>&lt;deployment xmlns=&quot;<a href="http://xml.apache.org/axis/wsdd/">http://xml.apache.org/axis/wsdd/</a>&quot; xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;</p>
-<p>&lt;service name=&quot;MyService&quot; provider=&quot;Handler&quot;&gt;</p>
-<p>&lt;requestFlow&gt;</p>
-<p>&lt;handler type=&quot;java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler&quot;&gt;&lt;/handler&gt;</p>
-<p>&lt;handler type=&quot;java:org.apache.axis.message.addressing.handler.AddressingHandler&quot;&gt;&lt;/handler&gt;</p>
-<p>&lt;/requestFlow&gt;</p>
-<p>&lt;parameter name=&quot;handlerClass&quot; value=&quot;org.apache.sandesha.ws.rm.providers.RMProvider&quot;/&gt;</p>
-<p>&lt;parameter name=&quot;className&quot; value=&quot;test.MyService&quot;/&gt;</p>
-<p>&lt;parameter name=&quot;allowedMethods&quot; value=&quot;*&quot;/&gt;</p>
-<p>&lt;parameter name=&quot;scope&quot; value=&quot;request&quot;/&gt;</p>
-<p>&lt;/service&gt;</p>
-<p>&lt;/deployment&gt;</p></source>
 <p>Note that we have to change the provider to <b>RMProvider</b> and need to add two 
 request handlers. A sample of this <b>deploy.wsdd</b> can be found in the interop 
 directory named <b>RMInteropServiceDeploy</b> with the required bat file to deploy the 
@@ -279,17 +322,83 @@ service. (make sure that the classes for the <b>MyService</b> is copied to
 use the <b>RPCProvider</b> to invoke the services, however user can specify the 
 actual provider that is required to invoke a particular service in <b>
 sandesha.properties</b> file that can be found in <b>config</b> directory.</p>
-<p>&nbsp;</p>
 
-<h2>Interop Testing</h2>
+<p><source>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot; 
+xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;
+&nbsp;&lt;service name=&quot;MyService&quot; provider=&quot;Handler&quot;&gt;
+&lt;requestFlow&gt;
+&lt;handler type=&quot;java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler&quot;&gt;&lt;/handler&gt;
+&lt;handler type=&quot;java:org.apache.axis.message.addressing.handler.AddressingHandler&quot;&gt;&lt;/handler&gt;
+&lt;/requestFlow&gt;
+&lt;parameter name=&quot;handlerClass&quot; value=&quot;org.apache.sandesha.ws.rm.providers.RMProvider&quot;/&gt;
+&lt;parameter name=&quot;className&quot; value=&quot;test.MyService&quot;/&gt;
+&lt;parameter name=&quot;allowedMethods&quot; value=&quot;*&quot;/&gt;
+&lt;parameter name=&quot;scope&quot; value=&quot;request&quot;/&gt;
+&lt;/service&gt;
+&lt;/deployment&gt;</source></p>
 
-<h3>Build the Interop Classes</h3>
+<h3>Using RMSource Inside a Server</h3>
+
+<p>A common usage of this scenario would be the use of Sandesha from a web 
+service that is already deployed in a server. In this scenario the web service 
+become the client that utilizes the&nbsp; RMSource for reliable delivery of 
+messages. According to the general configuration Sandesha will use a separate 
+listener in the client side to &quot;listen for&quot; any acknowledgements or responses 
+sent asynchronously to the RMSource. However, the server itself can act as the 
+&quot;Listener&quot; for Sandesha. The only aditional requirement is that to deploy &quot;RMService&quot; 
+in the same server with &quot;RMClientProvider as the provider. This behavior can 
+easily obtained using a deployment descriptor as shown below. </p>
+
+<p><source>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot; 
+xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;
+&lt;service name=&quot;MyService&quot; provider=&quot;java:RPC&quot;&gt;
+&lt;parameter name=&quot;className&quot; value=&quot;samples.userguide.example3.MyService&quot;/&gt;
+&lt;parameter name=&quot;allowedMethods&quot; value=&quot;*&quot;/&gt;
+&lt;/service&gt;
+
+&lt;service name=&quot;RMService&quot; provider=&quot;Handler&quot;&gt;
+&lt;requestFlow&gt;
+&lt;handler type=&quot;java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler&quot;&gt;&lt;/handler&gt;
+&lt;handler type=&quot;java:org.apache.axis.message.addressing.handler.AddressingHandler&quot;&gt;&lt;/handler&gt;
+&lt;/requestFlow&gt;
+
+&lt;parameter name=&quot;handlerClass&quot; value=&quot;org.apache.sandesha.ws.rm.providers.RMClientProvider&quot;/&gt;
+&lt;parameter name=&quot;className&quot; value=&quot;org.apache.sandesha.client.RMService&quot;/&gt;
+&lt;parameter name=&quot;allowedMethods&quot; value=&quot;*&quot;/&gt;
+&lt;parameter name=&quot;scope&quot; value=&quot;request&quot;/&gt;
+&lt;/service&gt;
+&lt;/deployment&gt;
+&nbsp;</source></p>
+
+<p>In this deployment descriptor &quot;MyService&quot; is the web service that behaves as 
+a client for some other service. (MyService is invoking some other web service 
+reliably using Apache Sandesha). To support asynchronous messaging for &quot;MyService&quot; 
+using the same server as the Client Side Listener, the user has to deploy &quot;RMService&quot; 
+with the above configurations in the same server. In addition to above, &quot;MyService&quot; 
+should specify the target URL of the &quot;RMService&quot; when it specify the 
+asynchronous endpoint for &lt;wsa:ReplyTo&gt;, &lt;wsrm:AcksTo&gt; , &lt;wsa:FaultTo&gt; etc.. For 
+the above sample deployment above URL would be, &quot;<a href="http://host.address:port/axis/services/RMService">http://host.address:port/axis/services/RMService</a>&quot;.</p>
+
+<p>In addition to the above configuration there can be more user specific 
+configurations for Sandesha which needs some customizations in the deployment 
+level. E.g. Sandesha can be used in the server side, with both RMSource and 
+RMDestination to be in the same server.(say, both the service and client are web 
+services that are deployed in the same server) For this kind of scenario again 
+the user needs &quot;RMService&quot; to be deployed with the above configuration and also 
+the web service that acts as the service (not the client service) to be deployed 
+with &quot;RMProvider&quot; as the provider. (This is similar to deploying a service to 
+use Sandesha)</p>
+
+<h2>Running Samples </h2>
+
+<h3>Build the Sample Classes</h3>
 <p>Note : Sandesha build process is done using Apache Maven. So assume that the 
-user has already configured Maven in his machine. </p>
-<p>Build process is mainly to run a single Maven command and it is</p>
+user has already configured Maven in his machine. 
+Build process is mainly to run a single Maven command and it is</p>
 <p>
 <source>maven</source></p>
-<p>Since we need the samples also to be build we need one more command</p>
+<p>Since we need the samples also to be build we need one more command (Let's 
+use the interop samples)</p>
 <p>
 <source>maven interop:compile</source></p>
 <p>If you need a project to be created for eclipse or Intellij IDEA use the 

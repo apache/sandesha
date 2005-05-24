@@ -896,8 +896,8 @@ public class SandeshaQueue {
 
     }*/
 
-    public  String getKeyFromOutgoingSequenceId(String seqId) {
-      synchronized (outgoingMap) {
+    public String getKeyFromOutgoingSequenceId(String seqId) {
+        synchronized (outgoingMap) {
             Iterator it = outgoingMap.keySet().iterator();
             while (it.hasNext()) {
                 String key = (String) it.next();
@@ -916,13 +916,13 @@ public class SandeshaQueue {
     public boolean isAllOutgoingTerminateSent() {
         synchronized (outgoingMap) {
             Iterator keys = outgoingMap.keySet().iterator();
-            boolean found=false;
+            boolean found = false;
 
             while (keys.hasNext()) {
                 OutgoingSequence ogs = (OutgoingSequence) outgoingMap.get(keys.next());
-                if (ogs.isTerminateSent()){
-                   found=true;
-                   break;
+                if (ogs.isTerminateSent()) {
+                    found = true;
+                    break;
                 }
             }
 
@@ -1038,6 +1038,37 @@ public class SandeshaQueue {
         }
         return (String) offerMap.get(msgID);
     }
+
+    public boolean isOutgoingTerminateSent(String seqId) {
+        synchronized (outgoingMap) {
+            OutgoingSequence ogs = (OutgoingSequence) outgoingMap.get(seqId);
+            if (ogs != null) {
+                if (ogs.isTerminateSent())
+                    return true;
+                else
+                    return false;
+            }
+            return false;
+        }
+
+    }
+
+    public boolean isIncommingTerminateReceived(String seqId) {
+        synchronized (incomingMap) {
+
+            IncomingSequence ics = (IncomingSequence) incomingMap.get(seqId);
+            OutgoingSequence ogs = (OutgoingSequence) outgoingMap.get(seqId);
+
+            boolean hasResponse = ogs.hasResponse();
+
+            if (hasResponse && !ics.isTerminateReceived())
+                return false;
+            else
+                return true;
+        }
+
+    }
+
 
 }
 

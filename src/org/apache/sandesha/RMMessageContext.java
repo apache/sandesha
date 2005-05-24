@@ -20,8 +20,8 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.commons.logging.Log;
 import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.commons.logging.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,32 +38,23 @@ public class RMMessageContext {
     private RMHeaders rmHeaders;
     private String outGoingAddress;
     private int messageType;
-    private long reTransmissionCount = 0;
-    private long lastPrecessedTime = 0;
-    private long lastSentTime = 0;
-    private boolean sync = false;
-    private boolean hasResponse = false;
-    private boolean lastMessage = false;
-    private long msgNumber = 0;
-    private String sourceURL = null;
-    private String action = null;
-    private String from = null;
-    private String replyTo = null;
+    private long reTransmissionCount;
+    private long lastPrecessedTime;
+    private long lastSentTime;
+    private boolean sync;
+    private boolean hasResponse;
+    private boolean lastMessage;
+    private long msgNumber;
+    private String sourceURL;
+    private String action;
+    private String from;
+    private String replyTo;
 
-    public String getOffer() {
-        return offer;
-    }
-
-    public void setOffer(String offer) {
-        this.offer = offer;
-    }
-
-    private boolean responseReceived = false;
-    private boolean ackReceived = false;
-    private String faultTo=null;
+    private boolean responseReceived;
+    private boolean ackReceived;
+    private String faultTo;
     private String acksTo = null;
-    private String to = null;
-    private String offer=null;
+    private String to;
 
 
     public boolean isSendOffer() {
@@ -77,16 +68,16 @@ public class RMMessageContext {
     private boolean sendOffer;
 
     private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
-    private ArrayList msgIdList = new ArrayList ();
-    
-    public void addToMsgIdList(String msgId){
+    private ArrayList msgIdList = new ArrayList();
+
+    public void addToMsgIdList(String msgId) {
         msgIdList.add(msgId);
     }
-    
-    public ArrayList getMessageIdList(){
+
+    public ArrayList getMessageIdList() {
         return msgIdList;
     }
-    
+
     public String getTo() {
         return to;
     }
@@ -104,139 +95,77 @@ public class RMMessageContext {
     }
 
     /**
-     * @return Returns the responseReceived.
-     */
-    public boolean isResponseReceived() {
-        return responseReceived;
-    }
-
-    /**
      * @param responseReceived The responseReceived to set.
      */
     public void setResponseReceived(boolean responseReceived) {
         this.responseReceived = responseReceived;
     }
 
-    /**
-     * @return Returns the from.
-     */
+
     public String getFrom() {
         return from;
     }
 
-    /**
-     * @param from The from to set.
-     */
     public void setFrom(String from) {
         this.from = from;
     }
 
-    /**
-     * @return Returns the replyTo.
-     */
     public String getReplyTo() {
         return replyTo;
     }
 
-    /**
-     * @param replyTo The replyTo to set.
-     */
     public void setReplyTo(String replyTo) {
         this.replyTo = replyTo;
     }
 
-    /**
-     * @return Returns the action.
-     */
     public String getAction() {
         return action;
     }
 
-    /**
-     * @param action The action to set.
-     */
     public void setAction(String action) {
         this.action = action;
     }
 
-    //This will be used to handle the relates to field.
-    //When sending the response messages from the server
-    private String oldSequenceID = null;
+    private String oldSequenceID;
 
-    /**
-     * @return Returns the hasResponse.
-     */
+
     public boolean isHasResponse() {
         return hasResponse;
     }
 
-    /**
-     * @param hasResponse The hasResponse to set.
-     */
     public void setHasResponse(boolean hasResponse) {
         this.hasResponse = hasResponse;
     }
 
-    /**
-     * @return Returns the lastMessage.
-     */
     public boolean isLastMessage() {
         return lastMessage;
     }
 
-    /**
-     * @param lastMessage The lastMessage to set.
-     */
     public void setLastMessage(boolean lastMessage) {
         this.lastMessage = lastMessage;
     }
 
-    /**
-     * @return Returns the rmHeaders.
-     */
-    public RMHeaders getRmHeaders() {
-        return rmHeaders;
-    }
-
-
-    /**
-     * @return Returns the sourceURL.
-     */
     public String getSourceURL() {
         return sourceURL;
     }
 
-    /**
-     * @param sourceURL The sourceURL to set.
-     */
     public void setSourceURL(String sourceURL) {
         this.sourceURL = sourceURL;
     }
 
-    /**
-     * @return Returns the msgNumber.
-     */
     public long getMsgNumber() {
         return msgNumber;
     }
 
-    /**
-     * @param msgNumber The msgNumber to set.
-     */
+
     public void setMsgNumber(long msgNumber) {
         this.msgNumber = msgNumber;
     }
 
-    /**
-     * @return Returns the oldSequenceID.
-     */
     public String getOldSequenceID() {
         return oldSequenceID;
     }
 
-    /**
-     * @param oldSequenceID The oldSequenceID to set.
-     */
     public void setOldSequenceID(String oldSequenceID) {
         this.oldSequenceID = oldSequenceID;
     }
@@ -249,106 +178,60 @@ public class RMMessageContext {
         this.ackReceived = ackReceived;
     }
 
-    /**
-     * @return
-     */
     public MessageContext getMsgContext() {
         return msgContext;
     }
 
-
-    /**
-     * @return
-     */
     public String getSequenceID() {
         return sequenceID;
     }
 
-    /**
-     * @param context
-     */
     public void setMsgContext(MessageContext msgContext) {
         this.msgContext = msgContext;
     }
 
-    /**
-     * @param object
-     */
-   
-
-    /**
-     * @param string
-     */
     public void setSequenceID(String sequenceID) {
         this.sequenceID = sequenceID;
     }
 
-    /**
-     * @return
-     */
     public String getMessageID() {
         return messageID;
     }
 
-    /**
-     * @param string
-     */
     public void setMessageID(String string) {
         messageID = string;
     }
 
-    /**
-     * @return
-     */
     public AddressingHeaders getAddressingHeaders() {
         return addressingHeaders;
     }
 
-    /**
-     * @return
-     */
     public RMHeaders getRMHeaders() {
         return rmHeaders;
     }
 
-    /**
-     * @param headers
-     */
     public void setAddressingHeaders(AddressingHeaders addressingHeaders) {
         this.addressingHeaders = addressingHeaders;
     }
 
-    /**
-     * @param headers
-     */
     public void setRMHeaders(RMHeaders rmHeaders) {
         this.rmHeaders = rmHeaders;
     }
 
-    /**
-     * @return
-     */
     public String getOutGoingAddress() {
         return outGoingAddress;
     }
 
-    /**
-     * @param string
-     */
     public void setOutGoingAddress(String outGoingAddress) {
         this.outGoingAddress = outGoingAddress;
     }
 
-    /**
-     * @return
-     */
+
     public int getMessageType() {
         return messageType;
     }
 
-    /**
-     * @param i
-     */
+
     public void setMessageType(int messageType) {
         this.messageType = messageType;
     }
@@ -377,30 +260,19 @@ public class RMMessageContext {
 
     }
 
-    /**
-     * @return
-     */
     public long getLastPrecessedTime() {
         return lastPrecessedTime;
     }
 
-    /**
-     * @return
-     */
+
     public long getReTransmissionCount() {
         return reTransmissionCount;
     }
 
-    /**
-     * @param l
-     */
     public void setLastPrecessedTime(long lastPrecessedTime) {
         this.lastPrecessedTime = lastPrecessedTime;
     }
 
-    /**
-     * @param l
-     */
     public void setReTransmissionCount(long reTransmissionCount) {
         this.reTransmissionCount = reTransmissionCount;
     }
@@ -468,7 +340,6 @@ public class RMMessageContext {
             msgContext2.setMaintainSession(msgContext1.getMaintainSession());
 
         } catch (AxisFault e) {
-            // TODO Auto-generated catch block
             log.error(e);
         }
 
@@ -482,9 +353,7 @@ public class RMMessageContext {
         lastSentTime = l;
     }
 
-    /**
-     * @param b
-     */
+
     public void setSync(boolean sync) {
         this.sync = sync;
 
@@ -496,9 +365,10 @@ public class RMMessageContext {
     }
 
     public void setFaultTo(String faultTo) {
-        this.faultTo=faultTo;
-            }
-    public String getFaultTo(){
+        this.faultTo = faultTo;
+    }
+
+    public String getFaultTo() {
         return this.faultTo;
     }
 }

@@ -38,7 +38,7 @@ public class ClientStorageManager implements IStorageManager {
     protected static Log log = LogFactory.getLog(ClientStorageManager.class.getName());
 
     private ISandeshaDAO accessor;
-    private static Callback callBack = null;
+    private static Callback callBack;
 
     public void init() {
     }
@@ -125,7 +125,7 @@ public class ClientStorageManager implements IStorageManager {
         long largest = 0;
         while (it.hasNext()) {
             Long key = (Long) it.next();
-            if (key == null)
+            if (null == key)
                 continue;
 
             long l = key.longValue();
@@ -152,15 +152,15 @@ public class ClientStorageManager implements IStorageManager {
     public RMMessageContext getNextMessageToSend() {
         RMMessageContext msg;
         msg = accessor.getNextPriorityMessageContextToSend();
-        if (null == msg)
+        if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
 
-        if (msg == null) {
+        if (null == msg) {
             msg = accessor.getNextLowPriorityMessageContextToSend();
 
             // checks whether all the request messages hv been acked
         }
-        if (callBack != null && msg != null)
+        if (null != callBack && null != msg)
             informOutgoingMessage(msg);
         return msg;
     }
@@ -184,13 +184,13 @@ public class ClientStorageManager implements IStorageManager {
         boolean done = false;
         // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
 
-        if (null == oldSeqId) {
+        if (oldSeqId == null) {
             return false;
         }
 
         String sequenceID = accessor.getSequenceOfOutSequence(oldSeqId);
 
-        if (sequenceID == null) {
+        if (null == sequenceID) {
             log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
             return false;
         }
@@ -244,18 +244,12 @@ public class ClientStorageManager implements IStorageManager {
         }
 
         long messageNumber = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
-        if (0 >= messageNumber)
+        if (messageNumber <= 0)
             return;
         Long msgNo = new Long(messageNumber);
         accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
     }
 
-
-    //Sets the property responseReceived of the request message
-    //corresponding to this response message.
-    private void setResponseReceived(RMMessageContext responseMsg) {
-        accessor.setResponseReceived(responseMsg);
-    }
 
     public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
         RMMessageContext response = accessor.checkForResponseMessage(requestMsgId, sequenceId);
@@ -272,15 +266,6 @@ public class ClientStorageManager implements IStorageManager {
         return !requestPresent;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#isAckComplete(java.lang.String)
-     */
-    //For client sequenceId should be outgoing sequence id.
-    public boolean isAckComplete(String sequenceID) {
-        boolean result = accessor.compareAcksWithSequence(sequenceID);  //For client
-        return result;
-    }
-
 
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
         accessor.addLowPriorityMessage(terminateSeqMessage);
@@ -290,20 +275,9 @@ public class ClientStorageManager implements IStorageManager {
     public boolean isAllSequenceComplete() {
         boolean outTerminateSent = accessor.isAllOutgoingTerminateSent();
         boolean incomingTerminateReceived = accessor.isAllIncommingTerminateReceived();
-        if (outTerminateSent && incomingTerminateReceived)
-            return true;
-        else
-            return false;
+        return outTerminateSent && incomingTerminateReceived;
     }
 
-
-    public boolean isResponseComplete(String sequenceID) {
-        return false;
-    }
-
-
-    public void terminateSequence(String sequenceID) {
-    }
 
     public void setAckReceived(String seqId, long msgNo) {
         accessor.setAckReceived(seqId, msgNo);
@@ -324,22 +298,6 @@ public class ClientStorageManager implements IStorageManager {
 
     public void addIncomingSequence(String sequenceId) {
         accessor.addIncomingSequence(sequenceId);
-    }
-
-    /* (non-Javadoc)
-	 * @see org.apache.sandesha.IStorageManager#hasLastMsgReceived(java.lang.String)
-	 */
-    public boolean hasLastOutgoingMsgReceived(String seqId) {
-        String key = accessor.getKeyFromOutgoingSequenceId(seqId);
-        return accessor.hasLastOutgoingMsgReceived(key);
-    }
-
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#getLastMsgNo(java.lang.String)
-     */
-    public long getLastOutgoingMsgNo(String seqId) {
-        String key = accessor.getKeyFromOutgoingSequenceId(seqId);
-        return accessor.getLastOutgoingMsgNo(key);
     }
 
     public long getLastIncomingMsgNo(String seqId) {
@@ -416,19 +374,25 @@ public class ClientStorageManager implements IStorageManager {
         CallbackData cbData = new CallbackData();
 
         //  setting callback data;
-        if (rmMsgContext != null) {
+        if (null != rmMsgContext) {
             cbData.setSequenceId(rmMsgContext.getSequenceID());
             cbData.setMessageId(rmMsgContext.getMessageID());
             cbData.setMessageType(rmMsgContext.getMessageType());
 
         }
 
-        if (callBack != null)
+        if (null != callBack)
             callBack.onOutgoingMessage(cbData);
     }
 
     public void clearStorage() {
         accessor.clear();
+    }
+
+    public boolean isSequenceComplete(String seqId) {
+         boolean outTerminateSent = accessor.isOutgoingTerminateSent(seqId);
+        boolean incomingTerminateReceived = accessor.isIncommingTerminateReceived(seqId);
+        return outTerminateSent && incomingTerminateReceived;
     }
 
 

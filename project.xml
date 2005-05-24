@@ -28,7 +28,7 @@
     <logo>http://ws.apache.org/ws-fx/sandesha/images/Sandesha.jpg</logo>
     <description>Apache Sandesha is an implementation of the Web Services ReliableMessaging (WS-ReliableMessaging), published by the IBM, Microsoft and  BEA as a joint specification, on top of Apache Axis (The Next Generation SOAP). Apache Sandesha provides; An implementation for WS-ReliableMessaging with the support to WS-Policy and WS- Addressing. Interoperability with other WS-ReliableMessaging implementations.   Sandesha provides a complete support for WS-ReliableMessaging  specification allowing a reliable communication between web services as well as web services and clients. It also provides the INORDER message delivery assurance for the users.
     </description>
-       <!-- a short description of what the project does -->
+    <!-- a short description of what the project does -->
     <shortDescription>WS-ReliableMessaging implementation for Apache Axis</shortDescription>
 
     <!-- the project home page -->
@@ -61,15 +61,15 @@
 
     <!-- who the developers are for the project -->
     <developers>
-    
-       <developer>
+
+        <developer>
             <name>Sanjiva Weerawarana</name>
             <id>sanjiva</id>
             <email>sanjiva@opensource.lk</email>
             <organization>
             </organization>
         </developer>
-    
+
         <developer>
             <name>Davanum Srinivas</name>
             <id>dims</id>
@@ -93,7 +93,7 @@
             <organization>
             </organization>
         </developer>
-     
+
     </developers>
 
     <licenses>
@@ -108,31 +108,36 @@
     <build>
         <nagEmailAddress>jaliya@apache.org</nagEmailAddress>
         <sourceDirectory>src</sourceDirectory>
-        <!--<unitTestSourceDirectory>test</unitTestSourceDirectory> -->
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
 
         <resources>
             <resource>
                 <directory>${basedir}/config</directory>
                 <includes>
                     <include>*.properties</include>
-			  <include>*.wsdd</include>
+                    <include>*.wsdd</include>
                 </includes>
             </resource>
         </resources>
 
-<!--        <unitTest>-->
-<!--              <includes>-->
-<!--                <include>**/*TC*.java</include>-->
-<!--            </includes>-->
-<!--            <resources>-->
-<!--                <resource>-->
-<!--                    <directory>test-resources</directory>-->
-<!--                    <includes>-->
-<!--                    <include>**/*.xml</include>-->
-<!--                </includes>-->
-<!--                </resource>-->
-<!--            </resources>-->
-<!--         </unitTest>-->
+        <unitTest>
+            <includes>
+                <include>**/*TC*.java</include>
+            </includes>
+              <excludes>
+                <exclude>**/TCClientStorageManager.java</exclude>
+             </excludes>
+
+            <resources>
+                <resource>
+                    <directory>test-resources</directory>
+                    <includes>
+                        <include>**/*.xml</include>
+                    </includes>
+                </resource>
+            </resources>
+
+        </unitTest>
 
     </build>
 
@@ -190,38 +195,38 @@
             </properties>
         </dependency>
 
-       <!--
-        <dependency>
-                  <groupId>axis</groupId>
-                  <artifactId>commons-discovery</artifactId>
-                  <version>SNAPSHOT</version>
-                  <properties>
-                      <module>true</module>
-                  </properties>
-              </dependency>
-              -->
-
+        <!--
          <dependency>
-      <groupId>commons-discovery</groupId>
-      <artifactId>commons-discovery</artifactId>
-      <version>0.2</version>
-       </dependency>
+                   <groupId>axis</groupId>
+                   <artifactId>commons-discovery</artifactId>
+                   <version>SNAPSHOT</version>
+                   <properties>
+                       <module>true</module>
+                   </properties>
+               </dependency>
+               -->
 
         <dependency>
-                 <groupId>axis</groupId>
-                 <artifactId>axis-ant</artifactId>
-                 <version>1.2</version>
-                 <properties>
-                     <module>true</module>
-                 </properties>
-             </dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.2</version>
+        </dependency>
 
         <dependency>
-          <groupId>axis</groupId>
-          <artifactId>axis-saaj</artifactId>
-          <version>1.2-RC2</version>
-          <url>http://ws.apache.org/axis/</url>
-         </dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-ant</artifactId>
+            <version>1.2</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-saaj</artifactId>
+            <version>1.2-RC2</version>
+            <url>http://ws.apache.org/axis/</url>
+        </dependency>
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
@@ -234,20 +239,20 @@
         <dependency>
             <groupId>addressing</groupId>
             <artifactId>addressing</artifactId>
-        <version>SNAPSHOT</version>
-         <properties>
+            <version>SNAPSHOT</version>
+            <properties>
                 <module>true</module>
             </properties>
-           </dependency>
+        </dependency>
 
-            <dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-        <version>1.2.8</version>
-         <properties>
+            <version>1.2.8</version>
+            <properties>
                 <module>true</module>
             </properties>
-           </dependency>
+        </dependency>
 
     </dependencies>
 

@@ -172,7 +172,7 @@ public interface Constants {
 
     public interface ClientProperties {
 
-        public static final short INOUT=1;
+        public static final short IN_OUT=1;
         public static final short IN_ONLY=2;
 
         public static final String PROPERTY_FILE = "sandesha.properties";

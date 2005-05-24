@@ -32,6 +32,10 @@ import javax.xml.soap.SOAPHeaderElement;
 import java.util.Vector;
 
 /**
+ * This class creates the SOAPEnvelopes using the RMMessageContexts passed-in to various
+ * methods. All the methods follow a simple process of creating SOAPEnvelopes using the
+ * WS-Addressing and, WS-RM headers and Body Elements.
+ *
  * @author JEkanayake
  */
 public class EnvelopeCreator {
@@ -86,7 +90,6 @@ public class EnvelopeCreator {
         }
         outGoingAddressingHaders.toEnvelope(envelope, null);
 
-        //now set the body elements
         CreateSequenceResponse response = new CreateSequenceResponse();
         Identifier id = new Identifier();
         id.setIdentifier(seqId);
@@ -142,18 +145,14 @@ public class EnvelopeCreator {
         SOAPEnvelope envelope = createBasicEnvelop();
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(envelope);
-        //Action for sequence acknowledgement.
         Action action = new Action(new URI(Constants.WSRM.SEQUENCE_ACKNOWLEDGEMENT_ACTION));
 
         SOAPHeaderElement actionElement = action.toSOAPHeaderElement(envelope, null);
-        //actionElement.setMustUnderstand(true);
         outGoingAddressingHaders.setAction(action);
 
-        //Set the messageID
         MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
         outGoingAddressingHaders.setMessageID(messageId);
 
-        //Set the <wsa:From> address from the incoming <wsa:To>
         To incommingTo = addressingHeaders.getTo();
         URI fromAddressURI = new URI(incommingTo.toString());
 
@@ -161,14 +160,10 @@ public class EnvelopeCreator {
         From from = new From(fromAddress);
         outGoingAddressingHaders.setFrom(from);
 
-        //Add to <To>
         To to = new To(new URI(toAddress));
         outGoingAddressingHaders.setTo(to);
-
-        //Set the addressing headers to the SOAPEnvelope.
         outGoingAddressingHaders.toEnvelope(envelope, null);
 
-        //Set <wsrm:SequenceAcknowldgement>
         SequenceAcknowledgement seqAck = new SequenceAcknowledgement();
         seqAck.setAckRanges(ackRangeVector);
         seqAck.setIdentifier(rmMessageContext.getRMHeaders().getSequence().getIdentifier());
@@ -184,8 +179,7 @@ public class EnvelopeCreator {
         SOAPEnvelope responseEnvelope = createBasicEnvelop();
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(responseEnvelope);
-        //TODO Action for RESPONSE MESSAGE
-        //Do we need this????
+
         Identifier seqId = new Identifier();
         seqId.setIdentifier(rmMessageContext.getSequenceID());
         Sequence seq = new Sequence();
@@ -209,12 +203,6 @@ public class EnvelopeCreator {
         }
 
 
-        //TODO
-        //Adding relatesTo header
-        //List relatesToList = addressingHeaders.getRelatesTo();
-        //List relatesToList.set(0,rmMessageContext.getOldSequenceID());
-        //outGoingAddressingHaders.setRelatesTo(relatesToList);
-        ///RelatesTo relatesTo = new RelatesTo();
         if (rmMessageContext.getOldSequenceID() != null)
             outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(), null);
 
@@ -230,35 +218,20 @@ public class EnvelopeCreator {
         From from = new From(fromAddress);
         outGoingAddressingHaders.setFrom(from);
 
-        //TODO
-        //HARD CODED REPLYTO
-        //THIS SHOULD BE SET USING A PROPERTY FOR THE SEVER SIDE
-        //  ReplyTo replyTo = new ReplyTo(
-        //        new Address(
-        //               "http://localhost:8080/axis/services/EchoStringService?wsdl"));
-        //outGoingAddressingHaders.setReplyTo(from);
-
-        //Add to <To>
         if (addressingHeaders.getReplyTo() == null)
             throw new Exception("ReplyTo is required to send Responses");
         AttributedURI inReplyTo = addressingHeaders.getReplyTo().getAddress();
         To to = new To(new URI(inReplyTo.toString()));
         outGoingAddressingHaders.setTo(to);
 
-        //Set the action
-        //TODO
-        //Action shuld also be taken from the server-config.wsdd
         if (addressingHeaders.getAction() != null) {
             Action action = new Action(new URI(addressingHeaders.getAction().toString()));
             outGoingAddressingHaders.setAction(action);
         }
 
-
-        //Set the addressing headers to the SOAPEnvelope.
         outGoingAddressingHaders.toEnvelope(responseEnvelope, null);
-        responseEnvelope.setBody(
-                (SOAPBody) rmMessageContext.getMsgContext().getResponseMessage().getSOAPEnvelope()
-                .getBody());
+        responseEnvelope.setBody((SOAPBody) rmMessageContext.getMsgContext().getResponseMessage()
+                .getSOAPEnvelope().getBody());
 
         return responseEnvelope;
     }
@@ -266,14 +239,10 @@ public class EnvelopeCreator {
 
     public static SOAPEnvelope createServiceRequestEnvelope(RMMessageContext rmMessageContext)
             throws Exception {
-        //Variable for SOAPEnvelope
         SOAPEnvelope requestEnvelope = null;
-        //Get the AddressingHeaders
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
-
-        //RMHeaders for the message.
         RMHeaders rmHeaders = new RMHeaders();
-        //Sequence for the new message.
+
         Sequence seq = new Sequence();
         Identifier id = new Identifier();
         id.setIdentifier(rmMessageContext.getSequenceID());
@@ -289,7 +258,6 @@ public class EnvelopeCreator {
             seq.setLastMessage(new LastMessage());
         }
 
-        //Message Number for the new message.
         MessageNumber msgNumber = new MessageNumber();
         msgNumber.setMessageNumber(rmMessageContext.getMsgNumber());
         seq.setMessageNumber(msgNumber);
@@ -297,25 +265,22 @@ public class EnvelopeCreator {
         rmHeaders.setSequence(seq);
         rmMessageContext.setRMHeaders(rmHeaders);
 
-        //requestEnvelope = new SOAPEnvelope();
         String str = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
         requestEnvelope = new Message(str).getSOAPEnvelope();
 
         rmMessageContext.getRMHeaders().toSoapEnvelop(requestEnvelope);
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(requestEnvelope);
 
-        //MessageID is set from the RMSender
         MessageID messageId = new MessageID(new URI(rmMessageContext.getMessageID()));
         outGoingAddressingHaders.setMessageID(messageId);
 
-        //Setting from the Client
         outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
         outGoingAddressingHaders.setTo(addressingHeaders.getTo());
-        //if (addressingHeaders.getReplyTo() != null && rmMessageContext.isHasResponse())
-        if (addressingHeaders.getReplyTo() != null)//&& rmMessageContext.isHasResponse())
+
+        if (addressingHeaders.getReplyTo() != null)
             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
 
-         if (addressingHeaders.getFaultTo() != null)//&& rmMessageContext.isHasResponse())
+        if (addressingHeaders.getFaultTo() != null)
             outGoingAddressingHaders.setFaultTo(addressingHeaders.getFaultTo());
         try {
             Action action = new Action(new URI(rmMessageContext.getAction()));
@@ -328,8 +293,6 @@ public class EnvelopeCreator {
             outGoingAddressingHaders.setFaultTo(
                     new FaultTo(new Address(rmMessageContext.getFaultTo())));
 
-
-        //Set the addressing headers to the SOAPEnvelope.
         outGoingAddressingHaders.toEnvelope(requestEnvelope, null);
 
         return requestEnvelope;
@@ -354,9 +317,9 @@ public class EnvelopeCreator {
         outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
         outGoingAddressingHaders.setTo(addressingHeaders.getTo());
 
-        if(addressingHeaders.getReplyTo()!=null)
+        if (addressingHeaders.getReplyTo() != null)
             outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
-         if(addressingHeaders.getFaultTo()!=null)
+        if (addressingHeaders.getFaultTo() != null)
             outGoingAddressingHaders.setFaultTo(addressingHeaders.getFaultTo());
 
         outGoingAddressingHaders.toEnvelope(terSeqEnv, null);

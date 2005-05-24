@@ -297,4 +297,12 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
 
     }
 
+    public boolean isOutgoingTerminateSent(String seqId) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean isIncommingTerminateReceived(String seqId) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

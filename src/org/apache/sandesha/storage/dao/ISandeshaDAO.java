@@ -334,4 +334,8 @@ public interface ISandeshaDAO {
      * clears the storage.
      */
     void clear();
+
+    public boolean isOutgoingTerminateSent(String seqId);
+
+   public  boolean isIncommingTerminateReceived(String seqId);
 }
