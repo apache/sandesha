@@ -20,16 +20,13 @@ package org.apache.sandesha.server;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.message.SOAPEnvelope;
-
-
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.AbstractTestCase;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.ws.rm.AckRequested;
 import org.apache.sandesha.ws.rm.AcknowledgementRange;
 import org.apache.sandesha.ws.rm.Identifier;
 import org.apache.sandesha.ws.rm.RMHeaders;
@@ -109,7 +106,7 @@ public class TCMessageValidator extends AbstractTestCase {
         try {
             MessageValidator.validate(rmMsgCtx, false);
         } catch (AxisFault af) {
-              assertEquals(af.getFaultString(), Constants.FaultMessages.UNKNOWN_SEQUENCE);
+            assertEquals(af.getFaultString(), Constants.FaultMessages.UNKNOWN_SEQUENCE);
         }
     }
 
@@ -155,12 +152,16 @@ public class TCMessageValidator extends AbstractTestCase {
             Identifier seqIdentifier = rmH.getSequence().getIdentifier();
             seqIdentifier.setIdentifier(seqID);
 
+            AckRequested ackRequested = new AckRequested();
+            ackRequested.setIdentifier(seqIdentifier);
+            rmH.setAckRequest(ackRequested);
+
 
             rmH.toSoapEnvelop(soapEnv2);
             msgCtx2.setRequestMessage(new Message(soapEnv2));
 
             rmProvider.processMessage(msgCtx2, null, null, null);
-            //System.out.println(msgCtx2.getResponseMessage().getSOAPEnvelope().toString());
+            // System.out.println(msgCtx2.getResponseMessage().getSOAPEnvelope().toString());
             RMHeaders rmHead = new RMHeaders();
             rmHead.fromSOAPEnvelope(msgCtx2.getResponseMessage().getSOAPEnvelope());
             AcknowledgementRange ackRange = (AcknowledgementRange) rmHead.getSequenceAcknowledgement()
@@ -193,9 +194,9 @@ public class TCMessageValidator extends AbstractTestCase {
 
         RMProvider rmProvider = new RMProvider();
         rmProvider.processMessage(msgCtx1, null, null, null);
-        SOAPBody sb=msgCtx1.getResponseMessage().getSOAPEnvelope().getBody();
-        SOAPFault sf=sb.getFault();
-        assertEquals(sf.getFaultString() ,Constants.FaultMessages.UNKNOWN_SEQUENCE);
+        SOAPBody sb = msgCtx1.getResponseMessage().getSOAPEnvelope().getBody();
+        SOAPFault sf = sb.getFault();
+        assertEquals(sf.getFaultString(), Constants.FaultMessages.UNKNOWN_SEQUENCE);
 
 
     }
