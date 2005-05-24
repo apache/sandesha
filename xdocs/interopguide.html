@@ -1,0 +1,78 @@
+<html>
+
+<head>
+<style>
+.style1 {
+	font-family: "Courier New", Courier, mono;
+	font-size: 14px;
+	color: #990000;
+}
+</style>
+</head>
+<body>
+<h1><font size="6">Interop guide for Apache Sandesha</font></h1>
+<p>This document explains the interoperability of apache Sandesha with 
+several other well known WS-RM implementations. We will not only show you 
+how nicely Sandesha interoperates with them but also how you can test the 
+interoperability yourself.</p>
+
+<h2><font size="5">Sandesha client</font></h2>
+<p>Sandesha client has successfully interoperated with the WS-RM server 
+implementations given below. We have developed client classes for each of
+these server endpoints. Please make sure that the server endpoints are 
+available before you try to run the client classes. Also make sure that 
+your computer has a public IP address available before testing. This will 
+be necessary for getting responses from the server. 
+</p>
+<h3><font size="4">With IBM server</font></h3>
+<p>Server endpoint is <a href="http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos">http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos</a></p>
+<p>With IBM we have successfully interoperated both Ping and EchoString clients. 
+Classes IBMEcho, IBMAsyncPing and IBMSyncPing can be used to test the interoperability 
+with this endpoint. These are available in the package org.apache.sandesha.samples.interop
+of the 'test' folder.
+</p>
+<h3><font size="4">With Microsoft server</font></h3>
+<p>Server endpoint is <a href="http://131.107.153.195/SecureReliableMessaging/ReliableOneWayDual.svc">http://131.107.153.195/SecureReliableMessaging/ReliableOneWayDual.svc</a></p>
+<p>Sandesha nicely works with above Ping service available from Microsoft.
+Classes MicrosoftAsyncPing and MicrosoftSyncPing can be used to test the interoperability 
+with this endpoint. These are available in the package org.apache.sandesha.samples.interop 
+of the 'test' folder.
+</p>
+<h3><font size="4">With Systinet server</font></h3>
+<p>Server endpoint is <a href="http://soap.systinet.net:6064/Service">http://soap.systinet.net:6064/Service</a></p>
+<p>Sandesha has proved its interoperability with the Systinet server as well. 
+The client stub classes are SystinetSyncPing and SystinetAsyncPing, available 
+in the package org.apache.sandesha.samples.interop  of the 'test' folder.
+</p>
+<h3><font size="4">Using the test client webapp</font></h3>
+<p>We have created a simple web application which you can deploy on tomcat and 
+test the interoperability with any available WS-RM server implementation.To build the webapp, 
+</p>
+<p>Make sure that you have Apache Ant installed in your system. After this go command 
+prompt move to the the folder 'interop' and type,</p>
+<p>
+<source>ant war</source>
+</p>
+<p>
+This will create the sandesha-interop.war file in the subfolder 'dist/war'. Copy this 
+to the webapps folder of tomcat and start the tomcat server. Now you are ready to run
+the Sandesha interop client. Start your web browser and go to URL <a href="http://localhost:8080/sandesha-interop/interop.jsp">http://localhost:8080/sandesha-interop/interop.jsp</a>
+This should show you the interop client web page.
+</p>
+<p>
+Most of the fields in this web page are self-explanaitory. First you can set the 
+target field to any valid target URL. After this choose the operation Ping or echoString accordingly. 
+The AcksTo field tells weather the acknowledgements are synchronous or asynchronous. 
+If acksTo is anonymous the acknowledgements will be sent in a synchronous path. You can also 
+set the WS-Addressing fields From, To and ReplyTo. ReplyTo should say where you expect to
+receive applications responses. FaultTo URL should point to the location you expect to receive faults.
+Finally you can mention weather the client should send a sequence offer which is the sequence 
+id of the response path, and the number of appplication messages you wish to send to the server.
+</p>
+<h2><font size="5">Sandesha Server</font></h2>
+<p>We have successfully tested the interoperability of Sandesha server with 
+the IBM test client available at <a href="http://ibm_test_client_url">http://ibm_test_client_url</a>
+</p>
+
+</body>
+</html>
