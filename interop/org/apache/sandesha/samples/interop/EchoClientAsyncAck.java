@@ -49,12 +49,12 @@ public class EchoClientAsyncAck {
 
             SandeshaContext ctx = new SandeshaContext();
             ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:echoString",
-                    Constants.ClientProperties.INOUT);
+                    Constants.ClientProperties.IN_OUT);
             ctx.setAcksToUrl(call,
                     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
             ctx.setReplyToUrl(call,
                     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-            ctx.setSendOffer(call, true);
+            ctx.setSendOffer(call);
 
             call.setOperationName(new QName("http://tempuri.org/", "echoString"));
 
@@ -77,7 +77,7 @@ public class EchoClientAsyncAck {
 
             if (report != null) {
                 System.out.println("\n***********Printing RM Report***********");
-                System.out.println("Were all messages acked     - " + report.isAllAcked());
+                System.out.println("Were all messages add     - " + report.isAllAcked());
                 System.out.println(
                         "No of response messages   - " + report.getNumberOfReturnMessages());
                 System.out.println("****************************************\n");

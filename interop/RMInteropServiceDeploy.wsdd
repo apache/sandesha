@@ -1,5 +1,4 @@
-<deployment xmlns="http://xml.apache.org/axis/wsdd/"
-    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 
     <service name="RMInteropService" provider="Handler">
         <requestFlow>
@@ -11,6 +10,6 @@
         <parameter name="className" value="org.apache.sandesha.samples.interop.RMInteropService"/>
         <parameter name="allowedMethods" value="*"/>
         <parameter name="scope" value="request"/>
-	  </service>
-
+    </service>
+    
 </deployment>

@@ -37,7 +37,7 @@ public class IBMEcho {
             Call call = (Call) service.createCall();
 
             SandeshaContext ctx = new SandeshaContext();
-            ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:echoString",Constants.ClientProperties.INOUT);
+            ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:echoString",Constants.ClientProperties.IN_OUT);
 
             ctx.setToUrl(call, "http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos");
             ctx.setFaultToUrl(call,"http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");

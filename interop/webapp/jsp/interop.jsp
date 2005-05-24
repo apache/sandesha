@@ -6,7 +6,8 @@
                  org.apache.axis.SimpleChain,
                  java.util.Properties,
                  java.io.InputStream,
-                 java.io.IOException"%>
+                 java.io.IOException,
+                 org.apache.sandesha.ws.rm.providers.RMClientProvider"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="interopBean" scope="request" class="org.apache.sandesha.samples.interop.testclient.InteropBean" />
 <jsp:setProperty name="interopBean" property="*" />

@@ -153,7 +153,7 @@ public class InteropStub {
 
 
         if (sendOffer)
-           ctx.setSendOffer(call,true);
+           ctx.setSendOffer(call);
 
         call.setProperty(Constants.ClientProperties.SOURCE_URL, bean.getSourceURL());
 
@@ -217,7 +217,7 @@ public class InteropStub {
             Call call = (Call) service.createCall();
 
             SandeshaContext ctx = new SandeshaContext();
-            ctx.addNewSequeceContext(call, target, "urn:wsrm:echoString", Constants.ClientProperties.INOUT);
+            ctx.addNewSequeceContext(call, target, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
             configureContext(ctx,call,bean);
 
