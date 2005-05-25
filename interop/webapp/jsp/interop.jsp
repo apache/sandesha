@@ -58,18 +58,20 @@ out.println("<head>");
 				//document.getElementById(txtItem).disabled = true;
 			}else if(val.value=="async"){
 				document.getElementById(txtItem).value = "<%=defaultAsyncEndPoint%>";
-                //document.getElementById(txtItem).disabled = false;
+                		//document.getElementById(txtItem).disabled = false;
 			}
 		}
 
 		function setOperation (itm){
 		//document.getElementById("txtfrom").value = itm.value;
 			if(itm.value=="ping" || itm.value=="Ping"){
-				document.getElementById('replytoTR').style.display = 'none';
-				document.getElementById('offerTR').style.display = 'none';
+				//document.getElementById('replytoTR').style.display = 'none';
+				//document.getElementById('offerTR').style.display = 'none';
+				document.getElementById("replyto").value = "";
 			}else if(itm.value=="echoString" || itm.value=="EchoString"){
-				document.getElementById('replytoTR').style.display = '';
-				document.getElementById('offerTR').style.display = '';
+				//document.getElementById('replytoTR').style.display = '';
+				//document.getElementById('offerTR').style.display = '';
+				document.getElementById("replyto").value = "<%=defaultAsyncEndPoint%>";
 			}
 		}
 
@@ -117,7 +119,7 @@ MM_reloadPage(true);
           </tr>
           <tr>
             <td width='20%'>Operation</td>
-            <td colspan="4"><select name='operation' >
+            <td colspan="4"><select name='operation' onchange="setOperation(this)" >
                 <option value="Ping">Ping</option>
                 <option value="echoString">echoString</option>
               </select></td>
