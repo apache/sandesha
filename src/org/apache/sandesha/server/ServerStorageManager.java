@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * ServerStorageManager is the access point for the SandeshaQueue from server side.  
+ *
  * @author Chamikara Jayalath
  * @author Jaliya Ekanayaka
  */

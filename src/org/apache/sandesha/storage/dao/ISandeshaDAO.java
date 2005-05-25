@@ -24,7 +24,6 @@ import java.util.Set;
 
 /**
  * @author Chamikara Jayalath
- * @author Jaliya Ekanayaka
  */
 
 public interface ISandeshaDAO {

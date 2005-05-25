@@ -23,13 +23,21 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.encoding.XMLType;
 import org.apache.axis.transport.http.SimpleAxisServer;
+import org.apache.axis.EngineConfiguration;
+import org.apache.axis.deployment.wsdd.WSDDDeployment;
+import org.apache.axis.deployment.wsdd.WSDDDocument;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMReport;
 import org.apache.sandesha.SandeshaContext;
+import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import java.net.ServerSocket;
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,18 +48,28 @@ import java.net.ServerSocket;
 public class TCScenarioTest extends TestCase {
     private static SimpleAxisServer sas = null;
 
-    private static String defaultServerPort = "8080";
+    private static String defaultServerPort = "5555";
     private static String defaultClientPort = "9090";
     private static boolean serverStarted = false;
     private static int testCount = 5;
 
     private static String targetURL = "http://127.0.0.1:" + defaultServerPort +
-            "/axis/services/RMInteropService?wsdl";
+            "/axis/services/RMTestService";
 
 
     public void setUp() throws Exception {
         if (!serverStarted) {
             sas = new SimpleAxisServer();
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+
+            Document doc = db.parse(new File("test-resources/server-config.wsdd"));
+            WSDDDocument wsdddoc = new WSDDDocument(doc);
+            WSDDDeployment wsdddep = wsdddoc.getDeployment();
+            sas.setMyConfig(wsdddep);
+
             sas.setServerSocket(new ServerSocket((new Integer(defaultServerPort)).intValue()));
             sas.start();
             serverStarted = true;

@@ -22,7 +22,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.ws.rm.Identifier;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
@@ -57,14 +56,10 @@ public class AckRequested extends MessageElement implements IRmElement {
      */
     public AckRequested() {
         ackRequested = new MessageElement();
-        ackRequested.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_REQUESTED);
+        ackRequested.setName(
+                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_REQUESTED);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
 
     /**
      * Method getSoapElement
@@ -91,19 +86,14 @@ public class AckRequested extends MessageElement implements IRmElement {
 
         SOAPEnvelope env = envelope;
         removeHeaders(env);
-        /*
-         * ackRequested.addChildElement(identifier.getSoapElement());
-         * ackRequested.addChildElement(messageNumber.getSoapElement());
-         * env.addHeader((SOAPHeaderElement)ackRequested);
-         */
+
         if (env.getHeader() == null) {
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
-                Constants.WSRM.NS_URI_RM);
-        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
-                .addHeaderElement(name);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(
+                name);
 
         // .setActor(null);
         headerElement.setActor(null);
@@ -135,7 +125,8 @@ public class AckRequested extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
@@ -147,7 +138,8 @@ public class AckRequested extends MessageElement implements IRmElement {
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
                 messageNumber = new MessageNumber();
 
                 messageNumber.fromSOAPEnvelope(childElement);
@@ -162,12 +154,6 @@ public class AckRequested extends MessageElement implements IRmElement {
 
         return this;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement
@@ -223,7 +209,8 @@ public class AckRequested extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (Constants.WSRM.ACK_REQUESTED.equals(childElement.getName()) && (Constants.WSRM.NS_URI_RM.equals(childElement.getNamespaceURI()))) {
+            if (Constants.WSRM.ACK_REQUESTED.equals(childElement.getName()) &&
+                    (Constants.WSRM.NS_URI_RM.equals(childElement.getNamespaceURI()))) {
                 childElement.detachNode();
                 break;
             }

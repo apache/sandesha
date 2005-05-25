@@ -29,11 +29,12 @@ import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 
 /**
- * @author JEkanayake
- *         <p/>
- *         This class will act as the service dispatcher for Sandesha. By default it
- *         will use the RPCProvider to invoke the service but need to improve this to
- *         use any Provider depending on the configuration.
+ * This class will act as the service dispatcher for Sandesha. However actual dispatching
+ * is done using the provider specified by the user in sandesha.properties file. By default this
+ * will use RPCProvider.
+ *
+ * @auther Chamikara Jayalath
+ * @auther Jaliya Ekanayake
  */
 public class RMInvoker implements Runnable {
     private IStorageManager storageManager = null;
@@ -51,8 +52,9 @@ public class RMInvoker implements Runnable {
             try {
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);
                 RMMessageContext rmMessageContext = storageManager.getNextMessageToProcess();
-                AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
+
                 if (rmMessageContext != null) {
+                    AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
                     Class c = Class.forName(PropertyLoader.getProvider());
                     JavaProvider provider = (JavaProvider) c.newInstance();
                     provider.invoke(rmMessageContext.getMsgContext());
@@ -83,16 +85,14 @@ public class RMInvoker implements Runnable {
                         boolean hasResponseSeq = storageManager.isResponseSequenceExist(
                                 rmMessageContext.getSequenceID());
                         boolean firstMsgOfResponseSeq = false;
-                        if (!(hasResponseSeq &&
-                                rmMessageContext.getRMHeaders().getSequence().getMessageNumber()
-                                .getMessageNumber() ==
-                                1)) {
+                        if (!(hasResponseSeq && rmMessageContext.getRMHeaders().getSequence()
+                                .getMessageNumber()
+                                .getMessageNumber() == 1)) {
                             firstMsgOfResponseSeq = !hasResponseSeq;
                         }
 
-                        rmMessageContext.setMsgNumber(
-                                storageManager.getNextMessageNumber(
-                                        rmMessageContext.getSequenceID()));
+                        rmMessageContext.setMsgNumber(storageManager.getNextMessageNumber(
+                                rmMessageContext.getSequenceID()));
                         storageManager.insertOutgoingMessage(rmMessageContext);
 
 
@@ -101,10 +101,9 @@ public class RMInvoker implements Runnable {
 
                             RMMessageContext csRMMsgCtx = RMMessageCreator.createCreateSeqMsg(
                                     rmMessageContext, Constants.SERVER, msgIdStr, null);
-                            csRMMsgCtx.setOutGoingAddress(
-                                    rmMessageContext.getAddressingHeaders().getReplyTo()
-                                    .getAddress()
-                                    .toString());
+                            csRMMsgCtx.setOutGoingAddress(rmMessageContext.getAddressingHeaders()
+                                    .getReplyTo()
+                                    .getAddress().toString());
 
                             csRMMsgCtx.addToMsgIdList(msgIdStr);
                             csRMMsgCtx.setMessageID(msgIdStr);

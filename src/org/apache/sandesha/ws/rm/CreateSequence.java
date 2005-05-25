@@ -49,20 +49,11 @@ public class CreateSequence implements IRmElement {
      */
     public CreateSequence() {
         createSequence = new MessageElement();
-        createSequence.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE);
-
-        //TEST - added for offer
-        //offer = new SequenceOffer ();
-        //END TEST
+        createSequence.setName(
+                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
 
-    
     /**
      * Method getSoapElement
      *
@@ -81,7 +72,7 @@ public class CreateSequence implements IRmElement {
      * @return SOAPEnvelope
      * @throws SOAPException
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)  throws SOAPException {
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws SOAPException {
 
         SOAPEnvelope env = envelope;
         if (env.getBody() == null) {
@@ -116,29 +107,25 @@ public class CreateSequence implements IRmElement {
             //TODO  add offer processing code here
             //TEST OFFER
             childElement = (MessageElement) iterator.next();
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
                 offer = new SequenceOffer();
                 offer.fromSOAPEnvelope(childElement);
             } else if (childElement.getName().equals(Constants.WSRM.SEQUENCE_OFFER)) {
                 offer = new SequenceOffer();
                 offer.fromSOAPEnvelope(childElement);
-            } else if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO)) {
+            } else if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO)) {
                 acksTo = new AcksTo();
                 acksTo.fromSOAPEnvelope(childElement);
             } else if (childElement.getName().equals(Constants.WSRM.ACKS_TO)) {
                 acksTo = new AcksTo();
                 acksTo.fromSOAPEnvelope(childElement);
-                        }
+            }
 
-          }
-           return this;
+        }
+        return this;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement

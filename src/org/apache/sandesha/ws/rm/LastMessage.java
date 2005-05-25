@@ -42,14 +42,9 @@ public class LastMessage extends MessageElement implements IRmElement {
     public LastMessage() {
         lastMsgElement = new MessageElement();
 
-        lastMsgElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.LAST_MSG);
+        lastMsgElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON +
+                Constants.WSRM.LAST_MSG);
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
 
     /**
      * Method getSoapElement
@@ -77,17 +72,10 @@ public class LastMessage extends MessageElement implements IRmElement {
      * @return MessageElement
      * @throws SOAPException
      */
-    public MessageElement toSOAPEnvelope(MessageElement msgElement)
-            throws SOAPException {
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
         msgElement.addChildElement(Constants.WSRM.LAST_MSG, Constants.WSRM.NS_PREFIX_RM);
         return msgElement;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement

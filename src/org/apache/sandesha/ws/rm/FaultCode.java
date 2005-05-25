@@ -33,14 +33,8 @@ public class FaultCode extends MessageElement implements IRmElement {
      */
     public FaultCode() {
         faultCode = new MessageElement();
-        faultCode.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.FAULT_CODE);
+        faultCode.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.FAULT_CODE);
     }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
 
     /**
      * Method getSoapElement
@@ -68,17 +62,10 @@ public class FaultCode extends MessageElement implements IRmElement {
      * @return MessageElement
      * @throws SOAPException
      */
-    public MessageElement toSOAPEnvelope(MessageElement msgElement)
-            throws SOAPException {
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
         msgElement.addChildElement(Constants.WSRM.FAULT_CODE, Constants.WSRM.NS_PREFIX_RM);
         return msgElement;
     }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement

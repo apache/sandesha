@@ -21,7 +21,8 @@ import org.apache.sandesha.storage.Callback;
 import java.util.Map;
 
 /**
- * @author
+ * Interface for StorageManager. This is the interface for RMSource and RMDestination for the
+ * Storage. Any implementation of this interface can be used as the storage for Sandesha
  */
 public interface IStorageManager {
     void init();

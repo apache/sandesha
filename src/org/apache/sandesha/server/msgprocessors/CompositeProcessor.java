@@ -32,7 +32,9 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 import javax.xml.namespace.QName;
 
 /**
- * @author
+ * This will process messages with sequence elements. Mainly the requests/responses.
+ *
+ * @auther Jaliya Ekanayake
  */
 public class CompositeProcessor implements IRMMessageProcessor {
 

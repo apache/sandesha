@@ -1,5 +1,5 @@
-<wsdl:definitions 
-	targetNamespace="example.com" 
+<wsdl:definitions
+	targetNamespace="urn:sandesha.policy"
 	xmlns:tns="example.com" 
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
 	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 

@@ -50,7 +50,8 @@ public class MessageNumber implements IRmElement {
 
         messageNoElement = new MessageElement();
 
-        messageNoElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.MSG_NUMBER);
+        messageNoElement.setName(
+                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER);
     }
 
     /**
@@ -61,12 +62,6 @@ public class MessageNumber implements IRmElement {
     public long getMessageNumber() {
         return messageNumber;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
 
     /**
      * Method getSoapElement
@@ -91,7 +86,8 @@ public class MessageNumber implements IRmElement {
 
         double tempMsgNo = (new Double(element.getValue())).doubleValue();
         if (tempMsgNo >= Constants.WSRM.MAX_MSG_NO)
-            throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_MSG_NO_ROLLOVER), Constants.FaultMessages.MSG_NO_ROLLOVER, null, null);
+            throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULT_MSG_NO_ROLLOVER),
+                    Constants.FaultMessages.MSG_NO_ROLLOVER, null, null);
 
         messageNumber = (new Long(element.getValue())).longValue();
         return this;
@@ -104,8 +100,7 @@ public class MessageNumber implements IRmElement {
      * @return MessageElement
      * @throws SOAPException
      */
-    public MessageElement toSOAPEnvelope(MessageElement msgElement)
-            throws SOAPException {
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
 
         msgElement.addChildElement(Constants.WSRM.MSG_NUMBER, Constants.WSRM.NS_PREFIX_RM)
                 .addTextNode((new Long(messageNumber)).toString());
@@ -123,11 +118,6 @@ public class MessageNumber implements IRmElement {
         messageNumber = msgNo;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement
@@ -135,8 +125,5 @@ public class MessageNumber implements IRmElement {
      * @param element
      */
     public void addChildElement(MessageElement element) {
-
-        // no child elements in the message no
-        // add your optional tags if required
     }
 }

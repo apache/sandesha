@@ -1,3 +1,19 @@
+/*
+* Copyright 1999-2004 The Apache Software Foundation.
+*
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not
+* use this file except in compliance with the License. You may obtain a copy of
+* the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+* License for the specific language governing permissions and limitations under
+* the License.
+*
+*/
 package org.apache.sandesha.samples.interop;
 
 import org.apache.axis.client.Call;
@@ -9,7 +25,12 @@ import org.apache.sandesha.SandeshaContext;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
-
+/**
+ * Test client for Ping scenario for Systinet with synchronous invocation. No client side listener will start
+ * and all the communications will happen synchronously.
+ *
+ * @auther Jaliya Ekanyake
+ */
 public class SystinetSyncPing {
 
     private static String targetURL = "http://127.0.0.1:6064/Service";
@@ -23,10 +44,8 @@ public class SystinetSyncPing {
 
             SandeshaContext ctx = new SandeshaContext();
             ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:Ping",
-                    Constants.ClientProperties.IN_ONLY);
-            ctx.setSynchronous(call);
+                    Constants.ClientProperties.IN_ONLY,true);
             ctx.setToUrl(call, "http://soap.systinet.net:6064/Service");
-            ctx.setAcksToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
 
             call.setTargetEndpointAddress(targetURL);
             call.setOperationName(new QName("http://tempuri.org/", "Ping"));

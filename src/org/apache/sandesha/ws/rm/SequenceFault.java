@@ -26,6 +26,11 @@ import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
 import java.util.Iterator;
 
+/**
+ * This is the SequenceFault element.
+ *
+ * @auther Jaliya Ekanayake
+ */
 public class SequenceFault extends MessageElement implements IRmElement {
 
 

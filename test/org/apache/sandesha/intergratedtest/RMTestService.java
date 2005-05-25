@@ -15,18 +15,13 @@
 *
 */
 
-package org.apache.sandesha.samples.interop;
+package org.apache.sandesha.intergratedtest;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * This is the service that is used for the interop testing. Two operations, ping and echoString
- * are defined as per the interop scenarios.
- *
- * @auther Jaliya Ekanayake
- */
-public class RMInteropService {
+
+public class RMTestService {
     private static Map sequences = new HashMap();
 
     public String echoString(String text, String sequence) {

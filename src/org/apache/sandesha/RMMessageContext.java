@@ -27,7 +27,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * @author JEkanayake
+ * RMMessageContext is used as the message context for Sandesha. It will carry all the required
+ * paramerters through the processing logics including the MessageContext handed over by the
+ * axis engine.
+ *
+ * @auther Jaliya Ekanayake
+ * @auther Chamikara Jayalath
  */
 public class RMMessageContext {
 

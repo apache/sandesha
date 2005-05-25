@@ -23,7 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
-
+ /**
+  * This is the property loader for Sandesha. All the properties will be loaded from the
+  * sandesha.properties file that is found in the classpath.
+  *
+  * @auther Jaliya Ekanayake
+  */
 public class PropertyLoader {
     public static int getClientSideListenerPort() {
         Properties prop = loadProperties();

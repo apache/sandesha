@@ -1,9 +1,19 @@
 /*
- * Created on Apr 15, 2005
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+* Copyright 1999-2004 The Apache Software Foundation.
+*
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not
+* use this file except in compliance with the License. You may obtain a copy of
+* the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+* License for the specific language governing permissions and limitations under
+* the License.
+*
+*/
 package org.apache.sandesha.samples.interop.testclient;
 
 import org.apache.sandesha.Constants;
@@ -11,10 +21,8 @@ import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.CallbackData;
 
 /**
- * @author root
- *         <p/>
- *         To change the template for this generated type comment go to
- *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *  This Callback is used to write the results of various points in the Sandesha engine.
+ * @auther Chamikara Jayalath
  */
 public class InteropCallback extends Callback {
 
@@ -90,7 +98,6 @@ public class InteropCallback extends Callback {
             entry = "<br /><font color='blue' size='2' > Sent " + msgType + "</font>";
         }
 
-
         boolean b = writer.write(entry);
         if (!b)
             setTestFinished(true);
@@ -105,11 +112,10 @@ public class InteropCallback extends Callback {
         if (exp.getMessage() != null) {
             message = exp.getMessage();
         }
-        String entry = "<br /><font color='red' size='2' > Error : " + message + "</font>";// + result.getSequenceId() + " </font>";
+        String entry = "<br /><font color='red' size='2' > Error : " + message + "</font>";
         boolean b = writer.write(entry);
         if (!b)
             setTestFinished(true);
-
-    }
+        }
 
 }

@@ -20,8 +20,13 @@ import org.apache.axis.AxisFault;
 import org.apache.sandesha.RMMessageContext;
 
 /**
- * @author
+ * Interface for message processors. Message processors handle various types of messages.
+ * Finding of the appropriate message processor is done by the
+ * org.apache.sandesha.server.RMMessageProcessorIdentifier.
+ *
+ * @auther Jaliya Ekanayake
  */
+
 public interface IRMMessageProcessor {
 
     //Returns true if the message has a synchronous response or ack.

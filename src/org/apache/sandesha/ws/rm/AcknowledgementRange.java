@@ -124,11 +124,6 @@ public class AcknowledgementRange implements IRmElement {
         return this;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement
@@ -136,8 +131,6 @@ public class AcknowledgementRange implements IRmElement {
      * @param element
      */
     public void addChildElement(MessageElement element) {
-
-        // TODO no child elements
     }
 
     /**

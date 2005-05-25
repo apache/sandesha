@@ -21,7 +21,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.ws.rm.Identifier;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
@@ -36,8 +35,7 @@ import java.util.List;
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
  */
-public class SequenceAcknowledgement extends MessageElement implements
-        IRmElement {
+public class SequenceAcknowledgement extends MessageElement implements IRmElement {
 
     /**
      * Field seqAck
@@ -70,12 +68,6 @@ public class SequenceAcknowledgement extends MessageElement implements
 
         seqAck.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_ACK);
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
 
     /**
      * Method getSoapElement
@@ -113,8 +105,7 @@ public class SequenceAcknowledgement extends MessageElement implements
      * @return SOAPEnvelope
      * @throws SOAPException
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
-            throws SOAPException {
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws SOAPException {
 
         SOAPEnvelope env = envelope;
 
@@ -122,10 +113,9 @@ public class SequenceAcknowledgement extends MessageElement implements
             env.addHeader();
         }
 
-        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
-                Constants.WSRM.NS_URI_RM);
-        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader()
-                .addHeaderElement(name);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(
+                name);
 
         headerElement.setActor(null);
         headerElement.setName(Constants.WSRM.SEQUENCE_ACK);
@@ -135,8 +125,7 @@ public class SequenceAcknowledgement extends MessageElement implements
 
         while (iterator.hasNext()) {
 
-            AcknowledgementRange ackRange = (AcknowledgementRange) iterator
-                    .next();
+            AcknowledgementRange ackRange = (AcknowledgementRange) iterator.next();
             ackRange.toSOAPEnvelope(headerElement);
         }
 
@@ -170,7 +159,8 @@ public class SequenceAcknowledgement extends MessageElement implements
 
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
@@ -181,7 +171,8 @@ public class SequenceAcknowledgement extends MessageElement implements
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_RANGE)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_RANGE)) {
                 AcknowledgementRange ackRange = new AcknowledgementRange();
 
                 ackRange.fromSOAPEnvelope(childElement);
@@ -194,7 +185,8 @@ public class SequenceAcknowledgement extends MessageElement implements
                 ackRanges.add(ackRange);
             }
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.NACK)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.NACK)) {
                 Nack nack = new Nack();
                 nack.fromSOAPEnvelope(childElement);
             }
@@ -207,12 +199,6 @@ public class SequenceAcknowledgement extends MessageElement implements
 
         return this;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement

@@ -27,6 +27,12 @@ import org.apache.sandesha.SandeshaContext;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
+/**
+ * Test client for Ping scenario with synchronous invocation. No client side listener will start
+ * and all the communications will happen synchronously.
+ *
+ * @auther Jaliya Ekanyake
+ */
 public class SyncPingClient {
 
     private static String defaultServerPort = "8070";
@@ -46,8 +52,7 @@ public class SyncPingClient {
             ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:Ping",
                     Constants.ClientProperties.IN_ONLY);
             ctx.setSynchronous(call);
-            ctx.setToUrl(call, "http://131.107.153.195/SecureReliableMessaging/ReliableOneWay.svc");
-
+         
             call.setOperationName(new QName("http://tempuri.org/", "Ping"));
 
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);

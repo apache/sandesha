@@ -18,9 +18,7 @@
 package org.apache.sandesha.ws.rm;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.Address;
-import org.apache.axis.types.URI;
 import org.apache.sandesha.Constants;
 
 import javax.xml.soap.SOAPException;
@@ -38,7 +36,8 @@ public class AcksTo implements IRmElement {
 
     public AcksTo(Address address) {
         acksToElement = new MessageElement();
-        acksToElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO);
+        acksToElement.setName(
+                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO);
         this.address = address;
     }
 
@@ -48,23 +47,27 @@ public class AcksTo implements IRmElement {
      * @param element
      * @return Nack
      */
-    public AcksTo fromSOAPEnvelope(MessageElement element) throws SOAPException{
+    public AcksTo fromSOAPEnvelope(MessageElement element) throws SOAPException {
 
         Iterator iterator = element.getChildElements();
         MessageElement childElement;
-        try{
-        while (iterator.hasNext()) {
-            childElement = (MessageElement) iterator.next();
-            if (childElement.getName().equals(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING + Constants.COLON + org.apache.axis.message.addressing.Constants.ADDRESS)) {
-                String uri = childElement.getFirstChild().getFirstChild().toString();
-                address = new Address(uri);
+        try {
+            while (iterator.hasNext()) {
+                childElement = (MessageElement) iterator.next();
+                if (childElement.getName().equals(
+                        org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING +
+                        Constants.COLON +
+                        org.apache.axis.message.addressing.Constants.ADDRESS)) {
+                    String uri = childElement.getFirstChild().getFirstChild().toString();
+                    address = new Address(uri);
+                }
+                if (childElement.getName().equals(
+                        org.apache.axis.message.addressing.Constants.ADDRESS)) {
+                    String uri = childElement.getFirstChild().getNodeValue();
+                    address = new Address(uri);
+                }
             }
-            if (childElement.getName().equals(org.apache.axis.message.addressing.Constants.ADDRESS)) {
-                String uri = childElement.getFirstChild().getNodeValue();
-                address = new Address(uri);
-            }
-        }
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new SOAPException(e);
         }
         return this;
@@ -78,18 +81,14 @@ public class AcksTo implements IRmElement {
      * @throws SOAPException
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
-        MessageElement messageElement = new MessageElement("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+        MessageElement messageElement = new MessageElement("", Constants.WSRM.NS_PREFIX_RM,
+                Constants.WSRM.NS_URI_RM);
         messageElement.setName(Constants.WSRM.ACKS_TO);
         address.append(messageElement);
         msgElement.addChildElement(messageElement);
         return msgElement;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
     public MessageElement getSoapElement() throws SOAPException {
         address.append(acksToElement);
         return acksToElement;
@@ -106,6 +105,7 @@ public class AcksTo implements IRmElement {
 
     /**
      * get the address
+     *
      * @return
      */
     public Address getAddress() {
@@ -114,6 +114,7 @@ public class AcksTo implements IRmElement {
 
     /**
      * set the address
+     *
      * @param address
      */
     public void setAddress(Address address) {

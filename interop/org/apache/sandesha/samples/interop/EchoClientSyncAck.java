@@ -26,7 +26,11 @@ import org.apache.sandesha.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
-
+/**
+ * Test client for echoString scenario.
+ *
+ * @auther Jaliya Ekanyake
+ */
 public class EchoClientSyncAck {
 
     private static String defaultServerPort = "8070";

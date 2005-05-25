@@ -36,7 +36,8 @@ import java.util.Vector;
  * methods. All the methods follow a simple process of creating SOAPEnvelopes using the
  * WS-Addressing and, WS-RM headers and Body Elements.
  *
- * @author JEkanayake
+ * @author Jaliya Ekanayake
+ * @auther Chamikara Jayalath
  */
 public class EnvelopeCreator {
     private static final Log log = LogFactory.getLog(EnvelopeCreator.class.getName());

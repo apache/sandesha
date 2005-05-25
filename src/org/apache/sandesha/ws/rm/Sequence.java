@@ -22,7 +22,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.ws.rm.Identifier;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
@@ -65,12 +64,6 @@ public class Sequence extends MessageElement implements IRmElement {
         seqElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
-
     /**
      * Method getSoapElement
      *
@@ -103,7 +96,8 @@ public class Sequence extends MessageElement implements IRmElement {
         removeHeaders(envelope);
 
         Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
-        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(
+                name);
 
         headerElement.setActor(null);
         headerElement.setName(Constants.WSRM.SEQUENCE);
@@ -139,7 +133,8 @@ public class Sequence extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }
@@ -149,7 +144,8 @@ public class Sequence extends MessageElement implements IRmElement {
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
                 messageNumber = new MessageNumber();
                 messageNumber.fromSOAPEnvelope(childElement);
             }
@@ -159,7 +155,8 @@ public class Sequence extends MessageElement implements IRmElement {
                 messageNumber.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.LAST_MSG)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.LAST_MSG)) {
                 lastMessage = new LastMessage();
                 lastMessage.fromSOAPEnvelope(childElement);
             }
@@ -181,18 +178,13 @@ public class Sequence extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (Constants.WSRM.SEQUENCE.equals(childElement.getName()) && (Constants.WSRM.NS_URI_RM.equals(childElement.getNamespaceURI()))) {
+            if (Constants.WSRM.SEQUENCE.equals(childElement.getName()) &&
+                    (Constants.WSRM.NS_URI_RM.equals(childElement.getNamespaceURI()))) {
                 childElement.detachNode();
                 break;
             }
         }
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement

@@ -31,8 +31,12 @@ import org.apache.sandesha.ws.rm.Sequence;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
-
-public final class MessageValidator {
+/**
+  * This will validate all the incoming messages receiving through the RMProvider.
+ *
+ *@auther Jaliya Ekanayake 
+ */
+ public final class MessageValidator {
     private static IStorageManager storageMgr = null;
     private static final Log log = LogFactory.getLog(MessageValidator.class.getName());
 

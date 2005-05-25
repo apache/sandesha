@@ -55,13 +55,7 @@ public class CreateSequenceResponse implements IRmElement {
         createSequenceResponse.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE_RESPONSE);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
-
-    /**
+       /**
      * Method getSoapElement
      *
      * @return MessageElement
@@ -134,13 +128,7 @@ public class CreateSequenceResponse implements IRmElement {
         return this;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
-
-    /**
+       /**
      * Method addChildElement
      *
      * @param element

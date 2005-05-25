@@ -27,6 +27,11 @@ import org.apache.sandesha.SandeshaContext;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
+/**
+ * Test client for Ping scenario, with asynchronous <wsrm:AcksTo>
+ *
+ * @auther Jaliya Ekanyake
+ */
 public class AsyncPingClient {
     private static String defaultServerPort = "8070";
     private static String defaultClientPort = "9070";
@@ -67,7 +72,6 @@ public class AsyncPingClient {
 
 
         } catch (Exception e) {
-            //System.err.println(e.toString());
             e.printStackTrace();
         }
     }

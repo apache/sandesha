@@ -9,7 +9,11 @@ import org.apache.sandesha.SandeshaContext;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
-
+/**
+ * Test client for Ping scenario for Systinet.
+ *
+ * @auther Jaliya Ekanyake
+ */
 public class SystinetAsyncPing {
 
     private static String targetURL = "http://127.0.0.1:6064/Service";

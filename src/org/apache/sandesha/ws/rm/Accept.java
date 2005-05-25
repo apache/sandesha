@@ -101,20 +101,10 @@ public class Accept extends MessageElement implements IRmElement {
         return msgElement;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
-    /**
-     * Method addChildElement
-     *
-     * @param element
-     */
+
     public void addChildElement(MessageElement element) {
 
-        // no child elements in LastMessage element
     }
 
     /**

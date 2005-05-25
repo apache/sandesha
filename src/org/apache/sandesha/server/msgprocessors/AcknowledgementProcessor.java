@@ -36,7 +36,11 @@ import java.util.Map;
 import java.util.Vector;
 
 /**
- * @author
+ * Processor for the acknowledgements. This will handle both processing of acknowledgements
+ * and sending acknowledgements. Sending part is required as the user wants synchronous
+ * acknowldgements to be sent from the server.
+ *
+ * @auther Jaliya Eknayake
  */
 public final class AcknowledgementProcessor implements IRMMessageProcessor {
     private IStorageManager storageManager = null;

@@ -23,10 +23,9 @@ import org.apache.sandesha.ws.rm.RMHeaders;
 import javax.xml.namespace.QName;
 
 /**
- * @author JEkanayake
- *         <p/>
- *         To change the template for this generated type comment go to
- *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * This class is the message processor for the faults.
+ *
+ * @author Jaliy Ekanayake
  */
 public class FaultProcessor implements IRMMessageProcessor {
     private IStorageManager storageManager = null;

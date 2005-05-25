@@ -1,9 +1,19 @@
 /*
- * Created on Apr 15, 2005
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
+* Copyright 1999-2004 The Apache Software Foundation.
+*
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not
+* use this file except in compliance with the License. You may obtain a copy of
+* the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+* License for the specific language governing permissions and limitations under
+* the License.
+*
+*/
 package org.apache.sandesha.samples.interop.testclient;
 
 
@@ -28,6 +38,15 @@ import javax.xml.rpc.ServiceException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+/**
+ * This is class has the client for the interop testing. interop.jsp
+ * simply calls the runPing and runEcho methods.
+ *
+ * @auther Chamikara Jayalath
+ *
+ */
+
 
 public class InteropStub {
 
@@ -59,63 +78,6 @@ public class InteropStub {
     }
 
     private static InteropCallback callback = null;
-
-
-    private Call getCall(InteropBean bean) throws ServiceException {
-        String target = bean.getTarget();
-        String from = bean.getFrom();
-        String replyTo = bean.getReplyto();
-        String acksTo = bean.getAcksTo();
-        String faultTo = bean.getFaultto();
-
-        boolean sendOffer = false;
-        if (bean.getOffer().equalsIgnoreCase("yes"))
-            sendOffer = true;
-
-        Service service = new Service();
-        Call call = (Call) service.createCall();
-
-        if (replyTo != null && replyTo.equalsIgnoreCase("anonymous")) {
-            call.setProperty(Constants.ClientProperties.REPLY_TO,
-                    AddressingUtils.getAnonymousRoleURI());
-        } else if (replyTo != null) {
-            call.setProperty(Constants.ClientProperties.REPLY_TO, bean.getReplyto());
-        }
-
-        if (from != null && from.equalsIgnoreCase("anonymous")) {
-            from = AddressingUtils.getAnonymousRoleURI();
-            call.setProperty(Constants.ClientProperties.FROM,
-                    AddressingUtils.getAnonymousRoleURI());
-        } else if (from != null) {
-            call.setProperty(Constants.ClientProperties.FROM, from);
-        }
-
-        if (acksTo != null && acksTo.equalsIgnoreCase("anonymous")) {
-            acksTo = AddressingUtils.getAnonymousRoleURI();
-            call.setProperty(Constants.ClientProperties.ACKS_TO,
-                    AddressingUtils.getAnonymousRoleURI());
-        } else if (acksTo != null) {
-            call.setProperty(Constants.ClientProperties.ACKS_TO, acksTo);
-        }
-
-        if (faultTo != null && faultTo.equalsIgnoreCase("anonymous")) {
-            faultTo = AddressingUtils.getAnonymousRoleURI();
-            call.setProperty(Constants.ClientProperties.FAULT_TO,
-                    AddressingUtils.getAnonymousRoleURI());
-        } else if (faultTo != null) {
-            call.setProperty(Constants.ClientProperties.FAULT_TO, bean.getFaultto());
-        }
-
-
-        if (sendOffer)
-            call.setProperty(Constants.ClientProperties.SEND_OFFER, new Boolean(true));
-
-        call.setTargetEndpointAddress(target);
-        call.setProperty(Constants.ClientProperties.SOURCE_URL, bean.getSourceURL());
-
-        return call;
-    }
-
 
     private void configureContext(SandeshaContext ctx,Call call, InteropBean bean) {
         String from = bean.getFrom();

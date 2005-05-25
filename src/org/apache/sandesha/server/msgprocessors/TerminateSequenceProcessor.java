@@ -22,7 +22,9 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.TerminateSequence;
 
 /**
- * @author
+ * This is the message processor for the TerminateSequence messages.
+ *
+ * @author Jaliya Ekanayake
  */
 public class TerminateSequenceProcessor implements IRMMessageProcessor {
 

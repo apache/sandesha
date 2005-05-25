@@ -41,7 +41,12 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 
 /**
- * @author JEkanayake
+ * This is the sender for Sandesha for both the client and the server sides. Starting of the
+ * Sender will be done either by the RMProvider or the SandeshaContext. The job of the sender is to
+ * keep on monitoring the SandeshaQueue and send any messages that are scheduled to be sent.
+ *
+ * @auther Chamikar Jayalath
+ * @auther Jaliya Ekanayake
  */
 public class Sender implements Runnable {
 

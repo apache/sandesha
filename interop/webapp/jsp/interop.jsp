@@ -117,7 +117,6 @@ MM_reloadPage(true);
           </tr>
           <tr>
             <td width='20%'>Operation</td>
-<%--            <td colspan="4"><select name='operation' onchange="setOperation(this)">--%>
             <td colspan="4"><select name='operation' >
                 <option value="Ping">Ping</option>
                 <option value="echoString">echoString</option>
@@ -259,15 +258,15 @@ MM_reloadPage(true);
 
 public void runTest(InteropBean bean,ResponseWriter writer,String defaultAsyncEndPoint) throws Exception {
 
-    System.out.println("AcksTo "+bean.getAcksTo());
-    System.out.println("FaultTo "+bean.getFaultto());
-    System.out.println("From "+bean.getFrom());
-    System.out.println("No of Msf "+bean.getNoOfMsgs());
-    System.out.println("Opertation "+bean.getOperation());
-    System.out.println("ReplyTo"+bean.getReplyto());
-    System.out.println("Source "+bean.getSourceURL());
-    System.out.println("Target "+bean.getTarget());
-    System.out.println("Offer "+bean.getOffer());
+//    System.out.println("AcksTo "+bean.getAcksTo());
+//    System.out.println("FaultTo "+bean.getFaultto());
+//    System.out.println("From "+bean.getFrom());
+//    System.out.println("No of Msf "+bean.getNoOfMsgs());
+//    System.out.println("Opertation "+bean.getOperation());
+//    System.out.println("ReplyTo"+bean.getReplyto());
+//    System.out.println("Source "+bean.getSourceURL());
+//    System.out.println("Target "+bean.getTarget());
+//    System.out.println("Offer "+bean.getOffer());
 
 
 	String to = null;

@@ -123,16 +123,14 @@
         <unitTest>
             <includes>
                 <include>**/*TC*.java</include>
+                  <include>**/*.wsdd</include>
             </includes>
-              <excludes>
-                <exclude>**/TCClientStorageManager.java</exclude>
-             </excludes>
-
             <resources>
                 <resource>
                     <directory>test-resources</directory>
                     <includes>
                         <include>**/*.xml</include>
+                           <include>**/*.wsdd</include>
                     </includes>
                 </resource>
             </resources>

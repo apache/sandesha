@@ -23,7 +23,9 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.CreateSequenceResponse;
 
 /**
- * @author JEkanayake
+ * This is the processor for the CreateSequenceRespones.
+ *
+ * @auther Jaliya Ekanayake
  */
 public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
     IStorageManager storageManager = null;
@@ -48,7 +50,6 @@ public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
         String offerID = storageManager.getOffer(relatesTo.getURI().toString());
 
         if (createSeqRes.getAccept() != null) {
-            String key = (new Long(System.currentTimeMillis())).toString();
 
             storageManager.addRequestedSequence(offerID);
             storageManager.setAcksTo(offerID,createSeqRes.getAccept().getAcksTo().getAddress().toString());

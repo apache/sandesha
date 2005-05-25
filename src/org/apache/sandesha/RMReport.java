@@ -16,6 +16,11 @@
  */
 package org.apache.sandesha;
 
+/**
+ * RMReport is generated at the end of the termination of each sequence.
+ * @auther Chamikara Jayalath
+ * @auther Jaliya Ekanyake
+ */
 public class RMReport {
 	
 	private  boolean allAcked;

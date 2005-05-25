@@ -47,14 +47,8 @@ public class Nack implements IRmElement {
     public Nack() {
 
         nackElement = new MessageElement();
-        nackElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.NACK);
+        nackElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.NACK);
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#getSoapElement()
-     */
 
     /**
      * Method getSoapElement
@@ -89,19 +83,13 @@ public class Nack implements IRmElement {
      * @return MessageElement
      * @throws SOAPException
      */
-    public MessageElement toSOAPEnvelope(MessageElement msgElement)
-            throws SOAPException {
+    public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
 
-        msgElement.addChildElement(Constants.WSRM.NACK, Constants.WSRM.NS_PREFIX_RM).addTextNode((new Long(notAckNum)).toString());
+        msgElement.addChildElement(Constants.WSRM.NACK, Constants.WSRM.NS_PREFIX_RM).addTextNode(
+                (new Long(notAckNum)).toString());
 
         return msgElement;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement
@@ -110,7 +98,6 @@ public class Nack implements IRmElement {
      */
     public void addChildElement(MessageElement element) {
 
-        // TODO no child elements ?
     }
 
     /**

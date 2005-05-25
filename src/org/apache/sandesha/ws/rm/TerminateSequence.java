@@ -22,7 +22,6 @@ import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.sandesha.Constants;
 
-
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
 import java.util.Iterator;
@@ -51,7 +50,8 @@ public class TerminateSequence implements IRmElement {
      */
     public TerminateSequence() {
         terminateSequence = new MessageElement();
-        terminateSequence.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.TERMINATE_DEQUENCE);
+        terminateSequence.setName(
+                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.TERMINATE_DEQUENCE);
     }
 
     /*
@@ -80,8 +80,7 @@ public class TerminateSequence implements IRmElement {
      * @return SOAPEnvelope
      * @throws SOAPException
      */
-    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope)
-            throws SOAPException {
+    public SOAPEnvelope toSoapEnvelop(SOAPEnvelope envelope) throws SOAPException {
 
         SOAPEnvelope env = envelope;
 
@@ -89,10 +88,8 @@ public class TerminateSequence implements IRmElement {
             env.addBody();
         }
 
-        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM,
-                Constants.WSRM.NS_URI_RM);
-        SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody()
-                .addBodyElement(name);
+        Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+        SOAPBodyElement bodyElement = (SOAPBodyElement) env.getBody().addBodyElement(name);
 
         bodyElement.setName(Constants.WSRM.TERMINATE_DEQUENCE);
 
@@ -118,7 +115,8 @@ public class TerminateSequence implements IRmElement {
 
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(
+                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);
@@ -133,12 +131,6 @@ public class TerminateSequence implements IRmElement {
 
         return this;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.ws.rm.IRmElement#addChildElement(org.apache.axis.message.MessageElement)
-     */
 
     /**
      * Method addChildElement

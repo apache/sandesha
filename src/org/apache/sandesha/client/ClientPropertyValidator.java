@@ -27,7 +27,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * @author Jaliya
+ * This class is used to get the client side properties and to set them to the RMMessageContext.
+ *
+ * @auther Jaliya Ekanayake
  */
 public class ClientPropertyValidator {
 

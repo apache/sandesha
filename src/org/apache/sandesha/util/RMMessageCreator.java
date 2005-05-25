@@ -29,6 +29,10 @@ import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.ws.rm.*;
 
+/**
+ * This is the message creater for Sandesha. This will create all the RM related messages
+ * with requried headers but only at he obect level. No serialization will occure.
+ */
 public class RMMessageCreator {
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
