@@ -16,6 +16,7 @@
  */
 package org.apache.sandesha.server;
 
+import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
@@ -29,38 +30,53 @@ import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 
 /**
- * This class will act as the service dispatcher for Sandesha. However actual dispatching
- * is done using the provider specified by the user in sandesha.properties file. By default this
- * will use RPCProvider.
- *
- * @auther Chamikara Jayalath
- * @auther Jaliya Ekanayake
+ * @author JEkanayake
+ *         <p/>
+ *         This class will act as the service dispatcher for Sandesha. By default it
+ *         will use the RPCProvider to invoke the service but need to improve this to
+ *         use any Provider depending on the configuration.
  */
 public class RMInvoker implements Runnable {
     private IStorageManager storageManager = null;
     private static final Log log = LogFactory.getLog(RMInvoker.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+    private static boolean invokerStarted = false;
 
     public RMInvoker() {
-        storageManager = new ServerStorageManager();
-        storageManager.init();
-
+        setStorageManager(new ServerStorageManager());
+        getStorageManager().init();
     }
+
+    public void startInvoker() {
+        if (!invokerStarted) {
+            System.out.println(Constants.InfomationMessage.RMINVOKER_STARTED);
+            invokerStarted = true;
+            Thread invokerThread = new Thread(this, "RMInvoker");
+            invokerThread.setDaemon(false);
+            invokerThread.start();
+        }
+    }
+
+    protected boolean doRealInvoke(MessageContext aMessageContext) throws Exception {
+        Class c = Class.forName(PropertyLoader.getProvider());
+        JavaProvider provider = (JavaProvider) c.newInstance();
+        provider.invoke(aMessageContext);
+        return aMessageContext.getOperation().getMethod().getReturnType() == Void.TYPE;
+    }
+
 
     public void run() {
         while (true) {
             try {
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);
-                RMMessageContext rmMessageContext = storageManager.getNextMessageToProcess();
+                RMMessageContext rmMessageContext = getStorageManager().getNextMessageToProcess();
 
                 if (rmMessageContext != null) {
                     AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
-                    Class c = Class.forName(PropertyLoader.getProvider());
-                    JavaProvider provider = (JavaProvider) c.newInstance();
-                    provider.invoke(rmMessageContext.getMsgContext());
+                    boolean isVoid = doRealInvoke(rmMessageContext.getMsgContext());
 
-                    if (rmMessageContext.getMsgContext().getOperation().getMethod().getReturnType() !=
-                            Void.TYPE) {
+                    if (!isVoid) {
+
                         String oldAction = rmMessageContext.getAddressingHeaders().getAction()
                                 .toString();
                         rmMessageContext.getAddressingHeaders().setAction(
@@ -72,7 +88,7 @@ public class RMInvoker implements Runnable {
                                 RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(
                                         rmMessageContext, Constants.SERVER);
                                 terminateMsg.setOutGoingAddress(replyTo);
-                                storageManager.insertTerminateSeqMessage(terminateMsg);
+                                getStorageManager().insertTerminateSeqMessage(terminateMsg);
                             } else {
                                 log.error(Constants.ErrorMessages.CANNOT_SEND_THE_TERMINATE_SEQ);
                             }
@@ -82,7 +98,7 @@ public class RMInvoker implements Runnable {
                         // used in this case. This is done by the RMSender.
                         rmMessageContext.setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
 
-                        boolean hasResponseSeq = storageManager.isResponseSequenceExist(
+                        boolean hasResponseSeq = getStorageManager().isResponseSequenceExist(
                                 rmMessageContext.getSequenceID());
                         boolean firstMsgOfResponseSeq = false;
                         if (!(hasResponseSeq && rmMessageContext.getRMHeaders().getSequence()
@@ -91,9 +107,9 @@ public class RMInvoker implements Runnable {
                             firstMsgOfResponseSeq = !hasResponseSeq;
                         }
 
-                        rmMessageContext.setMsgNumber(storageManager.getNextMessageNumber(
+                        rmMessageContext.setMsgNumber(getStorageManager().getNextMessageNumber(
                                 rmMessageContext.getSequenceID()));
-                        storageManager.insertOutgoingMessage(rmMessageContext);
+                        getStorageManager().insertOutgoingMessage(rmMessageContext);
 
 
                         if (firstMsgOfResponseSeq) {
@@ -108,9 +124,9 @@ public class RMInvoker implements Runnable {
                             csRMMsgCtx.addToMsgIdList(msgIdStr);
                             csRMMsgCtx.setMessageID(msgIdStr);
 
-                            storageManager.setTemporaryOutSequence(csRMMsgCtx.getSequenceID(),
+                            getStorageManager().setTemporaryOutSequence(csRMMsgCtx.getSequenceID(),
                                     msgIdStr);
-                            storageManager.addCreateSequenceRequest(csRMMsgCtx);
+                            getStorageManager().addCreateSequenceRequest(csRMMsgCtx);
                         }
                     }
                 }
@@ -121,4 +137,19 @@ public class RMInvoker implements Runnable {
             }
         }
     }
+
+    /**
+     * @param storageManager The storageManager to set.
+     */
+    protected void setStorageManager(IStorageManager storageManager) {
+        this.storageManager = storageManager;
+    }
+
+    /**
+     * @return Returns the storageManager.
+     */
+    protected IStorageManager getStorageManager() {
+        return storageManager;
+    }
+
 }

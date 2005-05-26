@@ -65,12 +65,14 @@ out.println("<head>");
 		function setOperation (itm){
 		//document.getElementById("txtfrom").value = itm.value;
 			if(itm.value=="ping" || itm.value=="Ping"){
+            document.getElementById("replyto1").disabled=false;
 				//document.getElementById('replytoTR').style.display = 'none';
 				//document.getElementById('offerTR').style.display = 'none';
 				document.getElementById("replyto").value = "";
 			}else if(itm.value=="echoString" || itm.value=="EchoString"){
 				//document.getElementById('replytoTR').style.display = '';
 				//document.getElementById('offerTR').style.display = '';
+                document.getElementById("replyto1").disabled=true;
 				document.getElementById("replyto").value = "<%=defaultAsyncEndPoint%>";
 			}
 		}
@@ -291,8 +293,9 @@ public void runTest(InteropBean bean,ResponseWriter writer,String defaultAsyncEn
             RMClientProvider.setCallback(callback);
 			Sender.setCallback(callback);
 
+            //InteropStub stub= InteropStub.getInstance();
             InteropStub stub= InteropStub.getInstance();
-            InteropStub.setCallback(callback);
+            stub.setCallback(callback);
 
         	if(bean.getOperation().equalsIgnoreCase("ping")){
 		       stub.runPing(bean);

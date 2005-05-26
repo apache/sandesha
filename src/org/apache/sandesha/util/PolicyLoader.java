@@ -25,124 +25,145 @@ package org.apache.sandesha.util;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 
 
-public class PolicyLoader{
+public class PolicyLoader {
 
-	private static final Log log = LogFactory.getLog(PolicyLoader.class.getName());
+    private static final Log log = LogFactory.getLog(PolicyLoader.class.getName());
 
-	private long inactivityTimeout;
-	private long baseRetransmissionInterval;
-	private long acknowledgementInterval;
-	private String exponentialBackoff;
+    private long inactivityTimeout;
+    private long baseRetransmissionInterval;
+    private long acknowledgementInterval;
+    private String exponentialBackoff;
+    private String binaryBackOff;
 
-	private DocumentBuilderFactory  factory;
-	private DocumentBuilder builder;
-	private Document document;
+    private DocumentBuilderFactory factory;
+    private DocumentBuilder builder;
+    private Document document;
 
-	private static PolicyLoader instance;
-	private static boolean policyInstance = false;
+    private static PolicyLoader instance;
+    private static boolean policyInstance = false;
 
-	private Element rootNodeElement;
+    private Element rootNodeElement;
 
-	private PolicyLoader (){
-		policyInstance = true;
-	}
+    private PolicyLoader() {
+            helper();
+        policyInstance = true;
+    }
 
-	public static PolicyLoader getInstance (){
-		if (policyInstance == false)
-			return instance = new PolicyLoader();
-		else
-			return instance;
-	}
+    public static PolicyLoader getInstance() {
+        if (policyInstance == false)
+            return instance = new PolicyLoader();
+        else
+            return instance;
+    }
 
-	public int getRetransmissionCount () {
-		return Constants.MAXIMUM_RETRANSMISSION_COUNT;
-	}
+    public int getRetransmissionCount() {
+        return Constants.MAXIMUM_RETRANSMISSION_COUNT;
+    }
 
-	public long getInactivityTimeout (){
-		helper();
-		if (inactivityTimeout == 0)
-			return Constants.INACTIVITY_TIMEOUT;
-		else
-			return inactivityTimeout;
-	}
+    public long getInactivityTimeout() {
 
-	public long getBaseRetransmissionInterval (){
-		helper();
-		if (baseRetransmissionInterval == 0)
-			return Constants.RETRANSMISSION_INTERVAL;
-		else
-			return baseRetransmissionInterval;
-	}
+        if (inactivityTimeout == 0)
+            return Constants.INACTIVITY_TIMEOUT;
+        else
+            return inactivityTimeout;
+    }
 
-	public long getAcknowledgementInterval () {
-		helper();
-		if (acknowledgementInterval == 0)
-			return Constants.ACKNOWLEDGEMENT_INTERVAL;
-		else
-			return acknowledgementInterval;
-	}
+    public long getBaseRetransmissionInterval() {
+        if (baseRetransmissionInterval == 0)
+            return Constants.RETRANSMISSION_INTERVAL;
+        else
+            return baseRetransmissionInterval;
+    }
 
-	public String getExponentialBackoff () {
-		helper();
-		return exponentialBackoff;
-	}
+    public long getAcknowledgementInterval() {
+        if (acknowledgementInterval == 0)
+            return Constants.ACKNOWLEDGEMENT_INTERVAL;
+        else
+            return acknowledgementInterval;
+    }
 
-	public void helper () {
-			init();
-			try{
-				inactivityTimeout = getAttributeValue(Constants.WSRMPolicy.WSRM,Constants.WSRMPolicy.INA_TIMEOUT);
-				baseRetransmissionInterval = getAttributeValue(Constants.WSRMPolicy.WSRM, Constants.WSRMPolicy.BASE_TX_INTERVAL);
-				acknowledgementInterval = getAttributeValue(Constants.WSRMPolicy.WSRM, Constants.WSRMPolicy.ACK_INTERVAL);
-				exponentialBackoff = getExpBackoffInterval(Constants.WSRMPolicy.WSRM, Constants.WSRMPolicy.EXP_BACKOFF);
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-	}
+    public String getExponentialBackoff() {
+        return exponentialBackoff;
+    }
 
-	private long getAttributeValue(String namespaceURI, String elementName) {
-		NodeList list = rootNodeElement.getElementsByTagNameNS(namespaceURI,elementName);
-		NamedNodeMap map = list.item(0).getAttributes();
-		Attr att = (Attr)map.item(0);
-		String value = att.getNodeValue();
-		return Long.parseLong(value.trim());
+    public void helper() {
+        init();
+        try {
+            inactivityTimeout =
+                    getAttributeValue(Constants.WSRMPolicy.WSRM, Constants.WSRMPolicy.INA_TIMEOUT);
+            baseRetransmissionInterval = getAttributeValue(Constants.WSRMPolicy.WSRM,
+                    Constants.WSRMPolicy.BASE_TX_INTERVAL);
+            acknowledgementInterval =
+                    getAttributeValue(Constants.WSRMPolicy.WSRM, Constants.WSRMPolicy.ACK_INTERVAL);
+            exponentialBackoff = getExpBackoffInterval(Constants.WSRMPolicy.WSRM,
+                    Constants.WSRMPolicy.EXP_BACKOFF);
+            binaryBackOff = geBinaryBackoffInterval(Constants.WSRMPolicy.WSRM,
+                    Constants.WSRMPolicy.BIN_BACKOFF);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	}
-	private String getExpBackoffInterval(String namespaceURI,String elementName){
-		NodeList list = rootNodeElement.getElementsByTagNameNS(namespaceURI,elementName);
-		String name = list.item(0).getLocalName();
-		return name;
-	}
+    private String geBinaryBackoffInterval(String namespaceURI, String elementName) {
+        String name = null;
+        NodeList list = rootNodeElement.getElementsByTagNameNS(namespaceURI, elementName);
+        if (list != null) {
+            Node node = list.item(0);
+            if (node != null)
+                name = list.item(0).getLocalName();
+        }
+        return name;
+    }
 
-	private void init() {
-		try{
-			factory = DocumentBuilderFactory.newInstance();
-			factory.setNamespaceAware(true);
-			builder = factory.newDocumentBuilder();
-			InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.ClientProperties.WSRM_POLICY_FILE);
+    private long getAttributeValue(String namespaceURI, String elementName) {
+        NodeList list = rootNodeElement.getElementsByTagNameNS(namespaceURI, elementName);
+        NamedNodeMap map = list.item(0).getAttributes();
+        Attr att = (Attr) map.item(0);
+        String value = att.getNodeValue();
+        return Long.parseLong(value.trim());
 
-			if ( in != null){
-				document = builder.parse(in);
-				rootNodeElement = document.getDocumentElement();
-			}
-			else
-				log.error("No WSRMPolicy.xml Found");
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-	}
+    }
+
+    private String getExpBackoffInterval(String namespaceURI, String elementName) {
+       String name = null;
+        NodeList list = rootNodeElement.getElementsByTagNameNS(namespaceURI, elementName);
+        if (list != null) {
+            Node node = list.item(0);
+            if (node != null)
+                name = list.item(0).getLocalName();
+        }
+        return name;
+    }
+
+    private void init() {
+        try {
+            factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            builder = factory.newDocumentBuilder();
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                    Constants.ClientProperties.WSRM_POLICY_FILE);
+
+            if (in != null) {
+                document = builder.parse(in);
+                rootNodeElement = document.getDocumentElement();
+            } else
+                log.error("No WSRMPolicy.xml Found");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
+    public String getBinaryBackOff() {
+        helper();
+        return binaryBackOff;
 
-
+    }
 }

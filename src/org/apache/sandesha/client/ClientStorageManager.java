@@ -390,7 +390,7 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public boolean isSequenceComplete(String seqId) {
-         boolean outTerminateSent = accessor.isOutgoingTerminateSent(seqId);
+        boolean outTerminateSent = accessor.isOutgoingTerminateSent(seqId);
         boolean incomingTerminateReceived = accessor.isIncommingTerminateReceived(seqId);
         return outTerminateSent && incomingTerminateReceived;
     }

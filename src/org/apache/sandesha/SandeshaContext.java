@@ -84,14 +84,16 @@ public class SandeshaContext {
                 serverSenderStarted = true;
                 thServerSender.start();
             }
-            if (!rmInvokerStarted) {
-                System.out.println(Constants.InfomationMessage.RMINVOKER_STARTED);
-                RMInvoker rmInvoker = new RMInvoker();
-                thInvoker = new Thread(rmInvoker);
-                thInvoker.setDaemon(true);
-                rmInvokerStarted = true;
-                thInvoker.start();
-            }
+            RMInvoker rmInvoker = new RMInvoker();
+            rmInvoker.startInvoker();
+            //            if (!rmInvokerStarted) {
+            //                System.out.println(Constants.InfomationMessage.RMINVOKER_STARTED);
+            //                RMInvoker rmInvoker = new RMInvoker();
+            //                thInvoker = new Thread(rmInvoker);
+            //                thInvoker.setDaemon(true);
+            //                rmInvokerStarted = true;
+            //                thInvoker.start();
+            //            }
             return new ServerStorageManager();
         }
     }

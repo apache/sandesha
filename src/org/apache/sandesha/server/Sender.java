@@ -111,13 +111,42 @@ public class Sender implements Runnable {
                 if (rmMessageContext == null) {
                     hasMessages = false;
                 } else {
-                    //Send the message.
-                    if ((rmMessageContext.getReTransmissionCount() <=
-                            PolicyLoader.getInstance().getRetransmissionCount()) &&
-                            ((System.currentTimeMillis() - rmMessageContext.getLastPrecessedTime()) >
-                            PolicyLoader.getInstance().getBaseRetransmissionInterval())) {
+                    long inactivityTimeout = PolicyLoader.getInstance().getInactivityTimeout();
+                    long retransmissionInterval = PolicyLoader.getInstance()
+                            .getBaseRetransmissionInterval();
+
+                    if (rmMessageContext.getFristProcessedTime() == 0)
+                        rmMessageContext.setFristProcessedTime(System.currentTimeMillis());
+
+                    if ((System.currentTimeMillis() - rmMessageContext.getFristProcessedTime()) >
+                            inactivityTimeout) {
+                        log.error(
+                                "Inactivity Time Out Reached for the message with <wsa:MessageID> " +
+                                rmMessageContext.getMessageID());
+                        storageManager.clearStorage();
+
+
+                    } else if (rmMessageContext.getRetransmissionTime() <
+                            (System.currentTimeMillis() - rmMessageContext.getLastPrecessedTime())) {
                         try {
+
+                            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+                            rmMessageContext.setReTransmissionCount(
+                                    rmMessageContext.getReTransmissionCount() + 1);
+
+                            if (PolicyLoader.getInstance().getExponentialBackoff() != null) {
+                                long newRtTime = ((long) Math.pow(retransmissionInterval / 1000,
+                                        rmMessageContext.getReTransmissionCount())) * 1000;
+                                rmMessageContext.setRetransmissionTime(newRtTime);
+
+                            } else {
+                                //Let's do Binary Back Off
+                                long rtTime = rmMessageContext.getRetransmissionTime();
+                                rmMessageContext.setRetransmissionTime(2 * rtTime);
+
+                            }
                             sendMessage(rmMessageContext);
+
                         } catch (AxisFault e) {
                             log.error(e);
                         } catch (SOAPException e) {
@@ -125,9 +154,26 @@ public class Sender implements Runnable {
                         } catch (Exception e) {
                             log.error(e);
                         }
-                    } else {
-                        //TODO REPORT ERROR
                     }
+
+
+                    //Send the message.
+                    /* if ((rmMessageContext.getReTransmissionCount() <=
+                             PolicyLoader.getInstance().getRetransmissionCount()) &&
+                             ((System.currentTimeMillis() - rmMessageContext.getLastPrecessedTime()) >
+                             PolicyLoader.getInstance().getBaseRetransmissionInterval())) {
+                         try {
+                             sendMessage(rmMessageContext);
+                         } catch (AxisFault e) {
+                             log.error(e);
+                         } catch (SOAPException e) {
+                             log.error(e);
+                         } catch (Exception e) {
+                             log.error(e);
+                         }
+                     } else {
+                         //TODO REPORT ERROR
+                     }*/
                 }
             } while (hasMessages);
 
@@ -161,9 +207,8 @@ public class Sender implements Runnable {
                 {
                     System.out.println(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
                     sendTerminateSequenceRequest(rmMessageContext);
-                    storageManager.setTerminateSend(
-                            storageManager.getKeyFromOutgoingSeqId(
-                                    rmMessageContext.getSequenceID()));
+                    storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(
+                            rmMessageContext.getSequenceID()));
                     break;
                 }
             case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
@@ -198,8 +243,8 @@ public class Sender implements Runnable {
         rmMessageContext.getMsgContext().setRequestMessage(terSeqMsg);
 
         Call call;
-        rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-        rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+        //rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+        //rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
         call = prepareCall(rmMessageContext);
         call.invoke();
 
@@ -225,8 +270,8 @@ public class Sender implements Runnable {
         String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
         call.setRequestMessage(new Message(soapMsg));
 
-        rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-        rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+        // rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+        // rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
         //We are not expecting the ack over the  same connection
         storageManager.addSendMsgNo(rmMessageContext.getSequenceID(),
                 rmMessageContext.getMsgNumber());
@@ -240,8 +285,6 @@ public class Sender implements Runnable {
         SOAPEnvelope reqEnvelope = EnvelopeCreator.createCreateSequenceEnvelope(rmMsgCtx);
         rmMsgCtx.getMsgContext().setRequestMessage(new Message(reqEnvelope));
 
-        rmMsgCtx.setLastPrecessedTime(System.currentTimeMillis());
-        rmMsgCtx.setReTransmissionCount(rmMsgCtx.getReTransmissionCount() + 1);
         call = prepareCall(rmMsgCtx);
         call.invoke();
 
@@ -257,8 +300,8 @@ public class Sender implements Runnable {
             //The code should not come to this point.
             System.err.println(Constants.ErrorMessages.NULL_REQUEST_MSG);
         } else {
-            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-            rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+            // rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+            // rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             Call call = prepareCall(rmMessageContext);
             call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
             call.invoke();
@@ -271,8 +314,8 @@ public class Sender implements Runnable {
         if (rmMessageContext.getMsgContext().getResponseMessage() == null) {
             log.error(Constants.ErrorMessages.NULL_REQUEST_MSG);
         } else {
-            rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-            rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+            //rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+            //rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
             Call call = prepareCall(rmMessageContext);
             call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());
             call.invoke();
@@ -304,8 +347,8 @@ public class Sender implements Runnable {
        
         requestEnvelope = EnvelopeCreator.createServiceRequestEnvelope(rmMessageContext);
         rmMessageContext.getMsgContext().setRequestMessage(new Message(requestEnvelope));
-        rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
-        rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
+        // rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
+        // rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
         if (rmMessageContext.getSync()) {
             Call call;
             call = prepareCall(rmMessageContext);

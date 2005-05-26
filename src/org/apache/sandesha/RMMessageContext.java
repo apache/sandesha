@@ -21,6 +21,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.ws.rm.RMHeaders;
+import org.apache.sandesha.util.PolicyLoader;
 import org.apache.commons.logging.Log;
 
 import java.util.ArrayList;
@@ -45,6 +46,25 @@ public class RMMessageContext {
     private int messageType;
     private long reTransmissionCount;
     private long lastPrecessedTime;
+    private long fristProcessedTime;
+    private long retransmissionTime;
+
+    public long getFristProcessedTime() {
+        return fristProcessedTime;
+    }
+
+    public void setFristProcessedTime(long fristProcessedTime) {
+        this.fristProcessedTime = fristProcessedTime;
+    }
+
+    public long getRetransmissionTime() {
+        return retransmissionTime;
+    }
+
+    public void setRetransmissionTime(long retransmissionTime) {
+        this.retransmissionTime = retransmissionTime;
+    }
+
     private long lastSentTime;
     private boolean sync;
     private boolean hasResponse;
@@ -60,6 +80,12 @@ public class RMMessageContext {
     private String faultTo;
     private String acksTo = null;
     private String to;
+
+
+    public RMMessageContext(){
+        this.retransmissionTime=PolicyLoader.getInstance().getBaseRetransmissionInterval();
+        this.fristProcessedTime=0;
+    }
 
 
     public boolean isSendOffer() {
