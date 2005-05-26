@@ -6,7 +6,7 @@
     <menu name="Sandesha">
       	<item name="Simple User Guide" href="userguide.html"/>
       	<item name="Architecture Guide" href="architecture.html"/>
-       
+                <item name="Interop Guide" href="interopguide.html"/>
     </menu>
      
     
