@@ -125,6 +125,10 @@
                 <include>**/*TC*.java</include>
                   <include>**/*.wsdd</include>
             </includes>
+            <excludes>
+                <exclude>**/*TCClientStorageManager.java</exclude>
+                <exclude>**/*TCServerStorageManager.java</exclude>
+            </excludes>
             <resources>
                 <resource>
                     <directory>test-resources</directory>

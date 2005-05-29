@@ -79,7 +79,7 @@ public class TCScenarioTest extends TestCase {
     public void tearDown() throws InterruptedException {
         if (testCount == 0) {
             Thread.sleep(5000);
-            sas.stop();
+            sas.stop(); 
         }
     }
 

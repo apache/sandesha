@@ -108,14 +108,20 @@ public class ServerStorageManager implements IStorageManager {
      * This is used to get a random message from the out queue Basically server
      * sender will use this.
      */
-    public RMMessageContext getNextMessageToSend() {
+    public synchronized  RMMessageContext getNextMessageToSend() {
         RMMessageContext msg;
         msg = accessor.getNextPriorityMessageContextToSend();
         if (msg == null)
             msg = accessor.getNextOutgoingMsgContextToSend();
         if (msg == null)
             msg = accessor.getNextLowPriorityMessageContextToSend();
+
+       if (msg != null && !msg.isLocked()){
+            msg.setLocked(true);
         return msg;
+        }else{
+            return null;
+        }
 
     }
 

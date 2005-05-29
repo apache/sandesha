@@ -37,9 +37,6 @@ public class SandeshaContext {
     private static boolean serverSenderStarted = false;
     private static boolean listenerStarted = false;
     private static SimpleAxisServer sas = null;
-    private static Thread thCleintSender;
-    private static Thread thServerSender;
-    private static Thread thInvoker;
     private static Sender cleintSender;
     private static Sender serverSender;
 
@@ -68,32 +65,22 @@ public class SandeshaContext {
                     cleintSender.setRequestChain(reqChain);
                 if (resChain != null)
                     cleintSender.setResponseChain(resChain);
-
-                thCleintSender = new Thread(cleintSender);
-                thCleintSender.setDaemon(false);
+                cleintSender.startSender();
                 cleintSenderStarted = true;
-                thCleintSender.start();
             }
             return storageManager;
         } else {
             if (!serverSenderStarted) {
                 System.out.println(Constants.InfomationMessage.SENDER_STARTED);
                 serverSender = new Sender();
-                thServerSender = new Thread(serverSender);
-                thServerSender.setDaemon(false);
+                serverSender.startSender();
                 serverSenderStarted = true;
-                thServerSender.start();
             }
-            RMInvoker rmInvoker = new RMInvoker();
-            rmInvoker.startInvoker();
-            //            if (!rmInvokerStarted) {
-            //                System.out.println(Constants.InfomationMessage.RMINVOKER_STARTED);
-            //                RMInvoker rmInvoker = new RMInvoker();
-            //                thInvoker = new Thread(rmInvoker);
-            //                thInvoker.setDaemon(true);
-            //                rmInvokerStarted = true;
-            //                thInvoker.start();
-            //            }
+            if (!rmInvokerStarted) {
+                RMInvoker rmInvoker = new RMInvoker();
+                rmInvoker.startInvoker();
+                rmInvokerStarted = true;
+            }
             return new ServerStorageManager();
         }
     }
@@ -183,7 +170,7 @@ public class SandeshaContext {
                 sas.stop();
                 listenerStarted = false;
             }
-            cleintSender.setRunning(false);
+            cleintSender.stop();
             cleintSenderStarted = false;
             storageManager.clearStorage();
             activeSequenes--;
@@ -204,7 +191,7 @@ public class SandeshaContext {
                 sas.stop();
                 listenerStarted = false;
             }
-            cleintSender.setRunning(false);
+            cleintSender.stop();
             cleintSenderStarted = false;
             storageManager.clearStorage();
             activeSequenes--;
@@ -222,7 +209,7 @@ public class SandeshaContext {
             //END JSP
             listenerStarted = false;
         }
-        cleintSender.setRunning(false);
+        cleintSender.stop();
 
         //FOR JSP
         cleintSenderStarted = false;

@@ -221,9 +221,10 @@ public class InteropStub {
         if (resChain != null)
             sender.setResponseChain(resChain);
 
-        thSender = new Thread(sender);
-        thSender.setDaemon(false);
-        thSender.start();
+        //thSender = new Thread(sender);
+        //thSender.setDaemon(false);
+        //thSender.start();
+        sender.startSender();
     }
 
     public static void stopClient() throws AxisFault {
@@ -243,7 +244,7 @@ public class InteropStub {
             }
         }
 
-        sender.setRunning(false);
+        sender.stop();
         storageManager.clearStorage();
 
 
@@ -251,7 +252,8 @@ public class InteropStub {
 
     public static void stopClientByForce() throws AxisFault {
 
-        sender.setRunning(false);
+        sender.stop();
+
         throw new AxisFault("Inactivity Timeout Reached, No Response from the Server");
     }
 

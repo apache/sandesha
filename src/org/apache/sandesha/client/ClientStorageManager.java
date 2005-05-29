@@ -69,7 +69,7 @@ public class ClientStorageManager implements IStorageManager {
      * acks.
      */
     public void setAcknowledged(String seqID, long msgNumber) {
-         accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
+        accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
 
     }
 
@@ -118,7 +118,7 @@ public class ClientStorageManager implements IStorageManager {
      * Get a Map of messages.
      */
     public Map getListOfMessageNumbers(String sequenceID) {
-        String seq=sequenceID;
+        String seq = sequenceID;
         Set st = accessor.getAllReceivedMsgNumsOfIncomingSeq(seq);
         Iterator it = st.iterator();
         //To find the largest id present
@@ -149,7 +149,7 @@ public class ClientStorageManager implements IStorageManager {
     /**
      * This will be used by the sender.
      */
-    public RMMessageContext getNextMessageToSend() {
+    public synchronized RMMessageContext getNextMessageToSend() {
         RMMessageContext msg;
         msg = accessor.getNextPriorityMessageContextToSend();
         if (msg == null)
@@ -162,7 +162,13 @@ public class ClientStorageManager implements IStorageManager {
         }
         if (null != callBack && null != msg)
             informOutgoingMessage(msg);
+
+        if (msg != null && !msg.isLocked()){
+            msg.setLocked(true);
         return msg;
+        }else{
+            return null;
+        }
     }
 
     /**

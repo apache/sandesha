@@ -49,6 +49,17 @@ public class RMMessageContext {
     private long fristProcessedTime;
     private long retransmissionTime;
 
+    private boolean locked=false;
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+
     public long getFristProcessedTime() {
         return fristProcessedTime;
     }

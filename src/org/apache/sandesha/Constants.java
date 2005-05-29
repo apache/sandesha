@@ -29,6 +29,9 @@ import org.apache.axis.message.addressing.util.AddressingUtils;
  */
 public interface Constants {
 
+    public static final int INVOKER_THREADS=10;
+    public static final int SENDER_THREADS=2;
+
     public static final int DEFAULR_CLIENT_SIDE_LISTENER_PORT = 9090;
     public static final int DEFAULT_SIMPLE_AXIS_SERVER_PORT = 8080;
 

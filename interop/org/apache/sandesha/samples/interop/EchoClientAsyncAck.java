@@ -82,6 +82,7 @@ public class EchoClientAsyncAck {
                         "No of response messages   - " + report.getNumberOfReturnMessages());
                 System.out.println("****************************************\n");
             }
+           
 
         } catch (Exception e) {
             e.printStackTrace();
