@@ -29,12 +29,16 @@ public class TCServerStorageManager extends TestCase {
         //messages should be returned (since the out sequence is approved)
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNull(msg1);
 
@@ -48,12 +52,16 @@ public class TCServerStorageManager extends TestCase {
 		
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNull(msg1);
 
@@ -67,12 +75,16 @@ public class TCServerStorageManager extends TestCase {
 		//Messages should be returned once again
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNull(msg1);
 
@@ -90,12 +102,16 @@ public class TCServerStorageManager extends TestCase {
         RMMessageContext msg1;
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         msg1 = csm.getNextMessageToSend();
         assertNull(msg1);
         
@@ -114,6 +130,7 @@ public class TCServerStorageManager extends TestCase {
 		//Only message no. 3 should be re-transmitted
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
+        msg1.setLocked(false);
         assertEquals(msg1.getMessageID(), "rmsg3");
         msg1 = csm.getNextMessageToSend();
         assertNull(msg1);  
