@@ -18,7 +18,9 @@ import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,9 +41,19 @@ public class SandeshaContext {
     private static SimpleAxisServer sas = null;
     private static Sender cleintSender;
     private static Sender serverSender;
+    private static boolean insideServer;
 
     private static HashMap callMap = new HashMap();
     private static int activeSequenes = 0;
+
+     public SandeshaContext(){
+            SandeshaContext.insideServer = false;
+     }
+
+    public SandeshaContext(boolean insideServer) {
+        SandeshaContext.insideServer = insideServer;
+    }
+
 
     public static HashMap getCallMap() {
         return callMap;
@@ -227,42 +239,61 @@ public class SandeshaContext {
         call.setProperty(Constants.ClientProperties.MEP, new Short(MEP));
         call.setProperty(Constants.ClientProperties.CALL_KEY, keyOfCall);
         call.setProperty(Constants.ClientProperties.REPORT, new RMReport());
+
+        if (!insideServer) {
+            InetAddress addr = null;
+            try {
+                addr = InetAddress.getLocalHost();
+            } catch (UnknownHostException e) {
+                log.error(e);
+            }
+
+            String sourceURL = Constants.HTTP + Constants.COLON + Constants.SLASH +
+                    Constants.SLASH +
+                    addr.getHostAddress() + Constants.COLON +
+                    PropertyLoader.getClientSideListenerPort() + Constants.URL_RM_SERVICE;
+            call.setProperty(Constants.ClientProperties.SOURCE_URL, sourceURL);
+        }
         return keyOfCall;
     }
 
 
     private static void startListener() {
-        if (!listenerStarted) {
-            listenerStarted = true;
-            try {
-                System.out.println(Constants.InfomationMessage.CLIENT_LISTENER_STARTED);
-                sas = new SimpleAxisServer();
+        if (!insideServer) {
+            if (!listenerStarted) {
+                listenerStarted = true;
+                try {
+                    System.out.println(Constants.InfomationMessage.CLIENT_LISTENER_STARTED);
+                    sas = new SimpleAxisServer();
 
-                SimpleProvider sp = new SimpleProvider();
-                sas.setMyConfig(sp);
+                    SimpleProvider sp = new SimpleProvider();
+                    sas.setMyConfig(sp);
 
-                SimpleChain reqHandlers = getListenerRequestChain();
-                SimpleChain resHandlers = getListenerResponseChain();
+                    SimpleChain reqHandlers = getListenerRequestChain();
+                    SimpleChain resHandlers = getListenerResponseChain();
 
-                RMProvider rmp = new RMProvider();
-                rmp.setClient(true);
-                SOAPService rmService = new SOAPService(reqHandlers, rmp, resHandlers);
+                    RMProvider rmp = new RMProvider();
+                    rmp.setClient(true);
+                    SOAPService rmService = new SOAPService(reqHandlers, rmp, resHandlers);
 
-                JavaServiceDesc desc = new JavaServiceDesc();
-                rmService.setOption(Constants.ClientProperties.CLASS_NAME,
-                        Constants.ClientProperties.RMSERVICE_CLASS);
-                rmService.setOption(Constants.ClientProperties.ALLOWED_METHODS, Constants.ASTERISK);
+                    JavaServiceDesc desc = new JavaServiceDesc();
+                    rmService.setOption(Constants.ClientProperties.CLASS_NAME,
+                            Constants.ClientProperties.RMSERVICE_CLASS);
+                    rmService.setOption(Constants.ClientProperties.ALLOWED_METHODS,
+                            Constants.ASTERISK);
 
-                desc.setName(Constants.ClientProperties.RMSERVICE);
-                rmService.setServiceDescription(desc);
-                sp.deployService(Constants.ClientProperties.RMSERVICE, rmService);
-                sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
+                    desc.setName(Constants.ClientProperties.RMSERVICE);
+                    rmService.setServiceDescription(desc);
+                    sp.deployService(Constants.ClientProperties.RMSERVICE, rmService);
+                    sas.setServerSocket(
+                            new ServerSocket(PropertyLoader.getClientSideListenerPort()));
 
-                Thread serverThread = new Thread(sas);
-                serverThread.start();
+                    Thread serverThread = new Thread(sas);
+                    serverThread.start();
 
-            } catch (Exception e) {
-                log.error(e);
+                } catch (Exception e) {
+                    log.error(e);
+                }
             }
         }
 
@@ -323,6 +354,14 @@ public class SandeshaContext {
 
     public void setToUrl(Call call, String toUrl) {
         call.setProperty(Constants.ClientProperties.TO, toUrl);
+    }
+
+    public String getSourceUrl(Call call) {
+        return (String) call.getProperty(Constants.ClientProperties.SOURCE_URL);
+    }
+
+    public void setSourceUrl(Call call, String toUrl) {
+        call.setProperty(Constants.ClientProperties.SOURCE_URL, toUrl);
     }
 
     public String getFaultTo(Call call) {

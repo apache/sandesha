@@ -23,9 +23,7 @@ import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.XMLType;
-import org.apache.axis.message.addressing.util.AddressingUtils;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.RMTransport;
 import org.apache.sandesha.SandeshaContext;
 import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.Sender;
@@ -34,7 +32,6 @@ import org.apache.sandesha.util.PropertyLoader;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
-import javax.xml.rpc.ServiceException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +41,6 @@ import java.util.List;
  * simply calls the runPing and runEcho methods.
  *
  * @auther Chamikara Jayalath
- *
  */
 
 
@@ -79,7 +75,7 @@ public class InteropStub {
 
     private static InteropCallback callback = null;
 
-    private void configureContext(SandeshaContext ctx,Call call, InteropBean bean) {
+    private void configureContext(SandeshaContext ctx, Call call, InteropBean bean) {
         String from = bean.getFrom();
         String replyTo = bean.getReplyto();
         String acksTo = bean.getAcksTo();
@@ -90,34 +86,32 @@ public class InteropStub {
             sendOffer = true;
 
         if (replyTo != null && replyTo.equalsIgnoreCase("anonymous")) {
-            ctx.setReplyToUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
-          } else if (replyTo != null) {
-           ctx.setReplyToUrl(call, bean.getReplyto());
+            ctx.setReplyToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+        } else if (replyTo != null) {
+            ctx.setReplyToUrl(call, bean.getReplyto());
         }
 
         if (from != null && from.equalsIgnoreCase("anonymous")) {
-           ctx.setFromUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.setFromUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
         } else if (from != null) {
-           ctx.setFromUrl(call, from);
+            ctx.setFromUrl(call, from);
         }
 
         if (acksTo != null && acksTo.equalsIgnoreCase("anonymous")) {
-            ctx.setAcksToUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.setAcksToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
         } else if (acksTo != null) {
             ctx.setAcksToUrl(call, acksTo);
         }
 
         if (faultTo != null && faultTo.equalsIgnoreCase("anonymous")) {
-           ctx.setFaultToUrl(call,Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.setFaultToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
         } else if (faultTo != null) {
             ctx.setFaultToUrl(call, bean.getFaultto());
         }
 
 
         if (sendOffer)
-           ctx.setSendOffer(call);
-
-        call.setProperty(Constants.ClientProperties.SOURCE_URL, bean.getSourceURL());
+            ctx.setSendOffer(call);
 
     }
 
@@ -131,11 +125,12 @@ public class InteropStub {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            SandeshaContext ctx = new SandeshaContext();
-            ctx.addNewSequeceContext(call, target, "urn:wsrm:ping", Constants.ClientProperties.IN_ONLY);
+            SandeshaContext ctx = new SandeshaContext(true);
+            ctx.setSourceUrl(call, bean.getSourceURL());
+            ctx.addNewSequeceContext(call, target, "urn:wsrm:ping",
+                    Constants.ClientProperties.IN_ONLY);
 
-            configureContext(ctx,call,bean);
-
+            configureContext(ctx, call, bean);
 
 
             call.setOperationName(new QName("http://tempuri.org", "Ping"));
@@ -178,10 +173,12 @@ public class InteropStub {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            SandeshaContext ctx = new SandeshaContext();
-            ctx.addNewSequeceContext(call, target, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
+            SandeshaContext ctx = new SandeshaContext(true);
+            ctx.setSourceUrl(call, bean.getSourceURL());
+            ctx.addNewSequeceContext(call, target, "urn:wsrm:echoString",
+                    Constants.ClientProperties.IN_OUT);
 
-            configureContext(ctx,call,bean);
+            configureContext(ctx, call, bean);
 
             call.setOperationName(new QName("http://tempuri.org/", "echoString"));
 

@@ -20,10 +20,8 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.util.PropertyLoader;
 
 import javax.xml.namespace.QName;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
@@ -49,11 +47,11 @@ public class ClientPropertyValidator {
         String to = getTo(call);
         String faultTo = getFaultTo(call);
         boolean sendOffer = getOffer(call);
-        String key=getKey(call);
+        String key = getKey(call);
 
         try {
             sourceURL = getSourceURL(call);
-        } catch (UnknownHostException e) {
+        } catch (Exception e) {
             throw new AxisFault(e.getMessage());
         }
 
@@ -153,20 +151,14 @@ public class ClientPropertyValidator {
     }
 
 
-    private static String getSourceURL(Call call) throws UnknownHostException {
+    private static String getSourceURL(Call call) throws Exception {
         String sourceURL = null;
         sourceURL = (String) call.getProperty(Constants.ClientProperties.SOURCE_URL);
         if (sourceURL != null) {
             return sourceURL;
         } else {
+            throw new Exception("No Source URL specified");
 
-            InetAddress addr = InetAddress.getLocalHost();
-
-            sourceURL = Constants.HTTP + Constants.COLON + Constants.SLASH + Constants.SLASH +
-                    addr.getHostAddress() + Constants.COLON +
-                    PropertyLoader.getClientSideListenerPort() + Constants.URL_RM_SERVICE;
-
-            return sourceURL;
         }
     }
 
@@ -177,11 +169,12 @@ public class ClientPropertyValidator {
     private static long getMessageNumber(Call call) {
         Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
         long msgNumber = 0;
-        if (temp == null){
-           call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(++msgNumber));
-        }else{
-          msgNumber=((Long)call.getProperty(Constants.ClientProperties.MSG_NUMBER)).longValue();
-          call.setProperty(Constants.ClientProperties.MSG_NUMBER,new Long(++msgNumber));
+        if (temp == null) {
+            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(++msgNumber));
+        } else {
+            msgNumber =
+                    ((Long) call.getProperty(Constants.ClientProperties.MSG_NUMBER)).longValue();
+            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(++msgNumber));
         }
 
         return msgNumber;
