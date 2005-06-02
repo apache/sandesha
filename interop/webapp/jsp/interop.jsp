@@ -99,10 +99,10 @@ MM_reloadPage(true);
 	<tr id='server' style="display:''">
 		<td>
 		<table width="100%">
-		<tr><td><h3><u>Server Endpoint</u></h3></td></tr>
-		<tr><td>
-		http://replace.by.actual.url
-		<br /><hr />
+		<tr><td><font size="+1">Server Endpoint</font></td><td><font size="+1"><%=defaultTarget%></font></td></tr>
+		<tr><td colspan="2" >
+	     <a href="<%=defaultTarget%>?wsdl"><h3><u>WSDL</h3></u></a>
+     		<br /><hr/>
 		</td></tr>
 		</table>
 		</td>

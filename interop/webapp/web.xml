@@ -12,16 +12,16 @@
     </servlet-class>
   </servlet>
 
-  <servlet>
+<!--<servlet>
     <servlet-name>AdminServlet</servlet-name>
     <display-name>Axis Admin Servlet</display-name>
     <servlet-class>
         org.apache.axis.transport.http.AdminServlet
     </servlet-class>
     <load-on-startup>100</load-on-startup>
-  </servlet>
+  </servlet>-->
 
-  <servlet>
+<!--<servlet>
     <servlet-name>SOAPMonitorService</servlet-name>
     <display-name>SOAPMonitorService</display-name>
     <servlet-class>
@@ -32,7 +32,7 @@
       <param-value>5001</param-value>
     </init-param>
     <load-on-startup>100</load-on-startup>
-  </servlet>
+  </servlet>-->
 
   <servlet-mapping>
     <servlet-name>AxisServlet</servlet-name>
@@ -49,18 +49,18 @@
     <url-pattern>/services/*</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
+<!--<servlet-mapping>
     <servlet-name>SOAPMonitorService</servlet-name>
     <url-pattern>/SOAPMonitor</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping>-->
 
  <!-- uncomment this if you want the admin servlet -->
- <!--
-  <servlet-mapping>
+
+ <!-- <servlet-mapping>
     <servlet-name>AdminServlet</servlet-name>
     <url-pattern>/servlet/AdminServlet</url-pattern>
-  </servlet-mapping>
- -->
+  </servlet-mapping>-->
+
 
     <!-- currently the W3C havent settled on a media type for WSDL;
     http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft
