@@ -191,6 +191,10 @@ public class ServerStorageManager implements IStorageManager {
      * @see org.apache.sandesha.IStorageManager#addAcknowledgement(org.apache.sandesha.RMMessageContext)
      */
     public void addAcknowledgement(RMMessageContext rmMessageContext) {
+        String sequenceID = rmMessageContext.getSequenceID();
+        if(sequenceID!=null)
+            accessor.removeAllAcks(sequenceID);
+        
         addPriorityMessage(rmMessageContext);
     }
 
@@ -259,6 +263,7 @@ public class ServerStorageManager implements IStorageManager {
 
         Long msgNo = new Long(messageNumber);
         accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
+        accessor.updateFinalMessageArrivedTime(sequenceId);
 
     }
 
@@ -367,11 +372,11 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public void addOffer(String msgID, String offerID) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        
     }
 
     public String getOffer(String msgID) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;  
     }
     
     public void clearStorage(){
@@ -379,8 +384,10 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public boolean isSequenceComplete(String seqId) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;  
     }
 
-
+    public void sendAck(String sequenceId) {
+        accessor.sendAck(sequenceId);
+    }
 }

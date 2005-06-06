@@ -20,6 +20,7 @@ package org.apache.sandesha.storage.queue;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
+import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 
 import java.util.*;
@@ -43,8 +44,34 @@ public class IncomingSequence {
     private long lastMsgNo = -1;
     private String acksTo = null;
     private String offer;
-    //private Set msgNumbers;
+    private long finalMsgArrivedTime = 0;   //this is the time the latest application msg was arrived (
+    private long finalAckedTime = 0;
+    private boolean sendAck = false;
 
+    public long getFinalAckedTime() {
+        return finalAckedTime;
+    }
+
+    public void setFinalAckedTime(long finalAckedTime) {
+        this.finalAckedTime = finalAckedTime;
+    }
+    
+    public long getFinalMsgArrivedTime() {
+        return finalMsgArrivedTime;
+    }
+
+    public void setFinalMsgArrivedTime(long finalMsgArrivedTime) {
+        this.finalMsgArrivedTime = finalMsgArrivedTime;
+    }
+
+    public boolean isSendAck() {
+        return sendAck;
+    }
+
+    public void setSendAck(boolean sendAck) {
+        this.sendAck = sendAck;
+    }
+    
     public String getOffer() {
         return offer;
     }

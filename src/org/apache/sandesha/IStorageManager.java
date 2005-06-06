@@ -112,4 +112,6 @@ public interface IStorageManager {
     void clearStorage();
 
     boolean isSequenceComplete(String seqId);
+    
+    void sendAck(String sequenceId);
 }

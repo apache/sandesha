@@ -421,5 +421,19 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
          SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
         return sq.isIncommingTerminateReceived(seqId);
     }
-
+    
+    public void updateFinalMessageArrivedTime(String sequenceID) {
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
+        sq.updateFinalMessageArrivedTime(sequenceID);
+    }
+    
+    public void sendAck(String sequenceId) {
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
+        sq.sendAck(sequenceId);
+    }
+    
+    public void removeAllAcks(String sequenceID){
+        SandeshaQueue sq = SandeshaQueue.getInstance(this.endPoint);
+        sq.removeAllAcks(sequenceID);
+    }
 }

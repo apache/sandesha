@@ -19,6 +19,7 @@ package org.apache.sandesha.storage.dao;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.storage.queue.SandeshaQueue;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -305,4 +306,12 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public void updateFinalMessageArrivedTime(String sequenceID) {
+    }
+    
+    public void sendAck(String sequenceId) {
+    }
+    
+    public void removeAllAcks(String sequenceID){
+    }
 }

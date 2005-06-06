@@ -23,8 +23,11 @@ import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.ws.rm.AcknowledgementRange;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
+
+import sun.nio.cs.HistoricallyNamedCharset;
 
 import java.util.*;
 
@@ -321,7 +324,44 @@ public class SandeshaQueue {
 
                                 }
                                 break;
-
+                            case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
+                                
+                                //acks are send in the folowing manner.
+                                //If a ack the system has asked to send a ack (sequence.sendAck==true)
+                                //then send it immediately.
+                                //Also send a ack when a interval (ACKNOWLEDGEMENT_INTERVAL) has passed
+                                //since last message arrived.
+                                
+                                String sequenceId = tempMsg.getSequenceID();
+                            	if(sequenceId==null)
+                            	    continue;
+                            	
+                            	String key = getKeyFromIncomingSequenceId(sequenceId);
+                            	IncomingSequence sequence = (IncomingSequence) incomingMap.get(key);
+                            	if(sequence==null)
+                            	    continue;
+                            	
+                            	d = new Date ();
+                            	currentTime = d.getTime();
+                            	
+                            	if(sequence.isSendAck()){
+                            	    
+                                    tempMsg.setLastSentTime(currentTime);
+                                    msg = tempMsg;
+                                    sequence.setSendAck(false);
+                                    sequence.setFinalAckedTime(currentTime);
+                                    break forLoop;
+                                    
+                            	}else{
+                                	long ackInterval = PolicyLoader.getInstance().getAcknowledgementInterval();
+                                	long finalAckedTime = sequence.getFinalAckedTime();
+                                	long finalMsgArrivedTime = sequence.getFinalMsgArrivedTime();
+                                	 
+                                	if((finalMsgArrivedTime>finalAckedTime) && (currentTime>finalMsgArrivedTime+ackInterval))
+                                	    sequence.setSendAck(true);
+                            	}
+                            	
+                                break;
                             default:
                                 highPriorityQueue.remove(i);
                                 queueBin.put(tempMsg.getMessageID(), tempMsg);
@@ -576,11 +616,18 @@ public class SandeshaQueue {
     }
 
     public void movePriorityMsgToBin(String messageId) {
+      
         synchronized (highPriorityQueue) {
             int size = highPriorityQueue.size();
             for (int i = 0; i < size; i++) {
                 RMMessageContext msg = (RMMessageContext) highPriorityQueue.get(i);
-                String tempMsgId = (String) msg.getMessageIdList().get(0);
+                
+                String tempMsgId;
+                try{
+                    tempMsgId = (String) msg.getMessageIdList().get(0);
+                }catch(Exception ex){
+                     tempMsgId = msg.getMessageID();
+                }
                 if (tempMsgId.equals(messageId)) {
                     highPriorityQueue.remove(i);
                     queueBin.put(messageId, msg);
@@ -1067,6 +1114,40 @@ public class SandeshaQueue {
                 return true;
         }
 
+    }
+    
+    public void updateFinalMessageArrivedTime(String sequenceId){
+        synchronized (incomingMap) {
+            IncomingSequence ics = (IncomingSequence) incomingMap.get(sequenceId);
+            if(ics==null)
+                return;
+            
+            Date d = new Date();
+            long time = d.getTime();
+            ics.setFinalMsgArrivedTime(time);
+        }
+    }
+    
+    public void sendAck(String sequenceId){
+        synchronized (incomingMap) {
+            IncomingSequence ics = (IncomingSequence) incomingMap.get(sequenceId);
+            if(ics==null)
+                return;
+            
+           ics.setSendAck(true);
+        }
+    }
+    
+    public void removeAllAcks (String sequenceID){
+        synchronized (highPriorityQueue){
+            int size = highPriorityQueue.size();
+            
+            for(int i=0;i<size;i++){
+                RMMessageContext msg = (RMMessageContext) highPriorityQueue.get(i);
+                if(msg.getSequenceID().equals(sequenceID) && msg.getMessageType()==Constants.MSG_TYPE_ACKNOWLEDGEMENT)
+                    highPriorityQueue.remove(i);
+            }
+        }
     }
 
 

@@ -337,4 +337,10 @@ public interface ISandeshaDAO {
     public boolean isOutgoingTerminateSent(String seqId);
 
    public  boolean isIncommingTerminateReceived(String seqId);
+   
+   public void updateFinalMessageArrivedTime(String sequenceID);
+   
+   public void sendAck(String sequenceId);
+   
+   public void removeAllAcks(String sequenceID);
 }

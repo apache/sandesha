@@ -99,6 +99,10 @@ public class ClientStorageManager implements IStorageManager {
      * responses received from the server side.
      */
     public void addAcknowledgement(RMMessageContext rmMessageContext) {
+        String sequenceID = rmMessageContext.getSequenceID();
+        if(sequenceID!=null)
+            accessor.removeAllAcks(sequenceID);
+        
         addPriorityMessage(rmMessageContext);
     }
 
@@ -254,6 +258,7 @@ public class ClientStorageManager implements IStorageManager {
             return;
         Long msgNo = new Long(messageNumber);
         accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
+        accessor.updateFinalMessageArrivedTime(sequenceId);
     }
 
 
@@ -399,6 +404,11 @@ public class ClientStorageManager implements IStorageManager {
         boolean outTerminateSent = accessor.isOutgoingTerminateSent(seqId);
         boolean incomingTerminateReceived = accessor.isIncommingTerminateReceived(seqId);
         return outTerminateSent && incomingTerminateReceived;
+    }
+    
+    public void sendAck(String sequenceId) {
+        String keyId = accessor.getKeyFromIncomingSequenceId(sequenceId);
+        accessor.sendAck(keyId);
     }
 
 
