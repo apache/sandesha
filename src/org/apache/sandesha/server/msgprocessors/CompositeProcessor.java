@@ -27,6 +27,7 @@ import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
+import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import javax.xml.namespace.QName;
@@ -93,11 +94,13 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     storageManager.insertIncomingMessage(rmMsgContext);
                 }
 
-                //Send an Ack for every message received by the server.
-                //This should be changed according to the WS-policy.
-                 if(rmHeaders.getAckRequest()!=null ||rmHeaders.getSequence().getLastMessage()!=null){
-                      return ackProcessor.sendAcknowledgement(rmMessageContext);
+                 // refresh the ack for every message arrived
+                 //But send only if needed.
+                 if(rmHeaders.getAckRequest()!=null ||rmHeaders.getSequence().getLastMessage()!=null){                     
+                     storageManager.sendAck(sequenceUUID); 
+                     return ackProcessor.sendAcknowledgement(rmMessageContext);
                  } else{
+                     ackProcessor.sendAcknowledgement(rmMessageContext);
                      return false;
                  }
             }
