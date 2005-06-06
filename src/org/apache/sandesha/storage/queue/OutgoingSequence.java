@@ -21,6 +21,7 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.util.PolicyLoader;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -166,7 +167,9 @@ public class OutgoingSequence {
             long lastSentTime = tempMsg.getLastSentTime();
             Date d = new Date();
             long currentTime = d.getTime();
-            if (currentTime >= lastSentTime + Constants.RETRANSMISSION_INTERVAL) {
+            
+            long retransmissionInterval = PolicyLoader.getInstance().getBaseRetransmissionInterval(); 
+            if (currentTime >= lastSentTime + retransmissionInterval) {
                 if (minMsg == null)
                     minMsg = tempMsg;
                 else {
