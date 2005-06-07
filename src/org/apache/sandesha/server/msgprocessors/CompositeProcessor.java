@@ -100,8 +100,11 @@ public class CompositeProcessor implements IRMMessageProcessor {
                      storageManager.sendAck(sequenceUUID); 
                      return ackProcessor.sendAcknowledgement(rmMessageContext);
                  } else{
-                     ackProcessor.sendAcknowledgement(rmMessageContext);
-                     return false;
+                     boolean sync=ackProcessor.sendAcknowledgement(rmMessageContext);
+                     if(sync)
+                         return true;
+                     else
+                         return false;
                  }
             }
         }
