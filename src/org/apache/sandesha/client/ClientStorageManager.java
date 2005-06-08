@@ -268,15 +268,6 @@ public class ClientStorageManager implements IStorageManager {
 
     }
 
-    public boolean checkForAcknowledgement(String sequenceId, String requestMsgId) {
-
-        //Request message will be present in the queue only if the ack has not been
-        //receive. It will be deleted by the AckProcessor when an ack get received.
-    
-        boolean requestPresent = accessor.isRequestMessagePresent(sequenceId, requestMsgId);
-        return !requestPresent;
-    }
-
 
     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
         accessor.addLowPriorityMessage(terminateSeqMessage);

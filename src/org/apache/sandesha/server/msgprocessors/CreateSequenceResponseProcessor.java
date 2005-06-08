@@ -42,18 +42,15 @@ public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
         RelatesTo relatesTo = (RelatesTo) rmMessageContext.getAddressingHeaders().getRelatesTo()
                 .get(0);
         String sequenceID = createSeqRes.getIdentifier().toString();
-        //Approve the sequences. Now we can start sending the messages using
-        // that sequence.
+        //Approve the sequences. Now we can start sending the messages using that sequence.
 
         storageManager.setApprovedOutSequence(relatesTo.getURI().toString(), sequenceID);
-
         String offerID = storageManager.getOffer(relatesTo.getURI().toString());
 
         if (createSeqRes.getAccept() != null) {
-
             storageManager.addRequestedSequence(offerID);
-            storageManager.setAcksTo(offerID,createSeqRes.getAccept().getAcksTo().getAddress().toString());
-
+            storageManager.setAcksTo(offerID,
+                    createSeqRes.getAccept().getAcksTo().getAddress().toString());
         }
         //No response to this message.
         return false;

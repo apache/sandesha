@@ -32,16 +32,15 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 /**
-  * This will validate all the incoming messages receiving through the RMProvider.
+ * This will validate all the incoming messages receiving through the RMProvider.
  *
- *@auther Jaliya Ekanayake 
+ * @auther Jaliya Ekanayake
  */
- public final class MessageValidator {
-    private static IStorageManager storageMgr = null;
+public final class MessageValidator {
+    private static IStorageManager storageMgr;
     private static final Log log = LogFactory.getLog(MessageValidator.class.getName());
 
-    public static void validate(final RMMessageContext rmMsgContext, boolean client)
-            throws AxisFault {
+    public static void validate(RMMessageContext rmMsgContext, boolean client) throws AxisFault {
 
         if (client)
             storageMgr = new ClientStorageManager();
@@ -52,7 +51,7 @@ import javax.xml.soap.SOAPException;
         try {
             AddressingHeaders aHeaders = (AddressingHeaders) rmMsgContext.getMsgContext()
                     .getProperty(
-                            org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+                        org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
             if (aHeaders == null)
                 throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
                         Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
@@ -110,7 +109,8 @@ import javax.xml.soap.SOAPException;
             }
             if (sequence.getMessageNumber() != null) {
                 long msgNo = sequence.getMessageNumber().getMessageNumber();
-                if (storageMgr.hasLastIncomingMsgReceived(sequence.getIdentifier().getIdentifier())) {
+                if (storageMgr.hasLastIncomingMsgReceived(
+                        sequence.getIdentifier().getIdentifier())) {
                     long lastMsg = storageMgr.getLastIncomingMsgNo(seqId);
                     if (msgNo > lastMsg)
                         throw new AxisFault(

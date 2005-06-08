@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * ServerStorageManager is the access point for the SandeshaQueue from server side.  
+ * ServerStorageManager is the access point for the SandeshaQueue from server side.
  *
  * @author Chamikara Jayalath
  * @author Jaliya Ekanayaka
@@ -53,7 +53,9 @@ public class ServerStorageManager implements IStorageManager {
     private ISandeshaDAO accessor;
 
     public ServerStorageManager() {
-        accessor = SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,Constants.SERVER);
+        accessor =
+                SandeshaDAOFactory.getStorageAccessor(Constants.SERVER_QUEUE_ACCESSOR,
+                        Constants.SERVER);
     }
 
     /**
@@ -108,7 +110,7 @@ public class ServerStorageManager implements IStorageManager {
      * This is used to get a random message from the out queue Basically server
      * sender will use this.
      */
-    public synchronized  RMMessageContext getNextMessageToSend() {
+    public synchronized RMMessageContext getNextMessageToSend() {
         RMMessageContext msg;
         msg = accessor.getNextPriorityMessageContextToSend();
         if (msg == null)
@@ -116,10 +118,10 @@ public class ServerStorageManager implements IStorageManager {
         if (msg == null)
             msg = accessor.getNextLowPriorityMessageContextToSend();
 
-       if (msg != null && !msg.isLocked()){
+        if (msg != null && !msg.isLocked()) {
             msg.setLocked(true);
-        return msg;
-        }else{
+            return msg;
+        } else {
             return null;
         }
 
@@ -192,9 +194,9 @@ public class ServerStorageManager implements IStorageManager {
      */
     public void addAcknowledgement(RMMessageContext rmMessageContext) {
         String sequenceID = rmMessageContext.getSequenceID();
-        if(sequenceID!=null)
+        if (sequenceID != null)
             accessor.removeAllAcks(sequenceID);
-        
+
         addPriorityMessage(rmMessageContext);
     }
 
@@ -273,14 +275,6 @@ public class ServerStorageManager implements IStorageManager {
     public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#checkForAcknowledgement(java.lang.String, java.lang.String)
-     */
-    public boolean checkForAcknowledgement(String sequenceId, String requestMsgId) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     /* (non-Javadoc)
@@ -372,19 +366,19 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public void addOffer(String msgID, String offerID) {
-        
+
     }
 
     public String getOffer(String msgID) {
-        return null;  
+        return null;
     }
-    
-    public void clearStorage(){
+
+    public void clearStorage() {
         accessor.clear();
     }
 
     public boolean isSequenceComplete(String seqId) {
-        return false;  
+        return false;
     }
 
     public void sendAck(String sequenceId) {

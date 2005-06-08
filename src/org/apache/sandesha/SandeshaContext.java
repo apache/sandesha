@@ -46,9 +46,9 @@ public class SandeshaContext {
     private static HashMap callMap = new HashMap();
     private static int activeSequenes = 0;
 
-     public SandeshaContext(){
-            SandeshaContext.insideServer = false;
-     }
+    public SandeshaContext() {
+        SandeshaContext.insideServer = false;
+    }
 
     public SandeshaContext(boolean insideServer) {
         SandeshaContext.insideServer = insideServer;
@@ -249,8 +249,7 @@ public class SandeshaContext {
             }
 
             String sourceURL = Constants.HTTP + Constants.COLON + Constants.SLASH +
-                    Constants.SLASH +
-                    addr.getHostAddress() + Constants.COLON +
+                    Constants.SLASH + addr.getHostAddress() + Constants.COLON +
                     PropertyLoader.getClientSideListenerPort() + Constants.URL_RM_SERVICE;
             call.setProperty(Constants.ClientProperties.SOURCE_URL, sourceURL);
         }
@@ -401,11 +400,11 @@ public class SandeshaContext {
     }
 
     public void setSendOffer(Call call) {
-        call.setProperty(Constants.ClientProperties.SEND_OFFER, new Boolean(true));
+        call.setProperty(Constants.ClientProperties.SEND_OFFER, Boolean.valueOf(true));
     }
 
     public void setLastMessage(Call call) {
-        call.setProperty(Constants.ClientProperties.LAST_MESSAGE, new Boolean(true));
+        call.setProperty(Constants.ClientProperties.LAST_MESSAGE, Boolean.valueOf(true));
     }
 
     public boolean isLastMessage(Call call) {
@@ -421,7 +420,7 @@ public class SandeshaContext {
     }
 
     public void setSynchronous(Call call) {
-        call.setProperty(Constants.ClientProperties.SYNC, new Boolean(true));
+        call.setProperty(Constants.ClientProperties.SYNC, Boolean.valueOf(true));
     }
 
     public boolean getSynchronous(Call call) {

@@ -1,3 +1,20 @@
+/*
+ * Copyright  1999-2004 The Apache Software Foundation.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package org.apache.sandesha.server;
 
 import org.apache.axis.MessageContext;
@@ -14,15 +31,13 @@ import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Jaliya
- * Date: May 29, 2005
- * Time: 12:52:37 PM
- * To change this template use File | Settings | File Templates.
+ * This is the worker class for the RMInvoker. RMInvoker instantiate several RMInvokerWorkers to
+ * keep on monitoring SandeshaQueue and invoke the web services. The run method is synchronized
+ * to get the IN-ORDER message invocation.
  */
 public class RMInvokerWorker implements Runnable {
 
-    private IStorageManager storageManager = null;
+    private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMInvokerWorker.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
@@ -65,12 +80,14 @@ public class RMInvokerWorker implements Runnable {
                                 terminateMsg.setOutGoingAddress(replyTo);
                                 getStorageManager().insertTerminateSeqMessage(terminateMsg);
                             } else {
-                                log.error(Constants.ErrorMessages.CANNOT_SEND_THE_TERMINATE_SEQ);
+                                RMInvokerWorker.log.error(
+                                        Constants.ErrorMessages.CANNOT_SEND_THE_TERMINATE_SEQ);
                             }
                         }
-                        //Store the message in the response queue. If there is an application response then that
-                        // response is always sent using a new HTTP connection and the <replyTo> header is
-                        // used in this case. This is done by the RMSender.
+                        //Store the message in the response queue. If there is an application
+                        // response then that response is always sent using a new HTTP connection
+                        // and the <replyTo> header is used in this case. This is done by the
+                        // RMSender.
                         rmMessageContext.setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
 
                         boolean hasResponseSeq = getStorageManager().isResponseSequenceExist(
@@ -87,7 +104,7 @@ public class RMInvokerWorker implements Runnable {
 
 
                         if (firstMsgOfResponseSeq) {
-                            String msgIdStr = Constants.UUID + uuidGen.nextUUID();
+                            String msgIdStr = Constants.UUID + RMInvokerWorker.uuidGen.nextUUID();
 
                             RMMessageContext csRMMsgCtx = RMMessageCreator.createCreateSeqMsg(
                                     rmMessageContext, Constants.SERVER, msgIdStr, null);
@@ -104,9 +121,9 @@ public class RMInvokerWorker implements Runnable {
                     }
                 }
             } catch (InterruptedException error) {
-                log.error(error);
+                RMInvokerWorker.log.error(error);
             } catch (Exception error) {
-                log.error(error);
+                RMInvokerWorker.log.error(error);
             }
         }
     }

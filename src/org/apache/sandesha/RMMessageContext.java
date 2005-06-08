@@ -20,9 +20,9 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.sandesha.ws.rm.RMHeaders;
-import org.apache.sandesha.util.PolicyLoader;
 import org.apache.commons.logging.Log;
+import org.apache.sandesha.util.PolicyLoader;
+import org.apache.sandesha.ws.rm.RMHeaders;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,6 +36,7 @@ import java.util.Iterator;
  * @auther Chamikara Jayalath
  */
 public class RMMessageContext {
+    private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
 
     private MessageContext msgContext;
     private String sequenceID;
@@ -49,7 +50,22 @@ public class RMMessageContext {
     private long fristProcessedTime;
     private long retransmissionTime;
 
-    private boolean locked=false;
+    private boolean locked;
+
+    private long lastSentTime;
+    private boolean sync;
+    private boolean hasResponse;
+    private boolean lastMessage;
+    private long msgNumber;
+    private String sourceURL;
+    private String action;
+    private String from;
+    private String replyTo;
+
+    private boolean ackReceived;
+    private String faultTo;
+    private String acksTo;
+    private String to;
 
     public boolean isLocked() {
         return locked;
@@ -58,7 +74,6 @@ public class RMMessageContext {
     public void setLocked(boolean locked) {
         this.locked = locked;
     }
-
 
     public long getFristProcessedTime() {
         return fristProcessedTime;
@@ -76,28 +91,10 @@ public class RMMessageContext {
         this.retransmissionTime = retransmissionTime;
     }
 
-    private long lastSentTime;
-    private boolean sync;
-    private boolean hasResponse;
-    private boolean lastMessage;
-    private long msgNumber;
-    private String sourceURL;
-    private String action;
-    private String from;
-    private String replyTo;
-
-    private boolean responseReceived;
-    private boolean ackReceived;
-    private String faultTo;
-    private String acksTo = null;
-    private String to;
-
-
-    public RMMessageContext(){
-        this.retransmissionTime=PolicyLoader.getInstance().getBaseRetransmissionInterval();
-        this.fristProcessedTime=0;
+    public RMMessageContext() {
+        retransmissionTime = PolicyLoader.getInstance().getBaseRetransmissionInterval();
+        fristProcessedTime = 0;
     }
-
 
     public boolean isSendOffer() {
         return sendOffer;
@@ -109,7 +106,7 @@ public class RMMessageContext {
 
     private boolean sendOffer;
 
-    private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());
+
     private ArrayList msgIdList = new ArrayList();
 
     public void addToMsgIdList(String msgId) {
@@ -134,13 +131,6 @@ public class RMMessageContext {
 
     public void setAcksTo(String acksTo) {
         this.acksTo = acksTo;
-    }
-
-    /**
-     * @param responseReceived The responseReceived to set.
-     */
-    public void setResponseReceived(boolean responseReceived) {
-        this.responseReceived = responseReceived;
     }
 
 
@@ -280,25 +270,25 @@ public class RMMessageContext {
 
     public void copyContents(RMMessageContext rmMsgContext) {
         if (addressingHeaders != null)
-            rmMsgContext.setAddressingHeaders(this.addressingHeaders);
+            rmMsgContext.setAddressingHeaders(addressingHeaders);
         if (messageID != null)
-            rmMsgContext.setMessageID(this.messageID);
+            rmMsgContext.setMessageID(messageID);
         if (rmHeaders != null)
-            rmMsgContext.setRMHeaders(this.rmHeaders);
+            rmMsgContext.setRMHeaders(rmHeaders);
         if (sequenceID != null)
-            rmMsgContext.setSequenceID(this.sequenceID);
+            rmMsgContext.setSequenceID(sequenceID);
         if (outGoingAddress != null)
-            rmMsgContext.setOutGoingAddress(this.outGoingAddress);
+            rmMsgContext.setOutGoingAddress(outGoingAddress);
         if (msgContext != null)
-            rmMsgContext.setMsgContext(this.msgContext);
+            rmMsgContext.setMsgContext(msgContext);
         if (acksTo != null)
-            rmMsgContext.setAcksTo(this.acksTo);
+            rmMsgContext.setAcksTo(acksTo);
         if (to != null)
-            rmMsgContext.setTo(this.to);
+            rmMsgContext.setTo(to);
 
-        rmMsgContext.setReTransmissionCount(this.reTransmissionCount);
-        rmMsgContext.setLastPrecessedTime(this.lastPrecessedTime);
-        rmMsgContext.setLastMessage(this.isLastMessage());
+        rmMsgContext.setReTransmissionCount(reTransmissionCount);
+        rmMsgContext.setLastPrecessedTime(lastPrecessedTime);
+        rmMsgContext.setLastMessage(isLastMessage());
 
     }
 
@@ -382,7 +372,7 @@ public class RMMessageContext {
             msgContext2.setMaintainSession(msgContext1.getMaintainSession());
 
         } catch (AxisFault e) {
-            log.error(e);
+            RMMessageContext.log.error(e);
         }
 
     }
@@ -411,6 +401,6 @@ public class RMMessageContext {
     }
 
     public String getFaultTo() {
-        return this.faultTo;
+        return faultTo;
     }
 }

@@ -28,8 +28,8 @@ import javax.xml.namespace.QName;
  * @author Jaliy Ekanayake
  */
 public class FaultProcessor implements IRMMessageProcessor {
-    private IStorageManager storageManager = null;
-    private AxisFault axisFault = null;
+    private IStorageManager storageManager;
+    private AxisFault axisFault;
     private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public FaultProcessor(IStorageManager storageManager) {
@@ -42,21 +42,8 @@ public class FaultProcessor implements IRMMessageProcessor {
 
     }
 
-    public IStorageManager getStorageManager() {
-        return storageManager;
-    }
-
-    public void setStorageManager(IStorageManager storageManager) {
-        this.storageManager = storageManager;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.server.msgprocessors.IRMMessageProcessor#processMessage(org.apache.sandesha.RMMessageContext)
-     */
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
-        this.axisFault = new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
+        axisFault = new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
                 Constants.FaultMessages.INVALID_MESSAGE, null, null);
         try {
             return sendFault(rmMessageContext);
@@ -96,14 +83,14 @@ public class FaultProcessor implements IRMMessageProcessor {
                 }
             }
         } else {
-            FaultProcessor.log.error(this.axisFault);
+            FaultProcessor.log.error(axisFault);
             return sendFaultSync(msgContext);
         }
         return true;
     }
 
     private boolean sendFaultSync(MessageContext msgContext) throws Exception {
-        SOAPFault soapFault = new SOAPFault(this.axisFault);
+        SOAPFault soapFault = new SOAPFault(axisFault);
         SOAPEnvelope sEnv = new SOAPEnvelope();
         sEnv.getBody().addChildElement(soapFault);
         msgContext.setResponseMessage(new Message(sEnv));

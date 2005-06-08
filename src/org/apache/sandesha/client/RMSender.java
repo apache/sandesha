@@ -63,8 +63,6 @@ public class RMSender extends BasicHandler {
 
     public void invoke(MessageContext msgContext) throws AxisFault {
 
-        //Initialize the storage manager. We are in the client side So initialize the
-        //Client Storage Manager.
         storageManager = new ClientStorageManager();
 
         try {
@@ -159,8 +157,6 @@ public class RMSender extends BasicHandler {
 
         createSeqRMMsgContext.setSync(sync);
         storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-        // RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(
-        //        reqRMMsgContext);
         processRequestMessage(reqRMMsgContext);
         return reqRMMsgContext;
     }

@@ -51,13 +51,13 @@ public class RMMessageProcessorIdentifier {
             } else if (addrHeaders.getAction().toString().equals(
                     Constants.WSRM.ACTION_TERMINATE_SEQUENCE)) {
                 return new TerminateSequenceProcessor(storageManager);
-            } else if ((rmHeaders.getSequenceAcknowledgement() != null) ||
-                    (rmHeaders.getSequence().getMessageNumber() != null)) {
+            } else if (rmHeaders.getSequenceAcknowledgement() != null ||
+                    rmHeaders.getSequence().getMessageNumber() != null) {
                 return new CompositeProcessor(storageManager);
             } else
                 return new FaultProcessor(storageManager);
-        } else if ((rmHeaders.getSequenceAcknowledgement() != null) ||
-                (rmHeaders.getSequence().getMessageNumber() != null)) {
+        } else if (rmHeaders.getSequenceAcknowledgement() != null ||
+                rmHeaders.getSequence().getMessageNumber() != null) {
             return new CompositeProcessor(storageManager);
         } else
             return new FaultProcessor(storageManager);

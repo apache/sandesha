@@ -19,15 +19,10 @@ package org.apache.sandesha.storage.queue;
 
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.util.PolicyLoader;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 /*
  * Created on Aug 4, 2004 at 5:08:29 PM
@@ -55,15 +50,6 @@ public class OutgoingSequence {
     private static final Log log = LogFactory.getLog(OutgoingSequence.class.getName());
     public boolean terminateSent = false;
     private boolean hasResponse = false;
-    private String offer;
-
-    public String getOffer() {
-        return offer;
-    }
-
-    public void setOffer(String offer) {
-        this.offer = offer;
-    }
 
     public boolean hasResponse() {
         return hasResponse;
@@ -78,7 +64,7 @@ public class OutgoingSequence {
     }
 
     public void setTerminateSent(boolean terminateSent) {
-           this.terminateSent = terminateSent;
+        this.terminateSent = terminateSent;
     }
 
     public OutgoingSequence(String sequenceId) {
@@ -96,10 +82,6 @@ public class OutgoingSequence {
 
     public String getSequenceId() {
         return sequenceId;
-    }
-
-    public void setSequenceId(String sequenceId) {
-        this.sequenceId = sequenceId;
     }
 
     public boolean isOutSeqApproved() {
@@ -136,21 +118,6 @@ public class OutgoingSequence {
     }
 
     /**
-     * Removes a message from the hash map.
-     */
-    public boolean removeMessage(long id) {
-        //TODO: Add messageremoving code if needed.
-        boolean removed = false;
-
-        Long key = new Long(id);
-        Object obj = hash.remove(key);
-
-        if (obj != null)
-            removed = true;
-        return removed;
-    }
-
-    /**
      * Returns the next deliverable message if has any. Otherwise returns null.
      */
     public RMMessageContext getNextMessageToSend() {
@@ -167,8 +134,8 @@ public class OutgoingSequence {
             long lastSentTime = tempMsg.getLastSentTime();
             Date d = new Date();
             long currentTime = d.getTime();
-            
-            long retransmissionInterval = PolicyLoader.getInstance().getBaseRetransmissionInterval(); 
+
+            long retransmissionInterval = PolicyLoader.getInstance().getBaseRetransmissionInterval();
             if (currentTime >= lastSentTime + retransmissionInterval) {
                 if (minMsg == null)
                     minMsg = tempMsg;
@@ -251,12 +218,13 @@ public class OutgoingSequence {
 
     public boolean hasMessageWithId(String msgId) {
         Iterator it = hash.keySet().iterator();
-        boolean result=false;
+        boolean result = false;
         while (it.hasNext()) {
-         RMMessageContext msg = (RMMessageContext) hash.get(it.next());
-            if (msg.getMessageID().equals(msgId)){
+            RMMessageContext msg = (RMMessageContext) hash.get(it.next());
+            if (msg.getMessageID().equals(msgId)) {
                 result = true;
-                break;  }
+                break;
+            }
         }
         return result;
     }
@@ -272,24 +240,6 @@ public class OutgoingSequence {
             result.add(new Long(l));
         }
         return result;
-    }
-
-    public void setResponseReceived(String msgID) {
-        Iterator it = hash.keySet().iterator();
-        while (it.hasNext()) {
-            RMMessageContext msg = (RMMessageContext) hash.get(it.next());
-            if (msg.getMessageID().equals(msgID))
-                msg.setResponseReceived(true);
-        }
-    }
-
-    public void setAckReceived(String msgID) {
-        Iterator it = hash.keySet().iterator();
-        while (it.hasNext()) {
-            RMMessageContext msg = (RMMessageContext) hash.get(it.next());
-            if (msg.getMessageID().equals(msgID))
-                msg.setAckReceived(true);
-        }
     }
 
     public void setAckReceived(long msgNo) {
@@ -328,17 +278,6 @@ public class OutgoingSequence {
             e.printStackTrace();
             return false;
         }
-    }
-
-    private long getLastMessage() {
-        Iterator it = hash.keySet().iterator();
-        while (it.hasNext()) {
-            RMMessageContext msg = (RMMessageContext) hash.get(it.next());
-            if (msg.isLastMessage()) {
-                return msg.getMsgNumber();
-            }
-        }
-        return -1;
     }
 
     public void addMsgToSendList(long msgNo) {

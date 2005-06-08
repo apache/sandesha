@@ -37,12 +37,10 @@ public class TerminateSequenceProcessor implements IRMMessageProcessor {
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
 
         TerminateSequence terminateSeq = rmMessageContext.getRMHeaders().getTerminateSequence();
-
         if (terminateSeq != null && terminateSeq.getIdentifier() != null) {
             String seqID = terminateSeq.getIdentifier().getIdentifier();
             storageManger.setTerminateReceived(seqID);
         }
-
         return false;
     }
 

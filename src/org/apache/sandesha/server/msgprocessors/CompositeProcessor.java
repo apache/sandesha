@@ -27,7 +27,6 @@ import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.dao.SandeshaQueueDAO;
-import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 import javax.xml.namespace.QName;
@@ -39,18 +38,18 @@ import javax.xml.namespace.QName;
  */
 public class CompositeProcessor implements IRMMessageProcessor {
 
-    private IStorageManager storageManager = null;
+    private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(SandeshaQueueDAO.class.getName());
 
     public CompositeProcessor(IStorageManager storageManger) {
-        this.storageManager = storageManger;
+        storageManager = storageManger;
     }
 
     public boolean processMessage(RMMessageContext rmMessageContext) throws AxisFault {
 
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
         AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
-        AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor(this.storageManager);
+        AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor(storageManager);
         if (rmHeaders.getSequenceAcknowledgement() != null) {
             ackProcessor.processMessage(rmMessageContext);
         }
@@ -71,7 +70,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
                 if (!hasSequence) {
                     storageManager.addIncomingSequence(seqId);
                 }
-                if (storageManager.isMessageExist(seqId, messageNumber) != true) {
+                if (!storageManager.isMessageExist(seqId, messageNumber)) {
                     //Create a copy of the RMMessageContext.
                     RMMessageContext rmMsgContext = new RMMessageContext();
                     //Copy the RMMEssageContext
@@ -79,9 +78,13 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     rmMsgContext.setSequenceID(sequenceUUID);
                     rmMsgContext.setMsgNumber(messageNumber);
                     try {
-                        MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
-                        RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(), msgContext);
-                        String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope().toString();
+                        MessageContext msgContext = new MessageContext(
+                                rmMessageContext.getMsgContext().getAxisEngine());
+                        RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(),
+                                msgContext);
+                        String soapMsg = rmMessageContext.getMsgContext().getRequestMessage()
+                                .getSOAPEnvelope()
+                                .toString();
                         Message reqMsg = new Message(soapMsg);
 
                         msgContext.setRequestMessage(reqMsg);
@@ -89,23 +92,23 @@ public class CompositeProcessor implements IRMMessageProcessor {
                         rmMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
                     } catch (Exception e) {
                         log.error(e);
-                        throw new AxisFault(new QName(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR), Constants.FaultMessages.SERVER_INTERNAL_ERROR, null, null);
+                        throw new AxisFault(
+                                new QName(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR),
+                                Constants.FaultMessages.SERVER_INTERNAL_ERROR, null, null);
                     }
                     storageManager.insertIncomingMessage(rmMsgContext);
                 }
 
-                 // refresh the ack for every message arrived
-                 //But send only if needed.
-                 if(rmHeaders.getAckRequest()!=null ||rmHeaders.getSequence().getLastMessage()!=null){                     
-                     storageManager.sendAck(sequenceUUID); 
-                     return ackProcessor.sendAcknowledgement(rmMessageContext);
-                 } else{
-                     boolean sync=ackProcessor.sendAcknowledgement(rmMessageContext);
-                     if(sync)
-                         return true;
-                     else
-                         return false;
-                 }
+                // refresh the ack for every message arrived
+                //But send only if needed.
+                if (rmHeaders.getAckRequest() != null ||
+                        rmHeaders.getSequence().getLastMessage() != null) {
+                    storageManager.sendAck(sequenceUUID);
+                    return ackProcessor.sendAcknowledgement(rmMessageContext);
+                } else {
+                    boolean sync = ackProcessor.sendAcknowledgement(rmMessageContext);
+                    return sync;
+                }
             }
         }
         return false;

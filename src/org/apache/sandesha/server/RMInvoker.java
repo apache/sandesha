@@ -16,7 +16,9 @@
  */
 package org.apache.sandesha.server;
 
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.threadpool.ThreadPool;
+import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 
 /**
@@ -27,10 +29,11 @@ import org.apache.sandesha.Constants;
  */
 public class RMInvoker {
     private static boolean invokerStarted = false;
+    private static final Log log = LogFactory.getLog(RMInvoker.class.getName());
 
     public void startInvoker() {
         if (!invokerStarted) {
-            System.out.println(Constants.InfomationMessage.RMINVOKER_STARTED);
+            log.info(Constants.InfomationMessage.RMINVOKER_STARTED);
             ThreadPool tPool = new ThreadPool(Constants.INVOKER_THREADS);
             for (int i = 0; i < Constants.INVOKER_THREADS; i++) {
                 RMInvokerWorker rmWorker = new RMInvokerWorker();

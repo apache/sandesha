@@ -62,9 +62,8 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             long msgNumber = ackRange.getMinValue();
             while (ackRange.getMaxValue() >= msgNumber) {
                 if (!storageManager.isSentMsg(seqID, msgNumber)) {
-                    throw new AxisFault(
-                            new javax.xml.namespace.QName(
-                                    Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT),
+                    throw new AxisFault(new javax.xml.namespace.QName(
+                            Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT),
                             Constants.FaultMessages.INVALID_ACKNOWLEDGEMENT, null, null);
                 }
                 storageManager.setAckReceived(seqID, msgNumber);
@@ -72,7 +71,6 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
                 msgNumber++;
             }
         }
-        //At the moment this return is not used.
         return false;
     }
 
@@ -133,8 +131,8 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             msgContext.setResponseMessage(resMsg);
             rmMsgContext.setMsgContext(msgContext);
 
-            //Get the from address to send the Ack. Doesn't matter whether we have Sync or ASync messages.
-            //If we have Sync them this property is not used.
+            //Get the from address to send the Ack. Doesn't matter whether we have Sync or
+            // ASync messages. If we have Sync them this property is not used.
             rmMsgContext.setOutGoingAddress(to);
             rmMsgContext.setMessageType(Constants.MSG_TYPE_ACKNOWLEDGEMENT);
         } catch (Exception e) {

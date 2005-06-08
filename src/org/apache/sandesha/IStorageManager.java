@@ -61,8 +61,6 @@ public interface IStorageManager {
 
     RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId);
 
-    boolean checkForAcknowledgement(String sequenceId, String requestMsgId);
-
     void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage);
 
     boolean isAllSequenceComplete();

@@ -119,14 +119,7 @@ public interface ISandeshaDAO {
      */
     Set getAllReceivedMsgNumsOfIncomingSeq(String sequenceId);
 
-    
-    /**
-     * Gives a set of message numbers of messages present in the queue for
-     *  the given sequence.
-     */
-    Set getAllReceivedMsgNumsOfOutgoingSeq(String sequenceId);
 
-    
     /**
      * This sets the outgoing sequence. Here seqId is the entry in the queue
      * that we hope to hold the messages of a perticular sequence. outseqid is the 
@@ -153,12 +146,6 @@ public interface ISandeshaDAO {
      */
     String getSequenceOfOutSequence(String outsequenceId);
 
-    
-    /**
-     * Removes the outgoing message from the sequence entry to the bin. 
-     * (so that they will not be re-transmitted)
-     */
-    void moveOutgoingMessageToBin(String sequenceId, Long msgNo);
 
     /**
      * This checks the priority queue for a message if given messageid and 
@@ -180,12 +167,6 @@ public interface ISandeshaDAO {
     public RMMessageContext checkForResponseMessage(String requestId, String seqId);
 
     /**
-     *This checks weather a message with given message id is present in the request sequence 
-     *given. 
-     */
-    public boolean isRequestMessagePresent(String sequenceId, String msgId);
-
-    /**
      * Tries to give the sequence id of the outgoing message with the given message id
      */
     public String searchForSequenceId(String messageId);
@@ -196,17 +177,6 @@ public interface ISandeshaDAO {
      */
     public void markOutgoingMessageToDelete(String sequenceId, Long msgNumber);
 
-    /**
-     * Should check weather all the outgoing messages have received acks. Otherwise
-     * should return false.
-     */
-    public boolean compareAcksWithSequence(String sequenceId);
-
-    /**
-     *Acks the storage to set the request message relating to the response message passed as a
-     *parameter as got response. 
-     */
-    public void setResponseReceived(RMMessageContext msg);
 
     /**
      * Tells to the rtorage that the given message of given sequence was acked.
@@ -237,16 +207,6 @@ public interface ISandeshaDAO {
      */
     public boolean isSentMsg(String seqId, long msgNo);
 
-    
-    /**
-     * Asks weather the storage has got the last message of the outgoing sequence.
-     */
-    public boolean hasLastOutgoingMsgReceived(String seqId);
-
-    /**
-     * Asks for the message no. of the last message of the given sequence.
-     */
-    public long getLastOutgoingMsgNo(String seqId);
 
     /**
      * Can be used to ckeck weather the last message has been received in the 
@@ -282,11 +242,6 @@ public interface ISandeshaDAO {
     public String getKeyFromOutgoingSequenceId(String outgoingSeqID);
 
     /**
-     * Gets a iterator of all outgoing sequence ids.
-     */
-    public Iterator getAllOutgoingSequences();
-
-    /**
      * Sets this after sending the terminate sequence message.
      */
     public void setTerminateSend(String seqId);
@@ -306,8 +261,6 @@ public interface ISandeshaDAO {
      * been received.
      */
     public boolean isAllIncommingTerminateReceived();
-    
-    public String getFirstCreateSequenceMsgId(String createSeqId);
 
     /**
      * Set the acks to of the given sequence.

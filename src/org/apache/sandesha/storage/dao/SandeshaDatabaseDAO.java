@@ -16,12 +16,8 @@
  */
 package org.apache.sandesha.storage.dao;
 
-import org.apache.axis.components.logger.LogFactory;
-import org.apache.commons.logging.Log;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.storage.queue.SandeshaQueue;
 
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -30,9 +26,7 @@ import java.util.Set;
  */
 
 public class SandeshaDatabaseDAO implements ISandeshaDAO {
-       private byte endPoint;
-    SandeshaDatabaseDAO(byte endPoint){
-        this.endPoint= endPoint;
+    SandeshaDatabaseDAO(byte endPoint) {
     }
 
     public String getAcksTo(String seqId) {
@@ -41,10 +35,6 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     }
 
     public void addOffer(String msgID, String offerID) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void setOffer(String seqID, String Offer) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -57,26 +47,9 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
 
     }
 
-    public String getFirstCreateSequenceMsgId(String createSeqId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    private static final Log log = LogFactory.getLog(SandeshaDatabaseDAO.class.getName());
 
     public void setAckReceived(String seqId, long msgNo) {
         // TODO Auto-generated method stub
-    }
-
-    public void setResponseReceived(RMMessageContext msg) {
-        // TODO Auto-generated method stub
-    }
-
-    public boolean isOutgoingTerminateSent() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public boolean isIncommingTerminateReceived() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void addRequestedSequence(String seqId) {
@@ -101,11 +74,6 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         return false;
     }
 
-    public RMMessageContext getNextMessageToSend() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public boolean addMessageToIncomingSequence(String sequenceId, Long msgNo,
                                                 RMMessageContext rmMessageContext) {
         // TODO Auto-generated method stub
@@ -120,11 +88,6 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public RMMessageContext getNextMsgContextToProcess(String sequenceId) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public boolean hasNewMessages() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     public String getRandomSeqIdToProcess() {
@@ -151,11 +114,6 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public boolean addOutgoingSequence(String sequenceId) {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    public Set getAllReceivedMsgNumsOfOutgoingSeq(String sequenceId) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public RMMessageContext getNextPriorityMessageContextToSend() {
@@ -188,11 +146,6 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         return null;
     }
 
-    public void moveOutgoingMessageToBin(String sequenceId, Long msgNo) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void removeCreateSequenceMsg(String messageId) {
         // TODO Auto-generated method stub
 
@@ -210,18 +163,8 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     }
 
 
-    public boolean isRequestMessagePresent(String sequenceId, String msgId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     public String searchForSequenceId(String messageId) {
         return null;
-    }
-
-    public boolean compareAcksWithSequence(String sequenceId) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     public void addLowPriorityMessage(RMMessageContext msg) {
@@ -244,17 +187,7 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         return 0;
     }
 
-    public long getLastOutgoingMsgNo(String seqId) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     public boolean hasLastIncomingMsgReceived(String seqId) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean hasLastOutgoingMsgReceived(String seqId) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -274,10 +207,6 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         return null;
     }
 
-    public Iterator getAllOutgoingSequences() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
     public void setTerminateSend(String seqId) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -294,7 +223,7 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void clear(){
+    public void clear() {
 
     }
 
@@ -308,10 +237,10 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
 
     public void updateFinalMessageArrivedTime(String sequenceID) {
     }
-    
+
     public void sendAck(String sequenceId) {
     }
-    
-    public void removeAllAcks(String sequenceID){
+
+    public void removeAllAcks(String sequenceID) {
     }
 }

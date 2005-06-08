@@ -17,10 +17,7 @@
 
 package org.apache.sandesha.storage.queue;
 
-import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.message.addressing.RelatesTo;
-import org.apache.commons.logging.Log;
-import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 
 import java.util.*;
@@ -42,9 +39,7 @@ public class IncomingSequence {
     private HashMap hash;
     private boolean beingProcessedLock = false; //When true messages are
     private long lastMsgNo = -1;
-    private String acksTo = null;
-    private String offer;
-    private long finalMsgArrivedTime = 0;   //this is the time the latest application msg was arrived (
+    private long finalMsgArrivedTime = 0; //this is the time the latest application msg was arrived
     private long finalAckedTime = 0;
     private boolean sendAck = false;
 
@@ -55,7 +50,7 @@ public class IncomingSequence {
     public void setFinalAckedTime(long finalAckedTime) {
         this.finalAckedTime = finalAckedTime;
     }
-    
+
     public long getFinalMsgArrivedTime() {
         return finalMsgArrivedTime;
     }
@@ -71,22 +66,6 @@ public class IncomingSequence {
     public void setSendAck(boolean sendAck) {
         this.sendAck = sendAck;
     }
-    
-    public String getOffer() {
-        return offer;
-    }
-
-    public void setOffer(String offer) {
-        this.offer = offer;
-    }
-
-    public void setAcksTo(String ack) {
-        acksTo = ack;
-    }
-
-    public String getAcksTo() {
-        return acksTo;
-    }
 
     private boolean terminateReceived = false;
 
@@ -97,8 +76,6 @@ public class IncomingSequence {
     public void setTerminateReceived(boolean terminateReceived) {
         this.terminateReceived = terminateReceived;
     }
-
-    private static final Log log = LogFactory.getLog(IncomingSequence.class.getName());
 
     public IncomingSequence(String sequenceId) {
         lastProcessed = 0;
@@ -128,21 +105,6 @@ public class IncomingSequence {
         //this.msgNumbers.add(key);
         refreshHasProcessableMessages();
         return obj;
-    }
-
-    public boolean removeMessage(long msgId) {
-        boolean removed = false;
-        Long key = new Long(msgId);
-        Object obj = hash.remove(key);
-
-        if (obj != null)
-            removed = true;
-        return removed;
-    }
-
-    public long getNextMessageIdToProcess() {
-        long id = lastProcessed + 1;
-        return id;
     }
 
     public RMMessageContext getNextMessageToProcess() {
@@ -248,24 +210,6 @@ public class IncomingSequence {
         }
 
         return msgToSend;
-    }
-
-    public boolean isMessagePresent(String msgId) {
-        boolean b = false;
-
-        b = hash.containsKey(msgId);
-        return b;
-    }
-
-    public boolean hasMessageWithId(String msgId) {
-        Iterator it = hash.keySet().iterator();
-
-        while (it.hasNext()) {
-            RMMessageContext msg = (RMMessageContext) it.next();
-            if (msg.getMessageID().equals(msgId))
-                return true;
-        }
-        return false;
     }
 
     public boolean hasLastMsgReceived() {

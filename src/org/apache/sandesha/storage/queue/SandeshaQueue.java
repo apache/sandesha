@@ -24,10 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.util.PolicyLoader;
-import org.apache.sandesha.ws.rm.AcknowledgementRange;
-import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
-
-import sun.nio.cs.HistoricallyNamedCharset;
 
 import java.util.*;
 
@@ -81,14 +77,6 @@ public class SandeshaQueue {
             return serverQueue;
         }
 
-    }
-
-    /**
-     * This will not replace messages automatically.
-     */
-
-    public Iterator getAllOutgoingSequences() {
-        return outgoingMap.keySet().iterator();
     }
 
     public boolean addMessageToIncomingSequence(String seqId, Long messageNo,
@@ -147,18 +135,6 @@ public class SandeshaQueue {
         return successful;
     }
 
-    public boolean messagePresentInIncomingSequence(String sequenceId, Long messageNo)
-            throws QueueException {
-        IncomingSequence seqHash = (IncomingSequence) incomingMap.get(sequenceId);
-
-        if (seqHash == null)
-            throw new QueueException(Constants.Queue.SEQUENCE_NOTPRESENT);
-
-        synchronized (seqHash) {
-            return seqHash.hasMessage(messageNo);
-        }
-    }
-
     public boolean isIncomingSequenceExists(String seqId) {
         synchronized (incomingMap) {
             return incomingMap.containsKey(seqId);
@@ -168,25 +144,6 @@ public class SandeshaQueue {
     public boolean isOutgoingSequenceExists(String resSeqId) {
         synchronized (outgoingMap) {
             return outgoingMap.containsKey(resSeqId);
-        }
-    }
-
-    public String nextIncomingSequenceIdToProcess() {
-        synchronized (incomingMap) {
-            int count = incomingMap.size();
-            Iterator it = incomingMap.keySet().iterator();
-            IncomingSequence sh = null;
-            String seqId = null;
-
-            whileLoop: while (it.hasNext()) {
-                String tempSeqId = (String) it.next();
-                sh = (IncomingSequence) incomingMap.get(tempSeqId);
-                if (sh.hasProcessableMessages()) {
-                    seqId = tempSeqId;
-                    break whileLoop;
-                }
-            }
-            return seqId;
         }
     }
 
@@ -333,34 +290,36 @@ public class SandeshaQueue {
                                 //since last message arrived.
                                 
                                 String sequenceId = tempMsg.getSequenceID();
-                            	if(sequenceId==null)
-                            	    continue;
-                            	
-                            	String key = getKeyFromIncomingSequenceId(sequenceId);
-                            	IncomingSequence sequence = (IncomingSequence) incomingMap.get(key);
-                            	if(sequence==null)
-                            	    continue;
-                            	
-                            	d = new Date ();
-                            	currentTime = d.getTime();
-                            	
-                            	if(sequence.isSendAck()){
-                            	    
+                                if (sequenceId == null)
+                                    continue;
+
+                                String key = getKeyFromIncomingSequenceId(sequenceId);
+                                IncomingSequence sequence = (IncomingSequence) incomingMap.get(key);
+                                if (sequence == null)
+                                    continue;
+
+                                d = new Date();
+                                currentTime = d.getTime();
+
+                                if (sequence.isSendAck()) {
+
                                     tempMsg.setLastSentTime(currentTime);
                                     msg = tempMsg;
                                     sequence.setSendAck(false);
                                     sequence.setFinalAckedTime(currentTime);
                                     break forLoop;
-                                    
-                            	}else{
-                                	long ackInterval = PolicyLoader.getInstance().getAcknowledgementInterval();
-                                	long finalAckedTime = sequence.getFinalAckedTime();
-                                	long finalMsgArrivedTime = sequence.getFinalMsgArrivedTime();
-                                	 
-                                	if((finalMsgArrivedTime>finalAckedTime) && (currentTime>finalMsgArrivedTime+ackInterval))
-                                	    sequence.setSendAck(true);
-                            	}
-                            	
+
+                                } else {
+                                    long ackInterval = PolicyLoader.getInstance()
+                                            .getAcknowledgementInterval();
+                                    long finalAckedTime = sequence.getFinalAckedTime();
+                                    long finalMsgArrivedTime = sequence.getFinalMsgArrivedTime();
+
+                                    if ((finalMsgArrivedTime > finalAckedTime) &&
+                                            (currentTime > finalMsgArrivedTime + ackInterval))
+                                        sequence.setSendAck(true);
+                                }
+
                                 break;
                             default:
                                 highPriorityQueue.remove(i);
@@ -375,14 +334,6 @@ public class SandeshaQueue {
 
             return msg;
 
-        }
-    }
-
-    public Vector nextAllMessagesToProcess(String sequenceId) throws QueueException {
-        IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
-        synchronized (sh) {
-            Vector v = sh.getNextMessagesToProcess();
-            return v;
         }
     }
 
@@ -411,34 +362,13 @@ public class SandeshaQueue {
         queueBin.clear();
     }
 
-    public void removeAllMsgsFromIncomingSeqence(String seqId, boolean yes) {
-        if (!yes)
-            return;
-        IncomingSequence sh = (IncomingSequence) incomingMap.get(seqId);
-        sh.clearSequence(yes);
-    }
-
-    public void removeAllMsgsFromOutgoingSeqence(String seqId, boolean yes) {
-        if (!yes)
-            return;
-        OutgoingSequence sh = (OutgoingSequence) outgoingMap.get(seqId);
-        sh.clearSequence(yes);
-    }
-
-    public void removeIncomingSequence(String sequenceId, boolean yes) {
-        if (!yes)
-            return;
-        incomingMap.remove(sequenceId);
-    }
-
-    public void removeOutgoingSequence(String sequenceId, boolean yes) {
-        if (!yes)
-            return;
-
-        synchronized (outgoingMap) {
-            outgoingMap.remove(sequenceId);
-        }
-    }
+    // --Commented out by Inspection START (6/8/05 1:19 PM):
+    //    public void removeIncomingSequence(String sequenceId, boolean yes) {
+    //        if (!yes)
+    //            return;
+    //        incomingMap.remove(sequenceId);
+    //    }
+    // --Commented out by Inspection STOP (6/8/05 1:19 PM)
 
     public void setSequenceLock(String sequenceId, boolean lock) {
         IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
@@ -451,14 +381,6 @@ public class SandeshaQueue {
             return sh.getAllKeys();
         else
             return null;
-    }
-
-    public Set getAllReceivedMsgNumsOfOutgoingSeq(String sequenceId) {
-        Vector v = new Vector();
-        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(sequenceId);
-        synchronized (rsh) {
-            return rsh.getAllKeys();
-        }
     }
 
     public boolean isIncomingMessageExists(String sequenceId, Long messageNo) {
@@ -573,31 +495,6 @@ public class SandeshaQueue {
         System.out.println("\n");
     }
 
-    public void moveOutgoingMsgToBin(String sequenceId, Long messageNo) {
-        String sequence = getSequenceOfOutSequence(sequenceId);
-        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(sequence);
-
-        if (rsh == null) {
-            System.out.println(Constants.Queue.RESPONSE_SEQ_NULL);
-            return;
-        }
-
-        synchronized (rsh) {
-            //Deleting retuns the deleted message.
-            RMMessageContext msg = rsh.deleteMessage(messageNo);
-            //If we jave already deleted then no message to return.
-            if (msg != null) {
-
-                String msgId = msg.getMessageID();
-                log.info("INFO: Moving out going messages to bin");
-                //Add msg to bin if id isnt null.
-                if (msgId != null)
-                    queueBin.put(msgId, msg);
-            }
-
-        }
-    }
-
     public void markOutgoingMessageToDelete(String sequenceId, Long messageNo) {
         String sequence = getSequenceOfOutSequence(sequenceId);
         OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(sequence);
@@ -616,17 +513,17 @@ public class SandeshaQueue {
     }
 
     public void movePriorityMsgToBin(String messageId) {
-      
+
         synchronized (highPriorityQueue) {
             int size = highPriorityQueue.size();
             for (int i = 0; i < size; i++) {
                 RMMessageContext msg = (RMMessageContext) highPriorityQueue.get(i);
-                
+
                 String tempMsgId;
-                try{
+                try {
                     tempMsgId = (String) msg.getMessageIdList().get(0);
-                }catch(Exception ex){
-                     tempMsgId = msg.getMessageID();
+                } catch (Exception ex) {
+                    tempMsgId = msg.getMessageID();
                 }
                 if (tempMsgId.equals(messageId)) {
                     highPriorityQueue.remove(i);
@@ -667,20 +564,6 @@ public class SandeshaQueue {
         }
     }
 
-    public boolean isRequestMsgPresent(String seqId, String messageId) {
-        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-        if (rsh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
-            return false;
-        }
-        boolean present = false;
-        synchronized (rsh) {
-            present = rsh.isMessagePresent(messageId);
-        }
-        return present;
-
-    }
-
     public String searchForSequenceId(String messageId) {
         Iterator it = outgoingMap.keySet().iterator();
 
@@ -704,69 +587,6 @@ public class SandeshaQueue {
         return key;
     }
 
-    public Vector getAllAckedMsgNumbers(String seqId) {
-        Vector msgNumbers = new Vector();
-
-        Iterator it = highPriorityQueue.iterator();
-        while (it.hasNext()) {
-            RMMessageContext msg = (RMMessageContext) it.next();
-            if (msg.getMessageType() != Constants.MSG_TYPE_ACKNOWLEDGEMENT)
-                continue;
-
-            SequenceAcknowledgement seqAck = msg.getRMHeaders().getSequenceAcknowledgement();
-            String sId = seqAck.getIdentifier().getIdentifier();
-            if (seqId != sId) //Sorry. Wrong sequence.
-                continue;
-
-            List ackList = seqAck.getAckRanges();
-            Iterator ackIt = ackList.iterator();
-            while (ackIt.hasNext()) {
-                AcknowledgementRange ackRng = (AcknowledgementRange) ackIt.next();
-                long min = ackRng.getMinValue();
-                long temp = min;
-                while (temp <= ackRng.getMaxValue()) {
-                    Long lng = new Long(temp);
-                    if (!msgNumbers.contains(lng)) //vector cant hv duplicate
-                    // entries.
-                        msgNumbers.add(new Long(temp));
-                    temp++;
-                }
-            }
-        }
-        return msgNumbers;
-    }
-
-    public Vector getAllOutgoingMsgNumbers(String seqId) {
-        Vector msgNumbers = new Vector();
-        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-        if (rsh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
-            return msgNumbers;
-        }
-        synchronized (rsh) {
-            msgNumbers = rsh.getReceivedMsgNumbers();
-        }
-        return msgNumbers;
-    }
-
-    public void setResponseReceived(RMMessageContext responseMsg) {
-        String requestMsgID = responseMsg.getAddressingHeaders().getRelatesTo().toString();
-        Iterator it = outgoingMap.keySet().iterator();
-
-        String key = null;
-        while (it.hasNext()) {
-            key = (String) it.next();
-            Object obj = outgoingMap.get(key);
-            if (obj != null) {
-                OutgoingSequence hash = (OutgoingSequence) obj;
-                boolean hasMsg = hash.hasMessageWithId(requestMsgID);
-                if (!hasMsg)
-                //set the property response received
-                    hash.setResponseReceived(requestMsgID);
-            }
-        }
-    }
-
     public void setAckReceived(String seqId, long msgNo) {
         Iterator it = outgoingMap.keySet().iterator();
         String key = null;
@@ -782,13 +602,6 @@ public class SandeshaQueue {
             }
         }
 
-    }
-
-    public Vector getAllIncommingMsgNumbers(String seqId) {
-        Vector msgNumbers = new Vector();
-        incomingMap.get(seqId);
-        //Not implemented yet.
-        return msgNumbers;
     }
 
     public RMMessageContext getLowPriorityMessageIfAcked() {
@@ -839,30 +652,6 @@ public class SandeshaQueue {
         }
         synchronized (rsh) {
             return rsh.isMsgInSentList(msgNo);
-        }
-    }
-
-    public boolean hasLastOutgoingMsgReceived(String seqId) {
-
-        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-
-        if (rsh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
-        }
-        synchronized (rsh) {
-            return rsh.hasLastMsgReceived();
-        }
-    }
-
-    public long getLastOutgoingMsgNo(String seqId) {
-        OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-
-        if (rsh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
-
-        }
-        synchronized (rsh) {
-            return rsh.getLastMsgNumber();
         }
     }
 
@@ -1009,43 +798,12 @@ public class SandeshaQueue {
         ics.setTerminateReceived(true);
     }
 
-    public String getFirstCreateSequenceMsgId(String createSeqId) {
-
-        synchronized (highPriorityQueue) {
-
-            Iterator it = highPriorityQueue.iterator();
-            while (it.hasNext()) {
-                RMMessageContext msg = (RMMessageContext) it.next();
-                boolean contains = msg.getMessageIdList().contains(createSeqId);
-                if (contains) {
-                    return ((String) msg.getMessageIdList().get(0));
-                }
-            }
-        }
-
-        return null;
-
-    }
-
     public void setAcksTo(String seqId, String acksTo) {
 
         if (seqId == null) {
-            System.out.println("ERROR: seq is null");
+            log.error("ERROR: seq is null in setAcksTo");
             return;
         }
-
-        /* Iterator it = incomingMap.keySet().iterator();
-
-         while(it.hasNext()){
-             String key = (String) it.next();
-             if(key.equals(seqId)){
-                 IncomingSequence ics = (IncomingSequence) incomingMap.get(key);
-                 if(ics!=null){
-                     ics.setAcksTo(acksTo);
-                     break;
-                 }
-             }
-         }   */
 
         acksToMap.put(seqId, acksTo);
     }
@@ -1053,34 +811,24 @@ public class SandeshaQueue {
     public String getAcksTo(String seqId) {
 
         if (seqId == null) {
-            System.out.println("ERROR: seq is null");
+            log.error("ERROR: seq is null in getAcksTo");
             return null;
         }
-        
-        /*IncomingSequence ics = (IncomingSequence) incomingMap.get(seqId);
-        
-        if(ics!=null){
-            return ics.getAcksTo();
-        }else {
-            System.out.println("ERROR: ics null");
-            return null;
-        } */
 
         return (String) acksToMap.get(seqId);
     }
 
 
     public void addOffer(String msgID, String offerID) {
-
         if (msgID == null) {
-            System.out.println("ERROR: seq is null");
+            log.error(" MessageID is null in addOffer");
         }
         offerMap.put(msgID, offerID);
     }
 
     public String getOffer(String msgID) {
         if (msgID == null) {
-            System.out.println("ERROR: seq is null");
+            log.error(" MessageID is null in getOffer");
             return null;
         }
         return (String) offerMap.get(msgID);
@@ -1115,36 +863,37 @@ public class SandeshaQueue {
         }
 
     }
-    
-    public void updateFinalMessageArrivedTime(String sequenceId){
+
+    public void updateFinalMessageArrivedTime(String sequenceId) {
         synchronized (incomingMap) {
             IncomingSequence ics = (IncomingSequence) incomingMap.get(sequenceId);
-            if(ics==null)
+            if (ics == null)
                 return;
-            
+
             Date d = new Date();
             long time = d.getTime();
             ics.setFinalMsgArrivedTime(time);
         }
     }
-    
-    public void sendAck(String sequenceId){
+
+    public void sendAck(String sequenceId) {
         synchronized (incomingMap) {
             IncomingSequence ics = (IncomingSequence) incomingMap.get(sequenceId);
-            if(ics==null)
+            if (ics == null)
                 return;
-            
-           ics.setSendAck(true);
+
+            ics.setSendAck(true);
         }
     }
-    
-    public void removeAllAcks (String sequenceID){
-        synchronized (highPriorityQueue){
+
+    public void removeAllAcks(String sequenceID) {
+        synchronized (highPriorityQueue) {
             int size = highPriorityQueue.size();
-            
-            for(int i=0;i<size;i++){
+
+            for (int i = 0; i < size; i++) {
                 RMMessageContext msg = (RMMessageContext) highPriorityQueue.get(i);
-                if(msg.getSequenceID().equals(sequenceID) && msg.getMessageType()==Constants.MSG_TYPE_ACKNOWLEDGEMENT)
+                if (msg.getSequenceID().equals(sequenceID) &&
+                        msg.getMessageType() == Constants.MSG_TYPE_ACKNOWLEDGEMENT)
                     highPriorityQueue.remove(i);
             }
         }

@@ -22,7 +22,6 @@ import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 
 import javax.xml.namespace.QName;
-import java.net.UnknownHostException;
 
 /**
  * This class is used to get the client side properties and to set them to the RMMessageContext.
@@ -198,7 +197,6 @@ public class ClientPropertyValidator {
             return errorMsg;
         }
 
-        //        if ((msgNumber == 0) || (action == null)) {
         if ((action == null)) {
             errorMsg = Constants.ErrorMessages.MESSAGE_NUMBER_NOT_SPECIFIED;
             return errorMsg;
