@@ -40,7 +40,7 @@ public class RMInvokerWorker implements Runnable {
     }
 
 
-    public void run() {
+    public synchronized void run() {
         while (true) {
             try {
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);

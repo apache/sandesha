@@ -61,7 +61,7 @@ public class ServerStorageManager implements IStorageManager {
      * that is using this. Every thread just have to create an instance of
      * ServerStorageManager and keep calling getNextMessageToProcess() and
      * processing messages. The method will try to give the messages from the
-     * same sequence id. But if that doesnt hv processable messages it will go 4
+     * same sequence id. But if that doesnt hv processable messages it will go for
      * a new sequence.
      */
     public RMMessageContext getNextMessageToProcess() {
