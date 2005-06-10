@@ -154,7 +154,7 @@ public class SandeshaQueue {
         IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
         synchronized (sh) {
             if (sh == null)
-                throw new QueueException("Sequence id does not exist");
+                throw new QueueException(Constants.Queue.SEQUENCE_ABSENT);
 
             if (!sh.hasProcessableMessages())
                 return null;
@@ -555,7 +555,6 @@ public class SandeshaQueue {
     public RMMessageContext checkForResponseMessage(String requestId, String seqId) {
         IncomingSequence sh = (IncomingSequence) incomingMap.get(seqId);
         if (sh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
             return null;
         }
         synchronized (sh) {
@@ -636,11 +635,11 @@ public class SandeshaQueue {
 
     public void addSendMsgNo(String seqId, long msgNo) {
         OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-        if (rsh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
-        }
-        synchronized (rsh) {
-            rsh.addMsgToSendList(msgNo);
+        if (rsh != null) {
+
+            synchronized (rsh) {
+                rsh.addMsgToSendList(msgNo);
+            }
         }
     }
 
@@ -648,11 +647,13 @@ public class SandeshaQueue {
         OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
 
         if (rsh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
+            return false;
         }
         synchronized (rsh) {
             return rsh.isMsgInSentList(msgNo);
         }
+
+
     }
 
     public boolean hasLastIncomingMsgReceived(String seqId) {
@@ -660,7 +661,6 @@ public class SandeshaQueue {
         IncomingSequence sh = (IncomingSequence) incomingMap.get(seqId);
 
         if (sh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
             return false;
         }
         synchronized (sh) {
@@ -671,8 +671,7 @@ public class SandeshaQueue {
     public long getLastIncomingMsgNo(String seqId) {
         IncomingSequence sh = (IncomingSequence) incomingMap.get(seqId);
         if (sh == null) {
-            log.error(Constants.Queue.SEQUENCE_ABSENT);
-
+            return 0;
         }
         synchronized (sh) {
             return sh.getLastMsgNumber();

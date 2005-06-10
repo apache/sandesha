@@ -19,13 +19,16 @@ package org.apache.sandesha;
 import org.apache.axis.Message;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBody;
+import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.*;
 import org.apache.axis.types.URI;
 import org.apache.sandesha.ws.rm.*;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import java.util.Vector;
 
 /**
@@ -163,11 +166,22 @@ public class EnvelopeCreator {
         return envelope;
     }
 
+    private static void setBodyForResponseEnvelope(SOAPEnvelope env, RMMessageContext rmMsgCtx)
+            throws SOAPException {
+
+        SOAPBody sb = (SOAPBody) rmMsgCtx.getMsgContext().getResponseMessage().getSOAPBody();
+        MessageElement mBody = (MessageElement) sb.getFirstChild();
+
+        env.removeBody();
+        env.addBodyElement((SOAPBodyElement) mBody);
+    }
 
     public static SOAPEnvelope createServiceResponseEnvelope(RMMessageContext rmMessageContext)
             throws Exception {
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
         SOAPEnvelope responseEnvelope = createBasicEnvelop();
+
+        setBodyForResponseEnvelope(responseEnvelope, rmMessageContext);
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(responseEnvelope);
 
@@ -221,8 +235,6 @@ public class EnvelopeCreator {
         }
 
         outGoingAddressingHaders.toEnvelope(responseEnvelope, null);
-        responseEnvelope.setBody((SOAPBody) rmMessageContext.getMsgContext().getResponseMessage()
-                .getSOAPEnvelope().getBody());
 
         return responseEnvelope;
     }

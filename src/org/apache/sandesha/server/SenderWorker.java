@@ -235,8 +235,10 @@ public class SenderWorker implements Runnable {
     private void sendServiceResponse(RMMessageContext rmMessageContext) throws Exception {
         SOAPEnvelope responseEnvelope = null;
         responseEnvelope = EnvelopeCreator.createServiceResponseEnvelope(rmMessageContext);
+
+
         rmMessageContext.getMsgContext().setRequestMessage(new Message(responseEnvelope));
-        rmMessageContext.getMsgContext().setResponseMessage(new Message(responseEnvelope));
+        //rmMessageContext.getMsgContext().setResponseMessage(new Message(responseEnvelope));
 
         Service service = new Service();
         Call call = (Call) service.createCall();
@@ -247,9 +249,18 @@ public class SenderWorker implements Runnable {
 
         call.setTargetEndpointAddress(
                 rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
+
         //NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
         String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
-        call.setRequestMessage(new Message(soapMsg));
+
+
+        if (soapMsg != null)
+            call.setRequestMessage(new Message(soapMsg));
+        else {
+            call.setRequestMessage(
+                    new Message(
+                            rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope()));
+        }
 
         // rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
         // rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);

@@ -199,8 +199,6 @@ public class OutgoingSequence {
     public boolean markMessageDeleted(Long messageNo) {
         if (hash.containsKey(messageNo)) {
             markedAsDelete.add(messageNo);
-            String msgId = ((RMMessageContext) hash.get(messageNo)).getMessageID();
-            log.info("INFO: Marking outgoing message deleted : msgId " + msgId);
             return true;
         }
         return false;

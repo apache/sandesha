@@ -17,10 +17,9 @@
 *
 */
 ====================================================================================== -->
-
 <deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
  <globalConfiguration>
-  <parameter name="adminPassword" value="admin"/>
+  <parameter name="adminPassword" value="sandeshaadmin"/>
   <parameter name="disablePrettyXML" value="true"/>
   <parameter name="sendMultiRefs" value="true"/>
   <parameter name="sendXsiTypes" value="true"/>
@@ -39,24 +38,34 @@
  <handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
  <handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
  <handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
- <service name="AdminService" provider="java:MSG">
+<service name="AdminService" provider="java:MSG">
   <parameter name="allowedMethods" value="AdminService"/>
-  <parameter name="enableRemoteAdmin" value="false"/>
+  <parameter name="enableRemoteAdmin" value="true"/>
   <parameter name="className" value="org.apache.axis.utils.Admin"/>
   <namespace>http://xml.apache.org/axis/wsdd/</namespace>
  </service>
- <service name="Version" provider="java:RPC">
+<service name="Version" provider="java:RPC">
   <parameter name="allowedMethods" value="getVersion"/>
   <parameter name="className" value="org.apache.axis.Version"/>
  </service>
- <service name="RMInteropService" provider="Handler">
+ <service name="RMService" provider="Handler">
   <requestFlow>
    <handler type="java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler"/>
    <handler type="java:org.apache.axis.message.addressing.handler.AddressingHandler"/>
   </requestFlow>
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="request"/>
-  <parameter name="className" value="org.apache.sandesha.samples.interop.RMInteropService"/>
+  <parameter name="className" value="org.apache.sandesha.client.RMService"/>
+  <parameter name="handlerClass" value="org.apache.sandesha.ws.rm.providers.RMClientProvider"/>
+ </service>
+ <service name="RMSampleService" provider="Handler">
+  <requestFlow>
+   <handler type="java:org.apache.sandesha.ws.rm.handlers.RMServerRequestHandler"/>
+   <handler type="java:org.apache.axis.message.addressing.handler.AddressingHandler"/>
+  </requestFlow>
+  <parameter name="allowedMethods" value="*"/>
+  <parameter name="scope" value="request"/>
+  <parameter name="className" value="org.apache.sandesha.samples.RMSampleService"/>
   <parameter name="handlerClass" value="org.apache.sandesha.ws.rm.providers.RMProvider"/>
  </service>
  <transport name="http">
@@ -74,4 +83,3 @@
   </responseFlow>
  </transport>
 </deployment>
-

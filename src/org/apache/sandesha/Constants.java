@@ -168,7 +168,7 @@ public interface Constants {
         String QUEUE_INCONSIS = "Inconsistent queue";
         String MESSAGE_EXISTS = "Message already exists";
         String SEQUENCE_NOTPRESENT = "Sequence not present";
-        String SEQUENCE_ABSENT = "Sequence id does not exist";
+        String SEQUENCE_ABSENT = "Sequence id does not exist............";
         String RESPONSE_SEQ_NULL = "ERROR: RESPONSE SEQ IS NULL";
         String SEQUENCE_ID_NULL = "Sequence Id is null";
         String MESSAGE_ID_NULL = "Message is null";

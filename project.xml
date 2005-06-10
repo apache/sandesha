@@ -11,7 +11,7 @@
 
     <!-- The version of the project under development, e.g.
            1.1, 1.2, 2.0-SNAPSHOT -->
-    <currentVersion>1.0</currentVersion>
+    <currentVersion>beta</currentVersion>
 
     <!-- details about the organization that 'owns' the project -->
     <organization>
@@ -125,10 +125,10 @@
                 <include>**/*TC*.java</include>
                   <include>**/*.wsdd</include>
             </includes>
-            <excludes>
-                <exclude>**/*TCClientStorageManager.java</exclude>
-                <exclude>**/*TCServerStorageManager.java</exclude>
-            </excludes>
+          <excludes>
+       <exclude>**/*TCScenarioTest.java</exclude>
+<!--                <exclude>**/*TCServerStorageManager.java</exclude>-->
+      </excludes>
             <resources>
                 <resource>
                     <directory>test-resources</directory>
