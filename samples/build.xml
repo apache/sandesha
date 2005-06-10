@@ -27,7 +27,6 @@ Build Instructions:
 
     <target name="usage">
         <echo message="                                                                            "/>
-        <echo message=" Build instructions                                                         "/>
         <echo message="----------------------------------------------------------------------------"/>
         <echo message=" Available Targets Are                                                      "/>
         <echo message="   ping_sync       -->runs interop test for AsyncPing                       "/>
@@ -42,8 +41,8 @@ Build Instructions:
 
 
     <target name="check.jar">
-        <available property="sandesha.jar.found1" file="..\Sandesha-beta.jar"/>
-        <available property="sandesha.jar.found2" file="..\target\Sandesha-beta.jar"/>
+        <available property="sandesha.jar.found1" file="../Sandesha-beta.jar"/>
+        <available property="sandesha.jar.found2" file="../target/Sandesha-beta.jar"/>
     </target>
 
     <target name="set.jar.at.root" depends="check.jar" unless="sandesha.jar.found1">
@@ -57,9 +56,9 @@ Build Instructions:
 
 
     <target name="init" depends="set.jar.at.root">
-        <property name="dir.libs" value="..\lib"/>
-        <property name="dir.root" value="..\"/>
-        <property name="dir.target" value="..\target"/>
+        <property name="dir.libs" value="../lib"/>
+        <property name="dir.root" value="../"/>
+        <property name="dir.target" value="../target"/>
         <property name="jar.name" value="Sandesha-beta.jar"/>
 
         <path id="classpath.libraries" description="3rd party libs">
@@ -69,7 +68,7 @@ Build Instructions:
             <fileset dir="${dir.root}">
                 <include name="${jar.name}"/>
             </fileset>
-            <fileset dir="${dir.target}">
+            <fileset dir="${dir.target}" >
                 <include name="${jar.name}"/>
             </fileset>
         </path>

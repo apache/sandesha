@@ -88,7 +88,7 @@
         <property name="bin.dist.dir" value="target/dist-bin/Sandesha-${pom.currentVersion}-bin"/>
         <ant:mkdir dir="${bin.dist.dir}"/>
         <ant:mkdir dir="${bin.dist.dir}/docs"/>
-        <ant:mkdir dir="${bin.dist.dir}/bin"/>
+        <ant:mkdir dir="${bin.dist.dir}/target"/>
         <ant:mkdir dir="${bin.dist.dir}/lib"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
         <ant:mkdir dir="${bin.dist.dir}/docs/api"/>
