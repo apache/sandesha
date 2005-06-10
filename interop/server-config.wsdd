@@ -65,7 +65,7 @@
   </requestFlow>
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="request"/>
-  <parameter name="className" value="org.apache.sandesha.samples.interop.RMInteropService"/>
+  <parameter name="className" value="org.apache.sandesha.interop.RMInteropService"/>
   <parameter name="handlerClass" value="org.apache.sandesha.ws.rm.providers.RMProvider"/>
  </service>
  <transport name="http">

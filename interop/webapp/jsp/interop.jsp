@@ -1,4 +1,4 @@
-<%@ page import="org.apache.sandesha.server.*,org.apache.sandesha.samples.interop.testclient.*,org.apache.sandesha.client.ClientStorageManager,org.apache.sandesha.ws.rm.providers.RMProvider,javax.servlet.jsp.*,
+<%@ page import="org.apache.sandesha.server.*,org.apache.sandesha.interop.testclient.*,org.apache.sandesha.client.ClientStorageManager,org.apache.sandesha.ws.rm.providers.RMProvider,javax.servlet.jsp.*,
                  java.io.Writer,
                  java.io.PrintWriter,
                  org.apache.sandesha.IStorageManager,
@@ -9,7 +9,7 @@
                  java.io.IOException,
                  org.apache.sandesha.ws.rm.providers.RMClientProvider"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<jsp:useBean id="interopBean" scope="request" class="org.apache.sandesha.samples.interop.testclient.InteropBean" />
+<jsp:useBean id="interopBean" scope="request" class="org.apache.sandesha.interop.testclient.InteropBean" />
 <jsp:setProperty name="interopBean" property="*" />
 
 <%

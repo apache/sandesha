@@ -2,7 +2,7 @@
 
 <project name="Apache Sandesha" default="usage" basedir=".">
     <description>
-   Build file for Apache Sandesha
+   Build File Interop Interops for Apache Sandesha
 
    This file is intended for ANT, a Java based build tool.
    ANT is available from http://jakarta.apache.org/ant/index.html
@@ -19,84 +19,34 @@ Optional components:
 Build Instructions:
    To build, run
 
-     ant "target"
-
-   on the directory where this file is located with the target you want.
-
+     ant "target"   on the directory where this file is located with the target you want.
     </description>
 
     <target name="init">
         <property name="product.Name" value="Apache-Sandesha-J"/>
-        <property name="product.name" value="sandesha"/>
-        <property name="product.shortname" value="sandesha"/>
-
-        <property name="product.version.major" value="1"/>
-        <property name="product.version.minor" value="0"/>
-        <property name="product.version.level" value="Beta2"/>
-        <property name="product.Version" value="${product.version.major}.${product.version.minor}.${product.version.level}"/>
-        <property name="product.version" value="${product.version.major}.${product.version.minor}.${product.version.level}"/>
-        <property name="product_version" value="${product.version.major}_${product.version.minor}_${product.version.level}"/>
         <property name="year" value="2004"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache Sandesha Project. All Rights Reserved."/>
 
-        <!-- Give user a chance to override without editing this file
-             (and without typing -D each time it compiles it) -->
-        <property file="./build.properties"/>
-        <property file="${user.home}/build.properties"/>
-
-        <!-- Place Holder for proxy settings -->
-        <property name="http.proxyHost" value=""/>
-        <property name="http.proxyPort" value=""/>
-        <property name="http.nonProxyHosts" value="localhost"/>
-        <property name="http.proxyUser" value=""/>
-        <property name="http.proxyPassword" value=""/>
-
-        <property name="dir.doc" value="..\doc"/>
-        <property name="dir.dist" value="..\dist"/>
-        <property name="dir.libs" value="..\lib"/>
-        <property name="dir.src" value="..\src"/>
-        <property name="dir.samples" value="..\samples"/>
-        <property name="dir.test" value="..\test"/>
-        <property name="dir.keys" value="..\keys"/>
-        <property name="dir.specs" value="..\specs"/>
-        <property name="dir.interop" value="..\interop"/>
-        <property name="dir.webapp" location="..\webapps/axis"/>
-        <property name="build.dir" value="..\target"/>
+        <property name="dir.dist" value="../target/dist"/>
+        <property name="dir.libs" value="../lib"/>
+        <property name="dir.src" value="../src"/>
+        <property name="dir.test" value="../test"/>
+        <property name="dir.interop" value="../interop"/>
+        <property name="dir.webapp" location="../webapps/axis"/>
+        <property name="build.dir" value="../target"/>
         
         
         <!-- Following two were added on 01-03-2005-->
-        <property name="dir.config" value="..\config"/>
-        <property name="test.report" value="${build.dir}/test-reports"/>
+        <property name="dir.config" value="../config"/>
         <property name="build.interop" value="${build.dir}/interop-classes"/>
 
 
         <property name="build.classes" value="${build.dir}/classes"/>
         <property name="build.work" value="${build.dir}/work"/>
         <property name="build.webapp" location="${build.dir}/webapps/axis"/>
-
-
-        <property name="jar.library" value="${product.shortname}.jar"/>
-
-        <property name="build.doc" value="${build.dir}/doc"/>
-        <property name="build.doc.xml" value="${build.doc}/xml"/>
-        <property name="build.doc.html" value="${build.doc}/html"/>
-        <property name="build.javadoc" value="${build.doc.html}/api"/>
-        <property name="build.junit.xml" value="${build.doc.xml}/junit"/>
-        <property name="build.junit.html" value="${build.doc.html}/junit"/>
-
-
         <property environment="env1"/>
 
-        <!--
 
-for the time being following path id uses the libs in the sandesha
-lib directory only This is done to test if we really don't need
-any axis libs. After this is done we can include the
-java.class.path and leave the sandesha/lib empty. This requires that
-the CLASSPATH includes all required packages (see above
-
-    ALEK: thos does nto seems to be true as start-functional-test-http-server depends on AXIS.jar (what version?)
-        -->
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
                 <include name="**/*.jar"/>
@@ -105,7 +55,6 @@ the CLASSPATH includes all required packages (see above
 
         <path id="classpath.sandesha" description="sandesha classes; first try pure class files, then jars">
             <pathelement path="${build.classes}"/>
-            <pathelement path="${build.dir}/${jar.library}"/>
         </path>
 
         <path id="classpath.library">
@@ -119,71 +68,30 @@ the CLASSPATH includes all required packages (see above
             <pathelement path="${build.interop}"/>
         </path>
 
-        <taskdef resource="axis-tasks.properties" classpathref="classpath.library"/>
-        <taskdef name="runaxisfunctionaltests" classname="org.apache.axis.tools.ant.axis.RunAxisFunctionalTestsTask" loaderref="axis">
-            <classpath refid="classpath.library"/>
-        </taskdef>
-      
-        <!-- this shall include Axis jars because the tests use the
-         Axis implementation of javax.xml.soap, etc. Therefore the
-         CLASSPATH is included.
-         -->
-        <path id="classpath.test">
-            <!-- classpath for test is librarypath plus junit -->
-            <path refid="classpath.library"/>
-            <pathelement path="${java.class.path}"/>
-        </path>
-
-        <path id="classpath.test.jar">
-            <!-- classpath for test is librarypath plus junit -->
-            <path refid="classpath.library"/>
-            <pathelement path="${build.dir}/${jar.library}"/>
-            <pathelement path="${build.dir}/${jar.tests}"/>
-        </path>
-
-        <patternset id="distFiles">
-            <include name="build.xml"/>
-            <include name="LICENSE.txt"/>
-        </patternset>
-
-        <patternset id="srcFiles">
-            <!-- for some strange reasons, I can't use ${src} but must use src -->
-            <include name="src/**/*"/>
-        </patternset>
-
 
         <echo message="-------------------------------------------------------------------"/>
-        <echo message="-------------- ${product.Name} v${product.Version} [${year}] ----------------"/>
+        <echo message="----------------------- Sandesha Interop Build---------------------"/>
         <echo message="-------------------------------------------------------------------"/>
         <echo message="Building with ${ant.version}"/>
         <echo message="using build file ${ant.file}"/>
         <echo message="Java ${java.version} located at ${java.home} "/>
         <echo message="-------------------------------------------------------------------"/>
-        <echo message="--- Property values ---"/>
-        <echo message="sun.boot.class.path=${sun.boot.class.path}"/>
-        <pathconvert targetos="windows" property="classpath.test.as.string" refid="classpath.test"/>
-        <echo message="classpath.test: ${classpath.test.as.string}"/>
         <echo message=""/>
 
     </target>
 
     <target name="usage" depends="init">
         <echo message="                                                                            "/>
-        <echo message="                                                                            "/>
         <echo message=" Build instructions                                                         "/>
         <echo message="----------------------------------------------------------------------------"/>
         <echo message="                                                                            "/>
         <echo message=" available targets are:                                                     "/>
-        <echo message="   ping_sync       -->runs interop test for AsyncPing                       "/>
-        <echo message="   ping_async      -->runs interop test for SyncPing                        "/>
-        <echo message="   echo_sync_ack   -->runs interop test for EchoStirng                      "/>
-        <echo message="   echo_async_ack  -->runs interop test for EchoStirng                      "/>
-        <echo message="   clean           --> cleans up all generated files and                    "/>
-        <echo message="   jar             --> creates the JAR file                                 "/>
-        <echo message="   war             --> creates the interop war file in ./dist/war directory "/>
-        <echo message="   war.copy        --> creates the war and copy it to                       "/>
-        <echo message="                       CATALINA_HOME/webapps                                "/>
-        <echo message="   usage           --> provides help on using the build tool                "/>
+        <echo message="   clean    --> cleans up all generated files and                           "/>
+        <echo message="   jar      --> creates the JAR file                                        "/>
+        <echo message="   war      --> creates the interop war file in ./target/dist/war directory "/>
+        <echo message="   war.copy --> creates the war and copy it to                              "/>
+        <echo message="                 CATALINA_HOME/webapps                                      "/>
+        <echo message="   usage    --> provides help on using the build tool                       "/>
         <echo message="                       (default)                                            "/>
         <echo message=" See comments inside the build.xml file for more details.                   "/>
         <echo message="----------------------------------------------------------------------------"/>
@@ -192,7 +100,7 @@ the CLASSPATH includes all required packages (see above
 
     <target name="clean" depends="init" description="Clean up all temporary build files">
         <delete dir="${build.dir}"/>
-           <delete dir="${dir.dist}"/>
+        <delete dir="${dir.dist}"/>
         <delete>
             <fileset dir="." includes="before*.xml"/>
             <fileset dir="." includes="after*.xml"/>
@@ -205,32 +113,6 @@ the CLASSPATH includes all required packages (see above
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${build.dir}/test-reports"/>
 
-        <available property="junit.present" classname="junit.framework.TestCase">
-            <!-- check whether JUnit is available -->
-            <classpath refid="classpath.test"/>
-        </available>
-
-        <available property="jdk14.present" classname="java.security.cert.CertPath">
-            <!-- check whether JDK14 is available -->
-            <classpath refid="classpath.test"/>
-        </available>
-
-        <available property="jdk15.present" classname="java.lang.instrument.Instrumentation">
-            <!-- check whether JDK15 is available -->
-            <classpath refid="classpath.test"/>
-        </available>
-
-        <available property="bc.present" classname="org.bouncycastle.jce.provider.BouncyCastleProvider">
-            <!-- check whether BouncyCastle is available -->
-            <classpath refid="classpath.test"/>
-        </available>
-
-        <echo message="--- Flags (Note: If the {property name} is displayed, "/>
-        <echo message="           then the component is not present)"/>
-        <echo message="jdk14.present=${jdk14.present}"/>
-        <echo message="jdk15.present=${jdk15.present}"/>
-        <echo message="bc.present=${bc.present}"/>
-
     </target>
 
 
@@ -242,21 +124,13 @@ the CLASSPATH includes all required packages (see above
     <target name="compile" depends="compile.library" description="compile everything"/>
 
     <target name="compile.library" depends="prepare-src">
-        <!-- Compile the java code from ${dir.src} into ${build.classes} -->
         <javac srcdir="${dir.src}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.library"/>
-            <exclude name="**/Merlin.java" unless="jdk14.present"/>
-            <!-- <exclude name="**/MerlinPFX.java" unless="jdk14.present"/> -->
-            <exclude name="**/BouncyCastle.java" unless="bc.present"/>
         </javac>
 
         <javac srcdir="${dir.interop}" destdir="${build.classes}" debug="on">
             <classpath refid="classpath.library"/>
-            <exclude name="**/Merlin.java" unless="jdk14.present"/>
-            <!-- <exclude name="**/MerlinPFX.java" unless="jdk14.present"/> -->
-            <exclude name="**/BouncyCastle.java" unless="bc.present"/>
         </javac>
-        <!-- Copy Property files -->
 
         <copy todir="${build.classes}">
 
@@ -276,11 +150,10 @@ the CLASSPATH includes all required packages (see above
     </target>
 
 
-    <target name="compile.interop" depends="compile.library,interop_prepare">
+    <target name="compile.interop" depends="compile.library">
         <javac srcdir="${dir.interop}" destdir="${build.interop}" debug="on">
             <classpath refid="classpath.library"/>
         </javac>
-
 
         <copy todir="${build.interop}">
             <fileset dir="${dir.interop}" includes="client-config.wsdd"/>
@@ -289,109 +162,6 @@ the CLASSPATH includes all required packages (see above
         </copy>
 
     </target>
-
-
-
-  <!--===========================//Interop Section//============================================-->
-  <!--
-     //Targets in this section is used to test the basic interops. Here Sandesha client and the
-     //Sandesha server are tested with each other. TCP Monitors will be started automatically to
-     //view the message flow.
-  -->
-
-    <target name="interop_prepare" depends="init" description="This target creats the interop-classses directory">
-        <tstamp/>
-        <mkdir dir="${build.dir}/interop-classes"/>
-    </target>
-
-
-    <target name="run_tcp1" depends="init">
-        <java classname="org.apache.axis.utils.tcpmon" fork="true" spawn="true">
-            <arg value="8070"/>
-            <arg value="localhost"/>
-            <arg value="8080"/>
-            <classpath refid="classpath.library"/>
-        </java>
-    </target>
-    <target name="run_tcp2" depends="init">
-        <java classname="org.apache.axis.utils.tcpmon" fork="true" spawn="true">
-            <arg value="9070"/>
-            <arg value="localhost"/>
-            <arg value="9090"/>
-            <classpath refid="classpath.library"/>
-        </java>
-    </target>
-<!--
-    <target name="run_server">
-        <java classname="org.apache.axis.transport.http.SimpleAxisServer" spawn="true" fork="true">
-            <arg value="-p"/>
-            <arg value="8080"/>
-            <classpath refid="classpath.library"/>
-            <classpath refid="classpath.interop"/>
-        </java>
-
-        <java classname="org.apache.axis.client.AdminClient" fork="true" spawn="true">
-            <arg value="${dir.interop}\RMInteropServiceDeploy.wsdd"/>
-            <classpath refid="classpath.library"/>
-            <classpath refid="classpath.interop"/>
-        </java>
-    </target>-->
-
-
-    <!-- =================================================================== -->
-  <!-- Launches the functional test HTTP server -->
-  <!-- =================================================================== -->
-  <target name="run_server">
-    <echo message="Starting test http server."/>
-    <java classname="org.apache.axis.transport.http.SimpleAxisServer"  spawn ="true" fork="yes" dir="${build.classes}">
-         <arg line="-p 8080" />  <!-- arbitrary port -->
-        <classpath refid="classpath.library"/>
-        <classpath refid="classpath.interop"/>
-    </java>
-  </target>
-
-
-
-    <target name="run_interop_async_ping" depends="compile.interop,run_tcp1,run_tcp2,run_server">
-        <java classname="org.apache.sandesha.samples.interop.AsyncPingClient">
-            <classpath refid="classpath.interop"/>
-        </java>
-
-    </target>
-
-    <target name="run_interop_sync_ping" depends="compile.interop,run_tcp1,run_server">
-        <java classname="org.apache.sandesha.samples.interop.SyncPingClient">
-            <classpath refid="classpath.interop"/>
-        </java>
-
-    </target>
-
-    <target name="run_interop_echo_string_async_ack" depends="compile.interop,run_tcp1,run_tcp2,run_server">
-        <java classname="org.apache.sandesha.samples.interop.EchoClientAsyncAck">
-            <classpath refid="classpath.interop"/>
-        </java>
-    </target>
-
-    <target name="run_interop_echo_string_sync_ack" depends="compile.interop,run_tcp1,run_tcp2,run_server">
-        <java classname="org.apache.sandesha.samples.interop.EchoClientSyncAck">
-            <classpath refid="classpath.interop"/>
-        </java>
-    </target>
-
-    <target name="shutdown_server" >
-        <echo message="ShutDown the server "/>
-        <java classname="org.apache.axis.client.AdminClient" fork="yes">
-            <classpath refid="classpath.library"/>
-            <arg line="quit -p 8080"/>
-        </java>
-    </target>
-
-    <target name="ping_sync" depends="run_interop_sync_ping,shutdown_server"> </target>
-    <target name="ping_async" depends="run_interop_async_ping,shutdown_server"> </target>
-    <target name="echo_sync_ack" depends="run_interop_echo_string_sync_ack,shutdown_server"> </target>
-    <target name="echo_async_ack" depends="run_interop_echo_string_async_ack,shutdown_server"> </target>
-
-    <!--=============================//End of Interop Testing//====================================-->
 
 
     <target name="prepare-dist">
@@ -407,7 +177,7 @@ the CLASSPATH includes all required packages (see above
         <mkdir dir="${dir.dist.jar}"/>
 
         <copy todir="${build.classes}">
-                <fileset dir="${dir.config}">
+            <fileset dir="${dir.config}">
                 <include name="client-config.wsdd"/>
                 <include name="sandesha.properties"/>
                 <include name="log4j.properties"/>
@@ -422,7 +192,7 @@ the CLASSPATH includes all required packages (see above
                 <include name="server-config.wsdd"/>
             </fileset>
         </copy>
-      </target>
+    </target>
 
     <target name="jar" depends="prepare-jar" description="creates the sandesha jar">
         <jar basedir="${build.classes}" destfile="${sandesha.jar}"/>
@@ -441,12 +211,12 @@ the CLASSPATH includes all required packages (see above
     </target>
 
     <target name="create.war" depends="prepare-war" description="creates the sandesha war">
-         <war destfile="${sandesha.war}" webxml="${webxml}">
+        <war destfile="${sandesha.war}" webxml="${webxml}">
             <fileset dir="${dir.interop}/webapp/jsp"/>
             <lib dir="${dir.libs}"/>
             <lib file="${sandesha.jar}"/>
         </war>
-     </target>
+    </target>
 
     <target name="war.copy.clean" depends="war.copy" description="cleans the temporary files">
         <delete dir="${dir.dist}"/>
@@ -464,6 +234,6 @@ the CLASSPATH includes all required packages (see above
         <copy file="${sandesha.jar}" todir="${axishome}"/>
     </target>
 
-      <target name="war" depends="clean,create.war" description="creates the war file"/>
+    <target name="war" depends="clean,create.war" description="creates the war file"/>
 
 </project>
