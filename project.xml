@@ -126,7 +126,7 @@
                   <include>**/*.wsdd</include>
             </includes>
           <excludes>
-       <exclude>**/*TCScenarioTest.java</exclude>
+<!--       <exclude>**/*TCScenarioTest.java</exclude>-->
 <!--                <exclude>**/*TCServerStorageManager.java</exclude>-->
       </excludes>
             <resources>

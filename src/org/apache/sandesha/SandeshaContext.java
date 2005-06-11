@@ -69,7 +69,7 @@ public class SandeshaContext {
         if (client) {
             IStorageManager storageManager = new ClientStorageManager();
             if (!cleintSenderStarted) {
-                System.out.println(Constants.InfomationMessage.SENDER_STARTED);
+                log.info(Constants.InfomationMessage.SENDER_STARTED);
                 cleintSender = new Sender(storageManager);
                 SimpleChain reqChain = getRequestChain();
                 SimpleChain resChain = getResponseChain();
@@ -83,7 +83,7 @@ public class SandeshaContext {
             return storageManager;
         } else {
             if (!serverSenderStarted) {
-                System.out.println(Constants.InfomationMessage.SENDER_STARTED);
+                log.info(Constants.InfomationMessage.SENDER_STARTED);
                 serverSender = new Sender();
                 serverSender.startSender();
                 serverSenderStarted = true;
@@ -140,7 +140,7 @@ public class SandeshaContext {
         long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
         while (!storageManager.isAllSequenceComplete()) {
             try {
-                System.out.println(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
+                log.info(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
                 Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
                 if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
                     stopClientByForce();
@@ -163,7 +163,7 @@ public class SandeshaContext {
         String seqId = (String) call.getProperty(Constants.ClientProperties.CALL_KEY);
         while (!storageManager.isSequenceComplete(seqId)) {
             try {
-                System.out.println(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
+                log.info(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
                 Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
                 if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
                     stopClientByForce();
@@ -262,7 +262,7 @@ public class SandeshaContext {
             if (!listenerStarted) {
                 listenerStarted = true;
                 try {
-                    System.out.println(Constants.InfomationMessage.CLIENT_LISTENER_STARTED);
+                    log.info(Constants.InfomationMessage.CLIENT_LISTENER_STARTED);
                     sas = new SimpleAxisServer();
 
                     SimpleProvider sp = new SimpleProvider();

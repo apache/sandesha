@@ -39,23 +39,23 @@ Build Instructions:
         <echo message="                                                                            "/>
     </target>
 
-
     <target name="check.jar">
         <available property="sandesha.jar.found1" file="../Sandesha-beta.jar"/>
-        <available property="sandesha.jar.found2" file="../target/Sandesha-beta.jar"/>
+        <available property="target.directory.found" file="../target/Sandesha-beta.jar"/>
     </target>
 
     <target name="set.jar.at.root" depends="check.jar" unless="sandesha.jar.found1">
-        <antcall target="set.jar.at.target"/>
-    </target>
-
-    <target name="set.jar.at.target" depends="check.jar" unless="sandesha.jar.found2">
         <echo message="Cannot find the Sandesha-beta.jar."/>
-        <echo message="If you are using the source distribution, please build the source using maven before running the samples."/>
+        <fail message="If you are using the source distribution, please build the source using maven before running the samples."/>
+     </target>
+
+    <target name="check.target.dir" depends="check.jar" unless="target.directory.found">
+        <mkdir dir="../target"/>
+        <antcall target="set.jar.at.root"/>
     </target>
 
 
-    <target name="init" depends="set.jar.at.root">
+    <target name="init" depends="check.target.dir">
         <property name="dir.libs" value="../lib"/>
         <property name="dir.root" value="../"/>
         <property name="dir.target" value="../target"/>
@@ -68,7 +68,7 @@ Build Instructions:
             <fileset dir="${dir.root}">
                 <include name="${jar.name}"/>
             </fileset>
-            <fileset dir="${dir.target}" >
+            <fileset dir="${dir.target}">
                 <include name="${jar.name}"/>
             </fileset>
         </path>
@@ -106,7 +106,7 @@ Build Instructions:
     <!-- =================================================================== -->
     <!-- Launches the functional test HTTP server -->
     <!-- =================================================================== -->
-    <target name="run_server">
+    <target name="run_server" depends="init" >
         <echo message="Starting test http server."/>
         <java classname="org.apache.axis.transport.http.SimpleAxisServer" spawn="true" fork="yes">
             <arg line="-p 8080"/>  <!-- arbitrary port -->
@@ -139,7 +139,7 @@ Build Instructions:
         </java>
     </target>
 
-    <target name="shutdown_server">
+    <target name="shutdown_server" depends="init" >
         <echo message="ShutDown the server "/>
         <java classname="org.apache.axis.client.AdminClient" fork="yes" spawn="true">
             <classpath refid="classpath.libraries"/>

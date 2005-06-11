@@ -21,23 +21,21 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.apache.axis.encoding.XMLType;
-import org.apache.axis.transport.http.SimpleAxisServer;
-import org.apache.axis.EngineConfiguration;
 import org.apache.axis.deployment.wsdd.WSDDDeployment;
 import org.apache.axis.deployment.wsdd.WSDDDocument;
+import org.apache.axis.encoding.XMLType;
+import org.apache.axis.transport.http.SimpleAxisServer;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMReport;
 import org.apache.sandesha.SandeshaContext;
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import java.net.ServerSocket;
+import javax.xml.rpc.ParameterMode;
 import java.io.File;
+import java.net.ServerSocket;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,7 +77,7 @@ public class TCScenarioTest extends TestCase {
     public void tearDown() throws InterruptedException {
         if (testCount == 0) {
             Thread.sleep(5000);
-            sas.stop(); 
+            sas.stop();
         }
     }
 
@@ -90,7 +88,7 @@ public class TCScenarioTest extends TestCase {
      * @throws Exception
      */
     public void testPingSync() throws Exception {
-        System.out.println("===================Synchronous Ping Test Started=====================");
+        System.out.println("          Synchronous Ping Test Started");
 
         Service service = new Service();
         Call call = (Call) service.createCall();
@@ -104,17 +102,16 @@ public class TCScenarioTest extends TestCase {
         call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
 
 
-        call.invoke(new Object[]{"Ping Message Number One"});
-        call.invoke(new Object[]{"Ping Message Number Two"});
+        call.invoke(new Object[]{"Ping One"});
         ctx.setLastMessage(call);
-        call.invoke(new Object[]{"Ping Message Number Three"});
+        call.invoke(new Object[]{"Ping Two"});
 
         RMReport report = ctx.endSequence(call);
 
         assertEquals(report.isAllAcked(), true);
         assertEquals(report.getNumberOfReturnMessages(), 0);
         testCount--;
-        System.out.println("===================Synchronous Ping Test Finished====================");
+        System.out.println("          Synchronous Ping Test Finished");
     }
 
     /**
@@ -124,7 +121,7 @@ public class TCScenarioTest extends TestCase {
      * @throws Exception
      */
     public void testPingAsync() throws Exception {
-        System.out.println("==================ASynchronous Ping Test Started=====================");
+        System.out.println("          Asynchronous Ping Test Started");
 
         Service service = new Service();
         Call call = (Call) service.createCall();
@@ -138,17 +135,16 @@ public class TCScenarioTest extends TestCase {
         call.setOperationName(new QName("http://tempuri.org", "Ping"));
         call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
 
-        call.invoke(new Object[]{"Ping Message Number One"});
-        call.invoke(new Object[]{"Ping Message Number Two"});
+        call.invoke(new Object[]{"Ping One"});
         ctx.setLastMessage(call);
-        call.invoke(new Object[]{"Ping Message Number Three"});
+        call.invoke(new Object[]{"Ping Two"});
 
         RMReport report = ctx.endSequence(call);
 
         assertEquals(report.isAllAcked(), true);
         assertEquals(report.getNumberOfReturnMessages(), 0);
         testCount--;
-        System.out.println("==================ASynchronous Ping Test Finished====================");
+        System.out.println("          Asynchronous Ping Test Finished");
 
     }
 
@@ -162,7 +158,7 @@ public class TCScenarioTest extends TestCase {
      */
 
     public void testEchoSyncAck() throws Exception {
-        System.out.println("=====================Echo(Sync Ack) Test Started=====================");
+        System.out.println("          Echo(Sync Ack) Test Started");
 
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
         String str = uuidGen.nextUUID();
@@ -184,22 +180,19 @@ public class TCScenarioTest extends TestCase {
         call.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
         call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
 
-        String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", str});
-        System.out.println("The Response for First Messsage is  :" + ret);
-
-        ret = (String) call.invoke(new Object[]{"Sandesha Echo 2", str});
-        System.out.println("The Response for Second Messsage is  :" + ret);
+        String ret = (String) call.invoke(new Object[]{" Echo 1 ", str});
+        System.out.println("          The Response for First Messsage is  :" + ret);
 
         ctx.setLastMessage(call);
-        ret = (String) call.invoke(new Object[]{"Sandesha Echo 3", str});
-        System.out.println("The Response for Third Messsage is  :" + ret);
+        ret = (String) call.invoke(new Object[]{" Echo 2 ", str});
+        System.out.println("          The Response for Second Messsage is  :" + ret);
 
         RMReport report = ctx.endSequence(call);
 
         assertEquals(report.isAllAcked(), true);
-        assertEquals(report.getNumberOfReturnMessages(), 3);
+        assertEquals(report.getNumberOfReturnMessages(), 2);
         testCount--;
-        System.out.println("====================Echo(Sync Ack) Test Finished=====================");
+        System.out.println("          Echo(Sync Ack) Test Finished");
     }
 
     /**
@@ -210,7 +203,7 @@ public class TCScenarioTest extends TestCase {
      * @throws Exception
      */
     public void testEchoAsyncAck() throws Exception {
-        System.out.println("=====================Echo(Aync Ack) Test Started=====================");
+        System.out.println("          Echo(Aync Ack) Test Started");
 
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
         String str = uuidGen.nextUUID();
@@ -233,22 +226,19 @@ public class TCScenarioTest extends TestCase {
         call.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
         call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
 
-        String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", str});
-        System.out.println("The Response for First Messsage is  :" + ret);
-
-        ret = (String) call.invoke(new Object[]{"Sandesha Echo 2", str});
-        System.out.println("The Response for Second Messsage is  :" + ret);
+        String ret = (String) call.invoke(new Object[]{" Echo 1 ", str});
+        System.out.println("          The Response for First Messsage is  :" + ret);
 
         ctx.setLastMessage(call);
-        ret = (String) call.invoke(new Object[]{"Sandesha Echo 3", str});
-        System.out.println("The Response for Third Messsage is  :" + ret);
+        ret = (String) call.invoke(new Object[]{" Echo 2 ", str});
+        System.out.println("          The Response for Second Messsage is  :" + ret);
 
         RMReport report = ctx.endSequence(call);
 
         assertEquals(report.isAllAcked(), true);
-        assertEquals(report.getNumberOfReturnMessages(), 3);
+        assertEquals(report.getNumberOfReturnMessages(), 2);
         testCount--;
-        System.out.println("===================Echo(Async Ack) Test Finished=====================");
+        System.out.println("          Echo(Async Ack) Test Finished");
     }
 
     /**
@@ -260,7 +250,7 @@ public class TCScenarioTest extends TestCase {
      * @throws Exception
      */
     public void testEchoPing() throws Exception {
-        System.out.println("================Echo and Ping Combined Test Started==================");
+        System.out.println("          Echo and Ping Combined Test Started");
         UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
         String str = uuidGen.nextUUID();
 
@@ -296,30 +286,28 @@ public class TCScenarioTest extends TestCase {
         //----------------------PING------------------------------------------------
 
 
-        String ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 1", str});
-        System.out.println("The Response for First Messsage is  :" + ret);
-        pingCall.invoke(new Object[]{ret});
-
-        ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 2", str});
-        System.out.println("The Response for Second Messsage is  :" + ret);
+        String ret = (String) echoCall.invoke(new Object[]{" Echo 1 ", str});
+        System.out.println("          The Response for First Messsage is  :" + ret);
         pingCall.invoke(new Object[]{ret});
 
         ctx.setLastMessage(echoCall);
-        ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 3", str});
-        System.out.println("The Response for Third Messsage is  :" + ret);
+        ret = (String) echoCall.invoke(new Object[]{" Echo 2 ", str});
+        System.out.println("          The Response for Second Messsage is  :" + ret);
+        pingCall.invoke(new Object[]{ret});
+
         ctx.setLastMessage(pingCall);
         pingCall.invoke(new Object[]{ret});
 
         RMReport echoReport = ctx.endSequence(echoCall);
-        RMReport pingReport=ctx.endSequence(pingCall);
+        RMReport pingReport = ctx.endSequence(pingCall);
 
         assertEquals(echoReport.isAllAcked(), true);
-        assertEquals(echoReport.getNumberOfReturnMessages(), 3);
+        assertEquals(echoReport.getNumberOfReturnMessages(), 2);
 
         assertEquals(pingReport.isAllAcked(), true);
         assertEquals(pingReport.getNumberOfReturnMessages(), 0);
         testCount--;
-        System.out.println("===============Echo and Ping Combined Test Finished==================");
+        System.out.println("          Echo and Ping Combined Test Finished");
 
     }
 

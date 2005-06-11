@@ -119,8 +119,8 @@ public class SenderWorker implements Runnable {
                             inactivityTimeout) {
                         log.error("Inactivity Time Out Reached for the message with <wsa:MessageID> " +
                                 rmMessageContext.getMessageID());
-                        storageManager.clearStorage();
-
+                        //Need to clear the storage only for this sequece.
+                        // storageManager.clearStorage();
 
                     } else if (rmMessageContext.getRetransmissionTime() <
                             (System.currentTimeMillis() - rmMessageContext.getLastPrecessedTime())) {
@@ -176,19 +176,19 @@ public class SenderWorker implements Runnable {
         switch (rmMessageContext.getMessageType()) {
             case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
                 {
-                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ);
+                    log.info(Constants.InfomationMessage.SENDING_CREATE_SEQ);
                     sendCreateSequenceRequest(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
                 {
-                    System.out.println(Constants.InfomationMessage.SENDING_CREATE_SEQ_RES);
+                    log.info(Constants.InfomationMessage.SENDING_CREATE_SEQ_RES);
                     sendCreateSequenceResponse(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
                 {
-                    System.out.println(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
+                    log.info(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
                     sendTerminateSequenceRequest(rmMessageContext);
                     storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(
                             rmMessageContext.getSequenceID()));
@@ -196,19 +196,19 @@ public class SenderWorker implements Runnable {
                 }
             case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
                 {
-                    System.out.println(Constants.InfomationMessage.SENDING_ACK);
+                   log.info(Constants.InfomationMessage.SENDING_ACK);
                     sendAcknowldgement(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_SERVICE_REQUEST:
                 {
-                    System.out.println(Constants.InfomationMessage.SENDING_REQ);
+                    log.info(Constants.InfomationMessage.SENDING_REQ);
                     sendServiceRequest(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_SERVICE_RESPONSE:
                 {
-                    System.out.println(Constants.InfomationMessage.SENDING_RES);
+                    log.info(Constants.InfomationMessage.SENDING_RES);
                     sendServiceResponse(rmMessageContext);
                     break;
                 }

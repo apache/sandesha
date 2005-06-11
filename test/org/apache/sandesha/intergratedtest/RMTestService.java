@@ -17,12 +17,16 @@
 
 package org.apache.sandesha.intergratedtest;
 
+import org.apache.axis.components.logger.LogFactory;
+import org.apache.commons.logging.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class RMTestService {
     private static Map sequences = new HashMap();
+    private static final Log log = LogFactory.getLog(RMTestService.class.getName());
 
     public String echoString(String text, String sequence) {
 
@@ -33,11 +37,11 @@ public class RMTestService {
             sequences.put(sequence, (new String(text)));
 
         }
-        System.out.println("ECHO-STRING SERVICE " + text);
+        log.info("ECHO-STRING SERVICE " + text);
         return text;
     }
 
     public void ping(String text) {
-        System.out.println("PING-STRING SERVICE " + text);
+        log.info("PING-STRING SERVICE " + text);
     }
 }
