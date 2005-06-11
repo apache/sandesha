@@ -1,14 +1,26 @@
-<!-- Created By Eran Chinthaka -->
 <project name="Sandesha">
-  <title>Sandesha</title>
-  <body>
+   <title>Sandesha</title>
+
+   <body>
+      <menu name="Apache Sandesha">
+         <item name="User Guide" href="userguide.html" />
+
+         <item name="Architecture Guide" href="architecture.html" />
+
+         <item name="Interop Guide" href="interopguide.html" />
+
+         <item name="Downloads">
+            <item name="Releases" href="releases.html" />
+            <item name="Source Code" href="http://svn.apache.org/viewcvs.cgi/webservices/axis/trunk/?root=Apache-SVN" />
+         </item>
+         <item name="Project Information">
+      	<item name="Mailing Lists" href="mail-lists.html" /> 
+      	<item name="Project Team" href="team-list.html" />
+      	<item name="Issue Tracking" href="issue-tracking.html" /> 
+      </item> 
      
-    <menu name="Sandesha">
-      	<item name="Simple User Guide" href="userguide.html"/>
-      	<item name="Architecture Guide" href="architecture.html"/>
-                <item name="Interop Guide" href="interopguide.html"/>
-    </menu>
-     
-    
-  </body>
+         
+      </menu>
+   </body>
 </project>
+

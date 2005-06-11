@@ -15,81 +15,56 @@
 <p>This document&nbsp; will guide you through the configuration of Sandesha and finally 
 to run the sample scenarios.</p>
 <h2><font size="5">Configuration</font></h2>
-<p>Configuration of Apache Sandesha can be described in three steps.</p>
-<ul type="square">
-  <li>Checkout the code</li>
-  <li>Run the Maven (Compile)</li>
-  <li>use <font color="#FF0000">&nbsp;</font>Sandesha-1.0.jar </li>
-</ul>
-<p>So as the first step let's focus on how to configure Sandesha and run the 
-sample tests. Following steps will guide you through the process.</p>
-<h3><font size="4">Check out Sandesha</font></h3>
-<p>Apache Sandesha is available for download as source. Please follow the CVS 
-instruction to download the code
-<a href="http://ws.apache.org/ws-fx/sandesha/cvs-usage.html">
-http://ws.apache.org/ws-fx/sandesha/cvs-usage.html</a></p>
-<h3>Build Using Apache Maven</h3>
-<p>Once you have the so</p>
-<p>Note : Sandesha build process is done using Apache Maven. So assume that the 
-user has already configured Maven in his machine. </p>
-<p>Build process is mainly to run a single Maven command and it is</p>
-<p>
-<source>maven</source></p>
-<p>Once the build process is completed you&nbsp; can find <b>Sandesha-1.0.jar</b> 
-under target directory. </p>
-<p>Ok now let us see how we can use Sandesha in the client side of your 
-application and also in the server side. The following section of this user 
-guide will explain them in details.</p>
+<p>Sandesha can be downloaded as <font color="#FF0000">binary</font> or
+<font color="#FF0000">source</font> distributions. This document assumes that 
+the user has downloaded the binary distribution, however if you have downloaded 
+the source distribution, you can create the binaries using the maven command 
+&quot;maven dist-bin&quot;.</p>
+<p>Following steps will guide to configure Apache Sandesha on both client and 
+server sides.</p>
 <h2><font size="5">Use Sandesha in the Client Side</font></h2>
-<p>Following two steps will enable the usage of Sandesha in the Client Side. 
-(Assume that you have build Sandesha using Maven)</p>
+<p>Following two steps will enable the usage of Sandesha in the Client Side.</p>
 <ul type="square">
-  <li>Copy the <b>Sandesha-1.0.jar</b> to your class path</li>
-  <li>Copy the <b>config/client-config.wsdd</b> to the class path of your 
-  client. </li>
+  <li>Copy the <b>Sandesha-beta.jar</b> to your classpath (this jar can be found 
+  in the root directory of the unzipped binary distribution)</li>
+  <li>Add the jars in the &quot;lib&quot; directory of the binary distribution to your 
+  classpath.</li>
 </ul>
-<p>To enable Sandesha in the client side, the only requirement is to use 
-<b>RMTransport</b> as the transport in the <b>client-config.wsdd.</b> If you 
-copy the <b>client-config.wsdd</b> found under config directory 
-then it is already configured with this property and ready to use.</p>
-<p>Note: please add the jars, that are there in the target/lib to your class 
-path.</p>
 <p>There are two main ways that one can use axis to write web service client 
 applications.</p>
 <ol>
   <li>1. Using Generated Stubs</li>
   <li>2. Using Dynamic Invocation Interface (DII)</li>
 </ol>
-<p>At the moment when you generate the stubs there is no way that we can inform 
+<p>At the moment when we generate the stubs there is no way that we can inform 
 the apache tool (wsdl2java) to generate stubs that are Sandesha aware and hence 
 we need to use the DII in order to use Sandesha in the client side. However if 
-there are existing stubs, then to use Sandesha with them then the user has to 
-manually edit the stubs generated to insert some properties to the call object. 
-We will see one example of this nature as well.</p>
+there are existing stubs, then to use Sandesha with them&nbsp; the user has to 
+manually edit the stubs generated to insert properties to the call object.</p>
 <h3>Simple  Request-Response&nbsp;Client</h3>
-<p>To simply use Sandesha in the client side, user has to add few lines to the 
+<p>To  use Sandesha in the client side, user has to add few lines to the 
 existing client. Following code fragment shows the required additions that one 
 should make. </p>
-<p><source>public static void main(String[] args) {
-try {
-Service service = new Service();
-Call call = (Call) service.createCall();
-<span style="background-color: #CCCCCC">SandeshaContext ctx = new SandeshaContext();</span>
-<span style="background-color: #CCCCCC">ctx.addNewSequeceContext(call, targetUrl,
-			 "urn:wsrm:echoString",Constants.ClientProperties.IN_OUT);</span>
-call.setOperationName(new QName("http://tempuri.org/", "echoString"));
-call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
-call.addParameter("Seq", XMLType.XSD_STRING, ParameterMode.IN);
-call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
+<source><pre>public static void main(String[] args) {
+	try {
+	Service service = new Service();
+	Call call = (Call) service.createCall();
+	<span style="background-color: #CCCCCC">SandeshaContext ctx = new SandeshaContext();</span>
+	<span style="background-color: #CCCCCC">ctx.addNewSequeceContext(call, targetUrl,</span>
+	<span style="background-color: #CCCCCC">"urn:wsrm:echoString",Constants.ClientProperties.IN_OUT);</span>
+	call.setOperationName(new QName("http://tempuri.org/", "echoString"));
+	call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
+	call.addParameter("Seq", XMLType.XSD_STRING, ParameterMode.IN);
+	call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
 
-<span style="background-color: #CCCCCC">ctx.setLastMessage(call);</span>
-String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", "abcdef"});
-System.out.println("The Response for First Messsage is :" + ret);
+	<span style="background-color: #CCCCCC">ctx.setLastMessage(call);</span>
+	String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", "abcdef"});
+	System.out.println("The Response for First Messsage is :" + ret);
 
-<span style="background-color: #CCCCCC">ctx.endSequence(call);</span>
-} catch (Exception e) { e.printStackTrace();
-}
-}</source></p>
+	<span style="background-color: #CCCCCC">ctx.endSequence(call);</span>
+	} catch (Exception e) { e.printStackTrace();
+	}
+}</pre></source></p>
 <h4>Explanation on Additions :</h4>
 <p>
 <span style="font-weight: 700; background-color: #CCCCCC">SandeshaContext ctx = new SandeshaContext();</span></p>
@@ -131,27 +106,27 @@ get more flexibility in Sandesha and we will see them in the following examples.
 messaging operation. Again the following code fragment will explain the 
 additional code lines required. For this we use a client that will invoke a 
 service 3 times. (This for the explanation purpose only)</p>
-<p><source>public static void main(String[] args) {
-try {
-Service service = new Service();
-Call call = (Call) service.createCall();
+<source><pre>public static void main(String[] args) {
+	try {
+	Service service = new Service();
+	Call call = (Call) service.createCall();
 
-SandeshaContext ctx = new SandeshaContext();
-ctx.addNewSequeceContext(call,targetUrl ,
-                    "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
-call.setOperationName(new QName("http://tempuri.org/", "ping"));
-call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
+	SandeshaContext ctx = new SandeshaContext();
+	ctx.addNewSequeceContext(call,targetUrl ,
+    	                "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
+	call.setOperationName(new QName("http://tempuri.org/", "ping"));
+	call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);	
             
-call.invoke(new Object[]{"Sandesha Ping 1"});
-call.invoke(new Object[]{"Sandesha Ping 2"});
-ctx.setLastMessage(call);
-call.invoke(new Object[]{"Sandesha Ping 3"});
-ctx.endSequence(call);
+	call.invoke(new Object[]{"Sandesha Ping 1"});
+	call.invoke(new Object[]{"Sandesha Ping 2"});
+	ctx.setLastMessage(call);	
+	call.invoke(new Object[]{"Sandesha Ping 3"});
+	ctx.endSequence(call);
 
-} catch (Exception e) {
-   e.printStackTrace();
-}
-}</source></p>
+	} catch (Exception e) {
+	   e.printStackTrace();
+	}
+}</pre></source></p>
 
 <p>As it can be seen, we need the same additions as above and the explanations 
 are the same.</p>
@@ -161,29 +136,28 @@ are the same.</p>
 <p>In this scenario we will look at how Sandesha can be used in a one-way 
 messaging operation using same transport channel to get acknowledgements.&nbsp; For this we use a client that will invoke a 
 service 3 times. (This for the explanation purpose only)</p>
-<p><source>
-public static void main(String[] args) {
-try {
-Service service = new Service();
-Call call = (Call) service.createCall();
+<source><pre>public static void main(String[] args) {
+	try {
+	Service service = new Service();
+	Call call = (Call) service.createCall();
 
-SandeshaContext ctx = new SandeshaContext();
-<span style="background-color: #CCCCCC">ctx.addNewSequeceContext(call,targetUrl ,
-	   "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY,</span><span style="background-color: #FFFF99">true</span>);
+	SandeshaContext ctx = new SandeshaContext();
+	<span style="background-color: #CCCCCC">ctx.addNewSequeceContext(call,targetUrl ,</span>
+		<span style="background-color: #CCCCCC">"urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY,</span><span style="background-color: #FFFF99">true</span>);
 
-call.setOperationName(new QName("http://tempuri.org/", "ping"));
-call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
+	call.setOperationName(new QName("http://tempuri.org/", "ping"));
+	call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
 
-call.invoke(new Object[]{"Sandesha Ping 1"});
-call.invoke(new Object[]{"Sandesha Ping 2"});
-ctx.setLastMessage(call);
-call.invoke(new Object[]{"Sandesha Ping 3"});
-ctx.endSequence(call);
+	call.invoke(new Object[]{"Sandesha Ping 1"});
+	call.invoke(new Object[]{"Sandesha Ping 2"});
+	ctx.setLastMessage(call);
+	call.invoke(new Object[]{"Sandesha Ping 3"});
+	ctx.endSequence(call);
 
-} catch (Exception e) {
-   e.printStackTrace();
-}
-}</source></p>
+	} catch (Exception e) {
+   		e.printStackTrace();
+	}
+}</pre></source></p>
 
 <p>The only change we need is to set the flag &quot;sync&quot; to &quot;true&quot; when we add the 
 sequence to SandeshaContext, as shown bellow.</p>
@@ -209,13 +183,12 @@ appropriate properties (depending on the client, either request-response or one
 way) to get the correct functionality. Following code fragment contains all the 
 parameters that the client can set inside the client code.</p>
 
-<p><source>
-ctx.setToUrl(call, "http://test.organization.com:8080/wsrm/services/rmDemos");
-ctx.setFromUrl(call, "http://our.organization.org:9070/axis/services/RMService");
-ctx.setReplyToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
-ctx.setAcksToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
-ctx.setFaultToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
-ctx.setSendOffer(call);</source></p>
+<source><pre>	ctx.setToUrl(call, "http://test.organization.com:8080/wsrm/services/rmDemos");
+	ctx.setFromUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+	ctx.setReplyToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+	ctx.setAcksToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+	ctx.setFaultToUrl(call, "http://our.organization.org:9070/axis/services/RMService");
+	ctx.setSendOffer(call);</pre></source></p>
 
 <p>These properties are very useful when debugging applications. By changing 
 them appropriately the user can route messages through TCP Monitor or some 
@@ -236,93 +209,93 @@ operation. </p>
 operations are in the same service &quot;RMInteropService&quot; as two different 
 operations. However these need NOT be operations of a single service.</p>
 
-<p><source>
-public void testEchoPing() throws Exception {
-System.out.println("===========Echo and Ping Combined Test Started=============");
-UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
-String str = uuidGen.nextUUID();
+<p><source><pre>public void testEchoPing() throws Exception {
+	System.out.println("===========Echo and Ping Combined Test Started=============");
+	UUIDGen uuidGen = UUIDGenFactory.getUUIDGen(); //Can use this for continuous testing.
+	String str = uuidGen.nextUUID();
 
-Service service = new Service();
-Call echoCall = (Call) service.createCall();
+	Service service = new Service();
+	Call echoCall = (Call) service.createCall();
 
-SandeshaContext ctx = new SandeshaContext();
-//------------------------ECHO------------------------------------------
-ctx.addNewSequeceContext(echoCall, targetURL, "urn:wsrm:echoString",
-                Constants.ClientProperties.IN_OUT);
-ctx.setAcksToUrl(echoCall,
-        "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-ctx.setReplyToUrl(echoCall,
-         "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-ctx.setSendOffer(echoCall);
+	SandeshaContext ctx = new SandeshaContext();
+	//------------------------ECHO------------------------------------------
+	ctx.addNewSequeceContext(echoCall, targetURL, "urn:wsrm:echoString",
+    	            Constants.ClientProperties.IN_OUT);
+	ctx.setAcksToUrl(echoCall,
+    	    "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+	ctx.setReplyToUrl(echoCall,
+    	     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+	ctx.setSendOffer(echoCall);
 
-echoCall.setOperationName(new QName("http://tempuri.org/", "echoString"));
+	echoCall.setOperationName(new QName("http://tempuri.org/", "echoString"));
 
-echoCall.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
-echoCall.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
-echoCall.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
-//----------------------ECHO----------------------------------------------
+	echoCall.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
+	echoCall.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
+	echoCall.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
+	//----------------------ECHO----------------------------------------------
 
-//------------------------PING--------------------------------------------
-Call pingCall = (Call) service.createCall();
-ctx.addNewSequeceContext(pingCall, targetURL, "urn:wsrm:Ping",
-      Constants.ClientProperties.IN_ONLY);
-ctx.setAcksToUrl(pingCall,
-     "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+	//------------------------PING--------------------------------------------
+	Call pingCall = (Call) service.createCall();
+	ctx.addNewSequeceContext(pingCall, targetURL, "urn:wsrm:Ping",
+	      Constants.ClientProperties.IN_ONLY);
+	ctx.setAcksToUrl(pingCall,
+    	 "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
 
-pingCall.setOperationName(new QName("http://tempuri.org/", "ping"));
-pingCall.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
-//----------------------PING----------------------------------------------
+	pingCall.setOperationName(new QName("http://tempuri.org/", "ping"));
+	pingCall.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
+	//----------------------PING----------------------------------------------
 
-String ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 1", str});
-System.out.println("The Response for First Messsage is  :" + ret);
-pingCall.invoke(new Object[]{ret});
+	String ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 1", str});
+	System.out.println("The Response for First Messsage is  :" + ret);
+	pingCall.invoke(new Object[]{ret});
 
-ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 2", str});
-System.out.println("The Response for Second Messsage is  :" + ret);
-pingCall.invoke(new Object[]{ret});
+	ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 2", str});
+	System.out.println("The Response for Second Messsage is  :" + ret);
+	pingCall.invoke(new Object[]{ret});
 
-ctx.setLastMessage(echoCall);
-ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 3", str});
-System.out.println("The Response for Third Messsage is  :" + ret);
-ctx.setLastMessage(pingCall);
-pingCall.invoke(new Object[]{ret});
+	ctx.setLastMessage(echoCall);
+	ret = (String) echoCall.invoke(new Object[]{"Sandesha Echo 3", str});
+	System.out.println("The Response for Third Messsage is  :" + ret);
+	ctx.setLastMessage(pingCall);
+	pingCall.invoke(new Object[]{ret});
 
-RMReport echoReport = ctx.endSequence(echoCall);
-RMReport pingReport=ctx.endSequence(pingCall);
+	RMReport echoReport = ctx.endSequence(echoCall);
+	RMReport pingReport=ctx.endSequence(pingCall);
 
-assertEquals(echoReport.isAllAcked(), true);
-assertEquals(echoReport.getNumberOfReturnMessages(), 3);
+	assertEquals(echoReport.isAllAcked(), true);
+	assertEquals(echoReport.getNumberOfReturnMessages(), 3);
 
-assertEquals(pingReport.isAllAcked(), true);
-assertEquals(pingReport.getNumberOfReturnMessages(), 0);
-System.out.println("===========Echo and Ping Combined Test Finished==========");
+	assertEquals(pingReport.isAllAcked(), true);
+	assertEquals(pingReport.getNumberOfReturnMessages(), 0);
+	System.out.println("===========Echo and Ping Combined Test Finished==========");
 
 }
-</source></p>
+</pre></source></p>
 
 <p>Note: Samples of all these scenarios are available in the &quot;interop&quot; 
 directory. Sample of invoking two web services in a same client is available as 
 a test case in the &quot;test&quot; directory.</p>
 
 <h2><font size="5">To Use Sandesha in the Server Side</font></h2>
-<p>This can again be done using two steps.</p>
-<p>Assume that axis is configured in Tomcat Server </p>
+<p>Sandesha configuration in the server side can be explained using two simple 
+steps. (Assume that axis is configured in Tomcat Server)</p>
 <ul type="square">
-  <li>Copy the <b>Sandesha-1.0.jar</b> to the <b>CATALINA_HOME/webapps/axis/WEB-INF/lib</b> along 
-with the other new jars that can be found in <b>target/lib</b> directory of Sandesha.</li>
+  <li>Copy the <b>Sandesha-beta.jar</b> to the <b>CATALINA_HOME/webapps/axis/WEB-INF/lib</b> along 
+with the other new jars that can be found in <b>lib</b> directory of Sandesha. 
+  (If you are using the Axis1.2 release, then the user have to copy only the 
+  &quot;addressing-SNAPTSHOT.jar&quot; additionally)</li>
   <li>To configure Sandesha for a particular service( say MyService) change the 
   <b>deploy.wsdd</b> of <b>&nbsp;MyService</b> according to the following.</li>
 </ul>
 <p>Note that we have to change the provider to <b>RMProvider</b> and need to add two 
-request handlers. A sample of this <b>deploy.wsdd</b> can be found in the interop 
-directory named <b>RMInteropServiceDeploy</b> with the required bat file to deploy the 
-service. (make sure that the classes for the <b>MyService</b> is copied to 
-<b>CATALINA_HOME/webapps/axis/WEB-INF/classes. RMProvider</b> by default will 
+request handlers. A sample of this <b>deploy.wsdd</b> can be found in the sample 
+directory named <b>RMSampleServiceDeploy</b> with the required bat file to deploy the 
+service. (make sure that the classes for the <b>MyService</b> is copied to <b>CATALINA_HOME/webapps/axis/WEB-INF/classes. RMProvider</b> by default will 
 use the <b>RPCProvider</b> to invoke the services, however user can specify the 
-actual provider that is required to invoke a particular service in <b>
-sandesha.properties</b> file that can be found in <b>config</b> directory.</p>
+actual provider that is required to invoke a particular service in <b>sandesha.properties</b> file that can be found in
+<b>Sandesha-beta.jar</b>.</p>
 
-<p><source>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot; 
+<source><pre>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot; 
 xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;
 &nbsp;&lt;service name=&quot;MyService&quot; provider=&quot;Handler&quot;&gt;
 &lt;requestFlow&gt;
@@ -334,7 +307,7 @@ xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;
 &lt;parameter name=&quot;allowedMethods&quot; value=&quot;*&quot;/&gt;
 &lt;parameter name=&quot;scope&quot; value=&quot;request&quot;/&gt;
 &lt;/service&gt;
-&lt;/deployment&gt;</source></p>
+&lt;/deployment&gt;</pre></source></p>
 
 <h3>Using RMSource Inside a Server</h3>
 
@@ -348,7 +321,7 @@ sent asynchronously to the RMSource. However, the server itself can act as the
 in the same server with &quot;RMClientProvider as the provider. This behavior can 
 easily obtained using a deployment descriptor as shown below. </p>
 
-<p><source>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot; 
+<source><pre>&lt;deployment xmlns=&quot;http://xml.apache.org/axis/wsdd/&quot; 
 xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;
 &lt;service name=&quot;MyService&quot; provider=&quot;java:RPC&quot;&gt;
 &lt;parameter name=&quot;className&quot; value=&quot;samples.userguide.example3.MyService&quot;/&gt;
@@ -367,7 +340,7 @@ xmlns:java=&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;&gt;
 &lt;parameter name=&quot;scope&quot; value=&quot;request&quot;/&gt;
 &lt;/service&gt;
 &lt;/deployment&gt;
-&nbsp;</source></p>
+&nbsp;</pre></source></p>
 
 <p>In this deployment descriptor &quot;MyService&quot; is the web service that behaves as 
 a client for some other service. (MyService is invoking some other web service 
@@ -390,23 +363,18 @@ use Sandesha)</p>
 
 <h2>Running Samples </h2>
 
-<h3>Build the Sample Classes</h3>
-<p>Note : Sandesha build process is done using Apache Maven. So assume that the 
-user has already configured Maven in his machine. 
-Build process is mainly to run a single Maven command and it is</p>
-<p>
-<source>maven</source></p>
-<p>Since we need the samples also to be build we need one more command (Let's 
-use the interop samples)</p>
-<p>
-<source>maven interop:compile</source></p>
-<p>If you need a project to be created for eclipse or Intellij IDEA use the 
+<p>If you are using the binary distribution of Sandesha then the samples are 
+already built and inside the Sandesha-beta.jar itself. Therefore the testing is 
+just matter of executing some ant targets provided in the &quot;build.xml&quot; file in 
+the samples directory. If you have downloaded the source distribution and need 
+to run the samples, please build the source first using the maven.</p>
+<p>If you need a project to be created for Eclipse or Intellij IDEA use the 
 maven commands</p>
 <p>
 <source>maven eclipse</source> </p>
 <p><source>maven idea</source> </p>
-<h3><font size="4">Run the Inter-op Samples</font></h3>
-<p>Go to the directory, interop under the main directory tree. To run the sample 
+<h3><font size="4">Run the&nbsp; Samples</font></h3>
+<p>Go to the directory, samples under the main directory tree. To run the sample 
 scenarios we only need to type simple ant commands in a command line.</p>
 <p>Followings are the commands to run the samples scenarios.</p>
 <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
@@ -438,10 +406,8 @@ different HTTP Connections. Acknowledgements are coming in the response path of
 different HTTP Connections.</td>
   </tr>
 </table>
-<p>In all these scenarios the service <b>RMInteropService</b> is deployed in a
-<b>SimpleAxisServer</b> using the ant script and the results will be shown in TCP 
-monitors. Please check whether the java processes that is used to invoke TCP 
-monitors are not running in the back ground, before every test.</p>
+<p>In all these scenarios the service <b>RMSampleService</b> is deployed in a <b>SimpleAxisServer</b> 
+using the ant script and the results will be shown in TCP monitors. </p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>

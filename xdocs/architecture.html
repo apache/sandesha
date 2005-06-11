@@ -181,8 +181,8 @@ Acknowledgement</font></p>
 <h3 style="text-align: justify;">Client Side - Initialization</h3>
 <p style="text-align: justify;">This is happening only at the first message of a 
 particular sequence. Web service client should initialize the reliable messaging 
-environment before sending messages. This can be done by calling the method&nbsp; 
-initClient(true) in the RMInitiator class. This will Initialize the Queue, 
+environment before sending messages. This can be done by creating a 
+SandeshaContext and adding a new sequence to it. This will Initialize the Queue, 
 Sender and the Client side receiver.</p>
 <p style="text-align:center">
 <img border="0" src="images/ClientInitialization.png" width="556" height="250"></p>
@@ -195,8 +195,8 @@ Client Side - Termination</h3>
 <p >
 This is happening only after the last message of a 
 particular sequence. Web service client should terminate the RM Environment 
-after receiving all the messages.&nbsp; This can be done by calling the method&nbsp; 
-stopClient() in the RMInitiator class. This will first check whether all the 
+after receiving all the messages.&nbsp; This can be done by calling the method&nbsp;&nbsp; 
+ctx.endSequence(call) in the SandeshaContext class. This will first check whether all the 
 sequence are complete with acknowledgements and then terminate the Queue, Sender 
 and the Client side receiver passing control back to the client.</p>
 <p style="text-align:center">
@@ -213,7 +213,7 @@ sending the service requests the RMSource will include the client side endpoint
 reference in the &lt;wsa:From&gt; address. So the sequence acknowledgements will be 
 sent through a new connection other than the one use for the request.</p>
 <p style="text-align:center">
-<img border="0" src="images/PingAsync.png" width="799" height="402"></p>
+<img border="0" src="images/PingAsync.png" width="798" height="366" ></p>
 <p style="text-align:center">
 <font size="2">Figure 7: Client Side - Request Only with Asynchronous 
 Acknowledgement</font></p>
