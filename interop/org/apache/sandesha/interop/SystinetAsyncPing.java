@@ -29,15 +29,13 @@ public class SystinetAsyncPing {
             Call call = (Call) service.createCall();
 
             SandeshaContext ctx = new SandeshaContext();
-            ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:Ping",
-                    Constants.ClientProperties.IN_ONLY);
 
-            ctx.setToUrl(call, "http://soap.systinet.net:6064/Service");
-            ctx.setAcksToUrl(call, "http://" + sourceHost + ":" + sourcePort +
-                    "/axis/services/RMService");
-            ctx.setFromUrl(call, "http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
-            ctx.setFaultToUrl(call, "http://" + sourceHost + ":" + sourcePort +
-                    "/axis/services/RMService");
+            ctx.setToURL("http://soap.systinet.net:6064/Service");
+            ctx.setAcksToURL("http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
+            ctx.setFromURL("http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
+            ctx.setFaultToURL("http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
+
+            ctx.initCall(call, targetURL, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 
             call.setOperationName(new QName("http://tempuri.org/", "Ping"));
 
@@ -49,7 +47,7 @@ public class SystinetAsyncPing {
             ctx.setLastMessage(call);
             call.invoke(new Object[]{"Ping Message Number Three"});
 
-            ctx.endSequence(call);
+            ctx.endSequence();
 
         } catch (Exception e) {
             e.printStackTrace();

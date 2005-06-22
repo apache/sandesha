@@ -17,6 +17,10 @@
 
 package org.apache.sandesha.interop;
 
+import org.apache.commons.logging.Log;
+import org.apache.axis.components.logger.LogFactory;
+import org.apache.sandesha.client.RMSender;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +32,7 @@ import java.util.Map;
  */
 public class RMInteropService {
     private static Map sequences = new HashMap();
+    private static final Log log = LogFactory.getLog(RMInteropService.class.getName());
 
     public String echoString(String text, String sequence) {
 
@@ -38,11 +43,11 @@ public class RMInteropService {
             sequences.put(sequence, (new String(text)));
 
         }
-        System.out.println("ECHO-STRING SERVICE " + text);
+        log.debug("Echo Service "+text);
         return text;
     }
 
     public void ping(String text) {
-        System.out.println("PING-STRING SERVICE " + text);
+        log.debug("Ping Service "+text);
     }
 }

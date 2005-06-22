@@ -27,6 +27,7 @@ import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.*;
+import org.apache.sandesha.storage.queue.SandeshaQueue;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.ws.rm.RMHeaders;
@@ -50,7 +51,8 @@ public class RMSender extends BasicHandler {
 
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMSender.class.getName());
-    private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+    private final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+    private static Boolean lock = new Boolean(false);
 
     /**
      * This is the main method that is invoked by the axis engine. This method will add the reqest
@@ -66,52 +68,43 @@ public class RMSender extends BasicHandler {
         storageManager = new ClientStorageManager();
 
         try {
-            RMMessageContext reqMsgCtx = getRMMessageContext(msgContext);
-            String tempSeqID = reqMsgCtx.getSequenceID();
+            RMMessageContext reqMsgCtx = null;
+            String tempSeqID = null;
 
-            long msgNo = reqMsgCtx.getMsgNumber();
+            reqMsgCtx = getRMMessageContext(msgContext);
 
-            if (msgNo == 1) {
-                reqMsgCtx = processFirstRequestMessage(reqMsgCtx, reqMsgCtx.getSync());
-            } else {
-                reqMsgCtx = processRequestMessage(reqMsgCtx);
-            }
+            tempSeqID = reqMsgCtx.getSequenceID();
 
-            if (reqMsgCtx.isLastMessage()) {
-                storageManager.insertTerminateSeqMessage(
-                        RMMessageCreator.createTerminateSeqMsg(reqMsgCtx, Constants.CLIENT));
-            }
+            reqMsgCtx = processFirstRequestMessage(reqMsgCtx, reqMsgCtx.getSync());
 
             if (reqMsgCtx.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
                 long startingTime = System.currentTimeMillis();
                 long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
+
                 while (responseMessageContext == null) {
+                    synchronized(lock){
                     responseMessageContext =
                             checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
                     if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
-                        SandeshaContext.stopClientByForce();
+                        reqMsgCtx.getCtx().stopClientByForce();
                     }
                     Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+                    }
                 }
-                
-                
+
                 //setting RMReport;
                 if (responseMessageContext != null) {
                     String oldSeqId = reqMsgCtx.getOldSequenceID();
                     if (oldSeqId != null) {
-                        Call call = (Call) SandeshaContext.getCallMap().get(
-                                reqMsgCtx.getOldSequenceID());
+                        Call call = (Call) reqMsgCtx.getCtx().getCallMap().get(reqMsgCtx.getOldSequenceID());
 
                         if (call != null) {
-                            RMReport report = (RMReport) call.getProperty(
-                                    Constants.ClientProperties.REPORT);
+                            RMReport report = (RMReport) call.getProperty(Constants.ClientProperties.REPORT);
                             report.incrementReturnedMsgCount();
                         }
                     }
                 }
-                
-
 
                 //We need these steps to filter all addressing and rm related headers.
                 Message resMsg = responseMessageContext.getMsgContext().getRequestMessage();
@@ -126,6 +119,7 @@ public class RMSender extends BasicHandler {
 
         } catch (Exception ex) {
             log.error(ex);
+
             throw new AxisFault(ex.getLocalizedMessage());
 
         }
@@ -141,32 +135,44 @@ public class RMSender extends BasicHandler {
      */
     private RMMessageContext processFirstRequestMessage(RMMessageContext reqRMMsgContext,
                                                         boolean sync) throws Exception {
-        String msgID = Constants.UUID + uuidGen.nextUUID();
-        String offerID = null;
-        if (reqRMMsgContext.isHasResponse() && reqRMMsgContext.isSendOffer()) {
-            offerID = Constants.UUID + uuidGen.nextUUID();
-            storageManager.addRequestedSequence(offerID);
-            storageManager.addOffer(msgID, offerID);
+                synchronized (lock) {
+
+            if (!storageManager.isSequenceExist(reqRMMsgContext.getSequenceID())) {
+                                String msgID = Constants.UUID + uuidGen.nextUUID();
+                String offerID = null;
+                if (reqRMMsgContext.isHasResponse() && reqRMMsgContext.isSendOffer()) {
+                    offerID = Constants.UUID + uuidGen.nextUUID();
+                    storageManager.addRequestedSequence(offerID);
+                    storageManager.addOffer(msgID, offerID);
+                }
+
+                RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(reqRMMsgContext, Constants.CLIENT, msgID, offerID);
+                storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
+                storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(),
+                        createSeqRMMsgContext.getMessageID());
+
+                createSeqRMMsgContext.setSync(sync);
+                storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
+                processRequestMessage(reqRMMsgContext);
+
+            } else {
+                processRequestMessage(reqRMMsgContext);
+            }
+
         }
 
-        RMMessageContext createSeqRMMsgContext = RMMessageCreator.createCreateSeqMsg(
-                reqRMMsgContext, Constants.CLIENT, msgID, offerID);
-        storageManager.addOutgoingSequence(reqRMMsgContext.getSequenceID());
-        storageManager.setTemporaryOutSequence(reqRMMsgContext.getSequenceID(),
-                createSeqRMMsgContext.getMessageID());
 
-        createSeqRMMsgContext.setSync(sync);
-        storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-        processRequestMessage(reqRMMsgContext);
         return reqRMMsgContext;
     }
 
     private RMMessageContext processRequestMessage(RMMessageContext reqRMMsgContext)
             throws Exception {
-        RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(
-                reqRMMsgContext);
+                if (reqRMMsgContext.isLastMessage()) {
+            storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(reqRMMsgContext, Constants.CLIENT));
+        }
+        RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(reqRMMsgContext);
         storageManager.insertOutgoingMessage(serviceRequestMsg);
-        return reqRMMsgContext;
+                return reqRMMsgContext;
     }
 
     private RMMessageContext checkTheQueueForResponse(String sequenceId, String reqMessageID) {
@@ -181,8 +187,7 @@ public class RMSender extends BasicHandler {
         Call call = (Call) newMsgContext.getProperty(MessageContext.CALL);
 
         requestMesssageContext = ClientPropertyValidator.validate(call);
-        requestMesssageContext.setOutGoingAddress(
-                (String) msgCtx.getProperty(MessageContext.TRANS_URL));
+        requestMesssageContext.setOutGoingAddress((String) msgCtx.getProperty(MessageContext.TRANS_URL));
         requestMesssageContext.setMsgContext(newMsgContext);
         return requestMesssageContext;
     }

@@ -290,7 +290,7 @@ public class SenderWorker implements Runnable {
         //i.e. we are not expecting any response for this.
         if (rmMessageContext.getMsgContext().getResponseMessage() == null) {
             //The code should not come to this point.
-            System.err.println(Constants.ErrorMessages.NULL_REQUEST_MSG);
+            log.error(Constants.ErrorMessages.NULL_REQUEST_MSG);
         } else {
             Call call = prepareCall(rmMessageContext);
             call.setRequestMessage(rmMessageContext.getMsgContext().getResponseMessage());

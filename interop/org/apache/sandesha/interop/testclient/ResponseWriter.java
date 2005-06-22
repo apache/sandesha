@@ -1,35 +1,38 @@
-
 package org.apache.sandesha.interop.testclient;
+
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.io.PrintWriter;
 
 
 /**
  * @author root
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *         <p/>
+ *         To change the template for this generated type comment go to
+ *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class ResponseWriter {
-	
-	private PrintWriter writer;
-	
-	public ResponseWriter(PrintWriter writer){
-			this.writer = writer;
-	}
-	
-	public synchronized boolean write(String s){ 
-		try{
-			writer.println(s);
-			flush();
-			return true;
-		}catch(Exception e){
-			System.out.println("Exception: In method 'write' of 'ResponseWriter'");
-			return false;
-		}
-	}
-	
-	public synchronized void flush(){
-		writer.flush();
-	}
+
+    private PrintWriter writer;
+    private static final Log log = LogFactory.getLog(PrintWriter.class.getName());
+
+    public ResponseWriter(PrintWriter writer) {
+        this.writer = writer;
+    }
+
+    public synchronized boolean write(String s) {
+        try {
+            writer.println(s);
+            flush();
+            return true;
+        } catch (Exception e) {
+            log.error("Exception: In method 'write' of 'ResponseWriter");
+            return false;
+        }
+    }
+
+    public synchronized void flush() {
+        writer.flush();
+    }
 }

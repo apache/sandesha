@@ -18,20 +18,23 @@
 package org.apache.sandesha.util;
 
 import org.apache.sandesha.Constants;
+import org.apache.axis.AxisFault;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
- /**
-  * This is the property loader for Sandesha. All the properties will be loaded from the
-  * sandesha.properties file that is found in the classpath.
-  *
-  * @auther Jaliya Ekanayake
-  */
+
+/**
+ * This is the property loader for Sandesha. All the properties will be loaded from the
+ * sandesha.properties file that is found in the classpath.
+ *
+ * @auther Jaliya Ekanayake
+ */
 public class PropertyLoader {
-    public static int getClientSideListenerPort() {
-        Properties prop = loadProperties();
+    public static int getClientSideListenerPort() throws Exception {
+        Properties  prop = loadProperties();
+
         if (prop != null) {
             return new Integer(prop.getProperty(Constants.ClientProperties.CLIENT_LISTENER_PORT)).intValue();
         } else
@@ -39,46 +42,41 @@ public class PropertyLoader {
 
     }
 
-    public static int getSimpleAxisServerPort() {
+    public static int getSimpleAxisServerPort() throws Exception {
         Properties prop = loadProperties();
         if (prop != null) {
-            return new Integer(
-                    prop.getProperty(Constants.ClientProperties.SIMPLE_AXIS_SERVER_PORT_POPERTY)).intValue();
+            return new Integer(prop.getProperty(Constants.ClientProperties.SIMPLE_AXIS_SERVER_PORT_POPERTY)).intValue();
         } else
             return Constants.DEFAULT_SIMPLE_AXIS_SERVER_PORT;
 
     }
 
-    private static Properties loadProperties() {
+    private static Properties loadProperties() throws Exception {
+
         Properties properties = new Properties();
-        try {
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                    Constants.ClientProperties.PROPERTY_FILE);
-            properties.load(in);
-            return properties;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        try{
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.ClientProperties.PROPERTY_FILE);
+        properties.load(in);
+        }catch(IOException e){
+            throw new Exception(Constants.ErrorMessages.CANNOT_LOAD_PROPERTIES);
         }
+
+        return properties;
+
     }
 
     //CHANGE FOR SECURITY ADDITION
-    public static ArrayList getRequestHandlerNames() {
+    public static ArrayList getRequestHandlerNames() throws Exception {
         return getHandlerNames(Constants.ClientProperties.REQUEST_HANDLER);
     }
 
-    public static ArrayList getResponseHandlerNames() {
+    public static ArrayList getResponseHandlerNames() throws Exception {
         return getHandlerNames(Constants.ClientProperties.RESPONSE_HANDLER);
     }
 
-    public static ArrayList getHandlerNames(String type) {
+    public static ArrayList getHandlerNames(String type) throws Exception {
         Properties properties = loadProperties();
         ArrayList ret = new ArrayList();
-
-        try {
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                    Constants.ClientProperties.PROPERTY_FILE);
-            properties.load(in);
 
             int temp = 0;
             String propVal;
@@ -92,21 +90,18 @@ public class PropertyLoader {
             } while (propVal != null);
 
             return ret;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+
     }
 
-    public static ArrayList getListenerRequestHandlerNames() {
+    public static ArrayList getListenerRequestHandlerNames() throws Exception {
         return getHandlerNames(Constants.ClientProperties.LISTENER_REQUEST_HANDLER);
     }
 
-    public static ArrayList getListenerResponseHandlerNames() {
+    public static ArrayList getListenerResponseHandlerNames() throws Exception {
         return getHandlerNames(Constants.ClientProperties.LISTENER_RESPONSE_HANDLER);
     }
 
-    public static String getProvider() {
+    public static String getProvider() throws Exception {
         Properties prop = loadProperties();
         String s;
 

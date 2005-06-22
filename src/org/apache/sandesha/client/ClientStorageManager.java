@@ -48,7 +48,7 @@ public class ClientStorageManager implements IStorageManager {
                 Constants.CLIENT);
     }
 
-    public boolean isSequenceExist(String sequenceID) {
+    public  boolean isSequenceExist(String sequenceID) {
         return accessor.isOutgoingSequenceExists(sequenceID);
     }
 
@@ -100,9 +100,9 @@ public class ClientStorageManager implements IStorageManager {
      */
     public void addAcknowledgement(RMMessageContext rmMessageContext) {
         String sequenceID = rmMessageContext.getSequenceID();
-        if(sequenceID!=null)
+        if (sequenceID != null)
             accessor.removeAllAcks(sequenceID);
-        
+
         addPriorityMessage(rmMessageContext);
     }
 
@@ -162,15 +162,15 @@ public class ClientStorageManager implements IStorageManager {
         if (null == msg) {
             msg = accessor.getNextLowPriorityMessageContextToSend();
 
-            // checks whether all the request messages hv been acked
+            // checks whether all the request messages have been acked
         }
         if (null != callBack && null != msg)
             informOutgoingMessage(msg);
 
-        if (msg != null && !msg.isLocked()){
+        if (msg != null && !msg.isLocked()) {
             msg.setLocked(true);
-        return msg;
-        }else{
+            return msg;
+        } else {
             return null;
         }
     }
@@ -226,9 +226,9 @@ public class ClientStorageManager implements IStorageManager {
      * @see org.apache.sandesha.IStorageManager#insertOutgoingMessage
      * (org.apache.sandesha.RMMessageContext)
      */
-    public void insertOutgoingMessage(RMMessageContext msg) {
-        String sequenceId = msg.getSequenceID();
-        accessor.addMessageToOutgoingSequence(sequenceId, msg);
+    public  void insertOutgoingMessage(RMMessageContext msg) {
+           String sequenceId = msg.getSequenceID();
+              accessor.addMessageToOutgoingSequence(sequenceId, msg);
     }
 
     /*
@@ -380,7 +380,6 @@ public class ClientStorageManager implements IStorageManager {
             cbData.setSequenceId(rmMsgContext.getSequenceID());
             cbData.setMessageId(rmMsgContext.getMessageID());
             cbData.setMessageType(rmMsgContext.getMessageType());
-
         }
 
         if (null != callBack)
@@ -396,7 +395,7 @@ public class ClientStorageManager implements IStorageManager {
         boolean incomingTerminateReceived = accessor.isIncommingTerminateReceived(seqId);
         return outTerminateSent && incomingTerminateReceived;
     }
-    
+
     public void sendAck(String sequenceId) {
         String keyId = accessor.getKeyFromIncomingSequenceId(sequenceId);
         accessor.sendAck(keyId);

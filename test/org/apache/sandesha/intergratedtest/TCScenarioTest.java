@@ -93,10 +93,8 @@ public class TCScenarioTest extends TestCase {
         Service service = new Service();
         Call call = (Call) service.createCall();
 
-        SandeshaContext ctx = new SandeshaContext();
-        ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:Ping",
-                Constants.ClientProperties.IN_ONLY);
-        ctx.setSynchronous(call);
+        SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONIZED);
+        ctx.initCall(call, targetURL, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 
         call.setOperationName(new QName("http://tempuri.org/", "Ping"));
         call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
@@ -106,7 +104,7 @@ public class TCScenarioTest extends TestCase {
         ctx.setLastMessage(call);
         call.invoke(new Object[]{"Ping Two"});
 
-        RMReport report = ctx.endSequence(call);
+        RMReport report = ctx.endSequence();
 
         assertEquals(report.isAllAcked(), true);
         assertEquals(report.getNumberOfReturnMessages(), 0);
@@ -127,10 +125,9 @@ public class TCScenarioTest extends TestCase {
         Call call = (Call) service.createCall();
 
         SandeshaContext ctx = new SandeshaContext();
-        ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:ping",
-                Constants.ClientProperties.IN_ONLY);
-        ctx.setAcksToUrl(call,
-                "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+
+        ctx.setAcksToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        ctx.initCall(call, targetURL, "urn:wsrm:ping", Constants.ClientProperties.IN_ONLY);
 
         call.setOperationName(new QName("http://tempuri.org", "Ping"));
         call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
@@ -139,7 +136,7 @@ public class TCScenarioTest extends TestCase {
         ctx.setLastMessage(call);
         call.invoke(new Object[]{"Ping Two"});
 
-        RMReport report = ctx.endSequence(call);
+        RMReport report = ctx.endSequence();
 
         assertEquals(report.isAllAcked(), true);
         assertEquals(report.getNumberOfReturnMessages(), 0);
@@ -167,12 +164,12 @@ public class TCScenarioTest extends TestCase {
         Call call = (Call) service.createCall();
 
         SandeshaContext ctx = new SandeshaContext();
-        ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:echoString",
-                Constants.ClientProperties.IN_OUT);
-        ctx.setAcksToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
-        ctx.setReplyToUrl(call,
-                "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-        ctx.setSendOffer(call);
+
+        ctx.setAcksToURL(Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+        ctx.setReplyToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        ctx.setSendOffer(true);
+
+        ctx.initCall(call, targetURL, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
         call.setOperationName(new QName("http://tempuri.org/", "echoString"));
 
@@ -187,7 +184,7 @@ public class TCScenarioTest extends TestCase {
         ret = (String) call.invoke(new Object[]{" Echo 2 ", str});
         System.out.println("          The Response for Second Messsage is  :" + ret);
 
-        RMReport report = ctx.endSequence(call);
+        RMReport report = ctx.endSequence();
 
         assertEquals(report.isAllAcked(), true);
         assertEquals(report.getNumberOfReturnMessages(), 2);
@@ -212,13 +209,12 @@ public class TCScenarioTest extends TestCase {
         Call call = (Call) service.createCall();
 
         SandeshaContext ctx = new SandeshaContext();
-        ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:echoString",
-                Constants.ClientProperties.IN_OUT);
-        ctx.setAcksToUrl(call,
-                "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-        ctx.setReplyToUrl(call,
-                "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-        ctx.setSendOffer(call);
+
+        ctx.setAcksToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        ctx.setReplyToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        ctx.setSendOffer(true);
+
+        ctx.initCall(call, targetURL, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
         call.setOperationName(new QName("http://tempuri.org/", "echoString"));
 
@@ -233,7 +229,7 @@ public class TCScenarioTest extends TestCase {
         ret = (String) call.invoke(new Object[]{" Echo 2 ", str});
         System.out.println("          The Response for Second Messsage is  :" + ret);
 
-        RMReport report = ctx.endSequence(call);
+        RMReport report = ctx.endSequence();
 
         assertEquals(report.isAllAcked(), true);
         assertEquals(report.getNumberOfReturnMessages(), 2);
@@ -259,13 +255,11 @@ public class TCScenarioTest extends TestCase {
 
         SandeshaContext ctx = new SandeshaContext();
         //------------------------ECHO--------------------------------------------
-        ctx.addNewSequeceContext(echoCall, targetURL, "urn:wsrm:echoString",
-                Constants.ClientProperties.IN_OUT);
-        ctx.setAcksToUrl(echoCall,
-                "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-        ctx.setReplyToUrl(echoCall,
-                "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
-        ctx.setSendOffer(echoCall);
+
+        ctx.setAcksToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        ctx.setReplyToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        ctx.setSendOffer(true);
+        ctx.initCall(echoCall, targetURL, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
         echoCall.setOperationName(new QName("http://tempuri.org/", "echoString"));
 
@@ -275,11 +269,11 @@ public class TCScenarioTest extends TestCase {
         //----------------------ECHO------------------------------------------------
 
         //------------------------PING--------------------------------------------
-        Call pingCall = (Call) service.createCall();
-        ctx.addNewSequeceContext(pingCall, targetURL, "urn:wsrm:Ping",
-                Constants.ClientProperties.IN_ONLY);
-        ctx.setAcksToUrl(pingCall,
-                "http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        Service pingService = new Service();
+        Call pingCall = (Call) pingService.createCall();
+        SandeshaContext pingCtx = new SandeshaContext();
+
+        pingCtx.initCall(pingCall, targetURL, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 
         pingCall.setOperationName(new QName("http://tempuri.org/", "ping"));
         pingCall.addParameter("arg2", XMLType.XSD_STRING, ParameterMode.IN);
@@ -295,11 +289,11 @@ public class TCScenarioTest extends TestCase {
         System.out.println("          The Response for Second Messsage is  :" + ret);
         pingCall.invoke(new Object[]{ret});
 
-        ctx.setLastMessage(pingCall);
+        pingCtx.setLastMessage(pingCall);
         pingCall.invoke(new Object[]{ret});
 
-        RMReport echoReport = ctx.endSequence(echoCall);
-        RMReport pingReport = ctx.endSequence(pingCall);
+        RMReport echoReport = ctx.endSequence();
+         RMReport pingReport = pingCtx.endSequence();
 
         assertEquals(echoReport.isAllAcked(), true);
         assertEquals(echoReport.getNumberOfReturnMessages(), 2);

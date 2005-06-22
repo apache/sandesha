@@ -25,7 +25,24 @@ public class RMReport {
 	
 	private  boolean allAcked;
 	private int returns;
-	
+    private String error;
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public int getReturns() {
+        return returns;
+    }
+
+    public void setReturns(int returns) {
+        this.returns = returns;
+    }
+
     public boolean isAllAcked() {
         return this.allAcked;
     }

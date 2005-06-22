@@ -67,6 +67,16 @@ public class RMMessageContext {
     private String acksTo;
     private String to;
 
+    public SandeshaContext getCtx() {
+        return ctx;
+    }
+
+    public void setCtx(SandeshaContext ctx) {
+        this.ctx = ctx;
+    }
+
+    private SandeshaContext ctx;
+
     public boolean isLocked() {
         return locked;
     }

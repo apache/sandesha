@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.io.IOException;
 
 /**
  * SandeshaContext will keep track of different Call objects that the user may use inside
@@ -33,6 +34,8 @@ import java.util.List;
  * of accepting a RMReport which contains the overall status of the message transfer.
  */
 public class SandeshaContext {
+
+    private static final Log log = LogFactory.getLog(SandeshaContext.class.getName());
 
     private static boolean rmInvokerStarted = false;
     private static boolean cleintSenderStarted = false;
@@ -43,36 +46,182 @@ public class SandeshaContext {
     private static Sender serverSender;
     private static boolean insideServer;
 
-    private static HashMap callMap = new HashMap();
-    private static int activeSequenes = 0;
 
-    public SandeshaContext() {
+    private HashMap callMap = new HashMap();
+    private static HashMap seqMap = new HashMap();
+
+    private long key;
+
+    private String toURL;
+    private String sourceURL;
+    private String replyToURL;
+
+    public String getReplyToURL() {
+        return replyToURL;
+    }
+
+    public void setReplyToURL(String replyToURL) {
+        this.replyToURL = replyToURL;
+    }
+
+    private String faultToURL;
+    private String fromURL;
+    private String acksToURL;
+    private boolean sendOffer;
+    // private boolean lastMessage;
+    private long messageNumber;
+
+    private RMReport report;
+
+    private boolean sync;
+
+    public boolean isSync() {
+        return sync;
+    }
+
+    public void setSync(boolean sync) {
+        this.sync = sync;
+    }
+
+    public long getMessageNumber() {
+        return messageNumber;
+    }
+
+    public void setMessageNumber(long messageNumber) {
+        this.messageNumber = messageNumber;
+    }
+
+    public boolean isSendOffer() {
+        return sendOffer;
+    }
+
+    public void setSendOffer(boolean sendOffer) {
+        this.sendOffer = sendOffer;
+    }
+
+    public String getAcksToURL() {
+        return acksToURL;
+    }
+
+    public void setAcksToURL(String acksToURL) {
+        this.acksToURL = acksToURL;
+    }
+
+    public String getFromURL() {
+        return fromURL;
+    }
+
+    public void setFromURL(String fromURL) {
+        this.fromURL = fromURL;
+    }
+
+    public String getFaultURL() {
+        return faultToURL;
+    }
+
+    public void setFaultToURL(String faultURL) {
+        this.faultToURL = faultURL;
+    }
+
+    public String getSourceURL() {
+        return sourceURL;
+    }
+
+    public void setSourceURL(String sourceURL) {
+        this.sourceURL = sourceURL;
+    }
+
+    public String getToURL() {
+        return toURL;
+    }
+
+    public void setToURL(String toURL) {
+        this.toURL = toURL;
+    }
+
+    public SandeshaContext() throws AxisFault {
+        messageNumber = 0;
+        key = System.currentTimeMillis();
         SandeshaContext.insideServer = false;
+        init(true);
+        startListener();
+        seqMap.put(new Long(key), this);
+        report = new RMReport();
     }
 
-    public SandeshaContext(boolean insideServer) {
+    public SandeshaContext(int sync) throws AxisFault {
+        this.sync = true;
+        messageNumber = 0;
+        key = System.currentTimeMillis();
+        SandeshaContext.insideServer = false;
+        init(true);
+        seqMap.put(new Long(key), this);
+        report = new RMReport();
+    }
+
+    public SandeshaContext(boolean insideServer) throws AxisFault {
+        messageNumber = 0;
+        key = System.currentTimeMillis();
         SandeshaContext.insideServer = insideServer;
+        init(true);
+        seqMap.put(new Long(key), this);
+        report = new RMReport();
     }
 
+    public SandeshaContext(boolean insideServer, int sync) throws AxisFault {
+        this.sync = true;
+        messageNumber = 0;
+        key = System.currentTimeMillis();
+        SandeshaContext.insideServer = insideServer;
+        init(true);
+        seqMap.put(new Long(key), this);
+        report = new RMReport();
+    }
 
-    public static HashMap getCallMap() {
+    public void initCall(Call call, String targetUrl, String action, short MEP) throws AxisFault {
+        if (toURL != null)
+            call.setProperty(Constants.ClientProperties.TO, toURL);
+        if (sourceURL != null)
+            call.setProperty(Constants.ClientProperties.SOURCE_URL, sourceURL);
+        if (faultToURL != null)
+            call.setProperty(Constants.ClientProperties.FAULT_TO, faultToURL);
+        if (fromURL != null)
+            call.setProperty(Constants.ClientProperties.FROM, fromURL);
+        if (replyToURL != null)
+            call.setProperty(Constants.ClientProperties.REPLY_TO, replyToURL);
+        if (acksToURL != null)
+            call.setProperty(Constants.ClientProperties.ACKS_TO, acksToURL);
+
+        call.setProperty(Constants.ClientProperties.SEND_OFFER, Boolean.valueOf(sendOffer));
+        call.setProperty(Constants.ClientProperties.SYNC, Boolean.valueOf(sync));
+        call.setProperty("context", this);
+
+        String key = initialize(call, targetUrl, action, MEP);
+        callMap.put(key, call);
+    }
+
+    public HashMap getCallMap() {
         return callMap;
     }
 
-    public static void setCallMap(HashMap callMap) {
-        SandeshaContext.callMap = callMap;
+    public void setCallMap(HashMap callMap) {
+        this.callMap = callMap;
     }
 
-    private static final Log log = LogFactory.getLog(SandeshaContext.class.getName());
-
-    public static IStorageManager init(boolean client) {
+    public static IStorageManager init(boolean client) throws AxisFault {
         if (client) {
             IStorageManager storageManager = new ClientStorageManager();
             if (!cleintSenderStarted) {
                 log.info(Constants.InfomationMessage.SENDER_STARTED);
                 cleintSender = new Sender(storageManager);
-                SimpleChain reqChain = getRequestChain();
-                SimpleChain resChain = getResponseChain();
+                SimpleChain reqChain = null;
+                SimpleChain resChain = null;
+                try {
+                    reqChain = getRequestChain();
+                    resChain = getResponseChain();
+                } catch (Exception e) {
+                    throw new AxisFault(e.getMessage());
+                }
                 if (reqChain != null)
                     cleintSender.setRequestChain(reqChain);
                 if (resChain != null)
@@ -97,8 +246,7 @@ public class SandeshaContext {
         }
     }
 
-
-    private static void validateProperties(Call call, String targetUrl, String action, short MEP)
+    private void validateProperties(Call call, String targetUrl, String action, short MEP)
             throws AxisFault {
         if (action == null)
             throw new AxisFault("Please sepeicfy Action");
@@ -106,78 +254,43 @@ public class SandeshaContext {
             throw new AxisFault("TargetUrl cannot be null");
         if (call == null)
             throw new AxisFault("Call cannot be null");
-        if (!(MEP == Constants.ClientProperties.IN_ONLY ||
-                MEP == Constants.ClientProperties.IN_OUT))
+        if (!(MEP == Constants.ClientProperties.IN_ONLY || MEP == Constants.ClientProperties.IN_OUT))
             throw new AxisFault("Invalid MEP");
     }
 
-
-    public void addNewSequeceContext(Call call, String targetUrl, String action, short MEP)
-            throws AxisFault {
-        String key = initialize(call, targetUrl, action, MEP);
-        init(true);
-        startListener();
-        callMap.put(key, call);
-        activeSequenes++;
-    }
-
-    public void addNewSequeceContext(Call call, String targetUrl, String action, short MEP,
-                                     boolean sync) throws AxisFault {
-        String key = initialize(call, targetUrl, action, MEP);
-        setSynchronous(call);
-        init(true);
-        if (!sync) {
-            startListener();
-        }
-        callMap.put(key, call);
-        activeSequenes++;
-    }
-
-    public void endAllSequence(Call call) throws AxisFault {
+    public RMReport endSequence() throws AxisFault {
 
         IStorageManager storageManager = new ClientStorageManager();
         long startingTime = System.currentTimeMillis();
         long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
-        while (!storageManager.isAllSequenceComplete()) {
-            try {
-                log.info(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
-                Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
-                if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
-                    stopClientByForce();
+
+        Iterator ite = callMap.keySet().iterator();
+
+        while (ite.hasNext()) {
+            String key = (String) ite.next();
+            Call tempCall = (Call) callMap.get(key);
+            String seqId = (String) tempCall.getProperty(Constants.ClientProperties.CALL_KEY);
+            while (!storageManager.isSequenceComplete(seqId)) {
+                try {
+                    log.info(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
+                    Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
+                    if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
+                        stopClientByForce();
+                        this.report.setError("Inactivity Time Out Reached. Sequence not complete");
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    log.error(e);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                log.error(e);
             }
         }
 
-        endAllSequences();
-
-    }
-
-    public RMReport endSequence(Call call) throws AxisFault {
-
-        IStorageManager storageManager = new ClientStorageManager();
-        long startingTime = System.currentTimeMillis();
-        long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
-        String seqId = (String) call.getProperty(Constants.ClientProperties.CALL_KEY);
-        while (!storageManager.isSequenceComplete(seqId)) {
-            try {
-                log.info(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
-                Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
-                if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
-                    stopClientByForce();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                log.error(e);
-            }
+        if (this.report.getError() == null) {
+            this.report.setAllAcked(true);
         }
 
-        RMReport rmReport = (RMReport) call.getProperty(Constants.ClientProperties.REPORT);
-        rmReport.setAllAcked(true);
-
-        if (activeSequenes == 1) {
+        seqMap.remove(new Long(key));
+        if (seqMap.isEmpty()) {
             if (listenerStarted) {
                 sas.stop();
                 listenerStarted = false;
@@ -185,60 +298,33 @@ public class SandeshaContext {
             cleintSender.stop();
             cleintSenderStarted = false;
             storageManager.clearStorage();
-            activeSequenes--;
-            return rmReport;
         }
-        activeSequenes--;
-        return rmReport;
+
+        return this.report;
 
     }
 
 
-    public void endAllSequences() throws AxisFault {
-        IStorageManager storageManager = new ClientStorageManager();
-        if (activeSequenes >= 1) {
-            stopClientByForce();
-        } else {
-            if (listenerStarted) {
-                sas.stop();
-                listenerStarted = false;
-            }
-            cleintSender.stop();
-            cleintSenderStarted = false;
-            storageManager.clearStorage();
-            activeSequenes--;
-        }
-
-    }
-
-
-    public static void stopClientByForce() throws AxisFault {
+    public void stopClientByForce() throws AxisFault {
         if (listenerStarted) {
             sas.stop();
-
-            //FOR JSP
-            listenerStarted = false;
-            //END JSP
             listenerStarted = false;
         }
         cleintSender.stop();
-
-        //FOR JSP
         cleintSenderStarted = false;
-        //END JSP
         throw new AxisFault("Inactivity Timeout Reached, No Response from the Server");
     }
 
-    private static String initialize(Call call, String targetUrl, String action, short MEP)
+    private String initialize(Call call, String targetUrl, String action, short MEP)
             throws AxisFault {
         validateProperties(call, targetUrl, action, MEP);
-        String keyOfCall = System.currentTimeMillis() + action;
+        String keyOfCall = this.key + action;
         call.setTargetEndpointAddress(targetUrl);
         call.setProperty(Constants.ClientProperties.ACTION, action);
         call.setTransport(new RMTransport(targetUrl, ""));
         call.setProperty(Constants.ClientProperties.MEP, new Short(MEP));
         call.setProperty(Constants.ClientProperties.CALL_KEY, keyOfCall);
-        call.setProperty(Constants.ClientProperties.REPORT, new RMReport());
+        call.setProperty(Constants.ClientProperties.REPORT, this.report);
 
         if (!insideServer) {
             InetAddress addr = null;
@@ -248,9 +334,15 @@ public class SandeshaContext {
                 log.error(e);
             }
 
-            String sourceURL = Constants.HTTP + Constants.COLON + Constants.SLASH +
-                    Constants.SLASH + addr.getHostAddress() + Constants.COLON +
-                    PropertyLoader.getClientSideListenerPort() + Constants.URL_RM_SERVICE;
+            String sourceURL = null;
+            try {
+                sourceURL = Constants.HTTP + Constants.COLON + Constants.SLASH +
+                        Constants.SLASH + addr.getHostAddress() + Constants.COLON +
+                        PropertyLoader.getClientSideListenerPort() + Constants.URL_RM_SERVICE;
+            } catch (Exception e) {
+                throw new AxisFault(e.getMessage());
+            }
+
             call.setProperty(Constants.ClientProperties.SOURCE_URL, sourceURL);
         }
         return keyOfCall;
@@ -284,8 +376,7 @@ public class SandeshaContext {
                     desc.setName(Constants.ClientProperties.RMSERVICE);
                     rmService.setServiceDescription(desc);
                     sp.deployService(Constants.ClientProperties.RMSERVICE, rmService);
-                    sas.setServerSocket(
-                            new ServerSocket(PropertyLoader.getClientSideListenerPort()));
+                    sas.setServerSocket(new ServerSocket(PropertyLoader.getClientSideListenerPort()));
 
                     Thread serverThread = new Thread(sas);
                     serverThread.start();
@@ -298,8 +389,7 @@ public class SandeshaContext {
 
     }
 
-
-    public static SimpleChain getHandlerChain(List arr) {
+    private static SimpleChain getHandlerChain(List arr) {
         SimpleChain reqHandlers = new SimpleChain();
         Iterator it = arr.iterator();
         boolean hasReqHandlers = false;
@@ -322,86 +412,30 @@ public class SandeshaContext {
     }
 
 
-    private static SimpleChain getRequestChain() {
+    private static SimpleChain getRequestChain() throws Exception {
         ArrayList arr = PropertyLoader.getRequestHandlerNames();
         return getHandlerChain(arr);
     }
 
 
-    private static SimpleChain getResponseChain() {
+    private static SimpleChain getResponseChain() throws Exception {
 
         ArrayList arr = PropertyLoader.getResponseHandlerNames();
         return getHandlerChain(arr);
     }
 
-    private static SimpleChain getListenerRequestChain() {
+    private static SimpleChain getListenerRequestChain() throws Exception {
 
         ArrayList arr = PropertyLoader.getListenerRequestHandlerNames();
         return getHandlerChain(arr);
     }
 
-    private static SimpleChain getListenerResponseChain() {
+    private static SimpleChain getListenerResponseChain() throws Exception {
 
         ArrayList arr = PropertyLoader.getListenerResponseHandlerNames();
         return getHandlerChain(arr);
     }
 
-
-    public String getToUrl(Call call) {
-        return (String) call.getProperty(Constants.ClientProperties.TO);
-    }
-
-    public void setToUrl(Call call, String toUrl) {
-        call.setProperty(Constants.ClientProperties.TO, toUrl);
-    }
-
-    public String getSourceUrl(Call call) {
-        return (String) call.getProperty(Constants.ClientProperties.SOURCE_URL);
-    }
-
-    public void setSourceUrl(Call call, String toUrl) {
-        call.setProperty(Constants.ClientProperties.SOURCE_URL, toUrl);
-    }
-
-    public String getFaultTo(Call call) {
-        return (String) call.getProperty(Constants.ClientProperties.FAULT_TO);
-    }
-
-    public void setFaultToUrl(Call call, String faultTo) {
-        call.setProperty(Constants.ClientProperties.FAULT_TO, faultTo);
-    }
-
-    public String getFromUrl(Call call) {
-        return (String) call.getProperty(Constants.ClientProperties.FROM);
-    }
-
-    public void setFromUrl(Call call, String fromUrl) {
-        call.setProperty(Constants.ClientProperties.FROM, fromUrl);
-    }
-
-    public String getReplyToUrl(Call call) {
-        return (String) call.getProperty(Constants.ClientProperties.REPLY_TO);
-    }
-
-    public void setReplyToUrl(Call call, String replyToUrl) {
-        call.setProperty(Constants.ClientProperties.REPLY_TO, replyToUrl);
-    }
-
-    public String getAcksToUrl(Call call) {
-        return (String) call.getProperty(Constants.ClientProperties.ACKS_TO);
-    }
-
-    public void setAcksToUrl(Call call, String acksToUrl) {
-        call.setProperty(Constants.ClientProperties.ACKS_TO, acksToUrl);
-    }
-
-    public boolean isSendOffer(Call call) {
-        return ((Boolean) call.getProperty(Constants.ClientProperties.SEND_OFFER)).booleanValue();
-    }
-
-    public void setSendOffer(Call call) {
-        call.setProperty(Constants.ClientProperties.SEND_OFFER, Boolean.valueOf(true));
-    }
 
     public void setLastMessage(Call call) {
         call.setProperty(Constants.ClientProperties.LAST_MESSAGE, Boolean.valueOf(true));
@@ -418,13 +452,4 @@ public class SandeshaContext {
     public void setMessageNumber(Call call, long msgNumber) {
         call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(msgNumber));
     }
-
-    public void setSynchronous(Call call) {
-        call.setProperty(Constants.ClientProperties.SYNC, Boolean.valueOf(true));
-    }
-
-    public boolean getSynchronous(Call call) {
-        return ((Boolean) call.getProperty(Constants.ClientProperties.SYNC)).booleanValue();
-    }
-
 }

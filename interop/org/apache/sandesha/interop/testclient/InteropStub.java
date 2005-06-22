@@ -37,6 +37,7 @@ import javax.xml.rpc.ParameterMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.io.IOException;
 
 /**
  * This is class has the client for the interop testing. interop.jsp
@@ -89,32 +90,32 @@ public class InteropStub {
             sendOffer = true;
 
         if (replyTo != null && replyTo.equalsIgnoreCase("anonymous")) {
-            ctx.setReplyToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.setReplyToURL(Constants.WSA.NS_ADDRESSING_ANONYMOUS);
         } else if (replyTo != null) {
-            ctx.setReplyToUrl(call, bean.getReplyto());
+            ctx.setReplyToURL(bean.getReplyto());
         }
 
         if (from != null && from.equalsIgnoreCase("anonymous")) {
-            ctx.setFromUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.setFromURL(Constants.WSA.NS_ADDRESSING_ANONYMOUS);
         } else if (from != null) {
-            ctx.setFromUrl(call, from);
+            ctx.setFromURL(from);
         }
 
         if (acksTo != null && acksTo.equalsIgnoreCase("anonymous")) {
-            ctx.setAcksToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.setAcksToURL(Constants.WSA.NS_ADDRESSING_ANONYMOUS);
         } else if (acksTo != null) {
-            ctx.setAcksToUrl(call, acksTo);
+            ctx.setAcksToURL(acksTo);
         }
 
         if (faultTo != null && faultTo.equalsIgnoreCase("anonymous")) {
-            ctx.setFaultToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.setFaultToURL(Constants.WSA.NS_ADDRESSING_ANONYMOUS);
         } else if (faultTo != null) {
-            ctx.setFaultToUrl(call, bean.getFaultto());
+            ctx.setFaultToURL(bean.getFaultto());
         }
 
 
         if (sendOffer)
-            ctx.setSendOffer(call);
+            ctx.setSendOffer(true);
 
     }
 
@@ -129,12 +130,9 @@ public class InteropStub {
             Call call = (Call) service.createCall();
 
             SandeshaContext ctx = new SandeshaContext(true);
-            ctx.setSourceUrl(call, bean.getSourceURL());
-            ctx.addNewSequeceContext(call, target, "urn:wsrm:ping",
-                    Constants.ClientProperties.IN_ONLY);
-
+            ctx.setSourceURL(bean.getSourceURL());
             configureContext(ctx, call, bean);
-
+            ctx.initCall(call, target, "urn:wsrm:ping", Constants.ClientProperties.IN_ONLY);
 
             call.setOperationName(new QName("http://tempuri.org", "Ping"));
 
@@ -149,12 +147,12 @@ public class InteropStub {
             }
 
             //InteropStub.stopClient();
-            ctx.endSequence(call);
+            ctx.endSequence();
 
         } catch (Exception e) {
             if (callback != null)
                 callback.onError(e);
-           log.info(e);
+            log.info(e);
         }
     }
 
@@ -177,11 +175,10 @@ public class InteropStub {
             Call call = (Call) service.createCall();
 
             SandeshaContext ctx = new SandeshaContext(true);
-            ctx.setSourceUrl(call, bean.getSourceURL());
-            ctx.addNewSequeceContext(call, target, "urn:wsrm:echoString",
-                    Constants.ClientProperties.IN_OUT);
+            ctx.setSourceURL( bean.getSourceURL());
 
             configureContext(ctx, call, bean);
+            ctx.initCall(call, target, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
             call.setOperationName(new QName("http://tempuri.org/", "echoString"));
 
@@ -197,10 +194,10 @@ public class InteropStub {
                 }
 
                 String ret = (String) call.invoke(new Object[]{msg, seq});
-               log.info("Got response from server " + ret);
+                log.info("Got response from server " + ret);
             }
 
-            ctx.endSequence(call);
+            ctx.endSequence();
 
         } catch (Exception e) {
             if (callback != null)
@@ -210,12 +207,17 @@ public class InteropStub {
     }
 
 
-    public static void initClient() {
-       log.info("STARTING SENDER FOR THE CLIENT .......");
+    public static void initClient() throws AxisFault {
+        log.info("STARTING SENDER FOR THE CLIENT .......");
         sender = new Sender(storageManager);
-
-        SimpleChain reqChain = getRequestChain();
-        SimpleChain resChain = getResponseChain();
+        SimpleChain reqChain = null;
+        SimpleChain resChain = null;
+        try {
+            reqChain = getRequestChain();
+            resChain = getResponseChain();
+        } catch (Exception e) {
+            throw new AxisFault(e.getMessage());
+        }
         if (reqChain != null)
             sender.setRequestChain(reqChain);
         if (resChain != null)
@@ -240,7 +242,7 @@ public class InteropStub {
                     stopClientByForce();
                 }
             } catch (InterruptedException e) {
-               log.error(e);
+                log.error(e);
             }
         }
 
@@ -257,13 +259,13 @@ public class InteropStub {
         throw new AxisFault("Inactivity Timeout Reached, No Response from the Server");
     }
 
-    private static SimpleChain getRequestChain() {
+    private static SimpleChain getRequestChain() throws Exception {
         ArrayList arr = PropertyLoader.getRequestHandlerNames();
         return getHandlerChain(arr);
     }
 
 
-    private static SimpleChain getResponseChain() {
+    private static SimpleChain getResponseChain() throws Exception {
 
         ArrayList arr = PropertyLoader.getResponseHandlerNames();
         return getHandlerChain(arr);

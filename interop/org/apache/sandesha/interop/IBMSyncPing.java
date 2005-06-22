@@ -43,12 +43,11 @@ public class IBMSyncPing {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            SandeshaContext ctx = new SandeshaContext();
-            ctx.addNewSequeceContext(call, targetURL, "urn:wsrm:Ping",
-                    Constants.ClientProperties.IN_ONLY);
-            ctx.setSynchronous(call);
-            ctx.setToUrl(call, "http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos");
-            ctx.setAcksToUrl(call, Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONIZED);
+
+            ctx.setToURL("http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos");
+            ctx.setAcksToURL(Constants.WSA.NS_ADDRESSING_ANONYMOUS);
+            ctx.initCall(call, targetURL, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 
             call.setOperationName(new QName("http://tempuri.org/", "Ping"));
 
@@ -59,7 +58,7 @@ public class IBMSyncPing {
             ctx.setLastMessage(call);
             call.invoke(new Object[]{"Ping Message Number Three"});
 
-            ctx.endSequence(call);
+            ctx.endSequence();
 
         } catch (Exception e) {
             //System.err.println(e.toString());

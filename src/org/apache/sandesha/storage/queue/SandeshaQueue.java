@@ -141,7 +141,7 @@ public class SandeshaQueue {
         }
     }
 
-    public boolean isOutgoingSequenceExists(String resSeqId) {
+    public synchronized boolean isOutgoingSequenceExists(String resSeqId) {
         synchronized (outgoingMap) {
             return outgoingMap.containsKey(resSeqId);
         }
@@ -225,7 +225,7 @@ public class SandeshaQueue {
         synchronized (lowPriorityQueue) {
             if (msg == null)
                 throw new QueueException(Constants.Queue.MESSAGE_ID_NULL);
-            lowPriorityQueue.add(msg);
+                       lowPriorityQueue.add(msg);
         }
     }
 
@@ -233,6 +233,7 @@ public class SandeshaQueue {
     public RMMessageContext nextPriorityMessageToSend() throws QueueException {
 
         synchronized (highPriorityQueue) {
+
 
             if (highPriorityQueue.size() <= 0)
                 return null;
@@ -552,7 +553,7 @@ public class SandeshaQueue {
         }
     }
 
-    public RMMessageContext checkForResponseMessage(String requestId, String seqId) {
+    public synchronized RMMessageContext checkForResponseMessage(String requestId, String seqId) {
         IncomingSequence sh = (IncomingSequence) incomingMap.get(seqId);
         if (sh == null) {
             return null;
@@ -792,8 +793,7 @@ public class SandeshaQueue {
     }
 
     public void setTerminateReceived(String seqId) {
-        IncomingSequence ics = (IncomingSequence) incomingMap.get(
-                getKeyFromIncomingSequenceId(seqId));
+        IncomingSequence ics = (IncomingSequence) incomingMap.get(getKeyFromIncomingSequenceId(seqId));
         ics.setTerminateReceived(true);
     }
 
@@ -853,9 +853,12 @@ public class SandeshaQueue {
             IncomingSequence ics = (IncomingSequence) incomingMap.get(seqId);
             OutgoingSequence ogs = (OutgoingSequence) outgoingMap.get(seqId);
 
-            boolean hasResponse = ogs.hasResponse();
+            boolean hasResponse = false;
+            if (ogs != null) {
+                hasResponse = ogs.hasResponse();
+            }
 
-            if (hasResponse && !ics.isTerminateReceived())
+            if (hasResponse && ics != null && !ics.isTerminateReceived())
                 return false;
             else
                 return true;

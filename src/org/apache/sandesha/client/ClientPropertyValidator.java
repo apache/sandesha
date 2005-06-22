@@ -20,6 +20,7 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.SandeshaContext;
 
 import javax.xml.namespace.QName;
 
@@ -30,7 +31,7 @@ import javax.xml.namespace.QName;
  */
 public class ClientPropertyValidator {
 
-    public static RMMessageContext validate(Call call) throws AxisFault {
+    public static synchronized RMMessageContext validate(Call call) throws AxisFault {
 
         RMMessageContext rmMessageContext = null;
 
@@ -47,6 +48,7 @@ public class ClientPropertyValidator {
         String faultTo = getFaultTo(call);
         boolean sendOffer = getOffer(call);
         String key = getKey(call);
+       SandeshaContext ctx=getCtx(call);
 
         try {
             sourceURL = getSourceURL(call);
@@ -71,11 +73,16 @@ public class ClientPropertyValidator {
             rmMessageContext.setTo(to);
             rmMessageContext.setFaultTo(faultTo);
             rmMessageContext.setSendOffer(sendOffer);
+            rmMessageContext.setCtx(ctx);
             return rmMessageContext;
 
         } else
             throw new AxisFault(errorMsg);
 
+    }
+
+    private static SandeshaContext getCtx(Call call){
+         return (SandeshaContext) call.getProperty("context");
     }
 
     private static String getKey(Call call) {
@@ -166,17 +173,17 @@ public class ClientPropertyValidator {
      * @return
      */
     private static long getMessageNumber(Call call) {
-        Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
-        long msgNumber = 0;
+       Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
+       SandeshaContext ctx=(SandeshaContext)call.getProperty("context");
+       long msgNo=ctx.getMessageNumber();
         if (temp == null) {
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(++msgNumber));
+             ctx.setMessageNumber(++msgNo);
         } else {
-            msgNumber =
-                    ((Long) call.getProperty(Constants.ClientProperties.MSG_NUMBER)).longValue();
-            call.setProperty(Constants.ClientProperties.MSG_NUMBER, new Long(++msgNumber));
+           msgNo = ((Long) call.getProperty(Constants.ClientProperties.MSG_NUMBER)).longValue();
+
         }
 
-        return msgNumber;
+        return msgNo;
     }
 
     private static boolean getLastMessage(Call call) {
