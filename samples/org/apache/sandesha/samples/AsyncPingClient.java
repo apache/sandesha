@@ -60,11 +60,9 @@ public class AsyncPingClient {
             ctx.endSequence();
 
 
-            //  if (report != null) {
             System.out.println("\n***********Printing RM Report***********");
             //     System.out.println("Were all messages acked     - " + report.isAllAcked());
             System.out.println("****************************************\n");
-            // }
 
 
         } catch (Exception e) {
