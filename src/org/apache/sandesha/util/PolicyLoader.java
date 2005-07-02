@@ -52,7 +52,7 @@ public class PolicyLoader {
     private Element rootNodeElement;
 
     private PolicyLoader() {
-            helper();
+        helper();
         policyInstance = true;
     }
 
@@ -132,7 +132,7 @@ public class PolicyLoader {
     }
 
     private String getExpBackoffInterval(String namespaceURI, String elementName) {
-       String name = null;
+        String name = null;
         NodeList list = rootNodeElement.getElementsByTagNameNS(namespaceURI, elementName);
         if (list != null) {
             Node node = list.item(0);
@@ -147,8 +147,7 @@ public class PolicyLoader {
             factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             builder = factory.newDocumentBuilder();
-            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                    Constants.ClientProperties.WSRM_POLICY_FILE);
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.ClientProperties.WSRM_POLICY_FILE);
 
             if (in != null) {
                 document = builder.parse(in);

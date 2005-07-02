@@ -72,9 +72,9 @@ public class Sequence extends MessageElement implements IRmElement {
      */
     public MessageElement getSoapElement() throws SOAPException {
 
-        seqElement.addChildElement(lastMessage.getSoapElement());
         seqElement.addChildElement(identifier.getSoapElement());
         seqElement.addChildElement(messageNumber.getSoapElement());
+        seqElement.addChildElement(lastMessage.getSoapElement());
 
         return seqElement;
     }
@@ -96,8 +96,7 @@ public class Sequence extends MessageElement implements IRmElement {
         removeHeaders(envelope);
 
         Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
-        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(
-                name);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
 
         headerElement.setActor(null);
         headerElement.setName(Constants.WSRM.SEQUENCE);
@@ -133,8 +132,7 @@ public class Sequence extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }
@@ -144,8 +142,7 @@ public class Sequence extends MessageElement implements IRmElement {
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER)) {
                 messageNumber = new MessageNumber();
                 messageNumber.fromSOAPEnvelope(childElement);
             }
@@ -155,8 +152,7 @@ public class Sequence extends MessageElement implements IRmElement {
                 messageNumber.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.LAST_MSG)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.LAST_MSG)) {
                 lastMessage = new LastMessage();
                 lastMessage.fromSOAPEnvelope(childElement);
             }

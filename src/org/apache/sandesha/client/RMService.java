@@ -16,6 +16,7 @@
  */
 
 package org.apache.sandesha.client;
+
 /**
  * This class is used as a web service in the client side.
  * This is the <b>addressible endpoint<b> for Sandesha client side. All the "reply"

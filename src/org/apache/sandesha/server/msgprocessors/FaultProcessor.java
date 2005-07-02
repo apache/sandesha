@@ -74,8 +74,7 @@ public class FaultProcessor implements IRMMessageProcessor {
         if (rmMessageContext.getAddressingHeaders() != null) {
             addrHeaders = rmMessageContext.getAddressingHeaders();
             if (addrHeaders.getFaultTo() != null) {
-                if (addrHeaders.getFaultTo().getAddress().toString().equals(
-                        Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
+                if (addrHeaders.getFaultTo().getAddress().toString().equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS)) {
                     return sendFaultSync(msgContext);
                 } else {
                     storageManager.insertFault(rmMessageContext);
@@ -99,8 +98,7 @@ public class FaultProcessor implements IRMMessageProcessor {
 
     private String getAcksTo(RMHeaders rmHeaders) {
         if (rmHeaders.getSequence() != null)
-            return storageManager.getAcksTo(
-                    rmHeaders.getSequence().getIdentifier().getIdentifier());
+            return storageManager.getAcksTo(rmHeaders.getSequence().getIdentifier().getIdentifier());
         else if (rmHeaders.getCreateSequence() != null)
             return rmHeaders.getCreateSequence().getAcksTo().getAddress().toString();
         else

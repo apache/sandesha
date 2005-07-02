@@ -50,8 +50,7 @@ public class TerminateSequence implements IRmElement {
      */
     public TerminateSequence() {
         terminateSequence = new MessageElement();
-        terminateSequence.setName(
-                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.TERMINATE_DEQUENCE);
+        terminateSequence.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.TERMINATE_DEQUENCE);
     }
 
     /*
@@ -115,8 +114,7 @@ public class TerminateSequence implements IRmElement {
 
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
 
                 identifier.fromSOAPEnvelope(childElement);

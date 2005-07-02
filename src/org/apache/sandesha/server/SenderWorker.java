@@ -140,8 +140,7 @@ public class SenderWorker implements Runnable {
 
                             }
                             sendMessage(rmMessageContext);
-                            rmMessageContext.setReTransmissionCount(
-                                    rmMessageContext.getReTransmissionCount() + 1);
+                            rmMessageContext.setReTransmissionCount(rmMessageContext.getReTransmissionCount() + 1);
 
                             rmMessageContext.setLocked(false);
 
@@ -190,13 +189,12 @@ public class SenderWorker implements Runnable {
                 {
                     log.info(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
                     sendTerminateSequenceRequest(rmMessageContext);
-                    storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(
-                            rmMessageContext.getSequenceID()));
+                    storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(rmMessageContext.getSequenceID()));
                     break;
                 }
             case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
                 {
-                   log.info(Constants.InfomationMessage.SENDING_ACK);
+                    log.info(Constants.InfomationMessage.SENDING_ACK);
                     sendAcknowldgement(rmMessageContext);
                     break;
                 }
@@ -247,8 +245,7 @@ public class SenderWorker implements Runnable {
             call.setSOAPActionURI(rmMessageContext.getAddressingHeaders().getAction().toString());
         }
 
-        call.setTargetEndpointAddress(
-                rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
+        call.setTargetEndpointAddress(rmMessageContext.getAddressingHeaders().getReplyTo().getAddress().toString());
 
         //NOTE: WE USE THE REQUEST MESSAGE TO SEND THE RESPONSE.
         String soapMsg = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
@@ -257,9 +254,7 @@ public class SenderWorker implements Runnable {
         if (soapMsg != null)
             call.setRequestMessage(new Message(soapMsg));
         else {
-            call.setRequestMessage(
-                    new Message(
-                            rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope()));
+            call.setRequestMessage(new Message(rmMessageContext.getMsgContext().getRequestMessage().getSOAPEnvelope()));
         }
 
         // rmMessageContext.setLastPrecessedTime(System.currentTimeMillis());
@@ -321,8 +316,7 @@ public class SenderWorker implements Runnable {
                     .getSOAPPartAsString();
             call.setRequestMessage(new Message(soapMsg));
             if (rmMessageContext.getAddressingHeaders().getAction() != null) {
-                call.setSOAPActionURI(
-                        rmMessageContext.getAddressingHeaders().getAction().toString());
+                call.setSOAPActionURI(rmMessageContext.getAddressingHeaders().getAction().toString());
             }
         }
         return call;
@@ -361,12 +355,10 @@ public class SenderWorker implements Runnable {
             RMHeaders rmHeaders = new RMHeaders();
             rmHeaders.fromSOAPEnvelope(call.getResponseMessage().getSOAPEnvelope());
             rmMessageContext.setRMHeaders(rmHeaders);
-            AddressingHeaders addrHeaders = new AddressingHeaders(
-                    call.getResponseMessage().getSOAPEnvelope());
+            AddressingHeaders addrHeaders = new AddressingHeaders(call.getResponseMessage().getSOAPEnvelope());
             rmMessageContext.setAddressingHeaders(addrHeaders);
             rmMessageContext.getMsgContext().setResponseMessage(call.getResponseMessage());
-            IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier.getMessageProcessor(
-                    rmMessageContext, storageManager);
+            IRMMessageProcessor messagePrcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
             messagePrcessor.processMessage(rmMessageContext);
         }
 

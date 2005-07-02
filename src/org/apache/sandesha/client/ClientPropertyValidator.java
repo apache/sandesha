@@ -48,7 +48,7 @@ public class ClientPropertyValidator {
         String faultTo = getFaultTo(call);
         boolean sendOffer = getOffer(call);
         String key = getKey(call);
-       SandeshaContext ctx=getCtx(call);
+        SandeshaContext ctx = getCtx(call);
 
         try {
             sourceURL = getSourceURL(call);
@@ -81,8 +81,8 @@ public class ClientPropertyValidator {
 
     }
 
-    private static SandeshaContext getCtx(Call call){
-         return (SandeshaContext) call.getProperty("context");
+    private static SandeshaContext getCtx(Call call) {
+        return (SandeshaContext) call.getProperty("context");
     }
 
     private static String getKey(Call call) {
@@ -173,13 +173,13 @@ public class ClientPropertyValidator {
      * @return
      */
     private static long getMessageNumber(Call call) {
-       Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
-       SandeshaContext ctx=(SandeshaContext)call.getProperty("context");
-       long msgNo=ctx.getMessageNumber();
+        Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
+        SandeshaContext ctx = (SandeshaContext) call.getProperty("context");
+        long msgNo = ctx.getMessageNumber();
         if (temp == null) {
-             ctx.setMessageNumber(++msgNo);
+            ctx.setMessageNumber(++msgNo);
         } else {
-           msgNo = ((Long) call.getProperty(Constants.ClientProperties.MSG_NUMBER)).longValue();
+            msgNo = ((Long) call.getProperty(Constants.ClientProperties.MSG_NUMBER)).longValue();
 
         }
 

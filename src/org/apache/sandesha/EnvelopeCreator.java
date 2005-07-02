@@ -68,8 +68,8 @@ public class EnvelopeCreator {
 
         //RelatesTo
         MessageID incommingMessageId = addressingHeaders.getMessageID();
-        outGoingAddressingHaders.addRelatesTo(incommingMessageId.toString(), new QName(
-                org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING,
+        outGoingAddressingHaders.addRelatesTo(incommingMessageId.toString(),
+                new QName(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING,
                 org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT));
 
         //SettingTo
@@ -125,8 +125,7 @@ public class EnvelopeCreator {
     public static void addNamespaceDeclarations(SOAPEnvelope soapEnv) throws Exception {
 
         soapEnv.addNamespaceDeclaration(Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
-        soapEnv.addNamespaceDeclaration(
-                org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING,
+        soapEnv.addNamespaceDeclaration(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING,
                 org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT);
         soapEnv.addNamespaceDeclaration(Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
     }
@@ -185,29 +184,6 @@ public class EnvelopeCreator {
 
         AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(responseEnvelope);
 
-        Identifier seqId = new Identifier();
-        seqId.setIdentifier(rmMessageContext.getSequenceID());
-        Sequence seq = new Sequence();
-        seq.setIdentifier(seqId);
-
-        MessageNumber msgNumber = new MessageNumber();
-        msgNumber.setMessageNumber(rmMessageContext.getMsgNumber());
-
-        seq.setMessageNumber(msgNumber);
-        if (rmMessageContext.isLastMessage()) {
-            seq.setLastMessage(new LastMessage());
-        }
-
-
-        seq.toSoapEnvelop(responseEnvelope);
-
-        if (rmMessageContext.getReTransmissionCount() > 0) {
-            AckRequested ackReq = new AckRequested();
-            ackReq.setIdentifier(seqId);
-            ackReq.toSoapEnvelop(responseEnvelope);
-        }
-
-
         if (rmMessageContext.getOldSequenceID() != null)
             outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(), null);
 
@@ -236,6 +212,27 @@ public class EnvelopeCreator {
 
         outGoingAddressingHaders.toEnvelope(responseEnvelope, null);
 
+        Identifier seqId = new Identifier();
+        seqId.setIdentifier(rmMessageContext.getSequenceID());
+        Sequence seq = new Sequence();
+        seq.setIdentifier(seqId);
+
+        MessageNumber msgNumber = new MessageNumber();
+        msgNumber.setMessageNumber(rmMessageContext.getMsgNumber());
+
+        seq.setMessageNumber(msgNumber);
+        if (rmMessageContext.isLastMessage()) {
+            seq.setLastMessage(new LastMessage());
+        }
+
+        seq.toSoapEnvelop(responseEnvelope);
+
+        if (rmMessageContext.getReTransmissionCount() > 0) {
+            AckRequested ackReq = new AckRequested();
+            ackReq.setIdentifier(seqId);
+            ackReq.toSoapEnvelop(responseEnvelope);
+        }
+
         return responseEnvelope;
     }
 
@@ -243,8 +240,37 @@ public class EnvelopeCreator {
     public static SOAPEnvelope createServiceRequestEnvelope(RMMessageContext rmMessageContext)
             throws Exception {
         SOAPEnvelope requestEnvelope;
+
+        String str = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
+        requestEnvelope = new Message(str).getSOAPEnvelope();
+
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
         RMHeaders rmHeaders = new RMHeaders();
+
+        AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(requestEnvelope);
+
+        MessageID messageId = new MessageID(new URI(rmMessageContext.getMessageID()));
+        outGoingAddressingHaders.setMessageID(messageId);
+
+        outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
+        outGoingAddressingHaders.setTo(addressingHeaders.getTo());
+
+        if (addressingHeaders.getReplyTo() != null)
+            outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
+
+        if (addressingHeaders.getFaultTo() != null)
+            outGoingAddressingHaders.setFaultTo(addressingHeaders.getFaultTo());
+        try {
+            Action action = new Action(new URI(rmMessageContext.getAction()));
+            outGoingAddressingHaders.setAction(action);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (rmMessageContext.getFaultTo() != null)
+            outGoingAddressingHaders.setFaultTo(new FaultTo(new Address(rmMessageContext.getFaultTo())));
+
+        outGoingAddressingHaders.toEnvelope(requestEnvelope, null);
 
         Sequence seq = new Sequence();
         Identifier id = new Identifier();
@@ -268,36 +294,7 @@ public class EnvelopeCreator {
         rmHeaders.setSequence(seq);
         rmMessageContext.setRMHeaders(rmHeaders);
 
-        String str = rmMessageContext.getMsgContext().getRequestMessage().getSOAPPartAsString();
-        requestEnvelope = new Message(str).getSOAPEnvelope();
-
         rmMessageContext.getRMHeaders().toSoapEnvelop(requestEnvelope);
-        AddressingHeaders outGoingAddressingHaders = new AddressingHeaders(requestEnvelope);
-
-        MessageID messageId = new MessageID(new URI(rmMessageContext.getMessageID()));
-        outGoingAddressingHaders.setMessageID(messageId);
-
-        outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
-        outGoingAddressingHaders.setTo(addressingHeaders.getTo());
-
-        if (addressingHeaders.getReplyTo() != null)
-            outGoingAddressingHaders.setReplyTo(addressingHeaders.getReplyTo());
-
-        if (addressingHeaders.getFaultTo() != null)
-            outGoingAddressingHaders.setFaultTo(addressingHeaders.getFaultTo());
-        try {
-            Action action = new Action(new URI(rmMessageContext.getAction()));
-            outGoingAddressingHaders.setAction(action);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (rmMessageContext.getFaultTo() != null)
-            outGoingAddressingHaders.setFaultTo(
-                    new FaultTo(new Address(rmMessageContext.getFaultTo())));
-
-        outGoingAddressingHaders.toEnvelope(requestEnvelope, null);
-
         return requestEnvelope;
     }
 

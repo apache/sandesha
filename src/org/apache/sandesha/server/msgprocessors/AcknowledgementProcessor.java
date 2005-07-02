@@ -62,8 +62,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
             long msgNumber = ackRange.getMinValue();
             while (ackRange.getMaxValue() >= msgNumber) {
                 if (!storageManager.isSentMsg(seqID, msgNumber)) {
-                    throw new AxisFault(new javax.xml.namespace.QName(
-                            Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT),
+                    throw new AxisFault(new javax.xml.namespace.QName(Constants.FaultCodes.WSRM_FAULT_INVALID_ACKNOWLEDGEMENT),
                             Constants.FaultMessages.INVALID_ACKNOWLEDGEMENT, null, null);
                 }
                 storageManager.setAckReceived(seqID, msgNumber);
@@ -118,15 +117,12 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         RMMessageContext rmMsgContext = new RMMessageContext();
         try {
 
-            String to = storageManager.getAcksTo(
-                    rmMessageContext.getRMHeaders().getSequence().getIdentifier().getIdentifier());
+            String to = storageManager.getAcksTo(rmMessageContext.getRMHeaders().getSequence().getIdentifier().getIdentifier());
 
-            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(
-                    rmMessageContext, to, ackRangeVector);
+            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext, to, ackRangeVector);
 
             Message resMsg = new Message(ackEnvelope);
-            MessageContext msgContext = new MessageContext(
-                    rmMessageContext.getMsgContext().getAxisEngine());
+            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
             rmMessageContext.copyContents(rmMsgContext);
             msgContext.setResponseMessage(resMsg);
             rmMsgContext.setMsgContext(msgContext);
@@ -166,8 +162,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
                     max = ((Long) listOfMsgNumbers.get(new Long(i))).longValue();
                 } else {
 
-                    if (1 == (((Long) listOfMsgNumbers.get(new Long(i + 1))).longValue() - ((Long) listOfMsgNumbers.get(
-                            new Long(i))).longValue())) {
+                    if (1 == (((Long) listOfMsgNumbers.get(new Long(i + 1))).longValue() - ((Long) listOfMsgNumbers.get(new Long(i))).longValue())) {
                         max = ((Long) listOfMsgNumbers.get(new Long(i + 1))).longValue();
                         found = true;
                     } else {

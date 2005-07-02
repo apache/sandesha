@@ -49,8 +49,7 @@ public class CreateSequence implements IRmElement {
      */
     public CreateSequence() {
         createSequence = new MessageElement();
-        createSequence.setName(
-                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE);
+        createSequence.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE);
     }
 
 
@@ -60,8 +59,8 @@ public class CreateSequence implements IRmElement {
      * @return MessageElement
      */
     public MessageElement getSoapElement() throws SOAPException {
-        createSequence.addChildElement(offer.getSoapElement());
         createSequence.addChildElement(acksTo.getSoapElement());
+        createSequence.addChildElement(offer.getSoapElement());
         return createSequence;
     }
 
@@ -84,10 +83,10 @@ public class CreateSequence implements IRmElement {
 
         bodyElement.setName(Constants.WSRM.CREATE_SEQUENCE);
 
-        if (offer != null)
-            offer.toSOAPEnvelope(bodyElement);
         if (acksTo != null)
             acksTo.toSOAPEnvelope(bodyElement);
+        if (offer != null)
+            offer.toSOAPEnvelope(bodyElement);
 
         return env;
     }
@@ -107,20 +106,19 @@ public class CreateSequence implements IRmElement {
             //TODO  add offer processing code here
             //TEST OFFER
             childElement = (MessageElement) iterator.next();
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
-                offer = new SequenceOffer();
-                offer.fromSOAPEnvelope(childElement);
-            } else if (childElement.getName().equals(Constants.WSRM.SEQUENCE_OFFER)) {
-                offer = new SequenceOffer();
-                offer.fromSOAPEnvelope(childElement);
-            } else if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO)) {
+
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO)) {
                 acksTo = new AcksTo();
                 acksTo.fromSOAPEnvelope(childElement);
             } else if (childElement.getName().equals(Constants.WSRM.ACKS_TO)) {
                 acksTo = new AcksTo();
                 acksTo.fromSOAPEnvelope(childElement);
+            } else if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_OFFER)) {
+                offer = new SequenceOffer();
+                offer.fromSOAPEnvelope(childElement);
+            } else if (childElement.getName().equals(Constants.WSRM.SEQUENCE_OFFER)) {
+                offer = new SequenceOffer();
+                offer.fromSOAPEnvelope(childElement);
             }
 
         }

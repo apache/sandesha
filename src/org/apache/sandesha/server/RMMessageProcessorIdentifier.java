@@ -45,11 +45,9 @@ public class RMMessageProcessorIdentifier {
         if (addrHeaders.getAction() != null) {
             if (addrHeaders.getAction().toString().equals(Constants.WSRM.ACTION_CREATE_SEQUENCE)) {
                 return new CreateSequenceProcessor(storageManager);
-            } else if (addrHeaders.getAction().toString().equals(
-                    Constants.WSRM.ACTION_CREATE_SEQUENCE_RESPONSE)) {
+            } else if (addrHeaders.getAction().toString().equals(Constants.WSRM.ACTION_CREATE_SEQUENCE_RESPONSE)) {
                 return new CreateSequenceResponseProcessor(storageManager);
-            } else if (addrHeaders.getAction().toString().equals(
-                    Constants.WSRM.ACTION_TERMINATE_SEQUENCE)) {
+            } else if (addrHeaders.getAction().toString().equals(Constants.WSRM.ACTION_TERMINATE_SEQUENCE)) {
                 return new TerminateSequenceProcessor(storageManager);
             } else if (rmHeaders.getSequenceAcknowledgement() != null ||
                     rmHeaders.getSequence().getMessageNumber() != null) {

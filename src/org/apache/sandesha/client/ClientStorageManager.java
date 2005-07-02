@@ -48,7 +48,7 @@ public class ClientStorageManager implements IStorageManager {
                 Constants.CLIENT);
     }
 
-    public  boolean isSequenceExist(String sequenceID) {
+    public boolean isSequenceExist(String sequenceID) {
         return accessor.isOutgoingSequenceExists(sequenceID);
     }
 
@@ -226,9 +226,9 @@ public class ClientStorageManager implements IStorageManager {
      * @see org.apache.sandesha.IStorageManager#insertOutgoingMessage
      * (org.apache.sandesha.RMMessageContext)
      */
-    public  void insertOutgoingMessage(RMMessageContext msg) {
-           String sequenceId = msg.getSequenceID();
-              accessor.addMessageToOutgoingSequence(sequenceId, msg);
+    public void insertOutgoingMessage(RMMessageContext msg) {
+        String sequenceId = msg.getSequenceID();
+        accessor.addMessageToOutgoingSequence(sequenceId, msg);
     }
 
     /*

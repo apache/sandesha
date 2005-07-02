@@ -100,19 +100,16 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
             resEnvelope = EnvelopeCreator.createCreateSequenceResponseEnvelope(seqId,
                     rmMessageContext, hasOffer, offerAccepted);
         } catch (Exception e) {
-            throw new AxisFault(
-                    org.apache.sandesha.Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);
+            throw new AxisFault(org.apache.sandesha.Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR);
         }
-        rmMessageContext.setMessageType(
-                org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
+        rmMessageContext.setMessageType(org.apache.sandesha.Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE);
 
         if (rmMessageContext.getSync()) {
             rmMessageContext.getMsgContext().setResponseMessage(new Message(resEnvelope));
             return true;
 
         } else {
-            MessageContext msgContext = new MessageContext(
-                    rmMessageContext.getMsgContext().getAxisEngine());
+            MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
             msgContext.setResponseMessage(new Message(resEnvelope));
             rmMessageContext.setMsgContext(msgContext);
 

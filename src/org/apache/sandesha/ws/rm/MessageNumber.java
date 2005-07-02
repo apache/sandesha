@@ -50,8 +50,7 @@ public class MessageNumber implements IRmElement {
 
         messageNoElement = new MessageElement();
 
-        messageNoElement.setName(
-                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER);
+        messageNoElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.MSG_NUMBER);
     }
 
     /**

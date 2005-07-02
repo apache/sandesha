@@ -127,6 +127,7 @@ public class TCScenarioTest extends TestCase {
         SandeshaContext ctx = new SandeshaContext();
 
         ctx.setAcksToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        ctx.setReplyToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
         ctx.initCall(call, targetURL, "urn:wsrm:ping", Constants.ClientProperties.IN_ONLY);
 
         call.setOperationName(new QName("http://tempuri.org", "Ping"));
@@ -272,6 +273,8 @@ public class TCScenarioTest extends TestCase {
         Service pingService = new Service();
         Call pingCall = (Call) pingService.createCall();
         SandeshaContext pingCtx = new SandeshaContext();
+        pingCtx.setAcksToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
+        pingCtx.setReplyToURL("http://127.0.0.1:" + defaultClientPort + "/axis/services/RMService");
 
         pingCtx.initCall(pingCall, targetURL, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 

@@ -114,8 +114,7 @@ public class SequenceAcknowledgement extends MessageElement implements IRmElemen
         }
 
         Name name = env.createName("", Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
-        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(
-                name);
+        SOAPHeaderElement headerElement = (SOAPHeaderElement) env.getHeader().addHeaderElement(name);
 
         headerElement.setActor(null);
         headerElement.setName(Constants.WSRM.SEQUENCE_ACK);
@@ -159,10 +158,8 @@ public class SequenceAcknowledgement extends MessageElement implements IRmElemen
 
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
-
                 identifier.fromSOAPEnvelope(childElement);
             }
 
@@ -171,8 +168,7 @@ public class SequenceAcknowledgement extends MessageElement implements IRmElemen
                 identifier.fromSOAPEnvelope(childElement);
             }
 
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_RANGE)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_RANGE)) {
                 AcknowledgementRange ackRange = new AcknowledgementRange();
 
                 ackRange.fromSOAPEnvelope(childElement);
@@ -185,8 +181,7 @@ public class SequenceAcknowledgement extends MessageElement implements IRmElemen
                 ackRanges.add(ackRange);
             }
 
-            if (childElement.getName().equals(
-                    Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.NACK)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.NACK)) {
                 Nack nack = new Nack();
                 nack.fromSOAPEnvelope(childElement);
             }

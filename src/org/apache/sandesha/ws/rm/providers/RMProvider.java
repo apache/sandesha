@@ -106,8 +106,7 @@ public class RMProvider extends RPCProvider {
                 rmMessageContext.setMessageID(addrHeaders.getMessageID().toString());
             }
 
-            IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(
-                    rmMessageContext, storageManager);
+            IRMMessageProcessor rmMessageProcessor = RMMessageProcessorIdentifier.getMessageProcessor(rmMessageContext, storageManager);
 
             if (callback != null) {
                 CallbackData cbData = getCallbackData(rmMessageContext);
@@ -142,8 +141,7 @@ public class RMProvider extends RPCProvider {
 
     private boolean isIgnorableMessage(MessageContext msgContext) throws Exception {
         boolean result = false;
-        AddressingHeaders addrH = new AddressingHeaders(
-                msgContext.getRequestMessage().getSOAPEnvelope());
+        AddressingHeaders addrH = new AddressingHeaders(msgContext.getRequestMessage().getSOAPEnvelope());
         List lst = getIgnorableActions(msgContext);
         if (lst != null && addrH.getAction() != null) {
             Iterator ite = lst.iterator();

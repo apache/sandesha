@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 /**
  * class SequenceOffer
+ *
  * @author Jaliya Ekanayaka
  * @author Chamikara Jayalath
  */
@@ -32,13 +33,13 @@ import java.util.Iterator;
 public class SequenceOffer extends MessageElement implements IRmElement {
 
     private MessageElement offerElement;
-    
+
     private Identifier identifier;
-    
-    public SequenceOffer (){
-        offerElement = new MessageElement(Constants.WSRM.SEQUENCE_OFFER,Constants.WSRM.NS_PREFIX_RM,Constants.WSRM.NS_URI_RM);
-      }
-    
+
+    public SequenceOffer() {
+        offerElement = new MessageElement(Constants.WSRM.SEQUENCE_OFFER, Constants.WSRM.NS_PREFIX_RM, Constants.WSRM.NS_URI_RM);
+    }
+
     public void addChildElement(MessageElement element) throws SOAPException {
         offerElement.addChildElement(element);
     }
@@ -47,7 +48,7 @@ public class SequenceOffer extends MessageElement implements IRmElement {
         offerElement.addChildElement(identifier.getSoapElement());
         return offerElement;
     }
-    
+
     public SequenceOffer fromSOAPEnvelope(MessageElement element) {
 
         Iterator iterator = element.getChildElements();
@@ -56,8 +57,8 @@ public class SequenceOffer extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
 
             childElement = (MessageElement) iterator.next();
-            
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.IDENTIFIER)) {
+
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }
@@ -69,17 +70,17 @@ public class SequenceOffer extends MessageElement implements IRmElement {
         }
         return this;
     }
-    
+
     public MessageElement toSOAPEnvelope(MessageElement element) throws SOAPException {
 
-       if(identifier!=null)
-           identifier.toSOAPEnvelope(offerElement);
+        if (identifier != null)
+            identifier.toSOAPEnvelope(offerElement);
 
         element.addChildElement(offerElement);
         return element;
     }
-    
-    
+
+
     public Identifier getIdentifier() {
         return identifier;
     }

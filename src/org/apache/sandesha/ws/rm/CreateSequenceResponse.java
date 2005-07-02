@@ -55,7 +55,7 @@ public class CreateSequenceResponse implements IRmElement {
         createSequenceResponse.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.CREATE_SEQUENCE_RESPONSE);
     }
 
-       /**
+    /**
      * Method getSoapElement
      *
      * @return MessageElement
@@ -104,7 +104,7 @@ public class CreateSequenceResponse implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM+ Constants.COLON + Constants.WSRM.IDENTIFIER)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER)) {
                 identifier = new Identifier();
                 identifier.fromSOAPEnvelope(childElement);
             }
@@ -128,7 +128,7 @@ public class CreateSequenceResponse implements IRmElement {
         return this;
     }
 
-       /**
+    /**
      * Method addChildElement
      *
      * @param element

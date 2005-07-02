@@ -27,35 +27,35 @@ import java.util.Set;
  */
 
 public interface ISandeshaDAO {
-    
+
     /**
-     * This adds a new entry in the storage to to hold messages of a perticular 
+     * This adds a new entry in the storage to to hold messages of a perticular
      * sequence that come in to the sandesha server/client
      */
     boolean addIncomingSequence(String sequenceId);
 
-    
+
     /**
-     * This adds a entry in the storage for holding the messages of the given outgoing 
+     * This adds a entry in the storage for holding the messages of the given outgoing
      * sequence.
      */
     boolean addOutgoingSequence(String sequenceId);
 
-    
+
     /**
-     * Adds a priority message (e.g. create seq) to the queue. These will be sent 
-     * before other messages like application requests. 
+     * Adds a priority message (e.g. create seq) to the queue. These will be sent
+     * before other messages like application requests.
      */
     boolean addPriorityMessage(RMMessageContext message);
 
-    
+
     /**
-     * This checks the priority messages to see weather there is any one to 
+     * This checks the priority messages to see weather there is any one to
      * be sent (either for the first time or a retransmission)
      */
     RMMessageContext getNextPriorityMessageContextToSend();
 
-    
+
     /**
      * This adds a incoming message to a area belonging to the given sequence in the
      * queue.
@@ -63,43 +63,42 @@ public interface ISandeshaDAO {
     boolean addMessageToIncomingSequence(String sequenceId, Long msgNo,
                                          RMMessageContext rmMessageContext);
 
-    
+
     /**
      * This adds the given message to the given sequence.
      */
     boolean addMessageToOutgoingSequence(String sequenceId,
                                          RMMessageContext rmMessageContext);
 
-    
+
     /**
-     * This checks weather there is a entry for the given incoming sequence in 
+     * This checks weather there is a entry for the given incoming sequence in
      * the queue.
      */
     boolean isIncomingSequenceExists(String sequenceId);
 
-    
+
     /**
      * Checks weather a entry for the given outgoing sequence exists in
      * the queue.
      */
     boolean isOutgoingSequenceExists(String sequenceId);
 
-    
 
     /**
-     * This checks in the given incoming sequence to see weather a message of 
+     * This checks in the given incoming sequence to see weather a message of
      * the given message no exists
      */
     boolean isIncomingMessageExists(String sequenceId, Long msgNo);
 
-    
+
     /**
      * This tries to get the next message to be sent from the given outgoing sequence
      * If these is no message to be sent in the given sequence, null will be returned.
      */
     RMMessageContext getNextMsgContextToProcess(String sequenceId);
 
-    
+
     /**
      * Gets the next possible message to be sent from the queue.
      */
@@ -112,9 +111,9 @@ public interface ISandeshaDAO {
      */
     String getRandomSeqIdToProcess();
 
-    
+
     /**
-     * This reutns a set of message numbers with all the message numbers of 
+     * This reutns a set of message numbers with all the message numbers of
      * incoming sequence.
      */
     Set getAllReceivedMsgNumsOfIncomingSeq(String sequenceId);
@@ -122,33 +121,33 @@ public interface ISandeshaDAO {
 
     /**
      * This sets the outgoing sequence. Here seqId is the entry in the queue
-     * that we hope to hold the messages of a perticular sequence. outseqid is the 
+     * that we hope to hold the messages of a perticular sequence. outseqid is the
      * actual sequence id (i.e. uuid). That will be set within the wsrm:sequence field of
      * this message. (remember that we may not have received this actual outgoing sequence id
      * by the time we start to store outgoing messages).
      */
     void setOutSequence(String sequenceId, String outSequenceId);
 
-    
+
     /**
-     * This sets a flag in the queue to indicate that the outSequence of the perticular message set 
+     * This sets a flag in the queue to indicate that the outSequence of the perticular message set
      * (stored with the id seqId) has been set correctly. The value in outSequence may be wrong
-     * before the sender gets the create seq. response. After getting this and after setting the 
+     * before the sender gets the create seq. response. After getting this and after setting the
      * out sequence correctly using the previous method, this flag will be set to true. Only then these
      * messages thould be send to the sender.
      */
     void setOutSequenceApproved(String sequenceID, boolean approved);
 
-    
+
     /**
-     * this gives the seqId which is used to hold the messages of which the 
+     * this gives the seqId which is used to hold the messages of which the
      * outsequence entry has been set to the value outsequenceId.
      */
     String getSequenceOfOutSequence(String outsequenceId);
 
 
     /**
-     * This checks the priority queue for a message if given messageid and 
+     * This checks the priority queue for a message if given messageid and
      * moves it to the bin
      */
     void removeCreateSequenceMsg(String messageId);
@@ -196,20 +195,20 @@ public interface ISandeshaDAO {
     public RMMessageContext getNextLowPriorityMessageContextToSend();
 
     /**
-     * The message will be added to a sent list (the list holds the 
+     * The message will be added to a sent list (the list holds the
      * messages that were sent at least once)
      */
     public void addSendMsgNo(String seqId, long msgNo);
 
     /**
-     * Asks from the storage weather the given message has been sent at 
-     * least once 
+     * Asks from the storage weather the given message has been sent at
+     * least once
      */
     public boolean isSentMsg(String seqId, long msgNo);
 
 
     /**
-     * Can be used to ckeck weather the last message has been received in the 
+     * Can be used to ckeck weather the last message has been received in the
      * incoming sequence.
      */
     public boolean hasLastIncomingMsgReceived(String seqId);
@@ -230,14 +229,15 @@ public interface ISandeshaDAO {
      */
     public boolean isRequestedSeqPresent(String seqId);
 
-    /**The client side will not be able to have sequenceId as a key for storing request messages.
-     *Since it may be not known when the user adds first message.
-     *This asks for that key, giving sequence id of incoming messages.
+    /**
+     * The client side will not be able to have sequenceId as a key for storing request messages.
+     * Since it may be not known when the user adds first message.
+     * This asks for that key, giving sequence id of incoming messages.
      */
     public String getKeyFromIncomingSequenceId(String incomingSeqID);
 
     /**
-     *This asks for the above key (the key used to hold messages) given the outgoing sequece id. 
+     * This asks for the above key (the key used to hold messages) given the outgoing sequece id.
      */
     public String getKeyFromOutgoingSequenceId(String outgoingSeqID);
 
@@ -257,7 +257,7 @@ public interface ISandeshaDAO {
     public boolean isAllOutgoingTerminateSent();
 
     /**
-     * Use this to check weather the terminate message of all sequences (incoming) has 
+     * Use this to check weather the terminate message of all sequences (incoming) has
      * been received.
      */
     public boolean isAllIncommingTerminateReceived();
@@ -265,8 +265,8 @@ public interface ISandeshaDAO {
     /**
      * Set the acks to of the given sequence.
      */
-    public void setAcksTo(String seqId,String acksTo);
-    
+    public void setAcksTo(String seqId, String acksTo);
+
     /**
      * gets the acksTo value
      */
@@ -281,7 +281,7 @@ public interface ISandeshaDAO {
      * Gets the offered incoming sequence, of outgoing sequence.
      */
     public String getOffer(String msgID);
-    
+
     /**
      * clears the storage.
      */
@@ -289,11 +289,11 @@ public interface ISandeshaDAO {
 
     public boolean isOutgoingTerminateSent(String seqId);
 
-   public  boolean isIncommingTerminateReceived(String seqId);
-   
-   public void updateFinalMessageArrivedTime(String sequenceID);
-   
-   public void sendAck(String sequenceId);
-   
-   public void removeAllAcks(String sequenceID);
+    public boolean isIncommingTerminateReceived(String seqId);
+
+    public void updateFinalMessageArrivedTime(String sequenceID);
+
+    public void sendAck(String sequenceId);
+
+    public void removeAllAcks(String sequenceID);
 }

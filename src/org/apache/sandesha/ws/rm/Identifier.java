@@ -32,8 +32,7 @@ public class Identifier extends URI {
      */
     public Identifier() {
         identifierElement = new MessageElement();
-        identifierElement.setName(
-                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER);
+        identifierElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.IDENTIFIER);
     }
 
     /**

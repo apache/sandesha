@@ -78,8 +78,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
                     rmMsgContext.setSequenceID(sequenceUUID);
                     rmMsgContext.setMsgNumber(messageNumber);
                     try {
-                        MessageContext msgContext = new MessageContext(
-                                rmMessageContext.getMsgContext().getAxisEngine());
+                        MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
                         RMMessageContext.copyMessageContext(rmMessageContext.getMsgContext(),
                                 msgContext);
                         String soapMsg = rmMessageContext.getMsgContext().getRequestMessage()
@@ -92,8 +91,7 @@ public class CompositeProcessor implements IRMMessageProcessor {
                         rmMsgContext.setMessageType(Constants.MSG_TYPE_SERVICE_REQUEST);
                     } catch (Exception e) {
                         log.error(e);
-                        throw new AxisFault(
-                                new QName(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR),
+                        throw new AxisFault(new QName(Constants.FaultCodes.WSRM_SERVER_INTERNAL_ERROR),
                                 Constants.FaultMessages.SERVER_INTERNAL_ERROR, null, null);
                     }
                     storageManager.insertIncomingMessage(rmMsgContext);

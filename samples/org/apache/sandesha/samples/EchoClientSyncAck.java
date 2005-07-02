@@ -39,6 +39,8 @@ public class EchoClientSyncAck {
     private static String targetURL = "http://127.0.0.1:" + defaultServerPort +
             "/axis/services/RMSampleService";
 
+
+
     public static void main(String[] args) {
 
         System.out.println("EchoClientSyncAck Started ........");

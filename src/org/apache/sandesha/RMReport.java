@@ -18,13 +18,14 @@ package org.apache.sandesha;
 
 /**
  * RMReport is generated at the end of the termination of each sequence.
+ *
  * @auther Chamikara Jayalath
  * @auther Jaliya Ekanyake
  */
 public class RMReport {
-	
-	private  boolean allAcked;
-	private int returns;
+
+    private boolean allAcked;
+    private int returns;
     private String error;
 
     public String getError() {
@@ -50,17 +51,17 @@ public class RMReport {
     public int getNumberOfReturnMessages() {
         return this.returns;
     }
-    
-    public void setAllAcked(boolean acked){
-    	this.allAcked = acked;
-    }
-    
-    public void setNoOfReturmMessages(int n){
-    	this.returns = n;
+
+    public void setAllAcked(boolean acked) {
+        this.allAcked = acked;
     }
 
-    public void incrementReturnedMsgCount(){
-       this.returns++;
+    public void setNoOfReturmMessages(int n) {
+        this.returns = n;
+    }
+
+    public void incrementReturnedMsgCount() {
+        this.returns++;
     }
 
 }

@@ -225,7 +225,7 @@ public class SandeshaQueue {
         synchronized (lowPriorityQueue) {
             if (msg == null)
                 throw new QueueException(Constants.Queue.MESSAGE_ID_NULL);
-                       lowPriorityQueue.add(msg);
+            lowPriorityQueue.add(msg);
         }
     }
 

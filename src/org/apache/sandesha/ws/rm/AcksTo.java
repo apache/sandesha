@@ -36,8 +36,7 @@ public class AcksTo implements IRmElement {
 
     public AcksTo(Address address) {
         acksToElement = new MessageElement();
-        acksToElement.setName(
-                Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO);
+        acksToElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO);
         this.address = address;
     }
 
@@ -54,15 +53,13 @@ public class AcksTo implements IRmElement {
         try {
             while (iterator.hasNext()) {
                 childElement = (MessageElement) iterator.next();
-                if (childElement.getName().equals(
-                        org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING +
+                if (childElement.getName().equals(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING +
                         Constants.COLON +
                         org.apache.axis.message.addressing.Constants.ADDRESS)) {
                     String uri = childElement.getFirstChild().getFirstChild().toString();
                     address = new Address(uri);
                 }
-                if (childElement.getName().equals(
-                        org.apache.axis.message.addressing.Constants.ADDRESS)) {
+                if (childElement.getName().equals(org.apache.axis.message.addressing.Constants.ADDRESS)) {
                     String uri = childElement.getFirstChild().getNodeValue();
                     address = new Address(uri);
                 }

@@ -40,7 +40,7 @@ public class SequenceFault extends MessageElement implements IRmElement {
 
     public SequenceFault() {
         sequenceFault = new MessageElement();
-        sequenceFault.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.SEQUENCE_FAULT);
+        sequenceFault.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.SEQUENCE_FAULT);
     }
 
 
@@ -85,7 +85,7 @@ public class SequenceFault extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.FAULT_CODE)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.FAULT_CODE)) {
                 faultCode = new FaultCode();
                 faultCode.fromSOAPEnvelope(childElement);
             }

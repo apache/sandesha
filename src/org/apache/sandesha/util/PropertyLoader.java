@@ -33,7 +33,7 @@ import java.util.Properties;
  */
 public class PropertyLoader {
     public static int getClientSideListenerPort() throws Exception {
-        Properties  prop = loadProperties();
+        Properties prop = loadProperties();
 
         if (prop != null) {
             return new Integer(prop.getProperty(Constants.ClientProperties.CLIENT_LISTENER_PORT)).intValue();
@@ -54,10 +54,10 @@ public class PropertyLoader {
     private static Properties loadProperties() throws Exception {
 
         Properties properties = new Properties();
-        try{
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.ClientProperties.PROPERTY_FILE);
-        properties.load(in);
-        }catch(IOException e){
+        try {
+            InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.ClientProperties.PROPERTY_FILE);
+            properties.load(in);
+        } catch (IOException e) {
             throw new Exception(Constants.ErrorMessages.CANNOT_LOAD_PROPERTIES);
         }
 
@@ -78,18 +78,18 @@ public class PropertyLoader {
         Properties properties = loadProperties();
         ArrayList ret = new ArrayList();
 
-            int temp = 0;
-            String propVal;
-            do {
-                temp++;
-                String tempStr = type + temp;
-                propVal = properties.getProperty(tempStr);
-                if (propVal != null) {
-                    ret.add(propVal);
-                }
-            } while (propVal != null);
+        int temp = 0;
+        String propVal;
+        do {
+            temp++;
+            String tempStr = type + temp;
+            propVal = properties.getProperty(tempStr);
+            if (propVal != null) {
+                ret.add(propVal);
+            }
+        } while (propVal != null);
 
-            return ret;
+        return ret;
 
     }
 

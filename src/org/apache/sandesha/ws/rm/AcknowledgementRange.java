@@ -52,7 +52,7 @@ public class AcknowledgementRange implements IRmElement {
      */
     public AcknowledgementRange() {
         ackRangeElement = new MessageElement();
-        ackRangeElement.setName(Constants.WSRM.NS_PREFIX_RM+Constants.COLON+Constants.WSRM.ACK_RANGE);
+        ackRangeElement.setName(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACK_RANGE);
     }
 
     /**

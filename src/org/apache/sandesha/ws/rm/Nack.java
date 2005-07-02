@@ -85,8 +85,7 @@ public class Nack implements IRmElement {
      */
     public MessageElement toSOAPEnvelope(MessageElement msgElement) throws SOAPException {
 
-        msgElement.addChildElement(Constants.WSRM.NACK, Constants.WSRM.NS_PREFIX_RM).addTextNode(
-                (new Long(notAckNum)).toString());
+        msgElement.addChildElement(Constants.WSRM.NACK, Constants.WSRM.NS_PREFIX_RM).addTextNode((new Long(notAckNum)).toString());
 
         return msgElement;
     }

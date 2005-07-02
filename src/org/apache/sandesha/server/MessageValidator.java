@@ -50,13 +50,11 @@ public final class MessageValidator {
         MessageContext msgContext = rmMsgContext.getMsgContext();
         try {
             AddressingHeaders aHeaders = (AddressingHeaders) rmMsgContext.getMsgContext()
-                    .getProperty(
-                        org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
+                    .getProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS);
             if (aHeaders == null)
                 throw new AxisFault(new QName(Constants.FaultCodes.IN_CORRECT_MESSAGE),
                         Constants.FaultMessages.NO_ADDRESSING_HEADERS, null, null);
-            AddressingHeaders addrHeaders = new AddressingHeaders(
-                    msgContext.getRequestMessage().getSOAPEnvelope());
+            AddressingHeaders addrHeaders = new AddressingHeaders(msgContext.getRequestMessage().getSOAPEnvelope());
             validateAddrHeaders(addrHeaders);
             rmMsgContext.setAddressingHeaders(addrHeaders);
 
@@ -109,12 +107,10 @@ public final class MessageValidator {
             }
             if (sequence.getMessageNumber() != null) {
                 long msgNo = sequence.getMessageNumber().getMessageNumber();
-                if (storageMgr.hasLastIncomingMsgReceived(
-                        sequence.getIdentifier().getIdentifier())) {
+                if (storageMgr.hasLastIncomingMsgReceived(sequence.getIdentifier().getIdentifier())) {
                     long lastMsg = storageMgr.getLastIncomingMsgNo(seqId);
                     if (msgNo > lastMsg)
-                        throw new AxisFault(
-                                new QName(Constants.FaultCodes.WSRM_FAULR_LAST_MSG_NO_EXCEEDED),
+                        throw new AxisFault(new QName(Constants.FaultCodes.WSRM_FAULR_LAST_MSG_NO_EXCEEDED),
                                 Constants.FaultMessages.LAST_MSG_NO_EXCEEDED, null, null);
                 }
             }

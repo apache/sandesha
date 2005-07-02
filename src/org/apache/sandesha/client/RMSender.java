@@ -83,13 +83,13 @@ public class RMSender extends BasicHandler {
                 long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
 
                 while (responseMessageContext == null) {
-                    synchronized(lock){
-                    responseMessageContext =
-                            checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
-                    if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
-                        reqMsgCtx.getCtx().stopClientByForce();
-                    }
-                    Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
+                    synchronized (lock) {
+                        responseMessageContext =
+                                checkTheQueueForResponse(tempSeqID, reqMsgCtx.getMessageID());
+                        if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
+                            reqMsgCtx.getCtx().stopClientByForce();
+                        }
+                        Thread.sleep(Constants.CLIENT_RESPONSE_CHECKING_INTERVAL);
                     }
                 }
 
@@ -135,10 +135,10 @@ public class RMSender extends BasicHandler {
      */
     private RMMessageContext processFirstRequestMessage(RMMessageContext reqRMMsgContext,
                                                         boolean sync) throws Exception {
-                synchronized (lock) {
+        synchronized (lock) {
 
             if (!storageManager.isSequenceExist(reqRMMsgContext.getSequenceID())) {
-                                String msgID = Constants.UUID + uuidGen.nextUUID();
+                String msgID = Constants.UUID + uuidGen.nextUUID();
                 String offerID = null;
                 if (reqRMMsgContext.isHasResponse() && reqRMMsgContext.isSendOffer()) {
                     offerID = Constants.UUID + uuidGen.nextUUID();
@@ -167,12 +167,12 @@ public class RMSender extends BasicHandler {
 
     private RMMessageContext processRequestMessage(RMMessageContext reqRMMsgContext)
             throws Exception {
-                if (reqRMMsgContext.isLastMessage()) {
+        if (reqRMMsgContext.isLastMessage()) {
             storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(reqRMMsgContext, Constants.CLIENT));
         }
         RMMessageContext serviceRequestMsg = RMMessageCreator.createServiceRequestMessage(reqRMMsgContext);
         storageManager.insertOutgoingMessage(serviceRequestMsg);
-                return reqRMMsgContext;
+        return reqRMMsgContext;
     }
 
     private RMMessageContext checkTheQueueForResponse(String sequenceId, String reqMessageID) {

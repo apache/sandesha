@@ -64,7 +64,7 @@ public class Accept extends MessageElement implements IRmElement {
         return acceptElement;
     }
 
-    public Accept fromSOAPEnvelope(MessageElement bodyElement) throws SOAPException{
+    public Accept fromSOAPEnvelope(MessageElement bodyElement) throws SOAPException {
 
         Iterator iterator = bodyElement.getChildElements();
         MessageElement childElement;
@@ -72,14 +72,15 @@ public class Accept extends MessageElement implements IRmElement {
         while (iterator.hasNext()) {
             childElement = (MessageElement) iterator.next();
 
-                if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO)) {
+            if (childElement.getName().equals(Constants.WSRM.NS_PREFIX_RM + Constants.COLON + Constants.WSRM.ACKS_TO)) {
                 acksTo = new AcksTo();
                 acksTo.fromSOAPEnvelope(childElement);
             }
 
-               if (childElement.getName().equals(Constants.WSRM.ACKS_TO)) {
+            if (childElement.getName().equals(Constants.WSRM.ACKS_TO)) {
                 acksTo = new AcksTo();
-                acksTo.fromSOAPEnvelope(childElement);}
+                acksTo.fromSOAPEnvelope(childElement);
+            }
 
         }
 
@@ -100,7 +101,6 @@ public class Accept extends MessageElement implements IRmElement {
         msgElement.addChildElement(messageElement);
         return msgElement;
     }
-
 
 
     public void addChildElement(MessageElement element) {
@@ -125,11 +125,11 @@ public class Accept extends MessageElement implements IRmElement {
         acceptElement = element;
     }
 
-    public void setAcksTo(AcksTo acksTo){
-        this.acksTo=acksTo;
+    public void setAcksTo(AcksTo acksTo) {
+        this.acksTo = acksTo;
     }
 
-    public AcksTo getAcksTo(){
+    public AcksTo getAcksTo() {
         return this.acksTo;
     }
 

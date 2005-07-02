@@ -68,7 +68,7 @@ public interface Constants {
     byte SERVER = (byte) 1;
     byte CLIENT = (byte) 0;
 
-    int SYNCHRONIZED=0;
+    int SYNCHRONIZED = 0;
 
     public interface WSA {
         String NS_ADDRESSING_ANONYMOUS = AddressingUtils.getAnonymousRoleURI();
@@ -148,8 +148,8 @@ public interface Constants {
 
         String SEQ_IS_NOT_CREATED = "ERROR: Sequence was not created correcly in the in queue";
 
-        String CANNOT_LOAD_PROPERTIES="Cannot Load Properties. Check Whether sandesha.properties file is " +
-                        "in your classpath. ";
+        String CANNOT_LOAD_PROPERTIES = "Cannot Load Properties. Check Whether sandesha.properties file is " +
+                "in your classpath. ";
     }
 
     public interface InfomationMessage {
