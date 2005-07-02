@@ -97,11 +97,12 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         return exists;
     }
 
-    public RMMessageContext getNextMsgContextToProcess(String sequenceId) {
+    public RMMessageContext getNextMsgContextToProcess(Object sequence) {
+
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
         RMMessageContext msg = null;
         try {
-            msg = sq.nextIncomingMessageToProcess(sequenceId);
+            msg = sq.nextIncomingMessageToProcess(sequence);
         } catch (Exception e) {
             SandeshaQueueDAO.log.error(e);
             e.printStackTrace();
@@ -109,8 +110,20 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
         return msg;
     }
 
+    public Object getRandomSeqToProcess(){
+         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
+         Vector seqs= sq.nextAllSeqsToProcess();
+         int size = seqs.size();
+        if (size <= 0)
+            return null;
+        Random r = new Random();
+        int number = r.nextInt(size);
+
+         return seqs.get(number);
+    }
+
+
     public String getRandomSeqIdToProcess() {
-        // TODO Auto-generated method stub
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
         Vector ids = sq.nextAllSeqIdsToProcess();
         int size = ids.size();

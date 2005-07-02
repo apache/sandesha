@@ -56,6 +56,14 @@ public class ClientStorageManager implements IStorageManager {
         return accessor.isIncomingSequenceExists(sequenceID);
     }
 
+    public Object getNextSeqToProcess() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public RMMessageContext getNextMessageToProcess(Object seq) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     /**
      * This will be used to inform the client about the presence of the response
      * message. But will be impemented later.

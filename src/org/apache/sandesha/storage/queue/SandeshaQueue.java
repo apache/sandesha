@@ -147,11 +147,13 @@ public class SandeshaQueue {
         }
     }
 
-    public RMMessageContext nextIncomingMessageToProcess(String sequenceId) throws QueueException {
-        if (sequenceId == null)
+    public RMMessageContext nextIncomingMessageToProcess(Object sequence) throws QueueException {
+        if (sequence == null)
             return null;
 
-        IncomingSequence sh = (IncomingSequence) incomingMap.get(sequenceId);
+        AbstractSequence absSeq=(AbstractSequence)sequence;
+
+       IncomingSequence sh = (IncomingSequence) incomingMap.get(absSeq.getSequenceId());
         synchronized (sh) {
             if (sh == null)
                 throw new QueueException(Constants.Queue.SEQUENCE_ABSENT);
@@ -337,6 +339,22 @@ public class SandeshaQueue {
 
         }
     }
+
+       public Vector nextAllSeqsToProcess() {
+           Vector seqs = new Vector();
+
+        synchronized (incomingMap) {
+            Iterator it = incomingMap.keySet().iterator();
+
+            while (it.hasNext()) {
+                Object tempKey = it.next();
+                IncomingSequence sh = (IncomingSequence) incomingMap.get(tempKey);
+                if (sh.hasProcessableMessages() && !sh.isSequenceLocked())
+                    seqs.add(sh);
+            }
+            return seqs;
+        }
+       }
 
     public Vector nextAllSeqIdsToProcess() {
         Vector ids = new Vector();

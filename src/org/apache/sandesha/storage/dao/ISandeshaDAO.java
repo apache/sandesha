@@ -96,13 +96,15 @@ public interface ISandeshaDAO {
      * This tries to get the next message to be sent from the given outgoing sequence
      * If these is no message to be sent in the given sequence, null will be returned.
      */
-    RMMessageContext getNextMsgContextToProcess(String sequenceId);
+    RMMessageContext getNextMsgContextToProcess(Object seq);
 
 
     /**
      * Gets the next possible message to be sent from the queue.
      */
     RMMessageContext getNextOutgoingMsgContextToSend();
+
+    public Object getRandomSeqToProcess();
 
     /**
      * This is used to randomize the process of message sending. Otherwise messages of some

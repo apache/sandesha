@@ -40,7 +40,6 @@ public class RMInvokerWorker implements Runnable {
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMInvokerWorker.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-    private static Object lock = new Object();
 
     public RMInvokerWorker() {
         setStorageManager(new ServerStorageManager());
@@ -56,78 +55,25 @@ public class RMInvokerWorker implements Runnable {
     }
 
 
-    public  void run() {
+    public void run() {
         while (true) {
+
             try {
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);
-            } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-
-            synchronized(lock){
-            try {
-
-                RMMessageContext rmMessageContext = getStorageManager().getNextMessageToProcess();
-
-                if (rmMessageContext != null) {
-                    AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
-                    boolean isVoid = doRealInvoke(rmMessageContext.getMsgContext());
-
-                    if (!isVoid) {
-
-                        String oldAction = rmMessageContext.getAddressingHeaders().getAction()
-                                .toString();
-                        rmMessageContext.getAddressingHeaders().setAction(oldAction + Constants.RESPONSE);
-                        if (rmMessageContext.isLastMessage()) {
-                            //Insert Terminate Sequnce.
-                            if (addrHeaders.getReplyTo() != null) {
-                                String replyTo = addrHeaders.getReplyTo().getAddress().toString();
-                                RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(rmMessageContext, Constants.SERVER);
-                                terminateMsg.setOutGoingAddress(replyTo);
-                                getStorageManager().insertTerminateSeqMessage(terminateMsg);
-                            } else {
-                                RMInvokerWorker.log.error(Constants.ErrorMessages.CANNOT_SEND_THE_TERMINATE_SEQ);
-                            }
-                        }
-                        //Store the message in the response queue. If there is an application
-                        // response then that response is always sent using a new HTTP connection
-                        // and the <replyTo> header is used in this case. This is done by the
-                        // RMSender.
-                        rmMessageContext.setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
-
-                        boolean hasResponseSeq = getStorageManager().isResponseSequenceExist(rmMessageContext.getSequenceID());
-                        boolean firstMsgOfResponseSeq = false;
-                        if (!(hasResponseSeq && rmMessageContext.getRMHeaders().getSequence()
-                                .getMessageNumber().getMessageNumber() == 1)) {
-                            firstMsgOfResponseSeq = !hasResponseSeq;
-                        }
-
-                        rmMessageContext.setMsgNumber(getStorageManager().getNextMessageNumber(rmMessageContext.getSequenceID()));
-                        getStorageManager().insertOutgoingMessage(rmMessageContext);
 
 
-                        if (firstMsgOfResponseSeq) {
-                            String msgIdStr = Constants.UUID + RMInvokerWorker.uuidGen.nextUUID();
-
-                            RMMessageContext csRMMsgCtx = RMMessageCreator.createCreateSeqMsg(rmMessageContext, Constants.SERVER, msgIdStr, null);
-                            csRMMsgCtx.setOutGoingAddress(rmMessageContext.getAddressingHeaders()
-                                    .getReplyTo().getAddress().toString());
-
-                            csRMMsgCtx.addToMsgIdList(msgIdStr);
-                            csRMMsgCtx.setMessageID(msgIdStr);
-
-                            getStorageManager().setTemporaryOutSequence(csRMMsgCtx.getSequenceID(),
-                                    msgIdStr);
-                            getStorageManager().addCreateSequenceRequest(csRMMsgCtx);
-                        }
-                    }
+                Object seq = getStorageManager().getNextSeqToProcess();
+                synchronized (seq) {
+                    RMMessageContext rmMessageContext = getStorageManager().getNextMessageToProcess(seq);
+                    doWork(rmMessageContext);
                 }
+
+
             } catch (InterruptedException error) {
                 RMInvokerWorker.log.error(error);
             } catch (Exception error) {
                 RMInvokerWorker.log.error(error);
             }
-        }
         }
     }
 
@@ -143,5 +89,61 @@ public class RMInvokerWorker implements Runnable {
      */
     protected IStorageManager getStorageManager() {
         return storageManager;
+    }
+
+    protected void doWork(RMMessageContext rmMessageContext) throws Exception {
+        if (rmMessageContext != null) {
+            AddressingHeaders addrHeaders = rmMessageContext.getAddressingHeaders();
+            boolean isVoid = doRealInvoke(rmMessageContext.getMsgContext());
+
+            if (!isVoid) {
+
+                String oldAction = rmMessageContext.getAddressingHeaders().getAction()
+                        .toString();
+                rmMessageContext.getAddressingHeaders().setAction(oldAction + Constants.RESPONSE);
+                if (rmMessageContext.isLastMessage()) {
+                    //Insert Terminate Sequnce.
+                    if (addrHeaders.getReplyTo() != null) {
+                        String replyTo = addrHeaders.getReplyTo().getAddress().toString();
+                        RMMessageContext terminateMsg = RMMessageCreator.createTerminateSeqMsg(rmMessageContext, Constants.SERVER);
+                        terminateMsg.setOutGoingAddress(replyTo);
+                        getStorageManager().insertTerminateSeqMessage(terminateMsg);
+                    } else {
+                        RMInvokerWorker.log.error(Constants.ErrorMessages.CANNOT_SEND_THE_TERMINATE_SEQ);
+                    }
+                }
+                //Store the message in the response queue. If there is an application
+                // response then that response is always sent using a new HTTP connection
+                // and the <replyTo> header is used in this case. This is done by the
+                // RMSender.
+                rmMessageContext.setMessageType(Constants.MSG_TYPE_SERVICE_RESPONSE);
+
+                boolean hasResponseSeq = getStorageManager().isResponseSequenceExist(rmMessageContext.getSequenceID());
+                boolean firstMsgOfResponseSeq = false;
+                if (!(hasResponseSeq && rmMessageContext.getRMHeaders().getSequence()
+                        .getMessageNumber().getMessageNumber() == 1)) {
+                    firstMsgOfResponseSeq = !hasResponseSeq;
+                }
+
+                rmMessageContext.setMsgNumber(getStorageManager().getNextMessageNumber(rmMessageContext.getSequenceID()));
+                getStorageManager().insertOutgoingMessage(rmMessageContext);
+
+
+                if (firstMsgOfResponseSeq) {
+                    String msgIdStr = Constants.UUID + RMInvokerWorker.uuidGen.nextUUID();
+
+                    RMMessageContext csRMMsgCtx = RMMessageCreator.createCreateSeqMsg(rmMessageContext, Constants.SERVER, msgIdStr, null);
+                    csRMMsgCtx.setOutGoingAddress(rmMessageContext.getAddressingHeaders()
+                            .getReplyTo().getAddress().toString());
+
+                    csRMMsgCtx.addToMsgIdList(msgIdStr);
+                    csRMMsgCtx.setMessageID(msgIdStr);
+
+                    getStorageManager().setTemporaryOutSequence(csRMMsgCtx.getSequenceID(),
+                            msgIdStr);
+                    getStorageManager().addCreateSequenceRequest(csRMMsgCtx);
+                }
+            }
+        }
     }
 }

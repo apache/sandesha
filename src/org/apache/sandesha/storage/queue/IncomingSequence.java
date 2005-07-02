@@ -31,11 +31,10 @@ import java.util.*;
  * @author Jaliya Ekanayaka
  */
 
-public class IncomingSequence {
+public class IncomingSequence extends AbstractSequence{
 
     private long lastProcessed;
     private boolean hasProcessableMessages;
-    private String sequenceId;
     private HashMap hash;
     private boolean beingProcessedLock = false; //When true messages are
     private long lastMsgNo = -1;
@@ -89,13 +88,6 @@ public class IncomingSequence {
         return hasProcessableMessages;
     }
 
-    public String getSequenceId() {
-        return sequenceId;
-    }
-
-    public void setSequenceId(String sequenceId) {
-        this.sequenceId = sequenceId;
-    }
 
     /**
      * adds the message to map. Also adds a record to cache if needed.

@@ -31,7 +31,9 @@ public interface IStorageManager {
 
     boolean isResponseSequenceExist(String sequenceID);
 
-    RMMessageContext getNextMessageToProcess();
+    Object getNextSeqToProcess();
+
+    RMMessageContext getNextMessageToProcess(Object seq);
 
     void setAcknowledged(String seqID, long msgNumber);
 

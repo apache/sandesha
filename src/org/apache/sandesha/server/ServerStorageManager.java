@@ -58,6 +58,7 @@ public class ServerStorageManager implements IStorageManager {
                         Constants.SERVER);
     }
 
+
     /**
      * A very important method. Makes life easy for the thread or thread pool
      * that is using this. Every thread just have to create an instance of
@@ -66,19 +67,19 @@ public class ServerStorageManager implements IStorageManager {
      * same sequence id. But if that doesnt hv processable messages it will go for
      * a new sequence.
      */
-    public RMMessageContext getNextMessageToProcess() {
-        if (tempSeqId == null)
-            tempSeqId = accessor.getRandomSeqIdToProcess();
+ public RMMessageContext getNextMessageToProcess(Object seq) {
+//        if (tempSeqId == null)
+//            tempSeqId = accessor.getRandomSeqIdToProcess();
 
-        if (tempSeqId == null)
+        if (seq == null)
             return null;
 
-        RMMessageContext nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);
+        RMMessageContext nextMsg = accessor.getNextMsgContextToProcess(seq);
 
-        if (nextMsg == null) {
-            tempSeqId = accessor.getRandomSeqIdToProcess();
-            nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);
-        }
+//        if (nextMsg == null) {
+//            tempSeqId = accessor.getRandomSeqIdToProcess();
+//            nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);
+//        }
 
         return nextMsg;
     }
@@ -105,6 +106,11 @@ public class ServerStorageManager implements IStorageManager {
         //return accessor.isIncomingSequenceExists(sequenceID);
         return accessor.isOutgoingSequenceExists(sequenceID);
     }
+
+    public Object getNextSeqToProcess() {
+      return  accessor.getRandomSeqToProcess();
+    }
+
 
     /**
      * This is used to get a random message from the out queue Basically server

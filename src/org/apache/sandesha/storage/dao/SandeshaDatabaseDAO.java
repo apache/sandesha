@@ -85,11 +85,7 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
         return false;
     }
 
-    public RMMessageContext getNextMsgContextToProcess(String sequenceId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+  
     public String getRandomSeqIdToProcess() {
         // TODO Auto-generated method stub
         return null;
@@ -103,6 +99,10 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public boolean isIncomingMessageExists(String sequenceId, Long msgNo) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    public RMMessageContext getNextMsgContextToProcess(Object seq) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public boolean addMessageToOutgoingSequence(String sequenceId,
@@ -124,6 +124,10 @@ public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public RMMessageContext getNextOutgoingMsgContextToSend() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public Object getRandomSeqToProcess() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public boolean isOutgoingSequenceExists(String sequenceId) {

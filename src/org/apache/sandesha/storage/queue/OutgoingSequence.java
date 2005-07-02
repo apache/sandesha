@@ -37,9 +37,8 @@ import java.util.*;
  * This class works as a hash map for storing response messages until they are
  * sent.
  */
-public class OutgoingSequence {
+public class OutgoingSequence extends AbstractSequence {
 
-    private String sequenceId;
     private String outSequenceId;
     private boolean outSeqApproved;
     private HashMap hash;
@@ -80,9 +79,6 @@ public class OutgoingSequence {
      * public boolean hasMessagesToSend(){ return hasMessagesToSend; }
      */
 
-    public String getSequenceId() {
-        return sequenceId;
-    }
 
     public boolean isOutSeqApproved() {
         return outSeqApproved;
