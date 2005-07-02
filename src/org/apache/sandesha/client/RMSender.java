@@ -75,7 +75,7 @@ public class RMSender extends BasicHandler {
 
             tempSeqID = reqMsgCtx.getSequenceID();
 
-            reqMsgCtx = processFirstRequestMessage(reqMsgCtx, reqMsgCtx.getSync());
+            reqMsgCtx = processRequestMessage(reqMsgCtx, reqMsgCtx.getSync());
 
             if (reqMsgCtx.isHasResponse()) {
                 RMMessageContext responseMessageContext = null;
@@ -133,7 +133,7 @@ public class RMSender extends BasicHandler {
      * @return
      * @throws Exception
      */
-    private RMMessageContext processFirstRequestMessage(RMMessageContext reqRMMsgContext,
+    private RMMessageContext processRequestMessage(RMMessageContext reqRMMsgContext,
                                                         boolean sync) throws Exception {
         synchronized (lock) {
 
@@ -153,10 +153,10 @@ public class RMSender extends BasicHandler {
 
                 createSeqRMMsgContext.setSync(sync);
                 storageManager.addCreateSequenceRequest(createSeqRMMsgContext);
-                processRequestMessage(reqRMMsgContext);
+                processMessage(reqRMMsgContext);
 
             } else {
-                processRequestMessage(reqRMMsgContext);
+                processMessage(reqRMMsgContext);
             }
 
         }
@@ -165,7 +165,7 @@ public class RMSender extends BasicHandler {
         return reqRMMsgContext;
     }
 
-    private RMMessageContext processRequestMessage(RMMessageContext reqRMMsgContext)
+    private RMMessageContext processMessage(RMMessageContext reqRMMsgContext)
             throws Exception {
         if (reqRMMsgContext.isLastMessage()) {
             storageManager.insertTerminateSeqMessage(RMMessageCreator.createTerminateSeqMsg(reqRMMsgContext, Constants.CLIENT));

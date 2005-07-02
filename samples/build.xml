@@ -29,10 +29,10 @@ Build Instructions:
         <echo message="                                                                            "/>
         <echo message="----------------------------------------------------------------------------"/>
         <echo message=" Available Targets Are                                                      "/>
-        <echo message="   ping_sync       -->runs interop test for AsyncPing                       "/>
-        <echo message="   ping_async      -->runs interop test for SyncPing                        "/>
-        <echo message="   echo_sync_ack   -->runs interop test for EchoStirng                      "/>
-        <echo message="   echo_async_ack  -->runs interop test for EchoStirng                      "/>
+        <echo message="   ping_sync       -->AsyncPing Sample                                      "/>
+        <echo message="   ping_async      -->SyncPing  Sample                                      "/>
+        <echo message="   echo_sync_ack   -->EchoStirng Sample                                     "/>
+        <echo message="   echo_async_ack  -->EchoStirng Sample                                     "/>
         <echo message="   clean           --> cleans up all generated files and                    "/>
         <echo message="   usage           --> provides help on using the build tool  (default)     "/>
         <echo message="----------------------------------------------------------------------------"/>
