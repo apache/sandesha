@@ -40,6 +40,7 @@ public class RMInvokerWorker implements Runnable {
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMInvokerWorker.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+    private static Object lock = new Object();
 
     public RMInvokerWorker() {
         setStorageManager(new ServerStorageManager());
@@ -55,10 +56,17 @@ public class RMInvokerWorker implements Runnable {
     }
 
 
-    public synchronized void run() {
+    public  void run() {
         while (true) {
             try {
                 Thread.sleep(Constants.RMINVOKER_SLEEP_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            synchronized(lock){
+            try {
+
                 RMMessageContext rmMessageContext = getStorageManager().getNextMessageToProcess();
 
                 if (rmMessageContext != null) {
@@ -119,6 +127,7 @@ public class RMInvokerWorker implements Runnable {
             } catch (Exception error) {
                 RMInvokerWorker.log.error(error);
             }
+        }
         }
     }
 
