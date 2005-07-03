@@ -102,6 +102,9 @@ MM_reloadPage(true);
 		<tr><td><font size="+1">Server Endpoint</font></td><td><font size="+1"><%=defaultTarget%></font></td></tr>
 		<tr><td colspan="2" >
 	     <a href="<%=defaultTarget%>?wsdl"><h3><u>WSDL</h3></u></a>
+		</td></tr>
+        <tr><td colspan="2" >
+	     <a href="http://ws.apache.org/sandesha/interopguide.html"><h4><u>Interop Guide</h4></u></a>
      		<br /><hr/>
 		</td></tr>
 		</table>

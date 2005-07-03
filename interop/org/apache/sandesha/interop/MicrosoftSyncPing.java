@@ -29,7 +29,7 @@ import org.apache.sandesha.SandeshaContext;
  */
 public class MicrosoftSyncPing {
 
-    private static String targetURL = "http://127.0.0.1:8080/SecureReliableMessaging/ReliableOneWay.svc";
+    private static String targetURL = "http://127.0.0.1:8070/SecureReliableMessaging/ReliableOneWay.svc";
 
     public static void main(String[] args) {
         System.out.println("Client started...... Synchronous - Microsoft ");
@@ -65,6 +65,6 @@ public class MicrosoftSyncPing {
         return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\n" +
                 "   <soapenv:Header>\n" + "   </soapenv:Header>\n" + "   <soapenv:Body>\n" + "      <Ping xmlns=\"http://tempuri.org/\">\n" +
                 "         <Text>Ping Message Number " + i + "</Text>\n" + "      </Ping>\n" + "   </soapenv:Body></soapenv:Envelope>";
-     
+
         }
 }

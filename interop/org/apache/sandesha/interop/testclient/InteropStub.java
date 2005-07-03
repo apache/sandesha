@@ -134,7 +134,7 @@ public class InteropStub {
             SandeshaContext ctx = new SandeshaContext(true);
             ctx.setSourceURL(bean.getSourceURL());
             configureContext(ctx, call, bean);
-            ctx.initCall(call, target, "urn:wsrm:ping", Constants.ClientProperties.IN_ONLY);
+            ctx.initCall(call, target, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 
             for (int i = 1; i <= msgs; i++) {
                 if (i == msgs) {
