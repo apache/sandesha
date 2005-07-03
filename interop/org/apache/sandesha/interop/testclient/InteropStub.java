@@ -20,6 +20,8 @@ package org.apache.sandesha.interop.testclient;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Handler;
 import org.apache.axis.SimpleChain;
+import org.apache.axis.Message;
+import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.components.logger.LogFactory;
@@ -134,16 +136,11 @@ public class InteropStub {
             configureContext(ctx, call, bean);
             ctx.initCall(call, target, "urn:wsrm:ping", Constants.ClientProperties.IN_ONLY);
 
-            call.setOperationName(new QName("http://tempuri.org", "Ping"));
-
-            call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
-
             for (int i = 1; i <= msgs; i++) {
                 if (i == msgs) {
                     ctx.setLastMessage(call);
                 }
-                String msg = "Sandesha Ping Message Number " + i;
-                call.invoke(new Object[]{msg});
+                call.invoke(new Message(getPingSOAPEnvelope(i)));
             }
 
             //InteropStub.stopClient();
@@ -154,6 +151,28 @@ public class InteropStub {
                 callback.onError(e);
             log.info(e);
         }
+    }
+
+
+    private static String getPingSOAPEnvelope(int i) {
+        return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\n" +
+                "   <soapenv:Header>\n" + "   </soapenv:Header>\n" + "   <soapenv:Body>\n" + "      <Ping xmlns=\"http://tempuri.org/\">\n" +
+                "         <Text>Sandesha Ping Message " + i + "</Text>\n" + "      </Ping>\n" + "   </soapenv:Body></soapenv:Envelope>";
+
+    }
+
+    private static String getEchoSOAPEnvelope(int i,String seq) {
+        return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\n" +
+                "<soapenv:Header>\n" +
+                "</soapenv:Header>\n" +
+                "<soapenv:Body>\n" +
+                " <echoString xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" +
+                "    xmlns=\"http://tempuri.org/\">\n" +
+                "   <Text>Sandesha Echo Message "+i+"</Text>\n" +
+                "   <Sequence>"+seq+"</Sequence>\n" +
+                "  </echoString>\n"+
+                "</soapenv:Body></soapenv:Envelope>";
+
     }
 
     public synchronized void runEcho(InteropBean bean) {
@@ -175,26 +194,20 @@ public class InteropStub {
             Call call = (Call) service.createCall();
 
             SandeshaContext ctx = new SandeshaContext(true);
-            ctx.setSourceURL( bean.getSourceURL());
+            ctx.setSourceURL(bean.getSourceURL());
 
             configureContext(ctx, call, bean);
             ctx.initCall(call, target, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
-            call.setOperationName(new QName("http://tempuri.org/", "echoString"));
-
-            call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
-            call.addParameter("Sequence", XMLType.XSD_STRING, ParameterMode.IN);
-            call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
-
             for (int i = 1; i <= messages; i++) {
-                String msg = "Sandesha Echo String " + i;
-
-                if (i == messages) {
+                 if (i == messages) {
                     ctx.setLastMessage(call);
                 }
 
-                String ret = (String) call.invoke(new Object[]{msg, seq});
-                log.info("Got response from server " + ret);
+                SOAPEnvelope env = call.invoke(new Message(getEchoSOAPEnvelope(i,seq)));
+                if(log.isDebugEnabled()){
+                log.debug("Got response from server " + env.toString());
+                }
             }
 
             ctx.endSequence();
