@@ -37,11 +37,15 @@ public class RMTestService {
             sequences.put(sequence, (new String(text)));
 
         }
-        log.info("ECHO-STRING SERVICE " + text);
-        return text;
+         if(log.isDebugEnabled()){
+        log.debug("ECHO-STRING SERVICE " + text);
+         }
+         return text;
     }
 
     public void ping(String text) {
-        log.info("PING-STRING SERVICE " + text);
-    }
+         if(log.isDebugEnabled()){
+        log.debug("PING-STRING SERVICE " + text);
+         }
+          }
 }

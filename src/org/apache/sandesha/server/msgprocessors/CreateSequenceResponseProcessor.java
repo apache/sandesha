@@ -25,7 +25,7 @@ import org.apache.sandesha.ws.rm.CreateSequenceResponse;
 /**
  * This is the processor for the CreateSequenceRespones.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public class CreateSequenceResponseProcessor implements IRMMessageProcessor {
     IStorageManager storageManager = null;

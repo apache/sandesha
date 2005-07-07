@@ -35,7 +35,7 @@ import org.apache.sandesha.ws.rm.SequenceOffer;
 /**
  * This is the processor for the CreateSequence.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public class CreateSequenceProcessor implements IRMMessageProcessor {
     IStorageManager storageManager;

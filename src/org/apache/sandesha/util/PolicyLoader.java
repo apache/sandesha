@@ -63,9 +63,6 @@ public class PolicyLoader {
             return instance;
     }
 
-    public int getRetransmissionCount() {
-        return Constants.MAXIMUM_RETRANSMISSION_COUNT;
-    }
 
     public long getInactivityTimeout() {
 

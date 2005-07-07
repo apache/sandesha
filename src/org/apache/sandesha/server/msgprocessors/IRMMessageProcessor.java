@@ -24,7 +24,7 @@ import org.apache.sandesha.RMMessageContext;
  * Finding of the appropriate message processor is done by the
  * org.apache.sandesha.server.RMMessageProcessorIdentifier.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 
 public interface IRMMessageProcessor {

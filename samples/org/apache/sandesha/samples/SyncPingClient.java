@@ -65,12 +65,11 @@ public class SyncPingClient {
 
             if (report != null) {
                 System.out.println("\n***********Printing RM Report***********");
-                System.out.println("Were all messages acked     - " + report.isAllAcked());
+                System.out.println("Is all messages acked     - " + report.isAllAcked());
                 System.out.println("****************************************\n");
             }
 
         } catch (Exception e) {
-            //System.err.println(e.toString());
             e.printStackTrace();
         }
     }

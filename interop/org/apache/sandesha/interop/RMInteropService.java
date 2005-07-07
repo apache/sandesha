@@ -43,11 +43,11 @@ public class RMInteropService {
             sequences.put(sequence, (new String(text)));
 
         }
-        log.debug("Echo Service "+text);
+        log.debug("Echo Service " + text);
         return text;
     }
 
     public void ping(String text) {
-        log.debug("Ping Service "+text);
+        log.debug("Ping Service " + text);
     }
 }

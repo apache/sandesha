@@ -57,25 +57,13 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public Object getNextSeqToProcess() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public RMMessageContext getNextMessageToProcess(Object seq) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    /**
-     * This will be used to inform the client about the presence of the response
-     * message. But will be impemented later.
-     */
-    public RMMessageContext getNextMessageToProcess() {
         return null;
     }
 
-    /**
-     * This will be used both by the Sender and the SimpleAxisServer to set the
-     * acks.
-     */
+    public RMMessageContext getNextMessageToProcess(Object seq) {
+        return null;
+    }
+
     public void setAcknowledged(String seqID, long msgNumber) {
         accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
 
@@ -84,7 +72,7 @@ public class ClientStorageManager implements IStorageManager {
     public void addSequence(String sequenceID) {
         boolean result = accessor.addOutgoingSequence(sequenceID);
         if (!result)
-            log.error("Sequence was not created correcly in the in queue");
+            log.error("Sequence was not created correctly in the in the queue");
     }
 
     /**
@@ -282,11 +270,13 @@ public class ClientStorageManager implements IStorageManager {
     }
 
 
-    public boolean isAllSequenceComplete() {
-        boolean outTerminateSent = accessor.isAllOutgoingTerminateSent();
-        boolean incomingTerminateReceived = accessor.isAllIncommingTerminateReceived();
-        return outTerminateSent && incomingTerminateReceived;
-    }
+// --Commented out by Inspection START (7/7/05 2:15 PM):
+//    public boolean isAllSequenceComplete() {
+//        boolean outTerminateSent = accessor.isAllOutgoingTerminateSent();
+//        boolean incomingTerminateReceived = accessor.isAllIncommingTerminateReceived();
+//        return outTerminateSent && incomingTerminateReceived;
+//    }
+// --Commented out by Inspection STOP (7/7/05 2:15 PM)
 
 
     public void setAckReceived(String seqId, long msgNo) {
@@ -294,7 +284,7 @@ public class ClientStorageManager implements IStorageManager {
     }
 
     public void insertFault(RMMessageContext rmMsgCtx) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
 

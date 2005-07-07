@@ -19,8 +19,8 @@ package org.apache.sandesha;
 /**
  * RMReport is generated at the end of the termination of each sequence.
  *
- * @auther Chamikara Jayalath
- * @auther Jaliya Ekanyake
+ * @author Chamikara Jayalath
+ * @author Jaliya Ekanyake
  */
 public class RMReport {
 

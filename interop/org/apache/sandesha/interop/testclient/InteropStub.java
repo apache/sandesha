@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.SandeshaContext;
 import org.apache.sandesha.client.ClientStorageManager;
+import org.apache.sandesha.client.ClientHandlerUtil;
 import org.apache.sandesha.server.Sender;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.PropertyLoader;
@@ -55,7 +56,6 @@ public class InteropStub {
     }
 
     private static Sender sender = null;
-    private static Thread thSender = null;
     private static ClientStorageManager storageManager = new ClientStorageManager();
     private static final Log log = LogFactory.getLog(InteropStub.class.getName());
 
@@ -81,7 +81,7 @@ public class InteropStub {
 
     private static InteropCallback callback = null;
 
-    private void configureContext(SandeshaContext ctx, Call call, InteropBean bean) {
+    private void configureContext(SandeshaContext ctx, InteropBean bean) {
         String from = bean.getFrom();
         String replyTo = bean.getReplyto();
         String acksTo = bean.getAcksTo();
@@ -122,8 +122,9 @@ public class InteropStub {
     }
 
     public synchronized void runPing(InteropBean bean) {
-
-        log.info("=========== RUNNING THE \"Ping\" INTEROP TEST ==========");
+        if (log.isDebugEnabled()) {
+            log.debug("=========== RUNNING THE \"Ping\" INTEROP TEST ==========");
+        }
         String target = bean.getTarget();
         int msgs = bean.getNoOfMsgs();
         try {
@@ -133,7 +134,7 @@ public class InteropStub {
 
             SandeshaContext ctx = new SandeshaContext(true);
             ctx.setSourceURL(bean.getSourceURL());
-            configureContext(ctx, call, bean);
+            configureContext(ctx, bean);
             ctx.initCall(call, target, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 
             for (int i = 1; i <= msgs; i++) {
@@ -149,7 +150,7 @@ public class InteropStub {
         } catch (Exception e) {
             if (callback != null)
                 callback.onError(e);
-            log.info(e);
+            log.error(e);
         }
     }
 
@@ -161,16 +162,16 @@ public class InteropStub {
 
     }
 
-    private static String getEchoSOAPEnvelope(int i,String seq) {
+    private static String getEchoSOAPEnvelope(int i, String seq) {
         return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:wsa=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\n" +
                 "<soapenv:Header>\n" +
                 "</soapenv:Header>\n" +
                 "<soapenv:Body>\n" +
                 " <echoString xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n" +
                 "    xmlns=\"http://tempuri.org/\">\n" +
-                "   <Text>Sandesha Echo Message "+i+"</Text>\n" +
-                "   <Sequence>"+seq+"</Sequence>\n" +
-                "  </echoString>\n"+
+                "   <Text>Sandesha Echo Message " + i + "</Text>\n" +
+                "   <Sequence>" + seq + "</Sequence>\n" +
+                "  </echoString>\n" +
                 "</soapenv:Body></soapenv:Envelope>";
 
     }
@@ -182,7 +183,9 @@ public class InteropStub {
         String seq = new Long(System.currentTimeMillis()).toString();
 
         try {
-            log.info("=========== RUNNING THE \"echoString\" INTEROP TEST ==========");
+            if (log.isDebugEnabled()) {
+                log.debug("=========== RUNNING THE \"echoString\" INTEROP TEST ==========");
+            }
 
             //We start the listener to be in the safe side.
             //User may specify some external(not in sandesha endpoint) replyTo address, then
@@ -196,17 +199,17 @@ public class InteropStub {
             SandeshaContext ctx = new SandeshaContext(true);
             ctx.setSourceURL(bean.getSourceURL());
 
-            configureContext(ctx, call, bean);
+            configureContext(ctx, bean);
             ctx.initCall(call, target, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
             for (int i = 1; i <= messages; i++) {
-                 if (i == messages) {
+                if (i == messages) {
                     ctx.setLastMessage(call);
                 }
 
-                SOAPEnvelope env = call.invoke(new Message(getEchoSOAPEnvelope(i,seq)));
-                if(log.isDebugEnabled()){
-                log.debug("Got response from server " + env.toString());
+                SOAPEnvelope env = call.invoke(new Message(getEchoSOAPEnvelope(i, seq)));
+                if (log.isDebugEnabled()) {
+                    log.debug("Got response from server " + env.toString());
                 }
             }
 
@@ -221,7 +224,9 @@ public class InteropStub {
 
 
     public static void initClient() throws AxisFault {
-        log.info("STARTING SENDER FOR THE CLIENT .......");
+        if (log.isDebugEnabled()) {
+            log.debug("STARTING SENDER FOR THE CLIENT .......");
+        }
         sender = new Sender(storageManager);
         SimpleChain reqChain = null;
         SimpleChain resChain = null;
@@ -235,75 +240,25 @@ public class InteropStub {
             sender.setRequestChain(reqChain);
         if (resChain != null)
             sender.setResponseChain(resChain);
-
-        //thSender = new Thread(sender);
-        //thSender.setDaemon(false);
-        //thSender.start();
         sender.startSender();
     }
 
-    public static void stopClient() throws AxisFault {
-        //This should check whether we have received all the acks or reponses if any
-        storageManager.isAllSequenceComplete();
-        long startingTime = System.currentTimeMillis();
-        long inactivityTimeOut = PolicyLoader.getInstance().getInactivityTimeout();
-        while (!storageManager.isAllSequenceComplete()) {
-            try {
-                log.info(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
-                Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
-                if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
-                    stopClientByForce();
-                }
-            } catch (InterruptedException e) {
-                log.error(e);
-            }
-        }
-
-        sender.stop();
-        storageManager.clearStorage();
-
-
-    }
 
     public static void stopClientByForce() throws AxisFault {
-
         sender.stop();
-
         throw new AxisFault("Inactivity Timeout Reached, No Response from the Server");
     }
 
-    private static SimpleChain getRequestChain() throws Exception {
+    private static SimpleChain getRequestChain() {
         ArrayList arr = PropertyLoader.getRequestHandlerNames();
-        return getHandlerChain(arr);
+        return ClientHandlerUtil.getHandlerChain(arr);
     }
 
 
-    private static SimpleChain getResponseChain() throws Exception {
+    private static SimpleChain getResponseChain() {
 
         ArrayList arr = PropertyLoader.getResponseHandlerNames();
-        return getHandlerChain(arr);
-    }
-
-    public static SimpleChain getHandlerChain(List arr) {
-        SimpleChain reqHandlers = new SimpleChain();
-        Iterator it = arr.iterator();
-        boolean hasReqHandlers = false;
-        try {
-            while (it.hasNext()) {
-                hasReqHandlers = true;
-                String strClass = (String) it.next();
-                Class c = Class.forName(strClass);
-                Handler h = (Handler) c.newInstance();
-                reqHandlers.addHandler(h);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        if (hasReqHandlers)
-            return reqHandlers;
-        else
-            return null;
+        return ClientHandlerUtil.getHandlerChain(arr);
     }
 
 }

@@ -60,7 +60,7 @@ public class IBMEcho {
             ctx.setFromURL("http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
             ctx.setReplyToURL("http://" + sourceHost + ":" + sourcePort + "/axis/services/RMService");
 
-            ctx.initCall(call,targetURL, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
+            ctx.initCall(call, targetURL, "urn:wsrm:echoString", Constants.ClientProperties.IN_OUT);
 
             call.setOperationName(new QName("http://tempuri.org/", "echoString"));
 

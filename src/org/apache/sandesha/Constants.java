@@ -25,7 +25,7 @@ import org.apache.axis.message.addressing.util.AddressingUtils;
  * @author Amila Navarathna
  * @author Jaliya Ekanayaka
  * @author Sudar Nimalan
- * @auther Chamikara Jayalath
+ * @author Chamikara Jayalath
  */
 public interface Constants {
 
@@ -44,11 +44,13 @@ public interface Constants {
     String URL_RM_SERVICE = "/axis/services/RMService";
     String IGNORE_ACTION = "ignoreAction";
     String RESPONSE = "Response";
+        String CONTEXT="context";
+    String INVOKER = "invoker";
+    String THREAD_POOL_SIZE = "threadPoolSize";
 
     long RETRANSMISSION_INTERVAL = 4000L;
     long ACKNOWLEDGEMENT_INTERVAL = 200L;
     long INACTIVITY_TIMEOUT = 600000L;
-    int MAXIMUM_RETRANSMISSION_COUNT = 10;
     long RMINVOKER_SLEEP_TIME = 2000L;
     long SENDER_SLEEP_TIME = 2000L;
     long CLIENT_RESPONSE_CHECKING_INTERVAL = 500L;
@@ -148,8 +150,6 @@ public interface Constants {
 
         String SEQ_IS_NOT_CREATED = "ERROR: Sequence was not created correcly in the in queue";
 
-        String CANNOT_LOAD_PROPERTIES = "Cannot Load Properties. Check Whether sandesha.properties file is " +
-                "in your classpath. ";
     }
 
     public interface InfomationMessage {
@@ -161,9 +161,7 @@ public interface Constants {
         String SENDING_RES = "INFO: SENDING RESPONSE MESSAGE ....\n";
         String PROVIDER_RECEIVED_MSG = "INFO: RMPROVIDER RECEIVED A SOAP REQUEST....\n";
         String SENDER_STARTED = "INFO: SENDER STARTED ....\n";
-        String RMINVOKER_STARTED = "INFO: RMINVOKER STARTED ....\n";
         String WAITING_TO_STOP_CLIENT = "INFO: WATING TO STOP CLIENT ....\n";
-        String CLIENT_LISTENER_STARTED = "NFO: CLIENT LISTENER STARTED ....\n";
 
     }
 
@@ -172,7 +170,6 @@ public interface Constants {
         String ADD_ERROR = "Error in adding message";
         String QUEUE_INCONSIS = "Inconsistent queue";
         String MESSAGE_EXISTS = "Message already exists";
-        String SEQUENCE_NOTPRESENT = "Sequence not present";
         String SEQUENCE_ABSENT = "Sequence id does not exist............";
         String RESPONSE_SEQ_NULL = "ERROR: RESPONSE SEQ IS NULL";
         String SEQUENCE_ID_NULL = "Sequence Id is null";
@@ -229,5 +226,11 @@ public interface Constants {
         String WSRM = "http://schemas.xmlsoap.org/ws/2005/02/rm/policy";
         String BIN_BACKOFF = "BinaryBackoff";
     }
+
+   String INVOKE_STRATEGY = "invokeStrategy";
+       String DEFAULT_STRATEGY = "org.apache.sandesha.server.ThreadPoolInvokeStrategy:threadPoolSize=10";
+      String INVOKE_HANDLER = "invokeHandler";
+       String DEFAULT_HANDLER = "org.apache.sandesha.server.InvokeHandlerImpl:invoker=org.apache.axis.providers.java.RPCProvider";
+
 }
 

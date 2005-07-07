@@ -1,7 +1,7 @@
 ======================================================
 Apache Sandesha beta build (June 11, 2005)
 
-http://ws.apache.org/ws-fx/sandesha
+http://ws.apache.org/ws-sandesha
 ------------------------------------------------------
 
 ___________________

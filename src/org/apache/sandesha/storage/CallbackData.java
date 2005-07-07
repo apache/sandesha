@@ -34,8 +34,7 @@ public class CallbackData {
 
     private long ackStart;
     private long ackEnd;
-    private ArrayList ackNack;
-    private AxisFault fault;
+     private AxisFault fault;
 
 
     /**
@@ -53,16 +52,8 @@ public class CallbackData {
     }
 
     public CallbackData() {
-        ackNack = new ArrayList();
     }
 
-    private void addToNacks(long nack) {
-        ackNack.add(new Long(nack));
-    }
-
-    private ArrayList getNacks() {
-        return ackNack;
-    }
 
     /**
      * @return

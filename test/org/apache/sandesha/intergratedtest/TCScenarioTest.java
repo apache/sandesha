@@ -51,7 +51,7 @@ public class TCScenarioTest extends TestCase {
     private static boolean serverStarted = false;
     private static int testCount = 5;
 
-    private static String targetURL = "http://127.0.0.1:" + defaultServerPort +
+    private static String targetURL = "http://127.0.0.1:" +defaultServerPort +
             "/axis/services/RMTestService";
 
 

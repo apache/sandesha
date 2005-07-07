@@ -65,8 +65,6 @@ public interface IStorageManager {
 
     void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage);
 
-    boolean isAllSequenceComplete();
-
     void setAckReceived(String seqId, long msgNo);
 
     void insertFault(RMMessageContext rmMsgCtx);

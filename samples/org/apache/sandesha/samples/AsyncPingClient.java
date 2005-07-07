@@ -30,7 +30,7 @@ import javax.xml.rpc.ParameterMode;
 /**
  * Test client for Ping scenario, with asynchronous <wsrm:AcksTo>
  *
- * @auther Jaliya Ekanyake
+ * @author Jaliya Ekanyake
  */
 public class AsyncPingClient {
     private static String defaultServerPort = "8070";
@@ -62,7 +62,7 @@ public class AsyncPingClient {
 
 
             System.out.println("\n***********Printing RM Report***********");
-            System.out.println("Were all messages acked     - " + report.isAllAcked());
+            System.out.println("Is all messages acked     - " + report.isAllAcked());
             System.out.println("****************************************\n");
 
 

@@ -123,20 +123,6 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     }
 
 
-    public String getRandomSeqIdToProcess() {
-        SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
-        Vector ids = sq.nextAllSeqIdsToProcess();
-        int size = ids.size();
-        if (size <= 0)
-            return null;
-        Random r = new Random();
-        int number = r.nextInt(size);
-        String id = (String) ids.get(number);
-        sq.setSequenceLock(id, true); //Locks the sequence temporarily to tell
-        // that it is locked.
-        return id;
-    }
-
     public Set getAllReceivedMsgNumsOfIncomingSeq(String sequenceId) {
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
         return sq.getAllReceivedMsgNumsOfIncomingSeq(sequenceId);
@@ -329,17 +315,14 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
 
 
     public void setAcksTo(String seqId, String acksTo) {
-
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
         sq.setAcksTo(seqId, acksTo);
     }
 
     public String getAcksTo(String seqId) {
-
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
         return sq.getAcksTo(seqId);
-
-    }
+      }
 
     public void addOffer(String msgID, String offerID) {
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);

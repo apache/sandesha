@@ -18,12 +18,18 @@
         <copy file="config/WSRMPolicy.xml" todir="${maven.build.dir}/classes"/>
     </preGoal>
 
-    <postGoal name="java:compile">
+    <goal name="samples:compile" prereqs="java:compile">
         <ant:property name="dir.samples" value="samples"/>
-        <ant:javac srcdir="${dir.samples}" destdir="${basedir}/target/classes" debug="on">
-            <ant:classpath refid="maven.dependency.classpath"/>
+        <ant:mkdir dir="${maven.build.dir}/sample-classes"/>
+        <copy file="samples/client-config.wsdd" todir="${maven.build.dir}/sample-classes"/>
+        <copy file="samples/server-config.wsdd" todir="${maven.build.dir}/sample-classes"/>
+        <ant:javac srcdir="${dir.samples}" destdir="${maven.build.dir}/sample-classes" debug="on">
+            <classpath>
+                <pathelement location="${maven.build.dest}"/>
+                <path refid="maven.dependency.classpath"/>
+            </classpath>
         </ant:javac>
-    </postGoal>
+    </goal>
 
     <postGoal name="jar">
         <ant:mkdir dir="${basedir}/target/lib"/>
@@ -53,8 +59,15 @@
 
     <goal name="interop.jar" prereqs="java:compile">
         <ant:property name="sandesha.jar.name" value="Sandesha-interop.jar"/>
-        <ant:mkdir dir="${basedir}/dist/jar"/>
+        <ant:mkdir dir="${maven.build.dir}/dist/jar"/>
         <ant:jar basedir="${maven.build.dir}/classes" destfile="${sandesha.jar.name}"/>
+    </goal>
+
+    <goal name="samples.jar" prereqs="samples:compile">
+        <ant:property name="samples.jar.name" value="Sandesha-samples.jar"/>
+        <ant:jar destfile="${maven.build.dir}/${samples.jar.name}">
+            <fileset dir="${maven.build.dir}/sample-classes"/>
+        </ant:jar>
     </goal>
 
     <!-- ================================================================ -->
@@ -129,7 +142,7 @@
                 <ant:include name="*.html"/>
                 <ant:include name="*.txt"/>
             </ant:fileset>
-         </ant:copy>
+        </ant:copy>
 
         <mkdir dir="target/dist"/>
 

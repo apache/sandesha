@@ -75,12 +75,11 @@ public class EchoClientAsyncAck {
 
             if (report != null) {
                 System.out.println("\n***********Printing RM Report***********");
-                System.out.println("Were all messages add     - " + report.isAllAcked());
+                System.out.println("Is all messages acked     - " + report.isAllAcked());
                 System.out.println(
                         "No of response messages   - " + report.getNumberOfReturnMessages());
                 System.out.println("****************************************\n");
             }
-           
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -30,15 +30,16 @@ import java.util.Iterator;
  * Sender will be done either by the RMProvider or the SandeshaContext. The job of the sender is to
  * keep on monitoring the SandeshaQueue and send any messages that are scheduled to be sent.
  *
- * @auther Chamikar Jayalath
- * @auther Jaliya Ekanayake
+ * @author Chamikar Jayalath
+ * @author Jaliya Ekanayake
  */
 public class Sender {
 
-    private ThreadPool tPool = new ThreadPool(Constants.SENDER_THREADS);;
+    private ThreadPool tPool = new ThreadPool(Constants.SENDER_THREADS);
     private ArrayList threadList = new ArrayList();
 
     public void startSender() {
+        running=true;
         for (int i = 0; i < Constants.SENDER_THREADS; i++) {
             SenderWorker senderWorker = new SenderWorker(this.storageManager);
             senderWorker.setRequestChain(this.getRequestChain());
@@ -48,7 +49,7 @@ public class Sender {
             threadList.add(senderWorker);
             tPool.addWorker(senderWorker);
         }
-    }
+  }
 
     public void stop() {
         Iterator ite = threadList.iterator();
@@ -58,10 +59,20 @@ public class Sender {
         }
 
         tPool.safeShutdown();
+        running=false;
     }
 
     public static Callback callback;
-    public boolean running = true;
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    private boolean running ;
     private IStorageManager storageManager;
 
 

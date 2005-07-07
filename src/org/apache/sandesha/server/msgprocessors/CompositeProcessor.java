@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
 /**
  * This will process messages with sequence elements. Mainly the requests/responses.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public class CompositeProcessor implements IRMMessageProcessor {
 

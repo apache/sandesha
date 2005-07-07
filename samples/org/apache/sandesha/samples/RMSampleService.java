@@ -24,7 +24,7 @@ import java.util.Map;
  * This is the service that is used for the interop testing. Two operations, ping and echoString
  * are defined as per the interop scenarios.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public class RMSampleService {
     private static Map sequences = new HashMap();
@@ -38,10 +38,10 @@ public class RMSampleService {
             sequences.put(sequence, (new String(text)));
 
         }
-        return text;
+           return text;
     }
 
     public void ping(String text) {
         //Just accept the message and do some processing
-    }
+       }
 }

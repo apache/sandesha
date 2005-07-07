@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 /**
  * This class is used to get the client side properties and to set them to the RMMessageContext.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public class ClientPropertyValidator {
 
@@ -174,7 +174,7 @@ public class ClientPropertyValidator {
      */
     private static long getMessageNumber(Call call) {
         Object temp = call.getProperty(Constants.ClientProperties.MSG_NUMBER);
-        SandeshaContext ctx = (SandeshaContext) call.getProperty("context");
+        SandeshaContext ctx = (SandeshaContext) call.getProperty(Constants.CONTEXT);
         long msgNo = ctx.getMessageNumber();
         if (temp == null) {
             ctx.setMessageNumber(++msgNo);

@@ -24,7 +24,7 @@ import org.apache.sandesha.server.msgprocessors.*;
 import org.apache.sandesha.ws.rm.RMHeaders;
 
 /**
- * @author
+ * @author Jaliya Ekanayake
  */
 public class RMMessageProcessorIdentifier {
     /**

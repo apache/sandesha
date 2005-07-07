@@ -298,7 +298,7 @@ public void runTest(InteropBean bean,ResponseWriter writer,String defaultAsyncEn
 
             //InteropStub stub= InteropStub.getInstance();
             InteropStub stub= InteropStub.getInstance();
-            stub.setCallback(callback);
+            InteropStub.setCallback(callback);
 
         	if(bean.getOperation().equalsIgnoreCase("ping")){
 		       stub.runPing(bean);

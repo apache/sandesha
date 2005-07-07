@@ -34,7 +34,7 @@ import javax.xml.soap.SOAPException;
 /**
  * This will validate all the incoming messages receiving through the RMProvider.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public final class MessageValidator {
     private static IStorageManager storageMgr;

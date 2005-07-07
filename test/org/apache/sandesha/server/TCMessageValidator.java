@@ -20,6 +20,8 @@ package org.apache.sandesha.server;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.client.Service;
+import org.apache.axis.description.ServiceDesc;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
@@ -110,73 +112,7 @@ public class TCMessageValidator extends AbstractTestCase {
         }
     }
 
-    public void testValidateKnonwSequence() throws Exception {
-
-        RMMessageContext rmMsgCtx1 = getRMMessageContext("server/validation/CreateSeqRequest.xml");
-        MessageContext msgCtx1 = rmMsgCtx1.getMsgContext();
-        AddressingHeaders addrHeaders = new AddressingHeaders(
-                rmMsgCtx1.getMsgContext().getRequestMessage().getSOAPEnvelope());
-        msgCtx1.setProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
-                addrHeaders);
-        rmMsgCtx1.setMsgContext(msgCtx1);
-        rmMsgCtx1.setAddressingHeaders(addrHeaders);
-
-        RMMessageContext rmMsgCtx2 = getRMMessageContext("server/validation/MsgNo1Correct.xml");
-        MessageContext msgCtx2 = rmMsgCtx2.getMsgContext();
-
-        addrHeaders = new AddressingHeaders(
-                rmMsgCtx2.getMsgContext().getRequestMessage().getSOAPEnvelope());
-        msgCtx2.setProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
-                addrHeaders);
-        rmMsgCtx2.setMsgContext(msgCtx2);
-        SOAPService soapService1 = new SOAPService();
-        msgCtx1.setService(soapService1);
-        SOAPService soapService2 = new SOAPService();
-        msgCtx2.setService(soapService2);
-
-        try {
-            RMProvider rmProvider = new RMProvider();
-            rmProvider.processMessage(msgCtx1, null, null, null);
-
-            SOAPEnvelope soapEnv = msgCtx1.getResponseMessage().getSOAPEnvelope();
-            RMHeaders rmHeaders = new RMHeaders();
-            rmHeaders.fromSOAPEnvelope(soapEnv);
-            String seqID = rmHeaders.getCreateSequenceResponse().getIdentifier().getIdentifier();
-
-            RMHeaders rmH = new RMHeaders();
-
-            SOAPEnvelope soapEnv2 = msgCtx2.getRequestMessage().getSOAPEnvelope();
-            rmH.fromSOAPEnvelope(soapEnv2);
-            Identifier seqIdentifier = rmH.getSequence().getIdentifier();
-            seqIdentifier.setIdentifier(seqID);
-
-            AckRequested ackRequested = new AckRequested();
-            ackRequested.setIdentifier(seqIdentifier);
-            rmH.setAckRequest(ackRequested);
-
-
-            rmH.toSoapEnvelop(soapEnv2);
-            msgCtx2.setRequestMessage(new Message(soapEnv2));
-
-            rmProvider.processMessage(msgCtx2, null, null, null);
-            // System.out.println(msgCtx2.getResponseMessage().getSOAPEnvelope().toString());
-            RMHeaders rmHead = new RMHeaders();
-            rmHead.fromSOAPEnvelope(msgCtx2.getResponseMessage().getSOAPEnvelope());
-            AcknowledgementRange ackRange = (AcknowledgementRange) rmHead.getSequenceAcknowledgement()
-                    .getAckRanges().get(0);
-            assertEquals(1, ackRange.getMaxValue());
-            assertEquals(1, ackRange.getMinValue());
-
-
-        } catch (AxisFault af) {
-            af.printStackTrace();
-        }
-
-    }
-
-    public void testForFaults() throws Exception {
+   public void testForFaults() throws Exception {
         RMMessageContext rmMsgCtx1 = getRMMessageContext("server/validation/MsgNo1Correct.xml");
         MessageContext msgCtx1 = rmMsgCtx1.getMsgContext();
         AddressingHeaders addrHeaders = new AddressingHeaders(

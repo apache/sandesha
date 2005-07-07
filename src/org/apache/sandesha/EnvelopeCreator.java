@@ -37,7 +37,7 @@ import java.util.Vector;
  * WS-Addressing and, WS-RM headers and Body Elements.
  *
  * @author Jaliya Ekanayake
- * @auther Chamikara Jayalath
+ * @author Chamikara Jayalath
  */
 public class EnvelopeCreator {
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
@@ -235,7 +235,6 @@ public class EnvelopeCreator {
 
         return responseEnvelope;
     }
-
 
     public static SOAPEnvelope createServiceRequestEnvelope(RMMessageContext rmMessageContext)
             throws Exception {

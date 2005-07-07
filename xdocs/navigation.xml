@@ -11,7 +11,7 @@
 
          <item name="Downloads">
             <item name="Releases" href="releases.html" />
-            <item name="Source Code" href="http://cvs.apache.org/viewcvs.cgi/ws-fx/sandesha/" />
+            <item name="Source Code" href="http://cvs.apache.org/viewcvs.cgi/ws-sandesha/" />
          </item>
          <item name="Project Information">
       	<item name="Mailing Lists" href="mail-lists.html" /> 

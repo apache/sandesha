@@ -21,7 +21,8 @@ import org.apache.sandesha.storage.Callback;
 import org.apache.sandesha.storage.CallbackData;
 
 /**
- *  This Callback is used to write the results of various points in the Sandesha engine.
+ * This Callback is used to write the results of various points in the Sandesha engine.
+ *
  * @auther Chamikara Jayalath
  */
 public class InteropCallback extends Callback {
@@ -116,6 +117,6 @@ public class InteropCallback extends Callback {
         boolean b = writer.write(entry);
         if (!b)
             setTestFinished(true);
-        }
+    }
 
 }

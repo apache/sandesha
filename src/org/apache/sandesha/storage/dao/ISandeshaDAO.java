@@ -106,14 +106,7 @@ public interface ISandeshaDAO {
 
     public Object getRandomSeqToProcess();
 
-    /**
-     * This is used to randomize the process of message sending. Otherwise messages of some
-     * sequence will not be sent while some other sequences will very easily be able to send all
-     * their messages.
-     */
-    String getRandomSeqIdToProcess();
-
-
+   
     /**
      * This reutns a set of message numbers with all the message numbers of
      * incoming sequence.

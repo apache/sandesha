@@ -40,7 +40,7 @@ import java.util.Vector;
  * and sending acknowledgements. Sending part is required as the user wants synchronous
  * acknowldgements to be sent from the server.
  *
- * @auther Jaliya Eknayake
+ * @author Jaliya Eknayake
  */
 public final class AcknowledgementProcessor implements IRMMessageProcessor {
     private IStorageManager storageManager = null;

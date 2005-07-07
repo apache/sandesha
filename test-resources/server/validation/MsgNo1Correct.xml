@@ -5,7 +5,7 @@
          <wsrm:MessageNumber>1</wsrm:MessageNumber>
       </wsrm:Sequence>
       <wsa:MessageID soapenv:mustUnderstand="1">uuid:101bbc20-c075-11d9-b48b-ec4b63ffde41</wsa:MessageID>
-      <wsa:To soapenv:mustUnderstand="1">http://127.0.0.1:8070/axis/services/RMInteropService?wsdl</wsa:To>
+      <wsa:To soapenv:mustUnderstand="1">http://127.0.0.1:8070/axis/services/RMTestService?wsdl</wsa:To>
       <wsa:Action soapenv:mustUnderstand="1">urn:wsrm:Ping</wsa:Action>
       <wsa:From soapenv:mustUnderstand="1">
          <Address xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</Address>

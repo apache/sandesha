@@ -41,15 +41,14 @@ import java.util.Set;
 public class ServerStorageManager implements IStorageManager {
 
     public void setTerminateSend(String seqId) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     public void setTerminateReceived(String seqId) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     protected static Log log = LogFactory.getLog(ServerStorageManager.class.getName());
-    private String tempSeqId = null; // used by getNextMessageToProcess();
     private ISandeshaDAO accessor;
 
     public ServerStorageManager() {
@@ -68,32 +67,20 @@ public class ServerStorageManager implements IStorageManager {
      * a new sequence.
      */
  public RMMessageContext getNextMessageToProcess(Object seq) {
-//        if (tempSeqId == null)
-//            tempSeqId = accessor.getRandomSeqIdToProcess();
 
         if (seq == null)
             return null;
 
         RMMessageContext nextMsg = accessor.getNextMsgContextToProcess(seq);
-
-//        if (nextMsg == null) {
-//            tempSeqId = accessor.getRandomSeqIdToProcess();
-//            nextMsg = accessor.getNextMsgContextToProcess(tempSeqId);
-//        }
-
         return nextMsg;
     }
 
     public void setAcknowledged(String seqID, long msgNumber) {
-        //TODO decide this in implementing the ServerSender.
-        //accessor.moveOutgoingMessageToBin(seqID, new Long(msgNumber));
-        accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
+       accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
     }
 
     public void init() {
-        //:TODO Complete
-    }
-
+     }
     /**
      * Used to find out weather the sequence with this id has already been
      * created.
@@ -103,8 +90,7 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public boolean isResponseSequenceExist(String sequenceID) {
-        //return accessor.isIncomingSequenceExists(sequenceID);
-        return accessor.isOutgoingSequenceExists(sequenceID);
+                return accessor.isOutgoingSequenceExists(sequenceID);
     }
 
     public Object getNextSeqToProcess() {
@@ -180,11 +166,7 @@ public class ServerStorageManager implements IStorageManager {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.IStorageManager#addCreateSequenceResponse(org.apache.sandesha.RMMessageContext)
-     */
+
     public void addCreateSequenceResponse(RMMessageContext rmMessageContext) {
         addPriorityMessage(rmMessageContext);
     }
@@ -193,12 +175,7 @@ public class ServerStorageManager implements IStorageManager {
         addPriorityMessage(rmMessageContext);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.IStorageManager#addAcknowledgement(org.apache.sandesha.RMMessageContext)
-     */
-    public void addAcknowledgement(RMMessageContext rmMessageContext) {
+      public void addAcknowledgement(RMMessageContext rmMessageContext) {
         String sequenceID = rmMessageContext.getSequenceID();
         if (sequenceID != null)
             accessor.removeAllAcks(sequenceID);
@@ -210,13 +187,7 @@ public class ServerStorageManager implements IStorageManager {
         accessor.addPriorityMessage(msg);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.sandesha.IStorageManager#setOutSequence(java.lang.String,
-     *      java.lang.String)
-     */
-    public void setTemporaryOutSequence(String sequenceId, String outSequenceId) {
+      public void setTemporaryOutSequence(String sequenceId, String outSequenceId) {
         accessor.setOutSequence(sequenceId, outSequenceId);
         accessor.setOutSequenceApproved(sequenceId, false);
     }
@@ -267,7 +238,7 @@ public class ServerStorageManager implements IStorageManager {
         long messageNumber = rmHeaders.getSequence().getMessageNumber().getMessageNumber();
 
         if (messageNumber <= 0)
-            return; //TODO: throw some exception
+            return;
 
         Long msgNo = new Long(messageNumber);
         accessor.addMessageToIncomingSequence(sequenceId, msgNo, rmMessageContext);
@@ -275,49 +246,29 @@ public class ServerStorageManager implements IStorageManager {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#checkForResponseMessage(java.lang.String, java.lang.String)
-     */
     public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
-        // TODO Auto-generated method stub
-        return null;
+           return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#insertTerminateSeqMessage(org.apache.sandesha.RMMessageContext)
-     */
-    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
+     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
         accessor.addLowPriorityMessage(terminateSeqMessage);
     }
-
-    /* (non-Javadoc)
-     * @see org.apache.sandesha.IStorageManager#isAllSequenceComplete()
-     */
-    public boolean isAllSequenceComplete() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
 
     public void setAckReceived(String seqId, long msgNo) {
         accessor.setAckReceived(seqId, msgNo);
 
     }
 
-    public void insertFault(RMMessageContext rmMsgCtx) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+    public void insertFault(RMMessageContext rmMsgCtx) { }
 
 
     public void addSendMsgNo(String seqId, long msgNo) {
         accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId), msgNo);
-
-    }
+     }
 
     public boolean isSentMsg(String seqId, long msgNo) {
         return accessor.isSentMsg(accessor.getSequenceOfOutSequence(seqId), msgNo);
-
-    }
+      }
 
 
     public void addOutgoingSequence(String sequenceId) {
@@ -329,7 +280,7 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public String getOutgoingSeqOfMsg(String msgId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public void addRequestedSequence(String seqId) {
@@ -354,7 +305,7 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public String getKeyFromOutgoingSeqId(String seqId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public void setAcksTo(String seqId, String acksTo) {

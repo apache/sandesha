@@ -415,7 +415,8 @@ public class SandeshaQueue {
         OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
 
         if (rsh == null) {
-            log.info("ERROR: RESPONSE SEQ IS NULL");
+             if(log.isDebugEnabled())
+            log.debug("ERROR: RESPONSE SEQ IS NULL");
             return;
         }
 
@@ -428,7 +429,8 @@ public class SandeshaQueue {
         OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
 
         if (rsh == null) {
-            log.info("ERROR: RESPONSE SEQ IS NULL");
+             if(log.isDebugEnabled())
+            log.debug("ERROR: RESPONSE SEQ IS NULL");
             return;
         }
         synchronized (rsh) {
