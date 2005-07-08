@@ -66,7 +66,7 @@ public class ServerStorageManager implements IStorageManager {
      * same sequence id. But if that doesnt hv processable messages it will go for
      * a new sequence.
      */
- public RMMessageContext getNextMessageToProcess(Object seq) {
+    public RMMessageContext getNextMessageToProcess(Object seq) {
 
         if (seq == null)
             return null;
@@ -76,11 +76,12 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public void setAcknowledged(String seqID, long msgNumber) {
-       accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
+        accessor.markOutgoingMessageToDelete(seqID, new Long(msgNumber));
     }
 
     public void init() {
-     }
+    }
+
     /**
      * Used to find out weather the sequence with this id has already been
      * created.
@@ -90,11 +91,11 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public boolean isResponseSequenceExist(String sequenceID) {
-                return accessor.isOutgoingSequenceExists(sequenceID);
+        return accessor.isOutgoingSequenceExists(sequenceID);
     }
 
     public Object getNextSeqToProcess() {
-      return  accessor.getRandomSeqToProcess();
+        return accessor.getRandomSeqToProcess();
     }
 
 
@@ -175,7 +176,7 @@ public class ServerStorageManager implements IStorageManager {
         addPriorityMessage(rmMessageContext);
     }
 
-      public void addAcknowledgement(RMMessageContext rmMessageContext) {
+    public void addAcknowledgement(RMMessageContext rmMessageContext) {
         String sequenceID = rmMessageContext.getSequenceID();
         if (sequenceID != null)
             accessor.removeAllAcks(sequenceID);
@@ -187,7 +188,7 @@ public class ServerStorageManager implements IStorageManager {
         accessor.addPriorityMessage(msg);
     }
 
-      public void setTemporaryOutSequence(String sequenceId, String outSequenceId) {
+    public void setTemporaryOutSequence(String sequenceId, String outSequenceId) {
         accessor.setOutSequence(sequenceId, outSequenceId);
         accessor.setOutSequenceApproved(sequenceId, false);
     }
@@ -247,10 +248,10 @@ public class ServerStorageManager implements IStorageManager {
     }
 
     public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
-           return null;
+        return null;
     }
 
-     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
+    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
         accessor.addLowPriorityMessage(terminateSeqMessage);
     }
 
@@ -259,16 +260,17 @@ public class ServerStorageManager implements IStorageManager {
 
     }
 
-    public void insertFault(RMMessageContext rmMsgCtx) { }
+    public void insertFault(RMMessageContext rmMsgCtx) {
+    }
 
 
     public void addSendMsgNo(String seqId, long msgNo) {
         accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId), msgNo);
-     }
+    }
 
     public boolean isSentMsg(String seqId, long msgNo) {
         return accessor.isSentMsg(accessor.getSequenceOfOutSequence(seqId), msgNo);
-      }
+    }
 
 
     public void addOutgoingSequence(String sequenceId) {

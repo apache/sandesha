@@ -186,16 +186,10 @@ public class ClientStorageManager implements IStorageManager {
      * proper sequenceID
      */
     public boolean setApprovedOutSequence(String oldSeqId, String newSeqId) {
-
-        boolean done = false;
-        // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
-
         if (oldSeqId == null) {
             return false;
         }
-
         String sequenceID = accessor.getSequenceOfOutSequence(oldSeqId);
-
         if (null == sequenceID) {
             log.error(Constants.ErrorMessages.SET_APPROVED_OUT_SEQ);
             return false;
