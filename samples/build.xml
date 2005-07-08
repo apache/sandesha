@@ -40,12 +40,12 @@ Build Instructions:
     </target>
 
     <target name="check.jar">
-        <available property="sandesha.jar.found1" file="../Sandesha-beta.jar"/>
-        <available property="target.directory.found" file="../target/Sandesha-beta.jar"/>
+        <available property="sandesha.jar.found1" file="../Sandesha-1.0-RC1.jar"/>
+        <available property="target.directory.found" file="../target/Sandesha-1.0-RC1.jar"/>
     </target>
 
     <target name="set.jar.at.root" depends="check.jar" unless="sandesha.jar.found1">
-        <echo message="Cannot find the Sandesha-beta.jar."/>
+        <echo message="Cannot find the Sandesha-1.0-RC1.jar."/>
         <fail message="If you are using the source distribution, please build the source using maven before running the samples."/>
      </target>
 
@@ -59,7 +59,7 @@ Build Instructions:
         <property name="dir.libs" value="../lib"/>
         <property name="dir.root" value="../"/>
         <property name="dir.target" value="../target"/>
-        <property name="jar.name" value="Sandesha-beta.jar"/>
+        <property name="jar.name" value="Sandesha-1.0-RC1.jar"/>
 
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">

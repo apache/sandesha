@@ -137,6 +137,10 @@
             <ant:fileset dir="samples"/>
         </ant:copy>
 
+
+        <attainGoal name="samples.jar"/>
+        <copy file="${maven.build.dir}/Sandesha-samples.jar" todir="${bin.dist.dir}/samples"/>
+      
         <ant:copy todir="${bin.dist.dir}/">
             <ant:fileset dir=".">
                 <ant:include name="*.html"/>
