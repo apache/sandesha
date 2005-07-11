@@ -122,17 +122,17 @@
         <unitTest>
             <includes>
                 <include>**/*TC*.java</include>
-                  <include>**/*.wsdd</include>
+                <include>**/*.wsdd</include>
             </includes>
-          <excludes>
-  <!--                <exclude>**/*TCServerStorageManager.java</exclude>-->
-      </excludes>
+            <excludes>
+                <!--                <exclude>**/*TCServerStorageManager.java</exclude>-->
+            </excludes>
             <resources>
                 <resource>
                     <directory>test-resources</directory>
                     <includes>
                         <include>**/*.xml</include>
-                           <include>**/*.wsdd</include>
+                        <include>**/*.wsdd</include>
                     </includes>
                 </resource>
             </resources>
@@ -195,7 +195,7 @@
             </properties>
         </dependency>
 
-         <dependency>
+        <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.2</version>
@@ -210,7 +210,7 @@
             </properties>
         </dependency>
 
-          <dependency>
+        <dependency>
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
             <version>1.2</version>
@@ -239,7 +239,7 @@
 
     </dependencies>
 
-   <!-- ======= -->
+    <!-- ======= -->
     <!-- Reports -->
     <!-- ======= -->
     <!-- reports>

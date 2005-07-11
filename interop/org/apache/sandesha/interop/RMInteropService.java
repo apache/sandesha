@@ -17,9 +17,8 @@
 
 package org.apache.sandesha.interop;
 
-import org.apache.commons.logging.Log;
 import org.apache.axis.components.logger.LogFactory;
-import org.apache.sandesha.client.RMSender;
+import org.apache.commons.logging.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,7 @@ import java.util.Map;
  * This is the service that is used for the interop testing. Two operations, ping and echoString
  * are defined as per the interop scenarios.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public class RMInteropService {
     private static Map sequences = new HashMap();

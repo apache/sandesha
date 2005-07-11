@@ -39,7 +39,7 @@ public class Sender {
     private ArrayList threadList = new ArrayList();
 
     public void startSender() {
-        running=true;
+        running = true;
         for (int i = 0; i < Constants.SENDER_THREADS; i++) {
             SenderWorker senderWorker = new SenderWorker(this.storageManager);
             senderWorker.setRequestChain(this.getRequestChain());
@@ -49,7 +49,7 @@ public class Sender {
             threadList.add(senderWorker);
             tPool.addWorker(senderWorker);
         }
-  }
+    }
 
     public void stop() {
         Iterator ite = threadList.iterator();
@@ -59,7 +59,7 @@ public class Sender {
         }
 
         tPool.safeShutdown();
-        running=false;
+        running = false;
     }
 
     public static Callback callback;
@@ -72,7 +72,7 @@ public class Sender {
         this.running = running;
     }
 
-    private boolean running ;
+    private boolean running;
     private IStorageManager storageManager;
 
 

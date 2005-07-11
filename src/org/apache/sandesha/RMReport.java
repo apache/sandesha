@@ -36,14 +36,6 @@ public class RMReport {
         this.error = error;
     }
 
-    public int getReturns() {
-        return returns;
-    }
-
-    public void setReturns(int returns) {
-        this.returns = returns;
-    }
-
     public boolean isAllAcked() {
         return this.allAcked;
     }

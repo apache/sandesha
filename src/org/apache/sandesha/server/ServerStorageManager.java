@@ -195,10 +195,7 @@ public class ServerStorageManager implements IStorageManager {
 
     public boolean setApprovedOutSequence(String createSeqId, String newOutSequenceId) {
 
-        // String oldOutsequenceId = accessor.getFirstCreateSequenceMsgId(createSeqId);
-        String oldOutsequenceId1 = createSeqId;
-
-        String tempOutSeq = oldOutsequenceId1;
+        String tempOutSeq = createSeqId;
         if (tempOutSeq == null)
             tempOutSeq = createSeqId;
         String sequenceID = accessor.getSequenceOfOutSequence(tempOutSeq);

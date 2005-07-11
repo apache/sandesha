@@ -31,7 +31,7 @@ import java.util.*;
  * @author Jaliya Ekanayaka
  */
 
-public class IncomingSequence extends AbstractSequence{
+public class IncomingSequence extends AbstractSequence {
 
     private long lastProcessed;
     private boolean hasProcessableMessages;
@@ -113,10 +113,10 @@ public class IncomingSequence extends AbstractSequence{
 
     }
 
-    public Vector getNextMessagesToProcess() {
+    public List getNextMessagesToProcess() {
 
         boolean done = false;
-        Vector messages = new Vector();
+        List messages = new ArrayList();
 
         while (!done) {
             Long nextKey = new Long(lastProcessed + 1);

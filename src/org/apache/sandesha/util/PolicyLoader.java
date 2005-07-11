@@ -104,7 +104,7 @@ public class PolicyLoader {
             binaryBackOff = geBinaryBackoffInterval(Constants.WSRMPolicy.WSRM,
                     Constants.WSRMPolicy.BIN_BACKOFF);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 
@@ -152,7 +152,7 @@ public class PolicyLoader {
             } else
                 log.error("No WSRMPolicy.xml Found");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 

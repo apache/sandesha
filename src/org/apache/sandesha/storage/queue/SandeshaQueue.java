@@ -151,9 +151,9 @@ public class SandeshaQueue {
         if (sequence == null)
             return null;
 
-        AbstractSequence absSeq=(AbstractSequence)sequence;
+        AbstractSequence absSeq = (AbstractSequence) sequence;
 
-       IncomingSequence sh = (IncomingSequence) incomingMap.get(absSeq.getSequenceId());
+        IncomingSequence sh = (IncomingSequence) incomingMap.get(absSeq.getSequenceId());
         synchronized (sh) {
             if (sh == null)
                 throw new QueueException(Constants.Queue.SEQUENCE_ABSENT);
@@ -256,31 +256,13 @@ public class SandeshaQueue {
                                 if (currentTime >=
                                         lastSentTime + Constants.RETRANSMISSION_INTERVAL) {
 
-                                    //EDITED FOR MSG NO REPITITION
-                                    String oldOutSeqId, newOutSeqId;
-
-                                    String oldCreateSeqId = tempMsg.getMessageID().toString();
-                                    String uuid = uuidGen.nextUUID();
-
-
-                                    String newCreateSeqId = Constants.UUID + uuid;
+                                    String newCreateSeqId = Constants.UUID + uuidGen.nextUUID();
                                     tempMsg.setMessageID(newCreateSeqId);
 
-                                    oldOutSeqId = oldCreateSeqId;
-                                    newOutSeqId = newCreateSeqId;
+                                    tempMsg.setLastSentTime(currentTime);
+                                    msg = tempMsg;
+                                    break forLoop;
 
-
-                                    try {
-
-                                        tempMsg.setLastSentTime(currentTime);
-                                        msg = tempMsg;
-
-
-                                        break forLoop;
-
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
 
                                 }
                                 break;
@@ -340,8 +322,8 @@ public class SandeshaQueue {
         }
     }
 
-       public Vector nextAllSeqsToProcess() {
-           Vector seqs = new Vector();
+    public List nextAllSeqsToProcess() {
+        List seqs = new ArrayList();
 
         synchronized (incomingMap) {
             Iterator it = incomingMap.keySet().iterator();
@@ -354,10 +336,10 @@ public class SandeshaQueue {
             }
             return seqs;
         }
-       }
+    }
 
-    public Vector nextAllSeqIdsToProcess() {
-        Vector ids = new Vector();
+    public List nextAllSeqIdsToProcess() {
+        List ids = new ArrayList();
 
         synchronized (incomingMap) {
             Iterator it = incomingMap.keySet().iterator();
@@ -413,27 +395,24 @@ public class SandeshaQueue {
 
     public void setOutSequence(String seqId, String outSeqId) {
         OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-
-        if (rsh == null) {
-             if(log.isDebugEnabled())
-            log.debug("ERROR: RESPONSE SEQ IS NULL");
-            return;
-        }
-
         synchronized (rsh) {
+            if (rsh == null) {
+                if (log.isDebugEnabled())
+                    log.debug("ERROR: RESPONSE SEQ IS NULL");
+                return;
+            }
             rsh.setOutSequenceId(outSeqId);
         }
     }
 
     public void setOutSequenceApproved(String seqId, boolean approved) {
         OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(seqId);
-
-        if (rsh == null) {
-             if(log.isDebugEnabled())
-            log.debug("ERROR: RESPONSE SEQ IS NULL");
-            return;
-        }
         synchronized (rsh) {
+            if (rsh == null) {
+                if (log.isDebugEnabled())
+                    log.debug("ERROR: RESPONSE SEQ IS NULL");
+                return;
+            }
             rsh.setOutSeqApproved(approved);
         }
     }
@@ -445,16 +424,15 @@ public class SandeshaQueue {
         synchronized (outgoingMap) {
             Iterator it = outgoingMap.keySet().iterator();
             while (it.hasNext()) {
-
                 String tempSeqId = (String) it.next();
                 OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(tempSeqId);
                 String tempOutSequence = rsh.getOutSequenceId();
                 if (outSequence.equals(tempOutSequence))
                     return tempSeqId;
-
             }
+            return null;
         }
-        return null;
+
     }
 
     public void displayOutgoingMap() {

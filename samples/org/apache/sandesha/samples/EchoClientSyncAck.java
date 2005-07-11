@@ -19,10 +19,12 @@ package org.apache.sandesha.samples;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.axis.encoding.XMLType;
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.sandesha.*;
+import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.axis.encoding.XMLType;
+import org.apache.sandesha.Constants;
+import org.apache.sandesha.RMReport;
+import org.apache.sandesha.SandeshaContext;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -30,7 +32,7 @@ import javax.xml.rpc.ParameterMode;
 /**
  * Test client for echoString scenario.
  *
- * @auther Jaliya Ekanyake
+ * @author Jaliya Ekanyake
  */
 public class EchoClientSyncAck {
 
@@ -38,7 +40,6 @@ public class EchoClientSyncAck {
     private static String defaultClientPort = "9070";
     private static String targetURL = "http://127.0.0.1:" + defaultServerPort +
             "/axis/services/RMSampleService";
-
 
 
     public static void main(String[] args) {

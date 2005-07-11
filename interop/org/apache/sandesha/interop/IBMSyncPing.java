@@ -29,7 +29,7 @@ import javax.xml.rpc.ParameterMode;
 /**
  * Test client for Ping scenario for IBM.
  *
- * @auther Jaliya Ekanyake
+ * @author Jaliya Ekanyake
  */
 
 public class IBMSyncPing {

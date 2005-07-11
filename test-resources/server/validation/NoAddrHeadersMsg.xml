@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm">
-   <soapenv:Header>
-      <wsrm:Sequence soapenv:mustUnderstand="1">
-         <wsrm:Identifier>uuid:38c46700-7596-11d9-bc0a-e04431962602</wsrm:Identifier>
-         <wsrm:MessageNumber>1</wsrm:MessageNumber>
-         <wsrm:Expires>2005-02-03T03:40:39.125Z</wsrm:Expires>
-      </wsrm:Sequence>
-   </soapenv:Header>
-   <soapenv:Body>
-      <echoString xmlns="http://tempuri.org/">
-         <Text>IBM-1</Text>
-         <Sequence>uuid:d64cbd820a0301d8005a2eaae3b975e0</Sequence>
-      </echoString>
-   </soapenv:Body>
+    <soapenv:Header>
+        <wsrm:Sequence soapenv:mustUnderstand="1">
+            <wsrm:Identifier>uuid:38c46700-7596-11d9-bc0a-e04431962602</wsrm:Identifier>
+            <wsrm:MessageNumber>1</wsrm:MessageNumber>
+            <wsrm:Expires>2005-02-03T03:40:39.125Z</wsrm:Expires>
+        </wsrm:Sequence>
+    </soapenv:Header>
+    <soapenv:Body>
+        <echoString xmlns="http://tempuri.org/">
+            <Text>IBM-1</Text>
+            <Sequence>uuid:d64cbd820a0301d8005a2eaae3b975e0</Sequence>
+        </echoString>
+    </soapenv:Body>
 </soapenv:Envelope>
 

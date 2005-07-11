@@ -44,7 +44,7 @@ public interface Constants {
     String URL_RM_SERVICE = "/axis/services/RMService";
     String IGNORE_ACTION = "ignoreAction";
     String RESPONSE = "Response";
-        String CONTEXT="context";
+    String CONTEXT = "context";
     String INVOKER = "invoker";
     String THREAD_POOL_SIZE = "threadPoolSize";
 
@@ -146,7 +146,7 @@ public interface Constants {
         String CANNOT_SEND_THE_TERMINATE_SEQ = "SERVER ERROR: Cannot send the TerminateSequence " +
                 "from Server";
 
-        String NULL_REQUEST_MSG = "ERROR: NULL REQUEST MESSAGE";
+        String NULL_REQUEST_MSG = "ERROR : NULL REQUEST MESSAGE";
 
         String SEQ_IS_NOT_CREATED = "ERROR: Sequence was not created correcly in the in queue";
 
@@ -227,10 +227,11 @@ public interface Constants {
         String BIN_BACKOFF = "BinaryBackoff";
     }
 
-   String INVOKE_STRATEGY = "invokeStrategy";
-       String DEFAULT_STRATEGY = "org.apache.sandesha.server.ThreadPoolInvokeStrategy:threadPoolSize=10";
-      String INVOKE_HANDLER = "invokeHandler";
-       String DEFAULT_HANDLER = "org.apache.sandesha.server.InvokeHandlerImpl:invoker=org.apache.axis.providers.java.RPCProvider";
+    String INVOKE_STRATEGY = "invokeStrategy";
+    String DEFAULT_STRATEGY = "org.apache.sandesha.server.ThreadPoolInvokeStrategy:threadPoolSize=10";
+    String INVOKE_HANDLER = "invokeHandler";
+    String DEFAULT_HANDLER = "org.apache.sandesha.server.InvokeHandlerImpl:invoker=org.apache.axis.providers.java." +
+            "RPCProvider";
 
 }
 

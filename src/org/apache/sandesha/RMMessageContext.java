@@ -32,8 +32,8 @@ import java.util.Iterator;
  * paramerters through the processing logics including the MessageContext handed over by the
  * axis engine.
  *
- * @auther Jaliya Ekanayake
- * @auther Chamikara Jayalath
+ * @author Jaliya Ekanayake
+ * @author Chamikara Jayalath
  */
 public class RMMessageContext {
     private static final Log log = LogFactory.getLog(RMMessageContext.class.getName());

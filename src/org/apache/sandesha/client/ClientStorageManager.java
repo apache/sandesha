@@ -177,12 +177,14 @@ public class ClientStorageManager implements IStorageManager {
      * queue using this temporary ID as the messageID.
      */
     public void setTemporaryOutSequence(String sequenceId, String outSequenceId) {
-        accessor.setOutSequence(sequenceId, outSequenceId);
-        accessor.setOutSequenceApproved(sequenceId, false);
+        synchronized (this) {
+            accessor.setOutSequence(sequenceId, outSequenceId);
+            accessor.setOutSequenceApproved(sequenceId, false);
+        }
     }
 
     /**
-     * This will be used by the SimpleAxisServer and the Sender to set the
+     * This will be used by the Client Listener and the Sender to set the
      * proper sequenceID
      */
     public boolean setApprovedOutSequence(String oldSeqId, String newSeqId) {

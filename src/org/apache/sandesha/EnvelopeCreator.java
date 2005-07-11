@@ -17,7 +17,6 @@
 package org.apache.sandesha;
 
 import org.apache.axis.Message;
-import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBody;
@@ -29,7 +28,7 @@ import org.apache.sandesha.ws.rm.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This class creates the SOAPEnvelopes using the RMMessageContexts passed-in to various
@@ -40,7 +39,7 @@ import java.util.Vector;
  * @author Chamikara Jayalath
  */
 public class EnvelopeCreator {
-    private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+
 
     public static SOAPEnvelope createCreateSequenceResponseEnvelope(String seqId,
                                                                     RMMessageContext rmMessageContext,
@@ -56,7 +55,9 @@ public class EnvelopeCreator {
 
         outGoingAddressingHaders.setAction(action);
 
-        MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
+        String str = getNextUUID();
+
+        MessageID messageId = new MessageID(new URI(str));
         outGoingAddressingHaders.setMessageID(messageId);
 
         To incommingTo = addressingHeaders.getTo();
@@ -70,7 +71,7 @@ public class EnvelopeCreator {
         MessageID incommingMessageId = addressingHeaders.getMessageID();
         outGoingAddressingHaders.addRelatesTo(incommingMessageId.toString(),
                 new QName(org.apache.axis.message.addressing.Constants.NS_PREFIX_ADDRESSING,
-                org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT));
+                        org.apache.axis.message.addressing.Constants.NS_URI_ADDRESSING_DEFAULT));
 
         //SettingTo
         AttributedURI incommingAddress = null;
@@ -102,7 +103,6 @@ public class EnvelopeCreator {
         return envelope;
     }
 
-
     public static SOAPEnvelope createCreateSequenceEnvelope(RMMessageContext rmMsgCtx)
             throws Exception {
 
@@ -132,7 +132,7 @@ public class EnvelopeCreator {
 
     public static SOAPEnvelope createAcknowledgementEnvelope(RMMessageContext rmMessageContext,
                                                              String toAddress,
-                                                             Vector ackRangeVector)
+                                                             List ackRangeList)
             throws Exception {
 
         AddressingHeaders addressingHeaders = rmMessageContext.getAddressingHeaders();
@@ -143,7 +143,7 @@ public class EnvelopeCreator {
 
         outGoingAddressingHaders.setAction(action);
 
-        MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
+        MessageID messageId = new MessageID(new URI(getNextUUID()));
         outGoingAddressingHaders.setMessageID(messageId);
 
         To incommingTo = addressingHeaders.getTo();
@@ -158,7 +158,7 @@ public class EnvelopeCreator {
         outGoingAddressingHaders.toEnvelope(envelope, null);
 
         SequenceAcknowledgement seqAck = new SequenceAcknowledgement();
-        seqAck.setAckRanges(ackRangeVector);
+        seqAck.setAckRanges(ackRangeList);
         seqAck.setIdentifier(rmMessageContext.getRMHeaders().getSequence().getIdentifier());
         seqAck.toSoapEnvelop(envelope);
 
@@ -188,7 +188,7 @@ public class EnvelopeCreator {
             outGoingAddressingHaders.addRelatesTo(rmMessageContext.getMessageID(), null);
 
         //Set the messageID
-        MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
+        MessageID messageId = new MessageID(new URI(getNextUUID()));
         outGoingAddressingHaders.setMessageID(messageId);
 
         //Set the <wsa:From> address from the incoming <wsa:To>
@@ -263,7 +263,7 @@ public class EnvelopeCreator {
             Action action = new Action(new URI(rmMessageContext.getAction()));
             outGoingAddressingHaders.setAction(action);
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
 
         if (rmMessageContext.getFaultTo() != null)
@@ -310,7 +310,7 @@ public class EnvelopeCreator {
         Action terSeqAction = new Action(new URI(Constants.WSRM.ACTION_TERMINATE_SEQUENCE));
         outGoingAddressingHaders.setAction(terSeqAction);
 
-        MessageID messageId = new MessageID(new URI(Constants.UUID + uuidGen.nextUUID()));
+        MessageID messageId = new MessageID(new URI(getNextUUID()));
         outGoingAddressingHaders.setMessageID(messageId);
 
         outGoingAddressingHaders.setFrom(addressingHeaders.getFrom());
@@ -328,6 +328,10 @@ public class EnvelopeCreator {
         terSeq.toSoapEnvelop(terSeqEnv);
 
         return terSeqEnv;
+    }
+
+    private static synchronized String getNextUUID() {
+        return Constants.UUID + UUIDGenFactory.getUUIDGen().nextUUID();
     }
 
 }

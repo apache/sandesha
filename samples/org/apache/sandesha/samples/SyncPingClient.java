@@ -31,7 +31,7 @@ import javax.xml.rpc.ParameterMode;
  * Test client for Ping scenario with synchronous invocation. No client side listener will start
  * and all the communications will happen synchronously.
  *
- * @auther Jaliya Ekanyake
+ * @author Jaliya Ekanyake
  */
 public class SyncPingClient {
 
@@ -54,7 +54,7 @@ public class SyncPingClient {
 
             call.setOperationName(new QName("http://tempuri.org/", "Ping"));
             call.addParameter("arg1", XMLType.XSD_STRING, ParameterMode.IN);
-        
+
             call.invoke(new Object[]{"Ping Message Number One"});
             call.invoke(new Object[]{"Ping Message Number Two"});
             ctx.setLastMessage(call);

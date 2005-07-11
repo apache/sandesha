@@ -27,7 +27,7 @@ import java.util.Set;
 
 public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public SandeshaDatabaseDAO(byte endPoint) {
-     }
+    }
 
     public boolean addIncomingSequence(String sequenceId) {
         return false;

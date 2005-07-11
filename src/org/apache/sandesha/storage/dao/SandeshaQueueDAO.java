@@ -22,9 +22,9 @@ import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.storage.queue.QueueException;
 import org.apache.sandesha.storage.queue.SandeshaQueue;
 
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.Vector;
 
 /**
  * @author Chamikara Jayalath
@@ -72,7 +72,6 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
             msg = sq.nextPriorityMessageToSend();
         } catch (QueueException e) {
             SandeshaQueueDAO.log.error(e);
-            e.printStackTrace();
         }
         return msg;
     }
@@ -86,7 +85,6 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
             result = true;
         } catch (QueueException e) {
             SandeshaQueueDAO.log.error(e);
-            e.printStackTrace();
         }
         return result;
     }
@@ -105,21 +103,20 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
             msg = sq.nextIncomingMessageToProcess(sequence);
         } catch (Exception e) {
             SandeshaQueueDAO.log.error(e);
-            e.printStackTrace();
         }
         return msg;
     }
 
-    public Object getRandomSeqToProcess(){
-         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
-         Vector seqs= sq.nextAllSeqsToProcess();
-         int size = seqs.size();
+    public Object getRandomSeqToProcess() {
+        SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
+        List seqs = sq.nextAllSeqsToProcess();
+        int size = seqs.size();
         if (size <= 0)
             return null;
         Random r = new Random();
         int number = r.nextInt(size);
 
-         return seqs.get(number);
+        return seqs.get(number);
     }
 
 
@@ -142,7 +139,6 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
             result = true;
         } catch (QueueException e) {
             SandeshaQueueDAO.log.error(e);
-            e.printStackTrace();
         }
         return result;
     }
@@ -322,7 +318,7 @@ public class SandeshaQueueDAO implements ISandeshaDAO {
     public String getAcksTo(String seqId) {
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);
         return sq.getAcksTo(seqId);
-      }
+    }
 
     public void addOffer(String msgID, String offerID) {
         SandeshaQueue sq = SandeshaQueue.getInstance(endPoint);

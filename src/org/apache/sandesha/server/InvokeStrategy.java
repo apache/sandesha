@@ -20,16 +20,18 @@ import java.util.Map;
 
 /**
  * A strategy for handling (asynchronous) web service invocations.
+ *
  * @author Patrick Collins
  */
-public interface InvokeStrategy
-{
-   /**
-    * Initialize the strategy.
-    */
-   public void start();
-   
-   public void stop();
-   
-   public void addParams( Map aParams );
+
+public interface InvokeStrategy {
+    /**
+     * Initialize the strategy.
+     */
+    public void start();
+
+    public void stop();
+
+    public void addParams(Map aParams);
 }
+

@@ -25,7 +25,10 @@ import org.apache.axis.message.addressing.Action;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.*;
+import org.apache.sandesha.Constants;
+import org.apache.sandesha.IStorageManager;
+import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.SandeshaContext;
 import org.apache.sandesha.server.MessageValidator;
 import org.apache.sandesha.server.RMMessageProcessorIdentifier;
 import org.apache.sandesha.server.msgprocessors.FaultProcessor;
@@ -63,8 +66,8 @@ public class RMProvider extends RPCProvider {
 
     public void processMessage(MessageContext msgContext, SOAPEnvelope reqEnv, SOAPEnvelope resEnv,
                                Object obj) throws Exception {
-         if(log.isDebugEnabled())
-        RMProvider.log.debug(Constants.InfomationMessage.PROVIDER_RECEIVED_MSG);
+        if (log.isDebugEnabled())
+            RMProvider.log.debug(Constants.InfomationMessage.PROVIDER_RECEIVED_MSG);
         //Some actions may need to be ignored. e.g.  http://schemas.xmlsoap.org/ws/2005/02/trust/RST/SCT
         //user can specify them in the server-config.wsdd as parameters to the service
         //parameter names should be in  ignoreAction1, ignoreAction2 format.

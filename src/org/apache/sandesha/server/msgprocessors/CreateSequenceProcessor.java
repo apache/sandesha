@@ -40,7 +40,7 @@ import org.apache.sandesha.ws.rm.SequenceOffer;
 public class CreateSequenceProcessor implements IRMMessageProcessor {
     IStorageManager storageManager;
 
-    public static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+    public UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
     public CreateSequenceProcessor(IStorageManager storageManager) {
         this.storageManager = storageManager;
@@ -59,7 +59,7 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
         if (rmHeaders.getCreateSequence() == null)
             throw new AxisFault();
 
-        String seqId = Constants.UUID + uuidGen.nextUUID();
+        String seqId = getNextUUID();
         storageManager.addRequestedSequence(seqId);
 
 
@@ -120,6 +120,9 @@ public class CreateSequenceProcessor implements IRMMessageProcessor {
 
     }
 
+    private synchronized String getNextUUID() {
+        return Constants.UUID + uuidGen.nextUUID();
+    }
 
     //TODO  Implent the strategy for accepting the offer or rejecting it.
     private boolean acceptOrRejectOffer(SequenceOffer offer) {

@@ -75,7 +75,7 @@ public class SandeshaContext {
 
     private RMReport report;
 
-       public String getReplyToURL() {
+    public String getReplyToURL() {
         return replyToURL;
     }
 
@@ -243,8 +243,8 @@ public class SandeshaContext {
     }
 
     private static void startClientSender(IStorageManager storageManager) throws AxisFault {
-        if(log.isDebugEnabled()){
-        log.debug(Constants.InfomationMessage.SENDER_STARTED);
+        if (log.isDebugEnabled()) {
+            log.debug(Constants.InfomationMessage.SENDER_STARTED);
         }
 
         cleintSender = new Sender(storageManager);
@@ -265,9 +265,9 @@ public class SandeshaContext {
     }
 
     private static void startServerSender() {
-         if(log.isDebugEnabled()){
-        log.debug(Constants.InfomationMessage.SENDER_STARTED);
-         }
+        if (log.isDebugEnabled()) {
+            log.debug(Constants.InfomationMessage.SENDER_STARTED);
+        }
         serverSender = new Sender();
         serverSender.startSender();
         serverSenderStarted = true;
@@ -299,9 +299,9 @@ public class SandeshaContext {
             String seqId = (String) tempCall.getProperty(Constants.ClientProperties.CALL_KEY);
             while (!storageManager.isSequenceComplete(seqId)) {
                 try {
-                     if(log.isDebugEnabled()){
-                    log.debug(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
-                     }
+                    if (log.isDebugEnabled()) {
+                        log.debug(Constants.InfomationMessage.WAITING_TO_STOP_CLIENT);
+                    }
                     Thread.sleep(Constants.CLIENT_WAIT_PERIOD_FOR_COMPLETE);
                     if ((System.currentTimeMillis() - startingTime) >= inactivityTimeOut) {
                         stopClientByForce();

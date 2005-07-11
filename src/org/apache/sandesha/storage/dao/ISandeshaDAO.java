@@ -17,9 +17,7 @@
 package org.apache.sandesha.storage.dao;
 
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.storage.queue.IncomingSequence;
 
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -106,7 +104,7 @@ public interface ISandeshaDAO {
 
     public Object getRandomSeqToProcess();
 
-   
+
     /**
      * This reutns a set of message numbers with all the message numbers of
      * incoming sequence.

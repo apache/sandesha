@@ -61,7 +61,7 @@ Build Instructions:
         <property name="dir.target" value="../target"/>
         <property name="jar.name" value="Sandesha-1.0-RC1.jar"/>
 
-        <mkdir  dir="classes"/>
+        <mkdir dir="classes"/>
 
         <path id="classpath.libraries" description="3rd party libs">
             <fileset dir="${dir.libs}">
@@ -75,9 +75,9 @@ Build Instructions:
             </fileset>
             <pathelement location="classes"/>
 
-         </path>
+        </path>
 
-         <javac srcdir="." destdir="classes" debug="on">
+        <javac srcdir="." destdir="classes" debug="on">
             <classpath refid="classpath.libraries"/>
         </javac>
 

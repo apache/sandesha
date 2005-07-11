@@ -22,12 +22,10 @@ import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.AddressingHeaders;
-import org.apache.axis.providers.java.JavaProvider;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.util.PropertyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 
 /**
@@ -40,7 +38,8 @@ public class RMInvokerWork {
     private IStorageManager storageManager;
     private static final Log log = LogFactory.getLog(RMInvokerWork.class.getName());
     private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-        private InvokeHandler invoker = null;
+    private InvokeHandler invoker = null;
+
     public RMInvokerWork() {
         setStorageManager(new ServerStorageManager());
         getStorageManager().init();
@@ -48,23 +47,23 @@ public class RMInvokerWork {
 
 
     protected boolean doRealInvoke(MessageContext aMessageContext) throws Exception {
-      if( invoker == null ) {
-         invoker = InvokerFactory.getInstance().createInvokeHandler();
-      }
-      return invoker.handleInvoke( aMessageContext );
-  }
-
-
-    public void executeInvoke() throws Exception{
-
-                Object seq = getStorageManager().getNextSeqToProcess();
-        if (seq!=null){
-                synchronized (seq) {
-                    RMMessageContext rmMessageContext = getStorageManager().getNextMessageToProcess(seq);
-                    doWork(rmMessageContext);
-                }
+        if (invoker == null) {
+            invoker = InvokerFactory.getInstance().createInvokeHandler();
+        }
+        return invoker.handleInvoke(aMessageContext);
     }
-     }
+
+
+    public void executeInvoke() throws Exception {
+
+        Object seq = getStorageManager().getNextSeqToProcess();
+        if (seq != null) {
+            synchronized (seq) {
+                RMMessageContext rmMessageContext = getStorageManager().getNextMessageToProcess(seq);
+                doWork(rmMessageContext);
+            }
+        }
+    }
 
 
     /**

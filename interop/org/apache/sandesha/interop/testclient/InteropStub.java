@@ -18,35 +18,27 @@ package org.apache.sandesha.interop.testclient;
 
 
 import org.apache.axis.AxisFault;
-import org.apache.axis.Handler;
-import org.apache.axis.SimpleChain;
 import org.apache.axis.Message;
-import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.components.logger.LogFactory;
-import org.apache.axis.encoding.XMLType;
+import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.SandeshaContext;
-import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.client.ClientHandlerUtil;
+import org.apache.sandesha.client.ClientStorageManager;
 import org.apache.sandesha.server.Sender;
-import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.PropertyLoader;
 
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.io.IOException;
 
 /**
  * This is class has the client for the interop testing. interop.jsp
  * simply calls the runPing and runEcho methods.
  *
- * @auther Chamikara Jayalath
+ * @author Chamikara Jayalath
  */
 
 

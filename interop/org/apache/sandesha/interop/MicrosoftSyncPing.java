@@ -25,7 +25,7 @@ import org.apache.sandesha.SandeshaContext;
 /**
  * Test client for Ping scenario for Microsoft.
  *
- * @auther Jaliya Ekanyake
+ * @author Jaliya Ekanyake
  */
 public class MicrosoftSyncPing {
 

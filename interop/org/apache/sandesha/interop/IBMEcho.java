@@ -23,7 +23,6 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.encoding.XMLType;
 import org.apache.sandesha.Constants;
-import org.apache.sandesha.RMTransport;
 import org.apache.sandesha.SandeshaContext;
 
 import javax.xml.namespace.QName;
@@ -32,7 +31,7 @@ import javax.xml.rpc.ParameterMode;
 /**
  * Test client for echoString scenario for IBM.
  *
- * @auther Jaliya Ekanyake
+ * @author Jaliya Ekanyake
  */
 public class IBMEcho {
     private static String sourceHost = "192.248.18.51"; //Change this to your public IP address

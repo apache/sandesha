@@ -30,10 +30,10 @@ import org.apache.sandesha.ws.rm.AcknowledgementRange;
 import org.apache.sandesha.ws.rm.SequenceAcknowledgement;
 
 import javax.xml.soap.SOAPEnvelope;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 /**
  * Processor for the acknowledgements. This will handle both processing of acknowledgements
@@ -82,17 +82,17 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
         String seq = storageManager.getOutgoingSeqenceIdOfIncomingMsg(rmMessageContext);
         Map listOfMsgNumbers = storageManager.getListOfMessageNumbers(seq);
 
-        Vector ackRangeVector = null;
+        ArrayList ackRangeList = null;
         if (listOfMsgNumbers != null) {
-            ackRangeVector = getAckRangesVector(listOfMsgNumbers);
+            ackRangeList = getAckRangesVector(listOfMsgNumbers);
         } else {
-            ackRangeVector = new Vector();
+            ackRangeList = new ArrayList();
             AcknowledgementRange ackRange = new AcknowledgementRange();
             ackRange.setMaxValue(messageNumber);
             ackRange.setMinValue(messageNumber);
-            ackRangeVector.add(ackRange);
+            ackRangeList.add(ackRange);
         }
-        RMMessageContext rmMsgContext = getAckRMMsgCtx(rmMessageContext, ackRangeVector);
+        RMMessageContext rmMsgContext = getAckRMMsgCtx(rmMessageContext, ackRangeList);
 
         if (true ==
                 (storageManager.getAcksTo(seqID).equals(Constants.WSA.NS_ADDRESSING_ANONYMOUS))) {
@@ -113,13 +113,13 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
     }
 
     private RMMessageContext getAckRMMsgCtx(RMMessageContext rmMessageContext,
-                                            Vector ackRangeVector) {
+                                            List ackRangeList) {
         RMMessageContext rmMsgContext = new RMMessageContext();
         try {
 
             String to = storageManager.getAcksTo(rmMessageContext.getRMHeaders().getSequence().getIdentifier().getIdentifier());
 
-            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext, to, ackRangeVector);
+            SOAPEnvelope ackEnvelope = EnvelopeCreator.createAcknowledgementEnvelope(rmMessageContext, to, ackRangeList);
 
             Message resMsg = new Message(ackEnvelope);
             MessageContext msgContext = new MessageContext(rmMessageContext.getMsgContext().getAxisEngine());
@@ -144,11 +144,11 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
      * @param listOfMsgNumbers
      * @return
      */
-    private Vector getAckRangesVector(Map listOfMsgNumbers) {
+    private ArrayList getAckRangesVector(Map listOfMsgNumbers) {
         long min;
         long max;
         long size = listOfMsgNumbers.size();
-        Vector vec = new Vector();
+        ArrayList list = new ArrayList();
         boolean found = false;
 
         min = ((Long) listOfMsgNumbers.get(new Long(1))).longValue();
@@ -171,7 +171,7 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
                         AcknowledgementRange ackRange = new AcknowledgementRange();
                         ackRange.setMaxValue(max);
                         ackRange.setMinValue(min);
-                        vec.add(ackRange);
+                        list.add(ackRange);
 
                         min = ((Long) listOfMsgNumbers.get(new Long(i + 1))).longValue();
                     }
@@ -182,14 +182,14 @@ public final class AcknowledgementProcessor implements IRMMessageProcessor {
                 AcknowledgementRange ackRange = new AcknowledgementRange();
                 ackRange.setMaxValue(max);
                 ackRange.setMinValue(min);
-                vec.add(ackRange);
+                list.add(ackRange);
             }
         } else {
             AcknowledgementRange ackRange = new AcknowledgementRange();
             ackRange.setMaxValue(max);
             ackRange.setMinValue(min);
-            vec.add(ackRange);
+            list.add(ackRange);
         }
-        return vec;
+        return list;
     }
 }

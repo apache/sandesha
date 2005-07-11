@@ -22,7 +22,7 @@ import java.io.Serializable;
 /**
  * This is used to pass parameters from interop.jsp to the Sandesha
  *
- * @auther Chamikara Jayalath
+ * @author Chamikara Jayalath
  */
 public class InteropBean implements Serializable {
 

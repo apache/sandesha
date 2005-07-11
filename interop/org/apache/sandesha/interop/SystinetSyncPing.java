@@ -29,7 +29,7 @@ import javax.xml.rpc.ParameterMode;
  * Test client for Ping scenario for Systinet with synchronous invocation. No client side listener will start
  * and all the communications will happen synchronously.
  *
- * @auther Jaliya Ekanyake
+ * @author Jaliya Ekanyake
  */
 public class SystinetSyncPing {
 

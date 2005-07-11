@@ -18,20 +18,12 @@
 package org.apache.sandesha.server;
 
 import org.apache.axis.AxisFault;
-import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.client.Service;
-import org.apache.axis.description.ServiceDesc;
 import org.apache.axis.handlers.soap.SOAPService;
-import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.sandesha.AbstractTestCase;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
-import org.apache.sandesha.ws.rm.AckRequested;
-import org.apache.sandesha.ws.rm.AcknowledgementRange;
-import org.apache.sandesha.ws.rm.Identifier;
-import org.apache.sandesha.ws.rm.RMHeaders;
 import org.apache.sandesha.ws.rm.providers.RMProvider;
 
 import javax.xml.soap.SOAPBody;
@@ -64,10 +56,8 @@ public class TCMessageValidator extends AbstractTestCase {
 
         RMMessageContext rmMsgCtx = getRMMessageContext("server/validation/NoRMHeadersMsg.xml");
         MessageContext msgCtx = rmMsgCtx.getMsgContext();
-        AddressingHeaders addrHeaders = new AddressingHeaders(
-                rmMsgCtx.getMsgContext().getRequestMessage().getSOAPEnvelope());
-        msgCtx.setProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
+        AddressingHeaders addrHeaders = new AddressingHeaders(rmMsgCtx.getMsgContext().getRequestMessage().getSOAPEnvelope());
+        msgCtx.setProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
                 addrHeaders);
         rmMsgCtx.setMsgContext(msgCtx);
 
@@ -81,10 +71,8 @@ public class TCMessageValidator extends AbstractTestCase {
     public void testValidateMsgNoRollOver() throws Exception {
         RMMessageContext rmMsgCtx = getRMMessageContext("server/validation/MsgNoRollOver.xml");
         MessageContext msgCtx = rmMsgCtx.getMsgContext();
-        AddressingHeaders addrHeaders = new AddressingHeaders(
-                rmMsgCtx.getMsgContext().getRequestMessage().getSOAPEnvelope());
-        msgCtx.setProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
+        AddressingHeaders addrHeaders = new AddressingHeaders(rmMsgCtx.getMsgContext().getRequestMessage().getSOAPEnvelope());
+        msgCtx.setProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
                 addrHeaders);
         rmMsgCtx.setMsgContext(msgCtx);
 
@@ -98,10 +86,8 @@ public class TCMessageValidator extends AbstractTestCase {
     public void testValidateUnknownSequence() throws Exception {
         RMMessageContext rmMsgCtx = getRMMessageContext("server/validation/UnknownSequenceMsg.xml");
         MessageContext msgCtx = rmMsgCtx.getMsgContext();
-        AddressingHeaders addrHeaders = new AddressingHeaders(
-                rmMsgCtx.getMsgContext().getRequestMessage().getSOAPEnvelope());
-        msgCtx.setProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
+        AddressingHeaders addrHeaders = new AddressingHeaders(rmMsgCtx.getMsgContext().getRequestMessage().getSOAPEnvelope());
+        msgCtx.setProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
                 addrHeaders);
         rmMsgCtx.setMsgContext(msgCtx);
 
@@ -112,13 +98,11 @@ public class TCMessageValidator extends AbstractTestCase {
         }
     }
 
-   public void testForFaults() throws Exception {
+    public void testForFaults() throws Exception {
         RMMessageContext rmMsgCtx1 = getRMMessageContext("server/validation/MsgNo1Correct.xml");
         MessageContext msgCtx1 = rmMsgCtx1.getMsgContext();
-        AddressingHeaders addrHeaders = new AddressingHeaders(
-                rmMsgCtx1.getMsgContext().getRequestMessage().getSOAPEnvelope());
-        msgCtx1.setProperty(
-                org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
+        AddressingHeaders addrHeaders = new AddressingHeaders(rmMsgCtx1.getMsgContext().getRequestMessage().getSOAPEnvelope());
+        msgCtx1.setProperty(org.apache.axis.message.addressing.Constants.ENV_ADDRESSING_REQUEST_HEADERS,
                 addrHeaders);
         rmMsgCtx1.setMsgContext(msgCtx1);
         rmMsgCtx1.setAddressingHeaders(addrHeaders);

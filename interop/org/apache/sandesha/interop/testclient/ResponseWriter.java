@@ -1,7 +1,7 @@
 package org.apache.sandesha.interop.testclient;
 
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.PrintWriter;
 

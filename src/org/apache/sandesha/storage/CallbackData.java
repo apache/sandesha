@@ -8,8 +8,6 @@ package org.apache.sandesha.storage;
 
 import org.apache.axis.AxisFault;
 
-import java.util.ArrayList;
-
 /**
  * @author root
  *         <p/>
@@ -34,7 +32,7 @@ public class CallbackData {
 
     private long ackStart;
     private long ackEnd;
-     private AxisFault fault;
+    private AxisFault fault;
 
 
     /**

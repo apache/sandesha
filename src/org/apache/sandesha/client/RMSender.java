@@ -26,8 +26,10 @@ import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.addressing.AddressingHeaders;
 import org.apache.commons.logging.Log;
-import org.apache.sandesha.*;
-import org.apache.sandesha.storage.queue.SandeshaQueue;
+import org.apache.sandesha.Constants;
+import org.apache.sandesha.IStorageManager;
+import org.apache.sandesha.RMMessageContext;
+import org.apache.sandesha.RMReport;
 import org.apache.sandesha.util.PolicyLoader;
 import org.apache.sandesha.util.RMMessageCreator;
 import org.apache.sandesha.ws.rm.RMHeaders;
@@ -134,7 +136,7 @@ public class RMSender extends BasicHandler {
      * @throws Exception
      */
     private RMMessageContext processRequestMessage(RMMessageContext reqRMMsgContext,
-                                                        boolean sync) throws Exception {
+                                                   boolean sync) throws Exception {
         synchronized (lock) {
 
             if (!storageManager.isSequenceExist(reqRMMsgContext.getSequenceID())) {

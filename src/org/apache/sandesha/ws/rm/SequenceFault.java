@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * This is the SequenceFault element.
  *
- * @auther Jaliya Ekanayake
+ * @author Jaliya Ekanayake
  */
 public class SequenceFault extends MessageElement implements IRmElement {
 

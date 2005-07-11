@@ -16,10 +16,7 @@
  */
 package org.apache.sandesha.storage;
 
-import java.util.Date;
-
 import junit.framework.TestCase;
-
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.RMMessageContext;
 import org.apache.sandesha.client.ClientStorageManager;
@@ -31,16 +28,16 @@ import org.apache.sandesha.storage.queue.SandeshaQueue;
  * @author Jaliya Ekanayaka
  */
 public class TCClientStorageManager extends TestCase {
-    
+
     //For testing weather messages are re-transmitted correctly
-    public void testRetransmission(){
-        
+    public void testRetransmission() {
+
         SandeshaQueue sq = SandeshaQueue.getInstance(Constants.CLIENT);
         ClientStorageManager csm = new ClientStorageManager();
         RMMessageContext msg1;
         
         //approving the out sequence
-        csm.setTemporaryOutSequence("seqid1","uuid:aaaa-bbbb-cccc");
+        csm.setTemporaryOutSequence("seqid1", "uuid:aaaa-bbbb-cccc");
         csm.setApprovedOutSequence("uuid:aaaa-bbbb-cccc", "approved1");
 
         //messages should be returned (since the out sequence is approved)
@@ -60,13 +57,13 @@ public class TCClientStorageManager extends TestCase {
         assertNull(msg1);
 
         //Waiting for little more than re-transmission interval
-		try{
-		    Thread.sleep(Constants.RETRANSMISSION_INTERVAL + 100);
-		}catch(InterruptedException e){
-		    e.printStackTrace();
-		}
+        try {
+            Thread.sleep(Constants.RETRANSMISSION_INTERVAL + 100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-		
+
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
         msg1.setLocked(false);
@@ -83,13 +80,13 @@ public class TCClientStorageManager extends TestCase {
         assertNull(msg1);
 
         //Again waiting for little more than re-transmission interval :)
-		try{
-		    Thread.sleep(Constants.RETRANSMISSION_INTERVAL + 100);
-		}catch(InterruptedException e){
-		    e.printStackTrace();
-		}
+        try {
+            Thread.sleep(Constants.RETRANSMISSION_INTERVAL + 100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-		//Messages should be returned once again
+        //Messages should be returned once again
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
         msg1.setLocked(false);
@@ -106,13 +103,13 @@ public class TCClientStorageManager extends TestCase {
         assertNull(msg1);
 
     }
-    
+
     //Testing weather the tr-transmission stops after a acknowledgement
-    public void testAcknowledgement(){
+    public void testAcknowledgement() {
         SandeshaQueue sq = SandeshaQueue.getInstance(Constants.CLIENT);
         ClientStorageManager csm = new ClientStorageManager();
-                
-        csm.setTemporaryOutSequence("seqid1","uuid:aaaa-bbbb-cccc");
+
+        csm.setTemporaryOutSequence("seqid1", "uuid:aaaa-bbbb-cccc");
         csm.setApprovedOutSequence("uuid:aaaa-bbbb-cccc", "approved1");
 
         RMMessageContext msg1;
@@ -133,22 +130,22 @@ public class TCClientStorageManager extends TestCase {
         
         //Acknowledging messages 1,2 and 4 (without 3)
         csm.setAcknowledged("approved1", 1);
-        csm.setAcknowledged("approved1", 2);    
+        csm.setAcknowledged("approved1", 2);
         csm.setAcknowledged("approved1", 4);
         
         //Waiting for little more than re-transmission interval
-		try{
-		    Thread.sleep(Constants.RETRANSMISSION_INTERVAL + 100);
-		}catch(InterruptedException e){
-		    e.printStackTrace();
-		}
+        try {
+            Thread.sleep(Constants.RETRANSMISSION_INTERVAL + 100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-		//Only message no. 3 should be re-transmitted
+        //Only message no. 3 should be re-transmitted
         msg1 = csm.getNextMessageToSend();
         assertNotNull(msg1);
         assertEquals(msg1.getMessageID(), "rmsg3");
         msg1 = csm.getNextMessageToSend();
-        assertNull(msg1);  
+        assertNull(msg1);
     }
     
     /*
@@ -250,10 +247,10 @@ public class TCClientStorageManager extends TestCase {
     }*/
     
     
-    public void setUp() throws QueueException{
-        
+    public void setUp() throws QueueException {
+
         SandeshaQueue sq = SandeshaQueue.getInstance(Constants.CLIENT);
-        ClientStorageManager csm = new ClientStorageManager ();
+        ClientStorageManager csm = new ClientStorageManager();
         RMMessageContext msg = new RMMessageContext();
         
         //Creating a new outgoing sequence.
@@ -267,16 +264,16 @@ public class TCClientStorageManager extends TestCase {
         msg.setMessageID("rmsg1");
         msg.setSequenceID("seqid1");
         msg.setMsgNumber(nextMsgNo);
-        sq.addMessageToOutgoingSequence("seqid1",msg);
+        sq.addMessageToOutgoingSequence("seqid1", msg);
 
-  		//Adding message 2
+        //Adding message 2
         nextMsgNo = csm.getNextMessageNumber("seqid1");
         assertEquals(nextMsgNo, 2);
         msg = new RMMessageContext();
         msg.setMessageID("rmsg2");
         msg.setSequenceID("seqid1");
         msg.setMsgNumber(nextMsgNo);
-        sq.addMessageToOutgoingSequence("seqid1",msg);
+        sq.addMessageToOutgoingSequence("seqid1", msg);
 
         //Adding message 3
         nextMsgNo = csm.getNextMessageNumber("seqid1");
@@ -287,20 +284,20 @@ public class TCClientStorageManager extends TestCase {
         msg.setMsgNumber(nextMsgNo);
 
         //Adding message 4
-        sq.addMessageToOutgoingSequence("seqid1",msg);
+        sq.addMessageToOutgoingSequence("seqid1", msg);
         nextMsgNo = csm.getNextMessageNumber("seqid1");
         assertEquals(nextMsgNo, 4);
         msg = new RMMessageContext();
         msg.setMessageID("rmsg4");
         msg.setSequenceID("seqid1");
         msg.setMsgNumber(nextMsgNo);
-        sq.addMessageToOutgoingSequence("seqid1",msg);
+        sq.addMessageToOutgoingSequence("seqid1", msg);
     }
-    
-    public void tearDown(){
+
+    public void tearDown() {
 
         //clearing the storage
-        ClientStorageManager csm = new ClientStorageManager ();
+        ClientStorageManager csm = new ClientStorageManager();
         csm.clearStorage();
 
     }

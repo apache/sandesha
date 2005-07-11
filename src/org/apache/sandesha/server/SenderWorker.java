@@ -178,45 +178,45 @@ public class SenderWorker implements Runnable {
         switch (rmMessageContext.getMessageType()) {
             case Constants.MSG_TYPE_CREATE_SEQUENCE_REQUEST:
                 {
-                     if(log.isDebugEnabled())
-                    log.debug(Constants.InfomationMessage.SENDING_CREATE_SEQ);
-                           sendCreateSequenceRequest(rmMessageContext);
+                    if (log.isDebugEnabled())
+                        log.debug(Constants.InfomationMessage.SENDING_CREATE_SEQ);
+                    sendCreateSequenceRequest(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_CREATE_SEQUENCE_RESPONSE:
                 {
-                     if(log.isDebugEnabled())
-                    log.debug(Constants.InfomationMessage.SENDING_CREATE_SEQ_RES);
+                    if (log.isDebugEnabled())
+                        log.debug(Constants.InfomationMessage.SENDING_CREATE_SEQ_RES);
 
                     sendCreateSequenceResponse(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_TERMINATE_SEQUENCE:
                 {
-                    if(log.isDebugEnabled())
-                    log.debug(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
+                    if (log.isDebugEnabled())
+                        log.debug(Constants.InfomationMessage.SENDING_TERMINATE_SEQ);
                     sendTerminateSequenceRequest(rmMessageContext);
                     storageManager.setTerminateSend(storageManager.getKeyFromOutgoingSeqId(rmMessageContext.getSequenceID()));
                     break;
                 }
             case Constants.MSG_TYPE_ACKNOWLEDGEMENT:
                 {
-                     if(log.isDebugEnabled())
-                    log.debug(Constants.InfomationMessage.SENDING_ACK);
+                    if (log.isDebugEnabled())
+                        log.debug(Constants.InfomationMessage.SENDING_ACK);
                     sendAcknowldgement(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_SERVICE_REQUEST:
                 {
-                     if(log.isDebugEnabled())
-                    log.debug(Constants.InfomationMessage.SENDING_REQ);
+                    if (log.isDebugEnabled())
+                        log.debug(Constants.InfomationMessage.SENDING_REQ);
                     sendServiceRequest(rmMessageContext);
                     break;
                 }
             case Constants.MSG_TYPE_SERVICE_RESPONSE:
                 {
-                     if(log.isDebugEnabled())
-                    log.debug(Constants.InfomationMessage.SENDING_RES);
+                    if (log.isDebugEnabled())
+                        log.debug(Constants.InfomationMessage.SENDING_RES);
                     sendServiceResponse(rmMessageContext);
                     break;
                 }

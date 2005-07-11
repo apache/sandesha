@@ -199,7 +199,7 @@ public class RMMessageCreator {
 
             }
         }
-        setAddressingHeadersSetToMsgCtx(rmMsgCtx,csAddrHeaders);
+        setAddressingHeadersSetToMsgCtx(rmMsgCtx, csAddrHeaders);
         return csAddrHeaders;
     }
 
@@ -236,19 +236,19 @@ public class RMMessageCreator {
                 csAddrHeaders.setReplyTo(new EndpointReference(rmMsgCtx.getSourceURL()));
         }
 
-        setAddressingHeadersSetToMsgCtx(rmMsgCtx,csAddrHeaders);
+        setAddressingHeadersSetToMsgCtx(rmMsgCtx, csAddrHeaders);
 
         return csAddrHeaders;
     }
 
     private static synchronized void setAddressingHeadersSetToMsgCtx(RMMessageContext rmMsgCtx, AddressingHeaders addrHeaders) throws URI.MalformedURIException {
-        if(addrHeaders.getFaultTo() == null && rmMsgCtx.getFaultTo() != null){
-            addrHeaders.setFaultTo(new EndpointReference(new Address(rmMsgCtx.getFaultTo())) );
+        if (addrHeaders.getFaultTo() == null && rmMsgCtx.getFaultTo() != null) {
+            addrHeaders.setFaultTo(new EndpointReference(new Address(rmMsgCtx.getFaultTo())));
         }
-        if(addrHeaders.getFrom()==null&&rmMsgCtx.getFrom()!=null){
+        if (addrHeaders.getFrom() == null && rmMsgCtx.getFrom() != null) {
             addrHeaders.setFrom((new EndpointReference(new Address(rmMsgCtx.getFrom()))));
         }
-        if(addrHeaders.getReplyTo()==null&&rmMsgCtx.getReplyTo()!=null){
+        if (addrHeaders.getReplyTo() == null && rmMsgCtx.getReplyTo() != null) {
             addrHeaders.setReplyTo(new EndpointReference(new Address(rmMsgCtx.getReplyTo())));
         }
     }

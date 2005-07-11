@@ -42,8 +42,8 @@ public class OutgoingSequence extends AbstractSequence {
     private String outSequenceId;
     private boolean outSeqApproved;
     private HashMap hash;
-    private Vector markedAsDelete;
-    private Vector sendMsgNoList;
+    private ArrayList markedAsDelete;
+    private ArrayList sendMsgNoList;
     private long lastMsgNo = -1;
     private long nextAutoNumber; // key for storing messages.
     private static final Log log = LogFactory.getLog(OutgoingSequence.class.getName());
@@ -69,10 +69,10 @@ public class OutgoingSequence extends AbstractSequence {
     public OutgoingSequence(String sequenceId) {
         this.sequenceId = sequenceId;
         hash = new HashMap();
-        markedAsDelete = new Vector();
+        markedAsDelete = new ArrayList();
         nextAutoNumber = 1; //This is the key for storing messages.
         outSeqApproved = false;
-        sendMsgNoList = new Vector();
+        sendMsgNoList = new ArrayList();
     }
 
     /*
@@ -223,8 +223,8 @@ public class OutgoingSequence extends AbstractSequence {
         return result;
     }
 
-    public Vector getReceivedMsgNumbers() {
-        Vector result = new Vector();
+    public List getReceivedMsgNumbers() {
+        List result = new ArrayList();
         Iterator it = hash.keySet().iterator();
 
         while (it.hasNext()) {
@@ -247,31 +247,26 @@ public class OutgoingSequence extends AbstractSequence {
     }
 
     public boolean isAckComplete() {
-        try {
-            long lastMsgNo = getLastMsgNumber();
-            if (lastMsgNo <= 0) {
-                return false;
-            }
-            Iterator it = hash.keySet().iterator();
-            for (long i = 1; i < lastMsgNo; i++) {
-                if (!hasMessage(new Long(i))) {
-                    return false;
-                }
-            }
-
-            it = hash.keySet().iterator();
-            while (it.hasNext()) {
-                RMMessageContext msg = (RMMessageContext) hash.get(it.next());
-                if (!msg.isAckReceived()) {
-                    return false;
-                }
-            }
-            return true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        long lastMsgNo = getLastMsgNumber();
+        if (lastMsgNo <= 0) {
             return false;
         }
+        Iterator it = hash.keySet().iterator();
+        for (long i = 1; i < lastMsgNo; i++) {
+            if (!hasMessage(new Long(i))) {
+                return false;
+            }
+        }
+
+        it = hash.keySet().iterator();
+        while (it.hasNext()) {
+            RMMessageContext msg = (RMMessageContext) hash.get(it.next());
+            if (!msg.isAckReceived()) {
+                return false;
+            }
+        }
+        return true;
+
     }
 
     public void addMsgToSendList(long msgNo) {

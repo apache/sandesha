@@ -23,7 +23,7 @@ import org.apache.sandesha.storage.CallbackData;
 /**
  * This Callback is used to write the results of various points in the Sandesha engine.
  *
- * @auther Chamikara Jayalath
+ * @author Chamikara Jayalath
  */
 public class InteropCallback extends Callback {
 

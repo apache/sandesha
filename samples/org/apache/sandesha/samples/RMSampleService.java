@@ -38,10 +38,10 @@ public class RMSampleService {
             sequences.put(sequence, (new String(text)));
 
         }
-           return text;
+        return text;
     }
 
     public void ping(String text) {
         //Just accept the message and do some processing
-       }
+    }
 }
