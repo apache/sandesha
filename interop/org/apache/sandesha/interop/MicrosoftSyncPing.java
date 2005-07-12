@@ -38,7 +38,7 @@ public class MicrosoftSyncPing {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONIZED);
+            SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONOUS);
 
             ctx.setToURL("http://131.107.153.195/SecureReliableMessaging/ReliableOneWay.svc");
             //We really do not want to send wsa:ReplyTo header for a synchronous operation.

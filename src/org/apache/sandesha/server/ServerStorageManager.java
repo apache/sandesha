@@ -180,7 +180,6 @@ public class ServerStorageManager implements IStorageManager {
         String sequenceID = rmMessageContext.getSequenceID();
         if (sequenceID != null)
             accessor.removeAllAcks(sequenceID);
-
         addPriorityMessage(rmMessageContext);
     }
 

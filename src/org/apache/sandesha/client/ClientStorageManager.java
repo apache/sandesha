@@ -33,6 +33,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This is the storage manager for Client side in Sandesha
+ * Provides the access points for the SandeshaQueue.
+ *
+ * @author Chamikara Jayalath
+ * @author Jaliya Ekanayake
+ */
 public class ClientStorageManager implements IStorageManager {
 
     protected static Log log = LogFactory.getLog(ClientStorageManager.class.getName());
@@ -212,23 +219,10 @@ public class ClientStorageManager implements IStorageManager {
         return msgNo;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.sandesha.IStorageManager#insertOutgoingMessage
-     * (org.apache.sandesha.RMMessageContext)
-     */
     public void insertOutgoingMessage(RMMessageContext msg) {
         String sequenceId = msg.getSequenceID();
         accessor.addMessageToOutgoingSequence(sequenceId, msg);
     }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.sandesha.IStorageManager#insertIncomingMessage
-     *(org.apache.sandesha.RMMessageContext)
-     */
 
     public void insertIncomingMessage(RMMessageContext rmMessageContext) {
         RMHeaders rmHeaders = rmMessageContext.getRMHeaders();
@@ -253,27 +247,15 @@ public class ClientStorageManager implements IStorageManager {
         accessor.updateFinalMessageArrivedTime(sequenceId);
     }
 
-
     public RMMessageContext checkForResponseMessage(String sequenceId, String requestMsgId) {
         RMMessageContext response = accessor.checkForResponseMessage(requestMsgId, sequenceId);
         return response;
 
     }
 
-
-    public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
+     public void insertTerminateSeqMessage(RMMessageContext terminateSeqMessage) {
         accessor.addLowPriorityMessage(terminateSeqMessage);
     }
-
-
-// --Commented out by Inspection START (7/7/05 2:15 PM):
-//    public boolean isAllSequenceComplete() {
-//        boolean outTerminateSent = accessor.isAllOutgoingTerminateSent();
-//        boolean incomingTerminateReceived = accessor.isAllIncommingTerminateReceived();
-//        return outTerminateSent && incomingTerminateReceived;
-//    }
-// --Commented out by Inspection STOP (7/7/05 2:15 PM)
-
 
     public void setAckReceived(String seqId, long msgNo) {
         accessor.setAckReceived(seqId, msgNo);
@@ -282,7 +264,6 @@ public class ClientStorageManager implements IStorageManager {
     public void insertFault(RMMessageContext rmMsgCtx) {
 
     }
-
 
     public void addSendMsgNo(String seqId, long msgNo) {
         accessor.addSendMsgNo(accessor.getSequenceOfOutSequence(seqId), msgNo);

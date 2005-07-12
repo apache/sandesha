@@ -44,35 +44,23 @@ public class InvokerFactory {
         return INSTANCE;
     }
 
-
     /**
      * Create the <code>RMInvokerStrategy</code> impl.
      */
 
     public InvokeStrategy createInvokerStrategy() throws Exception {
-
         String strategyClassName = PropertyLoader.getInvokeStrategyClassName();
-
         InvokeStrategy strategy = (InvokeStrategy) Class.forName(strategyClassName).newInstance();
-
         strategy.addParams(PropertyLoader.getInvokeStrategyParams());
-
         return strategy;
-
     }
 
 
     public InvokeHandler createInvokeHandler() throws Exception {
-
         String handlerClassName = PropertyLoader.getInvokeHandlerClassName();
-
         InvokeHandler handler = (InvokeHandler) Class.forName(handlerClassName).newInstance();
-
         handler.addParams(PropertyLoader.getInvokeHandlerParams());
-
         return handler;
-
     }
-
 }
 

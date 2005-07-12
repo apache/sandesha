@@ -200,7 +200,7 @@ public class EnvelopeCreator {
         outGoingAddressingHaders.setFrom(from);
 
         if (addressingHeaders.getReplyTo() == null)
-            throw new Exception("ReplyTo is required to send Responses");
+            throw new Exception("wsa:ReplyTo is required to send Responses");
         AttributedURI inReplyTo = addressingHeaders.getReplyTo().getAddress();
         To to = new To(new URI(inReplyTo.toString()));
         outGoingAddressingHaders.setTo(to);

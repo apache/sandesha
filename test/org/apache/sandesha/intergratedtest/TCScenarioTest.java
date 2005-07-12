@@ -93,7 +93,7 @@ public class TCScenarioTest extends TestCase {
         Service service = new Service();
         Call call = (Call) service.createCall();
 
-        SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONIZED);
+        SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONOUS);
         ctx.initCall(call, targetURL, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);
 
         call.setOperationName(new QName("http://tempuri.org/", "Ping"));

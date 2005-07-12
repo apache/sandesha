@@ -42,7 +42,7 @@ public class SystinetSyncPing {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONIZED);
+            SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONOUS);
 
             ctx.setToURL("http://soap.systinet.net:6064/Service");
             ctx.initCall(call, targetURL, "urn:wsrm:Ping", Constants.ClientProperties.IN_ONLY);

@@ -85,7 +85,7 @@ A more detailed view of the
 architecture will emerge when the Axis specific components are added to the 
 above diagram. A complete diagram would be as follows.</p>
 <p align="center">
-<img border="0" src="images/Architecture2.jpg" width="637" height="219"></p>
+<img border="0" src="images/Architecture2.jpg"></p>
 <p align="center">
 <font size="2">Figure 3: Sandesha Architecture on top of Apache Axis</font></p>
 <p >The 
@@ -101,6 +101,10 @@ Engine</h3>
 the apache Axis. Axis is essentially a SOAP engine 
 a framework for constructing SOAP processors such as clients, servers, gateways, 
 etc.</p>
+<h3 >SandeshaContext</h3>
+<p >This component keeps track of the different sequences created by the client 
+and helps the client application to set various Sandesha specific properties to 
+a particular Call object used by the client. </p>
 <h3 >RMSender</h3>
 <p >This is the transport 
 sender that the user should use in order to enable reliability in the client 
@@ -136,14 +140,17 @@ Axis engine in the server side. RMProvider will identify the incoming message
 and insert the required message or messages to the Queue. It will also generate 
 messages for Reliable Messaging specific messages such as &lt;wsrm:AckRequested&gt;, 
 see [3].</p>
-<h3 align="left"><fonts>RMInvoker</h3>
-<p align="left">This is a runnable component that actually handles the 
-dispatching of the web service request to the actual service. RMInvoker will 
-also put the service response (if any) to the Queue present in the server side.</p>
+<h3 align="left"><fonts>Invoker</h3>
+<p align="left">Invoker represents a set of components that does the web service 
+invocation. According to the Axis architecture, the provider is the one which 
+does the web service invocation. However, Sandesha architecture breaks the logic 
+of the provider into two parts , first part putting the messages to the queue 
+and the second part that is the Invoker which does the invocation. This provides 
+the users to configure the Invoker component. More details on how to configure 
+the Invoker is given in <a href="userguide.html">userguide</a>.</p>
 <h3 align="left">Service</h3>
 <p > This is the actual web service, which will be the Application Destination 
   according to the high-level architecture.</p>
-<p >&nbsp;</p>
 <h2 >Class diagrams</h2>
 <h3 >Sandesha Server</h3>
 <p >Following diagram describes the class structure of the Sandesha server.</p>

@@ -418,19 +418,21 @@ public class SandeshaQueue {
     }
 
     public String getSequenceOfOutSequence(String outSequence) {
-        if (outSequence == null) {
-            return null;
-        }
         synchronized (outgoingMap) {
+            if (outSequence == null) {
+                return null;
+            }
+            String tempSeqId = null;
             Iterator it = outgoingMap.keySet().iterator();
             while (it.hasNext()) {
-                String tempSeqId = (String) it.next();
+                tempSeqId = (String) it.next();
                 OutgoingSequence rsh = (OutgoingSequence) outgoingMap.get(tempSeqId);
                 String tempOutSequence = rsh.getOutSequenceId();
-                if (outSequence.equals(tempOutSequence))
-                    return tempSeqId;
+                if (outSequence.equals(tempOutSequence)) {
+                    break;
+                }
             }
-            return null;
+            return tempSeqId;
         }
 
     }
@@ -890,11 +892,18 @@ public class SandeshaQueue {
         synchronized (highPriorityQueue) {
             int size = highPriorityQueue.size();
 
+            ArrayList remLst = new ArrayList();
+
             for (int i = 0; i < size; i++) {
                 RMMessageContext msg = (RMMessageContext) highPriorityQueue.get(i);
-                if (msg.getSequenceID().equals(sequenceID) &&
-                        msg.getMessageType() == Constants.MSG_TYPE_ACKNOWLEDGEMENT)
-                    highPriorityQueue.remove(i);
+                if (msg.getSequenceID() != null)
+                    if (msg.getSequenceID().equals(sequenceID) && msg.getMessageType() == Constants.MSG_TYPE_ACKNOWLEDGEMENT)
+                        remLst.add(new Integer(i));
+            }
+
+            for (int i = 0; i < remLst.size(); i++) {
+                Integer in = (Integer) remLst.get(i);
+                highPriorityQueue.remove(in.intValue());
             }
         }
     }

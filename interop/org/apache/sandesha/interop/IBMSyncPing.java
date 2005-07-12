@@ -43,7 +43,7 @@ public class IBMSyncPing {
             Service service = new Service();
             Call call = (Call) service.createCall();
 
-            SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONIZED);
+            SandeshaContext ctx = new SandeshaContext(Constants.SYNCHRONOUS);
 
             ctx.setToURL("http://wsi.alphaworks.ibm.com:8080/wsrm/services/rmDemos");
             ctx.setAcksToURL(Constants.WSA.NS_ADDRESSING_ANONYMOUS);

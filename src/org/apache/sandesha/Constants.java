@@ -70,7 +70,7 @@ public interface Constants {
     byte SERVER = (byte) 1;
     byte CLIENT = (byte) 0;
 
-    int SYNCHRONIZED = 0;
+    int SYNCHRONOUS = 0;
 
     public interface WSA {
         String NS_ADDRESSING_ANONYMOUS = AddressingUtils.getAnonymousRoleURI();
