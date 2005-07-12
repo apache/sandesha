@@ -1,5 +1,5 @@
 #!/bin/sh
-CLASSPATH='.'
+CLASSPATH=.
 CLASSPATH=$CLASSPATH:../lib/addressing-SNAPSHOT.jar
 CLASSPATH=$CLASSPATH:../lib/axis-1.2.jar
 CLASSPATH=$CLASSPATH:../lib/axis-ant-1.2.jar
@@ -12,4 +12,4 @@ CLASSPATH=$CLASSPATH:../lib/axis-wsdl4j-1.2.jar
 CLASSPATH=$CLASSPATH:../lib/log4j-1.2.8.jar
 CLASSPATH=$CLASSPATH:../lib/xerces.jar
 export CLASSPATH
-java org.apache.axis.utils.tcpmon
+java -classpath $CLASSPATH org.apache.axis.utils.tcpmon
