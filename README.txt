@@ -1,5 +1,5 @@
 ======================================================
-Apache Sandesha beta build (June 11, 2005)
+Apache Sandesha-1.0-RC1 build 12th July, 2005)
 
 http://ws.apache.org/ws-sandesha
 ------------------------------------------------------
@@ -15,16 +15,20 @@ ___________________
 Installation
 ===================
 
-The binary distribution contains a Sandesha-beta.jar file. To configure Sandesha
+The binary distribution contains a Sandesha-1.0-RC1.jar file. To configure Sandesha
 in the server side simply follow the steps given bellow.
 
-Step1: Copy  Sandesha-beta.jar to the webapps/axis/WEB-INF/lib directory. (Assume that
+Step1: Copy  Sandesha-1.0-RC1.jar to the webapps/axis/WEB-INF/lib directory. (Assume that
        the user has already configured axis in a servlet container)
 Step2: Copy addressing-SNAPSHOT.jar that can be found in the lib directory of the binary
        distribution of Sandesha to the same location.
 
+If you need to test with samples then copy the Sandesha-samples.jar that can be found in the 
+samples directory to the webapps/axis/WEB-INF/lib directory as well.
+
 To verify the installation, go to http://localhost:8080/axis/ and
-click on the "List" link. Then if you can see the RMSampleService deployed then
+click on the "List" link. Then if you can see the RMSampleService deployed (this is only
+if the Sandesha-samples.jar is also copied to the webapps/axis/WEB-INF/lib) then
 you have successfully configured Sandesha on the server side.
 
 ________________________________________________
@@ -52,7 +56,7 @@ xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 ----------------------------------------------------------------------------------------------
 
 
-To build the Sandesha-beta.jar file using the source distribution use the
+To build the Sandesha-1.0-RC1.jar file using the source distribution use the
 following command:
     $ maven
 
@@ -73,7 +77,7 @@ can be found in the User Guide.
 Service service = new Service();
 	Call call = (Call) service.createCall();
 	SandeshaContext ctx = new SandeshaContext();
-	ctx.addNewSequeceContext(call, targetUrl,
+	ctx.initCall(call, targetUrl,
 	"urn:wsrm:echoString",Constants.ClientProperties.IN_OUT);
 	call.setOperationName(new QName("http://tempuri.org/", "echoString"));
 	call.addParameter("Text", XMLType.XSD_STRING, ParameterMode.IN);
@@ -84,7 +88,7 @@ Service service = new Service();
 	String ret = (String) call.invoke(new Object[]{"Sandesha Echo 1", "abcdef"});
 	System.out.println("The Response for First Messsage is :" + ret);
 
-	ctx.endSequence(call);
+	ctx.endSequence();
 	} catch (Exception e) { e.printStackTrace();
 	}
 ----------------------------------------------------------------------------------------------
