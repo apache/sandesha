@@ -25,6 +25,7 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.apache.axis.message.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.sandesha.Constants;
 import org.apache.sandesha.IStorageManager;
@@ -111,10 +112,9 @@ public class RMSender extends BasicHandler {
                 //We need these steps to filter all addressing and rm related headers.
                 Message resMsg = responseMessageContext.getMsgContext().getRequestMessage();
                 RMHeaders.removeHeaders(resMsg.getSOAPEnvelope());
-                AddressingHeaders addHeaders = new AddressingHeaders(resMsg.getSOAPEnvelope(),
-                        null, true, false, false, null);
+                AddressingHeaders addHeaders = new AddressingHeaders(resMsg.getSOAPEnvelope(), null, true, true, false, null);
+                msgContext.setResponseMessage(new Message(resMsg.getSOAPPartAsString()));
 
-                msgContext.setResponseMessage(resMsg);
             } else {
                 msgContext.setResponseMessage(null);
             }
@@ -122,7 +122,7 @@ public class RMSender extends BasicHandler {
         } catch (Exception ex) {
             log.error(ex);
 
-            throw new AxisFault(ex.getLocalizedMessage());
+            throw new AxisFault(ex.getMessage());
 
         }
     }

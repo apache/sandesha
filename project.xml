@@ -34,7 +34,7 @@
     <!-- the project home page -->
     <url>http://ws.apache.org/ws-sandesha/</url>
 
-    <issueTrackingUrl>http://nagoya.apache.org/jira/browse/WSFX</issueTrackingUrl>
+    <issueTrackingUrl>http://issues.apache.org/jira/browse/SAND</issueTrackingUrl>
     <siteAddress>ws.apache.org</siteAddress>
 
     <siteDirectory>/ws-sandesha/</siteDirectory>
@@ -52,9 +52,9 @@
     <!-- any mailing lists for the project -->
     <mailingLists>
         <mailingList>
-            <name>WS-FX Developer List</name>
-            <subscribe>fx-dev-subscribe@ws.apache.org</subscribe>
-            <unsubscribe>fx-dev-unsubscribe@ws.apache.org</unsubscribe>
+            <name>Sandesha Developer List</name>
+            <subscribe>sandesha-dev-subscribe@ws.apache.org</subscribe>
+            <unsubscribe>sandesha-dev-unsubscribe@ws.apache.org</unsubscribe>
             <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listId=221</archive>
         </mailingList>
     </mailingLists>

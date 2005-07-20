@@ -328,6 +328,10 @@ public class RMMessageContext {
     public static void copyMessageContext(MessageContext msgContext1, MessageContext msgContext2) {
 
         try {
+            if(msgContext1.getOperation()!=null){
+                msgContext2.setOperation(msgContext1.getOperation());
+            }
+            
             if (msgContext1.getClassLoader() != null)
                 msgContext2.setClassLoader(msgContext1.getClassLoader());
 
