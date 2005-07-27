@@ -25,6 +25,8 @@ import java.util.Set;
  * @author Jaliya Ekanayaka
  */
 
+//these methods are to be implemented
+
 public class SandeshaDatabaseDAO implements ISandeshaDAO {
     public SandeshaDatabaseDAO(byte endPoint) {
     }
