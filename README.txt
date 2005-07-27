@@ -1,5 +1,5 @@
 ======================================================
-Apache Sandesha-1.0-RC1 build 12th July, 2005)
+Apache Sandesha-1.0 build 28th July, 2005)
 
 http://ws.apache.org/ws-sandesha
 ------------------------------------------------------
@@ -15,10 +15,10 @@ ___________________
 Installation
 ===================
 
-The binary distribution contains a Sandesha-1.0-RC1.jar file. To configure Sandesha
+The binary distribution contains a Sandesha-1.0.jar file. To configure Sandesha
 in the server side simply follow the steps given bellow.
 
-Step1: Copy  Sandesha-1.0-RC1.jar to the webapps/axis/WEB-INF/lib directory. (Assume that
+Step1: Copy  Sandesha-1.0.jar to the webapps/axis/WEB-INF/lib directory. (Assume that
        the user has already configured axis in a servlet container)
 Step2: Copy addressing-SNAPSHOT.jar that can be found in the lib directory of the binary
        distribution of Sandesha to the same location.
@@ -56,7 +56,7 @@ xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
 ----------------------------------------------------------------------------------------------
 
 
-To build the Sandesha-1.0-RC1.jar file using the source distribution use the
+To build the Sandesha-1.0.jar file using the source distribution use the
 following command:
     $ maven
 
@@ -97,11 +97,11 @@ ___________________
 Support
 ===================
 
-Any problem with this release can be reported to WS-FX the mailing list
+Any problem with this release can be reported to sandesha the mailing list
 If you are sending email to the mailing list make sure to add the [Sandesha] prefix to the subject.
 
 Mailing list subscription:
-    fx-dev-subscribe@ws.apache.org
+    sandesha-dev-subscribe@ws.apache.org
 
 
 Thank you for your support on Sandesha!

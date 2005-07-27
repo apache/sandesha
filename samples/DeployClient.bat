@@ -21,18 +21,18 @@ goto end
 set CLASSPATH=%CLASSPATH%;Sandesha-samples.jar;
 
 
-if  exist  ..\Sandesha-1.0-RC1.jar goto  jarfoundinroot
-if  exist  ..\target\Sandesha-1.0-RC1.jar goto  jarfoundintarget
-echo Cannot find the Sandesha-1.0-RC1.jar.
+if  exist  ..\Sandesha-1.0.jar goto  jarfoundinroot
+if  exist  ..\target\Sandesha-1.0.jar goto  jarfoundintarget
+echo Cannot find the Sandesha-1.0.jar.
 echo If you are using the source distribution, please build the source using maven before running the samples
 pause
 goto end
 
 :jarfoundinroot
-set CLASSPATH=%CLASSPATH%;..\Sandesha-1.0-RC1.jar;
+set CLASSPATH=%CLASSPATH%;..\Sandesha-1.0.jar;
 
 :jarfoundintarget
-set CLASSPATH=%CLASSPATH%;..\target\Sandesha-1.0-RC1.jar;
+set CLASSPATH=%CLASSPATH%;..\target\Sandesha-1.0.jar;
 
 java org.apache.axis.utils.Admin client ClientDeploy.wsdd
 :end

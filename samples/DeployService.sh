@@ -14,16 +14,16 @@ CLASSPATH=$CLASSPATH:../lib/xerces.jar
 
 if [ -e Sandesha-samples.jar ]; then
     CLASSPATH=$CLASSPATH:Sandesha-samples.jar
-if [ -e ../Sandesha-1.0-RC1.jar ]; then
-     CLASSPATH=$CLASSPATH:../Sandesha-1.0-RC1.jar
+if [ -e ../Sandesha-1.0.jar ]; then
+     CLASSPATH=$CLASSPATH:../Sandesha-1.0.jar
      export CLASSPATH
      java -classpath $CLASSPATH org.apache.axis.client.AdminClient RMSampleServiceDeploy.wsdd
-elif [ -e ../target/Sandesha-1.0-RC1.jar ]; then
-     CLASSPATH=$CLASSPATH:../target/Sandesha-1.0-RC1.jar;
+elif [ -e ../target/Sandesha-1.0.jar ]; then
+     CLASSPATH=$CLASSPATH:../target/Sandesha-1.0.jar;
      export CLASSPATH
      java -classpath $CLASSPATH org.apache.axis.client.AdminClient RMSampleServiceDeploy.wsdd
 else
-echo "Cannot find the Sandesha-1.0-RC1.jar."
+echo "Cannot find the Sandesha-1.0.jar."
 echo "If you are using the source distribution, please build the source using maven before running the samples"
 fi
 else
