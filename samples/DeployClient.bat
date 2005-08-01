@@ -13,7 +13,7 @@ set CLASSPATH=%CLASSPATH%;..\lib\xerces.jar
 
 if exist Sandesha-samples.jar goto samplesjarfound
 echo Could not find Sandesha-samples.jar if you are using the source distribution, please
-echo run the maven command "maven samples.jar".
+echo run the maven goal maven samples.jar and copy the jar to the classpath.
 pause
 goto end
 

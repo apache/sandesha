@@ -10,10 +10,11 @@ set CLASSPATH=%CLASSPATH%;..\lib\junit-3.8.1.jar
 set CLASSPATH=%CLASSPATH%;..\lib\axis-wsdl4j-1.2.jar
 set CLASSPATH=%CLASSPATH%;..\lib\log4j-1.2.8.jar
 set CLASSPATH=%CLASSPATH%;..\lib\xerces.jar
+set CLASSPATH=%CLASSPATH%;..\target\Sandesha-samples.jar
 
 if exist Sandesha-samples.jar goto samplesjarfound
 echo Could not find Sandesha-samples.jar if you are using the source distribution, please
-echo run the maven command "maven samples.jar".
+echo run the maven goal maven samples.jar and copy the jar to the classpath.
 pause
 goto end
 
