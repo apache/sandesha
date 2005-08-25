@@ -48,7 +48,7 @@ public class CreateSequence implements IOMRMElement {
 
 	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
 		sequenceOffer = new SequenceOffer();
-		acksTo = new AcksTo(new EndpointReference("",""));
+		acksTo = new AcksTo(new EndpointReference(""));
 		sequenceOffer.fromSOAPEnvelope(envelope);
 		acksTo.fromSOAPEnvelope(envelope);		
 		return this;

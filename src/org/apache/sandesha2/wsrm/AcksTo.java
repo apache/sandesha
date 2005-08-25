@@ -58,7 +58,7 @@ public class AcksTo implements IOMRMElement{
 				OMElement omElement = (OMElement)omNode;
 				if (omElement.getLocalName().equals(Constants.WSRM.ACKS_TO)){
 					String uri = omElement.getText();
-					EPR = new EndpointReference("",uri);
+					EPR = new EndpointReference(uri);
 					return true;
 				}else{
 					readEPRElement(omElement);

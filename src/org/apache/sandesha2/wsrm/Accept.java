@@ -42,7 +42,7 @@ public class Accept implements IOMRMElement {
 	}
 	
 	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		acksTo = new AcksTo(new EndpointReference("",""));
+		acksTo = new AcksTo(new EndpointReference(""));
 		acksTo.fromSOAPEnvelope(envelope);
 		return this;
 	}
