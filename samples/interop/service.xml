@@ -1,0 +1,12 @@
+<service name="InteropService">
+    <parameter name="ServiceClass" locked="xsd:false">org.apache.sandesha2.samples.RMInteropService</parameter>
+
+   <description>
+        This is a testing service , to test the system is working or not
+    </description>
+
+    <module ref="sandesha" />
+    <operation name="ping" />
+    <operation name="echoString" />
+    
+</service>

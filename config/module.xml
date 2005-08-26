@@ -1,0 +1,20 @@
+<module name="sandesha" class="org.apache.sandesha2.SandeshaModule">
+
+    <inflow>
+        <handler name="ServerInHandler" class="org.apache.sandesha2.handlers.ServerInHandler">
+            <order phase="RMPhase"/>
+        </handler>
+    </inflow>
+
+    <outflow>
+        <handler name="ServerOutHandler" class="org.apache.sandesha2.handlers.ServerOutHandler">
+            <order phase="RMPhase"/>
+        </handler>
+    </outflow>
+
+
+    <operation name="CreateSequence" mep="http://www.w3.org/2004/08/wsdl/in-out">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+    </operation>
+
+</module>
