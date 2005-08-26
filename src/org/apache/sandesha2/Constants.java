@@ -14,12 +14,14 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2;
 
 /**
  * @author Saminda
  *
  */
+
 public interface Constants {
 
 	public interface WSRM{
@@ -57,5 +59,20 @@ public interface Constants {
       String IN_MESSAGE="inMessage";
       String OUT_MESSAGE="outMessage";
       String FAULT_MESSAGE="faultMessage";
+      
+      int MESSAGE_TYPE_UNKNOWN = 0;
+      int MESSAGE_TYPE_CREATE_SEQ = 1;
+      int MESSAGE_TYPE_CREATE_SEQ_RESPONSE = 2;
+      int MESSAGE_TYPE_APPLICATION = 3;
+      int MESSAGE_TYPE_ACK = 4;
+      int MESSAGE_TYPE_TERMINATE_SEQ = 5;
+      
+      int MESSAGE_PART_UNKNOWN = 0;
+      int MESSAGE_PART_RM_HEADERS = 1;
+      int MESSAGE_PART_ADDR_HEADERS = 2;
+      int MESSAGE_PART_CREATE_SEQ = 3;
+      int MESSAGE_PART_CREATE_SEQ_RESPONSE = 4;
+      int MESSAGE_PART_TERMINATE_SEQ = 5;
+      int MAX_MSG_PART_ID = 5;
 
 }
