@@ -30,11 +30,11 @@
         <ant:jar jarfile="${basedir}/target/dist/${service.jar.name}" basedir="${maven.build.dir}/samples/classes" />
     </goal>
 
-    <goal name="jar.copy" prereqs="module.jar,ping.jar">
+    <goal name="jar.copy" prereqs="module.jar,interop.jar">
         <property environment="env1"/>
         <property name="webapps" value="${env1.CATALINA_HOME}/webapps"/>
         <ant:copy file="${basedir}/target/dist/sandesha.jar" todir="${webapps}/axis2/WEB-INF/modules"/>
-        <ant:copy file="${basedir}/target/dist/echo.jar" todir="${webapps}/axis2/WEB-INF/services"/>
+        <ant:copy file="${basedir}/target/dist/InteropService.jar" todir="${webapps}/axis2/WEB-INF/services"/>
     </goal>
 
     <!--    <preGoal name="java:compile">-->

@@ -24,6 +24,7 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.om.OMNode;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
@@ -69,21 +70,36 @@ public class SequenceAcknowledgement implements IOMRMElement {
 		SOAPHeader soapHeader = envelope.getHeader();
 		Iterator iterator = soapHeader.getChildren();
 		while (iterator.hasNext()){
-			OMElement omElement = (OMElement)iterator.next();
+			OMNode omNode = (OMNode) iterator.next();
+			
+			if (!(omNode instanceof OMElement)) {
+				continue;
+			}
+			OMElement omElement = (OMElement) omNode;
+			
 			if (omElement.getLocalName().equals(Constants.WSRM.SEQUENCE_ACK)){
 				Iterator childIterator = omElement.getChildren();
 				while (childIterator.hasNext()){
-					OMElement childElement = (OMElement)childIterator.next();
+					OMNode childOMNode = (OMNode) childIterator.next();
+					
+					if (!(childOMNode instanceof OMElement)) {
+						continue;
+					}
+					
+					OMElement childElement = (OMElement) childOMNode;
+					
 					if (childElement.getLocalName().equals(Constants.WSRM.ACK_RANGE)){
 						AcknowledgementRange ackRange = new AcknowledgementRange();
 						ackRange.fromSOAPEnvelope(childElement);
 						acknowledgementRanges.add(ackRange);
 					}
+					
 					if (childElement.getLocalName().equals(Constants.WSRM.NACK)){
 						Nack nack = new Nack();	
 						nack.fromSOAPEnvelope(childElement);
 						nackList.add(nack);
 					}
+					
 					if ( childElement.getLocalName().equals(Constants.WSRM.IDENTIFIER)){
 						identifier = new Identifier();
 						identifier.fromSOAPEnvelope(envelope);

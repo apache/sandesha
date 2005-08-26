@@ -71,6 +71,7 @@ public class CreateSequenceResponse implements IOMRMElement {
 	public Identifier getIdentifier(){
 		return identifier;
 	}
+	
 	public void setAccept(Accept accept){
 		this.accept = accept;
 	}

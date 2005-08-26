@@ -18,6 +18,9 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
@@ -57,7 +60,9 @@ public class AcksTo implements IOMRMElement{
 			}else{
 				OMElement omElement = (OMElement)omNode;
 				if (omElement.getLocalName().equals(Constants.WSRM.ACKS_TO)){
-					String uri = omElement.getText();
+					OMElement addressElement = omElement.getFirstChildWithName(
+							new QName(AddressingConstants.EPR_ADDRESS));
+					String uri = addressElement.getText();
 					EPR = new EndpointReference(uri);
 					return true;
 				}else{

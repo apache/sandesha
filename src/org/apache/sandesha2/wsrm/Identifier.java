@@ -44,10 +44,6 @@ public class Identifier implements Constants, IOMRMElement {
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
 	}
 
-	public void setURI(String uri) throws OMException {
-		identifierElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(uri));
-	}
-
 	public void setIndentifer(String identifier) {
 		this.identifier = identifier;
 	}
@@ -89,7 +85,7 @@ public class Identifier implements Constants, IOMRMElement {
 			throws OMException {
 		//soapheaderblock will be given or anyother block reference to the requirment
 		if (identifier == null || identifier == "") {
-			throw new OMException("Set Identifier");
+			throw new OMException("identifier is not set .. ");
 		}
 		identifierElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
 				identifier));
