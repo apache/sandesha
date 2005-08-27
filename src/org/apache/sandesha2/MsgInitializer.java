@@ -18,6 +18,7 @@
 package org.apache.sandesha2;
 
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.wsrm.RMElements;
 
 
 /**
@@ -26,7 +27,7 @@ import org.apache.axis2.context.MessageContext;
 
 public class MsgInitializer {
 
-	public RMMsgContext initializeMessage (MessageContext ctx) {
+	public static RMMsgContext initializeMessage (MessageContext ctx) {
 		RMMsgContext rmMsgCtx = new RMMsgContext ();
 		populateRMMsgContext(ctx,rmMsgCtx);
 		return rmMsgCtx;
@@ -34,5 +35,16 @@ public class MsgInitializer {
 	
 	public static void populateRMMsgContext (MessageContext msgCtx, RMMsgContext rmMsgContext) {
 		//TODO set message parts
+		
+		RMElements elements = new RMElements ();
+		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
+		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,elements.getCreateSequence());
+		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE,elements.getCreateSequenceResponse());
+		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQUENCE ,elements.getSequence());
+		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT,elements.getSequenceAcknowledgement());
+		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ,elements.getTerminateSequence());
+		
+		
+		
 	}
 }

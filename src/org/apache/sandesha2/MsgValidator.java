@@ -25,7 +25,16 @@ import org.apache.axis2.context.MessageContext;
  */
 public class MsgValidator {
 
-	public static void validateMessage(MessageContext msgCtx) throws AxisFault{
+	public static void validateMessage(RMMsgContext rmMsgCtx) throws AxisFault{
         //TODO: Validate message
+		
+		//Setting message type.
+		if(rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ);
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ_RESPONSE);
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_TERMINATE_SEQ);
+			
     }
 }

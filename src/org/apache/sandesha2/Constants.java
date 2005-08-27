@@ -66,13 +66,15 @@ public interface Constants {
       int MESSAGE_TYPE_APPLICATION = 3;
       int MESSAGE_TYPE_ACK = 4;
       int MESSAGE_TYPE_TERMINATE_SEQ = 5;
+      int MAX_MSG_TYPE = 5;
       
       int MESSAGE_PART_UNKNOWN = 0;
-      int MESSAGE_PART_RM_HEADERS = 1;
-      int MESSAGE_PART_ADDR_HEADERS = 2;
-      int MESSAGE_PART_CREATE_SEQ = 3;
-      int MESSAGE_PART_CREATE_SEQ_RESPONSE = 4;
-      int MESSAGE_PART_TERMINATE_SEQ = 5;
-      int MAX_MSG_PART_ID = 5;
+      int MESSAGE_PART_SEQUENCE = 1;
+      int MESSAGE_PART_SEQ_ACKNOWLEDGEMENT = 2;
+      int MESSAGE_PART_ADDR_HEADERS = 3;
+      int MESSAGE_PART_CREATE_SEQ = 4;
+      int MESSAGE_PART_CREATE_SEQ_RESPONSE = 5;
+      int MESSAGE_PART_TERMINATE_SEQ = 6;
+      int MAX_MSG_PART_ID = 6;
 
 }

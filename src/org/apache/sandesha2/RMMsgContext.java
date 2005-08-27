@@ -44,8 +44,22 @@ public class RMMsgContext {
 		MsgInitializer.populateRMMsgContext(ctx,this);
 	}
 	
+	public int getMessageType (){
+		return messageType;
+	}
+	
+	public void setMessageType (int msgType){
+		if(msgType>=0 && msgType<=Constants.MAX_MSG_TYPE)
+			this.messageType = msgType;
+	}
+	
 	public void setMessagePart (int partId, IOMRMElement part){
 		if (partId>=0 && partId<=Constants.MAX_MSG_PART_ID)
 			rmMessageParts.put(new Integer (partId),part);
 	}
+	
+	public IOMRMElement getMessagePart (int partId) {
+		return (IOMRMElement) rmMessageParts.get(new Integer (partId));
+	}
+	
 }

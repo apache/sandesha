@@ -18,16 +18,33 @@
 package org.apache.sandesha2.handlers;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.sandesha2.MsgInitializer;
+import org.apache.sandesha2.MsgValidator;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.msgprocessors.MsgProcessor;
+import org.apache.sandesha2.msgprocessors.MsgProcessorException;
+import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 
 /**
  * @author 
  */
 public class ServerInHandler extends AbstractHandler {
 
-	public void invoke(MessageContext arg0) throws AxisFault {
-		// TODO create invoke logic
+	public void invoke(MessageContext msgCtx) throws AxisFault {
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+		MsgValidator.validateMessage(rmMsgCtx);
+		
+		MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx.getMessageType());
+		try {
+			msgProcessor.processMessage(rmMsgCtx);
+		}catch (MsgProcessorException mpe) {
+			mpe.printStackTrace();
+			throw new AxisFault ("Error in processing the message");
+		}
+		
 	}
 	
 }
