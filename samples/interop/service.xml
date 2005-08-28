@@ -6,7 +6,12 @@
     </description>
 
     <module ref="sandesha" />
-    <operation name="ping" />
-    <operation name="echoString" />
+<!--
+    <operation name="ping" />  
+    <operation name="echoString" /> -->
+
+    	<operation name="ping">
+		<messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver" />
+	</operation> 
     
 </service>

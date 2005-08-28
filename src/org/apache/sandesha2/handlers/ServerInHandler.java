@@ -34,10 +34,16 @@ import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 public class ServerInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
+		System.out.println  ("In server Handler 1");
+		
+		String opearaitonName = msgCtx.getOperationContext().getAxisOperation().getName().getLocalPart();
+		System.out.println ("Operation is:" + opearaitonName);
+		
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 		MsgValidator.validateMessage(rmMsgCtx);
 		
 		MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx.getMessageType());
+		
 		try {
 			msgProcessor.processMessage(rmMsgCtx);
 		}catch (MsgProcessorException mpe) {

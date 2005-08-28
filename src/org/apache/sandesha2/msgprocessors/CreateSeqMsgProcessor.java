@@ -17,7 +17,9 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.wsrm.CreateSequence;
 
 /**
  * @author 
@@ -27,5 +29,12 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws MsgProcessorException {
 		//TODO: Add create sequence message processing logic
+		CreateSequence createSeq = (CreateSequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+
+		//rmMsgCtx.test();
+		//Store AcksTo Value
+		
+		//Change the Operation (to go throught CreateSequence)
+		
 	}
 }

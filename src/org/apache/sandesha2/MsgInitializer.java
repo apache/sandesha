@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2;
 
+import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.wsrm.RMElements;
 
@@ -28,7 +29,7 @@ import org.apache.sandesha2.wsrm.RMElements;
 public class MsgInitializer {
 
 	public static RMMsgContext initializeMessage (MessageContext ctx) {
-		RMMsgContext rmMsgCtx = new RMMsgContext ();
+		RMMsgContext rmMsgCtx = new RMMsgContext (ctx);
 		populateRMMsgContext(ctx,rmMsgCtx);
 		return rmMsgCtx;
 	}
@@ -38,6 +39,7 @@ public class MsgInitializer {
 		
 		RMElements elements = new RMElements ();
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
+		
 		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,elements.getCreateSequence());
 		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE,elements.getCreateSequenceResponse());
 		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQUENCE ,elements.getSequence());

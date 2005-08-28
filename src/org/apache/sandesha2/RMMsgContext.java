@@ -18,8 +18,15 @@
 package org.apache.sandesha2;
 
 import java.util.HashMap;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.miheaders.RelatesTo;
 import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
@@ -41,7 +48,7 @@ public class RMMsgContext {
 	public RMMsgContext (MessageContext ctx){
 		this ();
 		this.msgContext = ctx;
-		MsgInitializer.populateRMMsgContext(ctx,this);
+		//MsgInitializer.populateRMMsgContext(ctx,this);
 	}
 	
 	public int getMessageType (){
@@ -61,5 +68,45 @@ public class RMMsgContext {
 	public IOMRMElement getMessagePart (int partId) {
 		return (IOMRMElement) rmMessageParts.get(new Integer (partId));
 	}
+	
+	public EndpointReference getFrom () {
+		return msgContext.getFrom();
+	}
+	
+	public EndpointReference getTo (){
+		return msgContext.getTo();
+	}
+	
+	public EndpointReference getReplyTo (){
+		return msgContext.getReplyTo();
+	}
+	
+	public RelatesTo getRelatesTo () {
+		return msgContext.getRelatesTo();
+	}
+	
+	public String getMessageId (){
+		return msgContext.getMessageID();
+	}
+	
+	public SOAPEnvelope getSOAPEnvelope () {
+		return msgContext.getEnvelope();
+	}
+	public void test (){
+		String opearaitonName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
+		System.out.println ("Operation is:" + opearaitonName);
+	}
+	
+	public void serializeSOAPEnvelop () {
+		try {
+			SOAPEnvelope envelop = msgContext.getEnvelope();
+			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+			envelop.serialize(writer);
+		}catch (Exception ex){
+			ex.printStackTrace();
+		}
+	}
+	
+	
 	
 }

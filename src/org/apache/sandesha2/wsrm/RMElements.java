@@ -18,6 +18,9 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -68,6 +71,7 @@ public class RMElements{
 		createSequenceElement.fromSOAPEnvelope(envelope);
 		createSequenceResponseElement.fromSOAPEnvelope(envelope);
 		terminateSequenceElement.fromSOAPEnvelope(envelope);
+
 		return this;
 	}
 
