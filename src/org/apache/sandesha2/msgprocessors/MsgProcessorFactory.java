@@ -31,7 +31,7 @@ public class MsgProcessorFactory {
 			case (Constants.MESSAGE_TYPE_CREATE_SEQ):
 				return new CreateSeqMsgProcessor ();
 			default:
-				return null;
+				return new ApplicationMsgProcessor ();
 		}
 	}
 }

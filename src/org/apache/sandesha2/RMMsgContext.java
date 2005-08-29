@@ -22,6 +22,7 @@ import java.util.HashMap;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.miheaders.RelatesTo;
 import org.apache.axis2.addressing.om.AddressingHeaders;
@@ -42,7 +43,7 @@ public class RMMsgContext {
 	
 	public RMMsgContext (){
 		rmMessageParts = new HashMap ();
-		messageType = Constants.MESSAGE_PART_UNKNOWN;
+		messageType = Constants.MESSAGE_TYPE_UNKNOWN;
 	}
 	
 	public RMMsgContext (MessageContext ctx){
@@ -92,6 +93,11 @@ public class RMMsgContext {
 	public SOAPEnvelope getSOAPEnvelope () {
 		return msgContext.getEnvelope();
 	}
+	
+	public void setSOAPEnvelop (SOAPEnvelope envelope) throws AxisFault {
+		msgContext.setEnvelope(envelope);
+	}
+	
 	public void test (){
 		String opearaitonName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
 		System.out.println ("Operation is:" + opearaitonName);
@@ -105,6 +111,26 @@ public class RMMsgContext {
 		}catch (Exception ex){
 			ex.printStackTrace();
 		}
+	}
+	
+	public void setFrom (EndpointReference epr) {
+		msgContext.setFrom(epr);
+	}
+	
+	public void setTo (EndpointReference epr){
+		msgContext.setTo(epr);
+	}
+	
+	public void setMessageId (String messageId){
+		msgContext.setMessageID(messageId);
+	}
+	
+	public void setAction (String action){
+		msgContext.setWSAAction(action);
+	}
+	
+	public void setRelatesTo (RelatesTo relatesTo){
+		msgContext.setRelatesTo(relatesTo);
 	}
 	
 	

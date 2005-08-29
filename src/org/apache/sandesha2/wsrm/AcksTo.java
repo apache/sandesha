@@ -36,6 +36,7 @@ import org.apache.sandesha2.Constants;
 public class AcksTo implements IOMRMElement{
 	private EndpointReference EPR;
 	private OMElement acksToElement;
+	//private OMElement addressElement;
 	
 	OMNamespace acksToNameSpace = 
 		OMAbstractFactory.getSOAP11Factory().createOMNamespace(
@@ -43,11 +44,16 @@ public class AcksTo implements IOMRMElement{
 	public AcksTo(EndpointReference EPR){
 		acksToElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
 				Constants.WSRM.ACKS_TO,acksToNameSpace);
+		//addressElement = acksToElement;
+		
 		this.EPR = EPR;
 	}
 	public OMElement getSOAPElement() throws OMException {
-		acksToElement.addChild(OMAbstractFactory.getSOAP12Factory()
+		OMElement addressElement = OMAbstractFactory.getSOAP11Factory().createOMElement(AddressingConstants.EPR_ADDRESS,
+				Constants.WSA.NS_ADDRESSING,AddressingConstants.WSA_DEFAULT_PRFIX);
+		addressElement.addChild(OMAbstractFactory.getSOAP11Factory()
 				.createText(EPR.getAddress()));
+		acksToElement.addChild(addressElement);
 		return acksToElement;
 	}
 
@@ -77,8 +83,12 @@ public class AcksTo implements IOMRMElement{
 		return this;
 	}
 	public OMElement toSOAPEnvelope(OMElement messageElement) throws OMException {
-		acksToElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
+		OMElement addressElement = OMAbstractFactory.getSOAP11Factory().createOMElement(AddressingConstants.EPR_ADDRESS,
+				Constants.WSA.NS_ADDRESSING,AddressingConstants.WSA_DEFAULT_PRFIX);
+		addressElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
 				EPR.getAddress()));
+		acksToElement.addChild(addressElement);
+		
 		messageElement.addChild(acksToElement);
 		return messageElement;
 	}

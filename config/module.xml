@@ -13,14 +13,21 @@
     </outflow>
 
 
+
     <operation name="CreateSequence" mep="http://www.w3.org/2004/08/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
     </operation> 
+    
+    <operation name="TerminateSequence" mep="http://www.w3.org/2004/08/wsdl/in-only">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</parameter>
+    </operation>
 
 <!--
     <operation name="CreateSequence" mep="http://www.w3.org/2004/08/wsdl/in-out">
-        <parameter name="Mapping">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
+        <parameter name="wsamapping" >http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
---> 
+ -->
 </module>

@@ -29,11 +29,14 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.sandesha2.wsrm.Accept;
+import org.apache.sandesha2.wsrm.AckRequested;
+import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * @author
@@ -50,12 +53,13 @@ public class RMMsgCreator {
 		
 		Identifier identifier = new Identifier();
 		// TODO : set the an appropriate id 
+		
 		identifier.setIndentifer("uuid:temp-id-of-sandesha");
 		response.setIdentifier(identifier);
 		Accept accept = new Accept();
 		EndpointReference acksToEPR = createSeqMessage.getTo();  
 		AcksTo acksTo = new AcksTo(acksToEPR);
-		//accept.setAcksTo(acksTo);
+		accept.setAcksTo(acksTo);
 		response.setAccept(accept);
 	
 		SOAPEnvelope envolope1 = outMessage.getEnvelope();
@@ -90,5 +94,28 @@ public class RMMsgCreator {
         outMessage.setEnvelope(envelope);
         RMMsgContext createSeqResponse = new RMMsgContext(outMessage);
 		return createSeqResponse;
+	}
+	
+	public static void createAckMessage (RMMsgContext applicationMsg) throws AxisFault {
+		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
+		if(envelope==null) {
+			SOAPEnvelope newEnvelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+			applicationMsg.setSOAPEnvelop(envelope);
+		}
+		
+		envelope = applicationMsg.getSOAPEnvelope();
+		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement ();
+		Identifier id = new Identifier ();
+		id.setIndentifer("uuid:temp-id-of-sandesha");
+		sequenceAck.setIdentifier(id);
+		AcknowledgementRange range = new AcknowledgementRange ();
+		range.setMaxValue(1);
+		range.setMinValue(1);
+		sequenceAck.addAcknowledgementRanges(range);
+		sequenceAck.toSOAPEnvelope(envelope);
+		applicationMsg.setAction("http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement");
+		applicationMsg.setMessageId("uuid:msg-id-of-first-ack");
+		
+		
 	}
 }

@@ -39,6 +39,7 @@ public class ServerInHandler extends AbstractHandler {
 		String opearaitonName = msgCtx.getOperationContext().getAxisOperation().getName().getLocalPart();
 		System.out.println ("Operation is:" + opearaitonName);
 		
+		msgCtx.setProperty("aaaa","abcd");
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 		MsgValidator.validateMessage(rmMsgCtx);
 		

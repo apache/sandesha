@@ -18,8 +18,12 @@
 package org.apache.sandesha2.msgreceivers;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.MessageInformationHeaders;
+import org.apache.axis2.addressing.miheaders.RelatesTo;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
@@ -30,6 +34,7 @@ import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
@@ -37,26 +42,83 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
 
 /**
- * @author  
+ * @author
  */
 
-public class RMMessageReceiver extends AbstractInOutSyncMessageReceiver {
+public class RMMessageReceiver extends AbstractMessageReceiver {
 
-	public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {
+	public void invokeBusinessLogic(MessageContext inMessage,
+			MessageContext outMessage) throws AxisFault {
 
 		System.out.println("RM Msg Receiver was called");
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
 		MsgValidator.validateMessage(rmMsgCtx);
 
 		if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
-			
+
 			RMMsgContext createSeqResponse = RMMsgCreator
-					.createCreateSeqResponseMsg(rmMsgCtx,outMessage);
+					.createCreateSeqResponseMsg(rmMsgCtx, outMessage);
 
 			//createSeqResponse.serializeSOAPEnvelop();
 			outMessage.setResponseWritten(true);
+		} else {
+			outMessage.setResponseWritten(true);
 		}
 
+	}
+
+	public final void receive(MessageContext messgeCtx) throws AxisFault {
+
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
+		MsgValidator.validateMessage(rmMsgCtx);
+
+		if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
+			MessageContext newmsgCtx = new MessageContext(messgeCtx
+					.getSystemContext(), messgeCtx.getSessionContext(),
+					messgeCtx.getTransportIn(), messgeCtx.getTransportOut());
+
+			newmsgCtx
+					.setMessageInformationHeaders(new MessageInformationHeaders());
+			MessageInformationHeaders oldMessageInfoHeaders = messgeCtx
+					.getMessageInformationHeaders();
+			MessageInformationHeaders messageInformationHeaders = new MessageInformationHeaders();
+			messageInformationHeaders.setTo(oldMessageInfoHeaders.getReplyTo());
+			messageInformationHeaders.setFaultTo(oldMessageInfoHeaders
+					.getFaultTo());
+			messageInformationHeaders.setFrom(oldMessageInfoHeaders.getTo());
+			messageInformationHeaders
+					.setRelatesTo(new RelatesTo(
+							oldMessageInfoHeaders.getMessageId(),
+							AddressingConstants.Submission.WSA_RELATES_TO_RELATIONSHIP_TYPE_DEFAULT_VALUE));
+			newmsgCtx.setMessageInformationHeaders(messageInformationHeaders);
+			newmsgCtx.setOperationContext(messgeCtx.getOperationContext());
+			newmsgCtx.setServiceContext(messgeCtx.getServiceContext());
+			newmsgCtx.setProperty(MessageContext.TRANSPORT_OUT, messgeCtx
+					.getProperty(MessageContext.TRANSPORT_OUT));
+			newmsgCtx.setProperty(HTTPConstants.HTTPOutTransportInfo, messgeCtx
+					.getProperty(HTTPConstants.HTTPOutTransportInfo));
+
+			//Setting the charater set encoding
+			newmsgCtx
+					.setProperty(
+							MessageContext.CHARACTER_SET_ENCODING,
+							messgeCtx
+									.getProperty(MessageContext.CHARACTER_SET_ENCODING));
+
+			newmsgCtx.setDoingREST(messgeCtx.isDoingREST());
+			newmsgCtx.setDoingMTOM(messgeCtx.isDoingMTOM());
+			newmsgCtx.setServerSide(messgeCtx.isServerSide());
+
+			invokeBusinessLogic(messgeCtx, newmsgCtx);
+
+			AxisEngine engine = new AxisEngine(messgeCtx.getOperationContext()
+					.getServiceContext().getEngineContext());
+			engine.send(newmsgCtx);
+		} else {
+			//TODO: Check weather terminate
+			  
+			//TODO: Do terminate processing
+		}
 	}
 
 	private SOAPFactory getSOAPFactory(MessageContext inMessage)

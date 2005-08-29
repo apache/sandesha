@@ -20,13 +20,39 @@ package org.apache.sandesha2.handlers;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.MsgInitializer;
+import org.apache.sandesha2.MsgValidator;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.RMMsgCreator;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
+import org.apache.wsdl.MessageReference;
+import org.apache.wsdl.WSDLConstants;
 
 /**
  * @author 
  */
 public class ServerOutHandler extends AbstractHandler {
 
-	public void invoke(MessageContext arg0) throws AxisFault {
-		// TODO create invoke logic
+	public void invoke(MessageContext msgCtx) throws AxisFault {
+		System.out.println ("Server out handler called");
+		
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+		MsgValidator.validateMessage(rmMsgCtx);
+	
+	
+		//getting the request message.
+		MessageContext reqMsgCtx = msgCtx.getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN);
+		RMMsgContext requestRMMsgCtx = MsgInitializer.initializeMessage(reqMsgCtx);
+		MsgValidator.validateMessage(requestRMMsgCtx);
+		
+
+		
+		if(requestRMMsgCtx.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ){
+			//set acknowledgement
+			RMMsgCreator.createAckMessage (rmMsgCtx);
+			
+		}
+		
 	}
 }

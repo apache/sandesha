@@ -69,6 +69,7 @@ public interface Constants {
 
 	public interface WSA {
 		String NS_URI_ANONYMOUS = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
+		String NS_ADDRESSING = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
 	}
 
 	String RM_HEADERS = "rmHeaders";
