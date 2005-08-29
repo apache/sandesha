@@ -18,63 +18,107 @@
 package org.apache.sandesha2;
 
 /**
- * @author Saminda
- *
+ * @author  
  */
 
 public interface Constants {
 
-	public interface WSRM{
-		public static final String NS_PREFIX_RM = "wsrm";
-        public static final String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2005/02/rm";
-        public static final String MSG_NUMBER = "MessageaNumber";
-        public static final String LAST_MSG = "LastMessage";
-        public static final String SEQUENCE = "Sequence";
-        public static final String SEQUENCE_OFFER = "Offer";
-        public static final String TERMINATE_SEQUENCE = "TerminateSequence";
-        public static final String FAULT_CODE = "FaultCode";
-        public static final String SEQUENCE_FAULT = "SequenceFault";
-        public static final String ACKS_TO = "AcksTo";
-        public static final String CREATE_SEQUENCE = "CreateSequence";
-        public static final String CREATE_SEQUENCE_RESPONSE = "CreateSequenceResponse";
-        public static final String ACK_REQUESTED = "AckRequested";
-        public static final String ACK_RANGE = "AcknowledgementRange";
-        public static final String UPPER = "Upper";
-        public static final String LOWER = "Lower";
-        public static final String NACK = "Nack";
-        public static final String SEQUENCE_ACK = "SequenceAcknowledgement";
-        public static final String IDENTIFIER = "Identifier";
-        public static final String ACCEPT = "Accept";
-    }
+	public interface WSRM {
+		String NS_PREFIX_RM = "wsrm";
 
-      String RM_HEADERS="rmHeaders";
-      String SEQUENCE="sequence";
-      String MESSAGE_NUMBER="messageNumber";
+		String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2005/02/rm";
 
-      String MESSAGE_TYPE ="messageType";
+		String NS_URI_CREATE_SEQ_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
+		
+		String MSG_NUMBER = "MessageaNumber";
 
-      String CREATE_SEQ_REQ="createSequenceReq";
-      String CREATE_SEQ_RES="createSequenceRes";
-      String ACKNOWLEDGEMENT="acknowledgement";
-      String IN_MESSAGE="inMessage";
-      String OUT_MESSAGE="outMessage";
-      String FAULT_MESSAGE="faultMessage";
-      
-      int MESSAGE_TYPE_UNKNOWN = 0;
-      int MESSAGE_TYPE_CREATE_SEQ = 1;
-      int MESSAGE_TYPE_CREATE_SEQ_RESPONSE = 2;
-      int MESSAGE_TYPE_APPLICATION = 3;
-      int MESSAGE_TYPE_ACK = 4;
-      int MESSAGE_TYPE_TERMINATE_SEQ = 5;
-      int MAX_MSG_TYPE = 5;
-      
-      int MESSAGE_PART_UNKNOWN = 0;
-      int MESSAGE_PART_SEQUENCE = 1;
-      int MESSAGE_PART_SEQ_ACKNOWLEDGEMENT = 2;
-      int MESSAGE_PART_ADDR_HEADERS = 3;
-      int MESSAGE_PART_CREATE_SEQ = 4;
-      int MESSAGE_PART_CREATE_SEQ_RESPONSE = 5;
-      int MESSAGE_PART_TERMINATE_SEQ = 6;
-      int MAX_MSG_PART_ID = 6;
+		String LAST_MSG = "LastMessage";
+
+		String SEQUENCE = "Sequence";
+
+		String SEQUENCE_OFFER = "Offer";
+
+		String TERMINATE_SEQUENCE = "TerminateSequence";
+
+		String FAULT_CODE = "FaultCode";
+
+		String SEQUENCE_FAULT = "SequenceFault";
+
+		String ACKS_TO = "AcksTo";
+
+		String CREATE_SEQUENCE = "CreateSequence";
+
+		String CREATE_SEQUENCE_RESPONSE = "CreateSequenceResponse";
+
+		String ACK_REQUESTED = "AckRequested";
+
+		String ACK_RANGE = "AcknowledgementRange";
+
+		String UPPER = "Upper";
+
+		String LOWER = "Lower";
+
+		String NACK = "Nack";
+
+		String SEQUENCE_ACK = "SequenceAcknowledgement";
+
+		String IDENTIFIER = "Identifier";
+
+		String ACCEPT = "Accept";
+	}
+
+	public interface WSA {
+		String NS_URI_ANONYMOUS = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
+	}
+
+	String RM_HEADERS = "rmHeaders";
+
+	String SEQUENCE = "sequence";
+
+	String MESSAGE_NUMBER = "messageNumber";
+
+	String MESSAGE_TYPE = "messageType";
+
+	String CREATE_SEQ_REQ = "createSequenceReq";
+
+	String CREATE_SEQ_RES = "createSequenceRes";
+
+	String ACKNOWLEDGEMENT = "acknowledgement";
+
+	String IN_MESSAGE = "inMessage";
+
+	String OUT_MESSAGE = "outMessage";
+
+	String FAULT_MESSAGE = "faultMessage";
+
+	int MESSAGE_TYPE_UNKNOWN = 0;
+
+	int MESSAGE_TYPE_CREATE_SEQ = 1;
+
+	int MESSAGE_TYPE_CREATE_SEQ_RESPONSE = 2;
+
+	int MESSAGE_TYPE_APPLICATION = 3;
+
+	int MESSAGE_TYPE_ACK = 4;
+
+	int MESSAGE_TYPE_TERMINATE_SEQ = 5;
+
+	int MAX_MSG_TYPE = 5;
+
+	int MESSAGE_PART_UNKNOWN = 0;
+
+	int MESSAGE_PART_SEQUENCE = 1;
+
+	int MESSAGE_PART_SEQ_ACKNOWLEDGEMENT = 2;
+
+	int MESSAGE_PART_ADDR_HEADERS = 3;
+
+	int MESSAGE_PART_CREATE_SEQ = 4;
+
+	int MESSAGE_PART_CREATE_SEQ_RESPONSE = 5;
+
+	int MESSAGE_PART_TERMINATE_SEQ = 6;
+
+	int MAX_MSG_PART_ID = 6;
 
 }

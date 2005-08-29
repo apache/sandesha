@@ -26,6 +26,8 @@ import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -48,24 +50,37 @@ public class RMMsgCreator {
 		
 		Identifier identifier = new Identifier();
 		// TODO : set the an appropriate id 
-		identifier.setIndentifer("temp-id-of-sandesha");
+		identifier.setIndentifer("uuid:temp-id-of-sandesha");
 		response.setIdentifier(identifier);
 		Accept accept = new Accept();
 		EndpointReference acksToEPR = createSeqMessage.getTo();  
 		AcksTo acksTo = new AcksTo(acksToEPR);
-		accept.setAcksTo(acksTo);
+		//accept.setAcksTo(acksTo);
 		response.setAccept(accept);
+	
+		SOAPEnvelope envolope1 = outMessage.getEnvelope();
 		
-		SOAPEnvelope envelope = createSeqMessage.getSOAPEnvelope();
-		envelope.getBody().getFirstChild().detach();
+	    /*try {
+		    XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+		    envolope1.serialize(writer);
+	    }catch (Exception ex){
+		    ex.printStackTrace();
+	    }*/
+		
+		SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+		//envelope.getBody().getFirstChild().detach();
 		
 		response.toSOAPEnvelope(envelope);
-        EndpointReference fromEPR= new EndpointReference("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous");
-
-        outMessage.setFrom(fromEPR);
-        outMessage.setWSAAction("http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse");
+       // EndpointReference fromEPR= createSeqMessage.getTo();  //new EndpointReference("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous");
+        //EndpointReference toEPR = createSeqMessage.getFrom();
+        // outMessage.setFrom(fromEPR);
+        //outMessage.setTo(toEPR);
+        // outMessage.setFaultTo(fromEPR);
+        outMessage.setWSAAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
+        outMessage.setMessageID("uuid:msg-id-of-create-seq-res-msg");
+        //outMessage.setF
         
-        /*try {
+       /* try {
 			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
 			envelope.serialize(writer);
 		}catch (Exception ex){

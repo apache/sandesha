@@ -19,5 +19,6 @@ public class SimpleServerImpl {
     public static void main(String[] args) throws IOException {
         SimpleHTTPServer sas= new SimpleHTTPServer("E:\\Program Files\\Apache Software Foundation\\Tomcat 5.0\\webapps\\axis2\\WEB-INF",8080);
         sas.start();
-      }
+        System.out.println ("Sandesha2 Simple Axis Server Started....");
+    }
 }

@@ -15,6 +15,12 @@
 
     <operation name="CreateSequence" mep="http://www.w3.org/2004/08/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
-    </operation>
+    </operation> 
 
+<!--
+    <operation name="CreateSequence" mep="http://www.w3.org/2004/08/wsdl/in-out">
+        <parameter name="Mapping">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+    </operation>
+--> 
 </module>
