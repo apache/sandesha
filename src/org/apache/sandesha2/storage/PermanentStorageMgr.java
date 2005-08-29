@@ -15,34 +15,12 @@
  *
  */
 
-package org.apache.sandesha2.storage.beanmanagers;
-
-import org.apache.sandesha2.storage.beans.RMBean;
+package org.apache.sandesha2.storage;
 
 /**
- * @author 
+ * @author
  * 
  */
-public class CreateSeqBeanMgr implements CRUD {
+public class PermanentStorageMgr {
 
-	private CreateSeqBeanMgr instance;
-	
-	private void CreateSeqBeanMgr (){
-		
-	}
-	public boolean create(RMBean object) {
-		return false;
-	}
-
-	public boolean delete(String primaryKey) {
-		return false;
-	}
-	
-	public RMBean retrieve(String primaryKey) {
-		return null;
-	}
-	
-	public boolean update(RMBean bean) {
-		return false;
-	}
 }
