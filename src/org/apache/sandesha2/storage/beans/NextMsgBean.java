@@ -22,8 +22,33 @@ package org.apache.sandesha2.storage.beans;
  * 
  */
 public class NextMsgBean implements RMBean {
-
-	String SequenceId;
-	String NextMsgNoToProcess;
+	private String SequenceId;
+	private String NextMsgNoToProcess;
 	
+	
+	
+	/**
+	 * @return Returns the nextMsgNoToProcess.
+	 */
+	public String getNextMsgNoToProcess() {
+		return NextMsgNoToProcess;
+	}
+	/**
+	 * @param nextMsgNoToProcess The nextMsgNoToProcess to set.
+	 */
+	public void setNextMsgNoToProcess(String nextMsgNoToProcess) {
+		NextMsgNoToProcess = nextMsgNoToProcess;
+	}
+	/**
+	 * @return Returns the sequenceId.
+	 */
+	public String getSequenceId() {
+		return SequenceId;
+	}
+	/**
+	 * @param sequenceId The sequenceId to set.
+	 */
+	public void setSequenceId(String sequenceId) {
+		SequenceId = sequenceId;
+	}
 }

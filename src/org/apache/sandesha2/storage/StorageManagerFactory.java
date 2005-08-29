@@ -22,6 +22,13 @@ package org.apache.sandesha2.storage;
  * 
  */
 public class StorageManagerFactory {
-
+	
+	public static StorageManager getInMemoryStorageManager() {
+		return InMemoryStorageMgr.getInstance();
+	}
+	
+	public static StorageManager getPermanentStroageManager() {
+		return PermanentStorageMgr.getInstance();
+	}
 	
 }

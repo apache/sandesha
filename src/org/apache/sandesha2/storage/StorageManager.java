@@ -17,10 +17,48 @@
 
 package org.apache.sandesha2.storage;
 
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.StorageMapBean;
+
 /**
  * @author 
  * 
  */
-public class StorageManager {
+public interface StorageManager {
 
+	public boolean createCreateSeq(CreateSeqBean bean);
+
+	public CreateSeqBean retriveCreateSeq(String key);
+
+	public boolean updateCreateSeq(CreateSeqBean bean);
+
+	public boolean deleteCreateSeq(String key);
+	
+	public boolean createNextMsg(NextMsgBean bean);
+	
+	public NextMsgBean retrieveNextMsgBean(String key);
+	
+	public boolean updateNextMsgBean(NextMsgBean bean);
+	
+	public boolean deleteNextMsgBean(String key);
+	
+	public boolean createRetransmitterBean(RetransmitterBean bean);
+	
+	public RetransmitterBean retrieveRetransmitterBean(String key);
+	
+	public boolean updateRetransmitterBean(RetransmitterBean bean);
+	
+	public boolean deleteRetransmitterBean(String key);
+	
+	public boolean createStorageMapBean(StorageMapBean bean);
+	
+	public StorageMapBean retrieveStorageMapBean(String key);
+	
+	public boolean updateStorageMapBean(StorageMapBean bean);
+	
+	public boolean deleteStorageMapBean(String key);
+	
+	
 }

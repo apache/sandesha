@@ -23,7 +23,45 @@ package org.apache.sandesha2.storage.beans;
  */
 public class StorageMapBean implements RMBean {
 
-	String Key;
-	int MsgNo;
-	String sequenceId;
+	private String Key;
+	private int MsgNo;
+	private String sequenceId;
+	
+	
+	/**
+	 * @return Returns the key.
+	 */
+	public String getKey() {
+		return Key;
+	}
+	/**
+	 * @param key The key to set.
+	 */
+	public void setKey(String key) {
+		Key = key;
+	}
+	/**
+	 * @return Returns the msgNo.
+	 */
+	public int getMsgNo() {
+		return MsgNo;
+	}
+	/**
+	 * @param msgNo The msgNo to set.
+	 */
+	public void setMsgNo(int msgNo) {
+		MsgNo = msgNo;
+	}
+	/**
+	 * @return Returns the sequenceId.
+	 */
+	public String getSequenceId() {
+		return sequenceId;
+	}
+	/**
+	 * @param sequenceId The sequenceId to set.
+	 */
+	public void setSequenceId(String sequenceId) {
+		this.sequenceId = sequenceId;
+	}
 }

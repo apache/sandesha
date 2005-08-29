@@ -23,7 +23,31 @@ package org.apache.sandesha2.storage.beans;
  */
 
 public class CreateSeqBean implements RMBean {
+	private String CreateSeqMsgId;
+	private String SequenceId;
 	
-	String CreateSeqMsgId;
-	String SequenceId;
+	/**
+	 * @return Returns the createSeqMsgId.
+	 */
+	public String getCreateSeqMsgId() {
+		return CreateSeqMsgId;
+	}
+	/**
+	 * @param createSeqMsgId The createSeqMsgId to set.
+	 */
+	public void setCreateSeqMsgId(String createSeqMsgId) {
+		CreateSeqMsgId = createSeqMsgId;
+	}
+	/**
+	 * @return Returns the sequenceId.
+	 */
+	public String getSequenceId() {
+		return SequenceId;
+	}
+	/**
+	 * @param sequenceId The sequenceId to set.
+	 */
+	public void setSequenceId(String sequenceId) {
+		SequenceId = sequenceId;
+	}
 }
