@@ -23,43 +23,39 @@ public class SequencePropertyBean implements RMBean{
 
 	private String sequenceId;
 	private String name;
-	private String value;
+	private Object value;
 	
+	public SequencePropertyBean (String seqId, String propertyName, Object value) {
+		this.sequenceId = seqId;
+		this.name = propertyName;
+		this.value = value;
+	}
 	
-	/**
-	 * @return Returns the name.
-	 */
+	public SequencePropertyBean () {
+		
+	}
+
 	public String getName() {
 		return name;
 	}
-	/**
-	 * @param name The name to set.
-	 */
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	/**
-	 * @return Returns the sequenceId.
-	 */
+
 	public String getSequenceId() {
 		return sequenceId;
 	}
-	/**
-	 * @param sequenceId The sequenceId to set.
-	 */
+
 	public void setSequenceId(String sequenceId) {
 		this.sequenceId = sequenceId;
 	}
-	/**
-	 * @return Returns the value.
-	 */
-	public String getValue() {
+
+	public Object getValue() {
 		return value;
 	}
-	/**
-	 * @param value The value to set.
-	 */
-	public void setValue(String value) {
+
+	public void setValue(Object value) {
 		this.value = value;
 	}
 }

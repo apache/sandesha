@@ -17,19 +17,20 @@
 
 package org.apache.sandesha2.storage;
 
+import org.apache.sandesha2.Constants;
+
 /**
  * @author
  * 
  */
 public class StorageManagerFactory {
 	
-	public static final int IN_MEMORY_STORAGE_TYPE = 1;
-	public static final int PERSISTANT_STORAGE_TYPE = 2;
+
 	
 	public static StorageManager getStorageManager(int storageType) {
-		if (storageType == IN_MEMORY_STORAGE_TYPE) {
+		if (storageType == Constants.STORAGE_TYPE_IN_MEMORY) {
 			return InMemoryStorageMgr.getInstance();
-		} else if (storageType == PERSISTANT_STORAGE_TYPE) {
+		} else if (storageType == Constants.STORAGE_TYPE_PERSISTANCE) {
 			return PermanentStorageMgr.getInstance();
 		} else {
 			throw new IllegalArgumentException("invalid storage type");
