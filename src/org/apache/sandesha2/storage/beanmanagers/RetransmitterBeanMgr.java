@@ -17,27 +17,41 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.StorageManagerFactory;
 import org.apache.sandesha2.storage.beans.RMBean;
+import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
 /**
  * @author 
  * 
  */
 public class RetransmitterBeanMgr implements CRUD {
-
-	public boolean create(RMBean object) {
-		return false;
+	
+	private StorageManager storageMgr;
+	
+	public RetransmitterBeanMgr(int storageType) {
+		storageMgr = StorageManagerFactory.getStorageManager(storageType);
+	}
+	public boolean create(RMBean bean) {
+		if (!(bean instanceof RetransmitterBean)) {
+			throw new IllegalArgumentException();			
+		}
+		return storageMgr.createRetransmitterBean((RetransmitterBean) bean);	
 	}
 	
-	public boolean delete(String primaryKey) {
-		return false;
+	public boolean delete(String key) {
+		return storageMgr.deleteRetransmitterBean(key);
 	}
 	
-	public RMBean retrieve(String primaryKey) {
-		return null;
+	public RMBean retrieve(String key) {
+		return storageMgr.retrieveRetransmitterBean(key);
 	}
 	
 	public boolean update(RMBean bean) {
-		return false;
+		if (!(bean instanceof RetransmitterBean)) {
+			throw new IllegalArgumentException();
+		}
+		return storageMgr.updateRetransmitterBean((RetransmitterBean) bean);
 	}
 }

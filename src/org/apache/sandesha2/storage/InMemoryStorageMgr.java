@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 
 /**
@@ -37,7 +38,8 @@ public class InMemoryStorageMgr implements StorageManager {
 	Hashtable createSeqTable = new Hashtable(),
 			  nextMsgTable	 = new Hashtable(),
 			  retransmitterBeanTable = new Hashtable(),
-			  storageMapBeanTable = new Hashtable();
+			  storageMapBeanTable = new Hashtable(),
+			  sequencePropertyBeanTable = new Hashtable();
 	
 	private InMemoryStorageMgr() {
 	}
@@ -62,7 +64,7 @@ public class InMemoryStorageMgr implements StorageManager {
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#retriveCreateSeq(java.lang.String)
 	 */
-	public CreateSeqBean retriveCreateSeq(String key) {
+	public CreateSeqBean retrieveCreateSeq(String key) {
 		if (createSeqTable.containsKey(key)) {
 			return (CreateSeqBean) createSeqTable.get(key);
 		} else {
@@ -100,6 +102,11 @@ public class InMemoryStorageMgr implements StorageManager {
 		storageMapBeanTable.put(bean.getKey(), bean);
 		return true;
 	}
+	
+	public boolean createSequencePropertyBean(SequencePropertyBean bean) {
+		sequencePropertyBeanTable.put(bean.getSequenceId() + bean.getName(), bean);
+		return true;
+	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#deleteNextMsgBean(java.lang.String)
 	 */
@@ -121,6 +128,11 @@ public class InMemoryStorageMgr implements StorageManager {
 		storageMapBeanTable.remove(key);
 		return true;
 	}
+	
+	public boolean deleteSequencePropertyBean(String key) {
+		sequencePropertyBeanTable.remove(key);
+		return true;
+	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#retrieveNextMsgBean(java.lang.String)
 	 */
@@ -139,6 +151,10 @@ public class InMemoryStorageMgr implements StorageManager {
 	 */
 	public StorageMapBean retrieveStorageMapBean(String key) {
 		return (StorageMapBean) storageMapBeanTable.get(key);
+	}
+	
+	public SequencePropertyBean retrieveSequencePropertyBean(String key) {
+		return (SequencePropertyBean) sequencePropertyBeanTable.get(key);
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#updateCreateSeq(org.apache.sandesha2.storage.beans.CreateSeqBean)
@@ -165,5 +181,11 @@ public class InMemoryStorageMgr implements StorageManager {
 		storageMapBeanTable.put(bean.getKey(), bean);
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public boolean updateSequencePropertyBean(SequencePropertyBean bean) {
+		sequencePropertyBeanTable.put(bean.getSequenceId(), bean);
+		return true;
+		
 	}
 }

@@ -17,6 +17,9 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.StorageManagerFactory;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RMBean;
 
 /**
@@ -24,20 +27,32 @@ import org.apache.sandesha2.storage.beans.RMBean;
  * 
  */
 public class NextMsgBeanMgr implements CRUD {
+	
+	private StorageManager storageMgr;
+	
+	public NextMsgBeanMgr(int storageType) {
+		storageMgr = StorageManagerFactory.getStorageManager(storageType);		
+	}
 
-	public boolean create(RMBean object) {
-		return false;
+	public boolean create(RMBean bean) {
+		if (!(bean instanceof NextMsgBean)) {
+			throw new IllegalArgumentException();
+		}
+		return storageMgr.createNextMsg((NextMsgBean) bean);
 	}	
 	
-	public boolean delete(String primaryKey) {
-		return false;
+	public boolean delete(String key) {
+		return storageMgr.deleteNextMsgBean(key);
 	}
 	
-	public RMBean retrieve(String primaryKey) {
-		return null;
+	public RMBean retrieve(String key) {
+		return storageMgr.retrieveNextMsgBean(key);
 	}
 	
 	public boolean update(RMBean bean) {
-		return false;
+		if (!(bean instanceof NextMsgBean)) {
+			throw new IllegalArgumentException();
+		}
+		return storageMgr.updateNextMsgBean((NextMsgBean) bean);
 	}
 }

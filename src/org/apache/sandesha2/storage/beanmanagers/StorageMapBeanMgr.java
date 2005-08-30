@@ -17,27 +17,41 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.StorageManagerFactory;
 import org.apache.sandesha2.storage.beans.RMBean;
+import org.apache.sandesha2.storage.beans.StorageMapBean;
 
 /**
  * @author 
  * 
  */
 public class StorageMapBeanMgr implements CRUD {
+	private StorageManager storageMgr;
+	
+	public StorageMapBeanMgr(int storageType) {
+		storageMgr = StorageManagerFactory.getStorageManager(storageType);
+	}
 
 	public boolean create(RMBean object) {
-		return false;
+		if (!(object instanceof StorageMapBean)) {
+			throw new IllegalArgumentException();
+		} 
+		return storageMgr.createStorageMapBean((StorageMapBean) object);
 	}
 	
 	public boolean delete(String primaryKey) {
-		return false;
+		return storageMgr.deleteStorageMapBean(primaryKey);
 	}
-	
+		
 	public RMBean retrieve(String primaryKey) {
-		return null;
+		return storageMgr.retrieveStorageMapBean(primaryKey);
 	}
 	
 	public boolean update(RMBean bean) {
-		return false;
+		if (!(bean instanceof StorageMapBean)) {
+			throw new IllegalArgumentException();
+		}
+		return storageMgr.updateStorageMapBean((StorageMapBean) bean);
 	}
 }

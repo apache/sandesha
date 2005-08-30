@@ -17,6 +17,9 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.StorageManagerFactory;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.RMBean;
 
 /**
@@ -24,25 +27,29 @@ import org.apache.sandesha2.storage.beans.RMBean;
  * 
  */
 public class CreateSeqBeanMgr implements CRUD {
-
-	private CreateSeqBeanMgr instance;
 	
-	private void CreateSeqBeanMgr (){
-		
-	}
-	public boolean create(RMBean object) {
-		return false;
-	}
-
-	public boolean delete(String primaryKey) {
-		return false;
+	private StorageManager storageMgr;
+	
+	public CreateSeqBeanMgr(int storageType) {
+		storageMgr = StorageManagerFactory.getStorageManager(storageType);
 	}
 	
-	public RMBean retrieve(String primaryKey) {
-		return null;
+	public boolean create(RMBean bean) {
+		if (!(bean instanceof CreateSeqBean)) {
+			throw new IllegalArgumentException("argument should be CreateSeqBean type");
+		}
+		return storageMgr.createCreateSeq((CreateSeqBean) bean);
+	}
+
+	public boolean delete(String key) {
+		return storageMgr.deleteCreateSeq(key);
+	}
+	
+	public RMBean retrieve(String key) {
+		return storageMgr.retrieveCreateSeq(key);
 	}
 	
 	public boolean update(RMBean bean) {
-		return false;
+		return storageMgr.updateCreateSeq((CreateSeqBean) bean);
 	}
 }

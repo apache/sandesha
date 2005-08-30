@@ -20,6 +20,7 @@ package org.apache.sandesha2.storage;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 
 /**
@@ -41,23 +42,27 @@ public class PermanentStorageMgr implements StorageManager {
 	}
 	
 	public boolean createCreateSeq(CreateSeqBean bean) {
-		return false;
+		// TODO
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
-	public CreateSeqBean retriveCreateSeq(String key) {
+	public CreateSeqBean retrieveCreateSeq(String key) {
 		// retrieve the appropriate tuple form the table
 		// use that data to create and return the Bean
-		return null;
+		// TODO
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public boolean updataCreateSeq(CreateSeqBean bean) {
 		// update the database using the data in bean
-		return false;
+		// TODO
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	public boolean deleteCreateSeq(String key) {
 		// delete the recored which is identified by this key..
-		return false;
+		// TODO
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	
 	
@@ -66,35 +71,39 @@ public class PermanentStorageMgr implements StorageManager {
 	 */
 	public boolean createNextMsg(NextMsgBean bean) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#createRetransmitterBean(org.apache.sandesha2.storage.beans.RetransmitterBean)
 	 */
 	public boolean createRetransmitterBean(RetransmitterBean bean) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#createStorageMapBean(org.apache.sandesha2.storage.beans.StorageMapBean)
 	 */
 	public boolean createStorageMapBean(StorageMapBean bean) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+	public boolean createSequencePropertyBean(SequencePropertyBean bean) {
+		// TODO
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#deleteNextMsgBean(java.lang.String)
 	 */
 	public boolean deleteNextMsgBean(String key) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#deleteRetransmitterBean(java.lang.String)
 	 */
 	public boolean deleteRetransmitterBean(String key) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#deleteStorageMapBean(java.lang.String)
@@ -102,6 +111,9 @@ public class PermanentStorageMgr implements StorageManager {
 	public boolean deleteStorageMapBean(String key) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	public boolean deleteSequencePropertyBean(String key) {
+		throw new UnsupportedOperationException("not yet implemented ");
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#retrieveNextMsgBean(java.lang.String)
@@ -124,6 +136,10 @@ public class PermanentStorageMgr implements StorageManager {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	public SequencePropertyBean retrieveSequencePropertyBean(String key) {
+		throw new UnsupportedOperationException("not yet implemented");
+		
+	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#updateCreateSeq(org.apache.sandesha2.storage.beans.CreateSeqBean)
 	 */
@@ -143,13 +159,17 @@ public class PermanentStorageMgr implements StorageManager {
 	 */
 	public boolean updateRetransmitterBean(RetransmitterBean bean) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
 	/* (non-Javadoc)
 	 * @see org.apache.sandesha2.storage.StorageManager#updateStorageMapBean(org.apache.sandesha2.storage.beans.StorageMapBean)
 	 */
 	public boolean updateStorageMapBean(StorageMapBean bean) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException("not yet implemented");
 	}
+	public boolean updateSequencePropertyBean(SequencePropertyBean bean) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+	
 }

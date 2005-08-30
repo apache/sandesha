@@ -23,12 +23,16 @@ package org.apache.sandesha2.storage;
  */
 public class StorageManagerFactory {
 	
-	public static StorageManager getInMemoryStorageManager() {
-		return InMemoryStorageMgr.getInstance();
-	}
+	public static final int IN_MEMORY_STORAGE_TYPE = 1;
+	public static final int PERSISTANT_STORAGE_TYPE = 2;
 	
-	public static StorageManager getPermanentStroageManager() {
-		return PermanentStorageMgr.getInstance();
+	public static StorageManager getStorageManager(int storageType) {
+		if (storageType == IN_MEMORY_STORAGE_TYPE) {
+			return InMemoryStorageMgr.getInstance();
+		} else if (storageType == PERSISTANT_STORAGE_TYPE) {
+			return PermanentStorageMgr.getInstance();
+		} else {
+			throw new IllegalArgumentException("invalid storage type");
+		}
 	}
-	
 }

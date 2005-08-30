@@ -17,37 +17,48 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
- * @author 
- * 
+ * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-
-public class SequencePropertyBean {
+public class SequencePropertyBean implements RMBean{
 
 	private String sequenceId;
 	private String name;
 	private String value;
 	
 	
+	/**
+	 * @return Returns the name.
+	 */
 	public String getName() {
 		return name;
 	}
-
+	/**
+	 * @param name The name to set.
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	/**
+	 * @return Returns the sequenceId.
+	 */
 	public String getSequenceId() {
 		return sequenceId;
 	}
-
+	/**
+	 * @param sequenceId The sequenceId to set.
+	 */
 	public void setSequenceId(String sequenceId) {
 		this.sequenceId = sequenceId;
 	}
-
+	/**
+	 * @return Returns the value.
+	 */
 	public String getValue() {
 		return value;
 	}
-
+	/**
+	 * @param value The value to set.
+	 */
 	public void setValue(String value) {
 		this.value = value;
 	}

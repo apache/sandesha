@@ -20,6 +20,7 @@ package org.apache.sandesha2.storage;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 
 /**
@@ -30,7 +31,7 @@ public interface StorageManager {
 
 	public boolean createCreateSeq(CreateSeqBean bean);
 
-	public CreateSeqBean retriveCreateSeq(String key);
+	public CreateSeqBean retrieveCreateSeq(String key);
 
 	public boolean updateCreateSeq(CreateSeqBean bean);
 
@@ -60,5 +61,11 @@ public interface StorageManager {
 	
 	public boolean deleteStorageMapBean(String key);
 	
+	public boolean createSequencePropertyBean(SequencePropertyBean bean);
 	
+	public SequencePropertyBean retrieveSequencePropertyBean(String key);
+	
+	public boolean updateSequencePropertyBean(SequencePropertyBean bean);
+	
+	public boolean deleteSequencePropertyBean(String key);	
 }

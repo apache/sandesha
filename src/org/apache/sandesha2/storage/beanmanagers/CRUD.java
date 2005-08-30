@@ -24,11 +24,13 @@ import org.apache.sandesha2.storage.beans.RMBean;
  * 
  */
 public interface CRUD {
-
-	    boolean create (RMBean object);
-		RMBean retrieve (String primaryKey);
-		boolean update (RMBean bean);
-		boolean delete (String primaryKey);
+	public static final int IN_MEMORY_STORAGE_TYPE = 1;
+	public static final int PERSISTANT_STORAGE_TYPE = 2;
+	
+	public boolean create (RMBean object);
+	public RMBean retrieve (String primaryKey);
+	public boolean update (RMBean bean);
+	public boolean delete (String primaryKey);
 
 		
 }
