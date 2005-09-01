@@ -17,6 +17,13 @@
 
 package org.apache.sandesha2.storage;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.apache.derby.impl.sql.execute.CreateConstraintConstantAction;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
@@ -29,9 +36,21 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
  */
 public class PermanentStorageMgr implements StorageManager {
 	
+	private static String Driver = "org.apache.derby.jdbc.EmbeddedDriver";
+	private static String protocol = "jdbc:derby:";
+	private static String SANDESHA2_DB = "sandesha2_db";
+	
+	private static String CREATE_SEQUENCE_TABLE = "CREATE TABLE CreateSequence(CreateSeqMsgId VARCHAR(200), SequenceId VARCHAR(200))";
+	private static String CREATE_NEXT_MSG_TABLE = "CREATE TABLE NextMsgSequence(SequenceId VARCHAR(200), NextMsgToProcess VARCHAR(200))";
+	private static String CREATE_RETRANSMITTER_TABLE = "CREATE TABLE Retransmitter(MessageId VARCHAR(200), RKey VARCHAR(200), LastSentTime BIGINT, Send CHAR(1), CreateSeqMsgId VARCHAR(200))";
+	private static String CREATE_STORAGE_MAP_TABLE = "CREATE TABLE StorageMap(SKey VARCHAR(200),MsgNo INTEGER, SequenceId VARCHAR(200))";
+	private static String CREATE_SEQUENCE_PROPERTY_TABLE = "CREATE TABLE SequenceProperty(SequenceId VARCHAR(200), Name VARCHAR(50), Value VARCHAR(200))";
+		
 	private static PermanentStorageMgr self;
+	private Connection connection = null;
 	
 	private PermanentStorageMgr() {
+		initialize();
 	}
 	
 	synchronized static PermanentStorageMgr getInstance() {
@@ -41,135 +60,457 @@ public class PermanentStorageMgr implements StorageManager {
 		return self;
 	}
 	
+	private void initialize() {
+		try {
+			loadDriver();
+			
+			if (!isDatabaseExists()) {
+				String str = protocol + SANDESHA2_DB + ";create=true";
+				connection = DriverManager.getConnection(str);
+				Statement statement = connection.createStatement();
+				statement.executeUpdate(CREATE_SEQUENCE_TABLE);
+				statement.executeUpdate(CREATE_NEXT_MSG_TABLE);
+				statement.executeUpdate(CREATE_RETRANSMITTER_TABLE);
+				statement.executeUpdate(CREATE_STORAGE_MAP_TABLE);
+				statement.executeUpdate(CREATE_SEQUENCE_PROPERTY_TABLE);
+				
+				connection.setAutoCommit(false);		
+				
+			} else {
+				connection = DriverManager.getConnection(protocol + SANDESHA2_DB);
+				connection.setAutoCommit(false);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new RuntimeException("can not initialize PersistantStorageManager");
+		}
+		
+	}
+	
+	private void loadDriver() {
+		try {
+			Class.forName(Driver).newInstance();
+		} catch (Exception ex) {
+		}
+	}
+	
+	private boolean isDatabaseExists() {
+		try {
+			DriverManager.getConnection(protocol + SANDESHA2_DB);
+		} catch (Exception ex) {
+			return false;
+		}
+		return true;
+	}
+	
+	private Statement getStatement() {
+		try {
+			return connection.createStatement();
+		} catch (SQLException sqlEx) {
+			throw new RuntimeException(sqlEx.getMessage());
+		}
+	}
+	
 	public boolean createCreateSeq(CreateSeqBean bean) {
-		// TODO
-		throw new UnsupportedOperationException("not yet implemented");
+		
+		String query = ("INSERT INTO CreateSequence VALUES ( " +
+				"'" + bean.getCreateSeqMsgId() + "', " +
+						"'" + bean.getSequenceId() + "')");
+		try {
+			getStatement().executeUpdate(query);
+			ResultSet executeQuery = getStatement().executeQuery("select * from CreateSequence");
+			
+			return true;
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());
+		}		
 	}
 	
-	public CreateSeqBean retrieveCreateSeq(String key) {
-		// retrieve the appropriate tuple form the table
-		// use that data to create and return the Bean
-		// TODO
-		throw new UnsupportedOperationException("not yet implemented");
+	public boolean createNextMsg(NextMsgBean bean) {
+		String query = ("INSERT INTO NextMsgSequence VALUES ( "
+				+ "'" + bean.getSequenceId() + "', " 
+				+ "'" + bean.getNextMsgNoToProcess() + "')");
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());
+		}
+		
 	}
 	
-	public boolean updataCreateSeq(CreateSeqBean bean) {
-		// update the database using the data in bean
-		// TODO
-		throw new UnsupportedOperationException("not yet implemented");
+	public boolean createRetransmitterBean(RetransmitterBean bean) {
+		String query = ("INSERT INTO Retransmitter VALUES ( " 
+				+ "'" + bean.getMessageId() + "', "
+				+ "'" + bean.getKey() + "', " 
+				+ bean.getLastSentTime() +", "
+				+ ((bean.isSend()) ? "'T'" : "'F'") + ", "
+				+ "'" + bean.getCreateSeqMsgId() + "'"
+				+ ")");
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());
+		}
+	}
+
+	public boolean createStorageMapBean(StorageMapBean bean) {
+
+		String query = ("INSERT INTO StorageMap VALUES ( " +
+				"'" + bean.getKey() + "', " 
+				+ bean.getMsgNo() +", "
+				+ "'" + bean.getSequenceId() + "')");
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			throw new RuntimeException(ex.getMessage());
+		}
+
+		
+		
+	}
+	public boolean createSequencePropertyBean(SequencePropertyBean bean) {
+		String query = ("INSERT INTO SequenceProperty VALUES ( " +
+				"'" + bean.getSequenceId() + "', " 
+				+"'" + bean.getName() +"', "
+				+ "'" + bean.getValue() + "')");
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());
+		}
 	}
 	
 	public boolean deleteCreateSeq(String key) {
-		// delete the recored which is identified by this key..
-		// TODO
-		throw new UnsupportedOperationException("not yet implemented");
+		
+		String query = "DELETE FROM CreateSequence WHERE CreateSeqMsgId = '" + key + "'" ;
+		
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+			
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			throw new RuntimeException(ex);
+			
+		}
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#createNextMsg(org.apache.sandesha2.storage.beans.NextMsgBean)
-	 */
-	public boolean createNextMsg(NextMsgBean bean) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#createRetransmitterBean(org.apache.sandesha2.storage.beans.RetransmitterBean)
-	 */
-	public boolean createRetransmitterBean(RetransmitterBean bean) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#createStorageMapBean(org.apache.sandesha2.storage.beans.StorageMapBean)
-	 */
-	public boolean createStorageMapBean(StorageMapBean bean) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-	public boolean createSequencePropertyBean(SequencePropertyBean bean) {
-		// TODO
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#deleteNextMsgBean(java.lang.String)
-	 */
 	public boolean deleteNextMsgBean(String key) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("not yet implemented");
+		String query = "DELETE FROM NextMsgSequence WHERE NextMsgSequence = '" + key + "'" ;
+		
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+			
+		}
 	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#deleteRetransmitterBean(java.lang.String)
-	 */
+	
 	public boolean deleteRetransmitterBean(String key) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("not yet implemented");
+		String query = "DELETE FROM Retransmitter WHERE RKey = '" + key + "'" ;
+		
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+			
+		}
 	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#deleteStorageMapBean(java.lang.String)
-	 */
+
 	public boolean deleteStorageMapBean(String key) {
-		// TODO Auto-generated method stub
-		return false;
+		String query = "DELETE FROM StorageMap WHERE SKey = '" + key + "'" ;
+		
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+			
+		}
 	}
+	
 	public boolean deleteSequencePropertyBean(String key) {
-		throw new UnsupportedOperationException("not yet implemented ");
+		String query = "DELETE FROM SequenceProperty WHERE SequenceId = '" + key + "'" ;
+		
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex);
+			
+		}
 	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#retrieveNextMsgBean(java.lang.String)
-	 */
+	
+	public CreateSeqBean retrieveCreateSeq(String key) {
+		
+		String query = "SELECT * FROM CreateSequence WHERE  CreateSeqMsgId = '" 
+				+ key + "'";
+				
+		try {
+			CreateSeqBean bean = new CreateSeqBean();
+			ResultSet rs = getStatement().executeQuery(query);
+			rs.next();
+			bean.setCreateSeqMsgId(rs.getString("CreateSeqMsgId"));
+			bean.setSequenceId(rs.getString("SequenceId"));
+			
+			return bean;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());			
+		}
+	}
+	
 	public NextMsgBean retrieveNextMsgBean(String key) {
-		// TODO Auto-generated method stub
-		return null;
+		String query = "SELECT * FROM NextMsgSequence WHERE  SequenceId = '" 
+			+ key + "'";
+			
+		try {
+			NextMsgBean bean = new NextMsgBean();
+			ResultSet rs = getStatement().executeQuery(query);
+			rs.next();
+			bean.setSequenceId(rs.getString("SequenceId"));
+			bean.setNextMsgNoToProcess(rs.getString("NextMsgToProcess"));
+			
+			return bean;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());			
+		}
 	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#retrieveRetransmitterBean(java.lang.String)
-	 */
-	public RetransmitterBean retrieveRetransmitterBean(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#retrieveStorageMapBean(java.lang.String)
-	 */
+
 	public StorageMapBean retrieveStorageMapBean(String key) {
-		// TODO Auto-generated method stub
-		return null;
+		String query = "SELECT * FROM StorageMap WHERE  SKey = '" 
+			+ key + "'";
+			
+		try {
+			StorageMapBean bean = new StorageMapBean();
+			ResultSet rs = getStatement().executeQuery(query);
+			rs.next();
+			bean.setKey(rs.getString("SKey"));
+			bean.setMsgNo(rs.getInt("MsgNo"));
+			bean.setSequenceId(rs.getString("SequenceId"));
+			
+			return bean;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());			
+		}
 	}
+
+	public RetransmitterBean retrieveRetransmitterBean(String key) {
+		String query = "SELECT * FROM Retransmitter ";// +
+				//"WHERE  RKey = '" 
+			//+ key + "'";
+			
+	try {
+		RetransmitterBean bean = new RetransmitterBean();
+		ResultSet rs = getStatement().executeQuery(query);
+		rs.next();
+		bean.setCreateSeqMsgId(rs.getString("CreateSeqMsgId"));
+		bean.setKey(rs.getString("RKey"));
+		bean.setLastSentTime(rs.getLong("LastSentTime"));
+		bean.setMessageId(rs.getString("MessageId"));
+		bean.setSend(rs.getBoolean("Send"));
+			
+		return bean;
+		
+	} catch (SQLException ex) {
+		ex.printStackTrace();
+		throw new RuntimeException(ex.getMessage());			
+	}
+	}
+	
 	public SequencePropertyBean retrieveSequencePropertyBean(String key) {
-		throw new UnsupportedOperationException("not yet implemented");
+		String query = "SELECT * FROM SequenceProperty WHERE  SequenceId = '" 
+			+ key + "'";
+			
+		try {
+			SequencePropertyBean bean = new SequencePropertyBean();
+			ResultSet rs = getStatement().executeQuery(query);
+			rs.next();
+			bean.setSequenceId(rs.getString("SequenceId"));
+			bean.setName(rs.getString("Name"));
+			bean.setValue(rs.getString("Value"));
+			
+			return bean;
+			
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());			
+		}
 		
 	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#updateCreateSeq(org.apache.sandesha2.storage.beans.CreateSeqBean)
-	 */
+	
 	public boolean updateCreateSeq(CreateSeqBean bean) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#updateNextMsgBean(org.apache.sandesha2.storage.beans.NextMsgBean)
-	 */
-	public boolean updateNextMsgBean(NextMsgBean bean) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#updateRetransmitterBean(java.lang.String)
-	 */
-	public boolean updateRetransmitterBean(RetransmitterBean bean) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.StorageManager#updateStorageMapBean(org.apache.sandesha2.storage.beans.StorageMapBean)
-	 */
-	public boolean updateStorageMapBean(StorageMapBean bean) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-	public boolean updateSequencePropertyBean(SequencePropertyBean bean) {
-		throw new UnsupportedOperationException("not yet implemented");
+		
+		String query = "UPDATE CreateSequence SET CreateSeqMsgId = '" + bean.getCreateSeqMsgId() + "', "
+				+ "SequenceId = '" + bean.getSequenceId() + "' "
+				+ "WHERE CreateSeqMsgId = '" + bean.getCreateSeqMsgId() + "'";
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			throw new RuntimeException(ex.getMessage());
+		}
 	}
 	
+	public boolean updateNextMsgBean(NextMsgBean bean) {
+		String query = ("UPDATE NextMsgSequence SET " 
+				+ "SequenceId = '" + bean.getSequenceId() + "', "
+				+ "NextMsgToProcess = '" + bean.getNextMsgNoToProcess() + "'");
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			throw new RuntimeException(ex.getMessage());
+		}
+	}
+
+	public boolean updateRetransmitterBean(RetransmitterBean bean) {
+		String query = "UPDATE Retransmitter SET " 
+			+ "MessageId = '" + bean.getMessageId() + "', "
+			+ "RKey = '" + bean.getKey() + "', " 
+			+ "LastSentTime = "+ bean.getLastSentTime() +", "
+			+ "Send = " + ((bean.isSend()) ? "'T'" : "'F'") + ", "
+			+ "CreateSeqMsgId = '" + bean.getCreateSeqMsgId() + "'";
+	try {
+		getStatement().executeUpdate(query);
+		return true;
+	} catch (SQLException ex) {
+		throw new RuntimeException(ex.getMessage());
+	}
+		
+	}
+	
+	public boolean updateStorageMapBean(StorageMapBean bean) {
+		String query = ("UPDATE StorageMap SET " +
+				"SKey = '" + bean.getKey() + "', " 
+				+ "MsgNo = " + bean.getMsgNo() +", "
+				+ "SequenceId = '" + bean.getSequenceId() + "'");
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());
+		}
+	}
+	
+	public boolean updateSequencePropertyBean(SequencePropertyBean bean) {
+		String query = ("UPDATE SequenceProperty SET " 
+				+ "SequenceId = '" + bean.getSequenceId() + "', " 
+				+"Name = '" + bean.getName() +"', "
+				+ "Value = '" + bean.getValue() + "'");
+		try {
+			getStatement().executeUpdate(query);
+			return true;
+		} catch (SQLException ex) {
+			throw new RuntimeException(ex.getMessage());
+		}
+	}
+	
+	public static void main(String[] args) {
+		PermanentStorageMgr mgr = PermanentStorageMgr.getInstance();
+//		CreateSeqBean bean = new CreateSeqBean();
+//		bean.setCreateSeqMsgId("101010");
+//		bean.setSequenceId("232323");
+//		mgr.createCreateSeq(bean);
+		
+//		NextMsgBean bean = new NextMsgBean();
+//		bean.setSequenceId("10");
+//		bean.setNextMsgNoToProcess("20");
+//		mgr.createNextMsg(bean);
+//		
+//		NextMsgBean bean3 = new NextMsgBean();
+//		bean3.setSequenceId("10");
+//		bean3.setNextMsgNoToProcess("30");
+//		mgr.updateNextMsgBean(bean3);
+//		NextMsgBean bean2 = mgr.retrieveNextMsgBean("10");
+//		System.out.println(bean2.getSequenceId() + " " + bean2.getNextMsgNoToProcess());
+		
+//		RetransmitterBean bean = new RetransmitterBean();
+//		bean.setKey("1010");
+//		bean.setCreateSeqMsgId("seqMsgId");
+//		bean.setLastSentTime(Long.parseLong("10000"));
+//		bean.setMessageId("msgId");
+//		bean.setSend(true);
+//		
+//		mgr.createRetransmitterBean(bean);
+	//	mgr.deleteRetransmitterBean("1010");
+		
+//		RetransmitterBean bean3 = new RetransmitterBean();
+//		bean3.setCreateSeqMsgId("setMsgIdUpdate");
+//		bean3.setKey("1010");
+//		bean3.setLastSentTime(Long.parseLong("20000"));
+//		bean3.setMessageId("msgIdUpdated");
+//		bean.setSend(false);
+//		mgr.updateRetransmitterBean(bean3);
+//		
+//		
+//		RetransmitterBean bean2 = mgr.retrieveRetransmitterBean("1010");
+//		System.out.println(bean2.getCreateSeqMsgId() + "," + bean2.getKey()
+//				+ "," + bean2.getLastSentTime() + ","
+//				+ bean2.getMessageId()+ ",'"
+//				+ bean2.isSend());
+		
+		
+		
+		
+		
+//		CreateSeqBean bean2 = mgr.retrieveCreateSeq("101010");
+//		System.out.println(bean2.getCreateSeqMsgId() + "  " + bean2.getSequenceId());
+//		System.out.println("done");
+//		CreateSeqBean bean2 = new CreateSeqBean();
+//		bean2.setCreateSeqMsgId("101010");
+//		bean2.setSequenceId("454545");
+//		mgr.updateCreateSeq(bean2);
+//		
+//		mgr.deleteCreateSeq("101010");
+//		CreateSeqBean bean3 = mgr.retrieveCreateSeq("101010");
+//		System.out.println(bean3.getSequenceId());
+//		
+		
+		//mgr.createCreateSeq()
+		
+//		StorageMapBean bean = new StorageMapBean();
+//		bean.setKey("1010");
+//		bean.setMsgNo(Integer.parseInt("1"));
+//		bean.setSequenceId("seqId");
+//		mgr.createStorageMapBean(bean);
+//		
+//		StorageMapBean bean2 = new StorageMapBean();
+//		bean2.setKey("1010");
+//		bean2.setMsgNo(2);
+//		bean2.setSequenceId("seqIdUpdated");
+//		mgr.updateStorageMapBean(bean2);
+//		
+//		StorageMapBean retrieveStorageMapBean = mgr.retrieveStorageMapBean("1010");
+//		System.out.println(retrieveStorageMapBean.getKey()+ "," + retrieveStorageMapBean.getMsgNo()+ "," + retrieveStorageMapBean.getSequenceId());
+//		
+		SequencePropertyBean bean = new SequencePropertyBean();
+		bean.setName("name");
+		bean.setValue("value");
+		bean.setSequenceId("10");
+		mgr.createSequencePropertyBean(bean);
+		
+		bean.setName("nameUpdated");
+		bean.setValue("valueUpdate");
+		mgr.updateSequencePropertyBean(bean);
+		//mgr.deleteSequencePropertyBean("10");
+		
+		SequencePropertyBean retrieveSequencePropertyBean = mgr.retrieveSequencePropertyBean("10");
+		System.out.println(retrieveSequencePropertyBean.getSequenceId()+ "," + retrieveSequencePropertyBean.getName() + "," + retrieveSequencePropertyBean.getValue());
+		
+	}
 }

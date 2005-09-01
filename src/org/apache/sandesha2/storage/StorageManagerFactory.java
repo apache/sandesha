@@ -24,9 +24,7 @@ import org.apache.sandesha2.Constants;
  * 
  */
 public class StorageManagerFactory {
-	
-
-	
+		
 	public static StorageManager getStorageManager(int storageType) {
 		if (storageType == Constants.STORAGE_TYPE_IN_MEMORY) {
 			return InMemoryStorageMgr.getInstance();

@@ -25,7 +25,7 @@ public class RetransmitterBean implements RMBean{
 
 	private String MessageId;
 	private String Key;
-	private String LastSentTime;
+	private long LastSentTime;
 	private boolean Send; 
 	private String CreateSeqMsgId;
 	
@@ -57,13 +57,13 @@ public class RetransmitterBean implements RMBean{
 	/**
 	 * @return Returns the lastSentTime.
 	 */
-	public String getLastSentTime() {
+	public long getLastSentTime() {
 		return LastSentTime;
 	}
 	/**
 	 * @param lastSentTime The lastSentTime to set.
 	 */
-	public void setLastSentTime(String lastSentTime) {
+	public void setLastSentTime(long lastSentTime) {
 		LastSentTime = lastSentTime;
 	}
 	/**
