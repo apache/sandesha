@@ -18,6 +18,10 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.wsdl.extensions.soap.SOAPBinding;
+import javax.wsdl.extensions.soap.SOAPBody;
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
@@ -26,71 +30,80 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class SequenceFault implements IOMRMElement {
 	private OMElement sequenceFaultElement;
 	private FaultCode faultCode;
 	
-	OMNamespace sequenceFaultNameSpace = 
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(
+	OMNamespace rmNamespace = 
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
 				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
 	public SequenceFault(){
-		sequenceFaultElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
-				Constants.WSRM.SEQUENCE_FAULT,sequenceFaultNameSpace);
+		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_FAULT,rmNamespace);
 	}
-	public OMElement getSOAPElement() throws OMException {
-		sequenceFaultElement.addChild(faultCode.getSOAPElement());
+	
+	public OMElement getOMElement() throws OMException {
 		return sequenceFaultElement;
 	}
 
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		//only for fault thus not intereated in refactoring
-		Iterator iterator = envelope.getChildren();
-		OMElement childElement;
-		OMElement siblings;
-		OMElement grandSiblings;
-		while(iterator.hasNext()){
-			childElement = (OMElement)iterator.next();
-			Iterator iteSib1 = childElement.getChildren();
-			while(iteSib1.hasNext()){
-				siblings = (OMElement)iteSib1.next();
-				Iterator iteSib2 = siblings.getChildren(); 
-				while(iteSib2.hasNext()){
-					grandSiblings = (OMElement)iteSib2.next();
-					if(grandSiblings.getLocalName().equals(Constants.WSRM.SEQUENCE_FAULT)){
-						faultCode = new FaultCode();
-						faultCode.fromSOAPEnvelope(envelope);
-					}
-				}
-			}
+	public Object fromOMElement(OMElement body) throws OMException {
+		
+		if (body==null || !(body instanceof SOAPBody))
+			throw new OMException ("Cant get Sequence Fault part from a non-header element");
+		
+		OMElement sequenceFaultPart = body.getFirstChildWithName( 
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_FAULT));
+		
+		if (sequenceFaultPart==null)
+			throw new OMException ("The passed element does not contain a Sequence Fault element");
+		
+		OMElement faultCodePart = sequenceFaultPart.getFirstChildWithName( 
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.FAULT_CODE));
+		
+		if (faultCodePart!=null) {
+		    faultCode = new FaultCode ();
+		    faultCode.fromOMElement(sequenceFaultPart);
 		}
+		
+		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_FAULT,rmNamespace);
+		
 		return this;
+		
 	}
 
-	public OMElement toSOAPEnvelope(OMElement envelope) throws OMException {
-//		soapelevement will be given here. 
-		SOAPEnvelope soapEnvelope = (SOAPEnvelope)envelope;
+	public OMElement toOMElement(OMElement body) throws OMException {
+
+		if (body==null || !(body instanceof SOAPBody))
+			throw new OMException ("Cant get Sequence Fault part from a non-header element");
+
+		if (sequenceFaultElement==null)
+			throw new OMException ("Cant add the sequnce fault since the internal element is null");
 		
-		SOAPHeader soapHeader = soapEnvelope.getHeader();
-		SOAPHeaderBlock soapHeaderBlock = soapHeader.addHeaderBlock(
-				Constants.WSRM.SEQUENCE_FAULT,sequenceFaultNameSpace);
-		soapHeaderBlock.setMustUnderstand(true);
+		if (faultCode!=null) 
+			faultCode.toOMElement(sequenceFaultElement);
 		
+		body.addChild(sequenceFaultElement);
+
+		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_FAULT,rmNamespace);
 		
-        if (faultCode != null) {
-            faultCode.toSOAPEnvelope(soapHeaderBlock);
-        }
-		
-		return envelope;
-		
+		return body;
 	}
+	
 	public void setFaultCode(FaultCode faultCode){
 		this.faultCode = faultCode;
 	}
+	
 	public FaultCode getFaultCode(){
 		return faultCode;
 	}

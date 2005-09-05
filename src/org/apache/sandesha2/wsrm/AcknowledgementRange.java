@@ -18,101 +18,110 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
+import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.OMNode;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
+ * @author chamikara
+ * @author sanka
  */
+
 public class AcknowledgementRange implements IOMRMElement {
 	private OMElement acknowledgementRangeElement;
-	private long maxValue;
-	private long minValue;
-	OMNamespace ackRangeNamespace = 
-        OMAbstractFactory.getSOAP11Factory().createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	private long upperValue;
+	private long lowerValue;
+	
+	OMNamespace rmNamespace = 
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
 	public AcknowledgementRange(){
-		acknowledgementRangeElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
-				Constants.WSRM.ACK_RANGE,ackRangeNamespace);
+		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_RANGE,rmNamespace);
 	}
-	public OMElement getSOAPElement() throws OMException {
-		acknowledgementRangeElement.addAttribute(Constants.WSRM.LOWER,
-				new Long(minValue).toString(),ackRangeNamespace);
-		acknowledgementRangeElement.addAttribute(Constants.WSRM.UPPER,
-				new Long(maxValue).toString(),ackRangeNamespace);
+	
+	public OMElement getOMElement() throws OMException {
 		return acknowledgementRangeElement;
 	}
+	
+	public Object fromOMElement(OMElement ackRangePart) throws OMException{
+		
+		/*OMElement ackRangePart = sequenceAckElement.getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.ACK_RANGE)); */
+		
+		if (ackRangePart==null)
+			throw new OMException ("The passed element is null");
 
-	private boolean readACKRangeElement(OMElement element){
-		Iterator iterator = element.getChildren();
-		while(iterator.hasNext()){
-			OMNode omNode = (OMNode)iterator.next();
-			if(omNode.getType() != OMNode.ELEMENT_NODE){
-				continue;
-			}
-			OMElement childElement = (OMElement)omNode;
-			if(childElement.getLocalName().equals(Constants.WSRM.ACK_RANGE)){
-				Iterator ite = childElement.getAttributes();
-				while(ite.hasNext()){
-					OMAttribute attr = (OMAttribute)ite.next();
-					if (attr.getLocalName().equals(Constants.WSRM.LOWER)){
-						minValue = Long.parseLong(attr.getValue());
-					}
-					else{										
-						maxValue = Long.parseLong(attr.getValue());
-						return true;
-					}
-				}
-			}else{
-				readACKRangeElement(childElement);
-			}
+		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName (Constants.WSRM.LOWER));
+		OMAttribute upperAttrib = ackRangePart.getAttribute(new QName (Constants.WSRM.UPPER));
+		
+		if (lowerAttrib==null || upperAttrib==null)
+			throw new OMException ("Passed element does not contain upper or lower attributes");
+		
+		try{
+			long lower = Long.parseLong(lowerAttrib.getValue());
+			long upper = Long.parseLong(upperAttrib.getValue());
+			upperValue = upper;
+			lowerValue = lower;
+		}catch (Exception ex) {
+			throw new OMException ("The ack range does not have proper long values for Upper and Lower attributes");
 		}
-		return false;
-	}
-	//this fromSOAPEnvelope(OMElement element) for the purpose of making the coming iteration easier
-	public Object fromSOAPEnvelope(OMElement element) throws OMException{
-		Iterator iterator = element.getAttributes();
-		while(iterator.hasNext()){
-			OMAttribute attr = (OMAttribute)iterator.next();
-			if (attr.getLocalName().equals(Constants.WSRM.LOWER)){
-				minValue = Long.parseLong(attr.getValue());
-			}
-			else{										
-				maxValue = Long.parseLong(attr.getValue());
-			}
-		}
+		
+		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_RANGE,rmNamespace);
+		
 		return this;
 	} 		
+
+	public OMElement toOMElement(OMElement sequenceAckElement) throws OMException {
+
+		if (sequenceAckElement==null)
+			throw new OMException ("Cant set Ack Range part since element is null");
+		
+		if (upperValue<=0 || lowerValue<=0 || lowerValue>upperValue) 
+			throw new OMException ("Cant set Ack Range part since Upper or Lower is not set to the correct value");
+		
+		OMAttribute lowerAttrib = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
+				Constants.WSRM.LOWER,rmNamespace,Long.toString(lowerValue));
+		OMAttribute upperAttrib = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
+				Constants.WSRM.UPPER,rmNamespace,Long.toString(upperValue));
+		
+		acknowledgementRangeElement.addAttribute(lowerAttrib);
+		acknowledgementRangeElement.addAttribute(upperAttrib);
+		
+		sequenceAckElement.addChild(acknowledgementRangeElement);
+		
+		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_RANGE,rmNamespace);
+		
+		return sequenceAckElement;
+	}
 	
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		readACKRangeElement(envelope);
-		return this;
+	public long getLowerValue() {
+		return lowerValue;
 	}
 
-	public OMElement toSOAPEnvelope(OMElement messageElement) throws OMException {
-		acknowledgementRangeElement.addAttribute(Constants.WSRM.LOWER,
-				new Long(minValue).toString(),ackRangeNamespace);
-		acknowledgementRangeElement.addAttribute(Constants.WSRM.UPPER,
-				new Long(maxValue).toString(),ackRangeNamespace);
-		messageElement.addChild(acknowledgementRangeElement);
-		return messageElement;
-	}
-	public void setMinValue(long minValue){
-		this.minValue = minValue;
-	}
-	public void setMaxValue(long maxValue){
-		this.maxValue = maxValue;		
-	}
-	public long getMinValue(){
-		return minValue;
-	}
-	public long getMaxValue(){
-		return maxValue;
+	public void setLowerValue(long lowerValue) {
+		this.lowerValue = lowerValue;
 	}
 
+	public long getUpperValue() {
+		return upperValue;
+	}
+
+	public void setUpperValue(long upperValue) {
+		this.upperValue = upperValue;
+	}
 }

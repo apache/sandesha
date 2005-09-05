@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.handlers;
 
+import java.util.ArrayList;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.MessageContext;
@@ -27,6 +29,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorException;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 
 /**
  * @author 

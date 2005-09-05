@@ -18,6 +18,8 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
@@ -25,62 +27,75 @@ import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.OMNode;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class Nack implements IOMRMElement {
 	private OMElement nackElement;
-	private long notAckNumber;
-	OMNamespace nackNamespace =
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	private long nackNumber;
+	
+	OMNamespace rmNamespace =
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
 	public Nack(){
-		nackElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
-				Constants.WSRM.NACK,nackNamespace);
+		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.NACK,rmNamespace);
 	}
-	public OMElement getSOAPElement() throws OMException {
-		nackElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
-				new Long(notAckNumber).toString()));
+	
+	public OMElement getOMElement() throws OMException {
 		return nackElement;
 	}
-	private boolean readNackElement(OMElement element){
-		Iterator iterator = element.getChildren();
-		while(iterator.hasNext()){
-			OMNode omNode = (OMNode)iterator.next();
-			if(omNode.getType() != OMNode.ELEMENT_NODE){
-				continue;
-			}
-			OMElement childElement = (OMElement)omNode;
-			if(childElement.getLocalName().equals(Constants.WSRM.NACK)){
-				notAckNumber = Long.parseLong(childElement.getText());
-				return true;
-			}else{
-				readNackElement(childElement);
-			}
+	
+
+	public Object fromOMElement(OMElement nackElement) throws OMException{
+		/*OMElement nackPart = sequenceAckElement.getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.NACK));*/
+		
+		if (nackElement==null)
+			throw new OMException ("Passed seq ack element does not contain a nack part");
+		
+		try {
+			nackNumber = Long.parseLong(nackElement.getText());
+		}catch (Exception ex ) {
+			throw new OMException ("Nack element does not contain a valid long value");
 		}
-		return false;	
-	}
-	//duplicate method for the purpose of using comming iteration easily
-	public Object fromSOAPEnvelope(OMElement element) throws OMException{
-		notAckNumber = Long.parseLong(element.getText());
+		
+		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.NACK,rmNamespace);
+		
 		return this;
 	} 
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		readNackElement(envelope);
-		return this;
-	}
-	public OMElement toSOAPEnvelope(OMElement messageElement) throws OMException {
-		nackElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
-				new Long(notAckNumber).toString()));
-		messageElement.addChild(nackElement);
-		return messageElement;
-	}
-	public void setNackNumber(long notAckNumber){
-		this.notAckNumber = notAckNumber;
-	}
-	public long getNackNumber(){
-		return notAckNumber;
+	
+	public OMElement toOMElement(OMElement sequenceAckElement) throws OMException {
+		if (sequenceAckElement==null)
+			throw new OMException ("Cant set the nack part since the seq ack element is null");
+		
+		if (nackNumber<=0)
+			throw new OMException ("Cant set the nack part since the nack number does not have a valid value");
+		
+		if (nackElement==null) 
+		    throw new OMException ("Cant set the nack part since the element is null");
+		
+		nackElement.setText(Long.toString(nackNumber));
+		sequenceAckElement.addChild(nackElement);
+
+		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.NACK,rmNamespace);
+		
+		return sequenceAckElement;
 	}
 
+	public long getNackNumber() {
+		return nackNumber;
+	}
+
+	public void setNackNumber(long nackNumber) {
+		this.nackNumber = nackNumber;
+	}
+	
 }

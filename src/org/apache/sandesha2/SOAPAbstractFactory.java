@@ -14,21 +14,26 @@
  *  limitations under the License.
  *
  */
-package org.apache.sandesha2.wsrm;
+
+package org.apache.sandesha2;
+
+import org.apache.axis2.om.OMAbstractFactory;
+import org.apache.axis2.soap.SOAPFactory;
 
 /**
- * @author Saminda
  * @author chamikara
  * @author sanka
  */
 
 
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMException;
-import org.apache.axis2.soap.SOAPEnvelope;
+public class SOAPAbstractFactory {
 
-public interface IOMRMElement {
-	public OMElement getOMElement() throws OMException;
-	public Object fromOMElement(OMElement element) throws OMException;
-	public OMElement toOMElement(OMElement element) throws OMException;
+	public static SOAPFactory getSOAPFactory (int SOAPVersion) {
+		if (SOAPVersion==Constants.SOAP_1_1)
+			return OMAbstractFactory.getSOAP11Factory();
+		else if(SOAPVersion==Constants.SOAP_1_2)
+			return OMAbstractFactory.getSOAP12Factory();
+		else
+			return null;
+	}
 }

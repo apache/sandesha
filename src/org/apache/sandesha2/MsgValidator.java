@@ -21,8 +21,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 
 /**
- * @author 
+ * @author chamikara
+ * @author sanka
  */
+
 public class MsgValidator {
 
 	public static void validateMessage(RMMsgContext rmMsgCtx) throws AxisFault{

@@ -33,8 +33,10 @@ import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
- * @author
+ * @author chamikara
+ * @author sanka
  */
+
 public class RMMsgContext {
 	
 	private MessageContext msgContext;

@@ -19,6 +19,8 @@ package org.apache.sandesha2.wsrm;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -29,74 +31,75 @@ import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.OMNode;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
+
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class AcksTo implements IOMRMElement{
-	private EndpointReference EPR;
+	
+	private Address address;
 	private OMElement acksToElement;
 	//private OMElement addressElement;
 	
-	OMNamespace acksToNameSpace = 
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(
+	OMNamespace rmNamespace = 
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
 				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	public AcksTo(EndpointReference EPR){
-		acksToElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
-				Constants.WSRM.ACKS_TO,acksToNameSpace);
-		//addressElement = acksToElement;
-		
-		this.EPR = EPR;
-	}
-	public OMElement getSOAPElement() throws OMException {
-		OMElement addressElement = OMAbstractFactory.getSOAP11Factory().createOMElement(AddressingConstants.EPR_ADDRESS,
-				Constants.WSA.NS_ADDRESSING,AddressingConstants.WSA_DEFAULT_PRFIX);
-		addressElement.addChild(OMAbstractFactory.getSOAP11Factory()
-				.createText(EPR.getAddress()));
-		acksToElement.addChild(addressElement);
-		return acksToElement;
-	}
-
-	public boolean readEPRElement(OMElement element){
-		Iterator iterator = element.getChildren();
-		while(iterator.hasNext()){
-			OMNode omNode = (OMNode)iterator.next();
-			if(omNode.getType() != OMNode.ELEMENT_NODE){
-				continue;
-			}else{
-				OMElement omElement = (OMElement)omNode;
-				if (omElement.getLocalName().equals(Constants.WSRM.ACKS_TO)){
-					OMElement addressElement = omElement.getFirstChildWithName(
-							new QName(AddressingConstants.EPR_ADDRESS));
-					String uri = addressElement.getText();
-					EPR = new EndpointReference(uri);
-					return true;
-				}else{
-					readEPRElement(omElement);
-				}
-			}			
-		}
-		return false;
-	}
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		readEPRElement(envelope);
-		return this;
-	}
-	public OMElement toSOAPEnvelope(OMElement messageElement) throws OMException {
-		OMElement addressElement = OMAbstractFactory.getSOAP11Factory().createOMElement(AddressingConstants.EPR_ADDRESS,
-				Constants.WSA.NS_ADDRESSING,AddressingConstants.WSA_DEFAULT_PRFIX);
-		addressElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
-				EPR.getAddress()));
-		acksToElement.addChild(addressElement);
-		
-		messageElement.addChild(acksToElement);
-		return messageElement;
-	}
-	public EndpointReference getEndPointReference(){
-		return EPR;
-	}
-	public void setEndPointReference(EndpointReference EPR){
-		this.EPR = EPR;
+	
+	public AcksTo(){
+		acksToElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACKS_TO,rmNamespace);
 	}
 	
+	public OMElement getOMElement() throws OMException {
+		return acksToElement;
+	}
+	
+	public Object fromOMElement(OMElement element) throws OMException {
+		OMElement acksToPart = element.getFirstChildWithName( new QName (
+				Constants.WSRM.NS_URI_RM,Constants.WSRM.ACKS_TO));
+		
+
+		
+		if (acksToPart==null)
+			throw new OMException ("Passed element does not contain an acksTo part");
+		
+		address = new Address ();
+		address.fromOMElement(acksToPart);
+		
+		acksToElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACKS_TO,rmNamespace);
+		
+		return this;
+	}
+	
+	public OMElement toOMElement(OMElement element) throws OMException {
+		
+		if (acksToElement==null)
+			throw new OMException ("Cant set AcksTo. AcksTo element is null");
+		if (address==null)
+			throw new OMException ("Cant set AcksTo. Address is null");
+		
+		OMElement acksToPart = element.getFirstChildWithName( 
+				new QName (Constants.WSA.NS_URI_ADDRESSING,Constants.WSRM.ACKS_TO));
+		
+		address.toOMElement(acksToElement);
+		element.addChild(acksToElement);
+		
+		acksToElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACKS_TO,rmNamespace);
+
+		return element;
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 }

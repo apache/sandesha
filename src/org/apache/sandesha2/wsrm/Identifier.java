@@ -18,9 +18,13 @@ package org.apache.sandesha2.wsrm;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 import java.util.Iterator;
+
+import javax.xml.namespace.QName;
 
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
@@ -29,18 +33,18 @@ import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.OMNode;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class Identifier implements Constants, IOMRMElement {
+	
 	private OMElement identifierElement;
+	private String identifier=null;
 
-	private String identifier;
-
-	OMNamespace wsuNamespace = OMAbstractFactory.getSOAP11Factory().createOMNamespace(
+	OMNamespace wsuNamespace = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public Identifier() {
-
-		identifierElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
+		identifierElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
 	}
 
@@ -52,63 +56,44 @@ public class Identifier implements Constants, IOMRMElement {
 		return identifier;
 	}
 
-	public OMElement getSOAPElement() throws OMException {
-		identifierElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
-				identifier));
+	public OMElement getOMElement () throws OMException {
 		return identifierElement;
 	}
 
-	private boolean readElement(OMElement element) {
-		Iterator iterator = element.getChildren();
-		while (iterator.hasNext()) {
-			OMNode omnode = (OMNode)iterator.next();
-			if(omnode.getType() != OMNode.ELEMENT_NODE){
-				continue ;
-			}				
-			OMElement childElement = (OMElement)omnode ;
-			if (childElement.getLocalName().equals(Constants.WSRM.IDENTIFIER)) {
-				identifier = childElement.getText();
-				return true;
-			}else {
-			   readElement(childElement);	
-			}
-		}
-		return false;
-	}
-
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		readElement(envelope);
+	public Object fromOMElement(OMElement element) throws OMException {
+		OMElement identifierPart = element.getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.IDENTIFIER));
+		if (identifierPart==null)
+			throw new OMException ("The parsed element does not contain an identifier part");
+		identifierElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.IDENTIFIER, wsuNamespace);
+		
+		String identifierText = identifierPart.getText();
+		if (identifierText==null || identifierText=="")
+			throw new OMException ("The identifier value is not valid");
+		
+		identifier = identifierText;
 		return this;
 	}
 
-	public OMElement toSOAPEnvelope(OMElement messageElement)
+	public OMElement toOMElement(OMElement element)
 			throws OMException {
-		//soapheaderblock will be given or anyother block reference to the requirment
+		
 		if (identifier == null || identifier == "") {
 			throw new OMException("identifier is not set .. ");
 		}
-		identifierElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
-				identifier));
-		messageElement.addChild(identifierElement);
-		return messageElement;
+		
+		identifierElement.setText(identifier);
+		element.addChild(identifierElement);
+		
+		identifierElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.IDENTIFIER, wsuNamespace);
+		
+		return element;
 	}
 
 	public String toString() {
 		return identifier;
-	}
-
-	public boolean equals(Object obj) {
-
-		if (obj instanceof Identifier) {
-			if (this.identifier == ((String) (((Identifier) obj)
-					.getIdentifier()))) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
 	}
 
 	public int hashCode() {

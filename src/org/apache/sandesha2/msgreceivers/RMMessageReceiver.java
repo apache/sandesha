@@ -17,6 +17,11 @@
 
 package org.apache.sandesha2.msgreceivers;
 
+import java.util.ArrayList;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -28,8 +33,11 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.receivers.AbstractInMessageReceiver;
+import org.apache.axis2.receivers.AbstractInOutAsyncMessageReceiver;
 import org.apache.axis2.receivers.AbstractInOutSyncMessageReceiver;
 import org.apache.axis2.receivers.AbstractMessageReceiver;
+import org.apache.axis2.receivers.ServerCallback;
 import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -40,6 +48,12 @@ import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.wsrm.CreateSequence;
+import org.apache.sandesha2.wsrm.CreateSequenceResponse;
+
+import com.bea.xml.stream.XMLWriterBase;
 
 /**
  * @author
@@ -47,7 +61,8 @@ import org.apache.sandesha2.RMMsgCreator;
 
 public class RMMessageReceiver extends AbstractMessageReceiver {
 
-	public void invokeBusinessLogic(MessageContext inMessage,
+	
+	public void setCreateSequence(MessageContext inMessage,
 			MessageContext outMessage) throws AxisFault {
 
 		System.out.println("RM Msg Receiver was called");
@@ -58,8 +73,25 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 			RMMsgContext createSeqResponse = RMMsgCreator
 					.createCreateSeqResponseMsg(rmMsgCtx, outMessage);
+			
+			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.
+								getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE);
+			
+			String newSequenceId = createSeqResPart.getIdentifier().getIdentifier();
+			
+			if (newSequenceId==null)
+				throw new AxisFault ("Internal error - Generated sequence id is null");
+			
+			
+			//TODO: put below to SequenceManager.setUpNewSequence ();
+			ArrayList arr;
+			SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_RECEIVED_MSG_LIST,arr = new ArrayList());
+			SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.STORAGE_TYPE_IN_MEMORY);
+			System.out.println ("put --" + newSequenceId + "--" + Constants.SEQ_PROPERTY_RECEIVED_MSG_LIST);
+			beanMgr.create(seqPropBean);
+			
+			arr.add("bbb");
 
-			//createSeqResponse.serializeSOAPEnvelop();
 			outMessage.setResponseWritten(true);
 		} else {
 			outMessage.setResponseWritten(true);
@@ -69,55 +101,32 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 	public final void receive(MessageContext messgeCtx) throws AxisFault {
 
+		System.out.println ("within RM Msg receiver");
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
 		MsgValidator.validateMessage(rmMsgCtx);
 
+		AbstractMessageReceiver msgReceiver = null;
 		if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
-			MessageContext newmsgCtx = new MessageContext(messgeCtx
-					.getSystemContext(), messgeCtx.getSessionContext(),
-					messgeCtx.getTransportIn(), messgeCtx.getTransportOut());
-
-			newmsgCtx
-					.setMessageInformationHeaders(new MessageInformationHeaders());
-			MessageInformationHeaders oldMessageInfoHeaders = messgeCtx
-					.getMessageInformationHeaders();
-			MessageInformationHeaders messageInformationHeaders = new MessageInformationHeaders();
-			messageInformationHeaders.setTo(oldMessageInfoHeaders.getReplyTo());
-			messageInformationHeaders.setFaultTo(oldMessageInfoHeaders
-					.getFaultTo());
-			messageInformationHeaders.setFrom(oldMessageInfoHeaders.getTo());
-			messageInformationHeaders
-					.setRelatesTo(new RelatesTo(
-							oldMessageInfoHeaders.getMessageId(),
-							AddressingConstants.Submission.WSA_RELATES_TO_RELATIONSHIP_TYPE_DEFAULT_VALUE));
-			newmsgCtx.setMessageInformationHeaders(messageInformationHeaders);
-			newmsgCtx.setOperationContext(messgeCtx.getOperationContext());
-			newmsgCtx.setServiceContext(messgeCtx.getServiceContext());
-			newmsgCtx.setProperty(MessageContext.TRANSPORT_OUT, messgeCtx
-					.getProperty(MessageContext.TRANSPORT_OUT));
-			newmsgCtx.setProperty(HTTPConstants.HTTPOutTransportInfo, messgeCtx
-					.getProperty(HTTPConstants.HTTPOutTransportInfo));
-
-			//Setting the charater set encoding
-			newmsgCtx
-					.setProperty(
-							MessageContext.CHARACTER_SET_ENCODING,
-							messgeCtx
-									.getProperty(MessageContext.CHARACTER_SET_ENCODING));
-
-			newmsgCtx.setDoingREST(messgeCtx.isDoingREST());
-			newmsgCtx.setDoingMTOM(messgeCtx.isDoingMTOM());
-			newmsgCtx.setServerSide(messgeCtx.isServerSide());
-
-			invokeBusinessLogic(messgeCtx, newmsgCtx);
-
-			AxisEngine engine = new AxisEngine(messgeCtx.getOperationContext()
-					.getServiceContext().getEngineContext());
-			engine.send(newmsgCtx);
+			
+			CreateSequence createSeqPart = (CreateSequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+			if (createSeqPart==null)
+				throw new AxisFault ("No create sequence part in create sequence message");
+			
+			//String acksTo = createSeqPart.getAcksTo().getEndPointReference().toString();
+			String from = messgeCtx.getFrom().getAddress();
+			if(from.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
+				msgReceiver = new RMInOutSyncMsgReceiver ();
+			} else {
+				msgReceiver = new RMInOutAsyncMsgReceiver ();
+			}
+			
 		} else {
 			//TODO: Check weather terminate
-			  
-			//TODO: Do terminate processing
+			msgReceiver = new RMInMsgReceiver ();
+		}
+		
+		if(msgReceiver!=null) {
+			msgReceiver.receive(messgeCtx);
 		}
 	}
 
@@ -133,6 +142,49 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 					"Unknown SOAP Version. Current Axis handles only SOAP 1.1 and SOAP 1.2 messages");
 		}
 		return fac;
+	}
+	
+	private class RMInMsgReceiver extends AbstractInMessageReceiver {
+		
+		public void invokeBusinessLogic(MessageContext inMessage) throws AxisFault {
+			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+			MsgValidator.validateMessage(rmMsgCtx);
+			
+			//TODO check for terminate sequence.
+			//TODO handle terminate sequence.
+			
+			
+		}
+	}
+	
+	private class RMInOutSyncMsgReceiver extends AbstractInOutSyncMessageReceiver {
+		
+		public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {
+			
+			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+			MsgValidator.validateMessage(rmMsgCtx);
+			
+			if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ) {
+				//TODO handle sync create seq.
+				setCreateSequence(inMessage,outMessage);
+			}
+			
+		}
+}
+	
+	private class RMInOutAsyncMsgReceiver extends AbstractInOutAsyncMessageReceiver {
+		
+		public void invokeBusinessLogic(MessageContext inMessage,
+				MessageContext outMessage, ServerCallback callback) throws AxisFault {
+			
+			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+			MsgValidator.validateMessage(rmMsgCtx);
+			
+			if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ) {
+				//TODO handle async create seq.
+				setCreateSequence(inMessage,outMessage);
+			}
+		}
 	}
 
 }

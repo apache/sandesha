@@ -18,6 +18,8 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
@@ -25,60 +27,64 @@ import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.OMNode;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class LastMessage implements IOMRMElement {
 
 	private OMElement lastMessageElement;
 	OMNamespace lastMsgNamespace =
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
 	public LastMessage(){
-		lastMessageElement = OMAbstractFactory.getSOAP11Factory().createOMElement(Constants.WSRM.LAST_MSG,lastMsgNamespace);	
+		lastMessageElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.LAST_MSG,lastMsgNamespace);	
 	}
-	public OMElement getSOAPElement() throws OMException {
+	
+	public OMElement getOMElement() throws OMException {
 		return lastMessageElement;
 	}
-
-	private boolean readMNElement(OMElement element){
-		Iterator iterator = element.getChildren();
-		while(iterator.hasNext()){
-			OMNode omNode = (OMNode)iterator.next();
-			if( omNode.getType() != OMNode.ELEMENT_NODE){
-				continue;
-			}
-			OMElement childElement = (OMElement)omNode;
-			if (childElement.getLocalName().equals(Constants.WSRM.LAST_MSG)){
-				lastMessageElement = childElement;
-				return true;
-			}else{
-				readMNElement(childElement);
-			}
-		}
-		return false;
-	}
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		readMNElement(envelope);
+	
+	public Object fromOMElement(OMElement element) throws OMException {
+		OMElement lastMessagePart = element.getFirstChildWithName( 
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.LAST_MSG));
+		if (lastMessagePart==null)
+			throw new OMException ("The passed element does not contain a Last Message part");
+		
+		lastMessageElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.LAST_MSG,lastMsgNamespace);
+		
 		return this;
 	}
 
 	
-	public OMElement toSOAPEnvelope(OMElement messageElement) throws OMException {
+	public OMElement toOMElement(OMElement sequenceElement) throws OMException {
 		//soapheaderblock element will be given
-		messageElement.addChild(lastMessageElement);
-		return messageElement;
+		if(lastMessageElement==null)
+			throw new OMException ("Cant set last message element. It is null");
+		
+		sequenceElement.addChild(lastMessageElement);
+		
+		lastMessageElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.LAST_MSG,lastMsgNamespace);
+		
+		return sequenceElement;
 	}
+	
 	public void setLastMessageElement(OMElement lastMsgElement){
 		lastMessageElement = lastMsgElement;
 	}
+	
 	public OMElement getLastMessageElement(){
 		return lastMessageElement;
 	}
+	
 	public boolean isPresent(){
 		return (lastMessageElement != null) ? true:false;
 	}
-	
-
 }

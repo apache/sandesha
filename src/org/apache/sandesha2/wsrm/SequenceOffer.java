@@ -16,53 +16,87 @@
  */
 package org.apache.sandesha2.wsrm;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class SequenceOffer implements IOMRMElement {
 	private OMElement sequenceOfferElement;
-	private Identifier identifier;
+	private Identifier identifier=null;
+	private Expires expires=null;
 	
-	OMNamespace sequenceOfferNameSpace = 
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(
+	OMNamespace rmNamespace = 
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
 				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
 	public SequenceOffer(){
-		sequenceOfferElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
-				Constants.WSRM.SEQUENCE_OFFER,sequenceOfferNameSpace);
-	}
-	public void addChildElement(OMElement element) throws OMException{
-		sequenceOfferElement.addChild(element);
+		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
+									.createOMElement(Constants.WSRM.SEQUENCE_OFFER,rmNamespace);
 	}
 	
-	public OMElement getSOAPElement() throws OMException {
-		sequenceOfferElement.addChild(identifier.getSOAPElement());
+	public OMElement getOMElement() throws OMException {
 		return sequenceOfferElement;
 	}
 
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
+	public Object fromOMElement(OMElement createSequenceElement) throws OMException {
+		OMElement sequenceOfferPart = createSequenceElement.getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_OFFER));
+		if (sequenceOfferPart==null)
+			throw new OMException("The passed element does not contain a SequenceOffer part");
+		
+		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement( 
+									Constants.WSRM.SEQUENCE_OFFER,rmNamespace);
+		
 		identifier = new Identifier();
-		identifier.fromSOAPEnvelope(envelope);
+		identifier.fromOMElement(sequenceOfferPart);
+		
+		OMElement expiresPart = sequenceOfferPart.getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.EXPIRES));
+		if(expiresPart!=null){
+			expires = new Expires ();
+			expires.fromOMElement(sequenceOfferElement);
+		}
+		
 		return this;
 	}
 
-	public OMElement toSOAPEnvelope(OMElement messageElement) throws OMException {
-		if (identifier != null){
-			identifier.toSOAPEnvelope(sequenceOfferElement);
+	public OMElement toOMElement(OMElement createSequenceElement) throws OMException {
+		if(sequenceOfferElement==null)
+			throw new OMException ("Cant set sequnceoffer. Offer element is null");
+		if (identifier==null)
+			throw new OMException ("Cant set sequnceOffer since identifier is null");
+
+		
+	    identifier.toOMElement(sequenceOfferElement);
+	    
+		if(expires!=null) {
+			expires.toOMElement(sequenceOfferElement);
 		}
-		messageElement.addChild(sequenceOfferElement);
-		return messageElement;
+		
+		createSequenceElement.addChild(sequenceOfferElement);
+			
+		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+									Constants.WSRM.SEQUENCE_OFFER,rmNamespace);
+		
+		return createSequenceElement;
 	}
+	
 	public Identifier getIdentifer(){
 		return identifier;
 	}
+	
 	public void setIdentifier(Identifier identifier){
 		this.identifier = identifier;		
 	}

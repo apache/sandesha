@@ -18,8 +18,10 @@
 package org.apache.sandesha2;
 
 /**
- * @author  
+ * @author chamikara
+ * @author sanka
  */
+
 
 public interface Constants {
 
@@ -30,7 +32,7 @@ public interface Constants {
 
 		String NS_URI_CREATE_SEQ_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
 		
-		String MSG_NUMBER = "MessageaNumber";
+		String MSG_NUMBER = "MessageNumber";
 
 		String LAST_MSG = "LastMessage";
 
@@ -45,6 +47,8 @@ public interface Constants {
 		String SEQUENCE_FAULT = "SequenceFault";
 
 		String ACKS_TO = "AcksTo";
+		
+		String EXPIRES = "Expires";
 
 		String CREATE_SEQUENCE = "CreateSequence";
 
@@ -69,7 +73,12 @@ public interface Constants {
 
 	public interface WSA {
 		String NS_URI_ANONYMOUS = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
-		String NS_ADDRESSING = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
+		
+		String NS_URI_ADDRESSING = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
+		
+		String NS_PREFIX_ADDRESSING = "wsa";
+		
+		String ADDRESS = "Address";
 	}
 
 	String RM_HEADERS = "rmHeaders";
@@ -119,7 +128,21 @@ public interface Constants {
 	int MESSAGE_PART_CREATE_SEQ_RESPONSE = 5;
 
 	int MESSAGE_PART_TERMINATE_SEQ = 6;
+	
+	int MESSAGE_PART_ACK_REQUEST = 7;
 
 	int MAX_MSG_PART_ID = 6;
+	
+	int STORAGE_TYPE_IN_MEMORY = 1;
+	
+	int STORAGE_TYPE_PERSISTANCE = 2;
+	
+	String SEQ_PROPERTY_RECEIVED_MSG_LIST = "SeqMsgList";
+	
+	int SOAP_1_1 = 1;
+	
+	int SOAP_1_2 = 2;
+	
+	int DEFAULT_SOAP_VERSION = SOAP_1_2;
 
 }

@@ -50,8 +50,7 @@ public class ServerOutHandler extends AbstractHandler {
 		
 		if(requestRMMsgCtx.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ){
 			//set acknowledgement
-			RMMsgCreator.createAckMessage (rmMsgCtx);
-			
+			RMMsgCreator.createAckMessage (rmMsgCtx);	
 		}
 		
 	}

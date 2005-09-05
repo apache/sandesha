@@ -18,6 +18,8 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
@@ -26,20 +28,24 @@ import org.apache.axis2.om.OMNode;
 import org.apache.axis2.soap.SOAPEnvelope;
 
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class MessageNumber implements IOMRMElement {
 	
 	private long messageNumber;
 	private OMElement messageNoElement;
 	
 	OMNamespace msgNoNamespace =
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);	
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
 	public MessageNumber(){
-		messageNoElement = OMAbstractFactory.getSOAP11Factory().createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
 	}
 	
 	public long getMessageNumber(){
@@ -48,47 +54,37 @@ public class MessageNumber implements IOMRMElement {
 	public void setMessageNumber(long messageNumber){
 		this.messageNumber = messageNumber;
 	}
-	private boolean readMNElement(OMElement element) {
-		Iterator iterator = element.getChildren();
-		while (iterator.hasNext()) {
-			OMNode omnode = (OMNode)iterator.next();
-			if(omnode.getType() != OMNode.ELEMENT_NODE){
-				continue ;
-			}				
-			OMElement childElement = (OMElement)omnode ;
-			if (childElement.getLocalName().equals(Constants.WSRM.MSG_NUMBER)) {
-				messageNumber = Long.parseLong(childElement.getText());
-				return true;
-			}else {
-			   readMNElement(childElement);	
-			}
-		}
-		return false;
-	}
 	
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		readMNElement(envelope);
+	public Object fromOMElement(OMElement seqenceElement) throws OMException {
+		OMElement msgNumberPart = seqenceElement.getFirstChildWithName( 
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.MSG_NUMBER));
+		if (msgNumberPart==null)
+			throw new OMException ("The passed sequnce element does not contain a message number part");
+		
+		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+
+		String msgNoStr = msgNumberPart.getText();
+		messageNumber = Long.parseLong(msgNoStr);
 		return this;
 	}
-	public OMElement toSOAPEnvelope(OMElement messageElement) throws OMException {
-		//soapheaderblock element will be given. 
-		long msgNo = getMessageNumber();
-		if (msgNo <= 0 ){
+	
+	public OMElement toOMElement(OMElement element) throws OMException {
+		if (messageNumber <= 0 ){
 			throw new OMException("Set A Valid Message Number");
 		}
-		messageNoElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(
-				new Long(msgNo).toString()));
-		messageElement.addChild(messageNoElement);
 		
-		return messageElement;
+		messageNoElement.setText(Long.toString(messageNumber));
+		element.addChild(messageNoElement);
+		
+		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+		
+		return element;
 	}
-	public OMElement getSOAPElement() throws OMException {
-		long msgNo = getMessageNumber();
-		messageNoElement.addChild(OMAbstractFactory.getSOAP11Factory().createText(new 
-					Long(msgNo).toString()));
-		
+	
+	public OMElement getOMElement() throws OMException {
 		return messageNoElement;
 	}
+	
 	public OMElement getMessageNumberElement(){
 		return messageNoElement;
 	}

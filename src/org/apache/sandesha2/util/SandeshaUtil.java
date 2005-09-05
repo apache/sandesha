@@ -14,21 +14,19 @@
  *  limitations under the License.
  *
  */
-package org.apache.sandesha2.wsrm;
+package org.apache.sandesha2.util;
+
+import org.apache.axis2.om.impl.MIMEOutputUtils;
 
 /**
- * @author Saminda
  * @author chamikara
  * @author sanka
  */
 
+public class SandeshaUtil {
 
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMException;
-import org.apache.axis2.soap.SOAPEnvelope;
-
-public interface IOMRMElement {
-	public OMElement getOMElement() throws OMException;
-	public Object fromOMElement(OMElement element) throws OMException;
-	public OMElement toOMElement(OMElement element) throws OMException;
+	public static String getUUID () {
+		String newSequenceID = "uuid:" + MIMEOutputUtils.getRandomStringOf18Characters();
+		return newSequenceID;
+	}
 }

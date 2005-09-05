@@ -18,6 +18,7 @@ package org.apache.sandesha2.wsrm;
 
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -30,101 +31,131 @@ import org.apache.sandesha2.Constants;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class RMElements{
-	private Sequence sequenceElement;
-	private SequenceAcknowledgement sequenceAcknowledgementElement;
 	
-	private CreateSequence createSequenceElement;
-	private CreateSequenceResponse createSequenceResponseElement;
-	private TerminateSequence terminateSequenceElement;
-
-	public OMElement getSOAPElement() throws OMException {
-		//this mehod has no significant in the code
-		return null;
-	}
+	private Sequence sequence = null;
+	private SequenceAcknowledgement sequenceAcknowledgement = null;
+	private CreateSequence createSequence = null;
+	private CreateSequenceResponse createSequenceResponse = null;
+	private TerminateSequence terminateSequence = null;
+	private AckRequested ackRequested = null;
 	
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		SOAPHeader soapHeader = envelope.getHeader();
-		Iterator iterator = soapHeader.examineAllHeaderBlocks();
-		while (iterator.hasNext()){
-			SOAPHeaderBlock childBlock = (SOAPHeaderBlock)iterator.next();
-			if (childBlock.getLocalName().equals(Constants.WSRM.SEQUENCE)){
-				sequenceElement = new Sequence();
-				childBlock.setMustUnderstand(false);
-				childBlock.setComplete(true);
-				sequenceElement.fromSOAPEnvelope(envelope);
-				
-			}
-			if (childBlock.getLocalName().equals(Constants.WSRM.SEQUENCE_ACK)){
-				sequenceAcknowledgementElement = new SequenceAcknowledgement();
-				childBlock.setMustUnderstand(false);
-				childBlock.setComplete(true);
-				sequenceAcknowledgementElement.fromSOAPEnvelope(envelope);
-			}
-		}
-		createSequenceElement = new CreateSequence();
-		createSequenceResponseElement = new CreateSequenceResponse();
-		terminateSequenceElement = new TerminateSequence();
+	public void fromSOAPEnvelope(SOAPEnvelope envelope) {
 		
-		createSequenceElement.fromSOAPEnvelope(envelope);
-		createSequenceResponseElement.fromSOAPEnvelope(envelope);
-		terminateSequenceElement.fromSOAPEnvelope(envelope);
-
-		return this;
+		if (envelope==null)
+			throw new OMException ("The passed envelope is null");
+		
+		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE));
+		if (sequenceElement!=null) {
+			sequence = new Sequence ();
+			sequence.fromOMElement(envelope.getHeader());
+		}
+		
+		OMElement sequenceAckElement = envelope.getHeader().getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_ACK));
+		if (sequenceAckElement!=null) {
+			sequenceAcknowledgement  = new SequenceAcknowledgement ();
+			sequence.fromOMElement(envelope.getHeader());
+		}
+		
+		OMElement createSeqElement = envelope.getBody().getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.CREATE_SEQUENCE));
+		if (createSeqElement!=null) {
+			createSequence  = new CreateSequence ();
+			createSequence.fromOMElement(envelope.getBody());
+		}
+		
+		OMElement createSeqResElement = envelope.getBody().getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
+		if (createSeqResElement!=null) {
+			createSequenceResponse  = new CreateSequenceResponse ();
+			createSequenceResponse.fromOMElement(envelope.getBody());
+		}
+		
+		OMElement terminateSeqElement = envelope.getBody().getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.TERMINATE_SEQUENCE));
+		if (terminateSeqElement!=null) {
+			terminateSequence = new TerminateSequence ();
+			terminateSequence.fromOMElement(envelope.getBody());
+		}
+		
+		OMElement ackRequestedElement = envelope.getHeader().getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.ACK_REQUESTED));
+		if (ackRequestedElement!=null) {
+			ackRequested = new AckRequested ();
+			ackRequested.fromOMElement(envelope.getHeader());
+		}	
 	}
 
-	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		
-		
-		if(sequenceElement != null){
-			sequenceElement.toSOAPEnvelope(envelope);
+	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope)  {
+		if(sequence != null){
+			sequence.toOMElement(envelope.getHeader());
 		}
-		if ( sequenceAcknowledgementElement != null) {
-			sequenceAcknowledgementElement.toSOAPEnvelope(envelope);
+		if ( sequenceAcknowledgement != null) {
+			sequenceAcknowledgement.toOMElement(envelope.getHeader());
 		}
-		if ( createSequenceElement != null){
-			createSequenceElement.toSOAPEnvelope(envelope);
+		if ( createSequence != null){
+			createSequence.toOMElement(envelope.getBody());
 		}
-		if (createSequenceResponseElement != null){
-			createSequenceResponseElement.toSOAPEnvelope(envelope);
+		if (createSequenceResponse != null){
+			createSequenceResponse.toOMElement(envelope.getBody());
 		}
-		if (terminateSequenceElement != null){
-			terminateSequenceElement.toSOAPEnvelope(envelope);
+		if (terminateSequence != null){
+			terminateSequence.toOMElement(envelope.getBody());
+		}
+		if (ackRequested != null){
+			ackRequested.toOMElement(envelope.getBody());
 		}
 		return envelope;
 	}
+	
 	public CreateSequence getCreateSequence(){
-		return createSequenceElement;
+		return createSequence;
 	}
 	public CreateSequenceResponse getCreateSequenceResponse(){
-		return createSequenceResponseElement;
+		return createSequenceResponse;
 	}
 	public Sequence getSequence(){
-		return sequenceElement;
+		return sequence;
 	}
 	public SequenceAcknowledgement getSequenceAcknowledgement(){
-		return sequenceAcknowledgementElement;
+		return sequenceAcknowledgement;
 	}
 	public TerminateSequence getTerminateSequence(){
-		return terminateSequenceElement;
+		return terminateSequence;
 	}
+	
 	public void setCreateSequence(CreateSequence createSequence){
-		createSequenceElement = createSequence;
+		this.createSequence = createSequence;
 	}
+	
 	public void setCreateSequenceResponse(CreateSequenceResponse createSequenceResponse){
-		createSequenceResponseElement = createSequenceResponse;
+		this.createSequenceResponse = createSequenceResponse;
 	}
+	
 	public void setSequence(Sequence sequence){
-		sequenceElement = sequence;
+		this.sequence = sequence;
 	}
+	
 	public void setSequenceAcknowledgement(SequenceAcknowledgement sequenceAcknowledgement){
-		sequenceAcknowledgementElement = sequenceAcknowledgement;
+		this.sequenceAcknowledgement = sequenceAcknowledgement;
 	}
+	
 	public void setTerminateSequence(TerminateSequence terminateSequence){
-		terminateSequenceElement = terminateSequence;
+		this.terminateSequence = terminateSequence;
 	}
 	
-	
+
+	public AckRequested getAckRequested() {
+		return ackRequested;
+	}
+
+	public void setAckRequested(AckRequested ackRequested) {
+		this.ackRequested = ackRequested;
+	}
 }

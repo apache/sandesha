@@ -20,6 +20,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
@@ -29,135 +33,148 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
 public class SequenceAcknowledgement implements IOMRMElement {
 	private OMElement sequenceAcknowledgementElement;
 	private Identifier identifier;
-	private List acknowledgementRanges;
+	private List acknowledgementRangeList;
 	private List nackList;
-	OMNamespace seqAcksNamespace =
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
+	OMNamespace rmNamespace =
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
 	public SequenceAcknowledgement(){
-		sequenceAcknowledgementElement = OMAbstractFactory.getSOAP11Factory().createOMElement(
-				Constants.WSRM.SEQUENCE_ACK,seqAcksNamespace);
-		acknowledgementRanges = new LinkedList();
+		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_ACK,rmNamespace);
+		acknowledgementRangeList = new LinkedList();
 		nackList = new LinkedList();
 	}
-	public OMElement getSOAPElement() throws OMException {
-		Iterator iterator = acknowledgementRanges.iterator();
-		while(iterator.hasNext()){
-			AcknowledgementRange range = (AcknowledgementRange)iterator.next();
-			sequenceAcknowledgementElement.addChild(
-					range.getSOAPElement());
-			
-		}
-		iterator = nackList.iterator();
-		while(iterator.hasNext()){
-			Nack nack = (Nack)iterator.next();
-			sequenceAcknowledgementElement.addChild(
-					nack.getSOAPElement());
-		}
-		sequenceAcknowledgementElement.addChild(identifier.getSOAPElement());
+	
+	public OMElement getOMElement() throws OMException {
 		return sequenceAcknowledgementElement;
 	}
 
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		identifier = new Identifier();
-		SOAPHeader soapHeader = envelope.getHeader();
-		Iterator iterator = soapHeader.getChildren();
-		while (iterator.hasNext()){
-			OMNode omNode = (OMNode) iterator.next();
+	public Object fromOMElement(OMElement element) throws OMException {
+		
+
+		
+		if (element==null || !(element instanceof SOAPHeader)) 
+			throw new OMException ("Cant get sequence acknowlegement from a non-header element");
+		
+		SOAPHeader header = (SOAPHeader) element;
+		OMElement sequenceAckPart = header.getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_ACK));
+		
+		if (sequenceAckPart==null)
+			throw new OMException ("The passed element does not contain a seqence ackknowledgement Part");
+		
+
+		
+		identifier = new Identifier ();
+		identifier.fromOMElement(sequenceAckPart);
+		
+
+		Iterator ackRangeParts = sequenceAckPart.getChildrenWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.ACK_RANGE));
+		
+		while (ackRangeParts.hasNext()) {
+			OMElement ackRangePart = (OMElement) ackRangeParts.next();	
 			
-			if (!(omNode instanceof OMElement)) {
-				continue;
-			}
-			OMElement omElement = (OMElement) omNode;
-			
-			if (omElement.getLocalName().equals(Constants.WSRM.SEQUENCE_ACK)){
-				Iterator childIterator = omElement.getChildren();
-				while (childIterator.hasNext()){
-					OMNode childOMNode = (OMNode) childIterator.next();
-					
-					if (!(childOMNode instanceof OMElement)) {
-						continue;
-					}
-					
-					OMElement childElement = (OMElement) childOMNode;
-					
-					if (childElement.getLocalName().equals(Constants.WSRM.ACK_RANGE)){
-						AcknowledgementRange ackRange = new AcknowledgementRange();
-						ackRange.fromSOAPEnvelope(childElement);
-						acknowledgementRanges.add(ackRange);
-					}
-					
-					if (childElement.getLocalName().equals(Constants.WSRM.NACK)){
-						Nack nack = new Nack();	
-						nack.fromSOAPEnvelope(childElement);
-						nackList.add(nack);
-					}
-					
-					if ( childElement.getLocalName().equals(Constants.WSRM.IDENTIFIER)){
-						identifier = new Identifier();
-						identifier.fromSOAPEnvelope(envelope);
-					}
-				}
-			}
+			AcknowledgementRange ackRange = new AcknowledgementRange ();
+			ackRange.fromOMElement (ackRangePart);
+			acknowledgementRangeList.add(ackRange);
 		}
+		
+		Iterator nackParts = sequenceAckPart.getChildrenWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.NACK));
+		
+		while (nackParts.hasNext()) {
+			OMElement nackPart = (OMElement) nackParts.next();	
+			Nack nack = new Nack ();
+			nack.fromOMElement (nackPart);
+			nackList.add(nack);
+		}
+		
+		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_ACK,rmNamespace);
 		
 		return this;
 	}
 
-	public OMElement toSOAPEnvelope(OMElement envelope) throws OMException {
-		SOAPEnvelope soapEnvelope = (SOAPEnvelope)envelope;
-		SOAPHeader soapHeader = soapEnvelope.getHeader();
-		SOAPHeaderBlock soapHeaderBlock = soapHeader.addHeaderBlock(
-				Constants.WSRM.SEQUENCE_ACK,seqAcksNamespace);
-		soapHeaderBlock.setMustUnderstand(true);
-		//adding ackRanges
-		Iterator iterator = acknowledgementRanges.iterator();
-		while(iterator.hasNext()){
-			AcknowledgementRange ackRange = (AcknowledgementRange)iterator.next();
-			ackRange.toSOAPEnvelope(soapHeaderBlock);
+	public OMElement toOMElement(OMElement header) throws OMException {
+		
+		if (header==null || !(header instanceof SOAPHeader))
+			throw new OMException ();
+		
+		SOAPHeader SOAPHeader = (SOAPHeader) header;
+		
+		if (sequenceAcknowledgementElement==null)
+			throw new OMException ("Cant set sequence acknowledgement since the element is null");
+		
+		if (identifier==null)
+			throw new OMException ("Cant set the sequence since Identifier is null");
+		
+		identifier.toOMElement(sequenceAcknowledgementElement);
+		
+		Iterator ackRangeIt = acknowledgementRangeList.iterator();
+		while (ackRangeIt.hasNext()) {
+			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIt.next();
+			ackRange.toOMElement (sequenceAcknowledgementElement);
 		}
-		iterator = nackList.iterator();
-		while(iterator.hasNext()){
-			Nack nack = (Nack)iterator.next();
-			nack.toSOAPEnvelope(soapHeaderBlock);
+		
+		Iterator nackIt = nackList.iterator();
+		while (nackIt.hasNext()) {
+			Nack nack = (Nack) nackIt.next();
+			nack.toOMElement (sequenceAcknowledgementElement);
 		}
-		if ( identifier != null){
-			identifier.toSOAPEnvelope(soapHeaderBlock);
-		}
-		return envelope;
+		
+		SOAPHeader.addChild(sequenceAcknowledgementElement);
+		
+		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_ACK,rmNamespace);
+		
+		return header;
 	}
+	
 	public void setIdentifier(Identifier identifier){
 		this.identifier = identifier;
 	}
+	
 	public void setAckRanges(List acknowledgementRagngesList){
-		acknowledgementRanges = acknowledgementRagngesList;
+		acknowledgementRangeList = acknowledgementRagngesList;
 	}
+	
 	public Nack addNackRangges(Nack nack){
 		nackList.add(nack);
 		return nack;
 	}
+	
 	public AcknowledgementRange addAcknowledgementRanges(AcknowledgementRange ackRange){
-		acknowledgementRanges.add(ackRange);
+		acknowledgementRangeList.add(ackRange);
 		return ackRange;
 	}
+	
 	public Identifier getIdentifier(){
 		return identifier;
 	}
+	
 	public List getAcknowledgementRanges(){
-		return acknowledgementRanges;
+		return acknowledgementRangeList;
 	}
+	
 	public List getNackList(){
 		return nackList;
 	}
+	
 	public void addChildElement(OMElement element){
-		acknowledgementRanges.add(element);
+		acknowledgementRangeList.add(element);
 	}
 
 }

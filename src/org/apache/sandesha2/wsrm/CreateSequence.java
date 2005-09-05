@@ -16,6 +16,10 @@
  */
 package org.apache.sandesha2.wsrm;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
@@ -24,48 +28,91 @@ import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SOAPAbstractFactory;
 
 /**
  * @author Saminda
- *
+ * @author chamikara
+ * @author sanka
  */
+
+
 public class CreateSequence implements IOMRMElement {
 	private OMElement createSequenceElement;
-	private AcksTo acksTo;
-	private SequenceOffer sequenceOffer;
 	
-	OMNamespace createSeqNoNamespace =
-		OMAbstractFactory.getSOAP11Factory().createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	private AcksTo acksTo=null;
+	private Expires expires=null;
+	private SequenceOffer sequenceOffer=null;
+	//private SequritytokenReference;
+	
+	OMNamespace rmNamespace =
+		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	
 	public CreateSequence(){
-		createSequenceElement = OMAbstractFactory.getSOAP11Factory().createOMElement(Constants.WSRM.CREATE_SEQUENCE,
-				createSeqNoNamespace);
+		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE,rmNamespace);
 	}
-	public OMElement getSOAPElement() throws OMException {
-		createSequenceElement.addChild(sequenceOffer.getSOAPElement());
-		createSequenceElement.addChild(acksTo.getSOAPElement());
+	
+	public OMElement getOMElement() throws OMException {
 		return createSequenceElement;
 	}
 
-	public Object fromSOAPEnvelope(SOAPEnvelope envelope) throws OMException {
-		sequenceOffer = new SequenceOffer();
-		acksTo = new AcksTo(new EndpointReference(""));
-		sequenceOffer.fromSOAPEnvelope(envelope);
-		acksTo.fromSOAPEnvelope(envelope);		
+	public Object fromOMElement(OMElement bodyElement) throws OMException {
+		
+		OMElement createSequencePart = bodyElement.getFirstChildWithName(
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.CREATE_SEQUENCE));
+		if (createSequencePart==null)
+			throw new OMException ("Create sequence is not present in the passed element");
+		
+		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.CREATE_SEQUENCE,
+				rmNamespace);
+		
+		acksTo = new AcksTo();
+		acksTo.fromOMElement (createSequencePart);
+		
+		OMElement offerPart = createSequencePart.getFirstChildWithName (
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_OFFER));
+		if (offerPart!=null) {
+			sequenceOffer = new SequenceOffer();
+			sequenceOffer.fromOMElement(createSequencePart);
+		}
+		
+		OMElement expiresPart = createSequenceElement.getFirstChildWithName (
+				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.EXPIRES));
+		if (expiresPart!=null) {
+			expires = new Expires ();
+			expires.fromOMElement(createSequencePart);
+		}
+		
 		return this;
 	}
 
-	public OMElement toSOAPEnvelope(OMElement envelope) throws OMException {
-		SOAPEnvelope soapEnvelope = (SOAPEnvelope)envelope;
-		SOAPBody soapBody = soapEnvelope.getBody();
-		soapBody.addChild(createSequenceElement);
+	public OMElement toOMElement(OMElement bodyElement) throws OMException {
+		
+		if (bodyElement==null || !(bodyElement instanceof SOAPBody))
+			throw new OMException ("Cant add Create Sequence Part to a non-body element");
+
+		if(acksTo==null)
+			throw new OMException ("Cant add create seqeunce part, having acks to as null");
+		
+		SOAPBody soapBody = (SOAPBody) bodyElement;
+		acksTo.toOMElement(createSequenceElement);
+		
 		if(sequenceOffer != null){
-			sequenceOffer.toSOAPEnvelope(createSequenceElement);
+			sequenceOffer.toOMElement(createSequenceElement);
 		}
-		if (acksTo != null){
-			acksTo.toSOAPEnvelope(createSequenceElement);
+		
+		if(expires!=null) {
+			expires.toOMElement(createSequenceElement);
 		}
-		return envelope;
+
+		soapBody.addChild(createSequenceElement);
+		
+		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE,rmNamespace);
+		return soapBody;
 	}
+	
 	public void setAcksTo(AcksTo acksTo){
 		this.acksTo = acksTo;
 	}

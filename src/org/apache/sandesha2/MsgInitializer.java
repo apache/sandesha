@@ -17,14 +17,19 @@
 
 package org.apache.sandesha2;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.wsrm.RMElements;
 
 
 /**
- *@ author
+ * @author chamikara
+ * @author sanka
  */
+
 
 public class MsgInitializer {
 
@@ -40,19 +45,23 @@ public class MsgInitializer {
 		RMElements elements = new RMElements ();
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
 		
-		String acksTo = elements.getCreateSequence().getAcksTo().getEndPointReference().getAddress();
-		boolean acksToPresent = (acksTo!=null)&&(!acksTo.equals(""));
-		
-		if(acksToPresent){
-			System.out.println("AcksTo:" + elements.getCreateSequence().getAcksTo().getEndPointReference().getAddress());
+		if (elements.getCreateSequence()!=null) 
 			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,elements.getCreateSequence());
-		}
 		
-		//TODO do similar checks to other parts too.
-		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE,elements.getCreateSequenceResponse());
-		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQUENCE ,elements.getSequence());
-		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT,elements.getSequenceAcknowledgement());
-		rmMsgContext.setMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ,elements.getTerminateSequence());
+		if(elements.getCreateSequenceResponse()!=null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE,elements.getCreateSequenceResponse());
+		
+		if (elements.getSequence()!=null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQUENCE ,elements.getSequence());
+		
+		if (elements.getSequenceAcknowledgement()!=null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT,elements.getSequenceAcknowledgement());
+		
+		if (elements.getTerminateSequence()!=null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ,elements.getTerminateSequence());
+		
+		if (elements.getAckRequested()!=null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_ACK_REQUEST,elements.getAckRequested());
 		
 		
 		
