@@ -195,6 +195,11 @@
             <artifactId>geronimo-spec-activation</artifactId>
             <version>1.0.2-rc3</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.1.1.0</version>
+        </dependency>
     </dependencies>
 
 
