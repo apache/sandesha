@@ -22,12 +22,15 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.wsdl.builder.wsdl4j.WSDL11MEPFinder;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -38,11 +41,14 @@ import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.wsdl.WSDLConstants;
 
 /**
- * @author chamikara
- * @author sanka
+ * @author Chamikara
+ * @author Sanka
+ * @author Jaliya 
  */
 
 public class RMMsgCreator {
@@ -78,30 +84,58 @@ public class RMMsgCreator {
         outMessage.setMessageID(newMessageId);
 		
         outMessage.setEnvelope(envelope);
-        RMMsgContext createSeqResponse = MsgInitializer.initializeMessage(outMessage);
-        MsgValidator.validateMessage(createSeqResponse);
-		return createSeqResponse;
+        
+        RMMsgContext createSeqResponse = null;
+        try {
+        	createSeqResponse = MsgInitializer.initializeMessage(outMessage);
+        }catch (RMException ex) {
+        	throw new AxisFault ("Cant initialize the message");
+        }
+        
+        return createSeqResponse;
 	}
 	
-	public static void createAckMessage (RMMsgContext applicationMsg) throws AxisFault {
-		/*SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
+	
+	//Adds a ack message to the following message.
+	public static void addAckMessage (RMMsgContext applicationMsg) throws AxisFault {
+		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
 		if(envelope==null) {
 			SOAPEnvelope newEnvelope = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
 			applicationMsg.setSOAPEnvelop(envelope);
 		}
-		
 		envelope = applicationMsg.getSOAPEnvelope();
-		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement ();
+		
+		MessageContext requestMessage = applicationMsg.getMessageContext().getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN);
+
+		RMMsgContext reqRMMsgCtx = null;
+		
+        try {
+        	reqRMMsgCtx = MsgInitializer.initializeMessage(requestMessage);
+        }catch (RMException ex) {
+        	throw new AxisFault ("Cant initialize the message");
+        }
+		
+        
+        Sequence reqSequence = (Sequence) reqRMMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+		if (reqSequence==null)
+			throw new AxisFault ("Sequence part of application message is null");
+        
+		String sequenceId = reqSequence.getIdentifier().getIdentifier();
+		
+        SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement ();
 		Identifier id = new Identifier ();
-		id.setIndentifer("uuid:temp-id-of-sandesha");
+		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);
 		AcknowledgementRange range = new AcknowledgementRange ();
-		range.setMaxValue(1);
-		range.setMinValue(1);
+		
+		//TODO correct below
+		range.setUpperValue(1);
+		range.setLowerValue(1);
+			
 		sequenceAck.addAcknowledgementRanges(range);
-		sequenceAck.toSOAPEnvelope(envelope);
-		applicationMsg.setAction("http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement");
-		applicationMsg.setMessageId("uuid:msg-id-of-first-ack"); */
+		sequenceAck.toOMElement(envelope.getHeader());
+		applicationMsg.setAction(Constants.WSRM.ACTION_SEQ_ACK);
+		applicationMsg.setMessageId(SandeshaUtil.getUUID()); 
 		
 	}
 }

@@ -1,8 +1,18 @@
 /*
- * Created on Aug 29, 2005
+ * Copyright  1999-2004 The Apache Software Foundation.
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 package org.apache.sandesha2.msgprocessors;
 
@@ -31,10 +41,22 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		SequencePropertyBeanMgr mgr = new SequencePropertyBeanMgr (Constants.STORAGE_TYPE_IN_MEMORY);
-		SequencePropertyBean bean = (SequencePropertyBean) mgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MSG_LIST);
-		System.out.println ("get --" + sequenceId + "--" + Constants.SEQ_PROPERTY_RECEIVED_MSG_LIST);
-		int i = 1;
-		ArrayList list = (ArrayList) bean.getValue();
-		System.out.println ("aaa is:" + list.get(0));
+		
+		SequencePropertyBean msgsBean = (SequencePropertyBean) mgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+		SequencePropertyBean acksToBean = (SequencePropertyBean) mgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_ACKS_TO);
+		
+		
+		String messagesStr =  (String) msgsBean.getValue();
+		String acksToStr = (String) acksToBean.getValue();
+	
+		System.out.println ("Messages received:" + Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+		System.out.println ("Acks To:" + Constants.SEQ_PROPERTY_ACKS_TO);
+		
+		if (acksToStr==null || messagesStr==null)
+			throw new MsgProcessorException ("Seqeunce properties are not set correctly");
+		
+		if (acksToStr!=Constants.WSA.NS_URI_ANONYMOUS) {
+			//TODO Add async Ack
+		}
 	}
 }

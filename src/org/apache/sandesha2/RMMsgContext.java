@@ -31,10 +31,12 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
+import org.apache.wsdl.WSDLConstants;
 
 /**
- * @author chamikara
- * @author sanka
+ * @author Chamikara
+ * @author Sanka
+ * @author Jaliya 
  */
 
 public class RMMsgContext {
@@ -133,6 +135,10 @@ public class RMMsgContext {
 	
 	public void setRelatesTo (RelatesTo relatesTo){
 		msgContext.setRelatesTo(relatesTo);
+	}
+	
+	public MessageContext getMessageContext () {
+		return msgContext;
 	}
 	
 	

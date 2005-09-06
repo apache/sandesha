@@ -26,20 +26,22 @@ import org.apache.sandesha2.wsrm.RMElements;
 
 
 /**
- * @author chamikara
- * @author sanka
+ * @author Chamikara
+ * @author Sanka
+ * @author Jaliya 
  */
 
 
 public class MsgInitializer {
 
-	public static RMMsgContext initializeMessage (MessageContext ctx) {
+	public static RMMsgContext initializeMessage (MessageContext ctx) throws RMException {
 		RMMsgContext rmMsgCtx = new RMMsgContext (ctx);
 		populateRMMsgContext(ctx,rmMsgCtx);
+		validateMessage(rmMsgCtx);
 		return rmMsgCtx;
 	}
 	
-	public static void populateRMMsgContext (MessageContext msgCtx, RMMsgContext rmMsgContext) {
+	private static void populateRMMsgContext (MessageContext msgCtx, RMMsgContext rmMsgContext) {
 		//TODO set message parts
 		
 		RMElements elements = new RMElements ();
@@ -65,5 +67,21 @@ public class MsgInitializer {
 		
 		
 		
+	}
+	
+	private static boolean validateMessage (RMMsgContext rmMsgCtx) throws RMException {
+        
+		//TODO: performa validation
+		
+		//Setting message type.
+		if(rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ);
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ_RESPONSE);
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_TERMINATE_SEQ);
+		
+		
+		return true;
 	}
 }

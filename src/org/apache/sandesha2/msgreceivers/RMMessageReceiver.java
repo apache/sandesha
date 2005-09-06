@@ -46,8 +46,10 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
+import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
+import org.apache.sandesha2.SequenceMenager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -65,64 +67,52 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 	public void setCreateSequence(MessageContext inMessage,
 			MessageContext outMessage) throws AxisFault {
 
-		System.out.println("RM Msg Receiver was called");
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
-		MsgValidator.validateMessage(rmMsgCtx);
+		System.out.println("set create seq was called in RM Msg receiver");
+		
+		RMMsgContext rmMsgCtx = null;
+        try {
+        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+        }catch (RMException ex) {
+        	throw new AxisFault ("Cant initialize the message");
+        }
 
-		if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
+        if (rmMsgCtx.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ)
+        	throw new AxisFault ("Wrong message type");
+        
+        RMMsgContext createSeqResponse = RMMsgCreator
+					.createCreateSeqResponseMsg(rmMsgCtx, outMessage);	
+		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.
+							getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE);
+			
+		String newSequenceId = createSeqResPart.getIdentifier().getIdentifier();
+		if (newSequenceId==null)
+			throw new AxisFault ("Internal error - Generated sequence id is null");
 
-			RMMsgContext createSeqResponse = RMMsgCreator
-					.createCreateSeqResponseMsg(rmMsgCtx, outMessage);
-			
-			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.
-								getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE);
-			
-			String newSequenceId = createSeqResPart.getIdentifier().getIdentifier();
-			
-			if (newSequenceId==null)
-				throw new AxisFault ("Internal error - Generated sequence id is null");
-			
-			
-			//TODO: put below to SequenceManager.setUpNewSequence ();
-			ArrayList arr;
-			SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_RECEIVED_MSG_LIST,arr = new ArrayList());
-			SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.STORAGE_TYPE_IN_MEMORY);
-			System.out.println ("put --" + newSequenceId + "--" + Constants.SEQ_PROPERTY_RECEIVED_MSG_LIST);
-			beanMgr.create(seqPropBean);
-			
-			arr.add("bbb");
+		SequenceMenager.setUpNewSequence(newSequenceId);
 
-			outMessage.setResponseWritten(true);
-		} else {
-			outMessage.setResponseWritten(true);
-		}
+		outMessage.setResponseWritten(true);
 
 	}
 
 	public final void receive(MessageContext messgeCtx) throws AxisFault {
 
 		System.out.println ("within RM Msg receiver");
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
-		MsgValidator.validateMessage(rmMsgCtx);
+		
+		//intitializing the message.
+		RMMsgContext rmMsgCtx = null;
+        try {
+        	rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
+        }catch (RMException ex) {
+        	throw new AxisFault ("Cant initialize the message");
+        }
 
 		AbstractMessageReceiver msgReceiver = null;
-		if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
-			
-			CreateSequence createSeqPart = (CreateSequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
-			if (createSeqPart==null)
-				throw new AxisFault ("No create sequence part in create sequence message");
-			
-			//String acksTo = createSeqPart.getAcksTo().getEndPointReference().toString();
-			String from = messgeCtx.getFrom().getAddress();
-			if(from.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
-				msgReceiver = new RMInOutSyncMsgReceiver ();
-			} else {
-				msgReceiver = new RMInOutAsyncMsgReceiver ();
-			}
-			
+		
+		String replyTo = messgeCtx.getFrom().getAddress();
+		if((replyTo==null) || replyTo.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
+			msgReceiver = new RMInOutSyncMsgReceiver ();
 		} else {
-			//TODO: Check weather terminate
-			msgReceiver = new RMInMsgReceiver ();
+			msgReceiver = new RMInOutAsyncMsgReceiver ();
 		}
 		
 		if(msgReceiver!=null) {
@@ -147,8 +137,12 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 	private class RMInMsgReceiver extends AbstractInMessageReceiver {
 		
 		public void invokeBusinessLogic(MessageContext inMessage) throws AxisFault {
-			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
-			MsgValidator.validateMessage(rmMsgCtx);
+			RMMsgContext rmMsgCtx = null;
+	        try {
+	        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+	        }catch (RMException ex) {
+	        	throw new AxisFault ("Cant initialize the message");
+	        }
 			
 			//TODO check for terminate sequence.
 			//TODO handle terminate sequence.
@@ -161,8 +155,12 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		
 		public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {
 			
-			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
-			MsgValidator.validateMessage(rmMsgCtx);
+			RMMsgContext rmMsgCtx = null;
+	        try {
+	        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+	        }catch (RMException ex) {
+	        	throw new AxisFault ("Cant initialize the message");
+	        }
 			
 			if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ) {
 				//TODO handle sync create seq.
@@ -177,8 +175,12 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		public void invokeBusinessLogic(MessageContext inMessage,
 				MessageContext outMessage, ServerCallback callback) throws AxisFault {
 			
-			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
-			MsgValidator.validateMessage(rmMsgCtx);
+			RMMsgContext rmMsgCtx = null;
+	        try {
+	        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+	        }catch (RMException ex) {
+	        	throw new AxisFault ("Cant initialize the message");
+	        }
 			
 			if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ) {
 				//TODO handle async create seq.

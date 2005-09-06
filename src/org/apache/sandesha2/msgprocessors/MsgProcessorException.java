@@ -23,4 +23,7 @@ package org.apache.sandesha2.msgprocessors;
  */
 public class MsgProcessorException extends Exception {
 
+	public MsgProcessorException (String s) {
+		super (s);
+	}
 }

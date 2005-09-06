@@ -22,8 +22,9 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 
 /**
- * @author chamikara
- * @author sanka
+ * @author Chamikara
+ * @author Sanka
+ * @author Jaliya 
  */
 
 public class SandeshaModule implements Module{

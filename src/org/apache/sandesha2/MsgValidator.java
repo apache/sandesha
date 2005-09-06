@@ -21,22 +21,18 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 
 /**
- * @author chamikara
- * @author sanka
+ * @author Chamikara
+ * @author Sanka
+ * @author Jaliya 
  */
 
+//TODO remove this class.
 public class MsgValidator {
 
-	public static void validateMessage(RMMsgContext rmMsgCtx) throws AxisFault{
-        //TODO: Validate message
-		
-		//Setting message type.
-		if(rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ)!=null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE)!=null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ_RESPONSE);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ)!=null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_TERMINATE_SEQ);
-			
+	
+	private static void validateMessage(RMMsgContext rmMsgCtx) throws AxisFault{
+
+			//no need of this method any more.
+			//Validation is done in the message initialized
     }
 }

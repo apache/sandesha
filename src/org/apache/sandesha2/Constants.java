@@ -18,8 +18,9 @@
 package org.apache.sandesha2;
 
 /**
- * @author chamikara
- * @author sanka
+ * @author Chamikara
+ * @author Sanka
+ * @author Jaliya 
  */
 
 
@@ -29,7 +30,11 @@ public interface Constants {
 		String NS_PREFIX_RM = "wsrm";
 
 		String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2005/02/rm";
+		
 
+		String ACTION_SEQ_ACK = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
+		
+		
 		String NS_URI_CREATE_SEQ_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
 		
 		String MSG_NUMBER = "MessageNumber";
@@ -137,7 +142,15 @@ public interface Constants {
 	
 	int STORAGE_TYPE_PERSISTANCE = 2;
 	
-	String SEQ_PROPERTY_RECEIVED_MSG_LIST = "SeqMsgList";
+	int DEFAULT_STORAGE_TYPE = STORAGE_TYPE_IN_MEMORY;
+	
+	
+	
+	
+	String SEQ_PROPERTY_RECEIVED_MESSAGES = "SeqMsgListProperty";
+	
+	String SEQ_PROPERTY_ACKS_TO = "acksToProperty";
+	
 	
 	int SOAP_1_1 = 1;
 	

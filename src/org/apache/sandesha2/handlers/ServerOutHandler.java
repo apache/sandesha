@@ -23,6 +23,7 @@ import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
+import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
@@ -30,27 +31,37 @@ import org.apache.wsdl.MessageReference;
 import org.apache.wsdl.WSDLConstants;
 
 /**
- * @author 
+ * @author Sanka
+ * @author Chamikara
+ * @author Jaliya 
  */
 public class ServerOutHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 		System.out.println ("Server out handler called");
 		
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-		MsgValidator.validateMessage(rmMsgCtx);
+		RMMsgContext rmMsgCtx;
+        try {
+        	rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+        }catch (RMException ex) {
+        	throw new AxisFault ("Cant initialize the message");
+        }
 	
 	
 		//getting the request message.
 		MessageContext reqMsgCtx = msgCtx.getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN);
-		RMMsgContext requestRMMsgCtx = MsgInitializer.initializeMessage(reqMsgCtx);
-		MsgValidator.validateMessage(requestRMMsgCtx);
+		RMMsgContext requestRMMsgCtx;
+        try {
+        	requestRMMsgCtx = MsgInitializer.initializeMessage(reqMsgCtx);
+        }catch (RMException ex) {
+        	throw new AxisFault ("Cant initialize the message");
+        }
 		
-
-		
+        //TODO change this to    IF==MSG_TYPE_APPLICATION
 		if(requestRMMsgCtx.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ){
 			//set acknowledgement
-			RMMsgCreator.createAckMessage (rmMsgCtx);	
+			RMMsgCreator.addAckMessage(rmMsgCtx);
+			
 		}
 		
 	}

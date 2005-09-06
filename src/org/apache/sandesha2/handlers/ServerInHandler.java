@@ -25,6 +25,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
+import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorException;
@@ -32,7 +33,9 @@ import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 
 /**
- * @author 
+ * @author Chamikara
+ * @author Sanka
+ * @author Jaliya 
  */
 public class ServerInHandler extends AbstractHandler {
 
@@ -43,8 +46,13 @@ public class ServerInHandler extends AbstractHandler {
 		System.out.println ("Operation is:" + opearaitonName);
 		
 		msgCtx.setProperty("aaaa","abcd");
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-		MsgValidator.validateMessage(rmMsgCtx);
+		RMMsgContext rmMsgCtx = null;
+
+        try {
+        	rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+        }catch (RMException ex) {
+        	throw new AxisFault ("Cant initialize the message");
+        }
 		
 		MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx.getMessageType());
 		
