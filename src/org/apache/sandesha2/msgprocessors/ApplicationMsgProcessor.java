@@ -18,12 +18,15 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.ArrayList;
 
+import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -45,9 +48,19 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequencePropertyBean msgsBean = (SequencePropertyBean) mgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
 		SequencePropertyBean acksToBean = (SequencePropertyBean) mgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_ACKS_TO);
 		
+		long msgNo = sequence.getMessageNumber().getMessageNumber();
+		if (msgNo==0)
+			throw new MsgProcessorException ("Wrong message number");
 		
 		String messagesStr =  (String) msgsBean.getValue();
+		if (messagesStr!="" && messagesStr!=null)
+			messagesStr = messagesStr + "," + Long.toString(msgNo);
+		else 
+			messagesStr = Long.toString(msgNo);
 		
+		msgsBean.setValue(messagesStr);
+		mgr.update(msgsBean);
+			
 		String acksToStr = null;
 		try {
 		    acksToStr = (String) acksToBean.getValue();
@@ -55,8 +68,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			e.printStackTrace();
 		}
 	
-		System.out.println ("Messages received:" + Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
-		System.out.println ("Acks To:" + Constants.SEQ_PROPERTY_ACKS_TO);
+		System.out.println ("Messages received:" + messagesStr);
+		System.out.println ("Acks To:" + acksToStr);
 		
 		if (acksToStr==null || messagesStr==null)
 			throw new MsgProcessorException ("Seqeunce properties are not set correctly");

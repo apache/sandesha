@@ -31,6 +31,8 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.wsdl.builder.wsdl4j.WSDL11MEPFinder;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -126,13 +128,20 @@ public class RMMsgCreator {
 		Identifier id = new Identifier ();
 		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);
-		AcknowledgementRange range = new AcknowledgementRange ();
+
+		//SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,acksTo);
+		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
+		SequencePropertyBean msgNosBean = (SequencePropertyBean) beanMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+		String msgNoList = (String) msgNosBean.getValue();
+		System.out.println ("Message No List:" + msgNoList);
 		
-		//TODO correct below
-		range.setUpperValue(1);
-		range.setLowerValue(1);
+		AcknowledgementRange[] ackRangeArr = SandeshaUtil.getAckRangeArray(msgNoList);
 			
-		sequenceAck.addAcknowledgementRanges(range);
+		int length = ackRangeArr.length;
+		
+		for (int i=0;i<length;i++)
+			sequenceAck.addAcknowledgementRanges(ackRangeArr[i]);
+		
 		sequenceAck.toOMElement(envelope.getHeader());
 		applicationMsg.setAction(Constants.WSRM.ACTION_SEQ_ACK);
 		applicationMsg.setMessageId(SandeshaUtil.getUUID()); 
