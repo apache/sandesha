@@ -17,25 +17,16 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMMsgContext;
 
 /**
- * @author 
+ * @author
  * 
  */
-public class MsgProcessorFactory {
+public class TerminateSeqMsgProcessor implements MsgProcessor {
 
-	public static MsgProcessor getMessageProcessor (int msgType) {
-		switch (msgType)
-		{
-			case (Constants.MESSAGE_TYPE_CREATE_SEQ):
-				return new CreateSeqMsgProcessor ();
-			case (Constants.MESSAGE_TYPE_TERMINATE_SEQ):
-				return new TerminateSeqMsgProcessor ();
-			case (Constants.MESSAGE_TYPE_APPLICATION):
-				return new ApplicationMsgProcessor ();
-			default:
-				return null;
-		}
+	public void processMessage(RMMsgContext rmMsgCtx)
+			throws MsgProcessorException {
+		//TODO Add terminate sequence message logic.
 	}
 }

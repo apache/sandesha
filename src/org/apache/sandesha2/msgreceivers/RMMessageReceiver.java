@@ -64,23 +64,25 @@ import com.bea.xml.stream.XMLWriterBase;
 public class RMMessageReceiver extends AbstractMessageReceiver {
 
 	
+	
+	//TODO move this code to create seq msg processor.
 	public void setCreateSequence(MessageContext inMessage,
 			MessageContext outMessage) throws AxisFault {
 
 		System.out.println("set create seq was called in RM Msg receiver");
 		
-		RMMsgContext rmMsgCtx = null;
+		RMMsgContext createSeqMsg = null;
         try {
-        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+        	createSeqMsg = MsgInitializer.initializeMessage(inMessage);
         }catch (RMException ex) {
         	throw new AxisFault ("Cant initialize the message");
         }
 
-        if (rmMsgCtx.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ)
+        if (createSeqMsg.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ)
         	throw new AxisFault ("Wrong message type");
         
         RMMsgContext createSeqResponse = RMMsgCreator
-					.createCreateSeqResponseMsg(rmMsgCtx, outMessage);	
+					.createCreateSeqResponseMsg(createSeqMsg, outMessage);	
 		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.
 							getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE);
 			
@@ -90,6 +92,18 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 		SequenceMenager.setUpNewSequence(newSequenceId);
 
+		CreateSequence createSeq = (CreateSequence) createSeqMsg.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+		if (createSeq==null)
+			throw new AxisFault ("Create sequence part not present in the create sequence message");
+		
+		String acksTo = createSeq.getAcksTo().getAddress().getEpr().getAddress();
+		if (acksTo==null || acksTo=="")
+			throw new AxisFault ("Acks to not present in the create sequence message");
+		
+		SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_ACKS_TO,acksTo);
+		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
+		beanMgr.create(seqPropBean);
+		
 		outMessage.setResponseWritten(true);
 
 	}
@@ -109,11 +123,13 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		AbstractMessageReceiver msgReceiver = null;
 		
 		String replyTo = messgeCtx.getFrom().getAddress();
-		if((replyTo==null) || replyTo.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
+		if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_TERMINATE_SEQ)
+			msgReceiver = new RMInMsgReceiver ();
+		else if(rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ && ((replyTo==null) || replyTo.equals(Constants.WSA.NS_URI_ANONYMOUS))) 
 			msgReceiver = new RMInOutSyncMsgReceiver ();
-		} else {
+		else if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ)
 			msgReceiver = new RMInOutAsyncMsgReceiver ();
-		}
+		
 		
 		if(msgReceiver!=null) {
 			msgReceiver.receive(messgeCtx);

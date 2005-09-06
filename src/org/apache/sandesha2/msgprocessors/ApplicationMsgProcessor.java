@@ -47,7 +47,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		
 		String messagesStr =  (String) msgsBean.getValue();
-		String acksToStr = (String) acksToBean.getValue();
+		
+		String acksToStr = null;
+		try {
+		    acksToStr = (String) acksToBean.getValue();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	
 		System.out.println ("Messages received:" + Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
 		System.out.println ("Acks To:" + Constants.SEQ_PROPERTY_ACKS_TO);

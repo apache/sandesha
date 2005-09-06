@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.wsrm.RMElements;
 
 
@@ -80,8 +81,12 @@ public class MsgInitializer {
 			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ_RESPONSE);
 		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ)!=null)
 			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_TERMINATE_SEQ);
-		
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_APPLICATION);
+		else
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_UNKNOWN);
 		
 		return true;
 	}
+	
 }

@@ -19,7 +19,6 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 public class SequenceMenager {
 
 	public static void setUpNewSequence (String sequenceId) {
-		ArrayList arr;
 		SequencePropertyBean seqPropBean = new SequencePropertyBean (sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,"");
 		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
 		beanMgr.create(seqPropBean);

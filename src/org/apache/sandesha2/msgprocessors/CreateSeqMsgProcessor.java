@@ -32,7 +32,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		CreateSequence createSeq = (CreateSequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
 
 		//rmMsgCtx.test();
-		//Store AcksTo Value
+	
 		
 		//Change the Operation (to go throught CreateSequence)
 		
