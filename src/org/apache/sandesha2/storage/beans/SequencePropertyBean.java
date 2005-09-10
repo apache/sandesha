@@ -16,10 +16,12 @@
  */
 package org.apache.sandesha2.storage.beans;
 
+import java.io.Serializable;
+
 /**
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class SequencePropertyBean implements RMBean{
+public class SequencePropertyBean implements Serializable {
 
 	private String sequenceId;
 	private String name;

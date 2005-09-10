@@ -17,16 +17,18 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import java.io.Serializable;
+
 /**
  * @author 
  * 
  */
-public class RetransmitterBean implements RMBean{
+public class RetransmitterBean implements Serializable {
 
-	private String MessageId;
-	private String Key;
+	private String messageId;
+	private String key;
 	private long LastSentTime;
-	private boolean Send; 
+	private Boolean Send; 
 	private String CreateSeqMsgId;
 	
 	
@@ -46,13 +48,13 @@ public class RetransmitterBean implements RMBean{
 	 * @return Returns the key.
 	 */
 	public String getKey() {
-		return Key;
+		return key;
 	}
 	/**
 	 * @param key The key to set.
 	 */
 	public void setKey(String key) {
-		Key = key;
+		this.key = key;
 	}
 	/**
 	 * @return Returns the lastSentTime.
@@ -70,24 +72,24 @@ public class RetransmitterBean implements RMBean{
 	 * @return Returns the messageId.
 	 */
 	public String getMessageId() {
-		return MessageId;
+		return messageId;
 	}
 	/**
 	 * @param messageId The messageId to set.
 	 */
 	public void setMessageId(String messageId) {
-		MessageId = messageId;
+		this.messageId = messageId;
 	}
 	/**
 	 * @return Returns the send.
 	 */
-	public boolean isSend() {
+	public Boolean isSend() {
 		return Send;
 	}
 	/**
 	 * @param send The send to set.
 	 */
-	public void setSend(boolean send) {
-		Send = send;
+	public void setSend(Boolean send) {
+		this.Send = send;
 	}
 }

@@ -16,52 +16,21 @@
  */
 package org.apache.sandesha2.storage.beanmanagers;
 
-import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.StorageManagerFactory;
-import org.apache.sandesha2.storage.beans.RMBean;
+import java.sql.ResultSet;
+import java.util.Collection;
+
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
+ * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class SequencePropertyBeanMgr implements CRUD {
-
-	private StorageManager storageMgr;
+public interface SequencePropertyBeanMgr {
+	public boolean delete(String sequenceId, String name);
+	public SequencePropertyBean retrieve(String sequenceId, String name);
+	public boolean insert(SequencePropertyBean bean);
+	public ResultSet find(String query);
+	public Collection find(SequencePropertyBean bean); 
+	public boolean update(SequencePropertyBean bean);
 	
-	public SequencePropertyBeanMgr(int storageType){
-		storageMgr = StorageManagerFactory.getStorageManager(storageType);
-	}
-	
-	public boolean create(RMBean key) {
-		if (!(key instanceof SequencePropertyBean)) {
-			throw new IllegalArgumentException();
-		}
-		return storageMgr.createSequencePropertyBean((SequencePropertyBean) key);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.beanmanagers.CRUD#retrieve(java.lang.String)
-	 */
-	public RMBean retrieve(String key) {
-		return storageMgr.retrieveSequencePropertyBean(key);
-	}
-	
-	public RMBean retrieve(String sequenceId, String name) {
-		return retrieve(sequenceId + name);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.sandesha2.storage.beanmanagers.CRUD#update(org.apache.sandesha2.storage.beans.RMBean)
-	 */
-	public boolean update(RMBean bean) {
-		if (!(bean instanceof SequencePropertyBean)) {
-			throw new IllegalArgumentException();
-		}
-		return storageMgr.updateSequencePropertyBean((SequencePropertyBean) bean);
-	}
-
-	public boolean delete(String key) {
-		return storageMgr.deleteSequencePropertyBean(key);
-	}
-
 }

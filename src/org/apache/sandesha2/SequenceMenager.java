@@ -8,6 +8,7 @@ package org.apache.sandesha2;
 
 import java.util.ArrayList;
 
+import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
@@ -19,9 +20,14 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 public class SequenceMenager {
 
 	public static void setUpNewSequence (String sequenceId) {
+//		SequencePropertyBean seqPropBean = new SequencePropertyBean (sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,"");
+//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
+//		beanMgr.create(seqPropBean);
+	
 		SequencePropertyBean seqPropBean = new SequencePropertyBean (sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,"");
-		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
-		beanMgr.create(seqPropBean);
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
+				getSequencePropretyBeanMgr();
+		seqPropMgr.insert(seqPropBean);
 	}
 	
 	public void removeSequence (String sequence) {

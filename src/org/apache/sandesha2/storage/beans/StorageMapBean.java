@@ -17,11 +17,13 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import java.io.Serializable;
+
 /**
  * @author 
  * 
  */
-public class StorageMapBean implements RMBean {
+public class StorageMapBean implements Serializable {
 
 	private String Key;
 	private int MsgNo;

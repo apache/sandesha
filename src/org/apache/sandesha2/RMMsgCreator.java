@@ -31,6 +31,7 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.wsdl.builder.wsdl4j.WSDL11MEPFinder;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
+import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -130,9 +131,15 @@ public class RMMsgCreator {
 		sequenceAck.setIdentifier(id);
 
 		//SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,acksTo);
-		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
-		SequencePropertyBean msgNosBean = (SequencePropertyBean) beanMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
-		String msgNoList = (String) msgNosBean.getValue();
+//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
+//		SequencePropertyBean msgNosBean = (SequencePropertyBean) beanMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+//		String msgNoList = (String) msgNosBean.getValue();
+		
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
+					getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+		String msgNoList = (String) seqBean.getValue();
 		System.out.println ("Message No List:" + msgNoList);
 		
 		AcknowledgementRange[] ackRangeArr = SandeshaUtil.getAckRangeArray(msgNoList);

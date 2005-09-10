@@ -23,6 +23,7 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -43,10 +44,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//setting ack range
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
-		SequencePropertyBeanMgr mgr = new SequencePropertyBeanMgr (Constants.STORAGE_TYPE_IN_MEMORY);
+
+		//		SequencePropertyBeanMgr mgr = new SequencePropertyBeanMgr (Constants.STORAGE_TYPE_IN_MEMORY);
 		
-		SequencePropertyBean msgsBean = (SequencePropertyBean) mgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
-		SequencePropertyBean acksToBean = (SequencePropertyBean) mgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_ACKS_TO);
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
+				getSequencePropretyBeanMgr();
+
+		SequencePropertyBean msgsBean = seqPropMgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+		SequencePropertyBean acksToBean = seqPropMgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_ACKS_TO);
 		
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo==0)
@@ -59,7 +64,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			messagesStr = Long.toString(msgNo);
 		
 		msgsBean.setValue(messagesStr);
-		mgr.update(msgsBean);
+		seqPropMgr.update(msgsBean);
 			
 		String acksToStr = null;
 		try {

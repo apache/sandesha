@@ -50,6 +50,7 @@ import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SequenceMenager;
+import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -101,9 +102,12 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 			throw new AxisFault ("Acks to not present in the create sequence message");
 		
 		SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_ACKS_TO,acksTo);
-		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
-		beanMgr.create(seqPropBean);
+//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
+//		beanMgr.create(seqPropBean);
 		
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
+					getSequencePropretyBeanMgr();
+		seqPropMgr.insert(seqPropBean);
 		outMessage.setResponseWritten(true);
 
 	}
