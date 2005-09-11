@@ -141,6 +141,21 @@ public class RMMsgContext {
 		return msgContext;
 	}
 	
+	public Object getProperty (String key) {
+		if (msgContext==null)
+			return null;
+		
+		return msgContext.getProperty(key);
+	}
+	
+	public boolean setProperty (String key, Object val){
+		if (msgContext==null)
+			return false;
+		
+		msgContext.setProperty(key,val);
+		return true;
+	}
+	
 	
 	
 }

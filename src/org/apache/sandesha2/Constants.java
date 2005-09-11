@@ -144,18 +144,42 @@ public interface Constants {
 	
 	int DEFAULT_STORAGE_TYPE = STORAGE_TYPE_IN_MEMORY;
 	
+	String IN_HANDLER_NAME = "SandeshaInHandler";
 	
 	
+	//Sequence properties
 	
 	String SEQ_PROPERTY_RECEIVED_MESSAGES = "SeqMsgListProperty";
 	
 	String SEQ_PROPERTY_ACKS_TO = "acksToProperty";
 	
 	
+	//SOAP versions
 	int SOAP_1_1 = 1;
 	
 	int SOAP_1_2 = 2;
 	
 	int DEFAULT_SOAP_VERSION = SOAP_1_2;
+
+	
+	//message context properties
+	String APPLICATION_PROCESSING_DONE = "APP_PROCESSING_DONE";
+	
+	//delivery assurance.
+	
+	String IN_ORDER = "InOrder";
+	
+	String NOT_IN_ORDER = "NotInOrder";
+	
+	String DEFAULT_DELIVERY_ASSURANCE = IN_ORDER;
+	
+	//invocation type
+	
+	String EXACTLY_ONCE = "ExactlyOnce";
+	
+	String MORE_THAN_ONCE = "MoreThanOnce";
+	
+	String DEFAULT_INVOCATION_TYPE = EXACTLY_ONCE;
+	
 
 }

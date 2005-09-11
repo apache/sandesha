@@ -54,7 +54,7 @@ public class PersistentNextMsgBeanMgr implements NextMsgBeanMgr {
 			ResultSet rs = getStatement().executeQuery(query);
 			rs.next();
 			bean.setSequenceId(rs.getString("SequenceId"));
-			bean.setNextMsgNoToProcess(rs.getString("NextMsgToProcess"));
+			bean.setNextMsgNoToProcess(rs.getLong ("NextMsgToProcess"));
 			return bean;
 			
 		} catch (SQLException ex) {
@@ -117,7 +117,7 @@ public class PersistentNextMsgBeanMgr implements NextMsgBeanMgr {
 			while (rs.next()) {
 				nbean =new NextMsgBean();
 				nbean.setSequenceId(rs.getString("SequenceId"));
-				nbean.setNextMsgNoToProcess(rs.getString("NextMsgToProcess"));
+				nbean.setNextMsgNoToProcess(rs.getLong ("NextMsgToProcess"));
 				beans.add(nbean);
 			}			
 			return beans;
@@ -146,5 +146,9 @@ public class PersistentNextMsgBeanMgr implements NextMsgBeanMgr {
 	private Statement getStatement() throws SQLException {
 		return PersistentBeanMgrFactory.getConnection().createStatement();		
 	}
-
+	
+	
+	public Collection retrieveAll() {
+		throw new UnsupportedOperationException ();
+	}
 }

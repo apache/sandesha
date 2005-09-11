@@ -32,4 +32,5 @@ public interface NextMsgBeanMgr {
 	public ResultSet find(String query);
 	public Collection find(NextMsgBean bean);
 	public boolean update(NextMsgBean bean);
+	public Collection retrieveAll ();
 }

@@ -23,6 +23,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 
 /**
@@ -38,6 +39,11 @@ public class InMemStorageMapBeanMgr implements StorageMapBeanMgr {
 	public InMemStorageMapBeanMgr() {
 	}
 
+	public boolean insert(StorageMapBean bean) {
+		table.put(bean.getKey(), bean);
+		return true;
+	}
+	
 	public boolean delete(String key) {
 		return table.remove(key) != null; 
 	}
@@ -57,15 +63,28 @@ public class InMemStorageMapBeanMgr implements StorageMapBeanMgr {
 		StorageMapBean temp = new StorageMapBean();
 		while (iterator.hasNext()) {
 			temp = (StorageMapBean) iterator.next();
-			if ((bean.getKey() != null 
+			boolean select = true;
+			/*if ((temp.getKey() != null 
 					&& bean.getKey().equals(temp.getKey()))
 					&& (bean.getMsgNo() != -1 
 					&& bean.getMsgNo() == temp.getMsgNo())
 					&& (bean.getSequenceId() != null 
 					&& bean.getSequenceId().equals(temp.getSequenceId()))) {
-				
+				*/
+
+			//}
+			
+			if (bean.getKey()!=null && !bean.getKey().equals(temp.getKey()))
+				select=false;
+			
+			if (bean.getMsgNo()!=0 && bean.getMsgNo()!=temp.getMsgNo())
+				select=false;
+			
+			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
+				select=false;
+			
+			if (select)
 				beans.add(temp);
-			}
 		}
 		return beans;
 	}

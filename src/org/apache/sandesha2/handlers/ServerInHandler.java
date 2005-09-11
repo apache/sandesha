@@ -19,10 +19,13 @@ package org.apache.sandesha2.handlers;
 
 import java.util.ArrayList;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMException;
@@ -39,13 +42,21 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
  */
 public class ServerInHandler extends AbstractHandler {
 
+//	public ServerInHandler (){
+//		System.out.println ("NEW SERVER IN HANDLER");
+//	}
+	
+	public QName getName (){
+		return new QName (Constants.IN_HANDLER_NAME);
+	}
+	
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 		System.out.println  ("In server Handler 1");
 		
-		String opearaitonName = msgCtx.getOperationContext().getAxisOperation().getName().getLocalPart();
-		System.out.println ("Operation is:" + opearaitonName);
+//		String opearaitonName = msgCtx.getOperationContext().getAxisOperation().getName().getLocalPart();
+//		System.out.println ("Operation is:" + opearaitonName);
+//		
 		
-		msgCtx.setProperty("aaaa","abcd");
 		RMMsgContext rmMsgCtx = null;
 
         try {
@@ -55,7 +66,7 @@ public class ServerInHandler extends AbstractHandler {
         }
 		
 		MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx.getMessageType());
-		
+					
 		try {
 			msgProcessor.processMessage(rmMsgCtx);
 		}catch (MsgProcessorException mpe) {

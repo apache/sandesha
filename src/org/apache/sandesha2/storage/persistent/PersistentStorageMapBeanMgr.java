@@ -32,6 +32,29 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
  */
 public class PersistentStorageMapBeanMgr implements StorageMapBeanMgr {
 
+	
+	
+	public boolean insert(StorageMapBean bean) {
+		
+		throw new UnsupportedOperationException ();
+		
+		//TODO: verify weather following works.
+		
+//		String query = ("INSERT INTO StorageMap VALUES ( " 
+//				+ "'" + bean.getKey() + "', "
+//				+ "'" + bean.getMsgNo() + "',"
+//				+ "'" + bean.getSequenceId() + "')");
+//		
+//		try {
+//			getStatement().executeUpdate(query);
+//			ResultSet executeQuery = getStatement().executeQuery("select * from CreateSequence");
+//			
+//			return true;
+//		} catch (SQLException ex) {
+//			// TODO logs the error .. 
+//		}	
+//		return false;
+	}
 	public boolean delete(String key) {		
 		String query = "DELETE FROM StorageMap WHERE SKey = '" + key + "'" ;
 		try {
@@ -79,46 +102,52 @@ public class PersistentStorageMapBeanMgr implements StorageMapBeanMgr {
 	}
 
 	public Collection find(StorageMapBean bean) {
-		StringBuffer query = new StringBuffer();
-
-		query.append("SELECT * FROM StorageMap WHERE");
-		query.append((bean.getKey() != null) 
-				? (query.toString().indexOf("=") != -1) ? " AND SKey = " + bean.getKey() 
-														: " SKey = " + bean.getKey()
-				: "");
-		query.append((bean.getMsgNo() != -1) 
-				? (query.toString().indexOf("=") != -1) ? " AND MsgNo = " + bean.getMsgNo()
-														: " MsgNo = " + bean.getMsgNo()
-				: "");
-		query.append((bean.getSequenceId() != null) 
-				? (query.toString().indexOf("=") != -1) ? " AND SequenceId = " + bean.getSequenceId()
-														: " SequenceId = " + bean.getSequenceId()
-				: "");
 		
-		String queryString = query.toString();
 		
-		if (queryString.indexOf("=") == -1) {
-			query.replace(queryString.indexOf("WHERE"), queryString.length(), "");
-		}
-			
-		try {
-			ResultSet rs = getStatement().executeQuery(query.toString().trim());
-			ArrayList beans = new ArrayList();
-			StorageMapBean nbean;
-			while (rs.next()) {
-				nbean = new StorageMapBean();
-				nbean.setKey(rs.getString("SKey"));
-				nbean.setSequenceId(rs.getString("SequenceId"));
-				nbean.setMsgNo(rs.getInt("MsgNo"));
-				beans.add(nbean);
-			}			
-			return beans;
+		throw new UnsupportedOperationException ();
 		
-		} catch (SQLException ex) {
-			//TODO logs the error ..
-			ex.printStackTrace();
-		}
-		return null;
+		//TODO recheck the folowing implementation. Had to change In-Memory one.
+		
+//		StringBuffer query = new StringBuffer();
+//
+//		query.append("SELECT * FROM StorageMap WHERE");
+//		query.append((bean.getKey() != null) 
+//				? (query.toString().indexOf("=") != -1) ? " AND SKey = " + bean.getKey() 
+//														: " SKey = " + bean.getKey()
+//				: "");
+//		query.append((bean.getMsgNo() != -1) 
+//				? (query.toString().indexOf("=") != -1) ? " AND MsgNo = " + bean.getMsgNo()
+//														: " MsgNo = " + bean.getMsgNo()
+//				: "");
+//		query.append((bean.getSequenceId() != null) 
+//				? (query.toString().indexOf("=") != -1) ? " AND SequenceId = " + bean.getSequenceId()
+//														: " SequenceId = " + bean.getSequenceId()
+//				: "");
+//		
+//		String queryString = query.toString();
+//		
+//		if (queryString.indexOf("=") == -1) {
+//			query.replace(queryString.indexOf("WHERE"), queryString.length(), "");
+//		}
+//			
+//		try {
+//			ResultSet rs = getStatement().executeQuery(query.toString().trim());
+//			ArrayList beans = new ArrayList();
+//			StorageMapBean nbean;
+//			while (rs.next()) {
+//				nbean = new StorageMapBean();
+//				nbean.setKey(rs.getString("SKey"));
+//				nbean.setSequenceId(rs.getString("SequenceId"));
+//				nbean.setMsgNo(rs.getInt("MsgNo"));
+//				beans.add(nbean);
+//			}			
+//			return beans;
+//		
+//		} catch (SQLException ex) {
+//			//TODO logs the error ..
+//			ex.printStackTrace();
+//		}
+//		return null;
 	}
 
 	public boolean update(StorageMapBean bean) {

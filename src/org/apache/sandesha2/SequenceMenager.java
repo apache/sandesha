@@ -9,7 +9,9 @@ package org.apache.sandesha2;
 import java.util.ArrayList;
 
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
@@ -28,6 +30,11 @@ public class SequenceMenager {
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
 				getSequencePropretyBeanMgr();
 		seqPropMgr.insert(seqPropBean);
+		
+		NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
+					getNextMsgBeanMgr();
+		nextMsgMgr.insert(new NextMsgBean (sequenceId,1)); // 1 will be the next message to invoke
+														   //this will apply for only in-order invocations.
 	}
 	
 	public void removeSequence (String sequence) {

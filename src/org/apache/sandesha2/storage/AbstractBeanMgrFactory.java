@@ -36,7 +36,7 @@ public abstract class AbstractBeanMgrFactory {
 	
 	public abstract CreateSeqBeanMgr getCreateSeqBeanMgr();
 	
-	public abstract NextMsgBeanMgr getNextMsgBean();
+	public abstract NextMsgBeanMgr getNextMsgBeanMgr();
 	
 	public abstract RetransmitterBeanMgr getRetransmitterBeanMgr();
 	

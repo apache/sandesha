@@ -26,10 +26,19 @@ import java.io.Serializable;
 public class StorageMapBean implements Serializable {
 
 	private String Key;
-	private int MsgNo;
+	private long MsgNo;
 	private String sequenceId;
 	
 	
+	public StorageMapBean (){
+		
+	}
+	
+	public StorageMapBean(String key, long msgNo, String sequenceId) {
+		this.Key = key;
+		this.MsgNo = msgNo;
+		this.sequenceId = sequenceId;
+	}
 	/**
 	 * @return Returns the key.
 	 */
@@ -45,13 +54,13 @@ public class StorageMapBean implements Serializable {
 	/**
 	 * @return Returns the msgNo.
 	 */
-	public int getMsgNo() {
+	public long getMsgNo() {
 		return MsgNo;
 	}
 	/**
 	 * @param msgNo The msgNo to set.
 	 */
-	public void setMsgNo(int msgNo) {
+	public void setMsgNo(long msgNo) {
 		MsgNo = msgNo;
 	}
 	/**

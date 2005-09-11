@@ -19,6 +19,7 @@ package org.apache.sandesha2.storage.beanmanagers;
 import java.sql.ResultSet;
 import java.util.Collection;
 
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 
 
@@ -27,6 +28,7 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
 public interface StorageMapBeanMgr {
+	public boolean insert(StorageMapBean bean);
 	public boolean delete(String key);
 	public StorageMapBean retrieve(String key);
 	public ResultSet find(String query);

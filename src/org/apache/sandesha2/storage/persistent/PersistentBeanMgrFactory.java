@@ -85,7 +85,7 @@ public class PersistentBeanMgrFactory extends AbstractBeanMgrFactory {
 		return new PersistentCreateSeqBeanMgr();
 	}
 	
-	public NextMsgBeanMgr getNextMsgBean() {
+	public NextMsgBeanMgr getNextMsgBeanMgr() {
 		return new PersistentNextMsgBeanMgr();
 	}
 	

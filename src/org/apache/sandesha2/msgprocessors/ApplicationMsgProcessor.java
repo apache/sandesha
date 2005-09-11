@@ -17,15 +17,24 @@
 package org.apache.sandesha2.msgprocessors;
 
 import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -41,23 +50,28 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		System.out.println ("Application msg processor called");
 		
-		//setting ack range
+		if (rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE)!=null && rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE).equals("true") ) {
+			return;
+		}
+		
+		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
-
-		//		SequencePropertyBeanMgr mgr = new SequencePropertyBeanMgr (Constants.STORAGE_TYPE_IN_MEMORY);
-		
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
 				getSequencePropretyBeanMgr();
-
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
-		SequencePropertyBean acksToBean = seqPropMgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_ACKS_TO);
-		
+
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo==0)
 			throw new MsgProcessorException ("Wrong message number");
 		
 		String messagesStr =  (String) msgsBean.getValue();
+		
+		if (msgNoPresentInList (messagesStr,msgNo) && (Constants.DEFAULT_INVOCATION_TYPE==Constants.EXACTLY_ONCE)) { 
+			//this is a duplicate message and the invocation type is EXACTLY_ONCE.
+			throw new MsgProcessorException ("Duplicate message - Invocation type is EXACTLY_ONCE");
+		}
+		
 		if (messagesStr!="" && messagesStr!=null)
 			messagesStr = messagesStr + "," + Long.toString(msgNo);
 		else 
@@ -66,6 +80,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		msgsBean.setValue(messagesStr);
 		seqPropMgr.update(msgsBean);
 			
+		//Setting the ack depending on AcksTo.
+		//TODO: Stop sending askc for every message.
+		SequencePropertyBean acksToBean = seqPropMgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_ACKS_TO);
 		String acksToStr = null;
 		try {
 		    acksToStr = (String) acksToBean.getValue();
@@ -73,14 +90,85 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			e.printStackTrace();
 		}
 	
+		//TODO: remove folowing 2.
 		System.out.println ("Messages received:" + messagesStr);
 		System.out.println ("Acks To:" + acksToStr);
 		
 		if (acksToStr==null || messagesStr==null)
 			throw new MsgProcessorException ("Seqeunce properties are not set correctly");
-		
 		if (acksToStr!=Constants.WSA.NS_URI_ANONYMOUS) {
 			//TODO Add async Ack
 		}
+		
+		
+		
+//		Pause the messages bean if not the right message to invoke.
+		NextMsgBeanMgr mgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
+					getNextMsgBeanMgr();
+		NextMsgBean bean = mgr.retrieve(sequenceId);
+		
+		if (bean==null)
+			throw new MsgProcessorException  ("Error- The sequence does not exist");
+		
+		StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
+						getStorageMapBeanMgr();
+		
+		long nextMsgno = bean.getNextMsgNoToProcess(); 
+		
+		
+		if (nextMsgno<msgNo) { 
+			
+			//pause and store the message (since it is not the next message of the order)
+			rmMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+			try {
+				String key = SandeshaUtil.storeMessageContext(rmMsgCtx.getMessageContext());
+				storageMapMgr.insert(new StorageMapBean (key,msgNo,sequenceId));
+				
+				//This will avoid performing application processing more than once.
+				rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
+				
+			}catch (Exception ex) {
+				throw new MsgProcessorException (ex.getMessage());
+			}			
+		}else {
+			//OK this is a correct message. 
+			//(nextMsgNo>msgNo can not happen if EXCTLY_ONCE is enabled. This should have been 
+			//		detected previously)
+
+			if (Constants.DEFAULT_DELIVERY_ASSURANCE==Constants.IN_ORDER) {
+				//store and let invoker handle for IN_ORDER invocation
+				rmMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+				try {
+					String key = SandeshaUtil.storeMessageContext(rmMsgCtx.getMessageContext());
+					storageMapMgr.insert(new StorageMapBean (key,msgNo,sequenceId));
+					
+//					This will avoid performing application processing more than once.
+					rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
+					
+					System.out.println ("paaused");
+				}catch (Exception ex) {
+					throw new MsgProcessorException (ex.getMessage());
+				}	
+			}else {
+				//if IN_ORDER is not required. Simply let this invoke (by doing nothing here :D )
+			}
+		}
+		
+		int i = 1;
+	}
+	
+	
+	//TODO convert following from INT to LONG
+	private boolean msgNoPresentInList (String list, long no) {
+		String[] msgStrs = list.split(",");
+
+		int l = msgStrs.length;
+		
+		for (int i=0;i<l;i++) {
+			if (msgStrs[i].equals(Long.toString(no)))
+				return true;
+		}
+		
+		return false;
 	}
 }

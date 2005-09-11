@@ -18,8 +18,10 @@ package org.apache.sandesha2.util;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
@@ -30,6 +32,8 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 public class SandeshaUtil {
 
+	private static Hashtable storedMsgContexts = new Hashtable ();
+	
 	public static String getUUID () {
 		String newSequenceID = "uuid:" + MIMEOutputUtils.getRandomStringOf18Characters();
 		return newSequenceID;
@@ -118,9 +122,24 @@ public class SandeshaUtil {
 		return longs;
 	}
 	
-	public static void main (String[] args) {
-		String msgList = "13,2,6,4,4,1,999,12,3";
-		getAckRangeArray( msgList);
+	
+	
+	public static String storeMessageContext (MessageContext ctx) throws Exception {
+		if (ctx==null)
+			throw new Exception ("Stored Msg Ctx is null");
 		
+		String key = getUUID();
+		storedMsgContexts.put(key,ctx);
+		return key;
 	}
+	
+	public static MessageContext getStoredMessageContext (String key) {
+		return (MessageContext) storedMsgContexts.get(key);
+	}
+	
+//	public static void main (String[] args) {
+//		String msgList = "13,2,6,4,4,1,999,12,3";
+//		getAckRangeArray( msgList);
+//		
+//	}
 }

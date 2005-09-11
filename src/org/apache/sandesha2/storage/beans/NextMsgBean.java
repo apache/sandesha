@@ -25,20 +25,28 @@ import java.io.Serializable;
  */
 public class NextMsgBean implements Serializable {
 	private String SequenceId;
-	private String NextMsgNoToProcess;
+	private long NextMsgNoToProcess;
 	
 	
+	public NextMsgBean (){
+		
+	}
+	
+	public NextMsgBean (String sequenceId, long nextNsgNo) {
+		this.SequenceId = sequenceId;
+		this.NextMsgNoToProcess = nextNsgNo;
+	}
 	
 	/**
 	 * @return Returns the nextMsgNoToProcess.
 	 */
-	public String getNextMsgNoToProcess() {
+	public long getNextMsgNoToProcess() {
 		return NextMsgNoToProcess;
 	}
 	/**
 	 * @param nextMsgNoToProcess The nextMsgNoToProcess to set.
 	 */
-	public void setNextMsgNoToProcess(String nextMsgNoToProcess) {
+	public void setNextMsgNoToProcess(long nextMsgNoToProcess) {
 		NextMsgNoToProcess = nextMsgNoToProcess;
 	}
 	/**

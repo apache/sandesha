@@ -33,7 +33,7 @@ public class InMemBeanMgrFactory extends AbstractBeanMgrFactory {
 		return new InMemCreateSeqBeanMgr();
 	}
 
-	public NextMsgBeanMgr getNextMsgBean() {
+	public NextMsgBeanMgr getNextMsgBeanMgr() {
 		return new InMemNextMsgBeanMgr();
 	}
 
