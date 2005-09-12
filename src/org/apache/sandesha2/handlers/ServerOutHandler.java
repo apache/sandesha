@@ -26,6 +26,7 @@ import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
+import org.apache.sandesha2.msgprocessors.MsgProcessorException;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.wsdl.MessageReference;
 import org.apache.wsdl.WSDLConstants;
@@ -57,12 +58,10 @@ public class ServerOutHandler extends AbstractHandler {
         	throw new AxisFault ("Cant initialize the message");
         }
 		
-        //TODO change this to    IF==MSG_TYPE_APPLICATION
-		if(requestRMMsgCtx.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ){
-			//set acknowledgement
+
+
+		if (requestRMMsgCtx.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ)
 			RMMsgCreator.addAckMessage(rmMsgCtx);
-			
-		}
-		
+
 	}
 }

@@ -36,12 +36,12 @@ public class SandeshaModule implements Module{
        
     	//Start invoker thread
     	
-    	inorderInvoker.start();
+    	//inorderInvoker.start();
     	
     }
 
     // shutdown the module
     public void shutdown(AxisConfiguration axisSystem) throws AxisFault {
-    	inorderInvoker.stopWork();
+    	//inorderInvoker.stopWork();
     }
 }

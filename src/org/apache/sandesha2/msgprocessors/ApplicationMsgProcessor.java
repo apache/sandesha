@@ -28,6 +28,7 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -38,6 +39,7 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
+import org.ietf.jgss.MessageProp;
 
 /**
  * @author 
@@ -96,7 +98,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		if (acksToStr==null || messagesStr==null)
 			throw new MsgProcessorException ("Seqeunce properties are not set correctly");
-		if (acksToStr!=Constants.WSA.NS_URI_ANONYMOUS) {
+		
+		if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
+			
+			//Adding sync ack
+			//set acknowledgement
+			//TODO stop adding acks to every message. Add acks only when needed.
+
+
+		}else {
 			//TODO Add async Ack
 		}
 		
@@ -119,7 +129,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (nextMsgno<msgNo) { 
 			
 			//pause and store the message (since it is not the next message of the order)
-			rmMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+			//rmMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+			
+			
+			
+			
 			try {
 				String key = SandeshaUtil.storeMessageContext(rmMsgCtx.getMessageContext());
 				storageMapMgr.insert(new StorageMapBean (key,msgNo,sequenceId));
@@ -137,7 +151,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			if (Constants.DEFAULT_DELIVERY_ASSURANCE==Constants.IN_ORDER) {
 				//store and let invoker handle for IN_ORDER invocation
-				rmMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+				//rmMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+				
+				
 				try {
 					String key = SandeshaUtil.storeMessageContext(rmMsgCtx.getMessageContext());
 					storageMapMgr.insert(new StorageMapBean (key,msgNo,sequenceId));
@@ -145,7 +161,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 //					This will avoid performing application processing more than once.
 					rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
 					
-					System.out.println ("paaused");
+					System.out.println ("paused");
 				}catch (Exception ex) {
 					throw new MsgProcessorException (ex.getMessage());
 				}	
