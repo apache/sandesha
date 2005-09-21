@@ -34,6 +34,7 @@ public interface Constants {
 
 		String ACTION_SEQ_ACK = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
 		
+		String ACTION_CREATE_SEQ = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
 		
 		String NS_URI_CREATE_SEQ_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
 		
@@ -153,13 +154,15 @@ public interface Constants {
 	
 	String SEQ_PROPERTY_ACKS_TO = "acksToProperty";
 	
+	String SEQ_PROPERTY_OUT_SEQUENCE_ID = "OutSequenceId";
+	
 	
 	//SOAP versions
 	int SOAP_1_1 = 1;
 	
 	int SOAP_1_2 = 2;
 	
-	int DEFAULT_SOAP_VERSION = SOAP_1_2;
+	int DEFAULT_SOAP_VERSION = SOAP_1_1;
 
 	
 	//message context properties
@@ -181,5 +184,15 @@ public interface Constants {
 	
 	String DEFAULT_INVOCATION_TYPE = EXACTLY_ONCE;
 	
+	
+	String CREATE_SEQUECE_BEAN_MAP = "CreateSequenceBeanMap";
+	
+	String RETRANSMITTER_BEAN_MAP = "RetransmitterBeanMap";
+	
+	String SEQUENCE_PROPERTY_BEAN_MAP = "SequencePropertyBeanMap";
+	
+	String STORAGE_MAP_BEAN_MAP = "StorageMapBeanMap";
+	
+	String NEXT_MESSAGE_BEAN_MAP = "NextMsgBeanMap";
 
 }

@@ -23,6 +23,7 @@ import java.util.StringTokenizer;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
+import org.apache.axis2.util.UUIDGenerator;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 /**
@@ -35,8 +36,8 @@ public class SandeshaUtil {
 	private static Hashtable storedMsgContexts = new Hashtable ();
 	
 	public static String getUUID () {
-		String newSequenceID = "uuid:" + MIMEOutputUtils.getRandomStringOf18Characters();
-		return newSequenceID;
+		String uuid = "uuid:" + UUIDGenerator.getUUID();
+		return uuid;
 	}
 	
 	public static AcknowledgementRange[] getAckRangeArray (String msgNoStr) {

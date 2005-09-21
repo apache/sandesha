@@ -29,12 +29,10 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemSequencePropretyBeanMgr implements SequencePropertyBeanMgr {
+public class InMemSequencePropretyBeanMgr /*implements SequencePropertyBeanMgr */{
+	/*
 	private static Hashtable table = new Hashtable();
 
-	/**
-	 * 
-	 */
 	public InMemSequencePropretyBeanMgr() {
 	}
 
@@ -84,5 +82,6 @@ public class InMemSequencePropretyBeanMgr implements SequencePropertyBeanMgr {
 	private String getId(SequencePropertyBean bean) {
 		return bean.getSequenceId() + ":" + bean.getName();
 	}
+	*/
 
 }

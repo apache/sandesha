@@ -17,21 +17,79 @@
 package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
 
+import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
 /**
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public interface RetransmitterBeanMgr {
-	public boolean delete(String MessageId);
-	public RetransmitterBean retrieve(String MessageId);
-	public boolean insert(RetransmitterBean bean);
-	public ResultSet find(String query);
-	public Collection find(RetransmitterBean bean);
-	public boolean update(RetransmitterBean bean);
+public class RetransmitterBeanMgr {
+	private Hashtable table = null;
 	
+	/**
+	 * 
+	 */
+	public RetransmitterBeanMgr(AbstractContext context)  {
+		Object obj = context.getProperty(Constants.RETRANSMITTER_BEAN_MAP);
+		if (obj!=null) {
+			table = (Hashtable) obj;
+		}else {
+			table = new Hashtable ();
+			context.setProperty(Constants.RETRANSMITTER_BEAN_MAP,table);
+		}
+	}
+
+	public boolean delete(String MessageId) {	
+		return table.remove(MessageId) != null;
+	}
+	
+	public RetransmitterBean retrieve(String MessageId){
+		return (RetransmitterBean) table.get(MessageId);
+	}
+
+	public boolean insert(RetransmitterBean bean) {
+		table.put(bean.getMessageId(), bean);
+		return true;
+	}
+
+	public ResultSet find(String query)  {
+		throw new UnsupportedOperationException("selectRS() is not supported");
+	}
+
+	public Collection find(RetransmitterBean bean)  {
+		ArrayList beans = new ArrayList();
+		Iterator iterator = table.values().iterator();
+		
+		RetransmitterBean temp;
+		while (iterator.hasNext()) {
+			temp = (RetransmitterBean) iterator.next();
+			if (!(bean.getMessageId() != null 
+					&& bean.getMessageId().equals(temp.getMessageId()))
+					&& (bean.getCreateSeqMsgId() != null
+					&& bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
+					&& (bean.getKey() != null 
+					&& bean.getKey().equals(temp.getKey()))
+					&& (bean.getLastSentTime() != -1 
+					&& bean.getLastSentTime() == temp.getLastSentTime())){
+				
+				beans.add(temp);				
+			}
+		}
+		
+		return beans;
+	}
+
+	public boolean update(RetransmitterBean bean) {
+		return table.put(bean.getMessageId(), bean) != null;
+	}
 
 }

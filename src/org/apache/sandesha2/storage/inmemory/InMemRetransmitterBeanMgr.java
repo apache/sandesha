@@ -29,12 +29,12 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemRetransmitterBeanMgr implements RetransmitterBeanMgr {
+public class InMemRetransmitterBeanMgr /*implements RetransmitterBeanMgr*/ {
+	
+	/*
 	private static Hashtable table = new Hashtable();
 	
-	/**
-	 * 
-	 */
+
 	public InMemRetransmitterBeanMgr() {
 	}
 
@@ -81,5 +81,7 @@ public class InMemRetransmitterBeanMgr implements RetransmitterBeanMgr {
 	public boolean update(RetransmitterBean bean) {
 		return table.put(bean.getMessageId(), bean) != null;
 	}
+	
+	*/
 
 }

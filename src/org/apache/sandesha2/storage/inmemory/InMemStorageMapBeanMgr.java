@@ -30,12 +30,12 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemStorageMapBeanMgr implements StorageMapBeanMgr {
+public class InMemStorageMapBeanMgr /*implements StorageMapBeanMgr */ {
+	
+	/*
 	private static Hashtable table = new Hashtable();
 	
-	/**
-	 * 
-	 */
+
 	public InMemStorageMapBeanMgr() {
 	}
 
@@ -64,13 +64,6 @@ public class InMemStorageMapBeanMgr implements StorageMapBeanMgr {
 		while (iterator.hasNext()) {
 			temp = (StorageMapBean) iterator.next();
 			boolean select = true;
-			/*if ((temp.getKey() != null 
-					&& bean.getKey().equals(temp.getKey()))
-					&& (bean.getMsgNo() != -1 
-					&& bean.getMsgNo() == temp.getMsgNo())
-					&& (bean.getSequenceId() != null 
-					&& bean.getSequenceId().equals(temp.getSequenceId()))) {
-				*/
 
 			//}
 			
@@ -92,5 +85,6 @@ public class InMemStorageMapBeanMgr implements StorageMapBeanMgr {
 	public boolean update(StorageMapBean bean) {
 		return table.put(bean.getKey(), bean) != null;
 	}
+	*/
 
 }

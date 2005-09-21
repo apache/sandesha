@@ -16,6 +16,8 @@
  */
 package org.apache.sandesha2.storage;
 
+import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
@@ -23,7 +25,6 @@ import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.storage.inmemory.InMemBeanMgrFactory;
-import org.apache.sandesha2.storage.persistent.PersistentBeanMgrFactory;
 
 import com.sun.corba.se.internal.core.Constant;
 
@@ -31,27 +32,56 @@ import com.sun.corba.se.internal.core.Constant;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public abstract class AbstractBeanMgrFactory {
+public class AbstractBeanMgrFactory {
 
+	AbstractContext context = null;
 	
-	public abstract CreateSeqBeanMgr getCreateSeqBeanMgr();
+	private static AbstractBeanMgrFactory instance = null;
 	
-	public abstract NextMsgBeanMgr getNextMsgBeanMgr();
+	public CreateSeqBeanMgr getCreateSeqBeanMgr() {
+		return new CreateSeqBeanMgr (context);
+	}
 	
-	public abstract RetransmitterBeanMgr getRetransmitterBeanMgr();
+	public NextMsgBeanMgr getNextMsgBeanMgr() {
+		return new NextMsgBeanMgr (context);
+	}
 	
-	public abstract SequencePropertyBeanMgr getSequencePropretyBeanMgr();
+	public RetransmitterBeanMgr getRetransmitterBeanMgr() {
+		return new RetransmitterBeanMgr (context);
+	}
 	
-	public abstract StorageMapBeanMgr getStorageMapBeanMgr();
+	public SequencePropertyBeanMgr getSequencePropretyBeanMgr() {
+		return new SequencePropertyBeanMgr (context);
+	}
+	
+	public StorageMapBeanMgr getStorageMapBeanMgr() {
+		return new StorageMapBeanMgr (context);
+	}
 		
-	public static AbstractBeanMgrFactory getBeanMgrFactory (int storageType) {
-		switch (storageType) {
-			case Constants.STORAGE_TYPE_PERSISTANCE:
-				return new PersistentBeanMgrFactory();
-			case Constants.STORAGE_TYPE_IN_MEMORY:
-				return new  InMemBeanMgrFactory();
-			default: 
-				return null;
-		}
+//	public static AbstractBeanMgrFactory getBeanMgrFactory (int storageType) {
+//		switch (storageType) {
+//			case Constants.STORAGE_TYPE_PERSISTANCE:
+//				return new PersistentBeanMgrFactory();
+//			case Constants.STORAGE_TYPE_IN_MEMORY:
+//				return new  InMemBeanMgrFactory();
+//			default: 
+//				return null;
+//		}
+//	}
+	 
+	
+	private AbstractBeanMgrFactory (AbstractContext context) {
+		this.context = context;
+	}
+	
+	public void init (ConfigurationContext context) {
+		this.context = context;
+	}
+	
+	public static AbstractBeanMgrFactory getInstance (AbstractContext context) {
+		if (instance==null)
+			instance = new AbstractBeanMgrFactory (context);
+		
+		return instance;
 	}
 }

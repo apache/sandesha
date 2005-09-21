@@ -30,13 +30,12 @@ import org.apache.sandesha2.storage.beans.CreateSeqBean;
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
 
-public class InMemCreateSeqBeanMgr implements CreateSeqBeanMgr {
+public class InMemCreateSeqBeanMgr /*implements CreateSeqBeanMgr */ {
 	
+	/*
 	private static Hashtable table = new Hashtable();
 
-	/**
-	 * 
-	 */
+
 	public InMemCreateSeqBeanMgr() {
 	}
 
@@ -78,5 +77,6 @@ public class InMemCreateSeqBeanMgr implements CreateSeqBeanMgr {
 	public ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not supported");
 	}
+	*/
 
 }

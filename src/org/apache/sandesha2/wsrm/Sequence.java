@@ -38,7 +38,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  */
 
 
-public class Sequence implements IOMRMElement {
+public class Sequence implements IOMRMPart {
 
 	private OMElement sequenceElement;
 	
@@ -139,6 +139,11 @@ public class Sequence implements IOMRMElement {
 	}
 	public void setMessageNumber(MessageNumber messageNumber){
 		this.messageNumber = messageNumber;
+	}
+	
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+		SOAPHeader header = envelope.getHeader();
+		toOMElement(header);
 	}
 	
 

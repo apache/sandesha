@@ -17,20 +17,82 @@
 package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
 
+import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public interface SequencePropertyBeanMgr {
-	public boolean delete(String sequenceId, String name);
-	public SequencePropertyBean retrieve(String sequenceId, String name);
-	public boolean insert(SequencePropertyBean bean);
-	public ResultSet find(String query);
-	public Collection find(SequencePropertyBean bean); 
-	public boolean update(SequencePropertyBean bean);
+public class SequencePropertyBeanMgr {
+	private Hashtable table = null;
+
+	/**
+	 * 
+	 */
+	public SequencePropertyBeanMgr(AbstractContext context) {
+		Object obj = context.getProperty(Constants.SEQUENCE_PROPERTY_BEAN_MAP);
+		if (obj!=null) {
+			table = (Hashtable) obj;
+		}else {
+			table = new Hashtable ();
+			context.setProperty(Constants.SEQUENCE_PROPERTY_BEAN_MAP,table);
+		}
+	}
+
+	public boolean delete(String sequenceId, String name) {
+		return table.remove(sequenceId +":" + name) != null;
+	}
+
+	public SequencePropertyBean retrieve(String sequenceId, String name){
+		return (SequencePropertyBean) table.get(sequenceId + ":" + name);
+	}
 	
+	public boolean insert(SequencePropertyBean bean) {
+		table.put(bean.getSequenceId() + ":" + bean.getName(), bean);
+		return true;
+	}
+
+	public ResultSet find(String query) {
+		throw new UnsupportedOperationException("selectRS() is not supported");
+	}
+
+	public Collection find(SequencePropertyBean bean){
+		ArrayList beans = new ArrayList();
+		Iterator iterator = table.values().iterator();
+		SequencePropertyBean temp;
+		
+		while (iterator.hasNext()) {
+			temp = (SequencePropertyBean) iterator.next();
+			
+			if ((bean.getSequenceId() != null 
+					&& bean.getSequenceId().equals(temp.getSequenceId()))
+					&& (bean.getName() != null 
+					&& bean.getName().equals(temp.getName()))
+					&& (bean.getValue() != null 
+					&& bean.getValue().equals(temp.getValue()))) {
+				
+				beans.add(temp);				
+			}
+		}
+		return beans;
+	}
+
+	public boolean update(SequencePropertyBean bean) {
+		return table.put(getId(bean), bean) != null;
+		
+	}
+	
+	private String getId(SequencePropertyBean bean) {
+		return bean.getSequenceId() + ":" + bean.getName();
+	}
+
 }

@@ -17,19 +17,76 @@
 package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
 
+import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 /**
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public interface CreateSeqBeanMgr {
-	public boolean insert(CreateSeqBean bean);
-	public boolean delete(String msgId);
-	public CreateSeqBean retrieve(String msgId);
-	public boolean update(CreateSeqBean bean);
-	public Collection find(CreateSeqBean bean);
-	public ResultSet find(String query);
+
+public class CreateSeqBeanMgr {
+	
+	private Hashtable table = null;
+
+	/**
+	 * 
+	 */
+	public CreateSeqBeanMgr(AbstractContext context) {
+		Object obj = context.getProperty(Constants.CREATE_SEQUECE_BEAN_MAP);
+		if (obj!=null) {
+			table = (Hashtable) obj;
+		}else {
+			table = new Hashtable ();
+			context.setProperty(Constants.CREATE_SEQUECE_BEAN_MAP,table);
+		}
+	}
+
+	public boolean insert(CreateSeqBean bean)  {
+		table.put(bean.getCreateSeqMsgId(), bean);
+		return true;
+	}
+
+	public boolean delete(String msgId)  {
+		return table.remove(msgId) != null;
+	}
+
+	public CreateSeqBean retrieve(String msgId) {
+		return (CreateSeqBean) table.get(msgId);
+	}
+
+	public boolean update(CreateSeqBean bean){
+		return table.put(bean.getCreateSeqMsgId(), bean) != null;
+	}
+
+	public Collection find(CreateSeqBean bean) {
+		ArrayList beans = new ArrayList();		
+		Iterator iterator = table.values().iterator();
+		
+		CreateSeqBean temp;		
+		while (iterator.hasNext()) {
+			temp = (CreateSeqBean) iterator.next();
+			if ( (bean.getCreateSeqMsgId() != null 
+						&& bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
+						&& (bean.getSequenceId() != null 
+						&& bean.getSequenceId().equals(bean.getSequenceId()))) {
+				beans.add(temp);
+				
+			}
+		}
+		return beans;
+	}
+
+	public ResultSet find(String query) {
+		throw new UnsupportedOperationException("selectRS() is not supported");
+	}
+
 }

@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.sandesha2.msgprocessors.MsgProcessorException;
@@ -43,6 +44,7 @@ import org.ietf.jgss.MessageProp;
 
 public class InOrderInvoker extends Thread {
 	boolean stopInvoker = false;
+	ConfigurationContext context = null;
 	
 	public synchronized void stopWork() {
 		stopInvoker = true;
@@ -52,16 +54,18 @@ public class InOrderInvoker extends Thread {
 		return stopInvoker;
 	}
 	
+	public void setConfugurationContext (ConfigurationContext context) {
+		this.context = context;
+	}
+	
 	public void run (){
 		
 		while (!isStopped()) {
 			
 			System.out.print ("|");
-			NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
-					getNextMsgBeanMgr();
+			NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(context).getNextMsgBeanMgr();
 			
-			StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
-					getStorageMapBeanMgr();
+			StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory.getInstance(context).getStorageMapBeanMgr();
 			
 			Collection coll = nextMsgMgr.retrieveAll ();
 			

@@ -17,20 +17,85 @@
 package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
 
+import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMException;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
+
 
 /**
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public interface NextMsgBeanMgr {
-	public boolean delete(String sequenceId);
-	public NextMsgBean retrieve(String sequenceId);
-	public boolean insert(NextMsgBean bean);
-	public ResultSet find(String query);
-	public Collection find(NextMsgBean bean);
-	public boolean update(NextMsgBean bean);
-	public Collection retrieveAll ();
+public class NextMsgBeanMgr {
+
+	private Hashtable table = null;
+	
+	/**
+	 * 
+	 */
+	public NextMsgBeanMgr(AbstractContext context) {
+		Object obj = context.getProperty(Constants.STORAGE_MAP_BEAN_MAP);
+	
+		if (obj!=null) {
+			table = (Hashtable) obj;
+		}else {
+			table = new Hashtable ();
+			context.setProperty(Constants.STORAGE_MAP_BEAN_MAP,table);
+		}
+	}
+
+	public boolean delete(String sequenceId)  {
+		return table.remove(sequenceId) != null;
+	}
+
+	public NextMsgBean retrieve(String sequenceId)  {
+		return (NextMsgBean) table.get(sequenceId);
+	}
+
+	public boolean insert(NextMsgBean bean) {	
+		table.put(bean.getSequenceId(), bean);
+		return true;
+	}
+
+	public ResultSet find(String query){
+		throw new UnsupportedOperationException("selectRS() is not supported");
+	}
+
+	public Collection find(NextMsgBean bean)  {
+		ArrayList beans = new ArrayList();
+		Iterator iterator = table.values().iterator();
+		
+		NextMsgBean temp;
+		while (iterator.hasNext()) {
+			temp = (NextMsgBean) iterator.next();
+			
+			if ((bean.getSequenceId() != null 
+					&& bean.getSequenceId().equals(temp.getSequenceId()))
+					/*&& (bean.getNextMsgNoToProcess() != null
+					&& bean.getNextMsgNoToProcess().equals(temp.getNextMsgNoToProcess()))*/
+					&& (bean.getNextMsgNoToProcess() > 0)
+			) {
+				
+				beans.add(temp);			
+			}
+			
+		}
+		return beans;
+	}
+
+	public boolean update(NextMsgBean bean)  {
+		return table.put(bean.getSequenceId(), bean) != null ;
+	}
+	
+	
+	public Collection retrieveAll() {
+		return table.values();
+	}
 }

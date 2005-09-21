@@ -37,7 +37,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  */
 
 
-public class CreateSequence implements IOMRMElement {
+public class CreateSequence implements IOMRMPart {
 	private OMElement createSequenceElement;
 	
 	private AcksTo acksTo=null;
@@ -125,5 +125,11 @@ public class CreateSequence implements IOMRMElement {
 	public SequenceOffer getSequenceOffer(){
 		return sequenceOffer;
 	}
+	
+	
 
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+		SOAPBody body = envelope.getBody();
+		toOMElement(body);
+	}
 }

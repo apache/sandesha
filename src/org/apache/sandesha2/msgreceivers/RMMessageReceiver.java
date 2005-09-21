@@ -27,6 +27,7 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.addressing.miheaders.RelatesTo;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.om.OMAbstractFactory;
@@ -91,7 +92,8 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		if (newSequenceId==null)
 			throw new AxisFault ("Internal error - Generated sequence id is null");
 
-		SequenceMenager.setUpNewSequence(newSequenceId);
+		ConfigurationContext configCtx = inMessage.getSystemContext();
+		SequenceMenager.setUpNewSequence(newSequenceId,configCtx);
 
 		CreateSequence createSeq = (CreateSequence) createSeqMsg.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
 		if (createSeq==null)
@@ -105,8 +107,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 //		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
 //		beanMgr.create(seqPropBean);
 		
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
-					getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(configCtx).getSequencePropretyBeanMgr();
 		seqPropMgr.insert(seqPropBean);
 		outMessage.setResponseWritten(true);
 
@@ -205,6 +206,9 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 			if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ) {
 				//TODO handle async create seq.
 				setCreateSequence(inMessage,outMessage);
+				ConfigurationContext configCtx = outMessage.getSystemContext();
+				AxisEngine engine = new AxisEngine (configCtx);
+				engine.send(outMessage);
 			}
 		}
 	}

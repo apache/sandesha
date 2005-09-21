@@ -33,7 +33,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  * @author sanka
  */
 
-public class TerminateSequence implements IOMRMElement {
+public class TerminateSequence implements IOMRMPart {
     
 	private OMElement terminateSequenceElement;
 	private Identifier identifier;
@@ -100,4 +100,8 @@ public class TerminateSequence implements IOMRMElement {
 		this.identifier = identifier;
 	}
 
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+		SOAPBody body = envelope.getBody();
+		toOMElement(body);
+	}
 }

@@ -35,7 +35,7 @@ public class SandeshaModule implements Module{
     public void init(AxisConfiguration axisSystem) throws AxisFault {
        
     	//Start invoker thread
-    	
+    	//axisSystem.get
     	//inorderInvoker.start();
     	
     }

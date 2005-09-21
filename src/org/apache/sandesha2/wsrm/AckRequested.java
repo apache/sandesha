@@ -34,7 +34,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  * @author sanka
  */
 
-public class AckRequested implements IOMRMElement {
+public class AckRequested implements IOMRMPart {
 	private OMElement ackRequestedElement;
 	private Identifier identifier;
 	private MessageNumber messageNumber;
@@ -118,6 +118,11 @@ public class AckRequested implements IOMRMElement {
 	
 	public MessageNumber getMessageNumber(){
 		return messageNumber;
+	}
+	
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+		SOAPHeader header = envelope.getHeader();
+		toOMElement(header);
 	}
 
 

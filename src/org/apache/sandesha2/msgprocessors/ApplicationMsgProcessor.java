@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.sandesha2.Constants;
@@ -59,8 +60,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
-				getSequencePropretyBeanMgr();
+		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getSystemContext();
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(configCtx).getSequencePropretyBeanMgr();
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve( sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
 
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
@@ -113,15 +114,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		
 //		Pause the messages bean if not the right message to invoke.
-		NextMsgBeanMgr mgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
-					getNextMsgBeanMgr();
+		NextMsgBeanMgr mgr = AbstractBeanMgrFactory.getInstance(configCtx).getNextMsgBeanMgr();
 		NextMsgBean bean = mgr.retrieve(sequenceId);
 		
 		if (bean==null)
 			throw new MsgProcessorException  ("Error- The sequence does not exist");
 		
-		StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory.getBeanMgrFactory(Constants.DEFAULT_STORAGE_TYPE).
-						getStorageMapBeanMgr();
+		StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory.getInstance(configCtx).getStorageMapBeanMgr();
 		
 		long nextMsgno = bean.getNextMsgNoToProcess(); 
 		

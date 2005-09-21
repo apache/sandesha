@@ -30,12 +30,10 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemNextMsgBeanMgr implements NextMsgBeanMgr {
-
+public class InMemNextMsgBeanMgr /*implements NextMsgBeanMgr*/ {
+/*
 	private static Hashtable table = new Hashtable();
-	/**
-	 * 
-	 */
+
 	public InMemNextMsgBeanMgr() {
 	}
 
@@ -66,8 +64,7 @@ public class InMemNextMsgBeanMgr implements NextMsgBeanMgr {
 			
 			if ((bean.getSequenceId() != null 
 					&& bean.getSequenceId().equals(temp.getSequenceId()))
-					/*&& (bean.getNextMsgNoToProcess() != null
-					&& bean.getNextMsgNoToProcess().equals(temp.getNextMsgNoToProcess()))*/
+					
 					&& (bean.getNextMsgNoToProcess() > 0)
 			) {
 				
@@ -86,4 +83,5 @@ public class InMemNextMsgBeanMgr implements NextMsgBeanMgr {
 	public Collection retrieveAll() {
 		return table.values();
 	}
+	*/
 }

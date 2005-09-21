@@ -26,7 +26,7 @@
         <ant:property name="service.jar.name" value="InteropService.jar"/>
         <ant:mkdir dir="${basedir}/target/dist" />
         <ant:mkdir dir="${basedir}/target/samples/classes/META-INF" />
-        <ant:copy file="${dir.samples}/interop/service.xml" todir="${basedir}/target/samples/classes/META-INF" /> 
+        <ant:copy file="${dir.samples}/interop/services.xml" todir="${basedir}/target/samples/classes/META-INF" /> 
         <ant:jar jarfile="${basedir}/target/dist/${service.jar.name}" basedir="${maven.build.dir}/samples/classes" />
     </goal>
 

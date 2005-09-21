@@ -41,7 +41,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  * @author sanka
  */
 
-public class SequenceAcknowledgement implements IOMRMElement {
+public class SequenceAcknowledgement implements IOMRMPart {
 	private OMElement sequenceAcknowledgementElement;
 	private Identifier identifier;
 	private List acknowledgementRangeList;
@@ -175,6 +175,11 @@ public class SequenceAcknowledgement implements IOMRMElement {
 	
 	public void addChildElement(OMElement element){
 		acknowledgementRangeList.add(element);
+	}
+	
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+		SOAPHeader header = envelope.getHeader();
+		toOMElement(header);
 	}
 
 }

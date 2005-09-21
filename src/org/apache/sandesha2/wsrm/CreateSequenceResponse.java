@@ -33,7 +33,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  * @author sanka
  */
 
-public class CreateSequenceResponse implements IOMRMElement {
+public class CreateSequenceResponse implements IOMRMPart {
 	private OMElement createSequenceResponseElement;
 	private Identifier identifier;
 	private Accept accept;
@@ -137,5 +137,10 @@ public class CreateSequenceResponse implements IOMRMElement {
 
 	public void setExpires(Expires expires) {
 		this.expires = expires;
+	}
+	
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+		SOAPBody body = envelope.getBody();
+		toOMElement(body);
 	}
 }
