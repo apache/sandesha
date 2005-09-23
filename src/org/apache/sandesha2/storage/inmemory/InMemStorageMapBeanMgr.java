@@ -30,61 +30,45 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemStorageMapBeanMgr /*implements StorageMapBeanMgr */ {
-	
+public class InMemStorageMapBeanMgr /* implements StorageMapBeanMgr */{
+
 	/*
-	private static Hashtable table = new Hashtable();
-	
-
-	public InMemStorageMapBeanMgr() {
-	}
-
-	public boolean insert(StorageMapBean bean) {
-		table.put(bean.getKey(), bean);
-		return true;
-	}
-	
-	public boolean delete(String key) {
-		return table.remove(key) != null; 
-	}
-
-	public StorageMapBean retrieve(String key) {
-		return (StorageMapBean) table.get(key);
-	}
-
-	public ResultSet find(String query) {
-		throw new UnsupportedOperationException("selectRS() is not implemented");
-	}
-	
-	public Collection find(StorageMapBean bean) {
-		ArrayList beans = new ArrayList();
-		Iterator iterator = table.values().iterator();
-		
-		StorageMapBean temp = new StorageMapBean();
-		while (iterator.hasNext()) {
-			temp = (StorageMapBean) iterator.next();
-			boolean select = true;
-
-			//}
-			
-			if (bean.getKey()!=null && !bean.getKey().equals(temp.getKey()))
-				select=false;
-			
-			if (bean.getMsgNo()!=0 && bean.getMsgNo()!=temp.getMsgNo())
-				select=false;
-			
-			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
-				select=false;
-			
-			if (select)
-				beans.add(temp);
-		}
-		return beans;
-	}
-	
-	public boolean update(StorageMapBean bean) {
-		return table.put(bean.getKey(), bean) != null;
-	}
-	*/
+	 * private static Hashtable table = new Hashtable();
+	 * 
+	 * 
+	 * public InMemStorageMapBeanMgr() { }
+	 * 
+	 * public boolean insert(StorageMapBean bean) { table.put(bean.getKey(),
+	 * bean); return true; }
+	 * 
+	 * public boolean delete(String key) { return table.remove(key) != null; }
+	 * 
+	 * public StorageMapBean retrieve(String key) { return (StorageMapBean)
+	 * table.get(key); }
+	 * 
+	 * public ResultSet find(String query) { throw new
+	 * UnsupportedOperationException("selectRS() is not implemented"); }
+	 * 
+	 * public Collection find(StorageMapBean bean) { ArrayList beans = new
+	 * ArrayList(); Iterator iterator = table.values().iterator();
+	 * 
+	 * StorageMapBean temp = new StorageMapBean(); while (iterator.hasNext()) {
+	 * temp = (StorageMapBean) iterator.next(); boolean select = true;
+	 * 
+	 * //}
+	 * 
+	 * if (bean.getKey()!=null && !bean.getKey().equals(temp.getKey()))
+	 * select=false;
+	 * 
+	 * if (bean.getMsgNo()!=0 && bean.getMsgNo()!=temp.getMsgNo()) select=false;
+	 * 
+	 * if (bean.getSequenceId()!=null &&
+	 * !bean.getSequenceId().equals(temp.getSequenceId())) select=false;
+	 * 
+	 * if (select) beans.add(temp); } return beans; }
+	 * 
+	 * public boolean update(StorageMapBean bean) { return
+	 * table.put(bean.getKey(), bean) != null; }
+	 */
 
 }

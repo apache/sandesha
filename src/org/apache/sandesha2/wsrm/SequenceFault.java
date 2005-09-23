@@ -40,77 +40,88 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class SequenceFault implements IOMRMElement {
 	private OMElement sequenceFaultElement;
+
 	private FaultCode faultCode;
-	
-	OMNamespace rmNamespace = 
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public SequenceFault(){
-		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.SEQUENCE_FAULT,rmNamespace);
+
+	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public SequenceFault() {
+		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return sequenceFaultElement;
 	}
 
 	public Object fromOMElement(OMElement body) throws OMException {
-		
-		if (body==null || !(body instanceof SOAPBody))
-			throw new OMException ("Cant get Sequence Fault part from a non-header element");
-		
-		OMElement sequenceFaultPart = body.getFirstChildWithName( 
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_FAULT));
-		
-		if (sequenceFaultPart==null)
-			throw new OMException ("The passed element does not contain a Sequence Fault element");
-		
-		OMElement faultCodePart = sequenceFaultPart.getFirstChildWithName( 
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.FAULT_CODE));
-		
-		if (faultCodePart!=null) {
-		    faultCode = new FaultCode ();
-		    faultCode.fromOMElement(sequenceFaultPart);
+
+		if (body == null || !(body instanceof SOAPBody))
+			throw new OMException(
+					"Cant get Sequence Fault part from a non-header element");
+
+		OMElement sequenceFaultPart = body.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE_FAULT));
+
+		if (sequenceFaultPart == null)
+			throw new OMException(
+					"The passed element does not contain a Sequence Fault element");
+
+		OMElement faultCodePart = sequenceFaultPart
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.FAULT_CODE));
+
+		if (faultCodePart != null) {
+			faultCode = new FaultCode();
+			faultCode.fromOMElement(sequenceFaultPart);
 		}
-		
-		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.SEQUENCE_FAULT,rmNamespace);
-		
+
+		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
+
 		return this;
-		
+
 	}
 
 	public OMElement toOMElement(OMElement body) throws OMException {
 
-		if (body==null || !(body instanceof SOAPBody))
-			throw new OMException ("Cant get Sequence Fault part from a non-header element");
+		if (body == null || !(body instanceof SOAPBody))
+			throw new OMException(
+					"Cant get Sequence Fault part from a non-header element");
 
-		if (sequenceFaultElement==null)
-			throw new OMException ("Cant add the sequnce fault since the internal element is null");
-		
-		if (faultCode!=null) 
+		if (sequenceFaultElement == null)
+			throw new OMException(
+					"Cant add the sequnce fault since the internal element is null");
+
+		if (faultCode != null)
 			faultCode.toOMElement(sequenceFaultElement);
-		
+
 		body.addChild(sequenceFaultElement);
 
-		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.SEQUENCE_FAULT,rmNamespace);
-		
+		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
+
 		return body;
 	}
-	
-	public void setFaultCode(FaultCode faultCode){
+
+	public void setFaultCode(FaultCode faultCode) {
 		this.faultCode = faultCode;
 	}
-	
-	public FaultCode getFaultCode(){
+
+	public FaultCode getFaultCode() {
 		return faultCode;
 	}
-	public void setSequenceFaultElement(OMElement sequenceFault){
+
+	public void setSequenceFaultElement(OMElement sequenceFault) {
 		sequenceFaultElement = sequenceFault;
 	}
-	public OMElement getSequenceFaultElement(){
+
+	public OMElement getSequenceFaultElement() {
 		return sequenceFaultElement;
 	}
 

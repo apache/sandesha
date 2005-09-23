@@ -33,60 +33,67 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  */
 
 public class FaultCode implements IOMRMElement {
-	
+
 	private OMElement faultCodeElement;
+
 	String faultCode = null;
-	
-	OMNamespace rmNameSpace = 
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	
-	public FaultCode(){
-		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.FAULT_CODE,rmNameSpace);
+
+	OMNamespace rmNameSpace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public FaultCode() {
+		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.FAULT_CODE, rmNameSpace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return faultCodeElement;
 	}
 
 	public Object fromOMElement(OMElement sequenceFault) throws OMException {
-		
-		if (sequenceFault==null)
-			throw new OMException ("Can't add Fault Code part since the passed element is null");
-		
-		OMElement faultCodePart = sequenceFault.getFirstChildWithName( 
-				new QName (Constants.WSRM.NS_PREFIX_RM,Constants.WSRM.FAULT_CODE));
-		
-		if  (faultCodePart==null) 
-			throw new OMException ("Passed element does not contain a Fauld Code part");
-		
+
+		if (sequenceFault == null)
+			throw new OMException(
+					"Can't add Fault Code part since the passed element is null");
+
+		OMElement faultCodePart = sequenceFault
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_PREFIX_RM,
+						Constants.WSRM.FAULT_CODE));
+
+		if (faultCodePart == null)
+			throw new OMException(
+					"Passed element does not contain a Fauld Code part");
+
 		this.faultCode = faultCodePart.getText();
-		
-		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.FAULT_CODE,rmNameSpace);
-		
+
+		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.FAULT_CODE, rmNameSpace);
+
 		return sequenceFault;
-		
+
 	}
 
 	public OMElement toOMElement(OMElement sequenceFault) throws OMException {
 
-		if (sequenceFault==null)
-			throw new OMException ("Can't add Fault Code part since the passed element is null");
-		
-		if (faultCode==null || faultCode=="")
-			throw new OMException ("Cant add fault code since the the value is not set correctly.");
-		
-		if (faultCodeElement==null)
-			throw new OMException ("Cant add the fault code since the internal element is null");
-		
+		if (sequenceFault == null)
+			throw new OMException(
+					"Can't add Fault Code part since the passed element is null");
+
+		if (faultCode == null || faultCode == "")
+			throw new OMException(
+					"Cant add fault code since the the value is not set correctly.");
+
+		if (faultCodeElement == null)
+			throw new OMException(
+					"Cant add the fault code since the internal element is null");
+
 		faultCodeElement.setText(faultCode);
 		sequenceFault.addChild(faultCodeElement);
-		
+
 		return sequenceFault;
 	}
 
-	
 }

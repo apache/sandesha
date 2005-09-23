@@ -30,53 +30,37 @@ import org.apache.sandesha2.storage.beans.CreateSeqBean;
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
 
-public class InMemCreateSeqBeanMgr /*implements CreateSeqBeanMgr */ {
-	
+public class InMemCreateSeqBeanMgr /* implements CreateSeqBeanMgr */{
+
 	/*
-	private static Hashtable table = new Hashtable();
-
-
-	public InMemCreateSeqBeanMgr() {
-	}
-
-	public boolean insert(CreateSeqBean bean) {
-		table.put(bean.getCreateSeqMsgId(), bean);
-		return true;
-	}
-
-	public boolean delete(String msgId) {
-		return table.remove(msgId) != null;
-	}
-
-	public CreateSeqBean retrieve(String msgId) {
-		return (CreateSeqBean) table.get(msgId);
-	}
-
-	public boolean update(CreateSeqBean bean) {
-		return table.put(bean.getCreateSeqMsgId(), bean) != null;
-	}
-
-	public Collection find(CreateSeqBean bean) {
-		ArrayList beans = new ArrayList();		
-		Iterator iterator = table.values().iterator();
-		
-		CreateSeqBean temp;		
-		while (iterator.hasNext()) {
-			temp = (CreateSeqBean) iterator.next();
-			if ( (bean.getCreateSeqMsgId() != null 
-						&& bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
-						&& (bean.getSequenceId() != null 
-						&& bean.getSequenceId().equals(bean.getSequenceId()))) {
-				beans.add(temp);
-				
-			}
-		}
-		return beans;
-	}
-
-	public ResultSet find(String query) {
-		throw new UnsupportedOperationException("selectRS() is not supported");
-	}
-	*/
+	 * private static Hashtable table = new Hashtable();
+	 * 
+	 * 
+	 * public InMemCreateSeqBeanMgr() { }
+	 * 
+	 * public boolean insert(CreateSeqBean bean) {
+	 * table.put(bean.getCreateSeqMsgId(), bean); return true; }
+	 * 
+	 * public boolean delete(String msgId) { return table.remove(msgId) != null; }
+	 * 
+	 * public CreateSeqBean retrieve(String msgId) { return (CreateSeqBean)
+	 * table.get(msgId); }
+	 * 
+	 * public boolean update(CreateSeqBean bean) { return
+	 * table.put(bean.getCreateSeqMsgId(), bean) != null; }
+	 * 
+	 * public Collection find(CreateSeqBean bean) { ArrayList beans = new
+	 * ArrayList(); Iterator iterator = table.values().iterator();
+	 * 
+	 * CreateSeqBean temp; while (iterator.hasNext()) { temp = (CreateSeqBean)
+	 * iterator.next(); if ( (bean.getCreateSeqMsgId() != null &&
+	 * bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId())) &&
+	 * (bean.getSequenceId() != null &&
+	 * bean.getSequenceId().equals(bean.getSequenceId()))) { beans.add(temp);
+	 *  } } return beans; }
+	 * 
+	 * public ResultSet find(String query) { throw new
+	 * UnsupportedOperationException("selectRS() is not supported"); }
+	 */
 
 }

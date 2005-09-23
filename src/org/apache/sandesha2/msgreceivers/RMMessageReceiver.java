@@ -47,7 +47,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
-import org.apache.sandesha2.RMException;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SequenceMenager;
@@ -65,49 +65,55 @@ import com.bea.xml.stream.XMLWriterBase;
 
 public class RMMessageReceiver extends AbstractMessageReceiver {
 
-	
-	
 	//TODO move this code to create seq msg processor.
 	public void setCreateSequence(MessageContext inMessage,
 			MessageContext outMessage) throws AxisFault {
 
 		System.out.println("set create seq was called in RM Msg receiver");
-		
-		RMMsgContext createSeqMsg = null;
-        try {
-        	createSeqMsg = MsgInitializer.initializeMessage(inMessage);
-        }catch (RMException ex) {
-        	throw new AxisFault ("Cant initialize the message");
-        }
 
-        if (createSeqMsg.getMessageType()!=Constants.MESSAGE_TYPE_CREATE_SEQ)
-        	throw new AxisFault ("Wrong message type");
-        
-        RMMsgContext createSeqResponse = RMMsgCreator
-					.createCreateSeqResponseMsg(createSeqMsg, outMessage);	
-		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.
-							getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE);
-			
+		RMMsgContext createSeqMsg = null;
+		try {
+			createSeqMsg = MsgInitializer.initializeMessage(inMessage);
+		} catch (SandeshaException ex) {
+			throw new AxisFault("Cant initialize the message");
+		}
+
+		if (createSeqMsg.getMessageType() != Constants.MESSAGE_TYPE_CREATE_SEQ)
+			throw new AxisFault("Wrong message type");
+
+		RMMsgContext createSeqResponse = RMMsgCreator
+				.createCreateSeqResponseMsg(createSeqMsg, outMessage);
+		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
+				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE);
+
 		String newSequenceId = createSeqResPart.getIdentifier().getIdentifier();
-		if (newSequenceId==null)
-			throw new AxisFault ("Internal error - Generated sequence id is null");
+		if (newSequenceId == null)
+			throw new AxisFault(
+					"Internal error - Generated sequence id is null");
 
 		ConfigurationContext configCtx = inMessage.getSystemContext();
-		SequenceMenager.setUpNewSequence(newSequenceId,configCtx);
+		SequenceMenager.setUpNewSequence(newSequenceId, createSeqMsg);
 
-		CreateSequence createSeq = (CreateSequence) createSeqMsg.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
-		if (createSeq==null)
-			throw new AxisFault ("Create sequence part not present in the create sequence message");
-		
-		String acksTo = createSeq.getAcksTo().getAddress().getEpr().getAddress();
-		if (acksTo==null || acksTo=="")
-			throw new AxisFault ("Acks to not present in the create sequence message");
-		
-		SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_ACKS_TO,acksTo);
-//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
-//		beanMgr.create(seqPropBean);
-		
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(configCtx).getSequencePropretyBeanMgr();
+		CreateSequence createSeq = (CreateSequence) createSeqMsg
+				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+		if (createSeq == null)
+			throw new AxisFault(
+					"Create sequence part not present in the create sequence message");
+
+		EndpointReference acksTo = createSeq.getAcksTo().getAddress().getEpr();
+		if (acksTo == null || acksTo.getAddress() == null
+				|| acksTo.getAddress() == "")
+			throw new AxisFault(
+					"Acks to not present in the create sequence message");
+
+		SequencePropertyBean seqPropBean = new SequencePropertyBean(
+				newSequenceId, Constants.SEQ_PROPERTY_ACKS_TO_EPR, acksTo);
+		//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
+		// (Constants.DEFAULT_STORAGE_TYPE);
+		//		beanMgr.create(seqPropBean);
+
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
+				.getInstance(configCtx).getSequencePropretyBeanMgr();
 		seqPropMgr.insert(seqPropBean);
 		outMessage.setResponseWritten(true);
 
@@ -115,28 +121,29 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 	public final void receive(MessageContext messgeCtx) throws AxisFault {
 
-		System.out.println ("within RM Msg receiver");
-		
+		System.out.println("within RM Msg receiver");
+
 		//intitializing the message.
 		RMMsgContext rmMsgCtx = null;
-        try {
-        	rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
-        }catch (RMException ex) {
-        	throw new AxisFault ("Cant initialize the message");
-        }
+		try {
+			rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
+		} catch (SandeshaException ex) {
+			throw new AxisFault("Cant initialize the message");
+		}
 
 		AbstractMessageReceiver msgReceiver = null;
-		
+
 		String replyTo = messgeCtx.getFrom().getAddress();
-		if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_TERMINATE_SEQ)
-			msgReceiver = new RMInMsgReceiver ();
-		else if(rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ && ((replyTo==null) || replyTo.equals(Constants.WSA.NS_URI_ANONYMOUS))) 
-			msgReceiver = new RMInOutSyncMsgReceiver ();
-		else if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ)
-			msgReceiver = new RMInOutAsyncMsgReceiver ();
-		
-		
-		if(msgReceiver!=null) {
+		if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_TERMINATE_SEQ)
+			msgReceiver = new RMInMsgReceiver();
+		else if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ
+				&& ((replyTo == null) || replyTo
+						.equals(Constants.WSA.NS_URI_ANONYMOUS)))
+			msgReceiver = new RMInOutSyncMsgReceiver();
+		else if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ)
+			msgReceiver = new RMInOutAsyncMsgReceiver();
+
+		if (msgReceiver != null) {
 			msgReceiver.receive(messgeCtx);
 		}
 	}
@@ -154,60 +161,64 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		}
 		return fac;
 	}
-	
+
 	private class RMInMsgReceiver extends AbstractInMessageReceiver {
-		
-		public void invokeBusinessLogic(MessageContext inMessage) throws AxisFault {
+
+		public void invokeBusinessLogic(MessageContext inMessage)
+				throws AxisFault {
 			RMMsgContext rmMsgCtx = null;
-	        try {
-	        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
-	        }catch (RMException ex) {
-	        	throw new AxisFault ("Cant initialize the message");
-	        }
-			
+			try {
+				rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+			} catch (SandeshaException ex) {
+				throw new AxisFault("Cant initialize the message");
+			}
+
 			//TODO check for terminate sequence.
 			//TODO handle terminate sequence.
-			
-			
+
 		}
 	}
-	
-	private class RMInOutSyncMsgReceiver extends AbstractInOutSyncMessageReceiver {
-		
-		public void invokeBusinessLogic(MessageContext inMessage, MessageContext outMessage) throws AxisFault {
-			
-			RMMsgContext rmMsgCtx = null;
-	        try {
-	        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
-	        }catch (RMException ex) {
-	        	throw new AxisFault ("Cant initialize the message");
-	        }
-			
-			if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ) {
-				//TODO handle sync create seq.
-				setCreateSequence(inMessage,outMessage);
-			}
-			
-		}
-}
-	
-	private class RMInOutAsyncMsgReceiver extends AbstractInOutAsyncMessageReceiver {
-		
+
+	private class RMInOutSyncMsgReceiver extends
+			AbstractInOutSyncMessageReceiver {
+
 		public void invokeBusinessLogic(MessageContext inMessage,
-				MessageContext outMessage, ServerCallback callback) throws AxisFault {
-			
+				MessageContext outMessage) throws AxisFault {
+
 			RMMsgContext rmMsgCtx = null;
-	        try {
-	        	rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
-	        }catch (RMException ex) {
-	        	throw new AxisFault ("Cant initialize the message");
-	        }
-			
-			if (rmMsgCtx.getMessageType()==Constants.MESSAGE_TYPE_CREATE_SEQ) {
+			try {
+				rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+			} catch (SandeshaException ex) {
+				throw new AxisFault("Cant initialize the message");
+			}
+
+			if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
+				//TODO handle sync create seq.
+				setCreateSequence(inMessage, outMessage);
+			}
+
+		}
+	}
+
+	private class RMInOutAsyncMsgReceiver extends
+			AbstractInOutAsyncMessageReceiver {
+
+		public void invokeBusinessLogic(MessageContext inMessage,
+				MessageContext outMessage, ServerCallback callback)
+				throws AxisFault {
+
+			RMMsgContext rmMsgCtx = null;
+			try {
+				rmMsgCtx = MsgInitializer.initializeMessage(inMessage);
+			} catch (SandeshaException ex) {
+				throw new AxisFault("Cant initialize the message");
+			}
+
+			if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
 				//TODO handle async create seq.
-				setCreateSequence(inMessage,outMessage);
+				setCreateSequence(inMessage, outMessage);
 				ConfigurationContext configCtx = outMessage.getSystemContext();
-				AxisEngine engine = new AxisEngine (configCtx);
+				AxisEngine engine = new AxisEngine(configCtx);
 				engine.send(outMessage);
 			}
 		}

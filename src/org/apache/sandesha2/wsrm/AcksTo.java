@@ -39,58 +39,67 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  * @author sanka
  */
 
-public class AcksTo implements IOMRMElement{
-	
+public class AcksTo implements IOMRMElement {
+
 	private Address address;
+
 	private OMElement acksToElement;
+
 	//private OMElement addressElement;
-	
-	OMNamespace rmNamespace = 
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public AcksTo(){
-		acksToElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACKS_TO,rmNamespace);
+
+	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public AcksTo() {
+		acksToElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACKS_TO, rmNamespace);
 	}
 	
+	public AcksTo (Address address) {
+		this ();
+		this.address = address;
+	}
+
 	public OMElement getOMElement() throws OMException {
 		return acksToElement;
 	}
-	
-	public Object fromOMElement(OMElement element) throws OMException {
-		OMElement acksToPart = element.getFirstChildWithName( new QName (
-				Constants.WSRM.NS_URI_RM,Constants.WSRM.ACKS_TO));
-		
 
-		
-		if (acksToPart==null)
-			throw new OMException ("Passed element does not contain an acksTo part");
-		
-		address = new Address ();
+	public Object fromOMElement(OMElement element) throws OMException {
+		OMElement acksToPart = element.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.ACKS_TO));
+
+		if (acksToPart == null)
+			throw new OMException(
+					"Passed element does not contain an acksTo part");
+
+		address = new Address();
 		address.fromOMElement(acksToPart);
-		
-		acksToElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACKS_TO,rmNamespace);
-		
+
+		acksToElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACKS_TO, rmNamespace);
+
 		return this;
 	}
-	
+
 	public OMElement toOMElement(OMElement element) throws OMException {
-		
-		if (acksToElement==null)
-			throw new OMException ("Cant set AcksTo. AcksTo element is null");
-		if (address==null)
-			throw new OMException ("Cant set AcksTo. Address is null");
-		
-		OMElement acksToPart = element.getFirstChildWithName( 
-				new QName (Constants.WSA.NS_URI_ADDRESSING,Constants.WSRM.ACKS_TO));
-		
+
+		if (acksToElement == null)
+			throw new OMException("Cant set AcksTo. AcksTo element is null");
+		if (address == null)
+			throw new OMException("Cant set AcksTo. Address is null");
+
+		OMElement acksToPart = element.getFirstChildWithName(new QName(
+				Constants.WSA.NS_URI_ADDRESSING, Constants.WSRM.ACKS_TO));
+
 		address.toOMElement(acksToElement);
 		element.addChild(acksToElement);
-		
-		acksToElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACKS_TO,rmNamespace);
+
+		acksToElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACKS_TO, rmNamespace);
 
 		return element;
 	}

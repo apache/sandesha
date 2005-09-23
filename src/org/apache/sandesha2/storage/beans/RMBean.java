@@ -18,8 +18,7 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
- * @author 
- * 
+ * @author  
  */
 public interface RMBean {
 

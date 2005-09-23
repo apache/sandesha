@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.RMException;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
 /**
@@ -34,57 +34,78 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
  */
 public class RetransmitterBeanMgr {
 	private Hashtable table = null;
-	
+
 	/**
-	 * 
+	 *  
 	 */
-	public RetransmitterBeanMgr(AbstractContext context)  {
+	public RetransmitterBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.RETRANSMITTER_BEAN_MAP);
-		if (obj!=null) {
+		if (obj != null) {
 			table = (Hashtable) obj;
-		}else {
-			table = new Hashtable ();
-			context.setProperty(Constants.RETRANSMITTER_BEAN_MAP,table);
+		} else {
+			table = new Hashtable();
+			context.setProperty(Constants.RETRANSMITTER_BEAN_MAP, table);
 		}
 	}
 
-	public boolean delete(String MessageId) {	
+	public boolean delete(String MessageId) {
 		return table.remove(MessageId) != null;
 	}
-	
-	public RetransmitterBean retrieve(String MessageId){
+
+	public RetransmitterBean retrieve(String MessageId) {
 		return (RetransmitterBean) table.get(MessageId);
 	}
 
-	public boolean insert(RetransmitterBean bean) {
+	public boolean insert(RetransmitterBean bean) throws SandeshaException {
+		if (bean.getMessageId()==null)
+			throw new SandeshaException ("Key (MessageId) is null. Cant insert.");
+		
 		table.put(bean.getMessageId(), bean);
 		return true;
 	}
 
-	public ResultSet find(String query)  {
+	public ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not supported");
 	}
 
-	public Collection find(RetransmitterBean bean)  {
+	public Collection find(RetransmitterBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
-		
+
 		RetransmitterBean temp;
 		while (iterator.hasNext()) {
 			temp = (RetransmitterBean) iterator.next();
-			if (!(bean.getMessageId() != null 
-					&& bean.getMessageId().equals(temp.getMessageId()))
-					&& (bean.getCreateSeqMsgId() != null
-					&& bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
-					&& (bean.getKey() != null 
-					&& bean.getKey().equals(temp.getKey()))
-					&& (bean.getLastSentTime() != -1 
-					&& bean.getLastSentTime() == temp.getLastSentTime())){
-				
-				beans.add(temp);				
-			}
+			/*
+			 * if (!(bean.getMessageId() != null &&
+			 * bean.getMessageId().equals(temp.getMessageId())) &&
+			 * (bean.getCreateSeqMsgId() != null &&
+			 * bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId())) &&
+			 * (bean.getKey() != null && bean.getKey().equals(temp.getKey())) &&
+			 * (bean.getLastSentTime() != -1 && bean.getLastSentTime() ==
+			 * temp.getLastSentTime())){
+			 * 
+			 * beans.add(temp); }
+			 */
+			boolean add = false;
+			if (bean.getKey() != null && bean.getKey() != temp.getKey())
+				add = false;
+
+			if (bean.getLastSentTime() > 0
+					&& bean.getLastSentTime() != temp.getLastSentTime())
+				add = false;
+
+			if (bean.getMessageId() != null
+					&& bean.getMessageId() != temp.getMessageId())
+				add = false;
+
+			if (bean.getTempSequenceId() != null
+					&& bean.getTempSequenceId() != temp.getTempSequenceId())
+				add = false;
+
+			if (add)
+				beans.add(temp);
 		}
-		
+
 		return beans;
 	}
 

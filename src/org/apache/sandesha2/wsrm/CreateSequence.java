@@ -36,97 +36,115 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  * @author sanka
  */
 
-
 public class CreateSequence implements IOMRMPart {
 	private OMElement createSequenceElement;
-	
-	private AcksTo acksTo=null;
-	private Expires expires=null;
-	private SequenceOffer sequenceOffer=null;
+
+	private AcksTo acksTo = null;
+
+	private Expires expires = null;
+
+	private SequenceOffer sequenceOffer = null;
+
 	//private SequritytokenReference;
-	
-	OMNamespace rmNamespace =
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public CreateSequence(){
-		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.CREATE_SEQUENCE,rmNamespace);
+
+	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public CreateSequence() {
+		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 	}
 	
+	public CreateSequence (AcksTo acksTo) {
+		this ();
+		this.acksTo = acksTo;
+	}
+
 	public OMElement getOMElement() throws OMException {
 		return createSequenceElement;
 	}
 
 	public Object fromOMElement(OMElement bodyElement) throws OMException {
-		
-		OMElement createSequencePart = bodyElement.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.CREATE_SEQUENCE));
-		if (createSequencePart==null)
-			throw new OMException ("Create sequence is not present in the passed element");
-		
-		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.CREATE_SEQUENCE,
-				rmNamespace);
-		
+
+		OMElement createSequencePart = bodyElement
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.CREATE_SEQUENCE));
+		if (createSequencePart == null)
+			throw new OMException(
+					"Create sequence is not present in the passed element");
+
+		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
+
 		acksTo = new AcksTo();
-		acksTo.fromOMElement (createSequencePart);
-		
-		OMElement offerPart = createSequencePart.getFirstChildWithName (
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_OFFER));
-		if (offerPart!=null) {
+		acksTo.fromOMElement(createSequencePart);
+
+		OMElement offerPart = createSequencePart
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.SEQUENCE_OFFER));
+		if (offerPart != null) {
 			sequenceOffer = new SequenceOffer();
 			sequenceOffer.fromOMElement(createSequencePart);
 		}
-		
-		OMElement expiresPart = createSequenceElement.getFirstChildWithName (
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.EXPIRES));
-		if (expiresPart!=null) {
-			expires = new Expires ();
+
+		OMElement expiresPart = createSequenceElement
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.EXPIRES));
+		if (expiresPart != null) {
+			expires = new Expires();
 			expires.fromOMElement(createSequencePart);
 		}
-		
+
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement bodyElement) throws OMException {
-		
-		if (bodyElement==null || !(bodyElement instanceof SOAPBody))
-			throw new OMException ("Cant add Create Sequence Part to a non-body element");
 
-		if(acksTo==null)
-			throw new OMException ("Cant add create seqeunce part, having acks to as null");
-		
+		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
+			throw new OMException(
+					"Cant add Create Sequence Part to a non-body element");
+
+		if (acksTo == null)
+			throw new OMException(
+					"Cant add create seqeunce part, having acks to as null");
+
 		SOAPBody soapBody = (SOAPBody) bodyElement;
 		acksTo.toOMElement(createSequenceElement);
-		
-		if(sequenceOffer != null){
+
+		if (sequenceOffer != null) {
 			sequenceOffer.toOMElement(createSequenceElement);
 		}
-		
-		if(expires!=null) {
+
+		if (expires != null) {
 			expires.toOMElement(createSequenceElement);
 		}
 
 		soapBody.addChild(createSequenceElement);
-		
-		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.CREATE_SEQUENCE,rmNamespace);
+
+		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 		return soapBody;
 	}
-	
-	public void setAcksTo(AcksTo acksTo){
+
+	public void setAcksTo(AcksTo acksTo) {
 		this.acksTo = acksTo;
 	}
-	public void setSequenceOffer(SequenceOffer sequenceOffer){
+
+	public void setSequenceOffer(SequenceOffer sequenceOffer) {
 		this.sequenceOffer = sequenceOffer;
 	}
-	public AcksTo getAcksTo(){
+
+	public AcksTo getAcksTo() {
 		return acksTo;
 	}
-	public SequenceOffer getSequenceOffer(){
+
+	public SequenceOffer getSequenceOffer() {
 		return sequenceOffer;
 	}
-	
-	
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPBody body = envelope.getBody();

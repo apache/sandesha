@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.RMException;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 
@@ -35,28 +35,27 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
  */
 public class StorageMapBeanMgr {
 	private Hashtable table = null;
-	
-	
+
 	/**
-	 * 
+	 *  
 	 */
 	public StorageMapBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.STORAGE_MAP_BEAN_MAP);
-		if (obj!=null) {
+		if (obj != null) {
 			table = (Hashtable) obj;
-		}else {
-			table = new Hashtable ();
-			context.setProperty(Constants.STORAGE_MAP_BEAN_MAP,table);
+		} else {
+			table = new Hashtable();
+			context.setProperty(Constants.STORAGE_MAP_BEAN_MAP, table);
 		}
 	}
 
-	public boolean insert(StorageMapBean bean){
+	public boolean insert(StorageMapBean bean) {
 		table.put(bean.getKey(), bean);
 		return true;
 	}
-	
+
 	public boolean delete(String key) {
-		return table.remove(key) != null; 
+		return table.remove(key) != null;
 	}
 
 	public StorageMapBean retrieve(String key) {
@@ -66,41 +65,40 @@ public class StorageMapBeanMgr {
 	public ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not implemented");
 	}
-	
+
 	public Collection find(StorageMapBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
-		
+
 		StorageMapBean temp = new StorageMapBean();
 		while (iterator.hasNext()) {
 			temp = (StorageMapBean) iterator.next();
 			boolean select = true;
-			/*if ((temp.getKey() != null 
-					&& bean.getKey().equals(temp.getKey()))
-					&& (bean.getMsgNo() != -1 
-					&& bean.getMsgNo() == temp.getMsgNo())
-					&& (bean.getSequenceId() != null 
-					&& bean.getSequenceId().equals(temp.getSequenceId()))) {
-				*/
+			/*
+			 * if ((temp.getKey() != null &&
+			 * bean.getKey().equals(temp.getKey())) && (bean.getMsgNo() != -1 &&
+			 * bean.getMsgNo() == temp.getMsgNo()) && (bean.getSequenceId() !=
+			 * null && bean.getSequenceId().equals(temp.getSequenceId()))) {
+			 */
 
 			//}
-			
-			if (bean.getKey()!=null && !bean.getKey().equals(temp.getKey()))
-				select=false;
-			
-			if (bean.getMsgNo()!=0 && bean.getMsgNo()!=temp.getMsgNo())
-				select=false;
-			
-			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
-				select=false;
-			
+			if (bean.getKey() != null && !bean.getKey().equals(temp.getKey()))
+				select = false;
+
+			if (bean.getMsgNo() != 0 && bean.getMsgNo() != temp.getMsgNo())
+				select = false;
+
+			if (bean.getSequenceId() != null
+					&& !bean.getSequenceId().equals(temp.getSequenceId()))
+				select = false;
+
 			if (select)
 				beans.add(temp);
 		}
 		return beans;
 	}
-	
-	public boolean update(StorageMapBean bean){
+
+	public boolean update(StorageMapBean bean) {
 		return table.put(bean.getKey(), bean) != null;
 	}
 

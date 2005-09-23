@@ -18,6 +18,7 @@
 package org.apache.sandesha2.msgprocessors;
 
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaException;
 
 /**
  * @author
@@ -26,7 +27,7 @@ import org.apache.sandesha2.RMMsgContext;
 public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx)
-			throws MsgProcessorException {
+			throws SandeshaException {
 		//TODO Add terminate sequence message logic.
 	}
 }

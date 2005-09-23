@@ -54,138 +54,195 @@ import org.apache.wsdl.WSDLConstants;
 /**
  * @author Chamikara
  * @author Sanka
- * @author Jaliya 
+ * @author Jaliya
  */
 
 public class RMMsgCreator {
-	
-	public static RMMsgContext createCreateSeqMsg (RMMsgContext applicationMsg) throws AxisFault {
-		ConfigurationContext context = applicationMsg.getMessageContext().getSystemContext();
-		if (context==null)
-			throw new AxisFault ("Configuration Context is null");
+
+	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationMsg)
+			throws SandeshaException {
+		ConfigurationContext context = applicationMsg.getMessageContext()
+				.getSystemContext();
+		if (context == null)
+			throw new SandeshaException("Configuration Context is null");
+
+		MessageContext msgContext;
+		try {
+			msgContext = new MessageContext(context,applicationMsg.getMessageContext().getTransportIn(),
+					applicationMsg.getMessageContext().getTransportOut());
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
+		msgContext.setTo(applicationMsg.getTo());
+		msgContext.setReplyTo(applicationMsg.getReplyTo());
 		
-		MessageContext msgContext = new MessageContext (context);
-		RMMsgContext createSeqMsg = new RMMsgContext (msgContext);
+		RMMsgContext createSeqMsg = new RMMsgContext(msgContext);
+
+		CreateSequence createSequencePart = new CreateSequence();
 		
-		IOMRMPart createSeqiuencePart = new CreateSequence ();
-		createSeqMsg.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,createSeqiuencePart);
-		createSeqMsg.addSOAPEnvelope();
+		//TODO correct below. Set a correct acksTo value
+		EndpointReference acksToEPR = applicationMsg.getReplyTo();
 		
+		createSequencePart.setAcksTo (new AcksTo (new Address (acksToEPR)));
+		createSeqMsg.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,
+				createSequencePart);
+		
+		try {
+			createSeqMsg.addSOAPEnvelope();
+		} catch (AxisFault e1) {
+			throw new SandeshaException (e1.getMessage());
+		}
+
 		createSeqMsg.setAction(Constants.WSRM.ACTION_CREATE_SEQ);
 		EndpointReference to = applicationMsg.getTo();
-		if (to==null || to.getAddress()==null || to.getAddress()==null || to.getAddress()=="")
-			throw new AxisFault ("To value of the Application Message is not set correctly");
-	
+		if (to == null || to.getAddress() == null || to.getAddress() == null
+				|| to.getAddress() == "")
+			throw new SandeshaException(
+					"To value of the Application Message is not set correctly");
+
 		createSeqMsg.setTo(to);
-		
+
 		EndpointReference replyTo = applicationMsg.getReplyTo();
-		if (replyTo==null || replyTo.getAddress()==null || replyTo.getAddress()==null || to.getAddress()=="")
-			throw new AxisFault ("ReplyTo value of the Application Message is not set correctly");
-	
+		if (replyTo == null || replyTo.getAddress() == null
+				|| replyTo.getAddress() == null || to.getAddress() == "")
+			throw new SandeshaException(
+					"ReplyTo value of the Application Message is not set correctly");
+
 		createSeqMsg.setTo(replyTo);
 		createSeqMsg.setReplyTo(replyTo);
-		
+
 		return createSeqMsg;
 	}
 
-	
-	public static RMMsgContext createCreateSeqResponseMsg (RMMsgContext createSeqMessage, MessageContext outMessage) throws AxisFault {
-		
-		IOMRMElement messagePart = 
-			createSeqMessage.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+	public static RMMsgContext createCreateSeqResponseMsg(
+			RMMsgContext createSeqMessage, MessageContext outMessage)
+			throws AxisFault {
+
+		IOMRMElement messagePart = createSeqMessage
+				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
 		CreateSequence cs = (CreateSequence) messagePart;
-		
+
 		CreateSequenceResponse response = new CreateSequenceResponse();
-		
+
 		Identifier identifier = new Identifier();
 		String newSequenceID = SandeshaUtil.getUUID();
 		identifier.setIndentifer(newSequenceID);
-		
+
 		response.setIdentifier(identifier);
-		
+
 		Accept accept = new Accept();
-		EndpointReference acksToEPR = createSeqMessage.getTo();  
+		EndpointReference acksToEPR = createSeqMessage.getTo();
 		AcksTo acksTo = new AcksTo();
-		Address address = new Address ();
-		address.setEpr(acksToEPR); 
+		Address address = new Address();
+		address.setEpr(acksToEPR);
 		acksTo.setAddress(address);
 		accept.setAcksTo(acksTo);
 		response.setAccept(accept);
-	
-		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();	
+
+		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
 		response.toOMElement(envelope.getBody());
-        outMessage.setWSAAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
-        
-        String newMessageId = SandeshaUtil.getUUID();
-        outMessage.setMessageID(newMessageId);
-		
-        outMessage.setEnvelope(envelope);
-        
-        RMMsgContext createSeqResponse = null;
-        try {
-        	createSeqResponse = MsgInitializer.initializeMessage(outMessage);
-        }catch (RMException ex) {
-        	throw new AxisFault ("Cant initialize the message");
-        }
-        
-        return createSeqResponse;
+		outMessage.setWSAAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
+
+		String newMessageId = SandeshaUtil.getUUID();
+		outMessage.setMessageID(newMessageId);
+
+		outMessage.setEnvelope(envelope);
+
+		RMMsgContext createSeqResponse = null;
+		try {
+			createSeqResponse = MsgInitializer.initializeMessage(outMessage);
+		} catch (SandeshaException ex) {
+			throw new AxisFault("Cant initialize the message");
+		}
+
+		return createSeqResponse;
 	}
-	
-	
+
 	//Adds a ack message to the following message.
-	public static void addAckMessage (RMMsgContext applicationMsg) throws AxisFault {
+	public static void addAckMessage(RMMsgContext applicationMsg)
+			throws SandeshaException  {
 		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
-		if(envelope==null) {
-			SOAPEnvelope newEnvelope = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
-			applicationMsg.setSOAPEnvelop(envelope);
+		if (envelope == null) {
+			SOAPEnvelope newEnvelope = SOAPAbstractFactory.getSOAPFactory(
+					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+			applicationMsg.setSOAPEnvelop(newEnvelope);
 		}
 		envelope = applicationMsg.getSOAPEnvelope();
-		
-		MessageContext requestMessage = applicationMsg.getMessageContext().getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN);
 
+		MessageContext requestMessage = null;
+		
+		try {
+			requestMessage = applicationMsg.getMessageContext()
+					.getOperationContext().getMessageContext(
+							WSDLConstants.MESSAGE_LABEL_IN);
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
+
+		if (requestMessage==null)
+			throw new SandeshaException ("Request message is null");
+		
 		RMMsgContext reqRMMsgCtx = null;
-		
-        try {
-        	reqRMMsgCtx = MsgInitializer.initializeMessage(requestMessage);
-        }catch (RMException ex) {
-        	throw new AxisFault ("Cant initialize the message");
-        }
-		
-        
-        Sequence reqSequence = (Sequence) reqRMMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
-		if (reqSequence==null)
-			throw new AxisFault ("Sequence part of application message is null");
-        
+
+
+		reqRMMsgCtx = MsgInitializer.initializeMessage(requestMessage);
+
+
+		Sequence reqSequence = (Sequence) reqRMMsgCtx
+				.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+		if (reqSequence == null)
+			throw new SandeshaException("Sequence part of application message is null");
+
 		String sequenceId = reqSequence.getIdentifier().getIdentifier();
-		
-        SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement ();
-		Identifier id = new Identifier ();
+
+		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement();
+		Identifier id = new Identifier();
 		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);
 
-//		SequencePropertyBean seqPropBean = new SequencePropertyBean (newSequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,acksTo);
-//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr (Constants.DEFAULT_STORAGE_TYPE);
-//		SequencePropertyBean msgNosBean = (SequencePropertyBean) beanMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
-//		String msgNoList = (String) msgNosBean.getValue();
-		
-		ConfigurationContext ctx = applicationMsg.getMessageContext().getSystemContext();
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(ctx).
-							getSequencePropretyBeanMgr();
-		
-		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+		//		SequencePropertyBean seqPropBean = new SequencePropertyBean
+		// (newSequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,acksTo);
+		//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
+		// (Constants.DEFAULT_STORAGE_TYPE);
+		//		SequencePropertyBean msgNosBean = (SequencePropertyBean)
+		// beanMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+		//		String msgNoList = (String) msgNosBean.getValue();
+
+		ConfigurationContext ctx = applicationMsg.getMessageContext()
+				.getSystemContext();
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
+				.getInstance(ctx).getSequencePropretyBeanMgr();
+
+		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
+				Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
-		System.out.println ("Message No List:" + msgNoList);
-		
-		AcknowledgementRange[] ackRangeArr = SandeshaUtil.getAckRangeArray(msgNoList);
-			
+		System.out.println("Message No List:" + msgNoList);
+
+		AcknowledgementRange[] ackRangeArr = SandeshaUtil
+				.getAckRangeArray(msgNoList);
+
 		int length = ackRangeArr.length;
-		
-		for (int i=0;i<length;i++)
+
+		for (int i = 0; i < length; i++)
 			sequenceAck.addAcknowledgementRanges(ackRangeArr[i]);
-		
+
 		sequenceAck.toOMElement(envelope.getHeader());
 		applicationMsg.setAction(Constants.WSRM.ACTION_SEQ_ACK);
-		applicationMsg.setMessageId(SandeshaUtil.getUUID()); 
-		
+		applicationMsg.setMessageId(SandeshaUtil.getUUID());
+
+	}
+	
+	public static RMMsgContext createAckMessage (RMMsgContext applicationMsg) throws SandeshaException {
+		try {
+			MessageContext applicationMsgCtx = applicationMsg.getMessageContext();
+			MessageContext ackMsgCtx = new MessageContext (applicationMsgCtx.getSystemContext(),
+					applicationMsgCtx.getTransportIn(),applicationMsgCtx.getTransportOut());
+			RMMsgContext ackRMMsgCtx = new RMMsgContext (ackMsgCtx);
+			addAckMessage(ackRMMsgCtx);
+			return ackRMMsgCtx;
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		} 
 	}
 }

@@ -20,43 +20,47 @@ package org.apache.sandesha2.storage.beans;
 import java.io.Serializable;
 
 /**
- * @author 
- * 
+ * @author  
  */
 public class NextMsgBean implements Serializable {
 	private String SequenceId;
+
 	private long NextMsgNoToProcess;
-	
-	
-	public NextMsgBean (){
-		
+
+	public NextMsgBean() {
+
 	}
-	
-	public NextMsgBean (String sequenceId, long nextNsgNo) {
+
+	public NextMsgBean(String sequenceId, long nextNsgNo) {
 		this.SequenceId = sequenceId;
 		this.NextMsgNoToProcess = nextNsgNo;
 	}
-	
+
 	/**
 	 * @return Returns the nextMsgNoToProcess.
 	 */
 	public long getNextMsgNoToProcess() {
 		return NextMsgNoToProcess;
 	}
+
 	/**
-	 * @param nextMsgNoToProcess The nextMsgNoToProcess to set.
+	 * @param nextMsgNoToProcess
+	 *            The nextMsgNoToProcess to set.
 	 */
 	public void setNextMsgNoToProcess(long nextMsgNoToProcess) {
 		NextMsgNoToProcess = nextMsgNoToProcess;
 	}
+
 	/**
 	 * @return Returns the sequenceId.
 	 */
 	public String getSequenceId() {
 		return SequenceId;
 	}
+
 	/**
-	 * @param sequenceId The sequenceId to set.
+	 * @param sequenceId
+	 *            The sequenceId to set.
 	 */
 	public void setSequenceId(String sequenceId) {
 		SequenceId = sequenceId;

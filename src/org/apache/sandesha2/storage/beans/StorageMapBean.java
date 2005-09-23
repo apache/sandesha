@@ -20,57 +20,66 @@ package org.apache.sandesha2.storage.beans;
 import java.io.Serializable;
 
 /**
- * @author 
- * 
+ * @author  
  */
 public class StorageMapBean implements Serializable {
 
 	private String Key;
+
 	private long MsgNo;
+
 	private String sequenceId;
-	
-	
-	public StorageMapBean (){
-		
+
+	public StorageMapBean() {
+
 	}
-	
+
 	public StorageMapBean(String key, long msgNo, String sequenceId) {
 		this.Key = key;
 		this.MsgNo = msgNo;
 		this.sequenceId = sequenceId;
 	}
+
 	/**
 	 * @return Returns the key.
 	 */
 	public String getKey() {
 		return Key;
 	}
+
 	/**
-	 * @param key The key to set.
+	 * @param key
+	 *            The key to set.
 	 */
 	public void setKey(String key) {
 		Key = key;
 	}
+
 	/**
 	 * @return Returns the msgNo.
 	 */
 	public long getMsgNo() {
 		return MsgNo;
 	}
+
 	/**
-	 * @param msgNo The msgNo to set.
+	 * @param msgNo
+	 *            The msgNo to set.
 	 */
 	public void setMsgNo(long msgNo) {
 		MsgNo = msgNo;
 	}
+
 	/**
 	 * @return Returns the sequenceId.
 	 */
 	public String getSequenceId() {
 		return sequenceId;
 	}
+
 	/**
-	 * @param sequenceId The sequenceId to set.
+	 * @param sequenceId
+	 *            The sequenceId to set.
 	 */
 	public void setSequenceId(String sequenceId) {
 		this.sequenceId = sequenceId;

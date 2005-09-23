@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.RMException;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 /**
@@ -34,28 +34,28 @@ import org.apache.sandesha2.storage.beans.CreateSeqBean;
  */
 
 public class CreateSeqBeanMgr {
-	
+
 	private Hashtable table = null;
 
 	/**
-	 * 
+	 *  
 	 */
 	public CreateSeqBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.CREATE_SEQUECE_BEAN_MAP);
-		if (obj!=null) {
+		if (obj != null) {
 			table = (Hashtable) obj;
-		}else {
-			table = new Hashtable ();
-			context.setProperty(Constants.CREATE_SEQUECE_BEAN_MAP,table);
+		} else {
+			table = new Hashtable();
+			context.setProperty(Constants.CREATE_SEQUECE_BEAN_MAP, table);
 		}
 	}
 
-	public boolean insert(CreateSeqBean bean)  {
+	public boolean insert(CreateSeqBean bean) {
 		table.put(bean.getCreateSeqMsgId(), bean);
 		return true;
 	}
 
-	public boolean delete(String msgId)  {
+	public boolean delete(String msgId) {
 		return table.remove(msgId) != null;
 	}
 
@@ -63,23 +63,23 @@ public class CreateSeqBeanMgr {
 		return (CreateSeqBean) table.get(msgId);
 	}
 
-	public boolean update(CreateSeqBean bean){
+	public boolean update(CreateSeqBean bean) {
 		return table.put(bean.getCreateSeqMsgId(), bean) != null;
 	}
 
 	public Collection find(CreateSeqBean bean) {
-		ArrayList beans = new ArrayList();		
+		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
-		
-		CreateSeqBean temp;		
+
+		CreateSeqBean temp;
 		while (iterator.hasNext()) {
 			temp = (CreateSeqBean) iterator.next();
-			if ( (bean.getCreateSeqMsgId() != null 
-						&& bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
-						&& (bean.getSequenceId() != null 
-						&& bean.getSequenceId().equals(bean.getSequenceId()))) {
+			if ((bean.getCreateSeqMsgId() != null && bean.getCreateSeqMsgId()
+					.equals(temp.getCreateSeqMsgId()))
+					&& (bean.getSequenceId() != null && bean.getSequenceId()
+							.equals(bean.getSequenceId()))) {
 				beans.add(temp);
-				
+
 			}
 		}
 		return beans;

@@ -29,59 +29,45 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemRetransmitterBeanMgr /*implements RetransmitterBeanMgr*/ {
-	
+public class InMemRetransmitterBeanMgr /* implements RetransmitterBeanMgr */{
+
 	/*
-	private static Hashtable table = new Hashtable();
-	
-
-	public InMemRetransmitterBeanMgr() {
-	}
-
-	public boolean delete(String MessageId) {
-		return table.remove(MessageId) != null;
-	}
-	
-	public RetransmitterBean retrieve(String MessageId) {
-		return (RetransmitterBean) table.get(MessageId);
-	}
-
-	public boolean insert(RetransmitterBean bean) {
-		table.put(bean.getMessageId(), bean);
-		return true;
-	}
-
-	public ResultSet find(String query) {
-		throw new UnsupportedOperationException("selectRS() is not supported");
-	}
-
-	public Collection find(RetransmitterBean bean) {
-		ArrayList beans = new ArrayList();
-		Iterator iterator = table.values().iterator();
-		
-		RetransmitterBean temp;
-		while (iterator.hasNext()) {
-			temp = (RetransmitterBean) iterator.next();
-			if (!(bean.getMessageId() != null 
-					&& bean.getMessageId().equals(temp.getMessageId()))
-					&& (bean.getCreateSeqMsgId() != null
-					&& bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
-					&& (bean.getKey() != null 
-					&& bean.getKey().equals(temp.getKey()))
-					&& (bean.getLastSentTime() != -1 
-					&& bean.getLastSentTime() == temp.getLastSentTime())){
-				
-				beans.add(temp);				
-			}
-		}
-		
-		return beans;
-	}
-
-	public boolean update(RetransmitterBean bean) {
-		return table.put(bean.getMessageId(), bean) != null;
-	}
-	
-	*/
+	 * private static Hashtable table = new Hashtable();
+	 * 
+	 * 
+	 * public InMemRetransmitterBeanMgr() { }
+	 * 
+	 * public boolean delete(String MessageId) { return table.remove(MessageId) !=
+	 * null; }
+	 * 
+	 * public RetransmitterBean retrieve(String MessageId) { return
+	 * (RetransmitterBean) table.get(MessageId); }
+	 * 
+	 * public boolean insert(RetransmitterBean bean) {
+	 * table.put(bean.getMessageId(), bean); return true; }
+	 * 
+	 * public ResultSet find(String query) { throw new
+	 * UnsupportedOperationException("selectRS() is not supported"); }
+	 * 
+	 * public Collection find(RetransmitterBean bean) { ArrayList beans = new
+	 * ArrayList(); Iterator iterator = table.values().iterator();
+	 * 
+	 * RetransmitterBean temp; while (iterator.hasNext()) { temp =
+	 * (RetransmitterBean) iterator.next(); if (!(bean.getMessageId() != null &&
+	 * bean.getMessageId().equals(temp.getMessageId())) &&
+	 * (bean.getCreateSeqMsgId() != null &&
+	 * bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId())) &&
+	 * (bean.getKey() != null && bean.getKey().equals(temp.getKey())) &&
+	 * (bean.getLastSentTime() != -1 && bean.getLastSentTime() ==
+	 * temp.getLastSentTime())){
+	 * 
+	 * beans.add(temp); } }
+	 * 
+	 * return beans; }
+	 * 
+	 * public boolean update(RetransmitterBean bean) { return
+	 * table.put(bean.getMessageId(), bean) != null; }
+	 *  
+	 */
 
 }

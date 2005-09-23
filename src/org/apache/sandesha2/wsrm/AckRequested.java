@@ -36,94 +36,103 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class AckRequested implements IOMRMPart {
 	private OMElement ackRequestedElement;
+
 	private Identifier identifier;
+
 	private MessageNumber messageNumber;
-	
-	OMNamespace rmNamespace =
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public AckRequested(){
-		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACK_REQUESTED,rmNamespace);
+
+	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public AckRequested() {
+		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return ackRequestedElement;
 	}
 
 	public Object fromOMElement(OMElement header) throws OMException {
-		
-		if (header==null || !(header instanceof SOAPHeader))
-			throw new OMException ("Cant add the Ack Requested part to a non-header element");
-		
-		OMElement ackReqPart = header.getFirstChildWithName
-			(new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.ACK_REQUESTED));
-		
-		if (ackReqPart==null)
-			throw new OMException ("the passed element does not contain an ack requested part");
-		
+
+		if (header == null || !(header instanceof SOAPHeader))
+			throw new OMException(
+					"Cant add the Ack Requested part to a non-header element");
+
+		OMElement ackReqPart = header.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.ACK_REQUESTED));
+
+		if (ackReqPart == null)
+			throw new OMException(
+					"the passed element does not contain an ack requested part");
+
 		identifier = new Identifier();
 		identifier.fromOMElement(ackReqPart);
-		
-		OMElement msgNoPart = ackReqPart.getFirstChildWithName
-		(new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.MSG_NUMBER));
-		
-		if (msgNoPart!=null){
+
+		OMElement msgNoPart = ackReqPart.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.MSG_NUMBER));
+
+		if (msgNoPart != null) {
 			messageNumber = new MessageNumber();
 			messageNumber.fromOMElement(ackReqPart);
 		}
-		
-		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACK_REQUESTED,rmNamespace);
-		
+
+		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_REQUESTED, rmNamespace);
+
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement header) throws OMException {
 
-		if (header==null || !(header instanceof SOAPHeader))
-			throw new OMException ("Cant add the Ack Requested part to a non-header element");
+		if (header == null || !(header instanceof SOAPHeader))
+			throw new OMException(
+					"Cant add the Ack Requested part to a non-header element");
 
-		if( identifier == null)
-			throw new OMException ("Cant add ack Req block since the identifier is null");
-		
+		if (identifier == null)
+			throw new OMException(
+					"Cant add ack Req block since the identifier is null");
+
 		SOAPHeader SOAPHdr = (SOAPHeader) header;
 		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(
-				Constants.WSRM.ACK_REQUESTED,rmNamespace);
+				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 		ackReqHdrBlock.setMustUnderstand(true);
-		
+
 		identifier.toOMElement(ackReqHdrBlock);
 
-		if ( messageNumber != null){
+		if (messageNumber != null) {
 			messageNumber.toOMElement(ackReqHdrBlock);
 		}
-		
-		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACK_REQUESTED,rmNamespace);
-		
+
+		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_REQUESTED, rmNamespace);
+
 		return header;
 	}
-	
-	public void setIdentifier(Identifier identifier){
+
+	public void setIdentifier(Identifier identifier) {
 		this.identifier = identifier;
 	}
-	
-	public void setMessageNumber(MessageNumber messageNumber){
+
+	public void setMessageNumber(MessageNumber messageNumber) {
 		this.messageNumber = messageNumber;
 	}
-	
-	public Identifier getIdentifier(){
+
+	public Identifier getIdentifier() {
 		return identifier;
 	}
-	
-	public MessageNumber getMessageNumber(){
+
+	public MessageNumber getMessageNumber() {
 		return messageNumber;
 	}
-	
+
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
 		toOMElement(header);
 	}
-
 
 }

@@ -35,102 +35,121 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class CreateSequenceResponse implements IOMRMPart {
 	private OMElement createSequenceResponseElement;
+
 	private Identifier identifier;
+
 	private Accept accept;
+
 	private Expires expires;
-	
-	OMNamespace createSeqResNoNamespace =
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public CreateSequenceResponse(){
-		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,createSeqResNoNamespace);
+
+	OMNamespace createSeqResNoNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public CreateSequenceResponse() {
+		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
+				createSeqResNoNamespace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return createSequenceResponseElement;
 	}
 
 	public Object fromOMElement(OMElement bodyElement) throws OMException {
-	
-		if (bodyElement==null || !(bodyElement instanceof SOAPBody))
-			throw new OMException ("Cant get create sequnce response from a non-body element");
-		
-		
+
+		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
+			throw new OMException(
+					"Cant get create sequnce response from a non-body element");
+
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
 
-		OMElement createSeqResponsePart = SOAPBody.getFirstChildWithName( 
-				new QName (Constants.WSRM.NS_URI_RM, Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
-		if(createSeqResponsePart==null)
-			throw new OMException ("The passed element does not contain a create seqence response part");
-		
-		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,createSeqResNoNamespace);
-		
+		OMElement createSeqResponsePart = SOAPBody
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
+		if (createSeqResponsePart == null)
+			throw new OMException(
+					"The passed element does not contain a create seqence response part");
+
+		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
+				createSeqResNoNamespace);
+
 		identifier = new Identifier();
 		identifier.fromOMElement(createSeqResponsePart);
-		
-		OMElement expiresPart = createSeqResponsePart.getFirstChildWithName( 
-				new QName (Constants.WSRM.NS_URI_RM, Constants.WSRM.EXPIRES));
-		if (expiresPart!=null) {
-			expires = new Expires ();
+
+		OMElement expiresPart = createSeqResponsePart
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.EXPIRES));
+		if (expiresPart != null) {
+			expires = new Expires();
 			expires.fromOMElement(createSeqResponsePart);
 		}
-	
-		OMElement acceptPart = createSeqResponsePart.getFirstChildWithName( 
-				new QName (Constants.WSRM.NS_URI_RM, Constants.WSRM.ACCEPT));
-		if (acceptPart!=null) {
-			accept = new Accept ();
+
+		OMElement acceptPart = createSeqResponsePart
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.ACCEPT));
+		if (acceptPart != null) {
+			accept = new Accept();
 			accept.fromOMElement(createSeqResponsePart);
 		}
-		
+
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement bodyElement) throws OMException {
-		
-		if (bodyElement==null || !(bodyElement instanceof SOAPBody))
-			throw new OMException ("Cant get create sequnce response from a non-body element");
-		
+
+		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
+			throw new OMException(
+					"Cant get create sequnce response from a non-body element");
+
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
-		
-		if (createSequenceResponseElement==null)
-			throw new OMException ("cant set create sequnce response since the internal element is not set");
-		if (identifier==null)
-			throw new OMException ("cant set create sequnce response since the Identifier is not set");
-		
+
+		if (createSequenceResponseElement == null)
+			throw new OMException(
+					"cant set create sequnce response since the internal element is not set");
+		if (identifier == null)
+			throw new OMException(
+					"cant set create sequnce response since the Identifier is not set");
+
 		identifier.toOMElement(createSequenceResponseElement);
-		
+
 		if (expires != null) {
 			expires.toOMElement(createSequenceResponseElement);
 		}
-		
-		if( accept != null){
+
+		if (accept != null) {
 			accept.toOMElement(createSequenceResponseElement);
 		}
-		
+
 		SOAPBody.addChild(createSequenceResponseElement);
-		
-		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,createSeqResNoNamespace);
-		
+
+		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
+				createSeqResNoNamespace);
+
 		return SOAPBody;
 	}
-	
-	public void setIdentifier(Identifier identifier){
+
+	public void setIdentifier(Identifier identifier) {
 		this.identifier = identifier;
 	}
-	public Identifier getIdentifier(){
+
+	public Identifier getIdentifier() {
 		return identifier;
 	}
-	
-	public void setAccept(Accept accept){
+
+	public void setAccept(Accept accept) {
 		this.accept = accept;
 	}
-	public Accept getAccept(){
+
+	public Accept getAccept() {
 		return accept;
 	}
-	
+
 	public Expires getExpires() {
 		return expires;
 	}
@@ -138,7 +157,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 	public void setExpires(Expires expires) {
 		this.expires = expires;
 	}
-	
+
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPBody body = envelope.getBody();
 		toOMElement(body);

@@ -24,17 +24,19 @@ import java.io.Serializable;
 public class SequencePropertyBean implements Serializable {
 
 	private String sequenceId;
+
 	private String name;
+
 	private Object value;
-	
-	public SequencePropertyBean (String seqId, String propertyName, Object value) {
+
+	public SequencePropertyBean(String seqId, String propertyName, Object value) {
 		this.sequenceId = seqId;
 		this.name = propertyName;
 		this.value = value;
 	}
-	
-	public SequencePropertyBean () {
-		
+
+	public SequencePropertyBean() {
+
 	}
 
 	public String getName() {

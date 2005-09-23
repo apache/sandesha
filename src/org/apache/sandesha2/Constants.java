@@ -147,15 +147,20 @@ public interface Constants {
 	
 	String IN_HANDLER_NAME = "SandeshaInHandler";
 	
+	String OUT_HANDLER_NAME = "SandeshaOutHandler";
+	
 	
 	//Sequence properties
 	
 	String SEQ_PROPERTY_RECEIVED_MESSAGES = "SeqMsgListProperty";
 	
-	String SEQ_PROPERTY_ACKS_TO = "acksToProperty";
+	String SEQ_PROPERTY_TO_EPR = "ToEPR";
+	
+	String SEQ_PROPERTY_ACKS_TO_EPR = "acksToEPR";
 	
 	String SEQ_PROPERTY_OUT_SEQUENCE_ID = "OutSequenceId";
 	
+	String SEQ_PROPERTY_REPLY_TO_EPR = "ReplyToEPR";
 	
 	//SOAP versions
 	int SOAP_1_1 = 1;

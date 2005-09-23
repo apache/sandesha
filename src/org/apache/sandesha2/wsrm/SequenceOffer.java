@@ -34,72 +34,82 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class SequenceOffer implements IOMRMElement {
 	private OMElement sequenceOfferElement;
-	private Identifier identifier=null;
-	private Expires expires=null;
-	
-	OMNamespace rmNamespace = 
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public SequenceOffer(){
-		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
-									.createOMElement(Constants.WSRM.SEQUENCE_OFFER,rmNamespace);
+
+	private Identifier identifier = null;
+
+	private Expires expires = null;
+
+	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public SequenceOffer() {
+		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return sequenceOfferElement;
 	}
 
-	public Object fromOMElement(OMElement createSequenceElement) throws OMException {
-		OMElement sequenceOfferPart = createSequenceElement.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE_OFFER));
-		if (sequenceOfferPart==null)
-			throw new OMException("The passed element does not contain a SequenceOffer part");
-		
-		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement( 
-									Constants.WSRM.SEQUENCE_OFFER,rmNamespace);
-		
+	public Object fromOMElement(OMElement createSequenceElement)
+			throws OMException {
+		OMElement sequenceOfferPart = createSequenceElement
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.SEQUENCE_OFFER));
+		if (sequenceOfferPart == null)
+			throw new OMException(
+					"The passed element does not contain a SequenceOffer part");
+
+		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
+
 		identifier = new Identifier();
 		identifier.fromOMElement(sequenceOfferPart);
-		
-		OMElement expiresPart = sequenceOfferPart.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.EXPIRES));
-		if(expiresPart!=null){
-			expires = new Expires ();
+
+		OMElement expiresPart = sequenceOfferPart
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.EXPIRES));
+		if (expiresPart != null) {
+			expires = new Expires();
 			expires.fromOMElement(sequenceOfferElement);
 		}
-		
+
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement createSequenceElement) throws OMException {
-		if(sequenceOfferElement==null)
-			throw new OMException ("Cant set sequnceoffer. Offer element is null");
-		if (identifier==null)
-			throw new OMException ("Cant set sequnceOffer since identifier is null");
+	public OMElement toOMElement(OMElement createSequenceElement)
+			throws OMException {
+		if (sequenceOfferElement == null)
+			throw new OMException(
+					"Cant set sequnceoffer. Offer element is null");
+		if (identifier == null)
+			throw new OMException(
+					"Cant set sequnceOffer since identifier is null");
 
-		
-	    identifier.toOMElement(sequenceOfferElement);
-	    
-		if(expires!=null) {
+		identifier.toOMElement(sequenceOfferElement);
+
+		if (expires != null) {
 			expires.toOMElement(sequenceOfferElement);
 		}
-		
+
 		createSequenceElement.addChild(sequenceOfferElement);
-			
-		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-									Constants.WSRM.SEQUENCE_OFFER,rmNamespace);
-		
+
+		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
+
 		return createSequenceElement;
 	}
-	
-	public Identifier getIdentifer(){
+
+	public Identifier getIdentifer() {
 		return identifier;
 	}
-	
-	public void setIdentifier(Identifier identifier){
-		this.identifier = identifier;		
+
+	public void setIdentifier(Identifier identifier) {
+		this.identifier = identifier;
 	}
-	
 
 }

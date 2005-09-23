@@ -12,9 +12,9 @@ package org.apache.sandesha2;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class RMException extends Exception {
+public class SandeshaException extends Exception {
 
-	public RMException (String message) {
+	public SandeshaException (String message) {
 		super (message);
 	}
 }

@@ -41,152 +41,160 @@ import org.ietf.jgss.MessageProp;
 /**
  * @author Chamikara
  * @author Sanka
- * @author Jaliya 
+ * @author Jaliya
  */
 
 public class RMMsgContext {
-	
+
 	private MessageContext msgContext;
+
 	private HashMap rmMessageParts;
+
 	private int messageType;
-	
-	public RMMsgContext (){
-		rmMessageParts = new HashMap ();
+
+	public RMMsgContext() {
+		rmMessageParts = new HashMap();
 		messageType = Constants.MESSAGE_TYPE_UNKNOWN;
 	}
-	
-	public RMMsgContext (MessageContext ctx) {
-		this ();
+
+	public RMMsgContext(MessageContext ctx) {
+		this();
 		this.msgContext = ctx;
 
 		//MsgInitializer.populateRMMsgContext(ctx,this);
 	}
-	
-	public void addSOAPEnvelope () throws AxisFault {
-		if (msgContext.getEnvelope()==null) {
-			msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope());
-		}	
-		
+
+	public void addSOAPEnvelope() throws AxisFault {
+		if (msgContext.getEnvelope() == null) {
+			msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(
+					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope());
+		}
+
 		SOAPEnvelope envelope = msgContext.getEnvelope();
 		Iterator keys = rmMessageParts.keySet().iterator();
 		while (keys.hasNext()) {
 			Object key = keys.next();
 			IOMRMPart rmPart = (IOMRMPart) rmMessageParts.get(key);
 			rmPart.toSOAPEnvelope(envelope);
-		}	
+		}
 	}
-	
-	public int getMessageType (){
+
+	public int getMessageType() {
 		return messageType;
 	}
-	
-	public void setMessageType (int msgType){
-		if(msgType>=0 && msgType<=Constants.MAX_MSG_TYPE)
+
+	public void setMessageType(int msgType) {
+		if (msgType >= 0 && msgType <= Constants.MAX_MSG_TYPE)
 			this.messageType = msgType;
 	}
-	
-	public void setMessagePart (int partId, IOMRMPart part){
-		if (partId>=0 && partId<=Constants.MAX_MSG_PART_ID)
-			rmMessageParts.put(new Integer (partId),part);
+
+	public void setMessagePart(int partId, IOMRMPart part) {
+		if (partId >= 0 && partId <= Constants.MAX_MSG_PART_ID)
+			rmMessageParts.put(new Integer(partId), part);
 	}
-	
-	public IOMRMElement getMessagePart (int partId) {
-		return (IOMRMElement) rmMessageParts.get(new Integer (partId));
+
+	public IOMRMElement getMessagePart(int partId) {
+		return (IOMRMElement) rmMessageParts.get(new Integer(partId));
 	}
-	
-	public EndpointReference getFrom () {
+
+	public EndpointReference getFrom() {
 		return msgContext.getFrom();
 	}
-	
-	public EndpointReference getTo (){
+
+	public EndpointReference getTo() {
 		return msgContext.getTo();
 	}
-	
-	public EndpointReference getReplyTo (){
+
+	public EndpointReference getReplyTo() {
 		return msgContext.getReplyTo();
 	}
-	
-	public RelatesTo getRelatesTo () {
+
+	public RelatesTo getRelatesTo() {
 		return msgContext.getRelatesTo();
 	}
-	
-	public String getMessageId (){
+
+	public String getMessageId() {
 		return msgContext.getMessageID();
 	}
-	
-	public SOAPEnvelope getSOAPEnvelope () {
+
+	public SOAPEnvelope getSOAPEnvelope() {
 		return msgContext.getEnvelope();
 	}
-	
-	public void setSOAPEnvelop (SOAPEnvelope envelope) throws AxisFault {
-		msgContext.setEnvelope(envelope);
+
+	public void setSOAPEnvelop(SOAPEnvelope envelope) throws SandeshaException {
+		
+		try {
+			msgContext.setEnvelope(envelope);
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
 	}
-	
-	public void test (){
-		String opearaitonName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
-		System.out.println ("Operation is:" + opearaitonName);
+
+	public void test() {
+		String opearaitonName = msgContext.getOperationContext()
+				.getAxisOperation().getName().getLocalPart();
+		System.out.println("Operation is:" + opearaitonName);
 	}
-	
-	public void serializeSOAPEnvelop () {
+
+	public void serializeSOAPEnvelop() {
 		try {
 			SOAPEnvelope envelop = msgContext.getEnvelope();
-			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+			XMLStreamWriter writer = XMLOutputFactory.newInstance()
+					.createXMLStreamWriter(System.out);
 			envelop.serialize(writer);
-		}catch (Exception ex){
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-	
-	public void setFrom (EndpointReference epr) {
+
+	public void setFrom(EndpointReference epr) {
 		msgContext.setFrom(epr);
 	}
-	
-	public void setTo (EndpointReference epr){
+
+	public void setTo(EndpointReference epr) {
 		msgContext.setTo(epr);
 	}
-	
-	public void setReplyTo (EndpointReference epr) {
+
+	public void setReplyTo(EndpointReference epr) {
 		msgContext.setReplyTo(epr);
 	}
-	
-	public void setMessageId (String messageId){
+
+	public void setMessageId(String messageId) {
 		msgContext.setMessageID(messageId);
 	}
-	
-	public void setAction (String action){
+
+	public void setAction(String action) {
 		msgContext.setWSAAction(action);
 	}
-	
-	public void setRelatesTo (RelatesTo relatesTo){
+
+	public void setRelatesTo(RelatesTo relatesTo) {
 		msgContext.setRelatesTo(relatesTo);
 	}
-	
-	public MessageContext getMessageContext () {
+
+	public MessageContext getMessageContext() {
 		return msgContext;
 	}
-	
-	public Object getProperty (String key) {
-		if (msgContext==null)
+
+	public Object getProperty(String key) {
+		if (msgContext == null)
 			return null;
-		
+
 		return msgContext.getProperty(key);
 	}
-	
-	public boolean setProperty (String key, Object val){
-		if (msgContext==null)
+
+	public boolean setProperty(String key, Object val) {
+		if (msgContext == null)
 			return false;
-		
-		msgContext.setProperty(key,val);
+
+		msgContext.setProperty(key, val);
 		return true;
 	}
-	
-	public AbstractContext getContext () {
-	   if (msgContext==null)
-	   	return null;
-	   
-	   return msgContext.getSystemContext();
+
+	public AbstractContext getContext() {
+		if (msgContext == null)
+			return null;
+
+		return msgContext.getSystemContext();
 	}
-	
-	
-	
+
 }

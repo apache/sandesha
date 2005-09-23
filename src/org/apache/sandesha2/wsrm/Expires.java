@@ -34,29 +34,34 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class Expires implements IOMRMElement {
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
-			Constants.WSRM.NS_URI_RM,Constants.WSRM.NS_PREFIX_RM);
-	
-	OMElement expiresElement=null;
-	String duration=null;
-	
-	public Expires () {
-		expiresElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.EXPIRES , rmNamespace);
+	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	OMElement expiresElement = null;
+
+	String duration = null;
+
+	public Expires() {
+		expiresElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.EXPIRES, rmNamespace);
 	}
-	
+
 	public Object fromOMElement(OMElement element) throws OMException {
-		OMElement expiresPart = element.getFirstChildWithName(new QName (
-				Constants.WSRM.NS_URI_RM,Constants.WSRM.EXPIRES));
-		if (expiresPart==null)
-			throw new OMException ("Passed elemenet does not have a Expires part");
+		OMElement expiresPart = element.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.EXPIRES));
+		if (expiresPart == null)
+			throw new OMException(
+					"Passed elemenet does not have a Expires part");
 		String expiresText = expiresPart.getText();
-		if (expiresText==null || expiresText=="")
-			throw new OMException ("The duration value is not valid");
-		
-		expiresElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.EXPIRES , rmNamespace);
-		
+		if (expiresText == null || expiresText == "")
+			throw new OMException("The duration value is not valid");
+
+		expiresElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.EXPIRES, rmNamespace);
+
 		duration = expiresText;
 		return element;
 	}
@@ -67,20 +72,22 @@ public class Expires implements IOMRMElement {
 	}
 
 	public OMElement toOMElement(OMElement element) throws OMException {
-		if (expiresElement==null)
-			throw new OMException ("Cant set Expires. It is null");
-		if (duration==null || duration=="")
-			throw new OMException ("Cant set Expires. The duration value is not set");
-		
+		if (expiresElement == null)
+			throw new OMException("Cant set Expires. It is null");
+		if (duration == null || duration == "")
+			throw new OMException(
+					"Cant set Expires. The duration value is not set");
+
 		expiresElement.setText(duration);
 		element.addChild(expiresElement);
-		
-		expiresElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.EXPIRES , rmNamespace);
-		
+
+		expiresElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.EXPIRES, rmNamespace);
+
 		return element;
 	}
-	
+
 	public String getDuration() {
 		return duration;
 	}

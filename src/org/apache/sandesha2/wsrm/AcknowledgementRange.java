@@ -41,74 +41,91 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class AcknowledgementRange implements IOMRMElement {
 	private OMElement acknowledgementRangeElement;
-	private long upperValue;
-	private long lowerValue;
-	
-	OMNamespace rmNamespace = 
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
-	public AcknowledgementRange(){
-		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACK_RANGE,rmNamespace);
+	private long upperValue;
+
+	private long lowerValue;
+
+	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public AcknowledgementRange() {
+		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_RANGE, rmNamespace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return acknowledgementRangeElement;
 	}
-	
-	public Object fromOMElement(OMElement ackRangePart) throws OMException{
-		
-		/*OMElement ackRangePart = sequenceAckElement.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.ACK_RANGE)); */
-		
-		if (ackRangePart==null)
-			throw new OMException ("The passed element is null");
 
-		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName (Constants.WSRM.LOWER));
-		OMAttribute upperAttrib = ackRangePart.getAttribute(new QName (Constants.WSRM.UPPER));
-		
-		if (lowerAttrib==null || upperAttrib==null)
-			throw new OMException ("Passed element does not contain upper or lower attributes");
-		
-		try{
+	public Object fromOMElement(OMElement ackRangePart) throws OMException {
+
+		/*
+		 * OMElement ackRangePart = sequenceAckElement.getFirstChildWithName(
+		 * new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.ACK_RANGE));
+		 */
+
+		if (ackRangePart == null)
+			throw new OMException("The passed element is null");
+
+		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName(
+				Constants.WSRM.LOWER));
+		OMAttribute upperAttrib = ackRangePart.getAttribute(new QName(
+				Constants.WSRM.UPPER));
+
+		if (lowerAttrib == null || upperAttrib == null)
+			throw new OMException(
+					"Passed element does not contain upper or lower attributes");
+
+		try {
 			long lower = Long.parseLong(lowerAttrib.getValue());
 			long upper = Long.parseLong(upperAttrib.getValue());
 			upperValue = upper;
 			lowerValue = lower;
-		}catch (Exception ex) {
-			throw new OMException ("The ack range does not have proper long values for Upper and Lower attributes");
+		} catch (Exception ex) {
+			throw new OMException(
+					"The ack range does not have proper long values for Upper and Lower attributes");
 		}
-		
-		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACK_RANGE,rmNamespace);
-		
+
+		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_RANGE, rmNamespace);
+
 		return this;
-	} 		
+	}
 
-	public OMElement toOMElement(OMElement sequenceAckElement) throws OMException {
+	public OMElement toOMElement(OMElement sequenceAckElement)
+			throws OMException {
 
-		if (sequenceAckElement==null)
-			throw new OMException ("Cant set Ack Range part since element is null");
-		
-		if (upperValue<=0 || lowerValue<=0 || lowerValue>upperValue) 
-			throw new OMException ("Cant set Ack Range part since Upper or Lower is not set to the correct value");
-		
-		OMAttribute lowerAttrib = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
-				Constants.WSRM.LOWER,rmNamespace,Long.toString(lowerValue));
-		OMAttribute upperAttrib = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
-				Constants.WSRM.UPPER,rmNamespace,Long.toString(upperValue));
-		
+		if (sequenceAckElement == null)
+			throw new OMException(
+					"Cant set Ack Range part since element is null");
+
+		if (upperValue <= 0 || lowerValue <= 0 || lowerValue > upperValue)
+			throw new OMException(
+					"Cant set Ack Range part since Upper or Lower is not set to the correct value");
+
+		OMAttribute lowerAttrib = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
+				Constants.WSRM.LOWER, rmNamespace, Long.toString(lowerValue));
+		OMAttribute upperAttrib = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
+				Constants.WSRM.UPPER, rmNamespace, Long.toString(upperValue));
+
 		acknowledgementRangeElement.addAttribute(lowerAttrib);
 		acknowledgementRangeElement.addAttribute(upperAttrib);
-		
+
 		sequenceAckElement.addChild(acknowledgementRangeElement);
-		
-		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
-				Constants.WSRM.ACK_RANGE,rmNamespace);
-		
+
+		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.ACK_RANGE, rmNamespace);
+
 		return sequenceAckElement;
 	}
-	
+
 	public long getLowerValue() {
 		return lowerValue;
 	}

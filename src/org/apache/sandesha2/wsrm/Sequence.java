@@ -37,114 +37,131 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  * @author sanka
  */
 
-
 public class Sequence implements IOMRMPart {
 
 	private OMElement sequenceElement;
-	
+
 	private Identifier identifier;
+
 	private MessageNumber messageNumber;
+
 	private LastMessage lastMessage = null;
-	
-	OMNamespace seqNoNamespace =
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public Sequence(){
-		sequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
-						.createOMElement(Constants.WSRM.SEQUENCE,seqNoNamespace);
+
+	OMNamespace seqNoNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public Sequence() {
+		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE, seqNoNamespace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return sequenceElement;
 	}
 
 	public Object fromOMElement(OMElement headerElement) throws OMException {
-		
+
 		SOAPHeader header = (SOAPHeader) headerElement;
-		if (header==null)
-			throw new OMException ("Sequence element cannot be added to non-header element");
-		
-		OMElement sequencePart = sequenceElement=headerElement.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE));
-		if (sequencePart==null)
-			throw new OMException ("Cannot find Sequence element in the given element");
-		
-		sequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
-							.createOMElement(Constants.WSRM.SEQUENCE,seqNoNamespace);
-		
+		if (header == null)
+			throw new OMException(
+					"Sequence element cannot be added to non-header element");
+
+		OMElement sequencePart = sequenceElement = headerElement
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.SEQUENCE));
+		if (sequencePart == null)
+			throw new OMException(
+					"Cannot find Sequence element in the given element");
+
+		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE, seqNoNamespace);
+
 		identifier = new Identifier();
 		messageNumber = new MessageNumber();
 		identifier.fromOMElement(sequencePart);
 		messageNumber.fromOMElement(sequencePart);
 
-		OMElement lastMessageElement = sequencePart.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.LAST_MSG));
-		
-		if (lastMessageElement!=null){
-			lastMessage = new LastMessage(); 
+		OMElement lastMessageElement = sequencePart
+				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+						Constants.WSRM.LAST_MSG));
+
+		if (lastMessageElement != null) {
+			lastMessage = new LastMessage();
 			lastMessage.fromOMElement(sequencePart);
 		}
-		
+
 		return this;
 	}
-	
+
 	public OMElement toOMElement(OMElement headerElement) throws OMException {
-		
-		if (headerElement==null || !(headerElement instanceof SOAPHeader))
-			throw new OMException ("Cant add Sequence Part to a non-header element");
+
+		if (headerElement == null || !(headerElement instanceof SOAPHeader))
+			throw new OMException(
+					"Cant add Sequence Part to a non-header element");
 
 		SOAPHeader soapHeader = (SOAPHeader) headerElement;
-		if (soapHeader==null)
-			throw new OMException ("cant add the sequence part to a non-header element");
-		if (sequenceElement==null)
-			throw new OMException ("cant add Sequence Part since Sequence is null");
-		if (identifier==null)
-			throw new OMException ("Cant add Sequence part since identifier is null");
-		if (messageNumber==null)
-			throw new OMException ("Cant add Sequence part since MessageNumber is null");
-		
-		
-        identifier.toOMElement(sequenceElement);
-        messageNumber.toOMElement(sequenceElement);
-		if (lastMessage != null) 
-            lastMessage.toOMElement (sequenceElement);
+		if (soapHeader == null)
+			throw new OMException(
+					"cant add the sequence part to a non-header element");
+		if (sequenceElement == null)
+			throw new OMException(
+					"cant add Sequence Part since Sequence is null");
+		if (identifier == null)
+			throw new OMException(
+					"Cant add Sequence part since identifier is null");
+		if (messageNumber == null)
+			throw new OMException(
+					"Cant add Sequence part since MessageNumber is null");
+
+		identifier.toOMElement(sequenceElement);
+		messageNumber.toOMElement(sequenceElement);
+		if (lastMessage != null)
+			lastMessage.toOMElement(sequenceElement);
 
 		SOAPHeaderBlock soapHeaderBlock = soapHeader.addHeaderBlock(
-				Constants.WSRM.SEQUENCE,seqNoNamespace);
+				Constants.WSRM.SEQUENCE, seqNoNamespace);
 		soapHeaderBlock.setMustUnderstand(true);
 		soapHeaderBlock.addChild(sequenceElement);
-		
-		//resetting the element. So that subsequest toOMElement calls will attach a different object.
-		sequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
-							.createOMElement(Constants.WSRM.SEQUENCE,seqNoNamespace); 
-		
+
+		//resetting the element. So that subsequest toOMElement calls will
+		// attach a different object.
+		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.SEQUENCE, seqNoNamespace);
+
 		return headerElement;
 	}
-	
-	
-	public Identifier getIdentifier(){
+
+	public Identifier getIdentifier() {
 		return identifier;
 	}
-	public LastMessage getLastMessage(){
+
+	public LastMessage getLastMessage() {
 		return lastMessage;
 	}
-	public MessageNumber getMessageNumber(){
+
+	public MessageNumber getMessageNumber() {
 		return messageNumber;
 	}
-	public void setIdentifier(Identifier identifier){
+
+	public void setIdentifier(Identifier identifier) {
 		this.identifier = identifier;
 	}
-	public void setLastMessage(LastMessage lastMessage){
+
+	public void setLastMessage(LastMessage lastMessage) {
 		this.lastMessage = lastMessage;
 	}
-	public void setMessageNumber(MessageNumber messageNumber){
+
+	public void setMessageNumber(MessageNumber messageNumber) {
 		this.messageNumber = messageNumber;
 	}
-	
+
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
 		toOMElement(header);
 	}
-	
 
 }

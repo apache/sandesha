@@ -29,59 +29,45 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemSequencePropretyBeanMgr /*implements SequencePropertyBeanMgr */{
+public class InMemSequencePropretyBeanMgr /* implements SequencePropertyBeanMgr */{
 	/*
-	private static Hashtable table = new Hashtable();
-
-	public InMemSequencePropretyBeanMgr() {
-	}
-
-	public boolean delete(String sequenceId, String name) {
-		return table.remove(sequenceId +":" + name) != null;
-	}
-
-	public SequencePropertyBean retrieve(String sequenceId, String name) {
-		return (SequencePropertyBean) table.get(sequenceId + ":" + name);
-	}
-	
-	public boolean insert(SequencePropertyBean bean) {
-		table.put(bean.getSequenceId() + ":" + bean.getName(), bean);
-		return true;
-	}
-
-	public ResultSet find(String query) {
-		throw new UnsupportedOperationException("selectRS() is not supported");
-	}
-
-	public Collection find(SequencePropertyBean bean) {
-		ArrayList beans = new ArrayList();
-		Iterator iterator = table.values().iterator();
-		SequencePropertyBean temp;
-		
-		while (iterator.hasNext()) {
-			temp = (SequencePropertyBean) iterator.next();
-			
-			if ((bean.getSequenceId() != null 
-					&& bean.getSequenceId().equals(temp.getSequenceId()))
-					&& (bean.getName() != null 
-					&& bean.getName().equals(temp.getName()))
-					&& (bean.getValue() != null 
-					&& bean.getValue().equals(temp.getValue()))) {
-				
-				beans.add(temp);				
-			}
-		}
-		return beans;
-	}
-
-	public boolean update(SequencePropertyBean bean) {
-		return table.put(getId(bean), bean) != null;
-		
-	}
-	
-	private String getId(SequencePropertyBean bean) {
-		return bean.getSequenceId() + ":" + bean.getName();
-	}
-	*/
+	 * private static Hashtable table = new Hashtable();
+	 * 
+	 * public InMemSequencePropretyBeanMgr() { }
+	 * 
+	 * public boolean delete(String sequenceId, String name) { return
+	 * table.remove(sequenceId +":" + name) != null; }
+	 * 
+	 * public SequencePropertyBean retrieve(String sequenceId, String name) {
+	 * return (SequencePropertyBean) table.get(sequenceId + ":" + name); }
+	 * 
+	 * public boolean insert(SequencePropertyBean bean) {
+	 * table.put(bean.getSequenceId() + ":" + bean.getName(), bean); return
+	 * true; }
+	 * 
+	 * public ResultSet find(String query) { throw new
+	 * UnsupportedOperationException("selectRS() is not supported"); }
+	 * 
+	 * public Collection find(SequencePropertyBean bean) { ArrayList beans = new
+	 * ArrayList(); Iterator iterator = table.values().iterator();
+	 * SequencePropertyBean temp;
+	 * 
+	 * while (iterator.hasNext()) { temp = (SequencePropertyBean)
+	 * iterator.next();
+	 * 
+	 * if ((bean.getSequenceId() != null &&
+	 * bean.getSequenceId().equals(temp.getSequenceId())) && (bean.getName() !=
+	 * null && bean.getName().equals(temp.getName())) && (bean.getValue() !=
+	 * null && bean.getValue().equals(temp.getValue()))) {
+	 * 
+	 * beans.add(temp); } } return beans; }
+	 * 
+	 * public boolean update(SequencePropertyBean bean) { return
+	 * table.put(getId(bean), bean) != null;
+	 *  }
+	 * 
+	 * private String getId(SequencePropertyBean bean) { return
+	 * bean.getSequenceId() + ":" + bean.getName(); }
+	 */
 
 }

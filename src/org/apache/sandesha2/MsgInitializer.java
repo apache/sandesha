@@ -25,68 +25,80 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.wsrm.RMElements;
 
-
 /**
  * @author Chamikara
  * @author Sanka
- * @author Jaliya 
+ * @author Jaliya
  */
-
 
 public class MsgInitializer {
 
-	public static RMMsgContext initializeMessage (MessageContext ctx) throws RMException {
-		RMMsgContext rmMsgCtx = new RMMsgContext (ctx);
-		populateRMMsgContext(ctx,rmMsgCtx);
+	public static RMMsgContext initializeMessage(MessageContext ctx)
+			throws SandeshaException {
+		RMMsgContext rmMsgCtx = new RMMsgContext(ctx);
+		populateRMMsgContext(ctx, rmMsgCtx);
 		validateMessage(rmMsgCtx);
 		return rmMsgCtx;
 	}
-	
-	private static void populateRMMsgContext (MessageContext msgCtx, RMMsgContext rmMsgContext) {
+
+	private static void populateRMMsgContext(MessageContext msgCtx,
+			RMMsgContext rmMsgContext) {
 		//TODO set message parts
-		
-		RMElements elements = new RMElements ();
+
+		RMElements elements = new RMElements();
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
+
+		if (elements.getCreateSequence() != null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,
+					elements.getCreateSequence());
+
+		if (elements.getCreateSequenceResponse() != null)
+			rmMsgContext.setMessagePart(
+					Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE, elements
+							.getCreateSequenceResponse());
+
+		if (elements.getSequence() != null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQUENCE,
+					elements.getSequence());
+
+		if (elements.getSequenceAcknowledgement() != null)
+			rmMsgContext.setMessagePart(
+					Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT, elements
+							.getSequenceAcknowledgement());
+
+		if (elements.getTerminateSequence() != null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ,
+					elements.getTerminateSequence());
+
+		if (elements.getAckRequested() != null)
+			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_ACK_REQUEST,
+					elements.getAckRequested());
 		
-		if (elements.getCreateSequence()!=null) 
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,elements.getCreateSequence());
 		
-		if(elements.getCreateSequenceResponse()!=null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE,elements.getCreateSequenceResponse());
-		
-		if (elements.getSequence()!=null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQUENCE ,elements.getSequence());
-		
-		if (elements.getSequenceAcknowledgement()!=null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT,elements.getSequenceAcknowledgement());
-		
-		if (elements.getTerminateSequence()!=null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ,elements.getTerminateSequence());
-		
-		if (elements.getAckRequested()!=null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_ACK_REQUEST,elements.getAckRequested());
-		
-		
-		
+
 	}
-	
-	private static boolean validateMessage (RMMsgContext rmMsgCtx) throws RMException {
-        
+
+	private static boolean validateMessage(RMMsgContext rmMsgCtx)
+			throws SandeshaException {
+
 		//TODO: performa validation
-		
+
 		//Setting message type.
-		if(rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ)!=null)
+		if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ) != null)
 			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE)!=null)
+		else if (rmMsgCtx
+				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE) != null)
 			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ_RESPONSE);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ)!=null)
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ) != null)
 			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_TERMINATE_SEQ);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE)!=null)
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE) != null)
 			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_APPLICATION);
+		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT)!=null)
+			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_ACK);
 		else
 			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_UNKNOWN);
-		
+
 		return true;
 	}
-	
+
 }

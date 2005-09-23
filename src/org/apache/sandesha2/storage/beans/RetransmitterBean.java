@@ -20,76 +20,98 @@ package org.apache.sandesha2.storage.beans;
 import java.io.Serializable;
 
 /**
- * @author 
- * 
+ * @author  
  */
 public class RetransmitterBean implements Serializable {
 
 	private String messageId;
+
 	private String key;
+
 	private long LastSentTime;
-	private Boolean Send; 
-	private String CreateSeqMsgId;
-	
-	
-	/**
-	 * @return Returns the createSeqMsgId.
-	 */
-	public String getCreateSeqMsgId() {
-		return CreateSeqMsgId;
+
+	private boolean Send;
+
+	private String tempSequenceId;
+
+	public RetransmitterBean() {
+
 	}
-	/**
-	 * @param createSeqMsgId The createSeqMsgId to set.
-	 */
-	public void setCreateSeqMsgId(String createSeqMsgId) {
-		CreateSeqMsgId = createSeqMsgId;
+
+	public RetransmitterBean(String messageId, String key, long lastSentTime,
+			boolean send, String tempSequenceId) {
+		this.messageId = messageId;
+		this.key = key;
+		this.LastSentTime = lastSentTime;
+		this.Send = send;
+		this.tempSequenceId = tempSequenceId;
 	}
+
 	/**
 	 * @return Returns the key.
 	 */
 	public String getKey() {
 		return key;
 	}
+
 	/**
-	 * @param key The key to set.
+	 * @param key
+	 *            The key to set.
 	 */
 	public void setKey(String key) {
 		this.key = key;
 	}
+
 	/**
 	 * @return Returns the lastSentTime.
 	 */
 	public long getLastSentTime() {
 		return LastSentTime;
 	}
+
 	/**
-	 * @param lastSentTime The lastSentTime to set.
+	 * @param lastSentTime
+	 *            The lastSentTime to set.
 	 */
 	public void setLastSentTime(long lastSentTime) {
 		LastSentTime = lastSentTime;
 	}
+
 	/**
 	 * @return Returns the messageId.
 	 */
 	public String getMessageId() {
 		return messageId;
 	}
+
 	/**
-	 * @param messageId The messageId to set.
+	 * @param messageId
+	 *            The messageId to set.
 	 */
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
+
 	/**
 	 * @return Returns the send.
 	 */
-	public Boolean isSend() {
+	public boolean isSend() {
 		return Send;
 	}
+
 	/**
-	 * @param send The send to set.
+	 * @param send
+	 *            The send to set.
 	 */
-	public void setSend(Boolean send) {
+	public void setSend(boolean send) {
 		this.Send = send;
+	}
+
+	public String getTempSequenceId() {
+		return tempSequenceId;
+	}
+
+	public void setTempSequenceId(String tempSequenceId) {
+		this.tempSequenceId = tempSequenceId;
 	}
 }

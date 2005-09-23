@@ -22,12 +22,10 @@ import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.sandesha2.msgprocessors.MsgProcessorException;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
@@ -39,102 +37,108 @@ import org.ietf.jgss.MessageProp;
 /**
  * @author Chamikara
  * @author Sanka
- * @author Jaliya 
+ * @author Jaliya
  */
 
 public class InOrderInvoker extends Thread {
 	boolean stopInvoker = false;
+
 	ConfigurationContext context = null;
-	
+
 	public synchronized void stopWork() {
 		stopInvoker = true;
 	}
-	
-	public synchronized boolean isStopped () {
+
+	public synchronized boolean isStopped() {
 		return stopInvoker;
 	}
-	
-	public void setConfugurationContext (ConfigurationContext context) {
+
+	public void setConfugurationContext(ConfigurationContext context) {
 		this.context = context;
 	}
-	
-	public void run (){
-		
+
+	public void run() {
+
 		while (!isStopped()) {
-			
-			System.out.print ("|");
-			NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(context).getNextMsgBeanMgr();
-			
-			StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory.getInstance(context).getStorageMapBeanMgr();
-			
-			Collection coll = nextMsgMgr.retrieveAll ();
-			
+
+			System.out.print("|");
+			NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(
+					context).getNextMsgBeanMgr();
+
+			StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory
+					.getInstance(context).getStorageMapBeanMgr();
+
+			Collection coll = nextMsgMgr.retrieveAll();
+
 			Iterator it = coll.iterator();
-			
+
 			while (it.hasNext()) {
 				Object obj = it.next();
 				NextMsgBean nextMsgBean = (NextMsgBean) obj;
 				long msgNo = nextMsgBean.getNextMsgNoToProcess();
 				boolean tryNext = true;
-				
+
 				while (tryNext) {
 					String seqId = nextMsgBean.getSequenceId();
-					Collection coll1 = storageMapMgr.find(new StorageMapBean (null,msgNo,seqId));
-					if (coll1==null || coll1.isEmpty())
-					{
-						tryNext=false;
+					Collection coll1 = storageMapMgr.find(new StorageMapBean(
+							null, msgNo, seqId));
+					if (coll1 == null || coll1.isEmpty()) {
+						tryNext = false;
 						continue;
 					}
-					
-					StorageMapBean stMapBean = (StorageMapBean) coll1.iterator().next();
-					if (stMapBean==null) {
 
-						tryNext=false;
+					StorageMapBean stMapBean = (StorageMapBean) coll1
+							.iterator().next();
+					if (stMapBean == null) {
+
+						tryNext = false;
 						continue;
 					}
-					
+
 					String key = stMapBean.getKey();
-					
+
 					try {
-						boolean done = resumeMessageContext (key);
-						System.out.println ("Resumed");
+						boolean done = resumeMessageContext(key);
+						System.out.println("Resumed");
 						if (!done) {
-							tryNext=false;
+							tryNext = false;
 							continue;
 						}
-					}catch (MsgProcessorException ex) {
+					} catch (SandeshaException ex) {
 						ex.printStackTrace();
-						tryNext=false;
+						tryNext = false;
 						continue;
 					}
-					
+
 					msgNo++;
 				}
-				
+
 				nextMsgBean.setNextMsgNoToProcess(msgNo);
 				nextMsgMgr.update(nextMsgBean);
 			}
-			
+
 			try {
 				Thread.sleep(20000);
-			}catch (InterruptedException ex) {
+			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
 		}
 	}
-	
-	private boolean resumeMessageContext (String key) throws MsgProcessorException {
+
+	private boolean resumeMessageContext(String key) throws SandeshaException {
 		MessageContext ctx = SandeshaUtil.getStoredMessageContext(key);
-		if (ctx==null)
+		if (ctx == null)
 			return false;
-		
-		ctx.setPausedTrue(new QName (Constants.IN_HANDLER_NAME)); 			//in case the pause is not set
-		
+
+		ctx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME)); //in case the
+																 // pause is not
+																 // set
+
 		//resuming.
 		try {
-		new AxisEngine(ctx.getSystemContext()).receive(ctx);
-		}catch (AxisFault ex) {
-			throw new MsgProcessorException  (ex.getMessage());
+			new AxisEngine(ctx.getSystemContext()).receive(ctx);
+		} catch (AxisFault ex) {
+			throw new SandeshaException(ex.getMessage());
 		}
 		return true;
 	}

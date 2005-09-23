@@ -35,53 +35,53 @@ import com.sun.corba.se.internal.core.Constant;
 public class AbstractBeanMgrFactory {
 
 	AbstractContext context = null;
-	
+
 	private static AbstractBeanMgrFactory instance = null;
-	
+
 	public CreateSeqBeanMgr getCreateSeqBeanMgr() {
-		return new CreateSeqBeanMgr (context);
+		return new CreateSeqBeanMgr(context);
 	}
-	
+
 	public NextMsgBeanMgr getNextMsgBeanMgr() {
-		return new NextMsgBeanMgr (context);
+		return new NextMsgBeanMgr(context);
 	}
-	
+
 	public RetransmitterBeanMgr getRetransmitterBeanMgr() {
-		return new RetransmitterBeanMgr (context);
+		return new RetransmitterBeanMgr(context);
 	}
-	
+
 	public SequencePropertyBeanMgr getSequencePropretyBeanMgr() {
-		return new SequencePropertyBeanMgr (context);
+		return new SequencePropertyBeanMgr(context);
 	}
-	
+
 	public StorageMapBeanMgr getStorageMapBeanMgr() {
-		return new StorageMapBeanMgr (context);
+		return new StorageMapBeanMgr(context);
 	}
-		
-//	public static AbstractBeanMgrFactory getBeanMgrFactory (int storageType) {
-//		switch (storageType) {
-//			case Constants.STORAGE_TYPE_PERSISTANCE:
-//				return new PersistentBeanMgrFactory();
-//			case Constants.STORAGE_TYPE_IN_MEMORY:
-//				return new  InMemBeanMgrFactory();
-//			default: 
-//				return null;
-//		}
-//	}
-	 
-	
-	private AbstractBeanMgrFactory (AbstractContext context) {
+
+	//	public static AbstractBeanMgrFactory getBeanMgrFactory (int storageType)
+	// {
+	//		switch (storageType) {
+	//			case Constants.STORAGE_TYPE_PERSISTANCE:
+	//				return new PersistentBeanMgrFactory();
+	//			case Constants.STORAGE_TYPE_IN_MEMORY:
+	//				return new InMemBeanMgrFactory();
+	//			default:
+	//				return null;
+	//		}
+	//	}
+
+	private AbstractBeanMgrFactory(AbstractContext context) {
 		this.context = context;
 	}
-	
-	public void init (ConfigurationContext context) {
+
+	public void init(ConfigurationContext context) {
 		this.context = context;
 	}
-	
-	public static AbstractBeanMgrFactory getInstance (AbstractContext context) {
-		if (instance==null)
-			instance = new AbstractBeanMgrFactory (context);
-		
+
+	public static AbstractBeanMgrFactory getInstance(AbstractContext context) {
+		if (instance == null)
+			instance = new AbstractBeanMgrFactory(context);
+
 		return instance;
 	}
 }

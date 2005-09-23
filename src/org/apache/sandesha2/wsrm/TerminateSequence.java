@@ -34,69 +34,77 @@ import org.apache.sandesha2.SOAPAbstractFactory;
  */
 
 public class TerminateSequence implements IOMRMPart {
-    
+
 	private OMElement terminateSequenceElement;
+
 	private Identifier identifier;
-	
-	OMNamespace rmNameSpace = 
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-	
-	public TerminateSequence(){
-		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
-									.createOMElement(Constants.WSRM.TERMINATE_SEQUENCE,rmNameSpace);
+
+	OMNamespace rmNameSpace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+
+	public TerminateSequence() {
+		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 	}
-	
+
 	public OMElement getOMElement() throws OMException {
 		return terminateSequenceElement;
 	}
-	
+
 	public Object fromOMElement(OMElement body) throws OMException {
-	    
-	    if (!(body instanceof SOAPBody))
-	        throw new OMException ("Cant add terminate sequence to a non body element");
-	    
-	    OMElement terminateSeqPart = body.getFirstChildWithName(
-	            new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.TERMINATE_SEQUENCE));
-	    
-	    if (terminateSeqPart==null)
-	        throw new OMException ("passed element does not contain a terminate sequence part");
-	    
+
+		if (!(body instanceof SOAPBody))
+			throw new OMException(
+					"Cant add terminate sequence to a non body element");
+
+		OMElement terminateSeqPart = body.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.TERMINATE_SEQUENCE));
+
+		if (terminateSeqPart == null)
+			throw new OMException(
+					"passed element does not contain a terminate sequence part");
+
 		identifier = new Identifier();
 		identifier.fromOMElement(terminateSeqPart);
-		
-		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
-									.createOMElement(Constants.WSRM.TERMINATE_SEQUENCE,rmNameSpace);
-		
+
+		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
+
 		return this;
 	}
-	
-	public OMElement toOMElement(OMElement body) throws OMException {
-	    
-	    if (body==null || !(body instanceof SOAPBody))
-	        throw new OMException ("Cant add terminate sequence to a nonbody element");
 
-	    if (terminateSequenceElement==null)
-	        throw new OMException ("Cant add terminate sequnce since the internal element is null");
-	    
-	    if (identifier==null)
-	        throw new OMException ("Cant add terminate sequence since identifier is not set");
-	    
-		
+	public OMElement toOMElement(OMElement body) throws OMException {
+
+		if (body == null || !(body instanceof SOAPBody))
+			throw new OMException(
+					"Cant add terminate sequence to a nonbody element");
+
+		if (terminateSequenceElement == null)
+			throw new OMException(
+					"Cant add terminate sequnce since the internal element is null");
+
+		if (identifier == null)
+			throw new OMException(
+					"Cant add terminate sequence since identifier is not set");
+
 		identifier.toOMElement(terminateSequenceElement);
 		body.addChild(terminateSequenceElement);
-		
-		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION)
-							.createOMElement(Constants.WSRM.TERMINATE_SEQUENCE,rmNameSpace);
+
+		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return body;
 	}
-	
-	public Identifier getIdentifier(){
+
+	public Identifier getIdentifier() {
 		return identifier;
 	}
-	
-	public void setIdentifier(Identifier identifier){
+
+	public void setIdentifier(Identifier identifier) {
 		this.identifier = identifier;
 	}
 

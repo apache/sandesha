@@ -36,15 +36,18 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SOAPAbstractFactory;
 
 public class Identifier implements Constants, IOMRMElement {
-	
-	private OMElement identifierElement;
-	private String identifier=null;
 
-	OMNamespace wsuNamespace = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+	private OMElement identifierElement;
+
+	private String identifier = null;
+
+	OMNamespace wsuNamespace = SOAPAbstractFactory.getSOAPFactory(
+			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public Identifier() {
-		identifierElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+		identifierElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
 	}
 
@@ -56,39 +59,41 @@ public class Identifier implements Constants, IOMRMElement {
 		return identifier;
 	}
 
-	public OMElement getOMElement () throws OMException {
+	public OMElement getOMElement() throws OMException {
 		return identifierElement;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
-		OMElement identifierPart = element.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.IDENTIFIER));
-		if (identifierPart==null)
-			throw new OMException ("The parsed element does not contain an identifier part");
-		identifierElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+		OMElement identifierPart = element.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.IDENTIFIER));
+		if (identifierPart == null)
+			throw new OMException(
+					"The parsed element does not contain an identifier part");
+		identifierElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
-		
+
 		String identifierText = identifierPart.getText();
-		if (identifierText==null || identifierText=="")
-			throw new OMException ("The identifier value is not valid");
-		
+		if (identifierText == null || identifierText == "")
+			throw new OMException("The identifier value is not valid");
+
 		identifier = identifierText;
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement element)
-			throws OMException {
-		
+	public OMElement toOMElement(OMElement element) throws OMException {
+
 		if (identifier == null || identifier == "") {
 			throw new OMException("identifier is not set .. ");
 		}
-		
+
 		identifierElement.setText(identifier);
 		element.addChild(identifierElement);
-		
-		identifierElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+
+		identifierElement = SOAPAbstractFactory.getSOAPFactory(
+				Constants.DEFAULT_SOAP_VERSION).createOMElement(
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
-		
+
 		return element;
 	}
 

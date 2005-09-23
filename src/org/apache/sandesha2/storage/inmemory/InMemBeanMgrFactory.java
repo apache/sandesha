@@ -27,26 +27,21 @@ import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
  * @author Chamikara Jayalath <chamikara@wso2.com>
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class InMemBeanMgrFactory /*extends AbstractBeanMgrFactory*/ {
-/*
-	public CreateSeqBeanMgr getCreateSeqBeanMgr() {
-		return new InMemCreateSeqBeanMgr();
-	}
-
-	public NextMsgBeanMgr getNextMsgBeanMgr() {
-		return new InMemNextMsgBeanMgr();
-	}
-
-	public RetransmitterBeanMgr getRetransmitterBeanMgr() {
-		return new InMemRetransmitterBeanMgr();
-	}
-
-	public SequencePropertyBeanMgr getSequencePropretyBeanMgr() {
-		return new InMemSequencePropretyBeanMgr();
-	}
-	
-	public StorageMapBeanMgr getStorageMapBeanMgr() {
-		return new InMemStorageMapBeanMgr();
-	}
- */
+public class InMemBeanMgrFactory /* extends AbstractBeanMgrFactory */{
+	/*
+	 * public CreateSeqBeanMgr getCreateSeqBeanMgr() { return new
+	 * InMemCreateSeqBeanMgr(); }
+	 * 
+	 * public NextMsgBeanMgr getNextMsgBeanMgr() { return new
+	 * InMemNextMsgBeanMgr(); }
+	 * 
+	 * public RetransmitterBeanMgr getRetransmitterBeanMgr() { return new
+	 * InMemRetransmitterBeanMgr(); }
+	 * 
+	 * public SequencePropertyBeanMgr getSequencePropretyBeanMgr() { return new
+	 * InMemSequencePropretyBeanMgr(); }
+	 * 
+	 * public StorageMapBeanMgr getStorageMapBeanMgr() { return new
+	 * InMemStorageMapBeanMgr(); }
+	 */
 }
