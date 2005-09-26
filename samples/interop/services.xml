@@ -11,7 +11,9 @@
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
     </operation>
 
-    <operation name="echoString" />
+    <operation name="echoString">
+            <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+    </operation>
 
 <!--
     <operation name="ping">

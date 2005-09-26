@@ -56,6 +56,10 @@ public class RMMsgContext {
 		rmMessageParts = new HashMap();
 		messageType = Constants.MESSAGE_TYPE_UNKNOWN;
 	}
+	
+	public void setMessageContext (MessageContext msgCtx) {
+		this.msgContext = msgCtx;
+	}
 
 	public RMMsgContext(MessageContext ctx) {
 		this();

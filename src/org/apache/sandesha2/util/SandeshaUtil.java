@@ -22,10 +22,17 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.MessageInformationHeaders;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.util.UUIDGenerator;
+import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 /**
@@ -142,4 +149,66 @@ public class SandeshaUtil {
 	//		getAckRangeArray( msgList);
 	//		
 	//	}
+	
+	public static MessageContext copyMessageContext (MessageContext msgCtx) throws SandeshaException {
+		ConfigurationContext configCtx = msgCtx.getSystemContext();
+		TransportInDescription transportIn = msgCtx.getTransportIn();
+		TransportOutDescription transportOut = msgCtx.getTransportOut();
+		MessageInformationHeaders msgInfoHeaders = msgCtx.getMessageInformationHeaders();
+		
+		try {
+			MessageContext newMessageContext = new MessageContext (configCtx,transportIn,transportOut);
+			newMessageContext.setDoingMTOM(msgCtx.isDoingMTOM());
+			newMessageContext.setDoingREST(msgCtx.isDoingREST());
+			newMessageContext.setEnvelope(msgCtx.getEnvelope());
+			newMessageContext.setFaultTo(msgCtx.getFaultTo());
+			newMessageContext.setFrom(msgCtx.getFrom());
+			//newMessageContext.setInFaultFlow(msgCtx.geti);
+			newMessageContext.setMessageID(getUUID());
+			newMessageContext.setMessageInformationHeaders(msgCtx.getMessageInformationHeaders());
+			newMessageContext.setOperationContext(msgCtx.getOperationContext());
+			newMessageContext.setOperationDescription(msgCtx.getOperationDescription());
+			newMessageContext.setOutPutWritten(msgCtx.isOutPutWritten());
+			newMessageContext.setParent(msgCtx.getParent());
+			newMessageContext.setPausedPhaseName(msgCtx.getPausedPhaseName());
+			newMessageContext.setProcessingFault(msgCtx.isProcessingFault() );
+			newMessageContext.setRelatesTo(msgCtx.getRelatesTo());
+			newMessageContext.setResponseWritten(msgCtx.isResponseWritten());
+			newMessageContext.setRestThroughPOST(msgCtx.isRestThroughPOST());
+			newMessageContext.setServerSide(msgCtx.isServerSide());
+			newMessageContext.setServiceContext(msgCtx.getServiceContext());
+			newMessageContext.setServiceContextID(msgCtx.getServiceContextID());
+			newMessageContext.setServiceDescription(msgCtx.getServiceDescription());
+			newMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
+			newMessageContext.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+			if (msgCtx.getServiceGroupDescription()!=null)
+				newMessageContext.setServiceGroupDescription(msgCtx.getServiceGroupDescription());
+			newMessageContext.setSoapAction(msgCtx.getSoapAction());
+			newMessageContext.setTo(msgCtx.getTo());
+			newMessageContext.setWSAAction(msgCtx.getWSAAction());
+			
+			if (msgCtx.getEnvelope()!=null)
+				newMessageContext.setEnvelope(msgCtx.getEnvelope());
+			
+			//newMessageContext.setServiceContext(msgCtx.getServiceContext());
+			//newMessageContext.setse
+			
+			return newMessageContext;
+			
+		} catch (AxisFault e) {
+			throw new SandeshaException ("Cannot copy message");
+		}
+	}
+	
+	public static RMMsgContext copyRMMessageContext (RMMsgContext rmMsgContext) throws SandeshaException{
+		MessageContext msgCtx = null;
+		if (rmMsgContext.getMessageContext()!=null)
+			msgCtx = copyMessageContext(rmMsgContext.getMessageContext());
+		
+	    RMMsgContext newRMMsgCtx = new RMMsgContext ();
+	    if (msgCtx!=null)
+	    	newRMMsgCtx.setMessageContext(msgCtx);
+	    
+	    return newRMMsgCtx;	
+	}
 }

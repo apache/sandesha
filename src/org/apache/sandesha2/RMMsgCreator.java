@@ -111,6 +111,8 @@ public class RMMsgCreator {
 		createSeqMsg.setTo(replyTo);
 		createSeqMsg.setReplyTo(replyTo);
 
+		createSeqMsg.setMessageId(SandeshaUtil.getUUID());
+		
 		return createSeqMsg;
 	}
 
@@ -239,6 +241,7 @@ public class RMMsgCreator {
 			MessageContext ackMsgCtx = new MessageContext (applicationMsgCtx.getSystemContext(),
 					applicationMsgCtx.getTransportIn(),applicationMsgCtx.getTransportOut());
 			RMMsgContext ackRMMsgCtx = new RMMsgContext (ackMsgCtx);
+			ackRMMsgCtx.getMessageContext().setOperationContext(applicationMsgCtx.getOperationContext());
 			addAckMessage(ackRMMsgCtx);
 			return ackRMMsgCtx;
 		} catch (AxisFault e) {

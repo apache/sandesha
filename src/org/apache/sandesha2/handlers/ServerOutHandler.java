@@ -122,11 +122,13 @@ public class ServerOutHandler extends AbstractHandler {
 					throw new SandeshaException("AcksTo not set correctly");
 
 				SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
-				if (env == null){
-					SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+				if (env == null) {
+					SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+							Constants.DEFAULT_SOAP_VERSION)
+							.getDefaultEnvelope();
 					rmMsgCtx.setSOAPEnvelop(envelope);
 				}
-				
+
 				SOAPBody soapBody = rmMsgCtx.getSOAPEnvelope().getBody();
 				if (soapBody == null)
 					throw new SandeshaException(
@@ -136,24 +138,49 @@ public class ServerOutHandler extends AbstractHandler {
 				if (soapBody.getChildElements().hasNext())
 					validResponse = true;
 
-				if (!validResponse){
-					if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksToEPR.getAddress())){
+				if (!validResponse) { //TODO either change MsgReceiver or move
+									  // if code to in handler.
+					if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksToEPR
+							.getAddress())) {
 						RMMsgCreator.addAckMessage(rmMsgCtx);
 					}
+				} else {
+					//valid response
+					
+					RMMsgContext ackRMMsgContext = RMMsgCreator
+							.createAckMessage(rmMsgCtx);
+					//SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
+					ackRMMsgContext.getSOAPEnvelope();
+
+					RMMsgContext newRMMsgCtx = SandeshaUtil
+							.copyRMMessageContext(rmMsgCtx);
+					rmMsgCtx.setSOAPEnvelop(ackRMMsgContext.getSOAPEnvelope());
+
+					processResponseMessage(newRMMsgCtx, requestRMMsgCtx);
+					
+					SOAPEnvelope env1 = msgCtx.getEnvelope();
+
+					try {
+						XMLStreamWriter writer = XMLOutputFactory.newInstance()
+								.createXMLStreamWriter(System.out);
+						System.out.println ("Writing envelop");
+						env1.serialize(writer);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+
 				}
-			
-//				if (acksToEPR.getAddress().equals(
-//						Constants.WSA.NS_URI_ANONYMOUS)) {
-//					RMMsgCreator.addAckMessage(rmMsgCtx);
-//				} else {
-//					RMMsgContext ackRMMessage = RMMsgCreator
-//							.createAckMessage(rmMsgCtx);
-//					//TODO add async ack to the retransmitter.
-//				}
-//				//processResponseMessage(rmMsgCtx, requestRMMsgCtx);
-				
-				
-				
+
+				//				if (acksToEPR.getAddress().equals(
+				//						Constants.WSA.NS_URI_ANONYMOUS)) {
+				//					RMMsgCreator.addAckMessage(rmMsgCtx);
+				//				} else {
+				//					RMMsgContext ackRMMessage = RMMsgCreator
+				//							.createAckMessage(rmMsgCtx);
+				//					//TODO add async ack to the retransmitter.
+				//				}
+				//				//processResponseMessage(rmMsgCtx, requestRMMsgCtx);
+
 			}
 		} catch (SandeshaException e) {
 			throw new AxisFault(e.getMessage());
