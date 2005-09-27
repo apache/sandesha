@@ -34,6 +34,8 @@ public class RetransmitterBean implements Serializable {
 
 	private String tempSequenceId;
 
+	private int sentCount = 0;
+	
 	public RetransmitterBean() {
 
 	}
@@ -54,55 +56,30 @@ public class RetransmitterBean implements Serializable {
 		return key;
 	}
 
-	/**
-	 * @param key
-	 *            The key to set.
-	 */
 	public void setKey(String key) {
 		this.key = key;
 	}
 
-	/**
-	 * @return Returns the lastSentTime.
-	 */
 	public long getLastSentTime() {
 		return LastSentTime;
 	}
 
-	/**
-	 * @param lastSentTime
-	 *            The lastSentTime to set.
-	 */
 	public void setLastSentTime(long lastSentTime) {
 		LastSentTime = lastSentTime;
 	}
 
-	/**
-	 * @return Returns the messageId.
-	 */
 	public String getMessageId() {
 		return messageId;
 	}
 
-	/**
-	 * @param messageId
-	 *            The messageId to set.
-	 */
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
 
-	/**
-	 * @return Returns the send.
-	 */
 	public boolean isSend() {
 		return Send;
 	}
 
-	/**
-	 * @param send
-	 *            The send to set.
-	 */
 	public void setSend(boolean send) {
 		this.Send = send;
 	}
@@ -114,4 +91,13 @@ public class RetransmitterBean implements Serializable {
 	public void setTempSequenceId(String tempSequenceId) {
 		this.tempSequenceId = tempSequenceId;
 	}
+	
+	public int getSentCount() {
+		return sentCount;
+	}
+	
+	public void setSentCount(int sentCount) {
+		this.sentCount = sentCount;
+	}
+	
 }

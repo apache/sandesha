@@ -23,9 +23,11 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.clientapi.InOutMEPClient;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -58,8 +60,14 @@ import org.apache.wsdl.WSDLConstants;
 public class ServerOutHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
+		//log
 		System.out.println("In server OutHandler");
 
+		//Strating the sender.
+		ConfigurationContext ctx = msgCtx.getSystemContext();
+		SandeshaUtil.startSenderIfStopped(ctx);
+
+		//getting rm message
 		RMMsgContext rmMsgCtx;
 		try {
 			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
@@ -67,37 +75,21 @@ public class ServerOutHandler extends AbstractHandler {
 			throw new AxisFault("Cant initialize the message");
 		}
 
-		//getting the request message.
+		//getting the request message and rmMessage.
 		MessageContext reqMsgCtx = msgCtx.getOperationContext()
 				.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN);
 		RMMsgContext requestRMMsgCtx;
 		try {
 			requestRMMsgCtx = MsgInitializer.initializeMessage(reqMsgCtx);
-		} catch (SandeshaException ex) {
-			throw new AxisFault("Cant initialize the message");
-		}
-
-		//		try {
-		//			if (requestRMMsgCtx.getMessageType() !=
-		// Constants.MESSAGE_TYPE_CREATE_SEQ)
-		//				RMMsgCreator.addAckMessage(rmMsgCtx);
-		//		} catch (SandeshaException e) {
-		//			throw new AxisFault (e.getMessage());
-		//		}
-
-		try {
 			if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_UNKNOWN) {
-				//This is a possible response message.
-				System.out.println("GOT Possible Response Message");
-				//RMMsgCreator.addAckMessage(rmMsgCtx);
 
+				System.out.println("GOT Possible Response Message");
 				AbstractContext context = rmMsgCtx.getContext();
 				if (context == null)
 					throw new SandeshaException("Context is null");
+				
 				Sequence sequence = (Sequence) requestRMMsgCtx
 						.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
-				//check weather the seq is is available.
-
 				if (sequence == null)
 					throw new SandeshaException("Sequence part is null");
 
@@ -109,7 +101,6 @@ public class ServerOutHandler extends AbstractHandler {
 						.getInstance(context).getSequencePropretyBeanMgr();
 				SequencePropertyBean acksToBean = seqPropMgr.retrieve(
 						incomingSeqId, Constants.SEQ_PROPERTY_ACKS_TO_EPR);
-
 				if (acksToBean == null
 						|| acksToBean.getValue() == null
 						|| !(acksToBean.getValue() instanceof EndpointReference))
@@ -128,7 +119,6 @@ public class ServerOutHandler extends AbstractHandler {
 							.getDefaultEnvelope();
 					rmMsgCtx.setSOAPEnvelop(envelope);
 				}
-
 				SOAPBody soapBody = rmMsgCtx.getSOAPEnvelope().getBody();
 				if (soapBody == null)
 					throw new SandeshaException(
@@ -139,63 +129,44 @@ public class ServerOutHandler extends AbstractHandler {
 					validResponse = true;
 
 				if (!validResponse) { //TODO either change MsgReceiver or move
-									  // if code to in handler.
 					if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksToEPR
 							.getAddress())) {
 						RMMsgCreator.addAckMessage(rmMsgCtx);
 					}
 				} else {
 					//valid response
-					
+
 					RMMsgContext ackRMMsgContext = RMMsgCreator
 							.createAckMessage(rmMsgCtx);
-					//SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
-					ackRMMsgContext.getSOAPEnvelope();
-
+					MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
+					ackMsgContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
+					ackMsgContext.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+					ackMsgContext.setServiceContext(msgCtx.getServiceContext());
+					ackMsgContext.setServiceContextID(msgCtx.getServiceContextID());
+					OperationContext ackOpContext = new OperationContext (ackMsgContext.getOperationDescription());
+					ackOpContext.addMessageContext(ackMsgContext);
+					ackMsgContext.setOperationContext(ackOpContext);
 					RMMsgContext newRMMsgCtx = SandeshaUtil
 							.copyRMMessageContext(rmMsgCtx);
+					MessageContext newMsgCtx = newRMMsgCtx.getMessageContext();
 					rmMsgCtx.setSOAPEnvelop(ackRMMsgContext.getSOAPEnvelope());
 
+					//setting contexts
+					newMsgCtx.setServiceGroupContext(msgCtx.getServiceGroupContext());
+					newMsgCtx.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+					newMsgCtx.setServiceContext(msgCtx.getServiceContext());
+					newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
+				    OperationContext newOpContext = new OperationContext (newMsgCtx.getOperationDescription());
+				    newOpContext.addMessageContext(newMsgCtx);
+				    newMsgCtx.setOperationContext(newOpContext);
+				    
+					//processing the response
 					processResponseMessage(newRMMsgCtx, requestRMMsgCtx);
-					
-					SOAPEnvelope env1 = msgCtx.getEnvelope();
-
-					try {
-						XMLStreamWriter writer = XMLOutputFactory.newInstance()
-								.createXMLStreamWriter(System.out);
-						System.out.println ("Writing envelop");
-						env1.serialize(writer);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-
 				}
-
-				//				if (acksToEPR.getAddress().equals(
-				//						Constants.WSA.NS_URI_ANONYMOUS)) {
-				//					RMMsgCreator.addAckMessage(rmMsgCtx);
-				//				} else {
-				//					RMMsgContext ackRMMessage = RMMsgCreator
-				//							.createAckMessage(rmMsgCtx);
-				//					//TODO add async ack to the retransmitter.
-				//				}
-				//				//processResponseMessage(rmMsgCtx, requestRMMsgCtx);
-
 			}
 		} catch (SandeshaException e) {
 			throw new AxisFault(e.getMessage());
 		}
-
-		//		SOAPEnvelope env = msgCtx.getEnvelope();
-		//
-		//		try {
-		//			XMLStreamWriter writer = XMLOutputFactory.newInstance()
-		//					.createXMLStreamWriter(System.out);
-		//			//env.serialize(writer);
-		//		} catch (Exception ex) {
-		//			ex.printStackTrace();
-		//		}
-
 	}
 
 	private void processResponseMessage(RMMsgContext msg, RMMsgContext reqMsg)
@@ -205,8 +176,6 @@ public class ServerOutHandler extends AbstractHandler {
 
 		Sequence sequence = (Sequence) reqMsg
 				.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
-		//check weather the seq is is available.
-
 		if (sequence == null)
 			throw new SandeshaException("Sequence part is null");
 
@@ -218,7 +187,6 @@ public class ServerOutHandler extends AbstractHandler {
 		if (context == null)
 			throw new SandeshaException("Context is null");
 
-		System.out.println("INCOMING SEQUENCE ID:" + incomingSeqId);
 		SequencePropertyBeanMgr mgr = AbstractBeanMgrFactory.getInstance(
 				context).getSequencePropretyBeanMgr();
 
@@ -248,16 +216,7 @@ public class ServerOutHandler extends AbstractHandler {
 		msg.setTo(incomingReplyTo);
 		msg.setReplyTo(incomingTo);
 
-		//		//TODO get following URL correctly.
-		//		String serverURL =
-		// "http://localhost:8070/axis2/services/InteropService";
-		//		EndpointReference replyTo = new EndpointReference (serverURL);
-		//		msg.setReplyTo(replyTo);
-
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
-			//sequence id is not present
-
-			//add msg to retransmitter with send=false;
 			RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
 					.getInstance(context).getRetransmitterBeanMgr();
 
@@ -271,7 +230,6 @@ public class ServerOutHandler extends AbstractHandler {
 			appMsgEntry.setTempSequenceId(incomingSeqId);
 			appMsgEntry.setSend(false);
 			appMsgEntry.setMessageId(msg.getMessageId());
-
 			retransmitterMgr.insert(appMsgEntry);
 
 			addCreateSequenceMessage(msg);
@@ -280,16 +238,19 @@ public class ServerOutHandler extends AbstractHandler {
 			//Sequence id is present
 			//set sequence part
 			//add message to retransmitter table with send=true;
-
 		}
 
 	}
 
-	public void addCreateSequenceMessage(RMMsgContext applicationMsg)
+	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg)
 			throws SandeshaException {
-		RMMsgContext createSeqMessage = RMMsgCreator
-				.createCreateSeqMsg(applicationMsg);
-		AbstractContext context = applicationMsg.getContext();
+		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
+		if (applicationMsg==null)
+			throw new SandeshaException ("Message context is null");
+		RMMsgContext createSeqRMMessage = RMMsgCreator
+				.createCreateSeqMsg(applicationRMMsg);
+		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
+		AbstractContext context = applicationRMMsg.getContext();
 		if (context == null)
 			throw new SandeshaException("Context is null");
 
@@ -297,12 +258,12 @@ public class ServerOutHandler extends AbstractHandler {
 				context).getStorageMapBeanMgr();
 		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
 				.getInstance(context).getRetransmitterBeanMgr();
-		String key = SandeshaUtil.storeMessageContext(createSeqMessage
+		String key = SandeshaUtil.storeMessageContext(createSeqRMMessage
 				.getMessageContext());
 		RetransmitterBean createSeqEntry = new RetransmitterBean();
 		createSeqEntry.setKey(key);
 		createSeqEntry.setLastSentTime(0);
-		createSeqEntry.setMessageId(createSeqMessage.getMessageId());
+		createSeqEntry.setMessageId(createSeqRMMessage.getMessageId());
 		createSeqEntry.setSend(true);
 		retransmitterMgr.insert(createSeqEntry);
 	}

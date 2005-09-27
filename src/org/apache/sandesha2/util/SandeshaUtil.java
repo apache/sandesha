@@ -32,6 +32,7 @@ import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Sender;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
@@ -43,7 +44,8 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 public class SandeshaUtil {
 
 	private static Hashtable storedMsgContexts = new Hashtable();
-
+	private static Sender sender = new Sender ();
+	
 	public static String getUUID() {
 		String uuid = "uuid:" + UUIDGenerator.getUUID();
 		return uuid;
@@ -166,7 +168,7 @@ public class SandeshaUtil {
 			//newMessageContext.setInFaultFlow(msgCtx.geti);
 			newMessageContext.setMessageID(getUUID());
 			newMessageContext.setMessageInformationHeaders(msgCtx.getMessageInformationHeaders());
-			newMessageContext.setOperationContext(msgCtx.getOperationContext());
+			//newMessageContext.setOperationContext(msgCtx.getOperationContext());
 			newMessageContext.setOperationDescription(msgCtx.getOperationDescription());
 			newMessageContext.setOutPutWritten(msgCtx.isOutPutWritten());
 			newMessageContext.setParent(msgCtx.getParent());
@@ -176,11 +178,11 @@ public class SandeshaUtil {
 			newMessageContext.setResponseWritten(msgCtx.isResponseWritten());
 			newMessageContext.setRestThroughPOST(msgCtx.isRestThroughPOST());
 			newMessageContext.setServerSide(msgCtx.isServerSide());
-			newMessageContext.setServiceContext(msgCtx.getServiceContext());
-			newMessageContext.setServiceContextID(msgCtx.getServiceContextID());
+			//newMessageContext.setServiceContext(msgCtx.getServiceContext());
+			//newMessageContext.setServiceContextID(msgCtx.getServiceContextID());
 			newMessageContext.setServiceDescription(msgCtx.getServiceDescription());
-			newMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
-			newMessageContext.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+			//newMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
+			//newMessageContext.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
 			if (msgCtx.getServiceGroupDescription()!=null)
 				newMessageContext.setServiceGroupDescription(msgCtx.getServiceGroupDescription());
 			newMessageContext.setSoapAction(msgCtx.getSoapAction());
@@ -210,5 +212,11 @@ public class SandeshaUtil {
 	    	newRMMsgCtx.setMessageContext(msgCtx);
 	    
 	    return newRMMsgCtx;	
+	}
+	
+	public static void startSenderIfStopped (ConfigurationContext context) {
+		if (!sender.isSenderStarted()) {
+			sender.start(context);
+		}
 	}
 }

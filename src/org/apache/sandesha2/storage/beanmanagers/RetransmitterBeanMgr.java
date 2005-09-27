@@ -108,6 +108,26 @@ public class RetransmitterBeanMgr {
 
 		return beans;
 	}
+	
+	public Collection findMsgsToSend () {
+		ArrayList beans = new ArrayList();
+		Iterator iterator = table.values().iterator();
+
+		RetransmitterBean temp;
+		while (iterator.hasNext()) {
+			temp = (RetransmitterBean) iterator.next();
+			if (temp.isSend()) {
+				long lastSentTime = temp.getLastSentTime();
+				int count = temp.getSentCount();
+				long timeNow = System.currentTimeMillis();
+				if (count==0 || (timeNow > lastSentTime+Constants.WSP.RETRANSMISSION_INTERVAL)) {
+					beans.add(temp);
+				}
+			}
+		}
+		
+		return beans;
+	}
 
 	public boolean update(RetransmitterBean bean) {
 		return table.put(bean.getMessageId(), bean) != null;

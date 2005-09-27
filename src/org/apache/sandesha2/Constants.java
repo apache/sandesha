@@ -87,6 +87,9 @@ public interface Constants {
 		String ADDRESS = "Address";
 	}
 
+	public interface WSP {
+		long RETRANSMISSION_INTERVAL = 3000;
+	}
 	String RM_HEADERS = "rmHeaders";
 
 	String SEQUENCE = "sequence";
