@@ -18,7 +18,9 @@
 package org.apache.sandesha2.handlers;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
@@ -67,6 +69,12 @@ public class ServerOutHandler extends AbstractHandler {
 		ConfigurationContext ctx = msgCtx.getSystemContext();
 		SandeshaUtil.startSenderIfStopped(ctx);
 
+		
+		
+		
+		
+
+		
 		//getting rm message
 		RMMsgContext rmMsgCtx;
 		try {
@@ -87,7 +95,7 @@ public class ServerOutHandler extends AbstractHandler {
 				AbstractContext context = rmMsgCtx.getContext();
 				if (context == null)
 					throw new SandeshaException("Context is null");
-				
+
 				Sequence sequence = (Sequence) requestRMMsgCtx
 						.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
 				if (sequence == null)
@@ -131,50 +139,86 @@ public class ServerOutHandler extends AbstractHandler {
 				if (!validResponse) { //TODO either change MsgReceiver or move
 					if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksToEPR
 							.getAddress())) {
-						RMMsgCreator.addAckMessage(rmMsgCtx);
+						Sequence reqSequence = (Sequence) requestRMMsgCtx
+								.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+						if (reqSequence == null)
+							throw new SandeshaException(
+									"Sequence part of application message is null");
+
+						String sequenceId = reqSequence.getIdentifier()
+								.getIdentifier();
+
+						RMMsgCreator.addAckMessage(rmMsgCtx, sequenceId);
 					}
 				} else {
 					//valid response
 
 					RMMsgContext ackRMMsgContext = RMMsgCreator
-							.createAckMessage(rmMsgCtx);
-					MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
-					ackMsgContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
-					ackMsgContext.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+							.createAckMessage(requestRMMsgCtx);
+					MessageContext ackMsgContext = ackRMMsgContext
+							.getMessageContext();
+					ackMsgContext.setServiceGroupContext(msgCtx
+							.getServiceGroupContext());
+					ackMsgContext.setServiceGroupContextId(msgCtx
+							.getServiceGroupContextId());
 					ackMsgContext.setServiceContext(msgCtx.getServiceContext());
-					ackMsgContext.setServiceContextID(msgCtx.getServiceContextID());
-					OperationContext ackOpContext = new OperationContext (ackMsgContext.getOperationDescription());
+					ackMsgContext.setServiceContextID(msgCtx
+							.getServiceContextID());
+					
+					//TODO set a suitable operation description
+					OperationContext ackOpContext = new OperationContext(
+							reqMsgCtx.getOperationDescription());
+					
 					ackOpContext.addMessageContext(ackMsgContext);
 					ackMsgContext.setOperationContext(ackOpContext);
-					RMMsgContext newRMMsgCtx = SandeshaUtil
-							.copyRMMessageContext(rmMsgCtx);
+					RMMsgContext newRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
 					MessageContext newMsgCtx = newRMMsgCtx.getMessageContext();
 					rmMsgCtx.setSOAPEnvelop(ackRMMsgContext.getSOAPEnvelope());
 
 					//setting contexts
-					newMsgCtx.setServiceGroupContext(msgCtx.getServiceGroupContext());
-					newMsgCtx.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+					newMsgCtx.setServiceGroupContext(msgCtx
+							.getServiceGroupContext());
+					newMsgCtx.setServiceGroupContextId(msgCtx
+							.getServiceGroupContextId());
 					newMsgCtx.setServiceContext(msgCtx.getServiceContext());
 					newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
-				    OperationContext newOpContext = new OperationContext (newMsgCtx.getOperationDescription());
-				    newOpContext.addMessageContext(newMsgCtx);
-				    newMsgCtx.setOperationContext(newOpContext);
-				    
+					OperationContext newOpContext = new OperationContext(
+							newMsgCtx.getOperationDescription());
+					newOpContext.addMessageContext(newMsgCtx);
+					newMsgCtx.setOperationContext(newOpContext);
+
 					//processing the response
 					processResponseMessage(newRMMsgCtx, requestRMMsgCtx);
+					//msgCtx.setTo(null);
+					msgCtx.setPausedTrue(getName());
+					
+
 				}
 			}
 		} catch (SandeshaException e) {
 			throw new AxisFault(e.getMessage());
 		}
+		
+		// serializing
+		try {
+			SOAPEnvelope env11 = msgCtx.getEnvelope();
+			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+			env11.serialize(writer);
+		} catch (XMLStreamException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (FactoryConfigurationError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
-	private void processResponseMessage(RMMsgContext msg, RMMsgContext reqMsg)
+	private void processResponseMessage(RMMsgContext rmMsg, RMMsgContext reqRMMsg)
 			throws SandeshaException {
-		if (msg == null || reqMsg == null)
+		if (rmMsg == null || reqRMMsg == null)
 			throw new SandeshaException("Message or reques message is null");
 
-		Sequence sequence = (Sequence) reqMsg
+		Sequence sequence = (Sequence) reqRMMsg
 				.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
 		if (sequence == null)
 			throw new SandeshaException("Sequence part is null");
@@ -183,7 +227,7 @@ public class ServerOutHandler extends AbstractHandler {
 		if (incomingSeqId == null || incomingSeqId == "")
 			throw new SandeshaException("Invalid seqence Id");
 
-		AbstractContext context = msg.getContext();
+		AbstractContext context = rmMsg.getContext();
 		if (context == null)
 			throw new SandeshaException("Context is null");
 
@@ -193,7 +237,7 @@ public class ServerOutHandler extends AbstractHandler {
 		SequencePropertyBean toBean = mgr.retrieve(incomingSeqId,
 				Constants.SEQ_PROPERTY_TO_EPR);
 		SequencePropertyBean replyToBean = mgr.retrieve(incomingSeqId,
-				Constants.SEQ_PROPERTY_ACKS_TO_EPR);
+				Constants.SEQ_PROPERTY_REPLY_TO_EPR);
 		SequencePropertyBean outSequenceBean = mgr.retrieve(incomingSeqId,
 				Constants.SEQ_PROPERTY_OUT_SEQUENCE_ID);
 
@@ -213,27 +257,58 @@ public class ServerOutHandler extends AbstractHandler {
 				|| incomingReplyTo.getAddress() == "")
 			throw new SandeshaException("ReplyTo is not set correctly");
 
-		msg.setTo(incomingReplyTo);
-		msg.setReplyTo(incomingTo);
+		rmMsg.setTo(incomingReplyTo);
+		rmMsg.setReplyTo(incomingTo);
 
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
 			RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
 					.getInstance(context).getRetransmitterBeanMgr();
 
-			msg.getMessageContext().setPausedTrue(getName());
+			rmMsg.getMessageContext().setPausedTrue(getName());
 
 			RetransmitterBean appMsgEntry = new RetransmitterBean();
-			String key = SandeshaUtil.storeMessageContext(msg
+			
+			RMMsgContext copiedRMMsgCtx = SandeshaUtil.deepCopy(rmMsg);
+			MessageContext copiedMsgCtx = copiedRMMsgCtx.getMessageContext();
+			MessageContext msg = rmMsg.getMessageContext();
+			//msg.setResponseWritten(false);
+			//msg.setOutPutWritten(true);
+			//msg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,org.apache.axis2.Constants.VALUE_TRUE);
+
+			
+			Object val = msg.getOperationContext().getProperty (org.apache.axis2.Constants.RESPONSE_WRITTEN);
+			copiedMsgCtx.setServiceGroupContext(msg
+					.getServiceGroupContext());
+			copiedMsgCtx.setServiceGroupContextId(msg
+					.getServiceGroupContextId());
+			copiedMsgCtx.setServiceContext(msg
+					.getServiceContext());
+			copiedMsgCtx.setServiceContextID(msg
+					.getServiceContextID());
+			copiedMsgCtx.setOperationContext(msg.getOperationContext());
+			
+			//TODO IF - may not work when op context is changed
+			try {
+				msg.getOperationContext().addMessageContext(copiedMsgCtx);
+			} catch (AxisFault e) {
+				e.printStackTrace();
+			}
+			
+			String key = SandeshaUtil.storeMessageContext(rmMsg
 					.getMessageContext());
 			appMsgEntry.setKey(key);
 			appMsgEntry.setLastSentTime(0);
 			appMsgEntry.setTempSequenceId(incomingSeqId);
 			appMsgEntry.setSend(false);
-			appMsgEntry.setMessageId(msg.getMessageId());
+			appMsgEntry.setMessageId(rmMsg.getMessageId());
+
 			retransmitterMgr.insert(appMsgEntry);
 
-			addCreateSequenceMessage(msg);
+			addCreateSequenceMessage(rmMsg);
+			
 
+
+			
 		} else {
 			//Sequence id is present
 			//set sequence part
@@ -245,8 +320,8 @@ public class ServerOutHandler extends AbstractHandler {
 	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg)
 			throws SandeshaException {
 		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
-		if (applicationMsg==null)
-			throw new SandeshaException ("Message context is null");
+		if (applicationMsg == null)
+			throw new SandeshaException("Message context is null");
 		RMMsgContext createSeqRMMessage = RMMsgCreator
 				.createCreateSeqMsg(applicationRMMsg);
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();

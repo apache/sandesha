@@ -24,6 +24,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.addressing.om.AddressingHeaders;
+import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -62,23 +63,56 @@ public class RMMsgCreator {
 
 	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg)
 			throws SandeshaException {
-		ConfigurationContext context = applicationRMMsg.getMessageContext()
-				.getSystemContext();
+		MessageContext applicationMsgContext = applicationRMMsg
+				.getMessageContext();
+		if (applicationMsgContext == null)
+			throw new SandeshaException("Application message is null");
+		ConfigurationContext context = applicationMsgContext.getSystemContext();
 		if (context == null)
 			throw new SandeshaException("Configuration Context is null");
 
-		MessageContext msgContext;
+		MessageContext createSeqmsgContext;
 		try {
-			msgContext = new MessageContext(context, applicationRMMsg
-					.getMessageContext().getTransportIn(), applicationRMMsg
-					.getMessageContext().getTransportOut());
-		} catch (AxisFault e) {
+			//creating by copying common contents. (this will not set contexts
+			// except for configCtx).
+			createSeqmsgContext = SandeshaUtil
+					.shallowCopy(applicationMsgContext);
+		} catch (SandeshaException e) {
 			throw new SandeshaException(e.getMessage());
 		}
-		msgContext.setTo(applicationRMMsg.getTo());
-		msgContext.setReplyTo(applicationRMMsg.getReplyTo());
 
-		RMMsgContext createSeqRMMsg = new RMMsgContext(msgContext);
+		//setting contexts
+		createSeqmsgContext.setServiceGroupContext(applicationMsgContext
+				.getServiceGroupContext());
+		createSeqmsgContext.setServiceGroupContextId(applicationMsgContext
+				.getServiceGroupContextId());
+		createSeqmsgContext.setServiceContext(applicationMsgContext
+				.getServiceContext());
+		createSeqmsgContext.setServiceContextID(applicationMsgContext
+				.getServiceContextID());
+
+		try {
+			//TODO set a suitable ope. description
+			OperationContext createSeqOpContext = new OperationContext(
+					applicationMsgContext.getOperationDescription());
+			createSeqmsgContext.setOperationContext(createSeqOpContext);
+			createSeqOpContext.addMessageContext(createSeqmsgContext);
+
+			//Setting a new SOAP Envelop.
+			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+
+			createSeqmsgContext.setEnvelope(envelope);
+			createSeqOpContext.addMessageContext(createSeqmsgContext);
+			createSeqmsgContext.setOperationContext(createSeqOpContext);
+		} catch (AxisFault e2) {
+			throw new SandeshaException(e2.getMessage());
+		}
+
+		createSeqmsgContext.setTo(applicationRMMsg.getTo());
+		createSeqmsgContext.setReplyTo(applicationRMMsg.getReplyTo());
+
+		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
 
 		CreateSequence createSequencePart = new CreateSequence();
 
@@ -171,8 +205,8 @@ public class RMMsgCreator {
 	}
 
 	//Adds a ack message to the following message.
-	public static void addAckMessage(RMMsgContext applicationMsg)
-			throws SandeshaException {
+	public static void addAckMessage(RMMsgContext applicationMsg,
+			String sequenceId) throws SandeshaException {
 		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
 		if (envelope == null) {
 			SOAPEnvelope newEnvelope = SOAPAbstractFactory.getSOAPFactory(
@@ -181,30 +215,22 @@ public class RMMsgCreator {
 		}
 		envelope = applicationMsg.getSOAPEnvelope();
 
-		MessageContext requestMessage = null;
-
-		try {
-			requestMessage = applicationMsg.getMessageContext()
-					.getOperationContext().getMessageContext(
-							WSDLConstants.MESSAGE_LABEL_IN);
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
-
-		if (requestMessage == null)
-			throw new SandeshaException("Request message is null");
-
-		RMMsgContext reqRMMsgCtx = null;
-
-		reqRMMsgCtx = MsgInitializer.initializeMessage(requestMessage);
-
-		Sequence reqSequence = (Sequence) reqRMMsgCtx
-				.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
-		if (reqSequence == null)
-			throw new SandeshaException(
-					"Sequence part of application message is null");
-
-		String sequenceId = reqSequence.getIdentifier().getIdentifier();
+//		MessageContext requestMessage = null;
+//
+//		try {
+//			requestMessage = applicationMsg.getMessageContext()
+//					.getOperationContext().getMessageContext(
+//							WSDLConstants.MESSAGE_LABEL_IN);
+//		} catch (AxisFault e) {
+//			throw new SandeshaException(e.getMessage());
+//		}
+//
+//		if (requestMessage == null)
+//			throw new SandeshaException("Request message is null");
+//
+//		RMMsgContext reqRMMsgCtx = null;
+//
+//		reqRMMsgCtx = MsgInitializer.initializeMessage(requestMessage);
 
 		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement();
 		Identifier id = new Identifier();
@@ -243,13 +269,13 @@ public class RMMsgCreator {
 
 	}
 
-	public static RMMsgContext createAckMessage(RMMsgContext applicationMsg)
+	public static RMMsgContext createAckMessage(RMMsgContext applicationRMMsgCtx)
 			throws SandeshaException {
 		try {
-			MessageContext applicationMsgCtx = applicationMsg
+			MessageContext applicationMsgCtx = applicationRMMsgCtx
 					.getMessageContext();
 			MessageContext ackMsgCtx = SandeshaUtil
-					.copyMessageContext(applicationMsgCtx);
+					.shallowCopy(applicationMsgCtx);
 			ackMsgCtx.setServiceGroupContext(applicationMsgCtx
 					.getServiceGroupContext());
 			ackMsgCtx.setServiceGroupContextId(applicationMsgCtx
@@ -257,21 +283,34 @@ public class RMMsgCreator {
 			ackMsgCtx.setServiceContext(applicationMsgCtx.getServiceContext());
 			ackMsgCtx.setServiceContextID(applicationMsgCtx
 					.getServiceContextID());
+
 			RMMsgContext ackRMMsgCtx = new RMMsgContext(ackMsgCtx);
 
-			OperationContext ackOpCtx = new OperationContext(ackMsgCtx
+			//TODO set a suitable description
+			OperationContext ackOpCtx = new OperationContext(applicationMsgCtx
 					.getOperationDescription());
-			MessageContext requestAppMsg = applicationMsgCtx
-					.getOperationContext().getMessageContext(
-							WSDLConstants.MESSAGE_LABEL_IN);
-			
-			//added request applicatin message as the request message for the newly created ack.
+
+			//			//TODO set a suitable request msg (if required)
+			//			MessageContext requestAppMsg = applicationMsgCtx
+			//					.getOperationContext().getMessageContext(
+			//							WSDLConstants.MESSAGE_LABEL_IN);
+
+			//added request applicatin message as the request message for the
+			// newly created ack.
 			//this helps to tread addAck and createAck cases equally.
-			ackOpCtx.addMessageContext(requestAppMsg);
+			//ackOpCtx.addMessageContext(requestAppMsg);
 			ackMsgCtx.setOperationContext(ackOpCtx);
 			ackOpCtx.addMessageContext(ackMsgCtx);
 
-			addAckMessage(ackRMMsgCtx);
+			Sequence reqSequence = (Sequence) applicationRMMsgCtx
+					.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+			if (reqSequence == null)
+				throw new SandeshaException(
+						"Sequence part of application message is null");
+
+			String sequenceId = reqSequence.getIdentifier().getIdentifier();
+
+			addAckMessage(ackRMMsgCtx, sequenceId);
 			return ackRMMsgCtx;
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());

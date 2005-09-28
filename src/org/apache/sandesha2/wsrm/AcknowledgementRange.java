@@ -19,7 +19,9 @@ package org.apache.sandesha2.wsrm;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.om.OMAbstractFactory;
@@ -70,10 +72,24 @@ public class AcknowledgementRange implements IOMRMElement {
 		if (ackRangePart == null)
 			throw new OMException("The passed element is null");
 
+		
+		// serializing
+		try {
+			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+			ackRangePart.serialize(writer);
+		} catch (XMLStreamException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (FactoryConfigurationError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName(
-				Constants.WSRM.LOWER));
+				Constants.WSRM.NS_URI_RM,Constants.WSRM.LOWER));
 		OMAttribute upperAttrib = ackRangePart.getAttribute(new QName(
-				Constants.WSRM.UPPER));
+				Constants.WSRM.NS_URI_RM,Constants.WSRM.UPPER));
 
 		if (lowerAttrib == null || upperAttrib == null)
 			throw new OMException(

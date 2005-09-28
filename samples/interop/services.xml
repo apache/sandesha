@@ -8,7 +8,7 @@
     <module ref="sandesha" />
 
     <operation name="ping">  
-        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
     </operation>
 
     <operation name="echoString">

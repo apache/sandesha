@@ -67,7 +67,7 @@ public class RMElements {
 								Constants.WSRM.SEQUENCE_ACK));
 		if (sequenceAckElement != null) {
 			sequenceAcknowledgement = new SequenceAcknowledgement();
-			sequence.fromOMElement(envelope.getHeader());
+			sequenceAcknowledgement.fromOMElement(envelope.getHeader());
 		}
 
 		OMElement createSeqElement = envelope.getBody().getFirstChildWithName(

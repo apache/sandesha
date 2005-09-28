@@ -19,6 +19,11 @@ package org.apache.sandesha2;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
@@ -45,6 +50,7 @@ public class Sender extends Thread {
 	public void run () {
 		
 		while (senderStarted) {
+			System.out.println ("|-|");
 			try {
 				if (context==null)
 					throw new SandeshaException ("Can't continue the Sender. Context is null");
@@ -60,11 +66,25 @@ public class Sender extends Thread {
 				 RetransmitterBean bean = (RetransmitterBean) iter.next();
 				 String key = (String) bean.getKey();
 				 MessageContext msgCtx = SandeshaUtil.getStoredMessageContext(key);
+				 
 				 try {
+					System.out.println ("SERIALIZATION BEFORE SENDING....");
+					 XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+					 msgCtx.getEnvelope().serialize(writer);
+				} catch (XMLStreamException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (FactoryConfigurationError e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				 
+				try {
 					new AxisEngine(context).send(msgCtx);
 				} catch (AxisFault e1) {
 					e1.printStackTrace();
 				}
+				
 			}
 			
 			try {
