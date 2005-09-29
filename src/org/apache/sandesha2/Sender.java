@@ -78,6 +78,9 @@ public class Sender extends Thread {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				}
+				
+				String action = msgCtx.getWSAAction();
+				System.out.println ("Action:" + action);
 				 
 				try {
 					new AxisEngine(context).send(msgCtx);

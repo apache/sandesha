@@ -34,7 +34,7 @@ public interface Constants {
 
 		String ACTION_SEQ_ACK = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
 		
-		String ACTION_CREATE_SEQ = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
+		String ACTION_CREATE_SEQ = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
 		
 		String NS_URI_CREATE_SEQ_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
 		

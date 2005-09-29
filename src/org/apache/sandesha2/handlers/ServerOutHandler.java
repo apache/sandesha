@@ -69,12 +69,6 @@ public class ServerOutHandler extends AbstractHandler {
 		ConfigurationContext ctx = msgCtx.getSystemContext();
 		SandeshaUtil.startSenderIfStopped(ctx);
 
-		
-		
-		
-		
-
-		
 		//getting rm message
 		RMMsgContext rmMsgCtx;
 		try {
@@ -164,11 +158,11 @@ public class ServerOutHandler extends AbstractHandler {
 					ackMsgContext.setServiceContext(msgCtx.getServiceContext());
 					ackMsgContext.setServiceContextID(msgCtx
 							.getServiceContextID());
-					
+
 					//TODO set a suitable operation description
 					OperationContext ackOpContext = new OperationContext(
 							reqMsgCtx.getOperationDescription());
-					
+
 					ackOpContext.addMessageContext(ackMsgContext);
 					ackMsgContext.setOperationContext(ackOpContext);
 					RMMsgContext newRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
@@ -189,32 +183,17 @@ public class ServerOutHandler extends AbstractHandler {
 
 					//processing the response
 					processResponseMessage(newRMMsgCtx, requestRMMsgCtx);
-					//msgCtx.setTo(null);
 					msgCtx.setPausedTrue(getName());
-					
 
 				}
 			}
 		} catch (SandeshaException e) {
 			throw new AxisFault(e.getMessage());
 		}
-		
-		// serializing
-		try {
-			SOAPEnvelope env11 = msgCtx.getEnvelope();
-			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
-			env11.serialize(writer);
-		} catch (XMLStreamException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (FactoryConfigurationError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 	}
 
-	private void processResponseMessage(RMMsgContext rmMsg, RMMsgContext reqRMMsg)
-			throws SandeshaException {
+	private void processResponseMessage(RMMsgContext rmMsg,
+			RMMsgContext reqRMMsg) throws SandeshaException {
 		if (rmMsg == null || reqRMMsg == null)
 			throw new SandeshaException("Message or reques message is null");
 
@@ -267,33 +246,27 @@ public class ServerOutHandler extends AbstractHandler {
 			rmMsg.getMessageContext().setPausedTrue(getName());
 
 			RetransmitterBean appMsgEntry = new RetransmitterBean();
-			
+
 			RMMsgContext copiedRMMsgCtx = SandeshaUtil.deepCopy(rmMsg);
 			MessageContext copiedMsgCtx = copiedRMMsgCtx.getMessageContext();
 			MessageContext msg = rmMsg.getMessageContext();
-			//msg.setResponseWritten(false);
-			//msg.setOutPutWritten(true);
-			//msg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,org.apache.axis2.Constants.VALUE_TRUE);
 
-			
-			Object val = msg.getOperationContext().getProperty (org.apache.axis2.Constants.RESPONSE_WRITTEN);
-			copiedMsgCtx.setServiceGroupContext(msg
-					.getServiceGroupContext());
+			Object val = msg.getOperationContext().getProperty(
+					org.apache.axis2.Constants.RESPONSE_WRITTEN);
+			copiedMsgCtx.setServiceGroupContext(msg.getServiceGroupContext());
 			copiedMsgCtx.setServiceGroupContextId(msg
 					.getServiceGroupContextId());
-			copiedMsgCtx.setServiceContext(msg
-					.getServiceContext());
-			copiedMsgCtx.setServiceContextID(msg
-					.getServiceContextID());
+			copiedMsgCtx.setServiceContext(msg.getServiceContext());
+			copiedMsgCtx.setServiceContextID(msg.getServiceContextID());
 			copiedMsgCtx.setOperationContext(msg.getOperationContext());
-			
+
 			//TODO IF - may not work when op context is changed
 			try {
 				msg.getOperationContext().addMessageContext(copiedMsgCtx);
 			} catch (AxisFault e) {
 				e.printStackTrace();
 			}
-			
+
 			String key = SandeshaUtil.storeMessageContext(rmMsg
 					.getMessageContext());
 			appMsgEntry.setKey(key);
@@ -305,10 +278,7 @@ public class ServerOutHandler extends AbstractHandler {
 			retransmitterMgr.insert(appMsgEntry);
 
 			addCreateSequenceMessage(rmMsg);
-			
 
-
-			
 		} else {
 			//Sequence id is present
 			//set sequence part

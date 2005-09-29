@@ -174,6 +174,14 @@ public class RMMsgContext {
 	public void setRelatesTo(RelatesTo relatesTo) {
 		msgContext.setRelatesTo(relatesTo);
 	}
+	
+	public void setWSAAction(String URI) {
+		msgContext.setWSAAction(URI);
+	}
+	
+	public String getWSAAction () {
+		return msgContext.getWSAAction();
+	}
 
 	public MessageContext getMessageContext() {
 		return msgContext;

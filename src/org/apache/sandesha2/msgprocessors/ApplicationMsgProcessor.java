@@ -54,7 +54,7 @@ import org.apache.wsdl.WSDLConstants;
 import org.ietf.jgss.MessageProp;
 
 /**
- * @author  
+ * @author
  */
 public class ApplicationMsgProcessor implements MsgProcessor {
 
@@ -63,9 +63,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		System.out.println("Application msg processor called");
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
-		if (msgCtx==null)
-			throw new SandeshaException ("Message context is null");
-		
+		if (msgCtx == null)
+			throw new SandeshaException("Message context is null");
+
 		if (rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE) != null
 				&& rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE)
 						.equals("true")) {
@@ -78,9 +78,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
 				.getSystemContext();
-		if (configCtx==null)
-			throw new SandeshaException ("Configuration Context is null");
-		
+		if (configCtx == null)
+			throw new SandeshaException("Configuration Context is null");
+
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
 				.getInstance(configCtx).getSequencePropretyBeanMgr();
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
@@ -114,7 +114,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				Constants.SEQ_PROPERTY_ACKS_TO_EPR);
 		String acksToStr = null;
 		try {
-			EndpointReference acksTo = (EndpointReference) acksToBean.getValue();
+			EndpointReference acksTo = (EndpointReference) acksToBean
+					.getValue();
 			acksToStr = acksTo.getAddress();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -130,71 +131,45 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
 
-//			//Adding sync ack
-//			//set acknowledgement
-//			//TODO stop adding acks to every message. Add acks only when
-//			// needed.
-//			
-//			
-////			try {
-////				MessageContext responseMsgCtx = rmMsgCtx.getMessageContext().getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT);		
-////				if (responseMsgCtx==null){
-////					responseMsgCtx = new MessageContext (configCtx,rmMsgCtx.getMessageContext().getTransportIn(),rmMsgCtx.getMessageContext().getTransportOut());
-////					rmMsgCtx.getMessageContext().getOperationContext().addMessageContext(responseMsgCtx);
-////					
-////					//TODO following line is due to a bug in Axis2. Remove this when it is fixed.
-////					responseMsgCtx.setOperationContext(rmMsgCtx.getMessageContext().getOperationContext());
-////				}
-////				
-////				RMMsgContext responseRMMsg = new RMMsgContext (responseMsgCtx);
-////				RMMsgCreator.addAckMessage(responseRMMsg);
-////				
-////			} catch (AxisFault af) {
-////				throw new SandeshaException (af.getMessage());
-////			} 
-			
-			
 			RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
 			MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
-			ackMsgCtx.setServiceGroupContext(msgCtx
-					.getServiceGroupContext());
+			ackMsgCtx.setServiceGroupContext(msgCtx.getServiceGroupContext());
 			ackMsgCtx.setServiceGroupContextId(msgCtx
 					.getServiceGroupContextId());
 			ackMsgCtx.setServiceContext(msgCtx.getServiceContext());
-			ackMsgCtx.setServiceContextID(msgCtx
-					.getServiceContextID());
-			
+			ackMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
+
 			//TODO set a suitable operation description
-			OperationContext ackOpContext = new OperationContext(
-					msgCtx.getOperationDescription());
-			
+			OperationContext ackOpContext = new OperationContext(msgCtx
+					.getOperationDescription());
+
 			try {
 				ackOpContext.addMessageContext(ackMsgCtx);
 			} catch (AxisFault e2) {
-				throw new SandeshaException (e2.getMessage());
+				throw new SandeshaException(e2.getMessage());
 			}
 			ackMsgCtx.setOperationContext(ackOpContext);
-			
+
 			//Set new envelope
-			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
 			try {
 				ackMsgCtx.setEnvelope(envelope);
 			} catch (AxisFault e3) {
-				throw new SandeshaException (e3.getMessage());
+				throw new SandeshaException(e3.getMessage());
 			}
-			
+
 			//FIXME set acksTo instead of ReplyTo
 			ackMsgCtx.setTo(msgCtx.getReplyTo());
 			ackMsgCtx.setReplyTo(msgCtx.getTo());
-			RMMsgCreator.addAckMessage(ackRMMsgCtx,sequenceId);
+			RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
 
-			
-		    AxisEngine engine = new AxisEngine(
-		     		ackRMMsgCtx.getMessageContext().getSystemContext());
-		    try {
+			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
+					.getSystemContext());
+			try {
 				engine.send(ackRMMsgCtx.getMessageContext());
 			} catch (AxisFault e1) {
-				throw new SandeshaException (e1.getMessage());
+				throw new SandeshaException(e1.getMessage());
 			}
 
 		} else {
@@ -258,8 +233,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 							"true");
 
 					System.out.println("paused");
-					
-					
+
 				} catch (Exception ex) {
 					throw new SandeshaException(ex.getMessage());
 				}

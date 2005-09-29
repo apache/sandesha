@@ -176,16 +176,6 @@ public class SandeshaUtil {
 			newMessageContext.setOperationDescription(msgCtx
 					.getOperationDescription());
 
-			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx
-					.getProperty(MessageContext.TRANSPORT_OUT));
-			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
-					msgCtx.getProperty(HTTPConstants.HTTPOutTransportInfo));
-
-			//Setting the charater set encoding
-			newMessageContext
-					.setProperty(MessageContext.CHARACTER_SET_ENCODING, msgCtx
-							.getProperty(MessageContext.CHARACTER_SET_ENCODING));
-
 			if (msgCtx.getEnvelope() != null)
 				newMessageContext.setEnvelope(msgCtx.getEnvelope());
 
@@ -214,8 +204,19 @@ public class SandeshaUtil {
 		msgInfoHeaders1.setMessageId(getUUID());
 
 		try {
+			
 			MessageContext newMessageContext = new MessageContext(configCtx,
 					transportIn, transportOut);
+			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx
+					.getProperty(MessageContext.TRANSPORT_OUT));
+			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
+					msgCtx.getProperty(HTTPConstants.HTTPOutTransportInfo));
+
+			//Setting the charater set encoding
+			newMessageContext
+					.setProperty(MessageContext.CHARACTER_SET_ENCODING, msgCtx
+							.getProperty(MessageContext.CHARACTER_SET_ENCODING));
+
 			newMessageContext.setMessageInformationHeaders(msgInfoHeaders1);
 			newMessageContext.setServiceDescription(msgCtx
 					.getServiceDescription());

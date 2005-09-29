@@ -215,35 +215,10 @@ public class RMMsgCreator {
 		}
 		envelope = applicationMsg.getSOAPEnvelope();
 
-//		MessageContext requestMessage = null;
-//
-//		try {
-//			requestMessage = applicationMsg.getMessageContext()
-//					.getOperationContext().getMessageContext(
-//							WSDLConstants.MESSAGE_LABEL_IN);
-//		} catch (AxisFault e) {
-//			throw new SandeshaException(e.getMessage());
-//		}
-//
-//		if (requestMessage == null)
-//			throw new SandeshaException("Request message is null");
-//
-//		RMMsgContext reqRMMsgCtx = null;
-//
-//		reqRMMsgCtx = MsgInitializer.initializeMessage(requestMessage);
-
 		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement();
 		Identifier id = new Identifier();
 		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);
-
-		//		SequencePropertyBean seqPropBean = new SequencePropertyBean
-		// (newSequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,acksTo);
-		//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
-		// (Constants.DEFAULT_STORAGE_TYPE);
-		//		SequencePropertyBean msgNosBean = (SequencePropertyBean)
-		// beanMgr.retrieve(sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
-		//		String msgNoList = (String) msgNosBean.getValue();
 
 		ConfigurationContext ctx = applicationMsg.getMessageContext()
 				.getSystemContext();
@@ -290,15 +265,6 @@ public class RMMsgCreator {
 			OperationContext ackOpCtx = new OperationContext(applicationMsgCtx
 					.getOperationDescription());
 
-			//			//TODO set a suitable request msg (if required)
-			//			MessageContext requestAppMsg = applicationMsgCtx
-			//					.getOperationContext().getMessageContext(
-			//							WSDLConstants.MESSAGE_LABEL_IN);
-
-			//added request applicatin message as the request message for the
-			// newly created ack.
-			//this helps to tread addAck and createAck cases equally.
-			//ackOpCtx.addMessageContext(requestAppMsg);
 			ackMsgCtx.setOperationContext(ackOpCtx);
 			ackOpCtx.addMessageContext(ackMsgCtx);
 
