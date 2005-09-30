@@ -23,6 +23,11 @@
         <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
     </operation> 
 
+    <operation name="CreateSequenceResponse" mep="http://www.w3.org/2004/08/wsdl/in-only">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse</parameter>
+    </operation>
+    
 <!--
 http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence
 http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence

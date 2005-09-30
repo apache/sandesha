@@ -58,6 +58,8 @@ import org.ietf.jgss.MessageProp;
  */
 public class ApplicationMsgProcessor implements MsgProcessor {
 
+	private boolean letInvoke = false;
+	
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
 		System.out.println("Application msg processor called");
@@ -226,14 +228,27 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 							.getMessageContext());
 					storageMapMgr.insert(new StorageMapBean(key, msgNo,
 							sequenceId));
+//					rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
 
-					//					This will avoid performing application processing more
-					// than once.
-					rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
-							"true");
-
-					System.out.println("paused");
-
+					
+					SequencePropertyBean msgProcessorListBean = seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.APP_MSG_PROCESSOR_LIST);
+					if (msgProcessorListBean == null){
+						ArrayList msgProcessorList = new ArrayList ();
+						msgProcessorListBean = new SequencePropertyBean (sequenceId,Constants.SequenceProperties.APP_MSG_PROCESSOR_LIST,msgProcessorList);
+						seqPropMgr.update(msgProcessorListBean);
+					}
+					
+					if (! (msgProcessorListBean.getValue() instanceof ArrayList)){
+						throw new SandeshaException ("Invalid property value");
+					}
+					
+					ArrayList msgProcessorList = (ArrayList) msgProcessorListBean.getValue();
+					msgProcessorList.add(this);
+					
+					while (!isLetInvoke()){
+						Thread.sleep(Constants.INVOKER_SLEEP_TIME);
+					}
+					
 				} catch (Exception ex) {
 					throw new SandeshaException(ex.getMessage());
 				}
@@ -242,11 +257,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				// nothing here :D )
 			}
 		}
-
-
-		//wait till InOrderInvoker allows me.
-		//TODO analyze and optimize performance
-		
+	}
+	
+	public synchronized void letInvoke () {
+		letInvoke = true;
+	}
+	
+	public synchronized boolean isLetInvoke () {
+		return letInvoke;
 	}
 
 	//TODO convert following from INT to LONG

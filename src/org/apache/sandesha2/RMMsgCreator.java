@@ -91,13 +91,16 @@ public class RMMsgCreator {
 		createSeqmsgContext.setServiceContextID(applicationMsgContext
 				.getServiceContextID());
 
+		String createSeqMsgId = SandeshaUtil.getUUID();
 		try {
 			//TODO set a suitable ope. description
 			OperationContext createSeqOpContext = new OperationContext(
 					applicationMsgContext.getOperationDescription());
 			createSeqmsgContext.setOperationContext(createSeqOpContext);
 			createSeqOpContext.addMessageContext(createSeqmsgContext);
-
+			//registering opearion context
+			context.registerOperationContext(createSeqMsgId,createSeqOpContext);
+			
 			//Setting a new SOAP Envelop.
 			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
 					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
@@ -145,7 +148,7 @@ public class RMMsgCreator {
 					"ReplyTo value of the Application Message is not set correctly");
 
 		createSeqRMMsg.setReplyTo(replyTo);
-		createSeqRMMsg.setMessageId(SandeshaUtil.getUUID());
+		createSeqRMMsg.setMessageId(createSeqMsgId);
 
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
 		MessageContext applicationMsg = applicationRMMsg.getMessageContext();

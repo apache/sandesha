@@ -58,6 +58,9 @@ public class ServerInHandler extends AbstractHandler {
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());
 
+		if (msgProcessor==null)
+			throw new AxisFault ("Cant find a suitable message processor");
+		
 		try {
 			msgProcessor.processMessage(rmMsgCtx);
 		} catch (SandeshaException se) {

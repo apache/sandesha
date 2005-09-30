@@ -81,6 +81,7 @@ public class MsgInitializer {
 
 		//TODO: performa validation
 
+		int a = 1;
 		//Setting message type.
 		if (rmMsgCtx.getMessagePart(Constants.MessageParts.CREATE_SEQ) != null)
 			rmMsgCtx.setMessageType(Constants.MessageTypes.CREATE_SEQ);

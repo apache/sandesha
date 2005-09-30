@@ -135,6 +135,8 @@ public interface Constants {
 		String OUT_SEQUENCE_ID = "OutSequenceId";
 
 		String REPLY_TO_EPR = "ReplyToEPR";
+		
+		String APP_MSG_PROCESSOR_LIST = "AppMsgProcessorList";
 	}
 
 	public interface SOAPVersion {

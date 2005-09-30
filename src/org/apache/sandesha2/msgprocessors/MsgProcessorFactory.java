@@ -34,7 +34,9 @@ public class MsgProcessorFactory {
 				return new TerminateSeqMsgProcessor ();
 			case (Constants.MessageTypes.APPLICATION):
 				return new ApplicationMsgProcessor ();
-			default:
+            case (Constants.MessageTypes.CREATE_SEQ_RESPONSE):
+                return new CreateSeqResponseMsgProcessor();
+            default:
 				return null;
 		}
 	}
