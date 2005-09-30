@@ -42,10 +42,10 @@ public class MessageNumber implements IOMRMElement {
 	private OMElement messageNoElement;
 	
 	OMNamespace msgNoNamespace =
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 	
 	public MessageNumber(){
-		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
 	}
 	
 	public long getMessageNumber(){
@@ -61,7 +61,7 @@ public class MessageNumber implements IOMRMElement {
 		if (msgNumberPart==null)
 			throw new OMException ("The passed sequnce element does not contain a message number part");
 		
-		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
 
 		String msgNoStr = msgNumberPart.getText();
 		messageNumber = Long.parseLong(msgNoStr);
@@ -76,7 +76,7 @@ public class MessageNumber implements IOMRMElement {
 		messageNoElement.setText(Long.toString(messageNumber));
 		element.addChild(messageNoElement);
 		
-		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
 		
 		return element;
 	}

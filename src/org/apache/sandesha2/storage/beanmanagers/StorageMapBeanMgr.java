@@ -40,12 +40,12 @@ public class StorageMapBeanMgr {
 	 *  
 	 */
 	public StorageMapBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.STORAGE_MAP_BEAN_MAP);
+		Object obj = context.getProperty(Constants.BeanMAPs.STORAGE_MAP);
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.STORAGE_MAP_BEAN_MAP, table);
+			context.setProperty(Constants.BeanMAPs.STORAGE_MAP, table);
 		}
 	}
 

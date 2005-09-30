@@ -31,13 +31,13 @@ public class Address implements IOMRMElement {
 	OMElement addressElement;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION)
+			Constants.SOAPVersion.DEFAULT)
 			.createOMNamespace(Constants.WSA.NS_URI_ADDRESSING,
 					Constants.WSA.NS_PREFIX_ADDRESSING);
 
 	public Address() {
 		addressElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSA.ADDRESS, rmNamespace);
 	}
 	
@@ -61,7 +61,7 @@ public class Address implements IOMRMElement {
 		addressElement = addressPart;
 		epr = new EndpointReference(addressText);
 		addressElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSA.ADDRESS, rmNamespace);
 		return this;
 
@@ -84,7 +84,7 @@ public class Address implements IOMRMElement {
 		element.addChild(addressElement);
 
 		addressElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSA.ADDRESS, rmNamespace);
 
 		return element;

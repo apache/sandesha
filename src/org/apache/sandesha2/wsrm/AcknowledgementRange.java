@@ -49,12 +49,12 @@ public class AcknowledgementRange implements IOMRMElement {
 	private long lowerValue;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public AcknowledgementRange() {
 		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACK_RANGE, rmNamespace);
 	}
 
@@ -106,7 +106,7 @@ public class AcknowledgementRange implements IOMRMElement {
 		}
 
 		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACK_RANGE, rmNamespace);
 
 		return this;
@@ -124,10 +124,10 @@ public class AcknowledgementRange implements IOMRMElement {
 					"Cant set Ack Range part since Upper or Lower is not set to the correct value");
 
 		OMAttribute lowerAttrib = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
+				Constants.SOAPVersion.DEFAULT).createOMAttribute(
 				Constants.WSRM.LOWER, rmNamespace, Long.toString(lowerValue));
 		OMAttribute upperAttrib = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMAttribute(
+				Constants.SOAPVersion.DEFAULT).createOMAttribute(
 				Constants.WSRM.UPPER, rmNamespace, Long.toString(upperValue));
 
 		acknowledgementRangeElement.addAttribute(lowerAttrib);
@@ -136,7 +136,7 @@ public class AcknowledgementRange implements IOMRMElement {
 		sequenceAckElement.addChild(acknowledgementRangeElement);
 
 		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACK_RANGE, rmNamespace);
 
 		return sequenceAckElement;

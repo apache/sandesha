@@ -41,12 +41,12 @@ public class CreateSeqBeanMgr {
 	 *  
 	 */
 	public CreateSeqBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.CREATE_SEQUECE_BEAN_MAP);
+		Object obj = context.getProperty(Constants.BeanMAPs.CREATE_SEQUECE);
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.CREATE_SEQUECE_BEAN_MAP, table);
+			context.setProperty(Constants.BeanMAPs.CREATE_SEQUECE, table);
 		}
 	}
 

@@ -30,7 +30,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		//TODO: Add create sequence message processing logic
-		CreateSequence createSeq = (CreateSequence) rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+		CreateSequence createSeq = (CreateSequence) rmMsgCtx.getMessagePart(Constants.MessageParts.CREATE_SEQ);
 
 		//rmMsgCtx.test();
 	

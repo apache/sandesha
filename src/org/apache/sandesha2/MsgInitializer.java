@@ -49,33 +49,31 @@ public class MsgInitializer {
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
 
 		if (elements.getCreateSequence() != null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,
+			rmMsgContext.setMessagePart(Constants.MessageParts.CREATE_SEQ,
 					elements.getCreateSequence());
 
 		if (elements.getCreateSequenceResponse() != null)
 			rmMsgContext.setMessagePart(
-					Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE, elements
+					Constants.MessageParts.CREATE_SEQ_RESPONSE, elements
 							.getCreateSequenceResponse());
 
 		if (elements.getSequence() != null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_SEQUENCE,
+			rmMsgContext.setMessagePart(Constants.MessageParts.SEQUENCE,
 					elements.getSequence());
 
 		if (elements.getSequenceAcknowledgement() != null)
 			rmMsgContext.setMessagePart(
-					Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT, elements
+					Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, elements
 							.getSequenceAcknowledgement());
 
 		if (elements.getTerminateSequence() != null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ,
+			rmMsgContext.setMessagePart(Constants.MessageParts.TERMINATE_SEQ,
 					elements.getTerminateSequence());
 
 		if (elements.getAckRequested() != null)
-			rmMsgContext.setMessagePart(Constants.MESSAGE_PART_ACK_REQUEST,
+			rmMsgContext.setMessagePart(Constants.MessageParts.ACK_REQUEST,
 					elements.getAckRequested());
-		
-		
-
+	
 	}
 
 	private static boolean validateMessage(RMMsgContext rmMsgCtx)
@@ -84,19 +82,19 @@ public class MsgInitializer {
 		//TODO: performa validation
 
 		//Setting message type.
-		if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ) != null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ);
+		if (rmMsgCtx.getMessagePart(Constants.MessageParts.CREATE_SEQ) != null)
+			rmMsgCtx.setMessageType(Constants.MessageTypes.CREATE_SEQ);
 		else if (rmMsgCtx
-				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE) != null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_CREATE_SEQ_RESPONSE);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_TERMINATE_SEQ) != null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_TERMINATE_SEQ);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQUENCE) != null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_APPLICATION);
-		else if (rmMsgCtx.getMessagePart(Constants.MESSAGE_PART_SEQ_ACKNOWLEDGEMENT)!=null)
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_ACK);
+				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE) != null)
+			rmMsgCtx.setMessageType(Constants.MessageTypes.CREATE_SEQ_RESPONSE);
+		else if (rmMsgCtx.getMessagePart(Constants.MessageParts.TERMINATE_SEQ) != null)
+			rmMsgCtx.setMessageType(Constants.MessageTypes.TERMINATE_SEQ);
+		else if (rmMsgCtx.getMessagePart(Constants.MessageParts.SEQUENCE) != null)
+			rmMsgCtx.setMessageType(Constants.MessageTypes.APPLICATION);
+		else if (rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT)!=null)
+			rmMsgCtx.setMessageType(Constants.MessageTypes.ACK);
 		else
-			rmMsgCtx.setMessageType(Constants.MESSAGE_TYPE_UNKNOWN);
+			rmMsgCtx.setMessageType(Constants.MessageTypes.UNKNOWN);
 
 		return true;
 	}

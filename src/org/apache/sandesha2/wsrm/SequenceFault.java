@@ -44,12 +44,12 @@ public class SequenceFault implements IOMRMElement {
 	private FaultCode faultCode;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public SequenceFault() {
 		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
 	}
 
@@ -80,7 +80,7 @@ public class SequenceFault implements IOMRMElement {
 		}
 
 		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
 
 		return this;
@@ -103,7 +103,7 @@ public class SequenceFault implements IOMRMElement {
 		body.addChild(sequenceFaultElement);
 
 		sequenceFaultElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
 
 		return body;

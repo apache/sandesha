@@ -41,12 +41,12 @@ public class Accept implements IOMRMElement {
 	private AcksTo acksTo;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public Accept() {
 		acceptElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACCEPT, rmNamespace);
 	}
 
@@ -66,7 +66,7 @@ public class Accept implements IOMRMElement {
 		acksTo.fromOMElement(acceptPart);
 
 		acceptElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACCEPT, rmNamespace);
 
 		return this;
@@ -86,7 +86,7 @@ public class Accept implements IOMRMElement {
 		element.addChild(acceptElement);
 
 		acceptElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACCEPT, rmNamespace);
 
 		return element;

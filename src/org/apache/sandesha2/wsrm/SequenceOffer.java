@@ -40,12 +40,12 @@ public class SequenceOffer implements IOMRMElement {
 	private Expires expires = null;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public SequenceOffer() {
 		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
 	}
 
@@ -63,7 +63,7 @@ public class SequenceOffer implements IOMRMElement {
 					"The passed element does not contain a SequenceOffer part");
 
 		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
 
 		identifier = new Identifier();
@@ -98,7 +98,7 @@ public class SequenceOffer implements IOMRMElement {
 		createSequenceElement.addChild(sequenceOfferElement);
 
 		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
 
 		return createSequenceElement;

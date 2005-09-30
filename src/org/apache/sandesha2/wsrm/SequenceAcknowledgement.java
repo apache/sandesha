@@ -51,12 +51,12 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	private List nackList;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public SequenceAcknowledgement() {
 		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_ACK, rmNamespace);
 		acknowledgementRangeList = new LinkedList();
 		nackList = new LinkedList();
@@ -105,7 +105,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		}
 
 		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_ACK, rmNamespace);
 
 		return this;
@@ -144,7 +144,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		SOAPHeader.addChild(sequenceAcknowledgementElement);
 
 		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_ACK, rmNamespace);
 
 		return header;

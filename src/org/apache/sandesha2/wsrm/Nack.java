@@ -40,10 +40,10 @@ public class Nack implements IOMRMElement {
 	private long nackNumber;
 	
 	OMNamespace rmNamespace =
-		SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 	
 	public Nack(){
-		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.NACK,rmNamespace);
 	}
 	
@@ -65,7 +65,7 @@ public class Nack implements IOMRMElement {
 			throw new OMException ("Nack element does not contain a valid long value");
 		}
 		
-		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.NACK,rmNamespace);
 		
 		return this;
@@ -84,7 +84,7 @@ public class Nack implements IOMRMElement {
 		nackElement.setText(Long.toString(nackNumber));
 		sequenceAckElement.addChild(nackElement);
 
-		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.DEFAULT_SOAP_VERSION).createOMElement(
+		nackElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.NACK,rmNamespace);
 		
 		return sequenceAckElement;

@@ -30,9 +30,9 @@ import org.apache.axis2.soap.SOAPFactory;
 public class SOAPAbstractFactory {
 
 	public static SOAPFactory getSOAPFactory (int SOAPVersion) {
-		if (SOAPVersion==Constants.SOAP_1_1)
+		if (SOAPVersion==Constants.SOAPVersion.v1_1)
 			return OMAbstractFactory.getSOAP11Factory();
-		else if(SOAPVersion==Constants.SOAP_1_2)
+		else if(SOAPVersion==Constants.SOAPVersion.v1_2)
 			return OMAbstractFactory.getSOAP12Factory();
 		else
 			return null;

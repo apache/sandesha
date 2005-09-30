@@ -42,12 +42,12 @@ public class Identifier implements Constants, IOMRMElement {
 	private String identifier = null;
 
 	OMNamespace wsuNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public Identifier() {
 		identifierElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
 	}
 
@@ -70,7 +70,7 @@ public class Identifier implements Constants, IOMRMElement {
 			throw new OMException(
 					"The parsed element does not contain an identifier part");
 		identifierElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
 
 		String identifierText = identifierPart.getText();
@@ -91,7 +91,7 @@ public class Identifier implements Constants, IOMRMElement {
 		element.addChild(identifierElement);
 
 		identifierElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.IDENTIFIER, wsuNamespace);
 
 		return element;

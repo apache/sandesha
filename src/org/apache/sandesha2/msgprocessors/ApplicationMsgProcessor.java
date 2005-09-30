@@ -74,7 +74,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
-				.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+				.getMessagePart(Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
 				.getSystemContext();
@@ -84,7 +84,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
 				.getInstance(configCtx).getSequencePropretyBeanMgr();
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
-				Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+				Constants.SequenceProperties.RECEIVED_MESSAGES);
 
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo == 0)
@@ -93,7 +93,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String messagesStr = (String) msgsBean.getValue();
 
 		if (msgNoPresentInList(messagesStr, msgNo)
-				&& (Constants.DEFAULT_INVOCATION_TYPE == Constants.EXACTLY_ONCE)) {
+				&& (Constants.DeliveryAssurance.DEFAULT_INVOCATION_TYPE == Constants.DeliveryAssurance.EXACTLY_ONCE)) {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 			throw new SandeshaException(
@@ -111,7 +111,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//Setting the ack depending on AcksTo.
 		//TODO: Stop sending askc for every message.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
-				Constants.SEQ_PROPERTY_ACKS_TO_EPR);
+				Constants.SequenceProperties.ACKS_TO_EPR);
 		String acksToStr = null;
 		try {
 			EndpointReference acksTo = (EndpointReference) acksToBean
@@ -152,7 +152,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			//Set new envelope
 			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 			try {
 				ackMsgCtx.setEnvelope(envelope);
 			} catch (AxisFault e3) {
@@ -216,7 +216,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// should have been
 			//		detected previously)
 
-			if (Constants.DEFAULT_DELIVERY_ASSURANCE == Constants.IN_ORDER) {
+			if (Constants.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.DeliveryAssurance.IN_ORDER) {
 				//store and let invoker handle for IN_ORDER invocation
 				//rmMsgCtx.getMessageContext().setPausedTrue(new QName
 				// (Constants.IN_HANDLER_NAME));
@@ -243,7 +243,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		}
 
-		int i = 1;
+
+		//wait till InOrderInvoker allows me.
+		//TODO analyze and optimize performance
+		
 	}
 
 	//TODO convert following from INT to LONG

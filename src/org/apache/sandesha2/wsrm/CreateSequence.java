@@ -48,12 +48,12 @@ public class CreateSequence implements IOMRMPart {
 	//private SequritytokenReference;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public CreateSequence() {
 		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 	}
 	
@@ -76,7 +76,7 @@ public class CreateSequence implements IOMRMPart {
 					"Create sequence is not present in the passed element");
 
 		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 
 		acksTo = new AcksTo();
@@ -125,7 +125,7 @@ public class CreateSequence implements IOMRMPart {
 		soapBody.addChild(createSequenceElement);
 
 		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 		return soapBody;
 	}

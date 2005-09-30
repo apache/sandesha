@@ -40,13 +40,13 @@ public class NextMsgBeanMgr {
 	 *  
 	 */
 	public NextMsgBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.STORAGE_MAP_BEAN_MAP);
+		Object obj = context.getProperty(Constants.BeanMAPs.NEXT_MESSAGE);
 
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.STORAGE_MAP_BEAN_MAP, table);
+			context.setProperty(Constants.BeanMAPs.NEXT_MESSAGE, table);
 		}
 	}
 

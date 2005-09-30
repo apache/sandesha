@@ -48,12 +48,12 @@ public class AcksTo implements IOMRMElement {
 	//private OMElement addressElement;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public AcksTo() {
 		acksToElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACKS_TO, rmNamespace);
 	}
 	
@@ -78,7 +78,7 @@ public class AcksTo implements IOMRMElement {
 		address.fromOMElement(acksToPart);
 
 		acksToElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACKS_TO, rmNamespace);
 
 		return this;
@@ -98,7 +98,7 @@ public class AcksTo implements IOMRMElement {
 		element.addChild(acksToElement);
 
 		acksToElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACKS_TO, rmNamespace);
 
 		return element;

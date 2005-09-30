@@ -100,7 +100,7 @@ public class RMMsgCreator {
 
 			//Setting a new SOAP Envelop.
 			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 
 			createSeqmsgContext.setEnvelope(envelope);
 			createSeqOpContext.addMessageContext(createSeqmsgContext);
@@ -120,7 +120,7 @@ public class RMMsgCreator {
 		EndpointReference acksToEPR = applicationRMMsg.getReplyTo();
 
 		createSequencePart.setAcksTo(new AcksTo(new Address(acksToEPR)));
-		createSeqRMMsg.setMessagePart(Constants.MESSAGE_PART_CREATE_SEQ,
+		createSeqRMMsg.setMessagePart(Constants.MessageParts.CREATE_SEQ,
 				createSequencePart);
 
 		try {
@@ -164,7 +164,7 @@ public class RMMsgCreator {
 			throws AxisFault {
 
 		IOMRMElement messagePart = createSeqMessage
-				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
 		CreateSequence cs = (CreateSequence) messagePart;
 
 		CreateSequenceResponse response = new CreateSequenceResponse();
@@ -185,7 +185,7 @@ public class RMMsgCreator {
 		response.setAccept(accept);
 
 		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 		response.toOMElement(envelope.getBody());
 		outMessage.setWSAAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
 
@@ -210,7 +210,7 @@ public class RMMsgCreator {
 		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
 		if (envelope == null) {
 			SOAPEnvelope newEnvelope = SOAPAbstractFactory.getSOAPFactory(
-					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope();
+					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 			applicationMsg.setSOAPEnvelop(newEnvelope);
 		}
 		envelope = applicationMsg.getSOAPEnvelope();
@@ -226,7 +226,7 @@ public class RMMsgCreator {
 				.getInstance(ctx).getSequencePropretyBeanMgr();
 
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
-				Constants.SEQ_PROPERTY_RECEIVED_MESSAGES);
+				Constants.SequenceProperties.RECEIVED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
 		System.out.println("Message No List:" + msgNoList);
 
@@ -269,7 +269,7 @@ public class RMMsgCreator {
 			ackOpCtx.addMessageContext(ackMsgCtx);
 
 			Sequence reqSequence = (Sequence) applicationRMMsgCtx
-					.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+					.getMessagePart(Constants.MessageParts.SEQUENCE);
 			if (reqSequence == null)
 				throw new SandeshaException(
 						"Sequence part of application message is null");

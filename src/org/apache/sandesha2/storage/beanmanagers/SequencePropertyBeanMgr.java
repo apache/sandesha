@@ -39,12 +39,12 @@ public class SequencePropertyBeanMgr {
 	 *  
 	 */
 	public SequencePropertyBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.SEQUENCE_PROPERTY_BEAN_MAP);
+		Object obj = context.getProperty(Constants.BeanMAPs.SEQUENCE_PROPERTY);
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.SEQUENCE_PROPERTY_BEAN_MAP, table);
+			context.setProperty(Constants.BeanMAPs.SEQUENCE_PROPERTY, table);
 		}
 	}
 

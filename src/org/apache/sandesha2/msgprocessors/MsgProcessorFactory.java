@@ -28,11 +28,11 @@ public class MsgProcessorFactory {
 	public static MsgProcessor getMessageProcessor (int msgType) {
 		switch (msgType)
 		{
-			case (Constants.MESSAGE_TYPE_CREATE_SEQ):
+			case (Constants.MessageTypes.CREATE_SEQ):
 				return new CreateSeqMsgProcessor ();
-			case (Constants.MESSAGE_TYPE_TERMINATE_SEQ):
+			case (Constants.MessageTypes.TERMINATE_SEQ):
 				return new TerminateSeqMsgProcessor ();
-			case (Constants.MESSAGE_TYPE_APPLICATION):
+			case (Constants.MessageTypes.APPLICATION):
 				return new ApplicationMsgProcessor ();
 			default:
 				return null;

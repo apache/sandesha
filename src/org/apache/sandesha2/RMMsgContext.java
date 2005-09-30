@@ -54,7 +54,7 @@ public class RMMsgContext {
 
 	public RMMsgContext() {
 		rmMessageParts = new HashMap();
-		messageType = Constants.MESSAGE_TYPE_UNKNOWN;
+		messageType = Constants.MessageTypes.UNKNOWN;
 	}
 	
 	public void setMessageContext (MessageContext msgCtx) {
@@ -71,7 +71,7 @@ public class RMMsgContext {
 	public void addSOAPEnvelope() throws AxisFault {
 		if (msgContext.getEnvelope() == null) {
 			msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(
-					Constants.DEFAULT_SOAP_VERSION).getDefaultEnvelope());
+					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope());
 		}
 
 		SOAPEnvelope envelope = msgContext.getEnvelope();
@@ -88,12 +88,12 @@ public class RMMsgContext {
 	}
 
 	public void setMessageType(int msgType) {
-		if (msgType >= 0 && msgType <= Constants.MAX_MSG_TYPE)
+		if (msgType >= 0 && msgType <= Constants.MessageTypes.MAX_MESSAGE_TYPE)
 			this.messageType = msgType;
 	}
 
 	public void setMessagePart(int partId, IOMRMPart part) {
-		if (partId >= 0 && partId <= Constants.MAX_MSG_PART_ID)
+		if (partId >= 0 && partId <= Constants.MessageParts.MAX_MSG_PART_ID)
 			rmMessageParts.put(new Integer(partId), part);
 	}
 

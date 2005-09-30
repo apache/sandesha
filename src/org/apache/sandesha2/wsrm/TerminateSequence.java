@@ -40,12 +40,12 @@ public class TerminateSequence implements IOMRMPart {
 	private Identifier identifier;
 
 	OMNamespace rmNameSpace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public TerminateSequence() {
 		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 	}
 
@@ -70,7 +70,7 @@ public class TerminateSequence implements IOMRMPart {
 		identifier.fromOMElement(terminateSeqPart);
 
 		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return this;
@@ -94,7 +94,7 @@ public class TerminateSequence implements IOMRMPart {
 		body.addChild(terminateSequenceElement);
 
 		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return body;

@@ -35,7 +35,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 public class Expires implements IOMRMElement {
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	OMElement expiresElement = null;
@@ -44,7 +44,7 @@ public class Expires implements IOMRMElement {
 
 	public Expires() {
 		expiresElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.EXPIRES, rmNamespace);
 	}
 
@@ -59,7 +59,7 @@ public class Expires implements IOMRMElement {
 			throw new OMException("The duration value is not valid");
 
 		expiresElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.EXPIRES, rmNamespace);
 
 		duration = expiresText;
@@ -82,7 +82,7 @@ public class Expires implements IOMRMElement {
 		element.addChild(expiresElement);
 
 		expiresElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.EXPIRES, rmNamespace);
 
 		return element;

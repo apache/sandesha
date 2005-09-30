@@ -39,12 +39,12 @@ public class FaultCode implements IOMRMElement {
 	String faultCode = null;
 
 	OMNamespace rmNameSpace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public FaultCode() {
 		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.FAULT_CODE, rmNameSpace);
 	}
 
@@ -69,7 +69,7 @@ public class FaultCode implements IOMRMElement {
 		this.faultCode = faultCodePart.getText();
 
 		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.FAULT_CODE, rmNameSpace);
 
 		return sequenceFault;

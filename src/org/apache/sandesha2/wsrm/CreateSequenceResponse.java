@@ -43,12 +43,12 @@ public class CreateSequenceResponse implements IOMRMPart {
 	private Expires expires;
 
 	OMNamespace createSeqResNoNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public CreateSequenceResponse() {
 		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
 				createSeqResNoNamespace);
 	}
@@ -73,7 +73,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 					"The passed element does not contain a create seqence response part");
 
 		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
 				createSeqResNoNamespace);
 
@@ -127,7 +127,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 		SOAPBody.addChild(createSequenceResponseElement);
 
 		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
 				createSeqResNoNamespace);
 

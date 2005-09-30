@@ -39,12 +39,12 @@ public class RetransmitterBeanMgr {
 	 *  
 	 */
 	public RetransmitterBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.RETRANSMITTER_BEAN_MAP);
+		Object obj = context.getProperty(Constants.BeanMAPs.RETRANSMITTER);
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.RETRANSMITTER_BEAN_MAP, table);
+			context.setProperty(Constants.BeanMAPs.RETRANSMITTER, table);
 		}
 	}
 

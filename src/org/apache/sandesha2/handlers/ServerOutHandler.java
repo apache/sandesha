@@ -83,7 +83,7 @@ public class ServerOutHandler extends AbstractHandler {
 		RMMsgContext requestRMMsgCtx;
 		try {
 			requestRMMsgCtx = MsgInitializer.initializeMessage(reqMsgCtx);
-			if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_UNKNOWN) {
+			if (rmMsgCtx.getMessageType() == Constants.MessageTypes.UNKNOWN) {
 
 				System.out.println("GOT Possible Response Message");
 				AbstractContext context = rmMsgCtx.getContext();
@@ -91,7 +91,7 @@ public class ServerOutHandler extends AbstractHandler {
 					throw new SandeshaException("Context is null");
 
 				Sequence sequence = (Sequence) requestRMMsgCtx
-						.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+						.getMessagePart(Constants.MessageParts.SEQUENCE);
 				if (sequence == null)
 					throw new SandeshaException("Sequence part is null");
 
@@ -102,7 +102,7 @@ public class ServerOutHandler extends AbstractHandler {
 				SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
 						.getInstance(context).getSequencePropretyBeanMgr();
 				SequencePropertyBean acksToBean = seqPropMgr.retrieve(
-						incomingSeqId, Constants.SEQ_PROPERTY_ACKS_TO_EPR);
+						incomingSeqId, Constants.SequenceProperties.ACKS_TO_EPR);
 				if (acksToBean == null
 						|| acksToBean.getValue() == null
 						|| !(acksToBean.getValue() instanceof EndpointReference))
@@ -117,7 +117,7 @@ public class ServerOutHandler extends AbstractHandler {
 				SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 				if (env == null) {
 					SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-							Constants.DEFAULT_SOAP_VERSION)
+							Constants.SOAPVersion.DEFAULT)
 							.getDefaultEnvelope();
 					rmMsgCtx.setSOAPEnvelop(envelope);
 				}
@@ -134,7 +134,7 @@ public class ServerOutHandler extends AbstractHandler {
 					if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksToEPR
 							.getAddress())) {
 						Sequence reqSequence = (Sequence) requestRMMsgCtx
-								.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+								.getMessagePart(Constants.MessageParts.SEQUENCE);
 						if (reqSequence == null)
 							throw new SandeshaException(
 									"Sequence part of application message is null");
@@ -198,7 +198,7 @@ public class ServerOutHandler extends AbstractHandler {
 			throw new SandeshaException("Message or reques message is null");
 
 		Sequence sequence = (Sequence) reqRMMsg
-				.getMessagePart(Constants.MESSAGE_PART_SEQUENCE);
+				.getMessagePart(Constants.MessageParts.SEQUENCE);
 		if (sequence == null)
 			throw new SandeshaException("Sequence part is null");
 
@@ -214,11 +214,11 @@ public class ServerOutHandler extends AbstractHandler {
 				context).getSequencePropretyBeanMgr();
 
 		SequencePropertyBean toBean = mgr.retrieve(incomingSeqId,
-				Constants.SEQ_PROPERTY_TO_EPR);
+				Constants.SequenceProperties.TO_EPR);
 		SequencePropertyBean replyToBean = mgr.retrieve(incomingSeqId,
-				Constants.SEQ_PROPERTY_REPLY_TO_EPR);
+				Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean outSequenceBean = mgr.retrieve(incomingSeqId,
-				Constants.SEQ_PROPERTY_OUT_SEQUENCE_ID);
+				Constants.SequenceProperties.OUT_SEQUENCE_ID);
 
 		if (toBean == null)
 			throw new SandeshaException("To is null");

@@ -42,12 +42,12 @@ public class AckRequested implements IOMRMPart {
 	private MessageNumber messageNumber;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public AckRequested() {
 		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 	}
 
@@ -80,7 +80,7 @@ public class AckRequested implements IOMRMPart {
 		}
 
 		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 
 		return this;
@@ -108,7 +108,7 @@ public class AckRequested implements IOMRMPart {
 		}
 
 		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 
 		return header;

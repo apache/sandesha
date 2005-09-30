@@ -49,7 +49,7 @@ public class SequenceMenager {
 			throw new AxisFault("ReplyTo is null");
 
 		CreateSequence createSequence = (CreateSequence) createSequenceMsg
-				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
 		if (createSequence == null)
 			throw new AxisFault("Create Sequence Part is null");
 
@@ -63,13 +63,13 @@ public class SequenceMenager {
 				.getInstance(context).getSequencePropretyBeanMgr();
 
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
-				sequenceId, Constants.SEQ_PROPERTY_RECEIVED_MESSAGES, "");
+				sequenceId, Constants.SequenceProperties.RECEIVED_MESSAGES, "");
 		SequencePropertyBean toBean = new SequencePropertyBean (sequenceId,
-				Constants.SEQ_PROPERTY_TO_EPR,to);
+				Constants.SequenceProperties.TO_EPR,to);
 		SequencePropertyBean replyToBean = new SequencePropertyBean(sequenceId,
-				Constants.SEQ_PROPERTY_REPLY_TO_EPR, replyTo);
+				Constants.SequenceProperties.REPLY_TO_EPR, replyTo);
 		SequencePropertyBean acksToBean = new SequencePropertyBean(sequenceId,
-				Constants.SEQ_PROPERTY_ACKS_TO_EPR, acksTo);
+				Constants.SequenceProperties.ACKS_TO_EPR, acksTo);
 
 		seqPropMgr.insert(receivedMsgBean);
 		seqPropMgr.insert(toBean);

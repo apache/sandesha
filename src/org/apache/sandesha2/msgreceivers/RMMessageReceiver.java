@@ -78,13 +78,13 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 			throw new AxisFault("Cant initialize the message");
 		}
 
-		if (createSeqMsg.getMessageType() != Constants.MESSAGE_TYPE_CREATE_SEQ)
+		if (createSeqMsg.getMessageType() != Constants.MessageTypes.CREATE_SEQ)
 			throw new AxisFault("Wrong message type");
 
 		RMMsgContext createSeqResponse = RMMsgCreator
 				.createCreateSeqResponseMsg(createSeqMsg, outMessage);
 		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
-				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ_RESPONSE);
+				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
 
 		String newSequenceId = createSeqResPart.getIdentifier().getIdentifier();
 		if (newSequenceId == null)
@@ -95,7 +95,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		SequenceMenager.setUpNewSequence(newSequenceId, createSeqMsg);
 
 		CreateSequence createSeq = (CreateSequence) createSeqMsg
-				.getMessagePart(Constants.MESSAGE_PART_CREATE_SEQ);
+				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
 		if (createSeq == null)
 			throw new AxisFault(
 					"Create sequence part not present in the create sequence message");
@@ -107,7 +107,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 					"Acks to not present in the create sequence message");
 
 		SequencePropertyBean seqPropBean = new SequencePropertyBean(
-				newSequenceId, Constants.SEQ_PROPERTY_ACKS_TO_EPR, acksTo);
+				newSequenceId, Constants.SequenceProperties.ACKS_TO_EPR, acksTo);
 		//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
 		// (Constants.DEFAULT_STORAGE_TYPE);
 		//		beanMgr.create(seqPropBean);
@@ -134,13 +134,13 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		AbstractMessageReceiver msgReceiver = null;
 
 		String replyTo = messgeCtx.getFrom().getAddress();
-		if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_TERMINATE_SEQ)
+		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.TERMINATE_SEQ)
 			msgReceiver = new RMInMsgReceiver();
-		else if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ
+		else if (rmMsgCtx.getMessageType() == Constants.MessageTypes.CREATE_SEQ
 				&& ((replyTo == null) || replyTo
 						.equals(Constants.WSA.NS_URI_ANONYMOUS)))
 			msgReceiver = new RMInOutSyncMsgReceiver();
-		else if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ)
+		else if (rmMsgCtx.getMessageType() == Constants.MessageTypes.CREATE_SEQ)
 			msgReceiver = new RMInOutAsyncMsgReceiver();
 
 		if (msgReceiver != null) {
@@ -192,7 +192,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 				throw new AxisFault("Cant initialize the message");
 			}
 
-			if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
+			if (rmMsgCtx.getMessageType() == Constants.MessageTypes.CREATE_SEQ) {
 				//TODO handle sync create seq.
 				setCreateSequence(inMessage, outMessage);
 			}
@@ -214,7 +214,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 				throw new AxisFault("Cant initialize the message");
 			}
 
-			if (rmMsgCtx.getMessageType() == Constants.MESSAGE_TYPE_CREATE_SEQ) {
+			if (rmMsgCtx.getMessageType() == Constants.MessageTypes.CREATE_SEQ) {
 				//TODO handle async create seq.
 				setCreateSequence(inMessage, outMessage);
 				ConfigurationContext configCtx = outMessage.getSystemContext();

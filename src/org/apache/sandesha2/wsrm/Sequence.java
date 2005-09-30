@@ -48,12 +48,12 @@ public class Sequence implements IOMRMPart {
 	private LastMessage lastMessage = null;
 
 	OMNamespace seqNoNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public Sequence() {
 		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
 	}
 
@@ -76,7 +76,7 @@ public class Sequence implements IOMRMPart {
 					"Cannot find Sequence element in the given element");
 
 		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
 
 		identifier = new Identifier();
@@ -129,7 +129,7 @@ public class Sequence implements IOMRMPart {
 		//resetting the element. So that subsequest toOMElement calls will
 		// attach a different object.
 		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
 
 		return headerElement;

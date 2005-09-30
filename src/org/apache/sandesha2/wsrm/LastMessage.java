@@ -40,12 +40,12 @@ public class LastMessage implements IOMRMElement {
 	private OMElement lastMessageElement;
 
 	OMNamespace lastMsgNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.DEFAULT_SOAP_VERSION).createOMNamespace(
+			Constants.SOAPVersion.DEFAULT).createOMNamespace(
 			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
 
 	public LastMessage() {
 		lastMessageElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.LAST_MSG, lastMsgNamespace);
 	}
 
@@ -61,7 +61,7 @@ public class LastMessage implements IOMRMElement {
 					"The passed element does not contain a Last Message part");
 
 		lastMessageElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.LAST_MSG, lastMsgNamespace);
 
 		return this;
@@ -75,7 +75,7 @@ public class LastMessage implements IOMRMElement {
 		sequenceElement.addChild(lastMessageElement);
 
 		lastMessageElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.DEFAULT_SOAP_VERSION).createOMElement(
+				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.LAST_MSG, lastMsgNamespace);
 
 		return sequenceElement;
