@@ -79,14 +79,17 @@ public class Sender extends Thread {
 					e2.printStackTrace();
 				}
 				
-				String action = msgCtx.getWSAAction();
-				System.out.println ("Action:" + action);
-				 
 				try {
 					new AxisEngine(context).send(msgCtx);
 				} catch (AxisFault e1) {
 					e1.printStackTrace();
 				}
+				
+				//changing the values of the sent bean.
+			    bean.setLastSentTime(System.currentTimeMillis());
+			    bean.setSentCount(bean.getSentCount()+1);
+			    mgr.update(bean);
+				
 				
 			}
 			

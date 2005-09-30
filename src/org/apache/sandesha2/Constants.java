@@ -88,7 +88,7 @@ public interface Constants {
 	}
 
 	public interface WSP {
-		long RETRANSMISSION_INTERVAL = 3000;
+		long RETRANSMISSION_INTERVAL = 20000;
 	}
 	String RM_HEADERS = "rmHeaders";
 
