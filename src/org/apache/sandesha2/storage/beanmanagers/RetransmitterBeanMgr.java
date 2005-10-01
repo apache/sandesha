@@ -86,7 +86,7 @@ public class RetransmitterBeanMgr {
 			 * 
 			 * beans.add(temp); }
 			 */
-			boolean add = false;
+			boolean add = true;
 			if (bean.getKey() != null && bean.getKey() != temp.getKey())
 				add = false;
 

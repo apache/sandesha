@@ -9,6 +9,15 @@ public class CreateSeqBean implements Serializable {
 
 	private String SequenceId;
 
+	public CreateSeqBean (){
+		
+	}
+	
+	public CreateSeqBean (String tempSeqId, String CreateSeqMsgId, String sequenceId) {
+		this.tempSequenceId = tempSeqId;
+		this.CreateSeqMsgId = CreateSeqMsgId;
+		this.SequenceId = sequenceId;
+	}
 	/**
 	 * @return Returns the createSeqMsgId.
 	 */

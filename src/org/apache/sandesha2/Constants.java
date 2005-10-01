@@ -137,6 +137,8 @@ public interface Constants {
 		String REPLY_TO_EPR = "ReplyToEPR";
 		
 		String APP_MSG_PROCESSOR_LIST = "AppMsgProcessorList";
+		
+		String OUT_CREATE_SEQUENCE_SENT = "OutCreateSeqSent";
 	}
 
 	public interface SOAPVersion {

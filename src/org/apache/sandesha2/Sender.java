@@ -28,11 +28,16 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.Sequence;
+
+import com.sun.rsasign.m;
 
 public class Sender extends Thread {
 
@@ -66,23 +71,14 @@ public class Sender extends Thread {
 				 RetransmitterBean bean = (RetransmitterBean) iter.next();
 				 String key = (String) bean.getKey();
 				 MessageContext msgCtx = SandeshaUtil.getStoredMessageContext(key);
-				 
-				 try {
-					System.out.println ("SERIALIZATION BEFORE SENDING....");
-					 XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
-					 msgCtx.getEnvelope().serialize(writer);
-				} catch (XMLStreamException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				} catch (FactoryConfigurationError e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
-				
-				try {
+					
+				 try {	 
+				 	updateMessage (msgCtx);
 					new AxisEngine(context).send(msgCtx);
 				} catch (AxisFault e1) {
 					e1.printStackTrace();
+				}catch (SandeshaException e2){
+					e2.printStackTrace();
 				}
 				
 				//changing the values of the sent bean.
@@ -107,6 +103,28 @@ public class Sender extends Thread {
 		senderStarted = true;
 		this.context = context;
 		super.start();
+	}
+	
+	private void updateMessage (MessageContext msgCtx) throws SandeshaException {
+		try {
+			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+			
+			if (rmMsgCtx.getMessageType()==Constants.MessageTypes.CREATE_SEQ) {
+				if (msgCtx.getOperationDescription()==null)
+					throw new SandeshaException ("Operation description is null");
+				
+				msgCtx.getOperationDescription().setMessageReceiver(new RMMessageReceiver ());
+				OperationContext createSeqOpCtx = new OperationContext (msgCtx.getOperationDescription());
+				createSeqOpCtx.addMessageContext(msgCtx);
+				msgCtx.setOperationContext(createSeqOpCtx);
+				if (msgCtx.getSystemContext()!=null)
+					msgCtx.getSystemContext().registerOperationContext(msgCtx.getMessageID(),createSeqOpCtx);
+				else
+					throw new SandeshaException ("System context is null");
+			}
+		} catch (AxisFault e) {
+			throw new SandeshaException ("Exception in updating contexts");
+		}
 	}
 	
 }
