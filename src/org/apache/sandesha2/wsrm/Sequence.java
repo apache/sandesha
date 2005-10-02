@@ -116,19 +116,19 @@ public class Sequence implements IOMRMPart {
 			throw new OMException(
 					"Cant add Sequence part since MessageNumber is null");
 
-		identifier.toOMElement(sequenceElement);
-		messageNumber.toOMElement(sequenceElement);
-		if (lastMessage != null)
-			lastMessage.toOMElement(sequenceElement);
 
-		SOAPHeaderBlock soapHeaderBlock = soapHeader.addHeaderBlock(
+		SOAPHeaderBlock sequenceHeaderBlock = soapHeader.addHeaderBlock(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
-		soapHeaderBlock.setMustUnderstand(true);
-		soapHeaderBlock.addChild(sequenceElement);
+		sequenceHeaderBlock.setMustUnderstand(true);
+		identifier.toOMElement(sequenceHeaderBlock);
+		messageNumber.toOMElement(sequenceHeaderBlock);
+		if (lastMessage != null)
+			lastMessage.toOMElement(sequenceHeaderBlock);
+
 
 		//resetting the element. So that subsequest toOMElement calls will
 		// attach a different object.
-		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
+		this.sequenceElement = SOAPAbstractFactory.getSOAPFactory(
 				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
 
@@ -161,6 +161,13 @@ public class Sequence implements IOMRMPart {
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
+		
+		//detach if already exist.
+		OMElement elem = header.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+				Constants.WSRM.SEQUENCE));
+		if (elem!=null)
+			elem.detach();
+		
 		toOMElement(header);
 	}
 

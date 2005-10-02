@@ -19,9 +19,6 @@ package org.apache.sandesha2.storage.beans;
 
 import java.io.Serializable;
 
-/**
- * @author  
- */
 public class RetransmitterBean implements Serializable {
 
 	private String messageId;
@@ -36,22 +33,22 @@ public class RetransmitterBean implements Serializable {
 
 	private int sentCount = 0;
 	
-	public RetransmitterBean() {
-
+	private long messageNumber = 0;
+	
+	public RetransmitterBean () {
+		
 	}
 
 	public RetransmitterBean(String messageId, String key, long lastSentTime,
-			boolean send, String tempSequenceId) {
+			boolean send, String tempSequenceId, long messageNumber) {
 		this.messageId = messageId;
 		this.key = key;
 		this.LastSentTime = lastSentTime;
 		this.Send = send;
 		this.tempSequenceId = tempSequenceId;
+		this.messageNumber = messageNumber;
 	}
 
-	/**
-	 * @return Returns the key.
-	 */
 	public String getKey() {
 		return key;
 	}
@@ -98,6 +95,14 @@ public class RetransmitterBean implements Serializable {
 	
 	public void setSentCount(int sentCount) {
 		this.sentCount = sentCount;
+	}
+	
+	public long getMessageNumber() {
+		return messageNumber;
+	}
+	
+	public void setMessageNumber(long messageNumber) {
+		this.messageNumber = messageNumber;
 	}
 	
 }

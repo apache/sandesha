@@ -64,32 +64,13 @@ public class AcknowledgementRange implements IOMRMElement {
 
 	public Object fromOMElement(OMElement ackRangePart) throws OMException {
 
-		/*
-		 * OMElement ackRangePart = sequenceAckElement.getFirstChildWithName(
-		 * new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.ACK_RANGE));
-		 */
-
 		if (ackRangePart == null)
 			throw new OMException("The passed element is null");
 
-		
-		// serializing
-		try {
-			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
-			ackRangePart.serialize(writer);
-		} catch (XMLStreamException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (FactoryConfigurationError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		
 		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName(
-				Constants.WSRM.NS_URI_RM,Constants.WSRM.LOWER));
+				Constants.WSRM.LOWER));
 		OMAttribute upperAttrib = ackRangePart.getAttribute(new QName(
-				Constants.WSRM.NS_URI_RM,Constants.WSRM.UPPER));
+				Constants.WSRM.UPPER));
 
 		if (lowerAttrib == null || upperAttrib == null)
 			throw new OMException(
@@ -125,10 +106,10 @@ public class AcknowledgementRange implements IOMRMElement {
 
 		OMAttribute lowerAttrib = SOAPAbstractFactory.getSOAPFactory(
 				Constants.SOAPVersion.DEFAULT).createOMAttribute(
-				Constants.WSRM.LOWER, rmNamespace, Long.toString(lowerValue));
+				Constants.WSRM.LOWER, null, Long.toString(lowerValue));
 		OMAttribute upperAttrib = SOAPAbstractFactory.getSOAPFactory(
 				Constants.SOAPVersion.DEFAULT).createOMAttribute(
-				Constants.WSRM.UPPER, rmNamespace, Long.toString(upperValue));
+				Constants.WSRM.UPPER, null, Long.toString(upperValue));
 
 		acknowledgementRangeElement.addAttribute(lowerAttrib);
 		acknowledgementRangeElement.addAttribute(upperAttrib);

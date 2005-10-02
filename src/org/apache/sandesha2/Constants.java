@@ -133,12 +133,18 @@ public interface Constants {
 		String ACKS_TO_EPR = "acksToEPR";
 
 		String OUT_SEQUENCE_ID = "OutSequenceId";
+		
+		String INCOMING_SEQUENCE_ID = "IncomingSequenceId";
+		
+		String TEMP_SEQUENCE_ID = "TempSequenceId";
 
 		String REPLY_TO_EPR = "ReplyToEPR";
 		
 		String APP_MSG_PROCESSOR_LIST = "AppMsgProcessorList";
 		
 		String OUT_CREATE_SEQUENCE_SENT = "OutCreateSeqSent";
+		
+		String NEXT_MESSAGE_NUMBER = "NextMsgNo";
 	}
 
 	public interface SOAPVersion {
@@ -188,7 +194,9 @@ public interface Constants {
 	String OUT_HANDLER_NAME = "SandeshaOutHandler";
 
 	//message context properties
-	String APPLICATION_PROCESSING_DONE = "APP_PROCESSING_DONE";
+	String APPLICATION_PROCESSING_DONE = "AppProcessingDone";
+	
+	String ACK_WRITTEN = "AckWritten";
 
 	int INVOKER_SLEEP_TIME = 1000;
 

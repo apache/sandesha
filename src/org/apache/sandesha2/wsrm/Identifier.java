@@ -25,6 +25,10 @@ package org.apache.sandesha2.wsrm;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
@@ -64,6 +68,21 @@ public class Identifier implements Constants, IOMRMElement {
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
+		
+		try {
+		System.out.println("PRINTING IDENTIFIER");
+
+		XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+		element.serialize(writer);
+	} catch (XMLStreamException e2) {
+		// TODO Auto-generated catch block
+		e2.printStackTrace();
+	} catch (FactoryConfigurationError e2) {
+		// TODO Auto-generated catch block
+		e2.printStackTrace();
+	}
+		
+		
 		OMElement identifierPart = element.getFirstChildWithName(new QName(
 				Constants.WSRM.NS_URI_RM, Constants.WSRM.IDENTIFIER));
 		if (identifierPart == null)

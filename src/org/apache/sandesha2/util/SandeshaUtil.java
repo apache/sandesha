@@ -197,12 +197,17 @@ public class SandeshaUtil {
 		TransportInDescription transportIn = msgCtx.getTransportIn();
 		TransportOutDescription transportOut = msgCtx.getTransportOut();
 		MessageInformationHeaders msgInfoHeaders1 = new MessageInformationHeaders();
-		msgInfoHeaders1.setTo(msgCtx.getTo());
-		msgInfoHeaders1.setFrom(msgCtx.getFrom());
-		msgInfoHeaders1.setReplyTo(msgCtx.getReplyTo());
-		msgInfoHeaders1.setFaultTo(msgCtx.getFaultTo());
+		MessageInformationHeaders oldMsgInfoHeaders = msgCtx.getMessageInformationHeaders();
+		
+		msgInfoHeaders1.setTo(oldMsgInfoHeaders.getTo());
+		msgInfoHeaders1.setFrom(oldMsgInfoHeaders.getFrom());
+		msgInfoHeaders1.setReplyTo(oldMsgInfoHeaders.getReplyTo());
+		msgInfoHeaders1.setFaultTo(oldMsgInfoHeaders.getFaultTo());
 		msgInfoHeaders1.setMessageId(getUUID());
-
+		msgInfoHeaders1.setRelatesTo(oldMsgInfoHeaders.getRelatesTo());
+		msgInfoHeaders1.setAction(oldMsgInfoHeaders.getAction());
+		msgInfoHeaders1.setReferenceParameters(oldMsgInfoHeaders.getReferenceParameters());
+		
 		try {
 			
 			MessageContext newMessageContext = new MessageContext(configCtx,

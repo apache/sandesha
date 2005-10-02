@@ -57,9 +57,9 @@ public class RetransmitterBeanMgr {
 	}
 
 	public boolean insert(RetransmitterBean bean) throws SandeshaException {
-		if (bean.getMessageId()==null)
-			throw new SandeshaException ("Key (MessageId) is null. Cant insert.");
-		
+		if (bean.getMessageId() == null)
+			throw new SandeshaException("Key (MessageId) is null. Cant insert.");
+
 		table.put(bean.getMessageId(), bean);
 		return true;
 	}
@@ -75,18 +75,9 @@ public class RetransmitterBeanMgr {
 		RetransmitterBean temp;
 		while (iterator.hasNext()) {
 			temp = (RetransmitterBean) iterator.next();
-			/*
-			 * if (!(bean.getMessageId() != null &&
-			 * bean.getMessageId().equals(temp.getMessageId())) &&
-			 * (bean.getCreateSeqMsgId() != null &&
-			 * bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId())) &&
-			 * (bean.getKey() != null && bean.getKey().equals(temp.getKey())) &&
-			 * (bean.getLastSentTime() != -1 && bean.getLastSentTime() ==
-			 * temp.getLastSentTime())){
-			 * 
-			 * beans.add(temp); }
-			 */
+
 			boolean add = true;
+			
 			if (bean.getKey() != null && bean.getKey() != temp.getKey())
 				add = false;
 
@@ -102,14 +93,18 @@ public class RetransmitterBeanMgr {
 					&& bean.getTempSequenceId() != temp.getTempSequenceId())
 				add = false;
 
+			if (bean.getMessageNumber() > 0
+					&& bean.getMessageNumber() != temp.getMessageNumber())
+				add = false;
+
 			if (add)
 				beans.add(temp);
 		}
 
 		return beans;
 	}
-	
-	public Collection findMsgsToSend () {
+
+	public Collection findMsgsToSend() {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 
@@ -120,12 +115,14 @@ public class RetransmitterBeanMgr {
 				long lastSentTime = temp.getLastSentTime();
 				int count = temp.getSentCount();
 				long timeNow = System.currentTimeMillis();
-				if (count==0 || (timeNow > lastSentTime+Constants.WSP.RETRANSMISSION_INTERVAL)) {
+				if (count == 0
+						|| (timeNow > lastSentTime
+								+ Constants.WSP.RETRANSMISSION_INTERVAL)) {
 					beans.add(temp);
 				}
 			}
 		}
-		
+
 		return beans;
 	}
 

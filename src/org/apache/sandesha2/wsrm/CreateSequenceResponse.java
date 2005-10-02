@@ -160,6 +160,13 @@ public class CreateSequenceResponse implements IOMRMPart {
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPBody body = envelope.getBody();
+		
+		//detach if already exist.
+		OMElement elem = body.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+				Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
+		if (elem!=null)
+			elem.detach();
+		
 		toOMElement(body);
 	}
 }

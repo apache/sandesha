@@ -132,6 +132,13 @@ public class AckRequested implements IOMRMPart {
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
+		
+		//detach if already exist.
+		OMElement elem = header.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+				Constants.WSRM.ACK_REQUESTED));
+		if (elem!=null)
+			elem.detach();
+		
 		toOMElement(header);
 	}
 

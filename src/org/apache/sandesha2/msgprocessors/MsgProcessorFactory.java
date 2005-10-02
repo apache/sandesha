@@ -36,6 +36,8 @@ public class MsgProcessorFactory {
 				return new ApplicationMsgProcessor ();
             case (Constants.MessageTypes.CREATE_SEQ_RESPONSE):
                 return new CreateSeqResponseMsgProcessor();
+            case (Constants.MessageTypes.ACK):
+            	return new AcknowledgementProcessor ();
             default:
 				return null;
 		}

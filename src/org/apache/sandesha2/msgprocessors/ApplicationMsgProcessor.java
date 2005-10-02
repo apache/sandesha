@@ -14,6 +14,7 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.msgprocessors;
 
 import java.util.ArrayList;
@@ -114,14 +115,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//TODO: Stop sending askc for every message.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
 				Constants.SequenceProperties.ACKS_TO_EPR);
-		String acksToStr = null;
-		try {
-			EndpointReference acksTo = (EndpointReference) acksToBean
-					.getValue();
-			acksToStr = acksTo.getAddress();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
+		EndpointReference acksTo = (EndpointReference) acksToBean.getValue();
+		String acksToStr = acksTo.getAddress();
+
 
 		//TODO: remove folowing 2.
 		System.out.println("Messages received:" + messagesStr);
@@ -162,17 +159,23 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			//FIXME set acksTo instead of ReplyTo
-			ackMsgCtx.setTo(msgCtx.getReplyTo());
+			ackMsgCtx.setTo(acksTo);
 			ackMsgCtx.setReplyTo(msgCtx.getTo());
 			RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
 
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getSystemContext());
+		
+			
+			//set CONTEXT_WRITTEN since acksto is anonymous
+			rmMsgCtx.getMessageContext().getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,"true");
+			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN,"true");
 			try {
 				engine.send(ackRMMsgCtx.getMessageContext());
 			} catch (AxisFault e1) {
 				throw new SandeshaException(e1.getMessage());
 			}
+			
 
 		} else {
 			//TODO Add async Ack

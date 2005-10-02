@@ -28,12 +28,10 @@
         <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse</parameter>
     </operation>
     
-<!--
-http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence
-http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence
-    <operation name="CreateSequence" mep="http://www.w3.org/2004/08/wsdl/in-out">
-        <parameter name="wsamapping" >http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
+    <operation name="SequenceAcknowledgement" mep="http://www.w3.org/2004/08/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
-    </operation>
- -->
+        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</parameter>
+    </operation> 
+    
+   
 </module>

@@ -110,6 +110,13 @@ public class TerminateSequence implements IOMRMPart {
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPBody body = envelope.getBody();
+		
+		//detach if already exist.
+		OMElement elem = body.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
+				Constants.WSRM.TERMINATE_SEQUENCE));
+		if (elem!=null)
+			elem.detach();
+		
 		toOMElement(body);
 	}
 }

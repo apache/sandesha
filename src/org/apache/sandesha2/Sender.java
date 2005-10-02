@@ -74,6 +74,10 @@ public class Sender extends Thread {
 					
 				 try {	 
 				 	updateMessage (msgCtx);
+				 	
+				 	Object obj = msgCtx.getProperty(
+                            MessageContext.CHARACTER_SET_ENCODING);
+				 	System.out.println("CHAR SET ENCODING:" + obj);
 					new AxisEngine(context).send(msgCtx);
 				} catch (AxisFault e1) {
 					e1.printStackTrace();
@@ -92,7 +96,8 @@ public class Sender extends Thread {
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e1) {
-				e1.printStackTrace();
+				//e1.printStackTrace();
+				System.out.println ("SENDER: Interupted Exception");
 			}
 		}
 		
@@ -122,6 +127,10 @@ public class Sender extends Thread {
 				else
 					throw new SandeshaException ("System context is null");
 			}
+			
+			
+			
+			rmMsgCtx.addSOAPEnvelope();
 		} catch (AxisFault e) {
 			throw new SandeshaException ("Exception in updating contexts");
 		}

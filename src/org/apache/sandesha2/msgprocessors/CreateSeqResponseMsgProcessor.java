@@ -33,10 +33,17 @@ import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.soap.SOAPEnvelope;
 
 import java.util.Iterator;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
@@ -78,9 +85,12 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr sequencePropMgr = AbstractBeanMgrFactory
 				.getInstance(configCtx).getSequencePropretyBeanMgr();
 		SequencePropertyBean outSequenceBean = new SequencePropertyBean(
-				incomingSequenceId,
+			incomingSequenceId,
 				Constants.SequenceProperties.OUT_SEQUENCE_ID, newOutSequenceId);
+		SequencePropertyBean incomingSequenceBean = new SequencePropertyBean (newOutSequenceId,
+				Constants.SequenceProperties.INCOMING_SEQUENCE_ID, incomingSequenceId);
 		sequencePropMgr.insert(outSequenceBean);
+		sequencePropMgr.insert(incomingSequenceBean);
 		
 		RetransmitterBean target = new RetransmitterBean();
 		target.setTempSequenceId(incomingSequenceId);
@@ -92,24 +102,32 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			//updating the application message
 			String key = tempBean.getKey();
 			MessageContext applicationMsg = SandeshaUtil
-					.getStoredMessageContext(key);
+					.getStoredMessageContext(key);		
+			
 			RMMsgContext applicaionRMMsg = MsgInitializer
 					.initializeMessage(applicationMsg);
 
-			Sequence sequence = new Sequence();
+	
+			Sequence sequencePart = (Sequence) applicaionRMMsg.getMessagePart(Constants.MessageParts.SEQUENCE); 
+			if (sequencePart==null)
+				throw new SandeshaException ("Sequence part is null");
+			
 			Identifier identifier = new Identifier ();
 			identifier.setIndentifer(newOutSequenceId);
-			sequence.setIdentifier(identifier);
 			
-			//FIXME set a correct message number.
-			MessageNumber msgNumber = new MessageNumber ();
-			msgNumber.setMessageNumber(1);
-			sequence.setMessageNumber(msgNumber);
-			applicaionRMMsg.setMessagePart(Constants.MessageParts.SEQUENCE,sequence);
-
+			sequencePart.setIdentifier(identifier);
+			try {
+				applicaionRMMsg.addSOAPEnvelope();
+			} catch (AxisFault e) {
+				throw new SandeshaException (e.getMessage());
+			}
+			
 			//asking to send the application msssage
 			tempBean.setSend(true);
 			retransmitterMgr.update(tempBean);
 		}
+		
+		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,"false");
+		
 	}
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.sandesha2.wsrm;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,9 +47,9 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 	private Identifier identifier;
 
-	private List acknowledgementRangeList;
+	private ArrayList acknowledgementRangeList;
 
-	private List nackList;
+	private ArrayList nackList;
 
 	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
 			Constants.SOAPVersion.DEFAULT).createOMNamespace(
@@ -58,8 +59,8 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(
 				Constants.SOAPVersion.DEFAULT).createOMElement(
 				Constants.WSRM.SEQUENCE_ACK, rmNamespace);
-		acknowledgementRangeList = new LinkedList();
-		nackList = new LinkedList();
+		acknowledgementRangeList = new ArrayList();
+		nackList = new ArrayList();
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -154,7 +155,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		this.identifier = identifier;
 	}
 
-	public void setAckRanges(List acknowledgementRagngesList) {
+	public void setAckRanges(ArrayList acknowledgementRagngesList) {
 		acknowledgementRangeList = acknowledgementRagngesList;
 	}
 
@@ -187,6 +188,13 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
+
+		//detach if already exist.
+		OMElement elem = header.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE_ACK));
+		if (elem != null)
+			elem.detach();
+
 		toOMElement(header);
 	}
 
