@@ -51,6 +51,7 @@ import org.apache.sandesha2.wsrm.IOMRMPart;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.wsdl.WSDLConstants;
 
 /**
@@ -160,6 +161,56 @@ public class RMMsgCreator {
 		createSeqMsg.setServiceContextID(applicationMsg.getServiceContextID());
 
 		return createSeqRMMsg;
+	}
+	
+	public static RMMsgContext createTerminateSequenceMessage (RMMsgContext referenceRMMessage, String sequenceId) throws SandeshaException {
+		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
+		if (referenceMessage==null)
+			throw new SandeshaException ("MessageContext is null");
+		
+		RMMsgContext terminateRMMessage = SandeshaUtil.shallowCopy(referenceRMMessage);
+		MessageContext terminateMessage = terminateRMMessage.getMessageContext();
+		if (terminateMessage==null)
+			throw new SandeshaException ("MessageContext is null");
+			
+		MessageInformationHeaders newMessageInfoHeaders = new MessageInformationHeaders ();
+		terminateMessage.setMessageInformationHeaders(newMessageInfoHeaders);
+		terminateMessage.setMessageID(SandeshaUtil.getUUID());
+		
+		terminateMessage.setServiceGroupContext(referenceMessage
+				.getServiceGroupContext());
+		terminateMessage.setServiceGroupContextId(referenceMessage
+				.getServiceGroupContextId());
+		terminateMessage.setServiceContext(referenceMessage
+				.getServiceContext());
+		terminateMessage.setServiceContextID(referenceMessage
+				.getServiceContextID());
+		
+		terminateMessage.setOperationDescription(referenceMessage.getOperationDescription());
+		OperationContext newOperationCtx = new OperationContext (terminateMessage.getOperationDescription());
+		try {
+			newOperationCtx.addMessageContext(terminateMessage);
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
+		
+		terminateMessage.setOperationContext(newOperationCtx);
+		
+		ConfigurationContext configCtx = terminateMessage.getSystemContext();
+		if (configCtx==null)
+			throw new SandeshaException ("Configuration Context is null");
+		configCtx.registerOperationContext(terminateMessage.getMessageID(),newOperationCtx);
+
+		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
+		terminateRMMessage.setSOAPEnvelop(envelope);
+		
+		TerminateSequence terminateSequencePart = new TerminateSequence ();
+		Identifier identifier = new Identifier ();
+		identifier.setIndentifer(sequenceId);
+		terminateSequencePart.setIdentifier(identifier);
+		terminateRMMessage.setMessagePart(Constants.MessageParts.TERMINATE_SEQ,terminateSequencePart);
+		
+		return terminateRMMessage;
 	}
 
 	public static RMMsgContext createCreateSeqResponseMsg(

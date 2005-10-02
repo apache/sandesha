@@ -18,7 +18,10 @@ package org.apache.sandesha2.util;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
@@ -197,8 +200,9 @@ public class SandeshaUtil {
 		TransportInDescription transportIn = msgCtx.getTransportIn();
 		TransportOutDescription transportOut = msgCtx.getTransportOut();
 		MessageInformationHeaders msgInfoHeaders1 = new MessageInformationHeaders();
-		MessageInformationHeaders oldMsgInfoHeaders = msgCtx.getMessageInformationHeaders();
-		
+		MessageInformationHeaders oldMsgInfoHeaders = msgCtx
+				.getMessageInformationHeaders();
+
 		msgInfoHeaders1.setTo(oldMsgInfoHeaders.getTo());
 		msgInfoHeaders1.setFrom(oldMsgInfoHeaders.getFrom());
 		msgInfoHeaders1.setReplyTo(oldMsgInfoHeaders.getReplyTo());
@@ -206,10 +210,11 @@ public class SandeshaUtil {
 		msgInfoHeaders1.setMessageId(getUUID());
 		msgInfoHeaders1.setRelatesTo(oldMsgInfoHeaders.getRelatesTo());
 		msgInfoHeaders1.setAction(oldMsgInfoHeaders.getAction());
-		msgInfoHeaders1.setReferenceParameters(oldMsgInfoHeaders.getReferenceParameters());
-		
+		msgInfoHeaders1.setReferenceParameters(oldMsgInfoHeaders
+				.getReferenceParameters());
+
 		try {
-			
+
 			MessageContext newMessageContext = new MessageContext(configCtx,
 					transportIn, transportOut);
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx
@@ -253,9 +258,51 @@ public class SandeshaUtil {
 		return newRMMsgCtx;
 	}
 
+	public static RMMsgContext shallowCopy(RMMsgContext rmMsgContext)
+			throws SandeshaException {
+		MessageContext msgCtx = null;
+		if (rmMsgContext.getMessageContext() != null)
+			msgCtx = shallowCopy(rmMsgContext.getMessageContext());
+
+		RMMsgContext newRMMsgCtx = new RMMsgContext();
+		if (msgCtx != null)
+			newRMMsgCtx.setMessageContext(msgCtx);
+
+		return newRMMsgCtx;
+	}
+
 	public static void startSenderIfStopped(ConfigurationContext context) {
 		if (!sender.isSenderStarted()) {
 			sender.start(context);
 		}
+	}
+
+	public static boolean verifySequenceCompletion(Iterator ackRangesIterator,
+			long lastMessageNo) {
+		HashMap startMap = new HashMap();
+
+		while (ackRangesIterator.hasNext()) {
+			AcknowledgementRange temp = (AcknowledgementRange) ackRangesIterator
+					.next();
+			startMap.put(new Long(temp.getLowerValue()), temp);
+		}
+
+		long start = 1;
+		boolean loop = true;
+		while (loop) {
+			AcknowledgementRange temp = (AcknowledgementRange) startMap
+					.get(new Long(start));
+			if (temp == null) {
+				loop = false;
+				continue;
+			}
+
+			if (temp.getUpperValue() >= lastMessageNo)
+				return true;
+
+			start = temp.getUpperValue() + 1;
+		}
+
+		return false;
 	}
 }

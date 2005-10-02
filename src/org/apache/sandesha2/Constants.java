@@ -73,6 +73,17 @@ public interface Constants {
 		String IDENTIFIER = "Identifier";
 
 		String ACCEPT = "Accept";
+		
+		public interface Actions {
+			
+			String CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
+			
+			String CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
+			
+			String SEQUENCE_ACKNOWLEDGEMENT = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
+			
+			String TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
+		}
 	}
 
 	public interface WSA {
@@ -145,6 +156,8 @@ public interface Constants {
 		String OUT_CREATE_SEQUENCE_SENT = "OutCreateSeqSent";
 		
 		String NEXT_MESSAGE_NUMBER = "NextMsgNo";
+		
+		String LAST_OUT_MESSAGE = "LastOutMessage";
 	}
 
 	public interface SOAPVersion {

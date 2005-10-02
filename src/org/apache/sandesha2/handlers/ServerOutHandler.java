@@ -53,6 +53,7 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.wsdl.MessageReference;
@@ -292,6 +293,27 @@ public class ServerOutHandler extends AbstractHandler {
 
 		appMsgEntry.setMessageNumber(nextMsgNo);
 
+		//setting last message
+		if (msg.isServerSide()) {
+			Sequence requestSequence = (Sequence) reqRMMsg
+					.getMessagePart(Constants.MessageParts.SEQUENCE);
+			if (requestSequence == null)
+				throw new SandeshaException("Request Sequence is null");
+
+			if (requestSequence.getLastMessage() != null) {
+				//FIX ME - This fails if request last message has more than one
+				// responses.
+				sequence.setLastMessage(new LastMessage());
+
+				//saving the last message no.
+				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
+						incomingSeqId,
+						Constants.SequenceProperties.LAST_OUT_MESSAGE,
+						new Long(nextMsgNo));
+				sequencePropertyMgr.insert(lastOutMsgBean);
+			}
+		}
+
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
 
 			//setting tempSequenceId;
@@ -355,7 +377,6 @@ public class ServerOutHandler extends AbstractHandler {
 		String tempSequeneId = (String) tempSequenceBean.getValue();
 		appMsgEntry.setTempSequenceId(tempSequeneId);
 		retransmitterMgr.insert(appMsgEntry);
-
 	}
 
 	private long getNextMsgNo(ConfigurationContext context, String incomingSeqId) {

@@ -21,17 +21,28 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
+import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.Nack;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
@@ -109,6 +120,31 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 			//TODO - Process Nack
 		}
+
+		//If all messages up to last message have been acknowledged.
+		//Add terminate Sequence message.
+		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
+				incomingSequenceId,
+				Constants.SequenceProperties.LAST_OUT_MESSAGE);
+		if (lastOutMsgBean != null) {
+			Long lastOutMsgNoLng = (Long) lastOutMsgBean.getValue();
+			if (lastOutMsgNoLng == null)
+				throw new SandeshaException(
+						"Invalid object set for the Last Out Message");
+
+			long lastOutMessageNo = lastOutMsgNoLng.longValue();
+			if (lastOutMessageNo <= 0)
+				throw new SandeshaException(
+						"Invalid value set for the last out message");
+
+			boolean complete = SandeshaUtil.verifySequenceCompletion(
+					sequenceAck.getAcknowledgementRanges().iterator(),
+					lastOutMessageNo);
+			if (complete) {
+				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,incomingSequenceId);
+			}
+		}
+
 	}
 
 	private RetransmitterBean getRetransmitterEntry(Collection collection,
@@ -122,4 +158,59 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		return null;
 	}
+
+	public void addTerminateSequenceMessage(RMMsgContext incomingAckRMMsg,
+			String outSequenceId,String incomingSequenceId) throws SandeshaException {
+		RMMsgContext terminateRMMessage = RMMsgCreator
+				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
+
+		//detting addressing headers.
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(
+				incomingAckRMMsg.getContext()).getSequencePropretyBeanMgr();
+		SequencePropertyBean replyToBean = seqPropMgr.retrieve(incomingSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
+		if (replyToBean==null)
+			throw new SandeshaException ("ReplyTo property is not set");
+		
+		EndpointReference replyToEPR = (EndpointReference) replyToBean.getValue();
+		if (replyToEPR==null)
+			throw new SandeshaException ("ReplyTo EPR has an invalid value");
+		 
+		terminateRMMessage.setTo(new EndpointReference (replyToEPR.getAddress()));
+		terminateRMMessage.setFrom(incomingAckRMMsg.getTo());
+		terminateRMMessage
+				.setWSAAction(Constants.WSRM.Actions.TERMINATE_SEQUENCE);
+
+		try {
+			terminateRMMessage.addSOAPEnvelope();
+		} catch (AxisFault e) {
+			throw new SandeshaException(e.getMessage());
+		}
+
+		String key = SandeshaUtil.storeMessageContext(terminateRMMessage
+				.getMessageContext());
+		RetransmitterBean terminateBean = new RetransmitterBean();
+		terminateBean.setKey(key);
+		terminateBean.setLastSentTime(0);
+		terminateBean.setMessageId(terminateRMMessage.getMessageId());
+		terminateBean.setSend(true);
+
+		RetransmitterBeanMgr retramsmitterMgr = AbstractBeanMgrFactory.getInstance(
+				incomingAckRMMsg.getContext()).getRetransmitterBeanMgr();
+		retramsmitterMgr.insert(terminateBean);
+		
+		
+		try {
+			System.out.println("SERIALIZING TERMINATE MSG");
+			SOAPEnvelope envel = terminateRMMessage.getSOAPEnvelope();
+			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+			envel.serialize(writer);
+		} catch (XMLStreamException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (FactoryConfigurationError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
 }
