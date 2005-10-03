@@ -40,6 +40,7 @@ import org.apache.axis2.soap.SOAPEnvelope;
 
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -129,5 +130,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,"false");
 		
+		//FIXME - Dont have to de below if the correct operation description is set.
+		createSeqResponseRMMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
 	}
 }

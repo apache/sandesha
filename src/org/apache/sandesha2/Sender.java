@@ -29,6 +29,7 @@ import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.OperationDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
@@ -37,7 +38,6 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
-import com.sun.rsasign.m;
 
 public class Sender extends Thread {
 
@@ -118,7 +118,11 @@ public class Sender extends Thread {
 				if (msgCtx.getOperationDescription()==null)
 					throw new SandeshaException ("Operation description is null");
 				
-				msgCtx.getOperationDescription().setMessageReceiver(new RMMessageReceiver ());
+				//msgCtx.getOperationDescription().setMessageReceiver(new RMMessageReceiver ());
+				//OperationDescription od = new OperationDescription ();
+				//od.setMessageReceiver(new RMMessageReceiver ());
+				
+				//FIXME set a correct operation description.
 				OperationContext createSeqOpCtx = new OperationContext (msgCtx.getOperationDescription());
 				createSeqOpCtx.addMessageContext(msgCtx);
 				msgCtx.setOperationContext(createSeqOpCtx);

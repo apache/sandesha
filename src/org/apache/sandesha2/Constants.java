@@ -82,7 +82,7 @@ public interface Constants {
 			
 			String SEQUENCE_ACKNOWLEDGEMENT = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
 			
-			String TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
+			String TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence";
 		}
 	}
 
