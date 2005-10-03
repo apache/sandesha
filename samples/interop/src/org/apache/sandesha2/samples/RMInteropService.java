@@ -35,15 +35,14 @@ public class RMInteropService {
 
     public OMElement echoString(OMElement in) {
         System.out.println("EchoString was called");
-        in.getFirstChild().detach();
 
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace("http://tempuri.org/", "echoString");
         OMElement method = fac.createOMElement("echoStringResponse", omNs);
 
         OMElement value = fac.createOMElement("Text", omNs);
-        //TODO umcomment
-        //value.addChild(fac.createText(value, "Echo Text"));
+        value.setText("echo response");
+
         method.addChild(value);
 
         return method;
