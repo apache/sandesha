@@ -78,7 +78,7 @@ public class InOrderInvoker extends Thread {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
-				ex.printStackTrace();
+				System.out.println("Invoker was Inturrepted....");
 			}
 			
 
@@ -137,11 +137,7 @@ public class InOrderInvoker extends Thread {
 						} catch (AxisFault e) {
 							throw new SandeshaException (e.getMessage());
 						}
-						
-
-						if (msgNo==3)
-							return;
-						
+									
 						//undating the next mst to invoke
 						nextMsgno++;
 						nextMsgMgr.update(new NextMsgBean (sequenceId,nextMsgno));

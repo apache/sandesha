@@ -100,10 +100,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				&& (Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
-			throw new SandeshaException(
-					"Duplicate message - Invocation type is EXACTLY_ONCE");
+			
+			//throw new SandeshaException(
+			//		"Duplicate message - Invocation type is EXACTLY_ONCE");
 
-			//FIXME - return instead of sending a fault.
+			//TODO is this enough
+			msgCtx.setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+			
 		}
 
 		if (messagesStr != "" && messagesStr != null)
@@ -180,7 +183,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 		} else {
-			//TODO Add async Ack
+		  	//TODO Add async Ack
 		}
 
 		//		Pause the messages bean if not the right message to invoke.
@@ -196,61 +199,59 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
-		//Have to pause the message anyway
-		msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
-		
-		
-		//Adding an entry in the SequencesToInvoke List  TODO - add this to a module init kind of place.
-		SequencePropertyBean incomingSequenceListBean =  (SequencePropertyBean) seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-		
-		if (incomingSequenceListBean==null) { 
-			ArrayList incomingSequenceList = new ArrayList ();
-			incomingSequenceListBean = new SequencePropertyBean ();
-			incomingSequenceListBean.setSequenceId(Constants.SequenceProperties.ALL_SEQUENCES);
-			incomingSequenceListBean.setName(Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-			incomingSequenceListBean.setValue(incomingSequenceList);
-			
-			seqPropMgr.insert(incomingSequenceListBean);
-		}
-		
-		//This must be a List :D
-		ArrayList incomingSequenceList = (ArrayList) incomingSequenceListBean.getValue();
-		
-		//Adding current sequence to the incoming sequence List.
-		if (!incomingSequenceList.contains(sequenceId)){
-			incomingSequenceList.add(sequenceId);
-		}
-		
-		//saving the message.
-		try {
-			String key = SandeshaUtil.storeMessageContext(rmMsgCtx
-					.getMessageContext());
-			storageMapMgr
-					.insert(new StorageMapBean(key, msgNo, sequenceId));
+		if (Constants.QOS.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.QOS.DeliveryAssurance.IN_ORDER) {
+			//pause the message
+			msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
 
-			//This will avoid performing application processing more than
-			// once.
-			rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
-					"true");
+			//Adding an entry in the SequencesToInvoke List TODO - add this to
+			// a module init kind of place.
+			SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
+					.retrieve(sequenceId,
+							Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 
-		} catch (Exception ex) {
-			throw new SandeshaException(ex.getMessage());
+			if (incomingSequenceListBean == null) {
+				ArrayList incomingSequenceList = new ArrayList();
+				incomingSequenceListBean = new SequencePropertyBean();
+				incomingSequenceListBean
+						.setSequenceId(Constants.SequenceProperties.ALL_SEQUENCES);
+				incomingSequenceListBean
+						.setName(Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+				incomingSequenceListBean.setValue(incomingSequenceList);
+
+				seqPropMgr.insert(incomingSequenceListBean);
+			}
+
+			//This must be a List :D
+			ArrayList incomingSequenceList = (ArrayList) incomingSequenceListBean
+					.getValue();
+
+			//Adding current sequence to the incoming sequence List.
+			if (!incomingSequenceList.contains(sequenceId)) {
+				incomingSequenceList.add(sequenceId);
+			}
+
+			//saving the message.
+			try {
+				String key = SandeshaUtil.storeMessageContext(rmMsgCtx
+						.getMessageContext());
+				storageMapMgr
+						.insert(new StorageMapBean(key, msgNo, sequenceId));
+
+				//This will avoid performing application processing more than
+				// once.
+				rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
+						"true");
+
+			} catch (Exception ex) {
+				throw new SandeshaException(ex.getMessage());
+			}
+
+			//Starting the invoker if stopped.
+			SandeshaUtil.startInvokerIfStopped(msgCtx.getSystemContext());
+
 		}
-		
-		//Starting the invoker if stopped.
-		SandeshaUtil.startInvokerIfStopped(msgCtx.getSystemContext());
-		
-		
 
 	}
-
-//	public synchronized void letInvoke() {
-//		letInvoke = true;
-//	}
-//
-//	public synchronized boolean isLetInvoke() {
-//		return letInvoke;
-//	}
 
 	//TODO convert following from INT to LONG
 	private boolean msgNoPresentInList(String list, long no) {
