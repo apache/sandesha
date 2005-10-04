@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -28,10 +29,13 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.Sequence;
 import org.ietf.jgss.MessageProp;
 
 /**
@@ -40,106 +44,114 @@ import org.ietf.jgss.MessageProp;
  * @author Jaliya
  */
 
+//TODO rename to Invoker
 public class InOrderInvoker extends Thread {
-	boolean stopInvoker = false;
+	boolean invokerStarted = false;
 
 	ConfigurationContext context = null;
 
-	public synchronized void stopWork() {
-		stopInvoker = true;
+	public synchronized void stopInvoker() {
+		invokerStarted = false;
 	}
 
-	public synchronized boolean isStopped() {
-		return stopInvoker;
+	public synchronized boolean isInvokerStarted() {
+		return invokerStarted;
 	}
 
 	public void setConfugurationContext(ConfigurationContext context) {
 		this.context = context;
 	}
 
+	public void start (ConfigurationContext context) {
+		System.out.println ("Starting the invoker......");
+		invokerStarted = true;
+		this.context = context;
+		super.start();
+	}
+	
 	public void run() {
 
-		while (!isStopped()) {
+		while (isInvokerStarted()) {
 
-			System.out.print("|");
-			NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(
-					context).getNextMsgBeanMgr();
-
-			StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory
-					.getInstance(context).getStorageMapBeanMgr();
-
-			Collection coll = nextMsgMgr.retrieveAll();
-
-			Iterator it = coll.iterator();
-
-			while (it.hasNext()) {
-				Object obj = it.next();
-				NextMsgBean nextMsgBean = (NextMsgBean) obj;
-				long msgNo = nextMsgBean.getNextMsgNoToProcess();
-				boolean tryNext = true;
-
-				while (tryNext) {
-					String seqId = nextMsgBean.getSequenceId();
-					Collection coll1 = storageMapMgr.find(new StorageMapBean(
-							null, msgNo, seqId));
-					if (coll1 == null || coll1.isEmpty()) {
-						tryNext = false;
-						continue;
-					}
-
-					StorageMapBean stMapBean = (StorageMapBean) coll1
-							.iterator().next();
-					if (stMapBean == null) {
-
-						tryNext = false;
-						continue;
-					}
-
-					String key = stMapBean.getKey();
-
-					try {
-						boolean done = resumeMessageContext(key);
-						System.out.println("Resumed");
-						if (!done) {
-							tryNext = false;
-							continue;
-						}
-					} catch (SandeshaException ex) {
-						ex.printStackTrace();
-						tryNext = false;
-						continue;
-					}
-
-					msgNo++;
-				}
-
-				nextMsgBean.setNextMsgNoToProcess(msgNo);
-				nextMsgMgr.update(nextMsgBean);
-			}
-
+			//System.out.print("~~");
+			
 			try {
-				Thread.sleep(20000);
+				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
 			}
+			
+
+			try {
+				NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(
+						context).getNextMsgBeanMgr();
+
+				StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory
+						.getInstance(context).getStorageMapBeanMgr();
+				
+				SequencePropertyBeanMgr sequencePropMgr = AbstractBeanMgrFactory
+						.getInstance(context).getSequencePropretyBeanMgr();
+
+				
+				
+				//Getting the incomingSequenceIdList
+				SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) sequencePropMgr.retrieve(Constants.SequenceProperties.ALL_SEQUENCES,Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+				if (sequencePropertyBean==null)
+					continue;
+				
+				
+				ArrayList seqPropList = (ArrayList) sequencePropertyBean.getValue();
+				Iterator seqPropIt = seqPropList.iterator();
+				
+				while (seqPropIt.hasNext()){
+					
+					//FIXME - Invoke multiple messages of the same sequence within one iteration.
+					
+					String sequenceId = (String) seqPropIt.next();
+					
+					NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
+					if (nextMsgBean==null) 
+						throw new SandeshaException ("Next message not set correctly");
+					
+					long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
+					if (nextMsgno<=0)
+						throw new SandeshaException ("Invalid messaage number for the nextMsgNo");
+					
+					Iterator stMapIt = storageMapMgr.find(new StorageMapBean (null,nextMsgno,sequenceId)).iterator();
+					while (stMapIt.hasNext()){
+						StorageMapBean stMapBean = (StorageMapBean) stMapIt.next();
+						String key = stMapBean.getKey();
+						
+						MessageContext msgToInvoke = SandeshaUtil.getStoredMessageContext(key);
+						
+						//removing the storage map entry.
+						storageMapMgr.delete(key);
+						
+						RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
+						Sequence seq = (Sequence) rmMsg.getMessagePart(Constants.MessageParts.SEQUENCE);
+						long msgNo = seq.getMessageNumber().getMessageNumber();
+						
+						try {
+							//Invoking the message.
+							new AxisEngine (msgToInvoke.getSystemContext()).receive(msgToInvoke);
+						} catch (AxisFault e) {
+							throw new SandeshaException (e.getMessage());
+						}
+						
+
+						if (msgNo==3)
+							return;
+						
+						//undating the next mst to invoke
+						nextMsgno++;
+						nextMsgMgr.update(new NextMsgBean (sequenceId,nextMsgno));
+					}
+					
+				}
+			} catch (SandeshaException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
-	}
-
-	private boolean resumeMessageContext(String key) throws SandeshaException {
-		MessageContext ctx = SandeshaUtil.getStoredMessageContext(key);
-		if (ctx == null)
-			return false;
-
-		ctx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME)); //in case the
-																 // pause is not
-																 // set
-
-		//resuming.
-		try {
-			new AxisEngine(ctx.getSystemContext()).receive(ctx);
-		} catch (AxisFault ex) {
-			throw new SandeshaException(ex.getMessage());
-		}
-		return true;
 	}
 }

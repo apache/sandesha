@@ -29,7 +29,7 @@ import org.apache.axis2.modules.Module;
 
 public class SandeshaModule implements Module{
 
-	private InOrderInvoker inorderInvoker = new InOrderInvoker ();
+	//private InOrderInvoker inorderInvoker = new InOrderInvoker ();
 	
     // initialize the module
     public void init(AxisConfiguration axisSystem) throws AxisFault {

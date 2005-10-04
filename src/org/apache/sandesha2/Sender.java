@@ -55,7 +55,7 @@ public class Sender extends Thread {
 	public void run () {
 		
 		while (senderStarted) {
-			System.out.println ("|-|");
+			//System.out.println ("|-|");
 			try {
 				if (context==null)
 					throw new SandeshaException ("Can't continue the Sender. Context is null");
@@ -73,9 +73,10 @@ public class Sender extends Thread {
 				 MessageContext msgCtx = SandeshaUtil.getStoredMessageContext(key);
 					
 				 try {	 
-				 	updateMessage (msgCtx);
+				 	MessageContext copiedMsgCtx = SandeshaUtil.deepCopy(msgCtx);
+				 	updateMessage (copiedMsgCtx);
 				 	
-				 	Object obj = msgCtx.getProperty(
+				 	Object obj = copiedMsgCtx.getProperty(
                             MessageContext.CHARACTER_SET_ENCODING);
 				 	System.out.println("CHAR SET ENCODING:" + obj);
 					new AxisEngine(context).send(msgCtx);
@@ -88,9 +89,13 @@ public class Sender extends Thread {
 				//changing the values of the sent bean.
 			    bean.setLastSentTime(System.currentTimeMillis());
 			    bean.setSentCount(bean.getSentCount()+1);
-			    mgr.update(bean);
-				
-				
+			    
+			    //update if resend=true otherwise delete. (reSend=false means send only once).
+			    if (bean.isReSend())
+			    	mgr.update(bean);
+			    else
+			    	mgr.delete(bean.getMessageId());
+					
 			}
 			
 			try {

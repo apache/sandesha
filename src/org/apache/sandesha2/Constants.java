@@ -137,6 +137,9 @@ public interface Constants {
 	}
 
 	public interface SequenceProperties {
+		
+		String ALL_SEQUENCES = "AllSequences";  //this is not a sequence property. This is used as the sequenceId to share data b/w sequences
+
 		String RECEIVED_MESSAGES = "SeqMsgListProperty";
 
 		String TO_EPR = "ToEPR";
@@ -158,6 +161,8 @@ public interface Constants {
 		String NEXT_MESSAGE_NUMBER = "NextMsgNo";
 		
 		String LAST_OUT_MESSAGE = "LastOutMessage";
+		
+		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
 	}
 
 	public interface SOAPVersion {
@@ -168,19 +173,28 @@ public interface Constants {
 		int DEFAULT = v1_1;
 	}
 
-	public interface DeliveryAssurance {
-		String IN_ORDER = "InOrder";
+	public interface QOS {
+		
+		public interface DeliveryAssurance {
+		
+			String IN_ORDER = "InOrder";
 
-		String NOT_IN_ORDER = "NotInOrder";
+			String NOT_IN_ORDER = "NotInOrder";
 
-		String DEFAULT_DELIVERY_ASSURANCE = NOT_IN_ORDER;
+			String DEFAULT_DELIVERY_ASSURANCE = NOT_IN_ORDER;
+		}
+		
+		public interface InvocationType {
+			
+			//invocation types
+			String EXACTLY_ONCE = "ExactlyOnce";
 
-		//invocation types
-		String EXACTLY_ONCE = "ExactlyOnce";
+			String MORE_THAN_ONCE = "MoreThanOnce";
 
-		String MORE_THAN_ONCE = "MoreThanOnce";
-
-		String DEFAULT_INVOCATION_TYPE = EXACTLY_ONCE;
+			String DEFAULT_INVOCATION_TYPE = EXACTLY_ONCE;
+		}
+		
+		
 	}
 
 	public interface BeanMAPs {
@@ -215,4 +229,5 @@ public interface Constants {
 
 	int SENDER_SLEEP_TIME = 1000;
 
+	int TERMINATE_DELAY = 1000;
 }

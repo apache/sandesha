@@ -35,6 +35,8 @@ public class RetransmitterBean implements Serializable {
 	
 	private long messageNumber = 0;
 	
+	private boolean reSend = true;
+	
 	public RetransmitterBean () {
 		
 	}
@@ -103,6 +105,15 @@ public class RetransmitterBean implements Serializable {
 	
 	public void setMessageNumber(long messageNumber) {
 		this.messageNumber = messageNumber;
+	}
+	
+	
+	public boolean isReSend() {
+		return reSend;
+	}
+	
+	public void setReSend(boolean reSend) {
+		this.reSend = reSend;
 	}
 	
 }

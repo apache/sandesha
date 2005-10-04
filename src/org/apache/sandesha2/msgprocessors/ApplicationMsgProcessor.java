@@ -34,6 +34,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.InOrderInvoker;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.RMMsgContext;
@@ -60,7 +61,7 @@ import org.ietf.jgss.MessageProp;
 public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private boolean letInvoke = false;
-	
+
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
 		System.out.println("Application msg processor called");
@@ -96,11 +97,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String messagesStr = (String) msgsBean.getValue();
 
 		if (msgNoPresentInList(messagesStr, msgNo)
-				&& (Constants.DeliveryAssurance.DEFAULT_INVOCATION_TYPE == Constants.DeliveryAssurance.EXACTLY_ONCE)) {
+				&& (Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 			throw new SandeshaException(
 					"Duplicate message - Invocation type is EXACTLY_ONCE");
+
+			//FIXME - return instead of sending a fault.
 		}
 
 		if (messagesStr != "" && messagesStr != null)
@@ -118,7 +121,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		EndpointReference acksTo = (EndpointReference) acksToBean.getValue();
 		String acksToStr = acksTo.getAddress();
-
 
 		//TODO: remove folowing 2.
 		System.out.println("Messages received:" + messagesStr);
@@ -165,17 +167,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getSystemContext());
-		
-			
+
 			//set CONTEXT_WRITTEN since acksto is anonymous
-			rmMsgCtx.getMessageContext().getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,"true");
-			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN,"true");
+			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
+					org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN,
+					"true");
 			try {
 				engine.send(ackRMMsgCtx.getMessageContext());
 			} catch (AxisFault e1) {
 				throw new SandeshaException(e1.getMessage());
 			}
-			
 
 		} else {
 			//TODO Add async Ack
@@ -194,81 +196,61 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
-		if (nextMsgno < msgNo) {
-
-			//pause and store the message (since it is not the next message of
-			// the order)
-			//rmMsgCtx.getMessageContext().setPausedTrue(new QName
-			// (Constants.IN_HANDLER_NAME));
-
-			try {
-				String key = SandeshaUtil.storeMessageContext(rmMsgCtx
-						.getMessageContext());
-				storageMapMgr
-						.insert(new StorageMapBean(key, msgNo, sequenceId));
-
-				//This will avoid performing application processing more than
-				// once.
-				rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
-						"true");
-
-			} catch (Exception ex) {
-				throw new SandeshaException(ex.getMessage());
-			}
-		} else {
-			//OK this is a correct message.
-			//(nextMsgNo>msgNo can not happen if EXCTLY_ONCE is enabled. This
-			// should have been
-			//		detected previously)
-
-			if (Constants.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.DeliveryAssurance.IN_ORDER) {
-				//store and let invoker handle for IN_ORDER invocation
-				//rmMsgCtx.getMessageContext().setPausedTrue(new QName
-				// (Constants.IN_HANDLER_NAME));
-
-				try {
-					String key = SandeshaUtil.storeMessageContext(rmMsgCtx
-							.getMessageContext());
-					storageMapMgr.insert(new StorageMapBean(key, msgNo,
-							sequenceId));
-//					rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
-
-					
-					SequencePropertyBean msgProcessorListBean = seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.APP_MSG_PROCESSOR_LIST);
-					if (msgProcessorListBean == null){
-						ArrayList msgProcessorList = new ArrayList ();
-						msgProcessorListBean = new SequencePropertyBean (sequenceId,Constants.SequenceProperties.APP_MSG_PROCESSOR_LIST,msgProcessorList);
-						seqPropMgr.update(msgProcessorListBean);
-					}
-					
-					if (! (msgProcessorListBean.getValue() instanceof ArrayList)){
-						throw new SandeshaException ("Invalid property value");
-					}
-					
-					ArrayList msgProcessorList = (ArrayList) msgProcessorListBean.getValue();
-					msgProcessorList.add(this);
-					
-					while (!isLetInvoke()){
-						Thread.sleep(Constants.INVOKER_SLEEP_TIME);
-					}
-					
-				} catch (Exception ex) {
-					throw new SandeshaException(ex.getMessage());
-				}
-			} else {
-				//if IN_ORDER is not required. Simply let this invoke (by doing
-				// nothing here :D )
-			}
+		//Have to pause the message anyway
+		msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
+		
+		
+		//Adding an entry in the SequencesToInvoke List  TODO - add this to a module init kind of place.
+		SequencePropertyBean incomingSequenceListBean =  (SequencePropertyBean) seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+		
+		if (incomingSequenceListBean==null) { 
+			ArrayList incomingSequenceList = new ArrayList ();
+			incomingSequenceListBean = new SequencePropertyBean ();
+			incomingSequenceListBean.setSequenceId(Constants.SequenceProperties.ALL_SEQUENCES);
+			incomingSequenceListBean.setName(Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+			incomingSequenceListBean.setValue(incomingSequenceList);
+			
+			seqPropMgr.insert(incomingSequenceListBean);
 		}
+		
+		//This must be a List :D
+		ArrayList incomingSequenceList = (ArrayList) incomingSequenceListBean.getValue();
+		
+		//Adding current sequence to the incoming sequence List.
+		if (!incomingSequenceList.contains(sequenceId)){
+			incomingSequenceList.add(sequenceId);
+		}
+		
+		//saving the message.
+		try {
+			String key = SandeshaUtil.storeMessageContext(rmMsgCtx
+					.getMessageContext());
+			storageMapMgr
+					.insert(new StorageMapBean(key, msgNo, sequenceId));
+
+			//This will avoid performing application processing more than
+			// once.
+			rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
+					"true");
+
+		} catch (Exception ex) {
+			throw new SandeshaException(ex.getMessage());
+		}
+		
+		//Starting the invoker if stopped.
+		SandeshaUtil.startInvokerIfStopped(msgCtx.getSystemContext());
+		
+		
+
 	}
-	
-	public synchronized void letInvoke () {
-		letInvoke = true;
-	}
-	
-	public synchronized boolean isLetInvoke () {
-		return letInvoke;
-	}
+
+//	public synchronized void letInvoke() {
+//		letInvoke = true;
+//	}
+//
+//	public synchronized boolean isLetInvoke() {
+//		return letInvoke;
+//	}
 
 	//TODO convert following from INT to LONG
 	private boolean msgNoPresentInList(String list, long no) {

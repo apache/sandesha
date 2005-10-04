@@ -140,11 +140,13 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			boolean complete = SandeshaUtil.verifySequenceCompletion(
 					sequenceAck.getAcknowledgementRanges().iterator(),
 					lastOutMessageNo);
+			
 			if (complete) {
 				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,incomingSequenceId);
 			}
 		}
 
+		int i = 1;
 	}
 
 	private RetransmitterBean getRetransmitterEntry(Collection collection,
@@ -190,27 +192,20 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.getMessageContext());
 		RetransmitterBean terminateBean = new RetransmitterBean();
 		terminateBean.setKey(key);
-		terminateBean.setLastSentTime(0);
+		
+		//Set a retransmitter lastSentTime so that terminate will be send with some delay.
+		//Otherwise this get send before return of the current request (ack).
+		//TODO verify that the time given is correct
+		terminateBean.setLastSentTime(System.currentTimeMillis()+Constants.TERMINATE_DELAY);
+		
 		terminateBean.setMessageId(terminateRMMessage.getMessageId());
 		terminateBean.setSend(true);
+		terminateBean.setReSend(false);
 
 		RetransmitterBeanMgr retramsmitterMgr = AbstractBeanMgrFactory.getInstance(
 				incomingAckRMMsg.getContext()).getRetransmitterBeanMgr();
 		retramsmitterMgr.insert(terminateBean);
 		
-		
-		try {
-			System.out.println("SERIALIZING TERMINATE MSG");
-			SOAPEnvelope envel = terminateRMMessage.getSOAPEnvelope();
-			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
-			envel.serialize(writer);
-		} catch (XMLStreamException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (FactoryConfigurationError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 	}
 
 }

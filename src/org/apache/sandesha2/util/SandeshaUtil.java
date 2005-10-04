@@ -34,10 +34,13 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
+import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.InOrderInvoker;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.Sender;
@@ -54,6 +57,7 @@ public class SandeshaUtil {
 	private static Hashtable storedMsgContexts = new Hashtable();
 
 	private static Sender sender = new Sender();
+	private static InOrderInvoker invoker = new InOrderInvoker ();
 
 	public static String getUUID() {
 		String uuid = "uuid:" + UUIDGenerator.getUUID();
@@ -276,6 +280,13 @@ public class SandeshaUtil {
 			sender.start(context);
 		}
 	}
+	
+	public static void startInvokerIfStopped(ConfigurationContext context) {
+		if (!invoker.isInvokerStarted()) {
+			System.out.println ("Starting invoker. SandeshaUtil.....");
+			invoker.start(context);
+		}
+	}
 
 	public static boolean verifySequenceCompletion(Iterator ackRangesIterator,
 			long lastMessageNo) {
@@ -305,4 +316,8 @@ public class SandeshaUtil {
 
 		return false;
 	}
+	
+//	public SOAPEnvelope cloneSOAPEnvelope (SOAPEnvelope oldEnvelope) {
+//		
+//	}
 }
