@@ -78,7 +78,7 @@ public class Sender extends Thread {
 				 	
 				 	Object obj = copiedMsgCtx.getProperty(
                             MessageContext.CHARACTER_SET_ENCODING);
-				 	System.out.println("CHAR SET ENCODING:" + obj);
+
 					new AxisEngine(context).send(msgCtx);
 				} catch (AxisFault e1) {
 					e1.printStackTrace();
@@ -102,14 +102,13 @@ public class Sender extends Thread {
 				Thread.sleep(2000);
 			} catch (InterruptedException e1) {
 				//e1.printStackTrace();
-				System.out.println ("SENDER: Interupted Exception");
+				System.out.println ("Sender was interupted...");
 			}
 		}
 		
 	}
 	
 	public void start (ConfigurationContext context) {
-		System.out.println ("Starting the sender......");
 		senderStarted = true;
 		this.context = context;
 		super.start();

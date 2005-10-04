@@ -49,8 +49,7 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 public class AcknowledgementProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-		System.out.println("WITHIN ACKNOWLEDGEMENT PROCESSOR");
-
+		
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck == null)

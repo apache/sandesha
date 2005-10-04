@@ -282,8 +282,7 @@ public class RMMsgCreator {
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
 				Constants.SequenceProperties.RECEIVED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
-		System.out.println("Message No List:" + msgNoList);
-
+		
 		AcknowledgementRange[] ackRangeArr = SandeshaUtil
 				.getAckRangeArray(msgNoList);
 

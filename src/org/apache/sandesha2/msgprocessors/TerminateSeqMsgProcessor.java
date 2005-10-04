@@ -29,7 +29,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext rmMsgCtx)
 			throws SandeshaException {
 		//TODO Add terminate sequence message logic.
-		System.out.println("Terminate Sequence Processor called");
-		//rmMsgCtx.getMessageContext().setProperty("Status",new Integer (202));
+
 	}
 }

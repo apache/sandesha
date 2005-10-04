@@ -64,8 +64,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
-		System.out.println("Application msg processor called");
-
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		if (msgCtx == null)
 			throw new SandeshaException("Message context is null");
@@ -124,10 +122,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		EndpointReference acksTo = (EndpointReference) acksToBean.getValue();
 		String acksToStr = acksTo.getAddress();
-
-		//TODO: remove folowing 2.
-		System.out.println("Messages received:" + messagesStr);
-		System.out.println("Acks To:" + acksToStr);
 
 		if (acksToStr == null || messagesStr == null)
 			throw new SandeshaException(

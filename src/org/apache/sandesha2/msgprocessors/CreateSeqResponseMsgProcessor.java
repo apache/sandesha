@@ -50,8 +50,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {
 
-		System.out.println("IN CREATE SEQ RESPONSE PROCESSOR");
-
 		CreateSequenceResponse createSeqResponsePart = (CreateSequenceResponse) createSeqResponseRMMsgCtx
 				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
 		if (createSeqResponsePart == null)

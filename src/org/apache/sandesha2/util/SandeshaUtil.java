@@ -278,13 +278,14 @@ public class SandeshaUtil {
 	public static void startSenderIfStopped(ConfigurationContext context) {
 		if (!sender.isSenderStarted()) {
 			sender.start(context);
+			System.out.println ("Sender started....");
 		}
 	}
 	
 	public static void startInvokerIfStopped(ConfigurationContext context) {
 		if (!invoker.isInvokerStarted()) {
-			System.out.println ("Starting invoker. SandeshaUtil.....");
 			invoker.start(context);
+			System.out.println ("Invoker started....");
 		}
 	}
 

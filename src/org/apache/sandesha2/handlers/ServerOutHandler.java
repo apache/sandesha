@@ -67,8 +67,6 @@ import org.apache.wsdl.WSDLConstants;
 public class ServerOutHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-		//log
-		System.out.println("In server OutHandler");
 		String DONE = (String) msgCtx
 				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE))

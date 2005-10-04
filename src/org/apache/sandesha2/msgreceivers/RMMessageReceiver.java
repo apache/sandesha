@@ -69,8 +69,6 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 	public void setCreateSequence(MessageContext inMessage,
 			MessageContext outMessage) throws AxisFault {
 
-		System.out.println("set create seq was called in RM Msg receiver");
-
 		RMMsgContext createSeqMsg = null;
 		try {
 			createSeqMsg = MsgInitializer.initializeMessage(inMessage);
@@ -120,8 +118,6 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 	}
 
 	public final void receive(MessageContext messgeCtx) throws AxisFault {
-
-		System.out.println("within RM Msg receiver");
 
 		//intitializing the message.
 		RMMsgContext rmMsgCtx = null;

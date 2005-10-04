@@ -63,7 +63,6 @@ public class InOrderInvoker extends Thread {
 	}
 
 	public void start (ConfigurationContext context) {
-		System.out.println ("Starting the invoker......");
 		invokerStarted = true;
 		this.context = context;
 		super.start();
@@ -73,8 +72,6 @@ public class InOrderInvoker extends Thread {
 
 		while (isInvokerStarted()) {
 
-			//System.out.print("~~");
-			
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
@@ -105,8 +102,6 @@ public class InOrderInvoker extends Thread {
 				
 				while (seqPropIt.hasNext()){
 					
-					//FIXME - Invoke multiple messages of the same sequence within one iteration.
-					
 					String sequenceId = (String) seqPropIt.next();
 					
 					NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
@@ -118,31 +113,35 @@ public class InOrderInvoker extends Thread {
 						throw new SandeshaException ("Invalid messaage number for the nextMsgNo");
 					
 					Iterator stMapIt = storageMapMgr.find(new StorageMapBean (null,nextMsgno,sequenceId)).iterator();
-					while (stMapIt.hasNext()){
+					
+					while (stMapIt.hasNext()) {
+						
 						StorageMapBean stMapBean = (StorageMapBean) stMapIt.next();
 						String key = stMapBean.getKey();
-						
+					
 						MessageContext msgToInvoke = SandeshaUtil.getStoredMessageContext(key);
-						
+					
 						//removing the storage map entry.
 						storageMapMgr.delete(key);
-						
+					
 						RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 						Sequence seq = (Sequence) rmMsg.getMessagePart(Constants.MessageParts.SEQUENCE);
 						long msgNo = seq.getMessageNumber().getMessageNumber();
-						
+					
+						System.out.println("Invoking message number " + msgNo + " of the sequence " + sequenceId);
 						try {
 							//Invoking the message.
 							new AxisEngine (msgToInvoke.getSystemContext()).receive(msgToInvoke);
 						} catch (AxisFault e) {
 							throw new SandeshaException (e.getMessage());
 						}
-									
+								
 						//undating the next mst to invoke
 						nextMsgno++;
-						nextMsgMgr.update(new NextMsgBean (sequenceId,nextMsgno));
+						stMapIt = storageMapMgr.find(new StorageMapBean (null,nextMsgno,sequenceId)).iterator();
 					}
-					
+				    
+					nextMsgMgr.update(new NextMsgBean (sequenceId,nextMsgno));
 				}
 			} catch (SandeshaException e1) {
 				// TODO Auto-generated catch block

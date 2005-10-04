@@ -46,8 +46,6 @@ public class ServerInHandler extends AbstractHandler {
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-		System.out.println("In server InHandler");
-
 		RMMsgContext rmMsgCtx = null;
 		try {
 			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
