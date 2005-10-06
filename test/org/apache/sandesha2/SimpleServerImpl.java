@@ -17,8 +17,8 @@ import org.apache.axis2.transport.http.SimpleHTTPServer;
 public class SimpleServerImpl {
 
     public static void main(String[] args) throws IOException {
-        SimpleHTTPServer sas= new SimpleHTTPServer("E:\\Program Files\\Apache Software Foundation\\Tomcat 5.0\\webapps\\axis2\\WEB-INF",8080);
-        sas.start();
+        SimpleHTTPServer simpleServer = new SimpleHTTPServer("/home/sanka/tomcat/jakarta-tomcat-4.1.30/webapps/axis2/WEB-INF",8080);
+        simpleServer.start();
         System.out.println ("Sandesha2 Simple Axis Server Started....");
     }
 }
