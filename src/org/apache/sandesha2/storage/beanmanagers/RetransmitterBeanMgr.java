@@ -35,9 +35,6 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
 public class RetransmitterBeanMgr {
 	private Hashtable table = null;
 
-	/**
-	 *  
-	 */
 	public RetransmitterBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.BeanMAPs.RETRANSMITTER);
 		if (obj != null) {

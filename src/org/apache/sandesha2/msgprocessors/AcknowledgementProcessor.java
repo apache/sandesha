@@ -71,26 +71,27 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
 				.getInstance(context).getSequencePropretyBeanMgr();
 
-		//getting IncomingSequenceId for the outSequenceId
-		SequencePropertyBean incomingSequenceBean = seqPropMgr.retrieve(
-				outSequenceId,
-				Constants.SequenceProperties.INCOMING_SEQUENCE_ID);
-		if (incomingSequenceBean == null
-				|| incomingSequenceBean.getValue() == null)
-			throw new SandeshaException(
-					"Incoming Sequence id is not set correctly");
 
-		String incomingSequenceId = (String) incomingSequenceBean.getValue();
 
-		//getting TempSequenceId for the IncomingSequenceId
-		SequencePropertyBean tempSequenceBean = seqPropMgr.retrieve(
-				incomingSequenceId,
-				Constants.SequenceProperties.TEMP_SEQUENCE_ID);
-		if (tempSequenceBean == null || tempSequenceBean.getValue() == null)
-			throw new SandeshaException(
-					"Incoming Sequence id is not set correctly");
+		String tempSequenceId = null;
+		
+		if (rmMsgCtx.getMessageContext().isServerSide()){
+			//getting IncomingSequenceId for the outSequenceId
+			SequencePropertyBean incomingSequenceBean = seqPropMgr.retrieve(
+					outSequenceId,
+					Constants.SequenceProperties.INCOMING_SEQUENCE_ID);
+			if (incomingSequenceBean == null
+					|| incomingSequenceBean.getValue() == null)
+				throw new SandeshaException(
+						"Incoming Sequence id is not set correctly");
 
-		String tempSequenceId = (String) tempSequenceBean.getValue();
+			String incomingSequenceId = (String) incomingSequenceBean.getValue();
+			tempSequenceId = incomingSequenceId;
+		}else {
+			//find temp sequence id for the client side.
+			
+			//IN CREATE SEQ RES PROCESSOR SET SET OUT SEQ - TEMP SEQ ID MATCH.
+		}
 
 		RetransmitterBean input = new RetransmitterBean();
 		input.setTempSequenceId(tempSequenceId);
@@ -123,7 +124,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//If all messages up to last message have been acknowledged.
 		//Add terminate Sequence message.
 		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
-				incomingSequenceId,
+				tempSequenceId,
 				Constants.SequenceProperties.LAST_OUT_MESSAGE);
 		if (lastOutMsgBean != null) {
 			Long lastOutMsgNoLng = (Long) lastOutMsgBean.getValue();
@@ -141,7 +142,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 					lastOutMessageNo);
 			
 			if (complete) {
-				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,incomingSequenceId);
+				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,tempSequenceId);
 			}
 		}
 
@@ -161,14 +162,15 @@ public class AcknowledgementProcessor implements MsgProcessor {
 	}
 
 	public void addTerminateSequenceMessage(RMMsgContext incomingAckRMMsg,
-			String outSequenceId,String incomingSequenceId) throws SandeshaException {
+			String outSequenceId,String tempSequenceId) throws SandeshaException {
 		RMMsgContext terminateRMMessage = RMMsgCreator
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
 
 		//detting addressing headers.
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(
 				incomingAckRMMsg.getContext()).getSequencePropretyBeanMgr();
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(incomingSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
+		SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
+		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.TO_EPR);
 		if (replyToBean==null)
 			throw new SandeshaException ("ReplyTo property is not set");
 		
@@ -176,8 +178,12 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		if (replyToEPR==null)
 			throw new SandeshaException ("ReplyTo EPR has an invalid value");
 		 
-		terminateRMMessage.setTo(new EndpointReference (replyToEPR.getAddress()));
-		terminateRMMessage.setFrom(incomingAckRMMsg.getTo());
+		EndpointReference toEPR = (EndpointReference) toBean.getValue();
+		if (replyToEPR==null)
+			throw new SandeshaException ("To EPR has an invalid value");
+		
+		terminateRMMessage.setTo(new EndpointReference (toEPR.getAddress()));
+		terminateRMMessage.setFrom(new EndpointReference (replyToEPR.getAddress()));
 		terminateRMMessage
 				.setWSAAction(Constants.WSRM.Actions.TERMINATE_SEQUENCE);
 

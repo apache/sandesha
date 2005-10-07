@@ -39,13 +39,15 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
  * @author Sanka
  * @author Jaliya
  */
-public class ServerInHandler extends AbstractHandler {
+public class SandeshaInHandler extends AbstractHandler {
 
 	public QName getName() {
 		return new QName(Constants.IN_HANDLER_NAME);
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
+		System.out.println ("Sandesha in handler called");
+		
 		RMMsgContext rmMsgCtx = null;
 		try {
 			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);

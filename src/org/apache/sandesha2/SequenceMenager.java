@@ -62,12 +62,15 @@ public class SequenceMenager {
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
 				.getInstance(context).getSequencePropretyBeanMgr();
 
+		//TODO - recheck following 
+		//incoming To - reply address of response messages
+		//imcoming replyTo - to address of response messages
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
 				sequenceId, Constants.SequenceProperties.RECEIVED_MESSAGES, "");
 		SequencePropertyBean toBean = new SequencePropertyBean (sequenceId,
-				Constants.SequenceProperties.TO_EPR,to);
+				Constants.SequenceProperties.TO_EPR,replyTo);
 		SequencePropertyBean replyToBean = new SequencePropertyBean(sequenceId,
-				Constants.SequenceProperties.REPLY_TO_EPR, replyTo);
+				Constants.SequenceProperties.REPLY_TO_EPR, to);
 		SequencePropertyBean acksToBean = new SequencePropertyBean(sequenceId,
 				Constants.SequenceProperties.ACKS_TO_EPR, acksTo);
 

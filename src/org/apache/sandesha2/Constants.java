@@ -230,4 +230,6 @@ public interface Constants {
 	int SENDER_SLEEP_TIME = 1000;
 
 	int TERMINATE_DELAY = 1000;
+	
+	String LAST_MESSAGE = "WSRMLastMessage";
 }

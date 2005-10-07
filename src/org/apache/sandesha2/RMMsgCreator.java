@@ -101,14 +101,15 @@ public class RMMsgCreator {
 			createSeqOpContext.addMessageContext(createSeqmsgContext);
 			//registering opearion context
 			context.registerOperationContext(createSeqMsgId,createSeqOpContext);
+
 			
 			//Setting a new SOAP Envelop.
 			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
 					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 
 			createSeqmsgContext.setEnvelope(envelope);
-			createSeqOpContext.addMessageContext(createSeqmsgContext);
-			createSeqmsgContext.setOperationContext(createSeqOpContext);
+//			createSeqOpContext.addMessageContext(createSeqmsgContext);
+//			createSeqmsgContext.setOperationContext(createSeqOpContext);
 		} catch (AxisFault e2) {
 			throw new SandeshaException(e2.getMessage());
 		}
