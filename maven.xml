@@ -5,14 +5,33 @@
     <j:set var="dist.dir" value="target/dist"/>
 
     <goal name="module.jar" prereqs="java:compile">
-        <ant:property name="module.jar.name" value="sandesha.jar"/>
-        <ant:property name="metainf.path" value="${maven.build.dir}/classes/META-INF" />
+        <ant:property name="module.jar.name" value="sandesha.mar"/>
+        <ant:property name="metainf.path" value="${maven.build.dir}/dist/module/META-INF" />
         <ant:mkdir dir="${maven.build.dir}/dist" />
+        <ant:mkdir dir="${maven.build.dir}/dist/module" />
         <ant:mkdir dir="${metainf.path}" />
         <ant:copy file="${basedir}/config/module.xml" todir="${metainf.path}" />
-        <ant:jar jarfile="${maven.build.dir}/dist/${module.jar.name}" basedir="${maven.build.dir}/classes" /> 
+
+		<!-- For the client side -->
+		<ant:mkdir dir="${metainf.path}" />
+        <copy todir="${maven.build.dir}/dist/module">
+            <fileset dir="${basedir}/target/classes" >
+            	<include name="**/*.class"/>
+            </fileset>
+        </copy>
+  
+        <ant:jar jarfile="${maven.build.dir}/dist/${module.jar.name}" basedir="${maven.build.dir}/dist/module" /> 
     </goal>
 
+	<goal name="client" prereqs="module.jar">
+		<ant:property name="module.jar.name" value="sandesha.mar"/>
+		<ant:property name="client.dist.path" value="${maven.build.dir}/dist/client"/>
+		<ant:mkdir dir="${client.dist.path}" />
+		<ant:mkdir dir="${client.dist.path}/modules" />
+		<ant:copy file="${basedir}/config/axis2.xml" todir="${client.dist.path}" />
+		<ant:copy file="${maven.build.dir}/dist/${module.jar.name}" todir="${client.dist.path}/modules" />       
+	</goal>
+	
     <goal name="sample:compile">
         <ant:property name="dir.samples" value="samples"/>
         <ant:mkdir dir="${basedir}/target/samples/classes" />
@@ -33,7 +52,8 @@
     <goal name="jar.copy" prereqs="module.jar,interop.jar">
         <property environment="env1"/>
         <property name="webapps" value="${env1.CATALINA_HOME}/webapps"/>
-        <ant:copy file="${basedir}/target/dist/sandesha.jar" todir="${webapps}/axis2/WEB-INF/modules"/>
+        <ant:copy file="${basedir}/target/dist/sandesha.mar" todir="${webapps}/axis2/WEB-INF/modules"/>
+        <!-- <ant:copy file="${basedir}/target/dist/sandesha.mar" todir="${basedir}/target/classes/modules"/> -->  <!-- For the client side -->
         <ant:copy file="${basedir}/target/dist/InteropService.jar" todir="${webapps}/axis2/WEB-INF/services"/>
     </goal>
 
