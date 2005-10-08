@@ -1,8 +1,8 @@
 package org.apache.sandesha2.storage;
 
-import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisConfigurationImpl;
 import org.apache.axis2.context.ConfigurationContext;

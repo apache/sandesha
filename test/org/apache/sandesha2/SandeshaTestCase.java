@@ -5,6 +5,15 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisConfigurationImpl;
+import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.om.OMAbstractFactory;
+import org.apache.axis2.om.OMXMLParserWrapper;
+import org.apache.axis2.om.impl.llom.factory.OMXMLBuilderFactory;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import java.io.*;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
  *
@@ -22,10 +31,49 @@ import org.apache.axis2.engine.AxisConfigurationImpl;
  */
 
 public class SandeshaTestCase extends TestCase {
+    String resourceDir = "test-resources";
 
     public SandeshaTestCase(String name) {
         super(name);
+        File baseDir = new File("");
+        String testRource = baseDir.getAbsolutePath() + File.separator + "test-resources";
+        resourceDir = new File(testRource).getPath();
+
     }
+
+    protected InputStreamReader getResource(String relativePath, String resourceName) {
+        String resourceFile = resourceDir + relativePath + File.separator + resourceName;
+        String file = new File("/home/sanka/sandesha2-src/trunk/test-resources/CreateSequence.xml").getPath();
+
+        try {
+            FileReader reader = new FileReader(resourceFile);
+            return reader;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("cannot load the test-resource", e);
+        }
+    }
+
+    protected SOAPEnvelope getSOAPEnvelope() {
+        return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+    }
+
+    protected SOAPEnvelope getSOAPEnvelope(String relativePath, String resourceName) {
+        try {
+            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
+                    getResource(relativePath, resourceName));
+            OMXMLParserWrapper wrapper = OMXMLBuilderFactory.createStAXSOAPModelBuilder(
+                    OMAbstractFactory.getSOAP11Factory(), reader);
+            return (SOAPEnvelope) wrapper.getDocumentElement();
+
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected SOAPEnvelope getEmptySOAPEnvelope() {
+        return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+    }
+
 
     private MessageContext getMessageContext() throws Exception{
         AxisConfiguration axisConfig = new AxisConfigurationImpl();
