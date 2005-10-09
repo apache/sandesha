@@ -1,4 +1,4 @@
-package org.apache.sandesha2.org.apache.sandesha2.wsrm;
+package org.apache.sandesha2.wsrm;
 
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Constants;
