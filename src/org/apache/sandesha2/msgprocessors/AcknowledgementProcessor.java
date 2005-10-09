@@ -73,25 +73,18 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 
 
-		String tempSequenceId = null;
+		SequencePropertyBean tempSequenceBean = seqPropMgr.retrieve(
+				outSequenceId,
+				Constants.SequenceProperties.TEMP_SEQUENCE_ID);
 		
-		if (rmMsgCtx.getMessageContext().isServerSide()){
-			//getting IncomingSequenceId for the outSequenceId
-			SequencePropertyBean incomingSequenceBean = seqPropMgr.retrieve(
-					outSequenceId,
-					Constants.SequenceProperties.INCOMING_SEQUENCE_ID);
-			if (incomingSequenceBean == null
-					|| incomingSequenceBean.getValue() == null)
-				throw new SandeshaException(
-						"Incoming Sequence id is not set correctly");
+		if (tempSequenceBean == null
+				|| tempSequenceBean.getValue() == null)
+			throw new SandeshaException(
+					"TempSequenceId is not set correctly");
 
-			String incomingSequenceId = (String) incomingSequenceBean.getValue();
-			tempSequenceId = incomingSequenceId;
-		}else {
-			//find temp sequence id for the client side.
-			
-			//IN CREATE SEQ RES PROCESSOR SET SET OUT SEQ - TEMP SEQ ID MATCH.
-		}
+		String tempSequenceId = (String) tempSequenceBean.getValue();
+		
+
 
 		RetransmitterBean input = new RetransmitterBean();
 		input.setTempSequenceId(tempSequenceId);

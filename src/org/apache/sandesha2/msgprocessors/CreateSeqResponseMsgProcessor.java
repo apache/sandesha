@@ -73,9 +73,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		if (createSeqBean == null)
 			throw new SandeshaException("Create Sequence entry is not found");
 
-		String incomingSequenceId = createSeqBean.getTempSequenceId();
-		if (incomingSequenceId == null || "".equals(incomingSequenceId))
-			throw new SandeshaException("Incoming sequence ID has is not set");
+		String tempSequenceId = createSeqBean.getTempSequenceId();
+		if (tempSequenceId == null || "".equals(tempSequenceId))
+			throw new SandeshaException("TempSequenceId has is not set");
 
 		//deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);
@@ -84,15 +84,15 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr sequencePropMgr = AbstractBeanMgrFactory
 				.getInstance(configCtx).getSequencePropretyBeanMgr();
 		SequencePropertyBean outSequenceBean = new SequencePropertyBean(
-			incomingSequenceId,
+				tempSequenceId,
 				Constants.SequenceProperties.OUT_SEQUENCE_ID, newOutSequenceId);
-		SequencePropertyBean incomingSequenceBean = new SequencePropertyBean (newOutSequenceId,
-				Constants.SequenceProperties.INCOMING_SEQUENCE_ID, incomingSequenceId);
+		SequencePropertyBean tempSequenceBean = new SequencePropertyBean (newOutSequenceId,
+				Constants.SequenceProperties.TEMP_SEQUENCE_ID, tempSequenceId);
 		sequencePropMgr.insert(outSequenceBean);
-		sequencePropMgr.insert(incomingSequenceBean);
+		sequencePropMgr.insert(tempSequenceBean);
 		
 		RetransmitterBean target = new RetransmitterBean();
-		target.setTempSequenceId(incomingSequenceId);
+		target.setTempSequenceId(tempSequenceId);
 
 		Iterator iterator = retransmitterMgr.find(target).iterator();
 		while (iterator.hasNext()) {

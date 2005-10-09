@@ -25,6 +25,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.clientapi.InOutMEPClient;
+import org.apache.axis2.clientapi.TwoWayTransportBasedSender;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -78,7 +80,13 @@ public class Sender extends Thread {
 				try {
 					updateMessage(msgCtx);
 
-					new AxisEngine(context).send(msgCtx);
+					if (msgCtx.isServerSide())
+						new AxisEngine(context).send(msgCtx);
+					else {
+						//TwoWayTransportBasedSender sender = new TwoWayTransportBasedSender ();
+						TwoWayTransportBasedSender.send(msgCtx, msgCtx.getTransportIn());
+						//inOutMepClient.invokeBlocking(msgCtx.getOperationDescription(),msgCtx);
+					}
 
 				} catch (AxisFault e1) {
 					e1.printStackTrace();

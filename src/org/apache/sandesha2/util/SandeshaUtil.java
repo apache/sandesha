@@ -219,8 +219,10 @@ public class SandeshaUtil {
 
 		try {
 
-			MessageContext newMessageContext = new MessageContext(configCtx,
-					transportIn, transportOut);
+			MessageContext newMessageContext = new MessageContext(configCtx);
+			newMessageContext.setTransportIn(transportIn);
+			newMessageContext.setTransportOut(transportOut);
+			
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx
 					.getProperty(MessageContext.TRANSPORT_OUT));
 			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,

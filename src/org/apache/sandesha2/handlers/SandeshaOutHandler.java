@@ -118,21 +118,33 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		} else {
 			//set the temp sequence id for the client side.
+			EndpointReference toEPR = msgCtx.getTo();
+			if (toEPR == null || toEPR.getAddress() == null
+					|| "".equals(toEPR.getAddress()))
+				throw new AxisFault(
+						"TO End Point Reference is not set correctly. This is a must for the sandesha client side.");
+
+			tempSequenceId = toEPR.getAddress();
 		}
 
 		//check if the fist message
 
+		long messageNumber = getNextMsgNo(context, tempSequenceId);
+
 		boolean firstApplicationMessage = false;
-		if (serverSide) {
-			SequencePropertyBean outSequenceBean = seqPropMgr.retrieve(
-					tempSequenceId,
-					Constants.SequenceProperties.OUT_SEQUENCE_ID);
-			if (outSequenceBean == null)
-				firstApplicationMessage = true;
+		if (messageNumber == 1)
+			firstApplicationMessage = true;
 
-		} else {
-
-		}
+		//		if (serverSide) {
+		//			SequencePropertyBean outSequenceBean = seqPropMgr.retrieve(
+		//					tempSequenceId,
+		//					Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		//			if (outSequenceBean == null)
+		//				firstApplicationMessage = true;
+		//
+		//		} else {
+		//			
+		//		}
 
 		//if fist message - setup the sequence for the client side
 		if (!serverSide && firstApplicationMessage) {
@@ -190,36 +202,37 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 				//valid response
 
-				//FIXME - do not copy application messages. Coz u loose
-				// properties etc.
-				RMMsgContext newRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
-				MessageContext newMsgCtx = newRMMsgCtx.getMessageContext();
-
-				//setting contexts
-				newMsgCtx.setServiceGroupContext(msgCtx
-						.getServiceGroupContext());
-				newMsgCtx.setServiceGroupContextId(msgCtx
-						.getServiceGroupContextId());
-				newMsgCtx.setServiceContext(msgCtx.getServiceContext());
-				newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
-				OperationContext newOpContext = new OperationContext(newMsgCtx
-						.getOperationDescription());
-
-				//if server side add request message
-				if (msgCtx.isServerSide()) {
-					MessageContext reqMsgCtx = msgCtx.getOperationContext()
-							.getMessageContext(
-									WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					newOpContext.addMessageContext(reqMsgCtx);
-				}
-
-				newOpContext.addMessageContext(newMsgCtx);
-				newMsgCtx.setOperationContext(newOpContext);
-
-				//processing the response
-				processResponseMessage(newRMMsgCtx, tempSequenceId);
-
 				if (serverSide) {
+
+					//FIXME - do not copy application messages. Coz u loose
+					// properties etc.
+					RMMsgContext newRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
+					MessageContext newMsgCtx = newRMMsgCtx.getMessageContext();
+
+					//setting contexts
+					newMsgCtx.setServiceGroupContext(msgCtx
+							.getServiceGroupContext());
+					newMsgCtx.setServiceGroupContextId(msgCtx
+							.getServiceGroupContextId());
+					newMsgCtx.setServiceContext(msgCtx.getServiceContext());
+					newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
+					OperationContext newOpContext = new OperationContext(
+							newMsgCtx.getOperationDescription());
+
+					//if server side add request message
+					if (msgCtx.isServerSide()) {
+						MessageContext reqMsgCtx = msgCtx.getOperationContext()
+								.getMessageContext(
+										WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+						newOpContext.addMessageContext(reqMsgCtx);
+					}
+
+					newOpContext.addMessageContext(newMsgCtx);
+					newMsgCtx.setOperationContext(newOpContext);
+
+					//processing the response
+					processResponseMessage(newRMMsgCtx, tempSequenceId,
+							messageNumber);
 
 					MessageContext reqMsgCtx = msgCtx.getOperationContext()
 							.getMessageContext(
@@ -237,11 +250,27 @@ public class SandeshaOutHandler extends AbstractHandler {
 								"false");
 					msgCtx.setPausedTrue(getName());
 
-					SOAPEnvelope env123 = msgCtx.getEnvelope();
-
 				} else {
-					//client side wait
 
+					//client side wait
+					boolean letMessageGo = false;
+					while (!letMessageGo) {
+						SequencePropertyBean outSequenceBean = seqPropMgr.retrieve(tempSequenceId, Constants.SequenceProperties.OUT_SEQUENCE_ID);
+						if (outSequenceBean==null){
+							try {
+								Thread.sleep(Constants.CLIENT_SLEEP_TIME);
+							} catch (InterruptedException e1) {
+								System.out.println ("Client was interupted...");
+							}
+						}else {
+							letMessageGo = true;
+						}
+					}
+
+					//processing the response
+					processResponseMessage(rmMsgCtx, tempSequenceId,
+							messageNumber);
+					
 				}
 			}
 
@@ -288,7 +317,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg,
-			String tempSequenceId) throws SandeshaException {
+			String tempSequenceId, long messageNumber) throws SandeshaException {
 
 		MessageContext msg = rmMsg.getMessageContext();
 
@@ -337,23 +366,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (replyToEPR != null)
 			rmMsg.setReplyTo(replyToEPR);
 
-		//Retransmitter bean entry for the application message
-		RetransmitterBean appMsgEntry = new RetransmitterBean();
-		String key = SandeshaUtil
-				.storeMessageContext(rmMsg.getMessageContext());
-		appMsgEntry.setKey(key);
-		appMsgEntry.setLastSentTime(0);
-		appMsgEntry.setMessageId(rmMsg.getMessageId());
-
 		Sequence sequence = new Sequence();
 
-		long nextMsgNo = getNextMsgNo(rmMsg.getMessageContext()
-				.getSystemContext(), tempSequenceId);
 		MessageNumber msgNumber = new MessageNumber();
-		msgNumber.setMessageNumber(nextMsgNo);
+		msgNumber.setMessageNumber(messageNumber);
 		sequence.setMessageNumber(msgNumber);
-
-		appMsgEntry.setMessageNumber(nextMsgNo);
 
 		//setting last message
 		if (msg.isServerSide()) {
@@ -384,7 +401,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
 						tempSequenceId,
 						Constants.SequenceProperties.LAST_OUT_MESSAGE,
-						new Long(nextMsgNo));
+						new Long(messageNumber));
 				sequencePropertyMgr.insert(lastOutMsgBean);
 			}
 
@@ -403,12 +420,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 			Identifier identifier = new Identifier();
 			identifier.setIndentifer(Constants.TEMP_SEQUENCE_ID);
 			sequence.setIdentifier(identifier);
-			appMsgEntry.setSend(false);
+
 		} else {
 			Identifier identifier = new Identifier();
 			identifier.setIndentifer((String) outSequenceBean.getValue());
 			sequence.setIdentifier(identifier);
-			appMsgEntry.setSend(true);
+
 		}
 
 		rmMsg.setMessagePart(Constants.MessageParts.SEQUENCE, sequence);
@@ -418,8 +435,26 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		appMsgEntry.setTempSequenceId(tempSequenceId);
-		retransmitterMgr.insert(appMsgEntry);
+		//send the message through sender only in the server case.
+		//in the client case use the normal flow.
+		if (msg.isServerSide()) {
+			//Retransmitter bean entry for the application message
+			RetransmitterBean appMsgEntry = new RetransmitterBean();
+			String key = SandeshaUtil.storeMessageContext(rmMsg
+					.getMessageContext());
+			appMsgEntry.setKey(key);
+			appMsgEntry.setLastSentTime(0);
+			appMsgEntry.setMessageId(rmMsg.getMessageId());
+			appMsgEntry.setMessageNumber(messageNumber);
+			if (outSequenceBean == null || outSequenceBean.getValue() == null) {
+				appMsgEntry.setSend(false);
+			} else {
+				appMsgEntry.setSend(true);
+
+			}
+			appMsgEntry.setTempSequenceId(tempSequenceId);
+			retransmitterMgr.insert(appMsgEntry);
+		}
 	}
 
 	private long getNextMsgNo(ConfigurationContext context,

@@ -148,7 +148,8 @@ public interface Constants {
 
 		String OUT_SEQUENCE_ID = "OutSequenceId";
 		
-		String INCOMING_SEQUENCE_ID = "IncomingSequenceId";
+		//FIXME - rema
+		//String INCOMING_SEQUENCE_ID = "IncomingSequenceId";
 		
 		String TEMP_SEQUENCE_ID = "TempSequenceId";
 
@@ -231,6 +232,8 @@ public interface Constants {
 	int INVOKER_SLEEP_TIME = 1000;
 
 	int SENDER_SLEEP_TIME = 1000;
+	
+	int CLIENT_SLEEP_TIME = 1000;
 
 	int TERMINATE_DELAY = 1000;
 	
