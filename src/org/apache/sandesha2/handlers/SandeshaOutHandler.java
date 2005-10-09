@@ -18,11 +18,6 @@
 package org.apache.sandesha2.handlers;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
@@ -38,6 +33,7 @@ import org.apache.sandesha2.SOAPAbstractFactory;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
+import org.apache.sandesha2.SequenceMenager;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
@@ -62,10 +58,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (null != DONE && "true".equals(DONE))
 			return;
 
-		//Strating the sender.
-		ConfigurationContext context = msgCtx.getSystemContext();
-		SandeshaUtil.startSenderIfStopped(context);
-
 		//getting rm message
 		RMMsgContext rmMsgCtx = null;
 		try {
@@ -79,25 +71,27 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (!(rmMsgCtx.getMessageType() == Constants.MessageTypes.UNKNOWN)) {
 			return;
 		}
-		boolean serverSide = msgCtx.isServerSide();
-		String tempSequenceId = null;
 
+		//Strating the sender.
+		ConfigurationContext context = msgCtx.getSystemContext();
+		SandeshaUtil.startSenderIfStopped(context);
+
+		CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(
+				context).getCreateSeqBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
 				.getInstance(context).getSequencePropretyBeanMgr();
+		boolean serverSide = msgCtx.isServerSide();
 
-		//setting temp sequence id (depending on the server side and the client
-		// side)
-		//temp sequence id is the one used to refer to the sequence (since
-		// actual sequence
-		// id is not available when first msg arrives)
-		//server side - sequenceId if the incoming sequence , client side -
-		// xxxxxxxxx
-		if (!serverSide) {
-			//Code for the client side
+		//initial work
+		//find temp sequence id
+		String tempSequenceId = null;
 
-		} else {
+		//Temp sequence id is the one used to refer to the sequence (since
+		//actual sequence id is not available when first msg arrives)
+		//server side - sequenceId if the incoming sequence
+		//client side - xxxxxxxxx
+		if (serverSide) {
 			try {
-				//code for the server side
 				//getting the request message and rmMessage.
 				MessageContext reqMsgCtx = msgCtx
 						.getOperationContext()
@@ -121,106 +115,176 @@ public class SandeshaOutHandler extends AbstractHandler {
 			} catch (SandeshaException e1) {
 				throw new AxisFault(e1.getMessage());
 			}
+
+		} else {
+			//set the temp sequence id for the client side.
 		}
 
-		try {
-			if (rmMsgCtx.getMessageType() == Constants.MessageTypes.UNKNOWN) {
-				System.out.println("GOT Possible Response Message");
+		//check if the fist message
 
-				SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
-				if (env == null) {
-					SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-							Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
-					rmMsgCtx.setSOAPEnvelop(envelope);
-				}
+		boolean firstApplicationMessage = false;
+		if (serverSide) {
+			SequencePropertyBean outSequenceBean = seqPropMgr.retrieve(
+					tempSequenceId,
+					Constants.SequenceProperties.OUT_SEQUENCE_ID);
+			if (outSequenceBean == null)
+				firstApplicationMessage = true;
 
-				SOAPBody soapBody = rmMsgCtx.getSOAPEnvelope().getBody();
-				if (soapBody == null)
-					throw new SandeshaException(
-							"Invalid SOAP message. Body is not present");
+		} else {
 
-				//TODO - Is this a correct way to find out validity of app.
-				// messages.
-				boolean validAppMessage = false;
-				if (soapBody.getChildElements().hasNext())
-					validAppMessage = true;
+		}
 
-				if (validAppMessage) {
+		//if fist message - setup the sequence for the client side
+		if (!serverSide && firstApplicationMessage) {
+			try {
+				SequenceMenager.setUpNewClientSequence(msgCtx, tempSequenceId);
+			} catch (SandeshaException e1) {
+				throw new AxisFault(e1.getMessage());
+			}
+		}
 
-					//valid response
+		//if first message - add create sequence
+		if (firstApplicationMessage) {
 
-					//FIXME - do not copy application messages. Coz u loose
-					// properties etc.
-					RMMsgContext newRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
-					MessageContext newMsgCtx = newRMMsgCtx.getMessageContext();
+			SequencePropertyBean responseCreateSeqAdded = seqPropMgr.retrieve(
+					tempSequenceId,
+					Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT);
 
-					//setting contexts
-					newMsgCtx.setServiceGroupContext(msgCtx
-							.getServiceGroupContext());
-					newMsgCtx.setServiceGroupContextId(msgCtx
-							.getServiceGroupContextId());
-					newMsgCtx.setServiceContext(msgCtx.getServiceContext());
-					newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
-					OperationContext newOpContext = new OperationContext(
-							newMsgCtx.getOperationDescription());
+			if (responseCreateSeqAdded == null) {
+				responseCreateSeqAdded = new SequencePropertyBean(
+						tempSequenceId,
+						Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT,
+						"true");
+				seqPropMgr.insert(responseCreateSeqAdded);
 
-					//if server side add request message
-					if (msgCtx.isServerSide()) {
-						MessageContext reqMsgCtx = msgCtx.getOperationContext()
-								.getMessageContext(
-										WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-						newOpContext.addMessageContext(reqMsgCtx);
-					}
-
-					newOpContext.addMessageContext(newMsgCtx);
-					newMsgCtx.setOperationContext(newOpContext);
-
-					//processing the response
-					processResponseMessage(newRMMsgCtx, tempSequenceId);
-
-					if (serverSide) {
-
-						MessageContext reqMsgCtx = msgCtx.getOperationContext()
-								.getMessageContext(
-										WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-
-						RMMsgContext requestRMMsgCtx = MsgInitializer
-								.initializeMessage(reqMsgCtx);
-
-						//let the request end with 202 if a ack has not been
-						// written in the incoming thread.
-						if (reqMsgCtx.getProperty(Constants.ACK_WRITTEN) == null
-								|| !"true".equals(reqMsgCtx
-										.getProperty(Constants.ACK_WRITTEN)))
-							reqMsgCtx
-									.getOperationContext()
-									.setProperty(
-											org.apache.axis2.Constants.RESPONSE_WRITTEN,
-											"false");
-						msgCtx.setPausedTrue(getName());
-
-						SOAPEnvelope env123 = msgCtx.getEnvelope();
-						try {
-							XMLStreamWriter writer = XMLOutputFactory
-									.newInstance().createXMLStreamWriter(
-											System.out);
-							env123.serialize(writer);
-						} catch (XMLStreamException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (FactoryConfigurationError e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-
-					} else {
-						//client side wait
-					}
+				try {
+					addCreateSequenceMessage(rmMsgCtx, tempSequenceId);
+				} catch (SandeshaException e1) {
+					throw new AxisFault(e1.getMessage());
 				}
 			}
+		}
+
+		//do response processing
+		try {
+
+			SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
+			if (env == null) {
+				SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+						Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
+				rmMsgCtx.setSOAPEnvelop(envelope);
+			}
+
+			SOAPBody soapBody = rmMsgCtx.getSOAPEnvelope().getBody();
+			if (soapBody == null)
+				throw new SandeshaException(
+						"Invalid SOAP message. Body is not present");
+
+			//TODO - Is this a correct way to find out validity of app.
+			// messages.
+			boolean validAppMessage = false;
+			if (soapBody.getChildElements().hasNext())
+				validAppMessage = true;
+
+			if (validAppMessage) {
+
+				//valid response
+
+				//FIXME - do not copy application messages. Coz u loose
+				// properties etc.
+				RMMsgContext newRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
+				MessageContext newMsgCtx = newRMMsgCtx.getMessageContext();
+
+				//setting contexts
+				newMsgCtx.setServiceGroupContext(msgCtx
+						.getServiceGroupContext());
+				newMsgCtx.setServiceGroupContextId(msgCtx
+						.getServiceGroupContextId());
+				newMsgCtx.setServiceContext(msgCtx.getServiceContext());
+				newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
+				OperationContext newOpContext = new OperationContext(newMsgCtx
+						.getOperationDescription());
+
+				//if server side add request message
+				if (msgCtx.isServerSide()) {
+					MessageContext reqMsgCtx = msgCtx.getOperationContext()
+							.getMessageContext(
+									WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+					newOpContext.addMessageContext(reqMsgCtx);
+				}
+
+				newOpContext.addMessageContext(newMsgCtx);
+				newMsgCtx.setOperationContext(newOpContext);
+
+				//processing the response
+				processResponseMessage(newRMMsgCtx, tempSequenceId);
+
+				if (serverSide) {
+
+					MessageContext reqMsgCtx = msgCtx.getOperationContext()
+							.getMessageContext(
+									WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+					RMMsgContext requestRMMsgCtx = MsgInitializer
+							.initializeMessage(reqMsgCtx);
+
+					//let the request end with 202 if a ack has not been
+					// written in the incoming thread.
+					if (reqMsgCtx.getProperty(Constants.ACK_WRITTEN) == null
+							|| !"true".equals(reqMsgCtx
+									.getProperty(Constants.ACK_WRITTEN)))
+						reqMsgCtx.getOperationContext().setProperty(
+								org.apache.axis2.Constants.RESPONSE_WRITTEN,
+								"false");
+					msgCtx.setPausedTrue(getName());
+
+					SOAPEnvelope env123 = msgCtx.getEnvelope();
+
+				} else {
+					//client side wait
+
+				}
+			}
+
 		} catch (SandeshaException e) {
 			throw new AxisFault(e.getMessage());
 		}
+	}
+
+	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg,
+			String tempSequenceId) throws SandeshaException {
+
+		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
+		if (applicationMsg == null)
+			throw new SandeshaException("Message context is null");
+		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
+				applicationRMMsg, tempSequenceId);
+		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
+		createSeqMsg.setRelatesTo(null); //create seq msg does not relateTo
+		// anything
+		AbstractContext context = applicationRMMsg.getContext();
+		if (context == null)
+			throw new SandeshaException("Context is null");
+
+		CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(
+				context).getCreateSeqBeanMgr();
+		CreateSeqBean createSeqBean = new CreateSeqBean(tempSequenceId,
+				createSeqMsg.getMessageID(), null);
+		createSeqMgr.insert(createSeqBean);
+
+		System.out.println("Create sequence msg id:"
+				+ createSeqRMMessage.getMessageId());
+
+		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
+				.getInstance(context).getRetransmitterBeanMgr();
+		String key = SandeshaUtil.storeMessageContext(createSeqRMMessage
+				.getMessageContext());
+		RetransmitterBean createSeqEntry = new RetransmitterBean();
+		createSeqEntry.setKey(key);
+		createSeqEntry.setLastSentTime(0);
+		createSeqEntry.setMessageId(createSeqRMMessage.getMessageId());
+		createSeqEntry.setSend(true);
+		retransmitterMgr.insert(createSeqEntry);
+
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg,
@@ -251,24 +315,27 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		if (toBean == null)
 			throw new SandeshaException("To is null");
-		if (replyToBean == null)
-			throw new SandeshaException("Replyto is null");
+		//		if (replyToBean == null)
+		//			throw new SandeshaException("Replyto is null");
 
-		EndpointReference incomingTo = (EndpointReference) toBean.getValue();
-		EndpointReference incomingReplyTo = (EndpointReference) replyToBean
-				.getValue();
+		EndpointReference toEPR = (EndpointReference) toBean.getValue();
+		EndpointReference replyToEPR = null;
 
-		if (incomingTo == null || incomingTo.getAddress() == null
-				|| incomingTo.getAddress() == "")
+		if (replyToBean != null) {
+			replyToEPR = (EndpointReference) replyToBean.getValue();
+		}
+
+		if (toEPR == null || toEPR.getAddress() == null
+				|| toEPR.getAddress() == "")
 			throw new SandeshaException("To Property has an invalid value");
-		if (incomingReplyTo == null || incomingReplyTo.getAddress() == null
-				|| incomingReplyTo.getAddress() == "")
-			throw new SandeshaException("ReplyTo is not set correctly");
 
-		//FIXME - set toBean - replyto value, replytobean - tovalue
+		//		if (replyToEPR == null || replyToEPR.getAddress() == null
+		//				|| replyToEPR.getAddress() == "")
+		//			throw new SandeshaException("ReplyTo is not set correctly");
 
-		rmMsg.setTo(incomingTo);
-		rmMsg.setReplyTo(incomingReplyTo);
+		rmMsg.setTo(toEPR);
+		if (replyToEPR != null)
+			rmMsg.setReplyTo(replyToEPR);
 
 		//Retransmitter bean entry for the application message
 		RetransmitterBean appMsgEntry = new RetransmitterBean();
@@ -309,7 +376,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				throw new SandeshaException("Request Sequence is null");
 
 			if (requestSequence.getLastMessage() != null) {
-				//FIX ME - This fails if request last message has more than one
+				//FIXME - This fails if request last message has more than one
 				// responses.
 				sequence.setLastMessage(new LastMessage());
 
@@ -329,29 +396,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 			}
 		}
 
+		//setting the Sequnece id.
+		//Set send = true/false depending on the availability of the out
+		// sequence id.
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
-
-			if (tempSequenceId == null)
-				throw new SandeshaException("TempSequenceId is not set");
-
-			//Adding create sequence
-			SequencePropertyBean responseCreateSeqAdded = sequencePropertyMgr
-					.retrieve(
-							tempSequenceId,
-							Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT);
-
-			if (responseCreateSeqAdded == null
-					|| responseCreateSeqAdded.getValue() == null
-					|| "".equals(responseCreateSeqAdded.getValue())) {
-				responseCreateSeqAdded = new SequencePropertyBean(
-						tempSequenceId,
-						Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT,
-						"true");
-				sequencePropertyMgr.insert(responseCreateSeqAdded);
-				addCreateSequenceMessage(rmMsg, tempSequenceId);
-			}
 			Identifier identifier = new Identifier();
-			identifier.setIndentifer("uuid:tempID");
+			identifier.setIndentifer(Constants.TEMP_SEQUENCE_ID);
 			sequence.setIdentifier(identifier);
 			appMsgEntry.setSend(false);
 		} else {
@@ -369,7 +419,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		appMsgEntry.setTempSequenceId(tempSequenceId);
-
 		retransmitterMgr.insert(appMsgEntry);
 	}
 
@@ -401,41 +450,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			seqPropMgr.insert(nextMsgNoBean);
 
 		return nextMsgNo;
-	}
-
-	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg,
-			String tempSequenceId) throws SandeshaException {
-		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
-		if (applicationMsg == null)
-			throw new SandeshaException("Message context is null");
-		RMMsgContext createSeqRMMessage = RMMsgCreator
-				.createCreateSeqMsg(applicationRMMsg);
-		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
-		createSeqMsg.setRelatesTo(null); //create seq msg does not relateTo
-		// anything
-		AbstractContext context = applicationRMMsg.getContext();
-		if (context == null)
-			throw new SandeshaException("Context is null");
-
-		CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(
-				context).getCreateSeqBeanMgr();
-		CreateSeqBean createSeqBean = new CreateSeqBean(tempSequenceId,
-				createSeqMsg.getMessageID(), null);
-		createSeqMgr.insert(createSeqBean);
-
-		System.out.println("Create sequence msg id:"
-				+ createSeqRMMessage.getMessageId());
-
-		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
-				.getInstance(context).getRetransmitterBeanMgr();
-		String key = SandeshaUtil.storeMessageContext(createSeqRMMessage
-				.getMessageContext());
-		RetransmitterBean createSeqEntry = new RetransmitterBean();
-		createSeqEntry.setKey(key);
-		createSeqEntry.setLastSentTime(0);
-		createSeqEntry.setMessageId(createSeqRMMessage.getMessageId());
-		createSeqEntry.setSend(true);
-		retransmitterMgr.insert(createSeqEntry);
 	}
 
 	public QName getName() {

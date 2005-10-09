@@ -209,6 +209,9 @@ public interface Constants {
 		String NEXT_MESSAGE = "NextMsgBeanMap";
 	}
 
+	public interface ClientProperties {
+		String AcksTo = "AcksToStr";
+	}
 	//TODO remove following three
 	int STORAGE_TYPE_IN_MEMORY = 1;
 
@@ -232,4 +235,6 @@ public interface Constants {
 	int TERMINATE_DELAY = 1000;
 	
 	String LAST_MESSAGE = "WSRMLastMessage";
+	
+	String TEMP_SEQUENCE_ID = "uuid:tempID";
 }

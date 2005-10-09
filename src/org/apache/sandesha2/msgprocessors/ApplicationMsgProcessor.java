@@ -98,13 +98,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				&& (Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
-			
+
 			//throw new SandeshaException(
 			//		"Duplicate message - Invocation type is EXACTLY_ONCE");
 
 			//TODO is this enough
-			msgCtx.setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
-			
+			msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
+
 		}
 
 		if (messagesStr != "" && messagesStr != null)
@@ -177,7 +177,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 		} else {
-		  	//TODO Add async Ack
+			//TODO Add async Ack
 		}
 
 		//		Pause the messages bean if not the right message to invoke.

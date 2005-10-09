@@ -62,8 +62,9 @@ import org.apache.wsdl.WSDLConstants;
 
 public class RMMsgCreator {
 
-	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg)
+	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String tempSequenceId)
 			throws SandeshaException {
+				
 		MessageContext applicationMsgContext = applicationRMMsg
 				.getMessageContext();
 		if (applicationMsgContext == null)
@@ -72,6 +73,7 @@ public class RMMsgCreator {
 		if (context == null)
 			throw new SandeshaException("Configuration Context is null");
 
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();
 		MessageContext createSeqmsgContext;
 		try {
 			//creating by copying common contents. (this will not set contexts
@@ -121,10 +123,13 @@ public class RMMsgCreator {
 
 		CreateSequence createSequencePart = new CreateSequence();
 
-		//TODO correct below. Set a correct acksTo value
-		EndpointReference acksToEPR = applicationRMMsg.getReplyTo();
-
-		createSequencePart.setAcksTo(new AcksTo(new Address(acksToEPR)));
+		//TODO decide - where to send create seq. Acksto or replyTo
+		SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId, Constants.SequenceProperties.REPLY_TO_EPR);
+		EndpointReference replyToEPR = (EndpointReference) replyToBean.getValue();
+		if (replyToEPR==null)
+			throw new SandeshaException ("ReplyTo EPR is not set");
+		
+		createSequencePart.setAcksTo(new AcksTo(new Address(replyToEPR)));
 		createSeqRMMsg.setMessagePart(Constants.MessageParts.CREATE_SEQ,
 				createSequencePart);
 
@@ -143,13 +148,7 @@ public class RMMsgCreator {
 
 		createSeqRMMsg.setTo(to);
 
-		EndpointReference replyTo = applicationRMMsg.getReplyTo();
-		if (replyTo == null || replyTo.getAddress() == null
-				|| replyTo.getAddress() == null || to.getAddress() == "")
-			throw new SandeshaException(
-					"ReplyTo value of the Application Message is not set correctly");
-
-		createSeqRMMsg.setReplyTo(replyTo);
+		createSeqRMMsg.setReplyTo(replyToEPR);
 		createSeqRMMsg.setMessageId(createSeqMsgId);
 
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
