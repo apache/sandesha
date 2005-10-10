@@ -27,6 +27,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.util.UUIDGenerator;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.SOAPAbstractFactory;
@@ -273,6 +274,19 @@ public class SandeshaOutHandler extends AbstractHandler {
 					
 				}
 			}
+			
+			//Setting WSA Action if null
+			//TODO: Recheck weather this action is correct
+			if (msgCtx.getWSAAction()==null){
+				EndpointReference toEPR = msgCtx.getTo();
+				
+				if (toEPR==null)
+					throw new SandeshaException ("To EPR is not found");
+				
+				String to = toEPR.getAddress();
+				String operationName = msgCtx.getOperationContext().getAxisOperation().getName().getLocalPart();
+				msgCtx.setWSAAction(to + "/" + operationName);
+			}
 
 		} catch (SandeshaException e) {
 			throw new AxisFault(e.getMessage());
@@ -320,6 +334,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 			String tempSequenceId, long messageNumber) throws SandeshaException {
 
 		MessageContext msg = rmMsg.getMessageContext();
+		
+		//Changing message Id.
+		//TODO remove this when Axis2 start sending uuids as uuid:xxxx
+		String messageId = SandeshaUtil.getUUID();
+		rmMsg.setMessageId(messageId);
+		OperationContext opCtx = msg.getOperationContext();
+		msg.getSystemContext().registerOperationContext(messageId,opCtx);
+		
 
 		if (rmMsg == null)
 			throw new SandeshaException("Message or reques message is null");

@@ -104,7 +104,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			//TODO is this enough
 			msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
-
+			
 		}
 
 		if (messagesStr != "" && messagesStr != null)
