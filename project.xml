@@ -155,6 +155,12 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.0-rc3</version>
+        </dependency>
+
+        <dependency>
                <groupId>axis</groupId>
                 <artifactId>axis-wsdl4j</artifactId>
             <version>1.2</version>
@@ -174,9 +180,9 @@
         </dependency>
 
            <dependency>
-            <groupId>axis</groupId>
+            <groupId>axis2</groupId>
             <artifactId>axis2</artifactId>
-            <version>0.91</version>
+            <version>0.92</version>
             </dependency>
 
         <dependency>
