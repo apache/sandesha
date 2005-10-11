@@ -75,7 +75,7 @@ public class RetransmitterBeanMgr {
 
 			boolean add = true;
 			
-			if (bean.getKey() != null && bean.getKey() != temp.getKey())
+			if (bean.getKey() != null && !bean.getKey().equals(temp.getKey()))
 				add = false;
 
 			if (bean.getLastSentTime() > 0
@@ -83,11 +83,11 @@ public class RetransmitterBeanMgr {
 				add = false;
 
 			if (bean.getMessageId() != null
-					&& bean.getMessageId() != temp.getMessageId())
+					&& !bean.getMessageId().equals(temp.getMessageId()))
 				add = false;
 
 			if (bean.getTempSequenceId() != null
-					&& bean.getTempSequenceId() != temp.getTempSequenceId())
+					&& !bean.getTempSequenceId().equals(temp.getTempSequenceId()))
 				add = false;
 
 			if (bean.getMessageNumber() > 0
@@ -124,6 +124,9 @@ public class RetransmitterBeanMgr {
 	}
 
 	public boolean update(RetransmitterBean bean) {
+		if (!table.contains(bean))
+			return false;
+		
 		return table.put(bean.getMessageId(), bean) != null;
 	}
 

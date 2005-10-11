@@ -87,6 +87,9 @@ public class SequencePropertyBeanMgr {
 	}
 
 	public boolean update(SequencePropertyBean bean) {
+		if (!table.contains(bean))
+			return false;
+		
 		return table.put(getId(bean), bean) != null;
 
 	}

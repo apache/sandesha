@@ -164,6 +164,8 @@ public interface Constants {
 		String LAST_OUT_MESSAGE = "LastOutMessage";
 		
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
+		
+		String CHECK_RESPONSE = "CheckResponse";
 	}
 
 	public interface SOAPVersion {

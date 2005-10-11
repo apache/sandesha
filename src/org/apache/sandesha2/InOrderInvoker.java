@@ -141,7 +141,8 @@ public class InOrderInvoker extends Thread {
 						stMapIt = storageMapMgr.find(new StorageMapBean (null,nextMsgno,sequenceId)).iterator();
 					}
 				    
-					nextMsgMgr.update(new NextMsgBean (sequenceId,nextMsgno));
+					nextMsgBean.setNextMsgNoToProcess(nextMsgno);
+					nextMsgMgr.update(nextMsgBean);
 				}
 			} catch (SandeshaException e1) {
 				// TODO Auto-generated catch block

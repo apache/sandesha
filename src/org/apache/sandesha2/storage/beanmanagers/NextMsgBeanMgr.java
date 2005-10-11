@@ -91,6 +91,9 @@ public class NextMsgBeanMgr {
 	}
 
 	public boolean update(NextMsgBean bean) {
+		if (!table.contains(bean))
+			return false;
+		
 		return table.put(bean.getSequenceId(), bean) != null;
 	}
 

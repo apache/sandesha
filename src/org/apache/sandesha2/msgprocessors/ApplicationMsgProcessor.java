@@ -193,6 +193,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
+		//FIXME - fix delivery assurances for the client side
+		if (msgCtx.isServerSide()) {
 		if (Constants.QOS.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.QOS.DeliveryAssurance.IN_ORDER) {
 			//pause the message
 			msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
@@ -200,7 +202,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//Adding an entry in the SequencesToInvoke List TODO - add this to
 			// a module init kind of place.
 			SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
-					.retrieve(sequenceId,
+					.retrieve(Constants.SequenceProperties.ALL_SEQUENCES,
 							Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 
 			if (incomingSequenceListBean == null) {
@@ -243,6 +245,25 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//Starting the invoker if stopped.
 			SandeshaUtil.startInvokerIfStopped(msgCtx.getSystemContext());
 
+		}
+		}
+		
+		//client side - SET CheckResponse to true.
+		if (!msgCtx.isServerSide()) {
+			try {
+				MessageContext requestMessage = rmMsgCtx.getMessageContext().getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+				String requestMessageId = requestMessage.getMessageID();
+				SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(requestMessageId,Constants.SequenceProperties.CHECK_RESPONSE);
+				if (checkResponseBean!=null) {
+					checkResponseBean.setValue("true");
+					seqPropMgr.update(checkResponseBean);
+				}
+			
+			} catch (AxisFault e) {
+				throw new SandeshaException (e.getMessage());
+			}
+			
+			//set 
 		}
 
 	}

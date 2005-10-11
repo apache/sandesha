@@ -59,6 +59,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (null != DONE && "true".equals(DONE))
 			return;
 
+		msgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
+		
 		//getting rm message
 		RMMsgContext rmMsgCtx = null;
 		try {
@@ -203,6 +205,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 				//valid response
 
+				
+				//Changing message Id.
+				//TODO remove this when Axis2 start sending uuids as uuid:xxxx
+				String messageId = SandeshaUtil.getUUID();
+				rmMsgCtx.setMessageId(messageId);
+				OperationContext opCtx = msgCtx.getOperationContext();
+				msgCtx.getSystemContext().registerOperationContext(messageId, opCtx);
+				
 				if (serverSide) {
 
 					//FIXME - do not copy application messages. Coz u loose
@@ -231,6 +241,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 					newOpContext.addMessageContext(newMsgCtx);
 					newMsgCtx.setOperationContext(newOpContext);
 
+					//Thid does not have to be processed again by RMHandlers
+					newMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
+					
 					//processing the response
 					processResponseMessage(newRMMsgCtx, tempSequenceId,
 							messageNumber);
@@ -253,39 +266,69 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 				} else {
 
-					//client side wait
-					boolean letMessageGo = false;
-					while (!letMessageGo) {
-						SequencePropertyBean outSequenceBean = seqPropMgr.retrieve(tempSequenceId, Constants.SequenceProperties.OUT_SEQUENCE_ID);
-						if (outSequenceBean==null){
-							try {
-								Thread.sleep(Constants.CLIENT_SLEEP_TIME);
-							} catch (InterruptedException e1) {
-								System.out.println ("Client was interupted...");
-							}
-						}else {
-							letMessageGo = true;
-						}
-					}
+					//Setting WSA Action if null
+					//TODO: Recheck weather this action is correct
+					if (msgCtx.getWSAAction() == null) {
+						EndpointReference toEPR = msgCtx.getTo();
 
+						if (toEPR == null)
+							throw new SandeshaException("To EPR is not found");
+
+						String to = toEPR.getAddress();
+						String operationName = msgCtx.getOperationContext()
+								.getAxisOperation().getName().getLocalPart();
+						msgCtx.setWSAAction(to + "/" + operationName);
+					}
+					
 					//processing the response
 					processResponseMessage(rmMsgCtx, tempSequenceId,
 							messageNumber);
 					
+					//Getting the mep.
+					String mep = msgCtx.getOperationDescription()
+							.getMessageExchangePattern();
+
+					if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
+						//Add a sequence property to check weather the response has arrived.
+						SequencePropertyBean checkResponseBean = new SequencePropertyBean ();
+						checkResponseBean.setSequenceId(msgCtx.getMessageID());
+						checkResponseBean.setName(Constants.SequenceProperties.CHECK_RESPONSE);
+						checkResponseBean.setValue("false");
+						seqPropMgr.insert(checkResponseBean);
+					}
+					
+					//client side wait
+					boolean letGo = false;
+					while (!letGo) {
+						if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
+							//if the mep is in-out them wait till the response comes. then pause.
+						    SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(msgCtx.getMessageID(),Constants.SequenceProperties.CHECK_RESPONSE);
+						    String val = (String) checkResponseBean.getValue();
+						    if ("true".equals(checkResponseBean.getValue())) {
+						    	msgCtx.setPausedTrue(getName());
+						    	letGo = true;
+						    }
+						} else {
+							//FIXME - non-inout case.
+							//if not in-out simply pause after the
+							SequencePropertyBean outSequenceBean = seqPropMgr
+									.retrieve(
+											tempSequenceId,
+											Constants.SequenceProperties.OUT_SEQUENCE_ID);
+							if (outSequenceBean == null) {
+								try {
+									Thread.sleep(Constants.CLIENT_SLEEP_TIME);
+								} catch (InterruptedException e1) {
+									System.out
+											.println("Client was interupted...");
+								}
+							} else {
+								letGo = true;
+							}
+						}
+					}
+
 				}
-			}
-			
-			//Setting WSA Action if null
-			//TODO: Recheck weather this action is correct
-			if (msgCtx.getWSAAction()==null){
-				EndpointReference toEPR = msgCtx.getTo();
-				
-				if (toEPR==null)
-					throw new SandeshaException ("To EPR is not found");
-				
-				String to = toEPR.getAddress();
-				String operationName = msgCtx.getOperationContext().getAxisOperation().getName().getLocalPart();
-				msgCtx.setWSAAction(to + "/" + operationName);
 			}
 
 		} catch (SandeshaException e) {
@@ -334,14 +377,13 @@ public class SandeshaOutHandler extends AbstractHandler {
 			String tempSequenceId, long messageNumber) throws SandeshaException {
 
 		MessageContext msg = rmMsg.getMessageContext();
-		
-		//Changing message Id.
-		//TODO remove this when Axis2 start sending uuids as uuid:xxxx
-		String messageId = SandeshaUtil.getUUID();
-		rmMsg.setMessageId(messageId);
-		OperationContext opCtx = msg.getOperationContext();
-		msg.getSystemContext().registerOperationContext(messageId,opCtx);
-		
+
+//		//Changing message Id.
+//		//TODO remove this when Axis2 start sending uuids as uuid:xxxx
+//		String messageId = SandeshaUtil.getUUID();
+//		rmMsg.setMessageId(messageId);
+//		OperationContext opCtx = msg.getOperationContext();
+//		msg.getSystemContext().registerOperationContext(messageId, opCtx);
 
 		if (rmMsg == null)
 			throw new SandeshaException("Message or reques message is null");
@@ -457,9 +499,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		//send the message through sender only in the server case.
-		//in the client case use the normal flow.
-		if (msg.isServerSide()) {
+//		//send the message through sender only in the server case.
+//		//in the client case use the normal flow.
+//		if (msg.isServerSide()) {
 			//Retransmitter bean entry for the application message
 			RetransmitterBean appMsgEntry = new RetransmitterBean();
 			String key = SandeshaUtil.storeMessageContext(rmMsg
@@ -476,7 +518,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			}
 			appMsgEntry.setTempSequenceId(tempSequenceId);
 			retransmitterMgr.insert(appMsgEntry);
-		}
+//		}
 	}
 
 	private long getNextMsgNo(ConfigurationContext context,

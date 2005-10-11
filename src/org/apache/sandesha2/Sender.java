@@ -77,7 +77,9 @@ public class Sender extends Thread {
 				MessageContext msgCtx = SandeshaUtil
 						.getStoredMessageContext(key);
 
+	
 				try {
+					RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 					updateMessage(msgCtx);
 
 					if (msgCtx.isServerSide())

@@ -99,6 +99,9 @@ public class StorageMapBeanMgr {
 	}
 
 	public boolean update(StorageMapBean bean) {
+		if (!table.contains(bean))
+			return false;
+		
 		return table.put(bean.getKey(), bean) != null;
 	}
 

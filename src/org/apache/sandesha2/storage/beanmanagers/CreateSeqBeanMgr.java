@@ -64,6 +64,9 @@ public class CreateSeqBeanMgr {
 	}
 
 	public boolean update(CreateSeqBean bean) {
+		if (!table.contains(bean))
+			return false;
+		
 		return table.put(bean.getCreateSeqMsgId(), bean) != null;
 	}
 

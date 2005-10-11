@@ -39,6 +39,7 @@ import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.UUIDGenerator;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.InOrderInvoker;
 import org.apache.sandesha2.RMMsgContext;
@@ -179,7 +180,6 @@ public class SandeshaUtil {
 			newMessageContext.setProcessingFault(msgCtx.isProcessingFault());
 			newMessageContext.setResponseWritten(msgCtx.isResponseWritten());
 			newMessageContext.setRestThroughPOST(msgCtx.isRestThroughPOST());
-			newMessageContext.setServerSide(msgCtx.isServerSide());
 			newMessageContext.setOperationDescription(msgCtx
 					.getOperationDescription());
 
@@ -229,9 +229,16 @@ public class SandeshaUtil {
 					msgCtx.getProperty(HTTPConstants.HTTPOutTransportInfo));
 
 			//Setting the charater set encoding
+			Object charSetEncoding = msgCtx.getProperty(MessageContext.CHARACTER_SET_ENCODING);
+
+			//TODO - this is required due to a bug in axis2. Remove this when it get fixed
+			//BUG - Commons HTTP transport sender sets a NameValuepair to as the CHAR_SET_ENCODING 
+			//instead of a String
+			if (charSetEncoding instanceof NameValuePair)
+				charSetEncoding = ((NameValuePair) charSetEncoding).getValue();
+				
 			newMessageContext
-					.setProperty(MessageContext.CHARACTER_SET_ENCODING, msgCtx
-							.getProperty(MessageContext.CHARACTER_SET_ENCODING));
+					.setProperty(MessageContext.CHARACTER_SET_ENCODING, charSetEncoding);
 
 			newMessageContext.setMessageInformationHeaders(msgInfoHeaders1);
 			newMessageContext.setServiceDescription(msgCtx
@@ -243,6 +250,7 @@ public class SandeshaUtil {
 			newMessageContext.setSoapAction(msgCtx.getSoapAction());
 			newMessageContext.setWSAAction(msgCtx.getWSAAction());
 
+			newMessageContext.setServerSide(msgCtx.isServerSide());
 			return newMessageContext;
 
 		} catch (AxisFault e) {

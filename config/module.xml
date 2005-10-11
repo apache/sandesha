@@ -1,17 +1,16 @@
 <module name="sandesha" class="org.apache.sandesha2.SandeshaModule">
 
     <inflow>
-        <handler name="ServerInHandler" class="org.apache.sandesha2.handlers.ServerInHandler">
+        <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">
             <order phase="RMPhase"/>
         </handler>
     </inflow>
 
     <outflow>
-        <handler name="ServerOutHandler" class="org.apache.sandesha2.handlers.ServerOutHandler">
+        <handler name="SandeshaOutHandler" class="org.apache.sandesha2.handlers.SandeshaOutHandler">
             <order phase="RMPhase"/>
         </handler>
     </outflow>
-
 
     <operation name="TerminateSequence" mep="http://www.w3.org/2004/08/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
