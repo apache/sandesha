@@ -17,8 +17,10 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * @author
@@ -28,6 +30,14 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx)
 			throws SandeshaException {
+		//Processing for ack if any
+		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		if (sequenceAck!=null) {
+			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor ();
+			ackProcessor.processMessage(rmMsgCtx);
+		}
+		
+		//Processing the terminate message
 		//TODO Add terminate sequence message logic.
 
 	}

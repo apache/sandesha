@@ -20,11 +20,16 @@ package org.apache.sandesha2.handlers;
 import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.MsgValidator;
@@ -54,6 +59,21 @@ public class SandeshaInHandler extends AbstractHandler {
 		} catch (SandeshaException ex) {
 			throw new AxisFault("Cant initialize the message");
 		}
+
+//		try {
+//			System.out.println("SandeshaInHandler Got a message of type:" + rmMsgCtx.getMessageType());
+//			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
+//			SOAPEnvelope env123 = msgCtx.getEnvelope();
+//			env123.serialize(writer);
+//		} catch (XMLStreamException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (FactoryConfigurationError e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+			
+
 
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());

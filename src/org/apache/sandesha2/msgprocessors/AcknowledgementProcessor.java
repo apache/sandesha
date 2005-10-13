@@ -162,21 +162,22 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//detting addressing headers.
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(
 				incomingAckRMMsg.getContext()).getSequencePropretyBeanMgr();
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
+		//SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.TO_EPR);
-		if (replyToBean==null)
-			throw new SandeshaException ("ReplyTo property is not set");
+//		if (replyToBean==null)
+//			throw new SandeshaException ("ReplyTo property is not set");
 		
-		EndpointReference replyToEPR = (EndpointReference) replyToBean.getValue();
-		if (replyToEPR==null)
-			throw new SandeshaException ("ReplyTo EPR has an invalid value");
+//		EndpointReference replyToEPR = (EndpointReference) replyToBean.getValue();
+//		if (replyToEPR==null)
+//			throw new SandeshaException ("ReplyTo EPR has an invalid value");
 		 
 		EndpointReference toEPR = (EndpointReference) toBean.getValue();
-		if (replyToEPR==null)
+		if (toEPR==null)
 			throw new SandeshaException ("To EPR has an invalid value");
 		
 		terminateRMMessage.setTo(new EndpointReference (toEPR.getAddress()));
-		terminateRMMessage.setFrom(new EndpointReference (replyToEPR.getAddress()));
+		
+		//terminateRMMessage.setFrom(new EndpointReference (replyToEPR.getAddress()));
 		terminateRMMessage
 				.setWSAAction(Constants.WSRM.Actions.TERMINATE_SEQUENCE);
 

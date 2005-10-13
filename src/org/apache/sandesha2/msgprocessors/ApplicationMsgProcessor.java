@@ -52,6 +52,7 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.wsdl.WSDLConstants;
 import org.ietf.jgss.MessageProp;
 
@@ -64,6 +65,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
+		//Processing for ack if any
+		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		if (sequenceAck!=null) {
+			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor ();
+			ackProcessor.processMessage(rmMsgCtx);
+		}
+		
+		//Processing the application message.
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		if (msgCtx == null)
 			throw new SandeshaException("Message context is null");
@@ -127,7 +136,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(
 					"Seqeunce properties are not set correctly");
 
-		if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
+		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
 
 			RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
 			MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
@@ -176,9 +185,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(e1.getMessage());
 			}
 
-		} else {
-			//TODO Add async Ack
-		}
+//		} else {
+//			//TODO Add async Ack
+//		}
 
 		//		Pause the messages bean if not the right message to invoke.
 		NextMsgBeanMgr mgr = AbstractBeanMgrFactory.getInstance(configCtx)

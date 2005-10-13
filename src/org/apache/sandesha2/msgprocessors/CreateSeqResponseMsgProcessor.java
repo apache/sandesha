@@ -33,6 +33,7 @@ import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -50,6 +51,14 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {
 
+		//Processing for ack if any
+		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) createSeqResponseRMMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		if (sequenceAck!=null) {
+			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor ();
+			ackProcessor.processMessage(createSeqResponseRMMsgCtx);
+		}
+		
+		//Processing the create sequence response.
 		CreateSequenceResponse createSeqResponsePart = (CreateSequenceResponse) createSeqResponseRMMsgCtx
 				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
 		if (createSeqResponsePart == null)

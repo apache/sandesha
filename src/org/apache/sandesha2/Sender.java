@@ -16,6 +16,7 @@
  */
 package org.apache.sandesha2;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -25,7 +26,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.clientapi.InOutMEPClient;
+import org.apache.axis2.clientapi.MessageSender;
 import org.apache.axis2.clientapi.TwoWayTransportBasedSender;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
@@ -33,6 +36,8 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.OperationDescription;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.sandesha2.client.SandeshaMepClient;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
@@ -85,9 +90,48 @@ public class Sender extends Thread {
 					if (msgCtx.isServerSide())
 						new AxisEngine(context).send(msgCtx);
 					else {
-						//TwoWayTransportBasedSender sender = new TwoWayTransportBasedSender ();
-						TwoWayTransportBasedSender.send(msgCtx, msgCtx.getTransportIn());
-						//inOutMepClient.invokeBlocking(msgCtx.getOperationDescription(),msgCtx);
+						
+//						//TwoWayTransportBasedSender.send(msgCtx, msgCtx.getTransportIn());
+//						
+//						//boolean invokeBlocking = isInvocationTypeBlocking (rmMsgCtx);
+//						
+//						//if (msgCtx.getOperationDescription().getMessageExchangePattern()==req-res)
+//						//{
+//						InOutMEPClient inoutClient = new InOutMEPClient (msgCtx.getServiceContext());
+//						Call call = new Call ();
+//						call.in
+//						inoutClient.setTransportInfo(msgCtx.get);
+//						if (invokeBlocking){
+//							inoutClient.invokeBlocking(msgCtx.getOperationDescription(),msgCtx);
+//						}else {
+//							inoutClient.invokeNonBlocking(msgCtx.getOperationDescription(),msgCtx,new SandeshaCallback ());
+//						}
+//						//}
+						
+						
+						boolean responseExpected = isResponseExpected (rmMsgCtx);
+						
+						if (responseExpected){
+							//Call inOutMepClient = new Call (msgCtx.getServiceContext());
+							//inOutMepClient.setTo(msgCtx.getTo());
+							
+							//this will start the listner.
+				
+							SandeshaMepClient inOutMepClient = new SandeshaMepClient (msgCtx.getServiceContext());
+							//inOutMepClient.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
+							inOutMepClient.setTo(msgCtx.getTo());
+							inOutMepClient.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
+							inOutMepClient.invokeDual(msgCtx.getOperationDescription(),msgCtx);
+							//inOutMepClient.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,false);
+							//call.invokeBlocking(msgCtx.getOperationDescription(),msgCtx);
+						}else {
+							MessageSender sender = new MessageSender ();
+							sender.setTo(msgCtx.getTo());
+							sender.send(msgCtx.getOperationDescription(),msgCtx);
+						}
+
+						
+						
 					}
 
 				} catch (AxisFault e1) {
@@ -119,6 +163,22 @@ public class Sender extends Thread {
 
 	}
 
+	private boolean isResponseExpected (RMMsgContext rmMsgCtx) {
+		boolean responseExpected = false;
+		
+		if (rmMsgCtx.getMessageType()==Constants.MessageTypes.CREATE_SEQ){
+			responseExpected = true;
+		}if (rmMsgCtx.getMessageType()==Constants.MessageTypes.APPLICATION) {
+			//a ack may arrive. (not a application response)
+			if (rmMsgCtx.getMessageContext().getOperationDescription().getMessageExchangePattern().equals(
+					org.apache.wsdl.WSDLConstants.MEP_URI_IN_OUT)) {
+					responseExpected = true;
+			}
+		}
+		
+		return true;
+	}
+	
 	public void start(ConfigurationContext context) {
 		senderStarted = true;
 		this.context = context;
@@ -129,9 +189,14 @@ public class Sender extends Thread {
 		try {
 			RMMsgContext rmMsgCtx1 = MsgInitializer.initializeMessage(msgCtx1);
 			rmMsgCtx1.addSOAPEnvelope();
+			
+		
+			
 		} catch (AxisFault e) {
 			throw new SandeshaException("Exception in updating contexts");
 		}
+		
+		
 	}
 
 }

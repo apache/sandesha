@@ -266,6 +266,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 				} else {
 
+					//setting reply to FIXME
+					//msgCtx.setReplyTo(new EndpointReference ("http://localhost:9070/somethingWorking"));
+					
 					//Setting WSA Action if null
 					//TODO: Recheck weather this action is correct
 					if (msgCtx.getWSAAction() == null) {
@@ -317,7 +320,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 											Constants.SequenceProperties.OUT_SEQUENCE_ID);
 							if (outSequenceBean == null) {
 								try {
-									Thread.sleep(Constants.CLIENT_SLEEP_TIME);
+									//Thread.sleep(Constants.CLIENT_SLEEP_TIME);
+									wait();
 								} catch (InterruptedException e1) {
 									System.out
 											.println("Client was interupted...");
@@ -345,6 +349,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
 				applicationRMMsg, tempSequenceId);
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
+		
+		
+		//TODO remove below
+		//createSeqMsg.setReplyTo(new EndpointReference ("http://localhost:9070/somethingWorking"));
+		
 		createSeqMsg.setRelatesTo(null); //create seq msg does not relateTo
 		// anything
 		AbstractContext context = applicationRMMsg.getContext();
@@ -472,9 +481,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 		} else {
 			//client side
 			Object obj = msg.getProperty(Constants.LAST_MESSAGE);
-			if (obj != null && "true".equals(obj)) {
+			//if (obj != null && "true".equals(obj)) {
 				sequence.setLastMessage(new LastMessage());
-			}
+				//saving the last message no.
+				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
+						tempSequenceId,
+						Constants.SequenceProperties.LAST_OUT_MESSAGE,
+						new Long(messageNumber));
+				sequencePropertyMgr.insert(lastOutMsgBean);
+			//}
 		}
 
 		//setting the Sequnece id.

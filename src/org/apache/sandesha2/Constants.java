@@ -235,7 +235,7 @@ public interface Constants {
 
 	int SENDER_SLEEP_TIME = 1000;
 	
-	int CLIENT_SLEEP_TIME = 1000;
+	int CLIENT_SLEEP_TIME = 10000;
 
 	int TERMINATE_DELAY = 1000;
 	
