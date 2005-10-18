@@ -36,6 +36,9 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.OperationDescription;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.i18n.Messages;
+import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.sandesha2.client.SandeshaMepClient;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
@@ -82,57 +85,13 @@ public class Sender extends Thread {
 				MessageContext msgCtx = SandeshaUtil
 						.getStoredMessageContext(key);
 
-	
 				try {
-					RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+					RMMsgContext rmMsgCtx = MsgInitializer
+							.initializeMessage(msgCtx);
 					updateMessage(msgCtx);
 
-					if (msgCtx.isServerSide())
-						new AxisEngine(context).send(msgCtx);
-					else {
-						
-//						//TwoWayTransportBasedSender.send(msgCtx, msgCtx.getTransportIn());
-//						
-//						//boolean invokeBlocking = isInvocationTypeBlocking (rmMsgCtx);
-//						
-//						//if (msgCtx.getOperationDescription().getMessageExchangePattern()==req-res)
-//						//{
-//						InOutMEPClient inoutClient = new InOutMEPClient (msgCtx.getServiceContext());
-//						Call call = new Call ();
-//						call.in
-//						inoutClient.setTransportInfo(msgCtx.get);
-//						if (invokeBlocking){
-//							inoutClient.invokeBlocking(msgCtx.getOperationDescription(),msgCtx);
-//						}else {
-//							inoutClient.invokeNonBlocking(msgCtx.getOperationDescription(),msgCtx,new SandeshaCallback ());
-//						}
-//						//}
-						
-						
-						boolean responseExpected = isResponseExpected (rmMsgCtx);
-						
-						if (responseExpected){
-							//Call inOutMepClient = new Call (msgCtx.getServiceContext());
-							//inOutMepClient.setTo(msgCtx.getTo());
-							
-							//this will start the listner.
-				
-							SandeshaMepClient inOutMepClient = new SandeshaMepClient (msgCtx.getServiceContext());
-							//inOutMepClient.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
-							inOutMepClient.setTo(msgCtx.getTo());
-							inOutMepClient.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
-							inOutMepClient.invokeDual(msgCtx.getOperationDescription(),msgCtx);
-							//inOutMepClient.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,false);
-							//call.invokeBlocking(msgCtx.getOperationDescription(),msgCtx);
-						}else {
-							MessageSender sender = new MessageSender ();
-							sender.setTo(msgCtx.getTo());
-							sender.send(msgCtx.getOperationDescription(),msgCtx);
-						}
-
-						
-						
-					}
+					new AxisEngine(context).send(msgCtx);
+					checkForSyncResponses(msgCtx);
 
 				} catch (AxisFault e1) {
 					e1.printStackTrace();
@@ -163,22 +122,24 @@ public class Sender extends Thread {
 
 	}
 
-	private boolean isResponseExpected (RMMsgContext rmMsgCtx) {
+	private boolean isResponseExpected(RMMsgContext rmMsgCtx) {
 		boolean responseExpected = false;
-		
-		if (rmMsgCtx.getMessageType()==Constants.MessageTypes.CREATE_SEQ){
+
+		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.CREATE_SEQ) {
 			responseExpected = true;
-		}if (rmMsgCtx.getMessageType()==Constants.MessageTypes.APPLICATION) {
+		}
+		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.APPLICATION) {
 			//a ack may arrive. (not a application response)
-			if (rmMsgCtx.getMessageContext().getOperationDescription().getMessageExchangePattern().equals(
-					org.apache.wsdl.WSDLConstants.MEP_URI_IN_OUT)) {
-					responseExpected = true;
+			if (rmMsgCtx.getMessageContext().getOperationDescription()
+					.getMessageExchangePattern().equals(
+							org.apache.wsdl.WSDLConstants.MEP_URI_IN_OUT)) {
+				responseExpected = true;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public void start(ConfigurationContext context) {
 		senderStarted = true;
 		this.context = context;
@@ -189,14 +150,50 @@ public class Sender extends Thread {
 		try {
 			RMMsgContext rmMsgCtx1 = MsgInitializer.initializeMessage(msgCtx1);
 			rmMsgCtx1.addSOAPEnvelope();
-			
-		
-			
+
 		} catch (AxisFault e) {
 			throw new SandeshaException("Exception in updating contexts");
 		}
-		
-		
+
+	}
+
+	private void checkForSyncResponses(MessageContext msgCtx) throws AxisFault {
+
+		boolean responsePresent = (msgCtx
+				.getProperty(MessageContext.TRANSPORT_IN) != null);
+
+		if (responsePresent) {
+			//create the response
+			MessageContext response = new MessageContext(msgCtx
+					.getSystemContext(), msgCtx.getSessionContext(), msgCtx
+					.getTransportIn(), msgCtx.getTransportOut());
+			response.setProperty(MessageContext.TRANSPORT_IN, msgCtx
+					.getProperty(MessageContext.TRANSPORT_IN));
+
+			response.setServerSide(false);
+
+			//If request is REST we assume the response is REST, so set the
+			// variable
+			response.setDoingREST(msgCtx.isDoingREST());
+			response.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+			response.setServiceGroupContext(msgCtx.getServiceGroupContext());
+			response.setServiceContext(msgCtx.getServiceContext());
+			response.setServiceDescription(msgCtx.getServiceDescription());
+			response.setServiceGroupDescription(msgCtx.getServiceGroupDescription());
+			
+			//Changed following from TransportUtils to SandeshaUtil since op. context is anavailable.
+			SOAPEnvelope resenvelope = SandeshaUtil.createSOAPMessage(
+					response, msgCtx.getEnvelope().getNamespace().getName());
+
+			if (resenvelope != null) {
+				AxisEngine engine = new AxisEngine(msgCtx.getSystemContext());
+				response.setEnvelope(resenvelope);
+				engine.receive(response);
+			} else {
+				throw new AxisFault(Messages
+						.getMessage("blockInvocationExpectsRes="));
+			}
+		}
 	}
 
 }

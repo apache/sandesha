@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,6 +36,7 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.handlers.SandeshaOutHandler;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -48,6 +50,11 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 public class AcknowledgementProcessor implements MsgProcessor {
 
+	public static void notifyAllWaitingOnKey () {
+	
+		SandeshaOutHandler.key.notifyAll();
+	}
+	
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
@@ -61,6 +68,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges()
 				.iterator();
+		
 		Iterator nackIterator = sequenceAck.getNackList().iterator();
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
 		if (outSequenceId == null || "".equals(outSequenceId))
@@ -70,8 +78,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.getInstance(context).getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
 				.getInstance(context).getSequencePropretyBeanMgr();
-
-
 
 		SequencePropertyBean tempSequenceBean = seqPropMgr.retrieve(
 				outSequenceId,
@@ -140,6 +146,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		}
 
 		int i = 1;
+		
+		//stopping the progress of the message further.
+		rmMsgCtx.getMessageContext().setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
 	}
 
 	private RetransmitterBean getRetransmitterEntry(Collection collection,

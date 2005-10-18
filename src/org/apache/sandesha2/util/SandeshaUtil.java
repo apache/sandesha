@@ -17,6 +17,7 @@
 package org.apache.sandesha2.util;
 
 import java.awt.datatransfer.StringSelection;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,20 +25,31 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.addressing.miheaders.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
+import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
+import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.soap.impl.llom.builder.StAXSOAPModelBuilder;
+import org.apache.axis2.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
@@ -328,7 +340,57 @@ public class SandeshaUtil {
 		return false;
 	}
 	
-//	public SOAPEnvelope cloneSOAPEnvelope (SOAPEnvelope oldEnvelope) {
-//		
-//	}
+	public static SOAPEnvelope createSOAPMessage (MessageContext msgContext, String soapNamespaceURI) throws AxisFault {
+        try {
+        	
+            InputStream inStream = (InputStream) msgContext.getProperty(
+                    MessageContext.TRANSPORT_IN);
+            msgContext.setProperty(MessageContext.TRANSPORT_IN, null);
+            //this inputstram is set by the TransportSender represents a two way transport or
+            //by a Transport Recevier
+            if (inStream == null) {
+                throw new AxisFault(Messages.getMessage("inputstreamNull"));
+            }
+            
+            //This should be set later
+            //TODO check weather this affects MTOM
+            String contentType = null;
+
+            StAXBuilder builder = null;
+            SOAPEnvelope envelope = null;
+
+            String charSetEnc = (String)msgContext.getProperty(MessageContext.CHARACTER_SET_ENCODING);
+            if(charSetEnc == null) {
+            	charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
+            }
+            
+			if (contentType != null) {
+                msgContext.setDoingMTOM(true);
+                builder =
+                        HTTPTransportUtils.selectBuilderForMIME(msgContext,
+                                inStream,
+                                (String) contentType);
+                envelope = (SOAPEnvelope) builder.getDocumentElement();
+            } else if (msgContext.isDoingREST()) {
+                XMLStreamReader xmlreader =
+                        XMLInputFactory.newInstance().createXMLStreamReader(
+                                inStream,charSetEnc);
+                SOAPFactory soapFactory = new SOAP11Factory();
+                builder = new StAXOMBuilder(xmlreader);
+                builder.setOmbuilderFactory(soapFactory);
+                envelope = soapFactory.getDefaultEnvelope();
+                envelope.getBody().addChild(builder.getDocumentElement());
+            } else {
+                XMLStreamReader xmlreader =
+                        XMLInputFactory.newInstance().createXMLStreamReader(
+                        		inStream,charSetEnc);
+                builder = new StAXSOAPModelBuilder(xmlreader, soapNamespaceURI);
+                envelope = (SOAPEnvelope) builder.getDocumentElement();
+            }
+            return envelope;
+        } catch (Exception e) {
+            throw new AxisFault(e);
+        }
+
+	}
 }

@@ -47,6 +47,7 @@ public class TwoWayOptionalTransportBasedSender {
 			
 			OperationContext newOperationContext = new OperationContext (msgctx.getOperationDescription());
 			
+			newOperationContext.setProperty("test","test123");
 			msgctx.getOperationDescription().registerOperationContext(response,
 					newOperationContext);
 			response.setServerSide(false);

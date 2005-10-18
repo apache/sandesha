@@ -51,6 +51,20 @@ import org.apache.wsdl.WSDLConstants;
 
 public class SandeshaOutHandler extends AbstractHandler {
 
+	public static final Object key = new Object();
+
+	public static void waitOnKey() throws InterruptedException {
+		synchronized (key) {
+			key.wait();
+		}
+	}
+
+	public static void notifyAllWaitingOnKey() {
+		synchronized (key) {
+			key.notifyAll();
+		}
+	}
+
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 		System.out.println("Sandesha out handler called");
 
@@ -59,8 +73,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (null != DONE && "true".equals(DONE))
 			return;
 
-		msgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
-		
+		msgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE, "true");
+
 		//getting rm message
 		RMMsgContext rmMsgCtx = null;
 		try {
@@ -205,14 +219,17 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 				//valid response
 
-				
 				//Changing message Id.
 				//TODO remove this when Axis2 start sending uuids as uuid:xxxx
-				String messageId = SandeshaUtil.getUUID();
-				rmMsgCtx.setMessageId(messageId);
-				OperationContext opCtx = msgCtx.getOperationContext();
-				msgCtx.getSystemContext().registerOperationContext(messageId, opCtx);
-				
+				String messageId1 = SandeshaUtil.getUUID();
+				if (rmMsgCtx.getMessageId()==null) {
+					rmMsgCtx.setMessageId(messageId1);
+					System.out.println("Message id was null");
+				}
+				//OperationContext opCtx = msgCtx.getOperationContext();
+//				msgCtx.getSystemContext().registerOperationContext(messageId,
+//						opCtx);
+
 				if (serverSide) {
 
 					//FIXME - do not copy application messages. Coz u loose
@@ -242,8 +259,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 					newMsgCtx.setOperationContext(newOpContext);
 
 					//Thid does not have to be processed again by RMHandlers
-					newMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,"true");
-					
+					newMsgCtx.setProperty(
+							Constants.APPLICATION_PROCESSING_DONE, "true");
+
 					//processing the response
 					processResponseMessage(newRMMsgCtx, tempSequenceId,
 							messageNumber);
@@ -267,8 +285,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 				} else {
 
 					//setting reply to FIXME
-					//msgCtx.setReplyTo(new EndpointReference ("http://localhost:9070/somethingWorking"));
-					
+					//msgCtx.setReplyTo(new EndpointReference
+					// ("http://localhost:9070/somethingWorking"));
+
 					//Setting WSA Action if null
 					//TODO: Recheck weather this action is correct
 					if (msgCtx.getWSAAction() == null) {
@@ -282,55 +301,62 @@ public class SandeshaOutHandler extends AbstractHandler {
 								.getAxisOperation().getName().getLocalPart();
 						msgCtx.setWSAAction(to + "/" + operationName);
 					}
-					
+
 					//processing the response
 					processResponseMessage(rmMsgCtx, tempSequenceId,
 							messageNumber);
 					
-					//Getting the mep.
-					String mep = msgCtx.getOperationDescription()
-							.getMessageExchangePattern();
+					//pausing the message
+					msgCtx.setPausedTrue(getName());
 
-					if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
-						//Add a sequence property to check weather the response has arrived.
-						SequencePropertyBean checkResponseBean = new SequencePropertyBean ();
-						checkResponseBean.setSequenceId(msgCtx.getMessageID());
-						checkResponseBean.setName(Constants.SequenceProperties.CHECK_RESPONSE);
-						checkResponseBean.setValue("false");
-						seqPropMgr.insert(checkResponseBean);
-					}
-					
-					//client side wait
-					boolean letGo = false;
-					while (!letGo) {
-						if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
-							//if the mep is in-out them wait till the response comes. then pause.
-						    SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(msgCtx.getMessageID(),Constants.SequenceProperties.CHECK_RESPONSE);
-						    String val = (String) checkResponseBean.getValue();
-						    if ("true".equals(checkResponseBean.getValue())) {
-						    	msgCtx.setPausedTrue(getName());
-						    	letGo = true;
-						    }
-						} else {
-							//FIXME - non-inout case.
-							//if not in-out simply pause after the
-							SequencePropertyBean outSequenceBean = seqPropMgr
-									.retrieve(
-											tempSequenceId,
-											Constants.SequenceProperties.OUT_SEQUENCE_ID);
-							if (outSequenceBean == null) {
-								try {
-									//Thread.sleep(Constants.CLIENT_SLEEP_TIME);
-									wait();
-								} catch (InterruptedException e1) {
-									System.out
-											.println("Client was interupted...");
-								}
-							} else {
-								letGo = true;
-							}
-						}
-					}
+//					//Getting the mep.
+//					String mep = msgCtx.getOperationDescription()
+//							.getMessageExchangePattern();
+//
+//					if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
+//						//Add a sequence property to check weather the response
+//						// has arrived.
+//						SequencePropertyBean checkResponseBean = new SequencePropertyBean();
+//						checkResponseBean.setSequenceId(msgCtx.getMessageID());
+//						checkResponseBean
+//								.setName(Constants.SequenceProperties.CHECK_RESPONSE);
+//						checkResponseBean.setValue(null);
+//						seqPropMgr.insert(checkResponseBean);
+//					}
+//
+//					//client side wait
+//					boolean letGo = false;
+//					while (!letGo) {
+//						if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
+//							//if the mep is in-out them wait till the response
+//							// comes. then pause.
+//							SequencePropertyBean checkResponseBean = seqPropMgr
+//									.retrieve(
+//											msgCtx.getMessageID(),
+//											Constants.SequenceProperties.CHECK_RESPONSE);
+//							MessageContext response = (MessageContext) checkResponseBean.getValue();
+//							if (null!=checkResponseBean.getValue()) {
+//								//simply return to the caller.
+//								//msgCtx.setConfigurationContext( properteies)
+//								//msgCtx.setTransportIn(response.getTransportIn());
+//								msgCtx.setProperty(MessageContext.TRANSPORT_IN,response.getProperty(MessageContext.TRANSPORT_IN));
+//								//msgCtx.setProperty(org.apache.axis2.Constants.tra)
+//								msgCtx.setPausedTrue(getName());
+//								letGo = true;
+//								continue;
+//							}
+//						} else {
+//							//FIXME - non-inout case.
+//							//TODO check for the ack and pause.
+//						}
+//							try {
+//								waitOnKey();
+//								
+//							} catch (InterruptedException e1) {
+//								System.out.println("Client was interupted...");
+//							}
+//
+//					}
 
 				}
 			}
@@ -349,11 +375,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
 				applicationRMMsg, tempSequenceId);
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
-		
-		
+
 		//TODO remove below
-		//createSeqMsg.setReplyTo(new EndpointReference ("http://localhost:9070/somethingWorking"));
-		
+		//createSeqMsg.setReplyTo(new EndpointReference
+		// ("http://localhost:9070/somethingWorking"));
+
 		createSeqMsg.setRelatesTo(null); //create seq msg does not relateTo
 		// anything
 		AbstractContext context = applicationRMMsg.getContext();
@@ -386,13 +412,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			String tempSequenceId, long messageNumber) throws SandeshaException {
 
 		MessageContext msg = rmMsg.getMessageContext();
-
-//		//Changing message Id.
-//		//TODO remove this when Axis2 start sending uuids as uuid:xxxx
-//		String messageId = SandeshaUtil.getUUID();
-//		rmMsg.setMessageId(messageId);
-//		OperationContext opCtx = msg.getOperationContext();
-//		msg.getSystemContext().registerOperationContext(messageId, opCtx);
 
 		if (rmMsg == null)
 			throw new SandeshaException("Message or reques message is null");
@@ -480,8 +499,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		} else {
 			//client side
-			Object obj = msg.getProperty(Constants.LAST_MESSAGE);
-			//if (obj != null && "true".equals(obj)) {
+
+			Object obj = msg.getSystemContext().getProperty(
+					Constants.LAST_MESSAGE);
+			if (obj != null && "true".equals(obj)) {
 				sequence.setLastMessage(new LastMessage());
 				//saving the last message no.
 				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
@@ -489,7 +510,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 						Constants.SequenceProperties.LAST_OUT_MESSAGE,
 						new Long(messageNumber));
 				sequencePropertyMgr.insert(lastOutMsgBean);
-			//}
+			}
 		}
 
 		//setting the Sequnece id.
@@ -514,26 +535,26 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-//		//send the message through sender only in the server case.
-//		//in the client case use the normal flow.
-//		if (msg.isServerSide()) {
-			//Retransmitter bean entry for the application message
-			RetransmitterBean appMsgEntry = new RetransmitterBean();
-			String key = SandeshaUtil.storeMessageContext(rmMsg
-					.getMessageContext());
-			appMsgEntry.setKey(key);
-			appMsgEntry.setLastSentTime(0);
-			appMsgEntry.setMessageId(rmMsg.getMessageId());
-			appMsgEntry.setMessageNumber(messageNumber);
-			if (outSequenceBean == null || outSequenceBean.getValue() == null) {
-				appMsgEntry.setSend(false);
-			} else {
-				appMsgEntry.setSend(true);
+		//		//send the message through sender only in the server case.
+		//		//in the client case use the normal flow.
+		//		if (msg.isServerSide()) {
+		//Retransmitter bean entry for the application message
+		RetransmitterBean appMsgEntry = new RetransmitterBean();
+		String key = SandeshaUtil
+				.storeMessageContext(rmMsg.getMessageContext());
+		appMsgEntry.setKey(key);
+		appMsgEntry.setLastSentTime(0);
+		appMsgEntry.setMessageId(rmMsg.getMessageId());
+		appMsgEntry.setMessageNumber(messageNumber);
+		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
+			appMsgEntry.setSend(false);
+		} else {
+			appMsgEntry.setSend(true);
 
-			}
-			appMsgEntry.setTempSequenceId(tempSequenceId);
-			retransmitterMgr.insert(appMsgEntry);
-//		}
+		}
+		appMsgEntry.setTempSequenceId(tempSequenceId);
+		retransmitterMgr.insert(appMsgEntry);
+		//		}
 	}
 
 	private long getNextMsgNo(ConfigurationContext context,

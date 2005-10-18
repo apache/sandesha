@@ -59,6 +59,8 @@ public class SandeshaInHandler extends AbstractHandler {
 		} catch (SandeshaException ex) {
 			throw new AxisFault("Cant initialize the message");
 		}
+		
+		System.out.println("Got message of type:" + rmMsgCtx.getMessageType() + " MessageId:" + msgCtx.getMessageID());
 
 //		try {
 //			System.out.println("SandeshaInHandler Got a message of type:" + rmMsgCtx.getMessageType());

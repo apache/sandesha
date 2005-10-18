@@ -184,7 +184,7 @@ public interface Constants {
 
 			String NOT_IN_ORDER = "NotInOrder";
 
-			String DEFAULT_DELIVERY_ASSURANCE = IN_ORDER;
+			String DEFAULT_DELIVERY_ASSURANCE = NOT_IN_ORDER;
 		}
 		
 		public interface InvocationType {

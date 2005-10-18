@@ -41,6 +41,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SOAPAbstractFactory;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.handlers.SandeshaOutHandler;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
@@ -202,7 +203,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
+		
 		//FIXME - fix delivery assurances for the client side
+
 		if (msgCtx.isServerSide()) {
 		if (Constants.QOS.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.QOS.DeliveryAssurance.IN_ORDER) {
 			//pause the message
@@ -258,13 +261,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 		
 		//client side - SET CheckResponse to true.
-		if (!msgCtx.isServerSide()) {
+		//FIXME this will not work. Even in client side inServerSide () is true for the messages.
+		//if (!msgCtx.isServerSide()) {
 			try {
 				MessageContext requestMessage = rmMsgCtx.getMessageContext().getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 				String requestMessageId = requestMessage.getMessageID();
 				SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(requestMessageId,Constants.SequenceProperties.CHECK_RESPONSE);
 				if (checkResponseBean!=null) {
-					checkResponseBean.setValue("true");
+					checkResponseBean.setValue(msgCtx);
 					seqPropMgr.update(checkResponseBean);
 				}
 			
@@ -272,8 +276,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				throw new SandeshaException (e.getMessage());
 			}
 			
+			
+			//SET THe RESPONSE
+			
+			//WAKE UP THE SLEEPING THREADS
+			//SandeshaOutHandler.notifyAllWaitingOnKey();
+			
 			//set 
-		}
+		//}
 
 	}
 
