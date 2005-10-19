@@ -91,7 +91,8 @@ public class Sender extends Thread {
 					updateMessage(msgCtx);
 
 					new AxisEngine(context).send(msgCtx);
-					checkForSyncResponses(msgCtx);
+					if (!msgCtx.isServerSide())
+						checkForSyncResponses(msgCtx);
 
 				} catch (AxisFault e1) {
 					e1.printStackTrace();

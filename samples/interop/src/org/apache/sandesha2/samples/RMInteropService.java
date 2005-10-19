@@ -17,8 +17,15 @@
 
 package org.apache.sandesha2.samples;
 
+
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
@@ -34,15 +41,32 @@ public class RMInteropService {
     private static Map sequences = new HashMap();
 
     public OMElement echoString(OMElement in) {
-        System.out.println("EchoString was called");
-
+    	     	
+        String responseText = null;
+        if (in!=null) {
+        	String tempText = in.getText();
+        	if (tempText==null || "".equals(tempText)) {
+        		OMElement firstChild = in.getFirstElement();
+        		if (firstChild!=null)
+        			tempText = firstChild.getText();
+        	}
+        	
+        	if (tempText!=null)
+        		responseText = tempText;
+        }
+        	
+        
+        System.out.println("echoString got text:" + ((null==responseText)?"":responseText));
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace("http://tempuri.org/", "echoString");
         OMElement method = fac.createOMElement("echoStringResponse", omNs);
 
-        OMElement value = fac.createOMElement("Text", omNs);
-        value.setText("echo response");
-
+        OMElement value = fac.createOMElement("text", omNs);
+        
+        if (responseText==null || "".equals(responseText))
+        	responseText = "echo response";
+        
+        value.setText(responseText);
         method.addChild(value);
 
         return method;

@@ -77,8 +77,8 @@ public class AcknowledgementRange implements IOMRMElement {
 					"Passed element does not contain upper or lower attributes");
 
 		try {
-			long lower = Long.parseLong(lowerAttrib.getValue());
-			long upper = Long.parseLong(upperAttrib.getValue());
+			long lower = Long.parseLong(lowerAttrib.getAttributeValue());
+			long upper = Long.parseLong(upperAttrib.getAttributeValue());
 			upperValue = upper;
 			lowerValue = lower;
 		} catch (Exception ex) {

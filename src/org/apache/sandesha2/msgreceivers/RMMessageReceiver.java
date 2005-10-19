@@ -129,7 +129,8 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 		AbstractMessageReceiver msgReceiver = null;
 
-		String replyTo = messgeCtx.getFrom().getAddress();
+		//String replyTo = messgeCtx.getFrom().getAddress();
+		String replyTo = messgeCtx.getReplyTo().getAddress();
 		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.TERMINATE_SEQ)
 			msgReceiver = new RMInMsgReceiver();
 		else if (rmMsgCtx.getMessageType() == Constants.MessageTypes.CREATE_SEQ

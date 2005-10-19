@@ -142,6 +142,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 						"TO End Point Reference is not set correctly. This is a must for the sandesha client side.");
 
 			tempSequenceId = toEPR.getAddress();
+			String sequenceKey = (String) context.getProperty(Constants.SEQUENCE_KEY);
+			if (sequenceKey!=null)
+				tempSequenceId = tempSequenceId + sequenceKey;
+			
+			
+			
 		}
 
 		//check if the fist message
@@ -297,8 +303,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 							throw new SandeshaException("To EPR is not found");
 
 						String to = toEPR.getAddress();
-						String operationName = msgCtx.getOperationContext()
-								.getAxisOperation().getName().getLocalPart();
+						String operationName = msgCtx.getOperationContext().getOperationDescription().getName().getLocalPart();
 						msgCtx.setWSAAction(to + "/" + operationName);
 					}
 

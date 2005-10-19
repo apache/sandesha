@@ -225,6 +225,8 @@ public interface Constants {
 	String IN_HANDLER_NAME = "SandeshaInHandler";
 
 	String OUT_HANDLER_NAME = "SandeshaOutHandler";
+	
+	String SEQUENCE_KEY = "SequenceKey";
 
 	//message context properties
 	String APPLICATION_PROCESSING_DONE = "AppProcessingDone";
