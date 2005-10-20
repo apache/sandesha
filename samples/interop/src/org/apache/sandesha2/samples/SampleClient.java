@@ -29,7 +29,6 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
-import org.apache.bcel.generic.GETFIELD;
 import org.apache.sandesha2.Constants;
 
 public class SampleClient {
@@ -40,6 +39,10 @@ public class SampleClient {
 	
 	private static String sandesha2TO = "http://localhost:8070/axis2/services/InteropService";
 
+	private static String SANDESHA_HOME = "E:\\wso2\\sandesha\\sandesha 2\\code\\checkouts\\Aug_25_2005\\"; //Change this to ur path.
+	
+	private static String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
+	
 	public static void main(String[] args) throws AxisFault {
 		SampleClient client = new SampleClient ();
 		client.run();
@@ -62,7 +65,7 @@ public class SampleClient {
 
 	public void testEcho () throws AxisFault {
 		
-		Call call = new Call("E:\\wso2\\sandesha\\sandesha 2\\code\\checkouts\\Aug_25_2005\\target\\dist\\client");
+		Call call = new Call(AXIS2_CLIENT_PATH);
 		call.engageModule(new QName("sandesha"));
 
 		call.set(Constants.AcksTo,"http://192.168.1.195:9070/axis2/services/AnonymousService/echoString");
