@@ -65,6 +65,7 @@ public class SampleClient {
 		Call call = new Call("E:\\wso2\\sandesha\\sandesha 2\\code\\checkouts\\Aug_25_2005\\target\\dist\\client");
 		call.engageModule(new QName("sandesha"));
 
+		call.set(Constants.AcksTo,"http://192.168.1.195:9070/axis2/services/AnonymousService/echoString");
 		call.setTo(new EndpointReference(sandesha2TO));
 		call.set(Constants.SEQUENCE_KEY,"sequence1");
 		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
