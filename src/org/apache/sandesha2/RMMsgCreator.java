@@ -62,7 +62,7 @@ import org.apache.wsdl.WSDLConstants;
 
 public class RMMsgCreator {
 
-	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String tempSequenceId)
+	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String tempSequenceId, String acksTo)
 			throws SandeshaException {
 				
 		MessageContext applicationMsgContext = applicationRMMsg
@@ -135,11 +135,17 @@ public class RMMsgCreator {
 		EndpointReference acksToEPR = null;
 		
 		//AcksTo value is replyto value (if set). Otherwise anonymous.
-		if (replyToBean==null || replyToBean.getValue()==null){
-			acksToEPR = new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS);
-		}else { 
-			acksToEPR = (EndpointReference) replyToBean.getValue();
-		}
+//		if (replyToBean==null || replyToBean.getValue()==null){
+//			if (acksTo==null)
+//			acksToEPR = new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS);
+//		}else { 
+//			acksToEPR = (EndpointReference) replyToBean.getValue();
+//		}
+		
+		if (acksTo==null || "".equals(acksTo))
+			acksTo = Constants.WSA.NS_URI_ANONYMOUS;
+			
+		acksToEPR = new EndpointReference (acksTo);	
 		
 		if (replyToBean!=null && replyToBean.getValue()!=null)
 			replyToEPR = (EndpointReference) replyToBean.getValue();

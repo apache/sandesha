@@ -244,4 +244,6 @@ public interface Constants {
 	String LAST_MESSAGE = "WSRMLastMessage";
 	
 	String TEMP_SEQUENCE_ID = "uuid:tempID";
+	
+	String AcksTo = "AcksToProperty";
 }

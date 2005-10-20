@@ -193,7 +193,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 				seqPropMgr.insert(responseCreateSeqAdded);
 
 				try {
-					addCreateSequenceMessage(rmMsgCtx, tempSequenceId);
+					String acksTo = (String) context.getProperty(Constants.AcksTo);
+					addCreateSequenceMessage(rmMsgCtx, tempSequenceId,acksTo);
 				} catch (SandeshaException e1) {
 					throw new AxisFault(e1.getMessage());
 				}
@@ -372,13 +373,13 @@ public class SandeshaOutHandler extends AbstractHandler {
 	}
 
 	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg,
-			String tempSequenceId) throws SandeshaException {
+			String tempSequenceId, String acksTo) throws SandeshaException {
 
 		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
 		if (applicationMsg == null)
 			throw new SandeshaException("Message context is null");
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
-				applicationRMMsg, tempSequenceId);
+				applicationRMMsg, tempSequenceId,acksTo);
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
 
 		//TODO remove below

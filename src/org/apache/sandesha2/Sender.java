@@ -37,6 +37,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.OperationDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.i18n.Messages;
+import org.apache.axis2.om.OMException;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -91,7 +92,7 @@ public class Sender extends Thread {
 					updateMessage(msgCtx);
 
 					new AxisEngine(context).send(msgCtx);
-					if (!msgCtx.isServerSide())
+					//if (!msgCtx.isServerSide())
 						checkForSyncResponses(msgCtx);
 
 				} catch (AxisFault e1) {
@@ -183,17 +184,20 @@ public class Sender extends Thread {
 			response.setServiceGroupDescription(msgCtx.getServiceGroupDescription());
 			
 			//Changed following from TransportUtils to SandeshaUtil since op. context is anavailable.
-			SOAPEnvelope resenvelope = SandeshaUtil.createSOAPMessage(
-					response, msgCtx.getEnvelope().getNamespace().getName());
-
+			SOAPEnvelope resenvelope = null;
+			try {
+				resenvelope = SandeshaUtil.createSOAPMessage(
+						response, msgCtx.getEnvelope().getNamespace().getName());
+			} catch (AxisFault e) {
+				//TODO: change to log.debug
+				System.out.println("No response message");
+			}
+			
 			if (resenvelope != null) {
 				AxisEngine engine = new AxisEngine(msgCtx.getSystemContext());
 				response.setEnvelope(resenvelope);
 				engine.receive(response);
-			} else {
-				throw new AxisFault(Messages
-						.getMessage("blockInvocationExpectsRes="));
-			}
+			} 
 		}
 	}
 
