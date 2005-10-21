@@ -236,7 +236,7 @@ public class RMMsgCreator {
 	}
 
 	public static RMMsgContext createCreateSeqResponseMsg(
-			RMMsgContext createSeqMessage, MessageContext outMessage)
+			RMMsgContext createSeqMessage, MessageContext outMessage, String newSequenceID)
 			throws AxisFault {
 
 		IOMRMElement messagePart = createSeqMessage
@@ -246,7 +246,6 @@ public class RMMsgCreator {
 		CreateSequenceResponse response = new CreateSequenceResponse();
 
 		Identifier identifier = new Identifier();
-		String newSequenceID = SandeshaUtil.getUUID();
 		identifier.setIndentifer(newSequenceID);
 
 		response.setIdentifier(identifier);

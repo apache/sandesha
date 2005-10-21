@@ -15,11 +15,13 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.handlers.SandeshaInHandler;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
@@ -30,14 +32,14 @@ import org.apache.sandesha2.wsrm.CreateSequence;
  */
 public class SequenceMenager {
 
-	public static void setUpNewSequence(String sequenceId,
-			RMMsgContext createSequenceMsg) throws AxisFault {
+	public static String setUpNewSequence(RMMsgContext createSequenceMsg) throws AxisFault {
 		//		SequencePropertyBean seqPropBean = new SequencePropertyBean
 		// (sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,"");
 		//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
 		// (Constants.DEFAULT_STORAGE_TYPE);
 		//		beanMgr.create(seqPropBean);
 
+		String sequenceId = SandeshaUtil.getUUID();
 		AbstractContext context = createSequenceMsg.getContext();
 		
 		EndpointReference to = createSequenceMsg.getTo();
@@ -85,6 +87,8 @@ public class SequenceMenager {
 		nextMsgMgr.insert(new NextMsgBean(sequenceId, 1)); // 1 will be the next
 														   // message to invoke
 		//this will apply for only in-order invocations.
+		
+		return sequenceId;
 	}
 
 	public void removeSequence(String sequence) {

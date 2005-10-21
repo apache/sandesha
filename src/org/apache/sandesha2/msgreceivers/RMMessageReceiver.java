@@ -79,18 +79,22 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		if (createSeqMsg.getMessageType() != Constants.MessageTypes.CREATE_SEQ)
 			throw new AxisFault("Wrong message type");
 
-		RMMsgContext createSeqResponse = RMMsgCreator
-				.createCreateSeqResponseMsg(createSeqMsg, outMessage);
-		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
-				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
-
-		String newSequenceId = createSeqResPart.getIdentifier().getIdentifier();
+		String newSequenceId = SequenceMenager.setUpNewSequence(createSeqMsg);
+		
 		if (newSequenceId == null)
 			throw new AxisFault(
 					"Internal error - Generated sequence id is null");
+		
+		RMMsgContext createSeqResponse = RMMsgCreator
+				.createCreateSeqResponseMsg(createSeqMsg, outMessage, newSequenceId);
+		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
+				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
+
+		//String newSequenceId = createSeqResPart.getIdentifier().getIdentifier();
+
 
 		ConfigurationContext configCtx = inMessage.getSystemContext();
-		SequenceMenager.setUpNewSequence(newSequenceId, createSeqMsg);
+		
 
 		CreateSequence createSeq = (CreateSequence) createSeqMsg
 				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
