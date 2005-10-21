@@ -65,6 +65,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	private boolean letInvoke = false;
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+		
 
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
@@ -84,6 +85,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(rmMsgCtx.getContext()).getSequencePropretyBeanMgr();
+		
+		
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQUENCE);
@@ -91,13 +95,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
 				.getSystemContext();
 		if (configCtx == null)
-			throw new SandeshaException("Configuration Context is null");
+			throw new SandeshaException("Configuration Context is null");		
 
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(configCtx).getSequencePropretyBeanMgr();
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
 				Constants.SequenceProperties.RECEIVED_MESSAGES);
 
+		
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo == 0)
 			throw new SandeshaException("Wrong message number");

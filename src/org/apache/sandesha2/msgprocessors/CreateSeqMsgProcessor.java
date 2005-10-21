@@ -31,11 +31,16 @@ import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SequenceMenager;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.sandesha2.wsrm.SequenceOffer;
 
 /**
  * @author 
@@ -46,6 +51,10 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext createSeqRMMsg) throws SandeshaException {
 		
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
+		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+		if (createSeqPart==null)
+			throw new SandeshaException ("No create sequence part is present in the create sequence message");
+		
 		MessageContext outMessage = null;
 		try {
 			outMessage = Utils.createOutMessageContext(createSeqMsg);
@@ -64,8 +73,47 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage, newSequenceId);
 			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
 
-			//ConfigurationContext configCtx = inMessage.getSystemContext();
 
+			//If an offer is accepted do necessary procesing.
+			Accept accept = createSeqResPart.getAccept();
+			if (accept!=null) {
+				SequenceOffer offer = createSeqPart.getSequenceOffer();
+				if (offer==null)
+					throw new SandeshaException ("Internal error - no offer for the response message with Accept");
+				
+				//Setting the CreateSequence table entry.
+				String incomingSeqId = createSeqResPart.getIdentifier().getIdentifier();
+				String outSequenceId = offer.getIdentifer().getIdentifier();
+				CreateSeqBean createSeqBean = new CreateSeqBean ();
+				createSeqBean.setSequenceId(outSequenceId);
+				createSeqBean.setTempSequenceId(newSequenceId);
+				createSeqBean.setCreateSeqMsgId(SandeshaUtil.getUUID());   //this is a dummy value.
+				
+				CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(context).getCreateSeqBeanMgr();
+				createSeqMgr.insert(createSeqBean);
+				
+				//Setting sequence properties.
+				SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();
+				SequencePropertyBean outSequenceBean = new SequencePropertyBean ();
+				outSequenceBean.setName(Constants.SequenceProperties.OUT_SEQUENCE_ID);
+				outSequenceBean.setValue(outSequenceId);
+				outSequenceBean.setSequenceId(newSequenceId);				
+				seqPropMgr.insert(outSequenceBean);
+				
+				//Temp sequence id should be set for the server side. 
+				//If temp sequence id is not set. this implies server side.
+				SequencePropertyBean tempSeqBean = seqPropMgr.retrieve(outSequenceId,Constants.SequenceProperties.TEMP_SEQUENCE_ID);
+				if (tempSeqBean==null) {
+					SequencePropertyBean tempSequenceBean = new SequencePropertyBean ();
+					tempSequenceBean.setName(Constants.SequenceProperties.TEMP_SEQUENCE_ID);
+					tempSequenceBean.setSequenceId(outSequenceId);
+					tempSequenceBean.setValue(newSequenceId);
+					seqPropMgr.insert(tempSequenceBean);
+				}
+
+			}
+			
+			
 			CreateSequence createSeq = (CreateSequence) createSeqRMMsg.getMessagePart(Constants.MessageParts.CREATE_SEQ);
 			if (createSeq == null)
 				throw new AxisFault("Create sequence part not present in the create sequence message");

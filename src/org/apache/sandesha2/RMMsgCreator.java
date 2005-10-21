@@ -51,6 +51,7 @@ import org.apache.sandesha2.wsrm.IOMRMPart;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.wsdl.WSDLConstants;
 
@@ -123,6 +124,18 @@ public class RMMsgCreator {
 
 		CreateSequence createSequencePart = new CreateSequence();
 
+		
+		//Adding sequence offer - if present
+		String offeredSequence = (String) context.getProperty(Constants.OFFERED_SEQUENCE_ID);
+		if (offeredSequence!=null && !"".equals(offeredSequence))
+		{
+			SequenceOffer offerPart = new SequenceOffer ();
+			Identifier identifier = new Identifier ();
+			identifier.setIndentifer(offeredSequence);
+			offerPart.setIdentifier(identifier);
+			createSequencePart.setSequenceOffer(offerPart);
+		}
+			
 		//TODO decide - where to send create seq. Acksto or replyTo
 		SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId, Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.TO_EPR);
@@ -250,14 +263,26 @@ public class RMMsgCreator {
 
 		response.setIdentifier(identifier);
 
-		Accept accept = new Accept();
-		EndpointReference acksToEPR = createSeqMessage.getTo();
-		AcksTo acksTo = new AcksTo();
-		Address address = new Address();
-		address.setEpr(acksToEPR);
-		acksTo.setAddress(address);
-		accept.setAcksTo(acksTo);
-		response.setAccept(accept);
+		SequenceOffer offer = cs.getSequenceOffer();
+		if (offer!=null) {
+			String outSequenceId = offer.getIdentifer().getIdentifier();
+			
+			//TODO do a better validation for the offered out sequence id.
+			if (outSequenceId!=null && !"".equals(outSequenceId)) {
+				
+				Accept accept = new Accept();
+				EndpointReference acksToEPR = createSeqMessage.getTo();
+				AcksTo acksTo = new AcksTo();
+				Address address = new Address();
+				address.setEpr(acksToEPR);
+				acksTo.setAddress(address);
+				accept.setAcksTo(acksTo);
+				response.setAccept(accept);	
+			}
+			
+			
+		}
+
 
 		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
 				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();

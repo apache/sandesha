@@ -166,6 +166,8 @@ public interface Constants {
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
 		
 		String CHECK_RESPONSE = "CheckResponse";
+		
+		String OFFERED_SEQUENCE = "OfferedSequence";
 	}
 
 	public interface SOAPVersion {
@@ -246,4 +248,7 @@ public interface Constants {
 	String TEMP_SEQUENCE_ID = "uuid:tempID";
 	
 	String AcksTo = "AcksToProperty";
+	
+	String OFFERED_SEQUENCE_ID = "OfferedSequenceId";
+	
 }

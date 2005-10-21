@@ -37,6 +37,9 @@ public class CreateSeqBeanMgr {
 
 	private Hashtable table = null;
 
+	
+	//TODO change the primary key.
+	//When offered. msgId==null
 	/**
 	 *  
 	 */

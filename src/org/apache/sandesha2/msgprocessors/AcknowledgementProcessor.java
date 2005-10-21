@@ -50,10 +50,10 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 public class AcknowledgementProcessor implements MsgProcessor {
 
-	public static void notifyAllWaitingOnKey () {
-	
-		SandeshaOutHandler.key.notifyAll();
-	}
+//	public static void notifyAllWaitingOnKey () {
+//	
+//		SandeshaOutHandler.key.notifyAll();
+//	}
 	
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		

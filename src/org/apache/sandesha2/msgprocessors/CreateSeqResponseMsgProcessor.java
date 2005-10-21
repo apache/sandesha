@@ -23,18 +23,22 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -99,6 +103,37 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				Constants.SequenceProperties.TEMP_SEQUENCE_ID, tempSequenceId);
 		sequencePropMgr.insert(outSequenceBean);
 		sequencePropMgr.insert(tempSequenceBean);
+		
+		
+		//processing for accept (offer has been sent)
+		Accept accept = createSeqResponsePart.getAccept();
+		if (accept!=null) {
+			//Find offered sequence from temp sequence id.
+			SequencePropertyBean offeredSequenceBean = sequencePropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.OFFERED_SEQUENCE);
+			
+			//TODO this should be detected in the Fault manager.
+			if (offeredSequenceBean==null)
+				throw new SandeshaException ("No offered sequence. But an accept was received");
+			
+			String offeredSequenceId = (String) offeredSequenceBean.getValue();
+			
+			EndpointReference acksToEPR = accept.getAcksTo().getAddress().getEpr();
+			SequencePropertyBean acksToBean = new SequencePropertyBean ();
+			acksToBean.setName(Constants.SequenceProperties.ACKS_TO_EPR);
+			acksToBean.setSequenceId(offeredSequenceId);
+			acksToBean.setValue(acksToEPR);	
+			
+			sequencePropMgr.insert(acksToBean);
+			
+			NextMsgBean nextMsgBean = new NextMsgBean ();
+			nextMsgBean.setSequenceId(offeredSequenceId);
+			nextMsgBean.setNextMsgNoToProcess(1);
+			
+			NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(configCtx).getNextMsgBeanMgr();
+			nextMsgMgr.insert(nextMsgBean);
+		}
+		
+		
 		
 		RetransmitterBean target = new RetransmitterBean();
 		target.setTempSequenceId(tempSequenceId);

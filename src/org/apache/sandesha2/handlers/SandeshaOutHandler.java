@@ -43,10 +43,12 @@ import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.wsdl.WSDLConstants;
 
 public class SandeshaOutHandler extends AbstractHandler {
@@ -153,23 +155,17 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		long messageNumber = getNextMsgNo(context, tempSequenceId);
 
-		boolean firstApplicationMessage = false;
-		if (messageNumber == 1)
-			firstApplicationMessage = true;
+		boolean sendCreateSequence = false;
+		
+		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		
+		if ((messageNumber==1) && (outSeqBean==null)) {
+			sendCreateSequence = true;
+		}
 
-		//		if (serverSide) {
-		//			SequencePropertyBean outSequenceBean = seqPropMgr.retrieve(
-		//					tempSequenceId,
-		//					Constants.SequenceProperties.OUT_SEQUENCE_ID);
-		//			if (outSequenceBean == null)
-		//				firstApplicationMessage = true;
-		//
-		//		} else {
-		//			
-		//		}
 
 		//if fist message - setup the sequence for the client side
-		if (!serverSide && firstApplicationMessage) {
+		if (!serverSide && sendCreateSequence) {
 			try {
 				SequenceMenager.setUpNewClientSequence(msgCtx, tempSequenceId);
 			} catch (SandeshaException e1) {
@@ -178,7 +174,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		//if first message - add create sequence
-		if (firstApplicationMessage) {
+		if (sendCreateSequence) {
 
 			SequencePropertyBean responseCreateSeqAdded = seqPropMgr.retrieve(
 					tempSequenceId,
@@ -378,6 +374,29 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException("Message context is null");
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
 				applicationRMMsg, tempSequenceId,acksTo);
+		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+		if (createSequencePart==null)
+			throw new SandeshaException ("Create Sequence part is null for a CreateSequence message");
+		
+		SequenceOffer offer = createSequencePart.getSequenceOffer();
+		if (offer!=null) {
+			//Offer processing
+			String offeredSequenceId = offer.getIdentifer().getIdentifier();
+			SequencePropertyBean msgsBean = new SequencePropertyBean ();
+			msgsBean.setSequenceId(offeredSequenceId);
+			msgsBean.setName(Constants.SequenceProperties.RECEIVED_MESSAGES);
+			msgsBean.setValue("");
+			
+			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean ();
+			offeredSequenceBean.setName(Constants.SequenceProperties.OFFERED_SEQUENCE);
+			offeredSequenceBean.setSequenceId(tempSequenceId);
+			offeredSequenceBean.setValue(offeredSequenceId);
+			
+			SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(applicationMsg.getSystemContext()).getSequencePropretyBeanMgr();
+			seqPropMgr.insert(msgsBean);
+			seqPropMgr.insert(offeredSequenceBean);
+		}
+		
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
 
 		//TODO remove below
