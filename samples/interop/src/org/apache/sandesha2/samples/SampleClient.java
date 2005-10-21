@@ -30,6 +30,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 public class SampleClient {
 
@@ -39,7 +40,7 @@ public class SampleClient {
 	
 	private static String sandesha2TO = "http://localhost:8070/axis2/services/InteropService";
 
-	private static String SANDESHA_HOME = "E:\\wso2\\sandesha\\sandesha 2\\code\\checkouts\\Aug_25_2005\\"; //Change this to ur path.
+	private static String SANDESHA_HOME = "E:\\sandesha\\sandesha 2\\"; //Change this to ur path.
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
 	
@@ -68,18 +69,17 @@ public class SampleClient {
 		Call call = new Call(AXIS2_CLIENT_PATH);
 		call.engageModule(new QName("sandesha"));
 
-		call.set(Constants.AcksTo,"http://192.168.1.195:9070/axis2/services/AnonymousService/echoString");
+		call.set(Constants.AcksTo,"http://localhost:9070/axis2/services/AnonymousService/echoString"); //Optional
 		call.setTo(new EndpointReference(sandesha2TO));
-		call.set(Constants.SEQUENCE_KEY,"sequence1");
+		call.set(Constants.SEQUENCE_KEY,"sequence1");  //Optional
+		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
 		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
 		Callback callback1 = new TestCallback ("Callback 1");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
 		Callback callback2 = new TestCallback ("Callback 2");
-		call.set(Constants.SEQUENCE_KEY,"sequence1");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
 		call.set(Constants.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
-		call.set(Constants.SEQUENCE_KEY,"sequence1");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 	}
 	
