@@ -17,10 +17,24 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.util.Utils;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SequenceMenager;
+import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
+import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
@@ -29,23 +43,53 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 public class CreateSeqMsgProcessor implements MsgProcessor {
 
-	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processMessage(RMMsgContext createSeqRMMsg) throws SandeshaException {
 		
-		//Processing for ack if any
-		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		if (sequenceAck!=null) {
-			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor ();
-			ackProcessor.processMessage(rmMsgCtx);
+		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
+		MessageContext outMessage = null;
+		try {
+			outMessage = Utils.createOutMessageContext(createSeqMsg);
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
 		}
 		
-		//Processing the create sequence 
-		//TODO: Add create sequence message processing logic
-		CreateSequence createSeq = (CreateSequence) rmMsgCtx.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+		
+		
+		try {
+			String newSequenceId = SequenceMenager.setUpNewSequence(createSeqRMMsg);
+			ConfigurationContext context = createSeqRMMsg.getMessageContext().getSystemContext();
+			if (newSequenceId == null)
+				throw new AxisFault("Internal error - Generated sequence id is null");
+			
+			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage, newSequenceId);
+			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
 
-		//rmMsgCtx.test();
-	
+			//ConfigurationContext configCtx = inMessage.getSystemContext();
+
+			CreateSequence createSeq = (CreateSequence) createSeqRMMsg.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+			if (createSeq == null)
+				throw new AxisFault("Create sequence part not present in the create sequence message");
+
+			EndpointReference acksTo = createSeq.getAcksTo().getAddress().getEpr();
+			if (acksTo == null || acksTo.getAddress() == null
+					|| acksTo.getAddress() == "")
+				throw new AxisFault("Acks to not present in the create sequence message");
+
+			SequencePropertyBean seqPropBean = new SequencePropertyBean(newSequenceId, Constants.SequenceProperties.ACKS_TO_EPR, acksTo);
+			//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
+			// (Constants.DEFAULT_STORAGE_TYPE);
+			//		beanMgr.create(seqPropBean);
+
+			SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();
+			seqPropMgr.insert(seqPropBean);
+			outMessage.setResponseWritten(true);
+
+			AxisEngine engine = new AxisEngine (context);
+			engine.send(outMessage);
+		} catch (AxisFault e1) {
+			throw new SandeshaException (e1.getMessage());
+		}
 		
-		//Change the Operation (to go throught CreateSequence)
-		
+		createSeqMsg.setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
 	}
 }

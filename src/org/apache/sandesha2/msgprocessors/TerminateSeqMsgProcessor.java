@@ -17,6 +17,9 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -28,17 +31,22 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
  */
 public class TerminateSeqMsgProcessor implements MsgProcessor {
 
-	public void processMessage(RMMsgContext rmMsgCtx)
+	public void processMessage(RMMsgContext terminateSeqRMMSg)
 			throws SandeshaException {
+		
+		MessageContext terminateSeqMsg = terminateSeqRMMSg.getMessageContext();
 		//Processing for ack if any
-		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) terminateSeqRMMSg.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck!=null) {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor ();
-			ackProcessor.processMessage(rmMsgCtx);
+			ackProcessor.processMessage(terminateSeqRMMSg);
 		}
 		
 		//Processing the terminate message
 		//TODO Add terminate sequence message logic.
 
+		
+		terminateSeqMsg.setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
+		
 	}
 }

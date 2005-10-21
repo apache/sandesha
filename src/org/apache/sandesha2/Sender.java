@@ -66,7 +66,6 @@ public class Sender extends Thread {
 	public void run() {
 
 		while (senderStarted) {
-			//System.out.println ("|-|");
 			try {
 				if (context == null)
 					throw new SandeshaException(
@@ -190,7 +189,6 @@ public class Sender extends Thread {
 						response, msgCtx.getEnvelope().getNamespace().getName());
 			} catch (AxisFault e) {
 				//TODO: change to log.debug
-				System.out.println("No response message");
 			}
 			
 			if (resenvelope != null) {

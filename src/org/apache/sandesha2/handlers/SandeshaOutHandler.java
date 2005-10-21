@@ -66,7 +66,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-		System.out.println("Sandesha out handler called");
 
 		String DONE = (String) msgCtx
 				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
@@ -231,7 +230,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 				String messageId1 = SandeshaUtil.getUUID();
 				if (rmMsgCtx.getMessageId()==null) {
 					rmMsgCtx.setMessageId(messageId1);
-					System.out.println("Message id was null");
 				}
 				//OperationContext opCtx = msgCtx.getOperationContext();
 //				msgCtx.getSystemContext().registerOperationContext(messageId,
@@ -397,9 +395,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		CreateSeqBean createSeqBean = new CreateSeqBean(tempSequenceId,
 				createSeqMsg.getMessageID(), null);
 		createSeqMgr.insert(createSeqBean);
-
-		System.out.println("Create sequence msg id:"
-				+ createSeqRMMessage.getMessageId());
 
 		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
 				.getInstance(context).getRetransmitterBeanMgr();

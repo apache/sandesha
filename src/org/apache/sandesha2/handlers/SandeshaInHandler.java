@@ -51,7 +51,6 @@ public class SandeshaInHandler extends AbstractHandler {
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-		System.out.println ("Sandesha in handler called");
 		
 		RMMsgContext rmMsgCtx = null;
 		try {
@@ -59,23 +58,6 @@ public class SandeshaInHandler extends AbstractHandler {
 		} catch (SandeshaException ex) {
 			throw new AxisFault("Cant initialize the message");
 		}
-		
-		System.out.println("Got message of type:" + rmMsgCtx.getMessageType() + " MessageId:" + msgCtx.getMessageID());
-
-//		try {
-//			System.out.println("SandeshaInHandler Got a message of type:" + rmMsgCtx.getMessageType());
-//			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(System.out);
-//			SOAPEnvelope env123 = msgCtx.getEnvelope();
-//			env123.serialize(writer);
-//		} catch (XMLStreamException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (FactoryConfigurationError e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-			
-
 
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());
