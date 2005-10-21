@@ -95,5 +95,13 @@ public class FaultCode implements IOMRMElement {
 
 		return sequenceFault;
 	}
+    
+    public void setFaultCode(String faultCode) {
+        this.faultCode = faultCode;
+    }
+    
+    public String getFaultCode() {
+        return faultCode;
+    }
 
 }
