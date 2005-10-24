@@ -58,22 +58,24 @@ import org.apache.wsdl.WSDLConstants;
 import org.ietf.jgss.MessageProp;
 
 /**
- * @author
+ * @author Chamikara
+ * @author Sanka
  */
+
 public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private boolean letInvoke = false;
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-		
 
 		//Processing for ack if any
-		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		if (sequenceAck!=null) {
-			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor ();
+		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
+				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		if (sequenceAck != null) {
+			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
 			ackProcessor.processMessage(rmMsgCtx);
 		}
-		
+
 		//Processing the application message.
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		if (msgCtx == null)
@@ -85,9 +87,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(rmMsgCtx.getContext()).getSequencePropretyBeanMgr();
-		
-		
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
+				.getInstance(rmMsgCtx.getContext())
+				.getSequencePropretyBeanMgr();
+
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQUENCE);
@@ -95,12 +98,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
 				.getSystemContext();
 		if (configCtx == null)
-			throw new SandeshaException("Configuration Context is null");		
+			throw new SandeshaException("Configuration Context is null");
 
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
 				Constants.SequenceProperties.RECEIVED_MESSAGES);
 
-		
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo == 0)
 			throw new SandeshaException("Wrong message number");
@@ -117,7 +119,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			//TODO is this enough
 			msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
-			
+
 		}
 
 		if (messagesStr != "" && messagesStr != null)
@@ -142,56 +144,54 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
 
-			RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
-			MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
-			ackMsgCtx.setServiceGroupContext(msgCtx.getServiceGroupContext());
-			ackMsgCtx.setServiceGroupContextId(msgCtx
-					.getServiceGroupContextId());
-			ackMsgCtx.setServiceContext(msgCtx.getServiceContext());
-			ackMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
+		RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
+		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
+		ackMsgCtx.setServiceGroupContext(msgCtx.getServiceGroupContext());
+		ackMsgCtx.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+		ackMsgCtx.setServiceContext(msgCtx.getServiceContext());
+		ackMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
 
-			//TODO set a suitable operation description
-			OperationContext ackOpContext = new OperationContext(msgCtx
-					.getOperationDescription());
+		//TODO set a suitable operation description
+		OperationContext ackOpContext = new OperationContext(msgCtx
+				.getOperationDescription());
 
-			try {
-				ackOpContext.addMessageContext(ackMsgCtx);
-			} catch (AxisFault e2) {
-				throw new SandeshaException(e2.getMessage());
-			}
-			ackMsgCtx.setOperationContext(ackOpContext);
+		try {
+			ackOpContext.addMessageContext(ackMsgCtx);
+		} catch (AxisFault e2) {
+			throw new SandeshaException(e2.getMessage());
+		}
+		ackMsgCtx.setOperationContext(ackOpContext);
 
-			//Set new envelope
-			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
-			try {
-				ackMsgCtx.setEnvelope(envelope);
-			} catch (AxisFault e3) {
-				throw new SandeshaException(e3.getMessage());
-			}
+		//Set new envelope
+		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
+		try {
+			ackMsgCtx.setEnvelope(envelope);
+		} catch (AxisFault e3) {
+			throw new SandeshaException(e3.getMessage());
+		}
 
-			//FIXME set acksTo instead of ReplyTo
-			ackMsgCtx.setTo(acksTo);
-			ackMsgCtx.setReplyTo(msgCtx.getTo());
-			RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
+		//FIXME set acksTo instead of ReplyTo
+		ackMsgCtx.setTo(acksTo);
+		ackMsgCtx.setReplyTo(msgCtx.getTo());
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
 
-			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
-					.getSystemContext());
+		AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
+				.getSystemContext());
 
-			//set CONTEXT_WRITTEN since acksto is anonymous
-			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-					org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN,
-					"true");
-			try {
-				engine.send(ackRMMsgCtx.getMessageContext());
-			} catch (AxisFault e1) {
-				throw new SandeshaException(e1.getMessage());
-			}
+		//set CONTEXT_WRITTEN since acksto is anonymous
+		rmMsgCtx.getMessageContext().getOperationContext().setProperty(
+				org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+		rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN, "true");
+		try {
+			engine.send(ackRMMsgCtx.getMessageContext());
+		} catch (AxisFault e1) {
+			throw new SandeshaException(e1.getMessage());
+		}
 
-//		} else {
-//			//TODO Add async Ack
-//		}
+		//		} else {
+		//			//TODO Add async Ack
+		//		}
 
 		//		Pause the messages bean if not the right message to invoke.
 		NextMsgBeanMgr mgr = AbstractBeanMgrFactory.getInstance(configCtx)
@@ -206,87 +206,87 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
-		
 		//FIXME - fix delivery assurances for the client side
 
 		if (msgCtx.isServerSide()) {
-		if (Constants.QOS.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.QOS.DeliveryAssurance.IN_ORDER) {
-			//pause the message
-			msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
+			if (Constants.QOS.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.QOS.DeliveryAssurance.IN_ORDER) {
+				//pause the message
+				msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
 
-			//Adding an entry in the SequencesToInvoke List TODO - add this to
-			// a module init kind of place.
-			SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
-					.retrieve(Constants.SequenceProperties.ALL_SEQUENCES,
-							Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+				//Adding an entry in the SequencesToInvoke List TODO - add this
+				// to
+				// a module init kind of place.
+				SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
+						.retrieve(
+								Constants.SequenceProperties.ALL_SEQUENCES,
+								Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 
-			if (incomingSequenceListBean == null) {
-				ArrayList incomingSequenceList = new ArrayList();
-				incomingSequenceListBean = new SequencePropertyBean();
-				incomingSequenceListBean
-						.setSequenceId(Constants.SequenceProperties.ALL_SEQUENCES);
-				incomingSequenceListBean
-						.setName(Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-				incomingSequenceListBean.setValue(incomingSequenceList);
+				if (incomingSequenceListBean == null) {
+					ArrayList incomingSequenceList = new ArrayList();
+					incomingSequenceListBean = new SequencePropertyBean();
+					incomingSequenceListBean
+							.setSequenceId(Constants.SequenceProperties.ALL_SEQUENCES);
+					incomingSequenceListBean
+							.setName(Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+					incomingSequenceListBean.setValue(incomingSequenceList);
 
-				seqPropMgr.insert(incomingSequenceListBean);
-			}
-
-			//This must be a List :D
-			ArrayList incomingSequenceList = (ArrayList) incomingSequenceListBean
-					.getValue();
-
-			//Adding current sequence to the incoming sequence List.
-			if (!incomingSequenceList.contains(sequenceId)) {
-				incomingSequenceList.add(sequenceId);
-			}
-
-			//saving the message.
-			try {
-				String key = SandeshaUtil.storeMessageContext(rmMsgCtx
-						.getMessageContext());
-				storageMapMgr
-						.insert(new StorageMapBean(key, msgNo, sequenceId));
-
-				//This will avoid performing application processing more than
-				// once.
-				rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
-						"true");
-
-			} catch (Exception ex) {
-				throw new SandeshaException(ex.getMessage());
-			}
-
-			//Starting the invoker if stopped.
-			SandeshaUtil.startInvokerIfStopped(msgCtx.getSystemContext());
-
-		}
-		}
-		
-		//client side - SET CheckResponse to true.
-		//FIXME this will not work. Even in client side inServerSide () is true for the messages.
-		//if (!msgCtx.isServerSide()) {
-			try {
-				MessageContext requestMessage = rmMsgCtx.getMessageContext().getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-				String requestMessageId = requestMessage.getMessageID();
-				SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(requestMessageId,Constants.SequenceProperties.CHECK_RESPONSE);
-				if (checkResponseBean!=null) {
-					checkResponseBean.setValue(msgCtx);
-					seqPropMgr.update(checkResponseBean);
+					seqPropMgr.insert(incomingSequenceListBean);
 				}
-			
-			} catch (AxisFault e) {
-				throw new SandeshaException (e.getMessage());
+
+				//This must be a List :D
+				ArrayList incomingSequenceList = (ArrayList) incomingSequenceListBean
+						.getValue();
+
+				//Adding current sequence to the incoming sequence List.
+				if (!incomingSequenceList.contains(sequenceId)) {
+					incomingSequenceList.add(sequenceId);
+				}
+
+				//saving the message.
+				try {
+					String key = SandeshaUtil.storeMessageContext(rmMsgCtx
+							.getMessageContext());
+					storageMapMgr.insert(new StorageMapBean(key, msgNo,
+							sequenceId));
+
+					//This will avoid performing application processing more
+					// than
+					// once.
+					rmMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
+							"true");
+
+				} catch (Exception ex) {
+					throw new SandeshaException(ex.getMessage());
+				}
+
+				//Starting the invoker if stopped.
+				SandeshaUtil.startInvokerIfStopped(msgCtx.getSystemContext());
+
 			}
-			
-			
-			//SET THe RESPONSE
-			
-			//WAKE UP THE SLEEPING THREADS
-			//SandeshaOutHandler.notifyAllWaitingOnKey();
-			
-			//set 
-		//}
+		}
+
+		//client side - SET CheckResponse to true.
+		//FIXME this will not work. Even in client side inServerSide () is true
+		// for the messages.
+		try {
+			MessageContext requestMessage = rmMsgCtx.getMessageContext()
+					.getOperationContext().getMessageContext(
+							WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+			String requestMessageId = requestMessage.getMessageID();
+			SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(
+					requestMessageId,
+					Constants.SequenceProperties.CHECK_RESPONSE);
+			if (checkResponseBean != null) {
+				checkResponseBean.setValue(msgCtx);
+				seqPropMgr.update(checkResponseBean);
+			}
+
+		} catch (AxisFault e) {
+			throw new SandeshaException(e.getMessage());
+		}
+
+		//SET THe RESPONSE
+
 
 	}
 

@@ -43,7 +43,8 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 
 /**
- * @author 
+ * @author Chamikara
+ * @author Sanka
  */
 
 public class CreateSeqMsgProcessor implements MsgProcessor {

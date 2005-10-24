@@ -22,7 +22,8 @@ import org.apache.sandesha2.SandeshaException;
 
 
 /**
- * @author
+ * @author Chamikara
+ * @author Sanka
  */
 
 public interface MsgProcessor {

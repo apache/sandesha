@@ -48,6 +48,11 @@ import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.Nack;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
+/**
+ * @author Chamikara
+ * @author Sanka
+ */
+
 public class AcknowledgementProcessor implements MsgProcessor {
 
 //	public static void notifyAllWaitingOnKey () {

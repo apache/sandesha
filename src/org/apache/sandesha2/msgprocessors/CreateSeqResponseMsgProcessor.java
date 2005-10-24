@@ -51,6 +51,11 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+/**
+ * @author Chamikara
+ * @author Sanka
+ */
+
 public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {

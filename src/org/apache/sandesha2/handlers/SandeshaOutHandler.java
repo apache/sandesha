@@ -51,24 +51,15 @@ import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.wsdl.WSDLConstants;
 
+/**
+ * @author Chamikara
+ * @author Sanka
+ */
+
 public class SandeshaOutHandler extends AbstractHandler {
 
-	public static final Object key = new Object();
-
-	public static void waitOnKey() throws InterruptedException {
-		synchronized (key) {
-			key.wait();
-		}
-	}
-
-	public static void notifyAllWaitingOnKey() {
-		synchronized (key) {
-			key.notifyAll();
-		}
-	}
-
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-
+	
 		String DONE = (String) msgCtx
 				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE))
@@ -100,6 +91,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 				.getInstance(context).getSequencePropretyBeanMgr();
 		boolean serverSide = msgCtx.isServerSide();
 
+		
+		//setting message Id if null
+		if (msgCtx.getMessageID()==null){
+			msgCtx.setMessageID(SandeshaUtil.getUUID());
+		}
 		//initial work
 		//find temp sequence id
 		String tempSequenceId = null;
@@ -143,12 +139,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 						"TO End Point Reference is not set correctly. This is a must for the sandesha client side.");
 
 			tempSequenceId = toEPR.getAddress();
-			String sequenceKey = (String) context.getProperty(Constants.SEQUENCE_KEY);
-			if (sequenceKey!=null)
+			String sequenceKey = (String) context
+					.getProperty(Constants.SEQUENCE_KEY);
+			if (sequenceKey != null)
 				tempSequenceId = tempSequenceId + sequenceKey;
-			
-			
-			
+
 		}
 
 		//check if the fist message
@@ -156,13 +151,13 @@ public class SandeshaOutHandler extends AbstractHandler {
 		long messageNumber = getNextMsgNo(context, tempSequenceId);
 
 		boolean sendCreateSequence = false;
-		
-		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.OUT_SEQUENCE_ID);
-		
-		if ((messageNumber==1) && (outSeqBean==null)) {
+
+		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(tempSequenceId,
+				Constants.SequenceProperties.OUT_SEQUENCE_ID);
+
+		if ((messageNumber == 1) && (outSeqBean == null)) {
 			sendCreateSequence = true;
 		}
-
 
 		//if fist message - setup the sequence for the client side
 		if (!serverSide && sendCreateSequence) {
@@ -188,8 +183,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 				seqPropMgr.insert(responseCreateSeqAdded);
 
 				try {
-					String acksTo = (String) context.getProperty(Constants.AcksTo);
-					addCreateSequenceMessage(rmMsgCtx, tempSequenceId,acksTo);
+					String acksTo = (String) context
+							.getProperty(Constants.AcksTo);
+					addCreateSequenceMessage(rmMsgCtx, tempSequenceId, acksTo);
 				} catch (SandeshaException e1) {
 					throw new AxisFault(e1.getMessage());
 				}
@@ -224,12 +220,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 				//Changing message Id.
 				//TODO remove this when Axis2 start sending uuids as uuid:xxxx
 				String messageId1 = SandeshaUtil.getUUID();
-				if (rmMsgCtx.getMessageId()==null) {
+				if (rmMsgCtx.getMessageId() == null) {
 					rmMsgCtx.setMessageId(messageId1);
 				}
 				//OperationContext opCtx = msgCtx.getOperationContext();
-//				msgCtx.getSystemContext().registerOperationContext(messageId,
-//						opCtx);
+				//				msgCtx.getSystemContext().registerOperationContext(messageId,
+				//						opCtx);
 
 				if (serverSide) {
 
@@ -281,8 +277,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 						reqMsgCtx.getOperationContext().setProperty(
 								org.apache.axis2.Constants.RESPONSE_WRITTEN,
 								"false");
-					msgCtx.setPausedTrue(getName());
-
 				} else {
 
 					//setting reply to FIXME
@@ -298,67 +292,21 @@ public class SandeshaOutHandler extends AbstractHandler {
 							throw new SandeshaException("To EPR is not found");
 
 						String to = toEPR.getAddress();
-						String operationName = msgCtx.getOperationContext().getOperationDescription().getName().getLocalPart();
+						String operationName = msgCtx.getOperationContext()
+								.getOperationDescription().getName()
+								.getLocalPart();
 						msgCtx.setWSAAction(to + "/" + operationName);
 					}
 
 					//processing the response
 					processResponseMessage(rmMsgCtx, tempSequenceId,
 							messageNumber);
-					
-					//pausing the message
-					msgCtx.setPausedTrue(getName());
 
-//					//Getting the mep.
-//					String mep = msgCtx.getOperationDescription()
-//							.getMessageExchangePattern();
-//
-//					if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
-//						//Add a sequence property to check weather the response
-//						// has arrived.
-//						SequencePropertyBean checkResponseBean = new SequencePropertyBean();
-//						checkResponseBean.setSequenceId(msgCtx.getMessageID());
-//						checkResponseBean
-//								.setName(Constants.SequenceProperties.CHECK_RESPONSE);
-//						checkResponseBean.setValue(null);
-//						seqPropMgr.insert(checkResponseBean);
-//					}
-//
-//					//client side wait
-//					boolean letGo = false;
-//					while (!letGo) {
-//						if (WSDLConstants.MEP_URI_IN_OUT.equals(mep)) {
-//							//if the mep is in-out them wait till the response
-//							// comes. then pause.
-//							SequencePropertyBean checkResponseBean = seqPropMgr
-//									.retrieve(
-//											msgCtx.getMessageID(),
-//											Constants.SequenceProperties.CHECK_RESPONSE);
-//							MessageContext response = (MessageContext) checkResponseBean.getValue();
-//							if (null!=checkResponseBean.getValue()) {
-//								//simply return to the caller.
-//								//msgCtx.setConfigurationContext( properteies)
-//								//msgCtx.setTransportIn(response.getTransportIn());
-//								msgCtx.setProperty(MessageContext.TRANSPORT_IN,response.getProperty(MessageContext.TRANSPORT_IN));
-//								//msgCtx.setProperty(org.apache.axis2.Constants.tra)
-//								msgCtx.setPausedTrue(getName());
-//								letGo = true;
-//								continue;
-//							}
-//						} else {
-//							//FIXME - non-inout case.
-//							//TODO check for the ack and pause.
-//						}
-//							try {
-//								waitOnKey();
-//								
-//							} catch (InterruptedException e1) {
-//								System.out.println("Client was interupted...");
-//							}
-//
-//					}
 
 				}
+				
+				//pausing the message
+				msgCtx.setPausedTrue(getName());
 			}
 
 		} catch (SandeshaException e) {
@@ -373,30 +321,35 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (applicationMsg == null)
 			throw new SandeshaException("Message context is null");
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
-				applicationRMMsg, tempSequenceId,acksTo);
-		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage.getMessagePart(Constants.MessageParts.CREATE_SEQ);
-		if (createSequencePart==null)
-			throw new SandeshaException ("Create Sequence part is null for a CreateSequence message");
-		
+				applicationRMMsg, tempSequenceId, acksTo);
+		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage
+				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+		if (createSequencePart == null)
+			throw new SandeshaException(
+					"Create Sequence part is null for a CreateSequence message");
+
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
-		if (offer!=null) {
+		if (offer != null) {
 			//Offer processing
 			String offeredSequenceId = offer.getIdentifer().getIdentifier();
-			SequencePropertyBean msgsBean = new SequencePropertyBean ();
+			SequencePropertyBean msgsBean = new SequencePropertyBean();
 			msgsBean.setSequenceId(offeredSequenceId);
 			msgsBean.setName(Constants.SequenceProperties.RECEIVED_MESSAGES);
 			msgsBean.setValue("");
-			
-			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean ();
-			offeredSequenceBean.setName(Constants.SequenceProperties.OFFERED_SEQUENCE);
+
+			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean();
+			offeredSequenceBean
+					.setName(Constants.SequenceProperties.OFFERED_SEQUENCE);
 			offeredSequenceBean.setSequenceId(tempSequenceId);
 			offeredSequenceBean.setValue(offeredSequenceId);
-			
-			SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(applicationMsg.getSystemContext()).getSequencePropretyBeanMgr();
+
+			SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
+					.getInstance(applicationMsg.getSystemContext())
+					.getSequencePropretyBeanMgr();
 			seqPropMgr.insert(msgsBean);
 			seqPropMgr.insert(offeredSequenceBean);
 		}
-		
+
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
 
 		//TODO remove below

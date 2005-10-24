@@ -36,12 +36,10 @@ import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceFault;
 
 /**
- * Created by IntelliJ IDEA.
- * User: sanka
- * Date: Oct 9, 2005
- * Time: 11:10:07 PM
- * To change this template use File | Settings | File Templates.
+ * @author Sanka
+ * @author Chamikara
  */
+
 public class FaultMgr {
 
     private static final String WSA_ACTION_FAULT 

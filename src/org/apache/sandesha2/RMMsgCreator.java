@@ -28,6 +28,8 @@ import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.OperationDescription;
+import org.apache.axis2.description.OperationDescriptionFactory;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -54,6 +56,7 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.wsdl.WSDLConstants;
+
 
 /**
  * @author Chamikara
@@ -97,9 +100,17 @@ public class RMMsgCreator {
 
 		String createSeqMsgId = SandeshaUtil.getUUID();
 		try {
+			OperationDescription appMsgOperationDesc = applicationMsgContext.getOperationDescription();
+			OperationDescription createSeqOperationDesc = OperationDescriptionFactory.getOperetionDescription(OperationDescriptionFactory.MEP_CONSTANT_OUT_IN);
+			createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
+			createSeqOperationDesc.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
+			createSeqOperationDesc.setPhasesInFaultFlow(appMsgOperationDesc.getPhasesInFaultFlow());
+			createSeqOperationDesc.setRemainingPhasesInFlow(appMsgOperationDesc.getRemainingPhasesInFlow());
+			
+			createSeqmsgContext.setOperationDescription(createSeqOperationDesc);
 			//TODO set a suitable ope. description
 			OperationContext createSeqOpContext = new OperationContext(
-					applicationMsgContext.getOperationDescription());
+					createSeqmsgContext.getOperationDescription());
 			createSeqmsgContext.setOperationContext(createSeqOpContext);
 			createSeqOpContext.addMessageContext(createSeqmsgContext);
 			//registering opearion context

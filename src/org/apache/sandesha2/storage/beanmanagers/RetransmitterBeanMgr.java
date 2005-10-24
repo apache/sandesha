@@ -25,6 +25,7 @@ import java.util.Iterator;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.MsgInitializer;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
@@ -55,8 +56,7 @@ public class RetransmitterBeanMgr {
 
 	public boolean insert(RetransmitterBean bean) throws SandeshaException {
 		if (bean.getMessageId() == null)
-			throw new SandeshaException("Key (MessageId) is null. Cant insert.");
-
+			throw new SandeshaException("Key (MessageId) is null. Cant insert.");	
 		table.put(bean.getMessageId(), bean);
 		return true;
 	}

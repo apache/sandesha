@@ -49,6 +49,11 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
+/**
+ * @author Chamikara
+ * @author Sanka
+ */
+
 public class Sender extends Thread {
 
 	private boolean senderStarted = false;

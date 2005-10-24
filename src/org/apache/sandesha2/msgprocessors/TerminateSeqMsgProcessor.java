@@ -26,9 +26,10 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
- * @author
- * 
+ * @author Chamikara
+ * @author Sanka
  */
+
 public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext terminateSeqRMMSg)

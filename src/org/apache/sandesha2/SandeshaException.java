@@ -17,6 +17,10 @@
 
 package org.apache.sandesha2;
 
+/**
+ * @author Chamikara
+ * @author Sanka
+ */
 
 //FIXME - extends AxisFault and clean code (remove unnecessary try-catches )
 public class SandeshaException extends Exception {
