@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.samples;
+package org.apache.sandesha2.clients;
 
 import javax.xml.namespace.QName;
 
@@ -23,7 +23,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.clientapi.AsyncResult;
 import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.clientapi.Callback;
-import org.apache.axis2.clientapi.InOnlyMEPClient;
 import org.apache.axis2.clientapi.MessageSender;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
@@ -32,36 +31,37 @@ import org.apache.axis2.om.OMNamespace;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SandeshaUtil;
 
-public class SampleClient {
-
+public class AsyncEchoClient {
 	private static String sandesha1TO = "http://localhost:8070/axis/services/RMSampleService";
 
 	private static String replyTo = "http://localhost:9070/axis/services/RMSampleService";
 	
 	private static String sandesha2TO = "http://localhost:8070/axis2/services/InteropService";
 
-	private static String SANDESHA_HOME = "E:\\sandesha\\sandesha 2\\"; //Change this to ur path.
+	private static String SANDESHA_HOME = "E:\\sandesha\\sandesha 2\\code\\checkouts\\"; //Change this to ur path.
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
-		SampleClient client = new SampleClient ();
-		client.run();
-
+		new AsyncEchoClient ().run();
 	}
 	
 	private void run () throws AxisFault {
-		/*
-		 * MessageSender ms = new MessageSender ("E:\\wso2\\sandesha\\sandesha
-		 * 2\\code\\checkouts\\Aug_25_2005\\target\\dist\\client");
-		 * ms.engageModule(new QName ("sandesha")); ms.engageModule(new QName
-		 * ("addressing")); ms.setTo(new EndpointReference (endPoint));
-		 * ms.send("ping1",getPingOMBlock());
-		 */
-		
-		testEcho();
+		Call call = new Call(AXIS2_CLIENT_PATH);
+		call.engageModule(new QName("sandesha"));
+		call.set(Constants.AcksTo,"http://localhost:9070/axis2/services/AnonymousService/echoString"); //Optional
+		call.setTo(new EndpointReference(sandesha2TO));
+		call.set(Constants.SEQUENCE_KEY,"sequence1");  //Optional
+		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
+		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
+		Callback callback1 = new TestCallback ("Callback 1");
+		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
+		Callback callback2 = new TestCallback ("Callback 2");
+		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
+		call.set(Constants.LAST_MESSAGE, "true");
+		Callback callback3 = new TestCallback ("Callback 3");
+		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 
-		int i = 1;
 	}
 
 	public void testEcho () throws AxisFault {
@@ -82,18 +82,6 @@ public class SampleClient {
 		Callback callback3 = new TestCallback ("Callback 3");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 	}
-	
-	private static OMElement getPingOMBlock() {
-		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace ns = fac.createOMNamespace("http://tempuri.apache.org",
-				"ns1");
-		OMElement pingElement = fac.createOMElement("ping", ns);
-		OMElement paramElement = fac.createOMElement("param1", ns);
-		pingElement.addChild(paramElement);
-		paramElement.setText("ping text");
-
-		return pingElement;
-	}
 
 	private static OMElement getEchoOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
@@ -106,7 +94,7 @@ public class SampleClient {
 		return echoElement;
 	}
 
-	private class TestCallback extends Callback {
+	class TestCallback extends Callback {
 
 		String name = null;
 		
@@ -142,4 +130,5 @@ public class SampleClient {
 		}
 	}
 
+	
 }

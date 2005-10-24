@@ -21,7 +21,7 @@ import org.apache.axis2.transport.http.SimpleHTTPServer;
 
 public class SimpleSandesha2Server {
 
-	private static String SANDESHA_HOME = "E:\\sandesha\\sandesha 2\\"; //Change this to ur path.
+	private static String SANDESHA_HOME = "E:\\sandesha\\sandesha 2\\code\\checkouts\\Aug_25_2005\\"; //Change this to ur path.
 	
 	private static String AXIS2_SERVER_PATH = SANDESHA_HOME + "target\\server\\";   //this will be available after a maven build
 	
