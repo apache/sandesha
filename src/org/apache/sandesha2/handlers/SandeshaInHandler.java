@@ -38,6 +38,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * @author Chamikara

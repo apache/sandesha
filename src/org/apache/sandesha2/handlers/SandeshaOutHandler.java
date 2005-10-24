@@ -20,6 +20,7 @@ package org.apache.sandesha2.handlers;
 import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.clientapi.ListenerManager;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -185,6 +186,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 				try {
 					String acksTo = (String) context
 							.getProperty(Constants.AcksTo);
+					
+					//If acksTo is not anonymous. Start the listner  TODO: verify
+					if (!Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+						String transportIn = (String) context.getProperty(MessageContext.TRANSPORT_IN);
+						if (transportIn==null)
+							transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
+						ListenerManager.makeSureStarted(transportIn,context);
+					}
+					
 					addCreateSequenceMessage(rmMsgCtx, tempSequenceId, acksTo);
 				} catch (SandeshaException e1) {
 					throw new AxisFault(e1.getMessage());

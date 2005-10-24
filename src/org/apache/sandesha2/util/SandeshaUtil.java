@@ -393,4 +393,23 @@ public class SandeshaUtil {
         }
 
 	}
+	
+	public static String getMessageTypeString (int messageType) {
+		switch (messageType) {
+		case Constants.MessageTypes.CREATE_SEQ:
+			return "CreateSequence";
+		case Constants.MessageTypes.CREATE_SEQ_RESPONSE:
+			return "CreateSequenceResponse";
+		case Constants.MessageTypes.ACK:
+			return "Acknowledgement";
+		case Constants.MessageTypes.APPLICATION:
+			return "Application";
+		case Constants.MessageTypes.TERMINATE_SEQ:
+			return "TerminateSequence";
+		case Constants.MessageTypes.UNKNOWN:
+			return "Unknown";
+		default:
+			return "Error";	
+		}
+	}
 }
