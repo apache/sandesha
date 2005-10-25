@@ -29,15 +29,15 @@ import org.apache.sandesha2.Constants;
 
 public class SyncPingClient {
 
-	private static String sandesha1TO = "http://localhost:8070/axis/services/RMSampleService";
-
-	private static String replyTo = "http://localhost:9070/axis/services/RMSampleService";
+	private String toIP = "127.0.0.1";
 	
-	private static String sandesha2TO = "http://localhost:8070/axis2/services/InteropService";
-
-	private static String SANDESHA_HOME = "E:\\sandesha\\sandesha 2\\code\\checkouts\\"; //Change this to ur path.
+	private String toPort = "8070";
 	
-	private static String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
+	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/InteropService";
+
+	private String SANDESHA_HOME = "<SANDESHA_HOME>"; //Change this to ur path.
+	
+	private String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
 		new SyncPingClient ().run();
@@ -46,7 +46,7 @@ public class SyncPingClient {
 	public void run () throws AxisFault {
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
 		sender.engageModule(new QName ("sandesha"));
-		sender.setTo(new EndpointReference(sandesha2TO));
+		sender.setTo(new EndpointReference(toEPR));
 		sender.set(Constants.SEQUENCE_KEY,"sequence1");
 		sender.send("ping",getPingOMBlock("ping1"));
 		sender.send("ping",getPingOMBlock("ping2"));

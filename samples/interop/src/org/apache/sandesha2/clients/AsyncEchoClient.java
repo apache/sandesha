@@ -32,15 +32,22 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class AsyncEchoClient {
-	private static String sandesha1TO = "http://localhost:8070/axis/services/RMSampleService";
-
-	private static String replyTo = "http://localhost:9070/axis/services/RMSampleService";
 	
-	private static String sandesha2TO = "http://localhost:8070/axis2/services/InteropService";
-
-	private static String SANDESHA_HOME = "E:\\sandesha\\sandesha 2\\code\\checkouts\\"; //Change this to ur path.
+	private String toIP = "127.0.0.1";
 	
-	private static String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
+	private String toPort = "8070";
+	
+	private String ackIP = "127.0.0.1";
+	
+	private String ackPort = "9070";
+	
+	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/InteropService";
+
+	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/AnonymousService/echoString";
+	
+	private String SANDESHA_HOME = "<SANDESHA_HOME>"; //Change this to ur path.
+	
+	private String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
 		new AsyncEchoClient ().run();
@@ -49,8 +56,8 @@ public class AsyncEchoClient {
 	private void run () throws AxisFault {
 		Call call = new Call(AXIS2_CLIENT_PATH);
 		call.engageModule(new QName("sandesha"));
-		call.set(Constants.AcksTo,"http://localhost:9070/axis2/services/AnonymousService/echoString"); //Optional
-		call.setTo(new EndpointReference(sandesha2TO));
+		call.set(Constants.AcksTo,acksToEPR); //Optional
+		call.setTo(new EndpointReference(toEPR));
 		call.set(Constants.SEQUENCE_KEY,"sequence1");  //Optional
 		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
 		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
@@ -62,25 +69,6 @@ public class AsyncEchoClient {
 		Callback callback3 = new TestCallback ("Callback 3");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 
-	}
-
-	public void testEcho () throws AxisFault {
-		
-		Call call = new Call(AXIS2_CLIENT_PATH);
-		call.engageModule(new QName("sandesha"));
-
-		call.set(Constants.AcksTo,"http://localhost:9070/axis2/services/AnonymousService/echoString"); //Optional
-		call.setTo(new EndpointReference(sandesha2TO));
-		call.set(Constants.SEQUENCE_KEY,"sequence1");  //Optional
-		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
-		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
-		Callback callback1 = new TestCallback ("Callback 1");
-		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
-		Callback callback2 = new TestCallback ("Callback 2");
-		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
-		call.set(Constants.LAST_MESSAGE, "true");
-		Callback callback3 = new TestCallback ("Callback 3");
-		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 	}
 
 	private static OMElement getEchoOMBlock(String text) {
