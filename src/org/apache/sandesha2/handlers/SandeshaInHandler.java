@@ -31,13 +31,13 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.MsgInitializer;
-import org.apache.sandesha2.MsgValidator;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.MsgValidator;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**

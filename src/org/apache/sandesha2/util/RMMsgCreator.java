@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -36,11 +36,18 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.wsdl.builder.wsdl4j.WSDL11MEPFinder;
 import org.apache.log4j.spi.Configurator;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Constants.MessageParts;
+import org.apache.sandesha2.Constants.SOAPVersion;
+import org.apache.sandesha2.Constants.SequenceProperties;
+import org.apache.sandesha2.Constants.WSA;
+import org.apache.sandesha2.Constants.WSRM;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;

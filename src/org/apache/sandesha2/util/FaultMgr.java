@@ -1,4 +1,4 @@
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -26,12 +26,18 @@ import org.apache.axis2.soap.SOAPFaultValue;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.impl.llom.SOAPConstants;
 import org.apache.axis2.soap.impl.llom.soap12.SOAP12Factory;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Constants.MessageTypes;
+import org.apache.sandesha2.Constants.SOAPVersion;
+import org.apache.sandesha2.Constants.SequenceProperties;
+import org.apache.sandesha2.Constants.WSRM;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceFault;
 

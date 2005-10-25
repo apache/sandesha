@@ -15,13 +15,18 @@
  *
  */
 
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Constants.MessageParts;
+import org.apache.sandesha2.Constants.MessageTypes;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.wsrm.RMElements;
 

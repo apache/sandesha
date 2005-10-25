@@ -26,7 +26,7 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.SOAPAbstractFactory;
+import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
  * @author Saminda

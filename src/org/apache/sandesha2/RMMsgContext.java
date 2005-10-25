@@ -30,6 +30,7 @@ import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.IOMRMElement;

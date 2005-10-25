@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
 
@@ -15,13 +15,19 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Constants.ClientProperties;
+import org.apache.sandesha2.Constants.MessageParts;
+import org.apache.sandesha2.Constants.SequenceProperties;
+import org.apache.sandesha2.Constants.WSA;
 import org.apache.sandesha2.handlers.SandeshaInHandler;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
@@ -30,9 +36,9 @@ import org.apache.sandesha2.wsrm.CreateSequence;
  * @author Sanka
  * @author Jaliya
  */
-public class SequenceMenager {
+public class SequenceManager {
 
-	public static String setUpNewSequence(RMMsgContext createSequenceMsg) throws AxisFault {
+	public static String setupNewSequence(RMMsgContext createSequenceMsg) throws AxisFault {
 		//		SequencePropertyBean seqPropBean = new SequencePropertyBean
 		// (sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,"");
 		//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
@@ -95,7 +101,7 @@ public class SequenceMenager {
 
 	}
 	
-	public static void setUpNewClientSequence (MessageContext firstAplicationMsgCtx, String tempSequenceId) throws SandeshaException {
+	public static void setupNewClientSequence (MessageContext firstAplicationMsgCtx, String tempSequenceId) throws SandeshaException {
 		
 		AbstractContext context = firstAplicationMsgCtx.getSystemContext();
 		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();

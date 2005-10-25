@@ -15,10 +15,12 @@
  *
  */
 
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Constants.SOAPVersion;
 
 /**
  * @author Chamikara

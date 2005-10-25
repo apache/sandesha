@@ -30,12 +30,8 @@ import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.MsgInitializer;
-import org.apache.sandesha2.SOAPAbstractFactory;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.RMMsgCreator;
-import org.apache.sandesha2.SequenceMenager;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
@@ -43,7 +39,11 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.RMMsgCreator;
+import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.LastMessage;
@@ -163,7 +163,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//if fist message - setup the sequence for the client side
 		if (!serverSide && sendCreateSequence) {
 			try {
-				SequenceMenager.setUpNewClientSequence(msgCtx, tempSequenceId);
+				SequenceManager.setupNewClientSequence(msgCtx, tempSequenceId);
 			} catch (SandeshaException e1) {
 				throw new AxisFault(e1.getMessage());
 			}

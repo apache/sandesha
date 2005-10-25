@@ -53,11 +53,11 @@ import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.InOrderInvoker;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Sender;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
+import org.apache.sandesha2.workers.InOrderInvoker;
+import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 /**

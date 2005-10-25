@@ -27,15 +27,15 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.RMMsgCreator;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SequenceMenager;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
@@ -66,7 +66,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		
 		
 		try {
-			String newSequenceId = SequenceMenager.setUpNewSequence(createSeqRMMsg);
+			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg);
 			ConfigurationContext context = createSeqRMMsg.getMessageContext().getSystemContext();
 			if (newSequenceId == null)
 				throw new AxisFault("Internal error - Generated sequence id is null");
