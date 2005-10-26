@@ -44,7 +44,7 @@ public class AsyncPingClient {
 	
 	private String SANDESHA_HOME = "<SANDESHA_HOME>"; //Change this to ur path.
 	
-	private String AXIS2_CLIENT_PATH = SANDESHA_HOME + "target\\client\\";   //this will be available after a maven build
+	private String AXIS2_CLIENT_PATH = SANDESHA_HOME + "\\target\\client\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
 		new AsyncPingClient().run();

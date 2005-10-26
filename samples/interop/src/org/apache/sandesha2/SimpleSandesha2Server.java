@@ -23,7 +23,7 @@ public class SimpleSandesha2Server {
 
 	private static String SANDESHA_HOME = "<SANDESHA_HOME>"; //Change this to ur path.
 	
-	private static String AXIS2_SERVER_PATH = SANDESHA_HOME + "target\\server\\";   //this will be available after a maven build
+	private static String AXIS2_SERVER_PATH = SANDESHA_HOME + "\\target\\server\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
 		System.out.println("Starting sandesha2 server...");
