@@ -45,10 +45,10 @@ public class TwoWayOptionalTransportBasedSender {
 			response.setProperty(MessageContext.TRANSPORT_IN, msgctx
 					.getProperty(MessageContext.TRANSPORT_IN));
 			
-			OperationContext newOperationContext = new OperationContext (msgctx.getOperationDescription());
+			OperationContext newOperationContext = new OperationContext (msgctx.getAxisOperation());
 			
 			newOperationContext.setProperty("test","test123");
-			msgctx.getOperationDescription().registerOperationContext(response,
+			msgctx.getAxisOperation().registerOperationContext(response,
 					newOperationContext);
 			response.setServerSide(false);
 			response.setServiceContext(msgctx.getServiceContext());

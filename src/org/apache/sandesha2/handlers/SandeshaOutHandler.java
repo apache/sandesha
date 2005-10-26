@@ -60,7 +60,7 @@ import org.apache.wsdl.WSDLConstants;
 public class SandeshaOutHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-	
+
 		String DONE = (String) msgCtx
 				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE))
@@ -252,7 +252,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 					newMsgCtx.setServiceContext(msgCtx.getServiceContext());
 					newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
 					OperationContext newOpContext = new OperationContext(
-							newMsgCtx.getOperationDescription());
+							newMsgCtx.getAxisOperation());
 
 					//if server side add request message
 					if (msgCtx.isServerSide()) {
@@ -303,7 +303,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 						String to = toEPR.getAddress();
 						String operationName = msgCtx.getOperationContext()
-								.getOperationDescription().getName()
+								.getAxisOperation().getName()
 								.getLocalPart();
 						msgCtx.setWSAAction(to + "/" + operationName);
 					}

@@ -192,8 +192,8 @@ public class SandeshaUtil {
 			newMessageContext.setProcessingFault(msgCtx.isProcessingFault());
 			newMessageContext.setResponseWritten(msgCtx.isResponseWritten());
 			newMessageContext.setRestThroughPOST(msgCtx.isRestThroughPOST());
-			newMessageContext.setOperationDescription(msgCtx
-					.getOperationDescription());
+			newMessageContext.setAxisOperation(msgCtx
+					.getAxisOperation());
 
 			if (msgCtx.getEnvelope() != null)
 				newMessageContext.setEnvelope(msgCtx.getEnvelope());
@@ -253,11 +253,11 @@ public class SandeshaUtil {
 					.setProperty(MessageContext.CHARACTER_SET_ENCODING, charSetEncoding);
 
 			newMessageContext.setMessageInformationHeaders(msgInfoHeaders1);
-			newMessageContext.setServiceDescription(msgCtx
-					.getServiceDescription());
-			if (msgCtx.getServiceGroupDescription() != null)
-				newMessageContext.setServiceGroupDescription(msgCtx
-						.getServiceGroupDescription());
+			newMessageContext.setAxisService(msgCtx
+					.getAxisService());
+			if (msgCtx.getAxisServiceGroup() != null)
+				newMessageContext.setAxisServiceGroup(msgCtx
+						.getAxisServiceGroup());
 
 			newMessageContext.setSoapAction(msgCtx.getSoapAction());
 			newMessageContext.setWSAAction(msgCtx.getWSAAction());

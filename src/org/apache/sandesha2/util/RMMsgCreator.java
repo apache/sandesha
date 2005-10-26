@@ -28,8 +28,8 @@ import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.description.OperationDescription;
-import org.apache.axis2.description.OperationDescriptionFactory;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -107,17 +107,17 @@ public class RMMsgCreator {
 
 		String createSeqMsgId = SandeshaUtil.getUUID();
 		try {
-			OperationDescription appMsgOperationDesc = applicationMsgContext.getOperationDescription();
-			OperationDescription createSeqOperationDesc = OperationDescriptionFactory.getOperetionDescription(OperationDescriptionFactory.MEP_CONSTANT_OUT_IN);
+			AxisOperation appMsgOperationDesc = applicationMsgContext.getAxisOperation();
+			AxisOperation createSeqOperationDesc = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_CONSTANT_OUT_IN);
 			createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
 			createSeqOperationDesc.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
 			createSeqOperationDesc.setPhasesInFaultFlow(appMsgOperationDesc.getPhasesInFaultFlow());
 			createSeqOperationDesc.setRemainingPhasesInFlow(appMsgOperationDesc.getRemainingPhasesInFlow());
 			
-			createSeqmsgContext.setOperationDescription(createSeqOperationDesc);
+			createSeqmsgContext.setAxisOperation(createSeqOperationDesc);
 			//TODO set a suitable ope. description
 			OperationContext createSeqOpContext = new OperationContext(
-					createSeqmsgContext.getOperationDescription());
+					createSeqmsgContext.getAxisOperation());
 			createSeqmsgContext.setOperationContext(createSeqOpContext);
 			createSeqOpContext.addMessageContext(createSeqmsgContext);
 			//registering opearion context
@@ -239,8 +239,8 @@ public class RMMsgCreator {
 		terminateMessage.setServiceContextID(referenceMessage
 				.getServiceContextID());
 		
-		terminateMessage.setOperationDescription(referenceMessage.getOperationDescription());
-		OperationContext newOperationCtx = new OperationContext (terminateMessage.getOperationDescription());
+		terminateMessage.setAxisOperation(referenceMessage.getAxisOperation());
+		OperationContext newOperationCtx = new OperationContext (terminateMessage.getAxisOperation());
 		try {
 			newOperationCtx.addMessageContext(terminateMessage);
 		} catch (AxisFault e) {
@@ -380,7 +380,7 @@ public class RMMsgCreator {
 
 			//TODO set a suitable description
 			OperationContext ackOpCtx = new OperationContext(applicationMsgCtx
-					.getOperationDescription());
+					.getAxisOperation());
 
 			ackMsgCtx.setOperationContext(ackOpCtx);
 			ackOpCtx.addMessageContext(ackMsgCtx);

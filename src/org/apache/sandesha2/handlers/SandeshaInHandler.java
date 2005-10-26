@@ -52,7 +52,7 @@ public class SandeshaInHandler extends AbstractHandler {
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-		
+
 		RMMsgContext rmMsgCtx = null;
 		try {
 			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);

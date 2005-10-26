@@ -34,7 +34,6 @@ import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.description.OperationDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.om.OMException;
@@ -141,7 +140,7 @@ public class Sender extends Thread {
 		}
 		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.APPLICATION) {
 			//a ack may arrive. (not a application response)
-			if (rmMsgCtx.getMessageContext().getOperationDescription()
+			if (rmMsgCtx.getMessageContext().getAxisOperation()
 					.getMessageExchangePattern().equals(
 							org.apache.wsdl.WSDLConstants.MEP_URI_IN_OUT)) {
 				responseExpected = true;
@@ -189,8 +188,8 @@ public class Sender extends Thread {
 			response.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
 			response.setServiceGroupContext(msgCtx.getServiceGroupContext());
 			response.setServiceContext(msgCtx.getServiceContext());
-			response.setServiceDescription(msgCtx.getServiceDescription());
-			response.setServiceGroupDescription(msgCtx.getServiceGroupDescription());
+			response.setAxisService (msgCtx.getAxisService());
+			response.setAxisServiceGroup(msgCtx.getAxisServiceGroup());
 			
 			//Changed following from TransportUtils to SandeshaUtil since op. context is anavailable.
 			SOAPEnvelope resenvelope = null;

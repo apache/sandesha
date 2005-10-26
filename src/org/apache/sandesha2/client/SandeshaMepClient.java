@@ -26,7 +26,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.description.OperationDescription;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -60,7 +60,7 @@ public class SandeshaMepClient extends MEPClient {
 		callbackReceiver = new CallbackReceiver();
 	}
 
-	public MessageContext invokeDual(OperationDescription axisop,
+	public MessageContext invokeDual(AxisOperation axisop,
 			final MessageContext msgctx) throws AxisFault {
 
 		prepareInvocation(axisop, msgctx);
@@ -78,14 +78,14 @@ public class SandeshaMepClient extends MEPClient {
 			axisop.setMessageReceiver(callbackReceiver);
 			callbackReceiver.addCallback(messageID, callback);
 			msgctx.setReplyTo(ListenerManager.replyToEPR(serviceContext
-					.getServiceConfig().getName().getLocalPart()
+					.getAxisService().getName().getLocalPart()
 					+ "/" + axisop.getName().getLocalPart(), listenerTransport
 					.getName().getLocalPart()));
 		}
 		
 		msgctx.setTo(to);
 		msgctx.setServiceContext(serviceContext);
-		ConfigurationContext syscontext = serviceContext.getEngineContext();
+		ConfigurationContext syscontext = serviceContext.getConfigurationContext();
 		msgctx.setConfigurationContext(syscontext);
 
 		checkTransport(msgctx);
@@ -157,7 +157,7 @@ public class SandeshaMepClient extends MEPClient {
 		}
 
 		//find and set the transport details
-		AxisConfiguration axisConfig = serviceContext.getEngineContext()
+		AxisConfiguration axisConfig = serviceContext.getConfigurationContext()
 				.getAxisConfiguration();
 		this.listenerTransport = axisConfig.getTransportIn(new QName(
 				listenerTransport));
@@ -174,13 +174,13 @@ public class SandeshaMepClient extends MEPClient {
 
 		//if seperate transport is used, start the required listeners
 		if (hasAsyncResponse) {
-			if (!serviceContext.getEngineContext().getAxisConfiguration()
+			if (!serviceContext.getConfigurationContext().getAxisConfiguration()
 					.isEngaged(new QName(Constants.MODULE_ADDRESSING))) {
 				throw new AxisFault(Messages
 						.getMessage("2channelNeedAddressing"));
 			}
 			ListenerManager.makeSureStarted(listenerTransport, serviceContext
-					.getEngineContext());
+					.getConfigurationContext());
 		}
 	}
 
@@ -189,7 +189,7 @@ public class SandeshaMepClient extends MEPClient {
 			senderTransport = inferTransport(to);
 		}
 		if (listenerTransport == null) {
-			listenerTransport = serviceContext.getEngineContext()
+			listenerTransport = serviceContext.getConfigurationContext()
 					.getAxisConfiguration().getTransportIn(
 							senderTransport.getName());
 		}

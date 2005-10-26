@@ -153,7 +153,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		//TODO set a suitable operation description
 		OperationContext ackOpContext = new OperationContext(msgCtx
-				.getOperationDescription());
+				.getAxisOperation());
 
 		try {
 			ackOpContext.addMessageContext(ackMsgCtx);

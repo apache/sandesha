@@ -136,7 +136,7 @@ public class RMMsgContext {
 	}
 
 	public void test() {
-		String opearaitonName = msgContext.getOperationContext().getOperationDescription().getName().getLocalPart();
+		String opearaitonName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
 		System.out.println("Operation is:" + opearaitonName);
 	}
 
