@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.sandesha2.samples;
+package org.apache.sandesha2.samples.interop.service;
 
 
 import java.util.HashMap;
@@ -75,6 +75,17 @@ public class RMInteropService {
 
     public void ping(OMElement in) {
         //Just accept the message and do some processing
-    	System.out.println("Ping was called");
+
+    	String text = null;
+    	if (in!=null) {
+    		OMElement firstElement= in.getFirstElement();
+    		if (firstElement!=null) {
+    			text = firstElement.getText();
+    		}
+    	}
+    	
+    	text = (text==null)?"":text;
+    	
+    	System.out.println("Ping got text:" + text);
     }
 }

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.clients;
+package org.apache.sandesha2.samples.interop.clients;
 
 import javax.xml.namespace.QName;
 
@@ -27,24 +27,37 @@ import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.sandesha2.Constants;
 
-public class SyncPingClient {
+
+public class AsyncPingClient {
 
 	private String toIP = "127.0.0.1";
 	
 	private String toPort = "8070";
 	
+	private String ackIP = "127.0.0.1";
+	
+	private String ackPort = "9070";
+
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/InteropService";
 
-	private String SANDESHA_HOME = "<SANDESHA_HOME>"; //Change this to ur path.
+	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/AnonymousService/echoString";
 	
-	private String AXIS2_CLIENT_PATH = SANDESHA_HOME + "\\target\\client\\";   //this will be available after a maven build
+	private String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
+	
+	private String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\client\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
-		new SyncPingClient ().run();
+		new AsyncPingClient().run();
 	}
 	
 	public void run () throws AxisFault {
+		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
+			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
+			return;
+		}
+		
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
+		sender.set(Constants.AcksTo,acksToEPR);
 		sender.engageModule(new QName ("sandesha"));
 		sender.setTo(new EndpointReference(toEPR));
 		sender.set(Constants.SEQUENCE_KEY,"sequence1");

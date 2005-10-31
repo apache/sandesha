@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.clients;
+package org.apache.sandesha2.samples.interop.clients;
 
 import javax.xml.namespace.QName;
 
@@ -45,15 +45,20 @@ public class AsyncEchoClient {
 
 	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/AnonymousService/echoString";
 	
-	private String SANDESHA_HOME = "<SANDESHA_HOME>"; //Change this to ur path.
+	private String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
-	private String AXIS2_CLIENT_PATH = SANDESHA_HOME + "\\target\\client\\";   //this will be available after a maven build
+	private String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\client\\";   //this will be available after a maven build
 	
-	public static void main(String[] args) throws AxisFault {
+	public static void main(String[] args) throws AxisFault {		
 		new AsyncEchoClient ().run();
 	}
 	
 	private void run () throws AxisFault {
+		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
+			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
+			return;
+		}
+		
 		Call call = new Call(AXIS2_CLIENT_PATH);
 		call.engageModule(new QName("sandesha"));
 		call.set(Constants.AcksTo,acksToEPR); //Optional
@@ -68,7 +73,6 @@ public class AsyncEchoClient {
 		call.set(Constants.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
-
 	}
 
 	private static OMElement getEchoOMBlock(String text) {

@@ -14,18 +14,23 @@
  * the License.
  */
 
-package org.apache.sandesha2;
+package org.apache.sandesha2.simpleServer;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 
 public class SimpleSandesha2Server {
 
-	private static String SANDESHA_HOME = "<SANDESHA_HOME>"; //Change this to ur path.
+	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
-	private static String AXIS2_SERVER_PATH = SANDESHA_HOME + "\\target\\server\\";   //this will be available after a maven build
+	private static String AXIS2_SERVER_PATH = SANDESHA2_HOME + "\\target\\server\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
+		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
+			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
+			return;
+		}
+		
 		System.out.println("Starting sandesha2 server...");
 		SimpleHTTPServer server = new SimpleHTTPServer (AXIS2_SERVER_PATH,8080);
 		server.start();
