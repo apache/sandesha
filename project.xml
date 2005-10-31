@@ -108,7 +108,7 @@
     <build>
         <nagEmailAddress>jaliya@apache.org</nagEmailAddress>
         <sourceDirectory>src</sourceDirectory>
-        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTestSourceDirectory>test/src</unitTestSourceDirectory>
 
 <!--        <resources>-->
 <!--            <resource>-->
@@ -122,7 +122,7 @@
 
         <unitTest>
             <includes>
-                <include>**/*TC*.java</include>
+                <include>**/*Test.java</include>
                 <include>**/*.wsdd</include>
             </includes>
             <excludes>

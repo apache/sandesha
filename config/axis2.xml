@@ -90,6 +90,7 @@
     <!-- ================================================= -->
     <!-- Comment this to disable Addressing -->
     <module ref="addressing"/>
+    <module ref="sandesha"/> 
 
 
     <!--Configuring module , providing paramters for modules whether they refer or not-->
@@ -108,19 +109,20 @@
         <phase name="PostDispatch"/>
         <!--  System pre defined phases       -->
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
-        <phase name="RMPhase"/>
+         <phase name="RMPhase"/> 
     </phaseOrder>
+    
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
+        <phase name="RMPhase"/> 
     </phaseOrder>
     <phaseOrder type="INfaultflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
+        <phase name="RMPhase"/> 
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
+        <phase name="RMPhase"/> 
     </phaseOrder>
 </axisconfig>
 

@@ -49,7 +49,7 @@
     <goal name="sample:compile">
         <ant:property name="dir.samples" value="samples"/>
         <ant:mkdir dir="${basedir}/target/samples/classes" />
-        <ant:javac srcdir="${dir.samples}" destdir="${basedir}/target/samples/classes" debug="on">
+        <ant:javac srcdir="${dir.samples}/src" destdir="${basedir}/target/samples/classes" debug="on">
             <ant:classpath refid="maven.dependency.classpath" />
 	    <ant:classpath path="${basedir}/target/classes" />
         </ant:javac>
@@ -60,7 +60,7 @@
         <ant:property name="service.jar.name" value="InteropService.jar"/>
         <ant:mkdir dir="${basedir}/target/dist" />
         <ant:mkdir dir="${basedir}/target/samples/classes/META-INF" />
-        <ant:copy file="${dir.samples}/interop/services.xml" todir="${basedir}/target/samples/classes/META-INF" /> 
+        <ant:copy file="${dir.samples}/conf/interop/services.xml" todir="${basedir}/target/samples/classes/META-INF" /> 
         <ant:jar jarfile="${basedir}/target/dist/${service.jar.name}" basedir="${maven.build.dir}/samples/classes" />
     </goal>
 
