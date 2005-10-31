@@ -1,0 +1,16 @@
+This document explains how to run the interop sample of Sandesha2
+-----------------------------------------------------------------
+
+1. Take a latest checkout from Sandesha2 svn codebase. (http://svn.apache.org/repos/asf/webservices/sandesha/trunk)
+
+2. Build Sandesha2 with maven. (if the latest Axis2 jar is not avilable in repo. build Axis2 and put the jar manually to the MAVEN_REPO/axis2/jars directory.)
+
+3. Copy addressing.mar file from Axis2 to the 'SANDESHA2_HOME/target/client/modules' directory and 'SANDESHA2_HOME/target/server/modules' directory.
+
+4. From your IDE run the SimpleSandesha2Server.java file within samples/src/org/apache/sandesha2/simpleServer directory.
+
+5. Start tcp mon and map following ports.
+   8070 -> 8080
+   9070 -> 6060
+
+6. Run any one of the four client files under samples/src/org/apache/sandesha2/samples/interop/clients directory.
