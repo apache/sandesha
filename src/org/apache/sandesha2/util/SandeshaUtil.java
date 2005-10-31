@@ -148,7 +148,7 @@ public class SandeshaUtil {
 		return input;
 	}
 
-	private static long[] getLongArr(String[] strings) {
+	public static long[] getLongArr(String[] strings) {
 		int length = strings.length;
 		long[] longs = new long[length];
 		for (int i = 0; i < length; i++) {
@@ -192,8 +192,8 @@ public class SandeshaUtil {
 			newMessageContext.setProcessingFault(msgCtx.isProcessingFault());
 			newMessageContext.setResponseWritten(msgCtx.isResponseWritten());
 			newMessageContext.setRestThroughPOST(msgCtx.isRestThroughPOST());
-			newMessageContext.setAxisOperation(msgCtx
-					.getAxisOperation());
+			if (msgCtx.getAxisOperation()!=null)
+				newMessageContext.setAxisOperation(msgCtx.getAxisOperation());
 
 			if (msgCtx.getEnvelope() != null)
 				newMessageContext.setEnvelope(msgCtx.getEnvelope());
@@ -411,5 +411,47 @@ public class SandeshaUtil {
 		default:
 			return "Error";	
 		}
+	}
+	
+	public static boolean isGloballyProcessableMessageType (int type) {
+		if (type==Constants.MessageTypes.ACK || type==Constants.MessageTypes.TERMINATE_SEQ) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static boolean isDuplicateDropRequiredMsgType (int rmMessageType) {
+		if (rmMessageType==Constants.MessageTypes.APPLICATION)
+			return true;
+		
+		if (rmMessageType==Constants.MessageTypes.CREATE_SEQ_RESPONSE)
+			return true;
+		
+		return false;
+	}
+	
+	//TODO: correct following to work for long.
+	public static ArrayList getSplittedMsgNoArraylist (String str) {
+		String[] splitted = str.split(",");
+		ArrayList results = new ArrayList ();
+		
+		long count = splitted.length;
+		for (int i=0;i<count;i++) {
+			String s = splitted[i];
+			results.add(s);
+		}
+		
+		return results;
+	}
+	
+	public static String getServerSideIncomingSeqIdFromInternalSeqId (String internalSequenceId) {
+		String incomingSequenceId = internalSequenceId;
+		return incomingSequenceId;
+	}
+	
+	public static String getServerSideInternalSeqIdFromIncomingSeqId (String incomingSequenceId) {
+		String internalSequenceId = incomingSequenceId;
+		return internalSequenceId;
 	}
 }

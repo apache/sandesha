@@ -67,21 +67,40 @@ public class SequencePropertyBeanMgr {
 
 	public Collection find(SequencePropertyBean bean) {
 		ArrayList beans = new ArrayList();
+		
+		if (bean==null)
+			return beans;
+		
 		Iterator iterator = table.values().iterator();
 		SequencePropertyBean temp;
 
 		while (iterator.hasNext()) {
 			temp = (SequencePropertyBean) iterator.next();
 
-			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
-					temp.getSequenceId()))
-					&& (bean.getName() != null && bean.getName().equals(
-							temp.getName()))
-					&& (bean.getValue() != null && bean.getValue().equals(
-							temp.getValue()))) {
-
+//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
+//					temp.getSequenceId()))
+//					&& (bean.getName() != null && bean.getName().equals(
+//							temp.getName()))
+//					&& (bean.getValue() != null && bean.getValue().equals(
+//							temp.getValue()))) {
+//
+//				beans.add(temp);
+//			}
+			
+			boolean equal = true;
+			
+			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
+				equal = false;
+			
+			if (bean.getName()!=null && !bean.getName().equals(temp.getName()))
+				equal = false;
+			
+			if (bean.getValue()!=null && !bean.getValue().equals(temp.getValue()))
+				equal = false;
+			
+			if (equal)
 				beans.add(temp);
-			}
+			
 		}
 		return beans;
 	}

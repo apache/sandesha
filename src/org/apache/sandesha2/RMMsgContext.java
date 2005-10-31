@@ -121,6 +121,14 @@ public class RMMsgContext {
 	public String getMessageId() {
 		return msgContext.getMessageID();
 	}
+	
+	public void setFaultTo (EndpointReference epr) {
+		msgContext.setFaultTo(epr);
+	}
+	
+	public EndpointReference getFaultTo () {
+		return msgContext.getFaultTo();
+	}
 
 	public SOAPEnvelope getSOAPEnvelope() {
 		return msgContext.getEnvelope();
@@ -209,4 +217,7 @@ public class RMMsgContext {
 		return msgContext.getSystemContext();
 	}
 
+	public void setSOAPAction (String SOAPAction) {
+		msgContext.setSoapAction(SOAPAction);
+	}
 }

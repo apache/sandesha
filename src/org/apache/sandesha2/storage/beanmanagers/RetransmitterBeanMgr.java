@@ -113,8 +113,7 @@ public class RetransmitterBeanMgr {
 				int count = temp.getSentCount();
 				long timeNow = System.currentTimeMillis();
 				if (count == 0
-						|| (timeNow > lastSentTime
-								+ Constants.WSP.RETRANSMISSION_INTERVAL)) {
+						|| (timeNow > (lastSentTime + Constants.WSP.RETRANSMISSION_INTERVAL))) {
 					beans.add(temp);
 				}
 			}

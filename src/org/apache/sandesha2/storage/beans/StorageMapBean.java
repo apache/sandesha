@@ -29,6 +29,8 @@ public class StorageMapBean implements Serializable {
 	private long MsgNo;
 
 	private String sequenceId;
+	
+	private boolean invoked = false;
 
 	public StorageMapBean() {
 
@@ -83,5 +85,13 @@ public class StorageMapBean implements Serializable {
 	 */
 	public void setSequenceId(String sequenceId) {
 		this.sequenceId = sequenceId;
+	}
+	
+	public boolean isInvoked() {
+		return invoked;
+	}
+	
+	public void setInvoked(boolean invoked) {
+		this.invoked = invoked;
 	}
 }

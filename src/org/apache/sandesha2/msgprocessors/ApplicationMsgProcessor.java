@@ -31,6 +31,13 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.ServiceGroupContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisServiceGroup;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
@@ -40,9 +47,11 @@ import org.apache.sandesha2.handlers.SandeshaOutHandler;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -51,6 +60,7 @@ import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.workers.InOrderInvoker;
+import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -130,64 +140,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		msgsBean.setValue(messagesStr);
 		seqPropMgr.update(msgsBean);
 
-		//Setting the ack depending on AcksTo.
-		//TODO: Stop sending askc for every message.
-		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
-				Constants.SequenceProperties.ACKS_TO_EPR);
-
-		EndpointReference acksTo = (EndpointReference) acksToBean.getValue();
-		String acksToStr = acksTo.getAddress();
-
-		if (acksToStr == null || messagesStr == null)
-			throw new SandeshaException(
-					"Seqeunce properties are not set correctly");
-
-		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
-
-		RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
-		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
-		ackMsgCtx.setServiceGroupContext(msgCtx.getServiceGroupContext());
-		ackMsgCtx.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
-		ackMsgCtx.setServiceContext(msgCtx.getServiceContext());
-		ackMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
-
-		//TODO set a suitable operation description
-		OperationContext ackOpContext = new OperationContext(msgCtx
-				.getAxisOperation());
-
-		try {
-			ackOpContext.addMessageContext(ackMsgCtx);
-		} catch (AxisFault e2) {
-			throw new SandeshaException(e2.getMessage());
-		}
-		ackMsgCtx.setOperationContext(ackOpContext);
-
-		//Set new envelope
-		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
-		try {
-			ackMsgCtx.setEnvelope(envelope);
-		} catch (AxisFault e3) {
-			throw new SandeshaException(e3.getMessage());
-		}
-
-		//FIXME set acksTo instead of ReplyTo
-		ackMsgCtx.setTo(acksTo);
-		ackMsgCtx.setReplyTo(msgCtx.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
-
-		AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
-				.getSystemContext());
-
-		//set CONTEXT_WRITTEN since acksto is anonymous
-		rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-				org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-		rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN, "true");
-		try {
-			engine.send(ackRMMsgCtx.getMessageContext());
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1.getMessage());
-		}
+		sendAckIfNeeded(rmMsgCtx,messagesStr);
 
 		//		} else {
 		//			//TODO Add async Ack
@@ -302,5 +255,118 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		return false;
+	}
+	
+	public void sendAckIfNeeded (RMMsgContext rmMsgCtx,String messagesStr) throws SandeshaException {
+		
+		MessageContext msgCtx = rmMsgCtx.getMessageContext();
+		
+		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
+		.getInstance(rmMsgCtx.getContext())
+		.getSequencePropretyBeanMgr();
+		
+		
+		Sequence sequence = (Sequence) rmMsgCtx
+		.getMessagePart(Constants.MessageParts.SEQUENCE);
+		String sequenceId = sequence.getIdentifier().getIdentifier();
+		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
+			.getSystemContext();
+		if (configCtx == null)
+			throw new SandeshaException("Configuration Context is null");
+
+		//Setting the ack depending on AcksTo.
+		//TODO: Stop sending askc for every message.
+		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
+				Constants.SequenceProperties.ACKS_TO_EPR);
+
+		EndpointReference acksTo = (EndpointReference) acksToBean.getValue();
+		String acksToStr = acksTo.getAddress();
+
+		if (acksToStr == null || messagesStr == null)
+			throw new SandeshaException(
+					"Seqeunce properties are not set correctly");
+
+		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
+
+		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
+		AxisServiceGroup serviceGroup = new AxisServiceGroup (axisConfig);
+		AxisService service = new AxisService (new QName ("RMClientService")); // This is a dummy service.
+		ServiceGroupContext serviceGroupContext = new ServiceGroupContext (configCtx,serviceGroup);
+		ServiceContext serviceContext = new ServiceContext (service,serviceGroupContext);
+		
+
+		RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
+		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
+		
+		ackMsgCtx.setAxisServiceGroup(serviceGroup);
+		ackMsgCtx.setServiceGroupContext(serviceGroupContext);
+		ackMsgCtx.setAxisService(service);
+		ackMsgCtx.setServiceContext(serviceContext);
+		
+		try {
+			AxisOperation ackOperation = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_CONSTANT_IN_ONLY);
+
+			AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext().getAxisOperation();
+			if (rmMsgOperation!=null) {
+				ArrayList outFlow = rmMsgOperation.getPhasesOutFlow();
+				if (outFlow!=null) {
+					ackOperation.setPhasesOutFlow(outFlow);
+					ackOperation.setPhasesOutFaultFlow(outFlow);
+				}
+			}
+			
+			OperationContext ackOpContext = new OperationContext (ackOperation);
+			ackMsgCtx.setAxisOperation(ackOperation);
+			ackMsgCtx.setOperationContext(ackOpContext);
+			ackOpContext.addMessageContext(ackMsgCtx);
+			ackMsgCtx.setOperationContext(ackOpContext);
+			
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
+
+		//Set new envelope
+		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
+		try {
+			ackMsgCtx.setEnvelope(envelope);
+		} catch (AxisFault e3) {
+			throw new SandeshaException(e3.getMessage());
+		}
+
+		//FIXME set acksTo instead of ReplyTo
+		ackMsgCtx.setTo(acksTo);
+		ackMsgCtx.setReplyTo(msgCtx.getTo());
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
+
+		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
+			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
+					.getSystemContext());
+
+
+			//set CONTEXT_WRITTEN since acksto is anonymous
+			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
+					org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN, "true");
+			try {
+				engine.send(ackRMMsgCtx.getMessageContext());
+			} catch (AxisFault e1) {
+				throw new SandeshaException(e1.getMessage());
+			}
+		} else {
+			RetransmitterBeanMgr retransmitterBeanMgr = AbstractBeanMgrFactory.getInstance(configCtx).getRetransmitterBeanMgr();
+			
+			String key = SandeshaUtil.storeMessageContext(ackMsgCtx);
+			RetransmitterBean ackBean = new RetransmitterBean ();
+			ackBean.setKey(key);
+			ackBean.setMessageId(ackMsgCtx.getMessageID());
+			ackBean.setReSend(false);
+			ackBean.setSend(true);
+			
+			retransmitterBeanMgr.insert(ackBean);
+			
+			SandeshaUtil.startSenderIfStopped(configCtx);
+		}
+		
 	}
 }

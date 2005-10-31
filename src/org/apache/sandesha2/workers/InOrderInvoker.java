@@ -82,6 +82,8 @@ public class InOrderInvoker extends Thread {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
 				System.out.println("Invoker was Inturrepted....");
+				ex.printStackTrace();
+				System.out.println("End printing Interrupt...");
 			}
 			
 
@@ -127,17 +129,17 @@ public class InOrderInvoker extends Thread {
 					
 						MessageContext msgToInvoke = SandeshaUtil.getStoredMessageContext(key);
 					
-						//removing the storage map entry.
-						storageMapMgr.delete(key);
-					
 						RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 						Sequence seq = (Sequence) rmMsg.getMessagePart(Constants.MessageParts.SEQUENCE);
 						long msgNo = seq.getMessageNumber().getMessageNumber();
 					
-						System.out.println("Invoking message number " + msgNo + " of the sequence " + sequenceId);
 						try {
 							//Invoking the message.
 							new AxisEngine (msgToInvoke.getSystemContext()).receive(msgToInvoke);
+							
+							//deleting the message entry.							
+							storageMapMgr.delete(key);
+							
 						} catch (AxisFault e) {
 							throw new SandeshaException (e.getMessage());
 						}

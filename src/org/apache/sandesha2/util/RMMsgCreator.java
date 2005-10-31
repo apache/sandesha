@@ -17,6 +17,9 @@
 
 package org.apache.sandesha2.util;
 
+import java.util.ArrayList;
+
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -28,8 +31,15 @@ import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisServiceGroup;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisConfigurationImpl;
+import org.apache.axis2.engine.Phase;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -109,10 +119,12 @@ public class RMMsgCreator {
 		try {
 			AxisOperation appMsgOperationDesc = applicationMsgContext.getAxisOperation();
 			AxisOperation createSeqOperationDesc = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_CONSTANT_OUT_IN);
-			createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
-			createSeqOperationDesc.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
-			createSeqOperationDesc.setPhasesInFaultFlow(appMsgOperationDesc.getPhasesInFaultFlow());
-			createSeqOperationDesc.setRemainingPhasesInFlow(appMsgOperationDesc.getRemainingPhasesInFlow());
+			if (appMsgOperationDesc!=null) {
+				createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
+				createSeqOperationDesc.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
+				createSeqOperationDesc.setPhasesInFaultFlow(appMsgOperationDesc.getPhasesInFaultFlow());
+				createSeqOperationDesc.setRemainingPhasesInFlow(appMsgOperationDesc.getRemainingPhasesInFlow());
+			}
 			
 			createSeqmsgContext.setAxisOperation(createSeqOperationDesc);
 			//TODO set a suitable ope. description
@@ -201,7 +213,7 @@ public class RMMsgCreator {
 		}
 
 		createSeqRMMsg.setAction(Constants.WSRM.ACTION_CREATE_SEQ);
-		
+		createSeqRMMsg.setSOAPAction("\"" + Constants.WSRM.ACTION_CREATE_SEQ + "\"");
 		createSeqRMMsg.setMessageId(createSeqMsgId);
 
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
@@ -230,30 +242,43 @@ public class RMMsgCreator {
 		terminateMessage.setMessageInformationHeaders(newMessageInfoHeaders);
 		terminateMessage.setMessageID(SandeshaUtil.getUUID());
 		
-		terminateMessage.setServiceGroupContext(referenceMessage
-				.getServiceGroupContext());
-		terminateMessage.setServiceGroupContextId(referenceMessage
-				.getServiceGroupContextId());
-		terminateMessage.setServiceContext(referenceMessage
-				.getServiceContext());
-		terminateMessage.setServiceContextID(referenceMessage
-				.getServiceContextID());
 		
-		terminateMessage.setAxisOperation(referenceMessage.getAxisOperation());
-		OperationContext newOperationCtx = new OperationContext (terminateMessage.getAxisOperation());
+		ConfigurationContext configCtx = referenceMessage.getSystemContext();
+		if (configCtx==null)
+			throw new SandeshaException ("Configuration Context is null");
+		
+		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
+		AxisServiceGroup serviceGroup = new AxisServiceGroup (axisConfig);
+		AxisService service = new AxisService (new QName ("RMClientService")); // This is a dummy service.
+		ServiceGroupContext serviceGroupContext = new ServiceGroupContext (configCtx,serviceGroup);
+		ServiceContext serviceContext = new ServiceContext (service,serviceGroupContext);
+		
+		terminateMessage.setAxisServiceGroup(serviceGroup);
+		terminateMessage.setServiceGroupContext(serviceGroupContext);
+		terminateMessage.setAxisService(service);
+		terminateMessage.setServiceContext(serviceContext);
+		
 		try {
-			newOperationCtx.addMessageContext(terminateMessage);
+			AxisOperation terminateOperaiton = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_CONSTANT_IN_ONLY);
+			AxisOperation referenceMsgOperation = referenceMessage.getAxisOperation();
+			if (referenceMsgOperation!=null) {
+				ArrayList outPhases = referenceMsgOperation.getPhasesOutFlow();
+				if (outPhases!=null) {
+					terminateOperaiton.setPhasesOutFlow(outPhases);
+					terminateOperaiton.setPhasesOutFaultFlow(outPhases);
+				}
+			}
+			
+			OperationContext terminateOpContext = new OperationContext (terminateOperaiton);
+			terminateMessage.setAxisOperation(terminateOperaiton);
+			terminateMessage.setOperationContext(terminateOpContext);
+			terminateOpContext.addMessageContext(terminateMessage);
+			terminateMessage.setOperationContext(terminateOpContext);
+			
 		} catch (AxisFault e) {
 			throw new SandeshaException (e.getMessage());
 		}
 		
-		terminateMessage.setOperationContext(newOperationCtx);
-		
-		ConfigurationContext configCtx = terminateMessage.getSystemContext();
-		if (configCtx==null)
-			throw new SandeshaException ("Configuration Context is null");
-		configCtx.registerOperationContext(terminateMessage.getMessageID(),newOperationCtx);
-
 		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 		terminateRMMessage.setSOAPEnvelop(envelope);
 		
@@ -306,7 +331,8 @@ public class RMMsgCreator {
 				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 		response.toOMElement(envelope.getBody());
 		outMessage.setWSAAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
-
+		outMessage.setSoapAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
+		
 		String newMessageId = SandeshaUtil.getUUID();
 		outMessage.setMessageID(newMessageId);
 
@@ -357,6 +383,7 @@ public class RMMsgCreator {
 
 		sequenceAck.toOMElement(envelope.getHeader());
 		applicationMsg.setAction(Constants.WSRM.ACTION_SEQ_ACK);
+		applicationMsg.setSOAPAction(Constants.WSRM.ACTION_SEQ_ACK);
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
 
 	}

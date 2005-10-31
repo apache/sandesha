@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2;
 
+
+
 /**
  * @author Chamikara
  * @author Sanka
@@ -97,7 +99,7 @@ public interface Constants {
 	}
 
 	public interface WSP {
-		long RETRANSMISSION_INTERVAL = 20000;
+		long RETRANSMISSION_INTERVAL = 15000;
 	}
 
 	public interface MessageTypes {
@@ -228,6 +230,8 @@ public interface Constants {
 
 	String OUT_HANDLER_NAME = "SandeshaOutHandler";
 	
+	String GLOBAL_IN_HANDLER_NAME= "GlobalInHandler";
+	
 	String SEQUENCE_KEY = "SequenceKey";
 
 	//message context properties
@@ -250,5 +254,7 @@ public interface Constants {
 	String AcksTo = "AcksToProperty";
 	
 	String OFFERED_SEQUENCE_ID = "OfferedSequenceId";
+	
+	String ACK_PROCSSED = "AckProcessed";
 	
 }

@@ -17,13 +17,22 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import java.io.SequenceInputStream;
+
 import javax.xml.namespace.QName;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * @author Chamikara
@@ -45,7 +54,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		//Processing the terminate message
 		//TODO Add terminate sequence message logic.
-
 		
 		terminateSeqMsg.setPausedTrue(new QName (Constants.IN_HANDLER_NAME));
 		

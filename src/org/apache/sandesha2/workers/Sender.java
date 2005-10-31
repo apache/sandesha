@@ -17,6 +17,7 @@
 package org.apache.sandesha2.workers;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -107,6 +108,8 @@ public class Sender extends Thread {
 					e1.printStackTrace();
 				} catch (SandeshaException e2) {
 					e2.printStackTrace();
+				} catch (Exception e3) {
+					e3.printStackTrace();
 				}
 
 				//changing the values of the sent bean.
@@ -127,6 +130,8 @@ public class Sender extends Thread {
 			} catch (InterruptedException e1) {
 				//e1.printStackTrace();
 				System.out.println("Sender was interupted...");
+				e1.printStackTrace();
+				System.out.println("End printing Interrupt...");
 			}
 		}
 
@@ -190,6 +195,13 @@ public class Sender extends Thread {
 			response.setServiceContext(msgCtx.getServiceContext());
 			response.setAxisService (msgCtx.getAxisService());
 			response.setAxisServiceGroup(msgCtx.getAxisServiceGroup());
+			
+			//setting the in-flow.
+			//ArrayList inPhaseHandlers = response.getAxisOperation().getRemainingPhasesInFlow();
+			/*if (inPhaseHandlers==null || inPhaseHandlers.isEmpty()) {
+				ArrayList phases = msgCtx.getSystemContext().getAxisConfiguration().getInPhasesUptoAndIncludingPostDispatch();
+				response.getAxisOperation().setRemainingPhasesInFlow(phases);
+			}*/
 			
 			//Changed following from TransportUtils to SandeshaUtil since op. context is anavailable.
 			SOAPEnvelope resenvelope = null;

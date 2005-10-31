@@ -75,18 +75,37 @@ public class CreateSeqBeanMgr {
 
 	public Collection find(CreateSeqBean bean) {
 		ArrayList beans = new ArrayList();
+		if (bean==null)
+			return beans;
+		
 		Iterator iterator = table.values().iterator();
 
 		CreateSeqBean temp;
 		while (iterator.hasNext()) {
 			temp = (CreateSeqBean) iterator.next();
-			if ((bean.getCreateSeqMsgId() != null && bean.getCreateSeqMsgId()
-					.equals(temp.getCreateSeqMsgId()))
-					&& (bean.getSequenceId() != null && bean.getSequenceId()
-							.equals(bean.getSequenceId()))) {
+//			if ((bean.getCreateSeqMsgId() != null && bean.getCreateSeqMsgId()
+//					.equals(temp.getCreateSeqMsgId()))
+//					&& (bean.getSequenceId() != null && bean.getSequenceId()
+//							.equals(bean.getSequenceId()))) {
+//				beans.add(temp);
+//
+//			}
+			
+			boolean equal = true;
+			
+			if (bean.getCreateSeqMsgId()!=null && !bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
+				equal = false;
+			
+			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
+				equal = false;
+			
+			if (bean.getTempSequenceId()!=null && !bean.getTempSequenceId().equals(temp.getTempSequenceId()))
+				equal = false;
+			
+			
+			if (equal)
 				beans.add(temp);
-
-			}
+			
 		}
 		return beans;
 	}

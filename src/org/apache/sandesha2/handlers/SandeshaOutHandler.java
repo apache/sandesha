@@ -75,7 +75,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		} catch (SandeshaException ex) {
 			throw new AxisFault("Cant initialize the message");
 		}
-
+		
 		//TODO recheck
 		//continue only if an possible application message
 		if (!(rmMsgCtx.getMessageType() == Constants.MessageTypes.UNKNOWN)) {
@@ -188,11 +188,19 @@ public class SandeshaOutHandler extends AbstractHandler {
 							.getProperty(Constants.AcksTo);
 					
 					//If acksTo is not anonymous. Start the listner  TODO: verify
-					if (!Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+					if (!Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo) && !serverSide) {
 						String transportIn = (String) context.getProperty(MessageContext.TRANSPORT_IN);
 						if (transportIn==null)
 							transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
 						ListenerManager.makeSureStarted(transportIn,context);
+					}else if (acksTo==null && serverSide) {
+						String incomingSequencId = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(tempSequenceId);
+						SequencePropertyBean bean = seqPropMgr.retrieve(incomingSequencId,Constants.SequenceProperties.REPLY_TO_EPR); 
+						if (bean!=null) {
+							EndpointReference acksToEPR = (EndpointReference) bean.getValue();
+							if (acksToEPR!=null)
+								acksTo = (String) acksToEPR.getAddress();
+						}
 					}
 					
 					addCreateSequenceMessage(rmMsgCtx, tempSequenceId, acksTo);
@@ -294,18 +302,23 @@ public class SandeshaOutHandler extends AbstractHandler {
 					// ("http://localhost:9070/somethingWorking"));
 
 					//Setting WSA Action if null
-					//TODO: Recheck weather this action is correct
+					//TODO: Recheck weather this actions are correct
+					EndpointReference toEPR = msgCtx.getTo();
+
+					if (toEPR == null)
+						throw new SandeshaException("To EPR is not found");
+
+					String to = toEPR.getAddress();
+					String operationName = msgCtx.getOperationContext()
+							.getAxisOperation().getName()
+							.getLocalPart();
+					
 					if (msgCtx.getWSAAction() == null) {
-						EndpointReference toEPR = msgCtx.getTo();
-
-						if (toEPR == null)
-							throw new SandeshaException("To EPR is not found");
-
-						String to = toEPR.getAddress();
-						String operationName = msgCtx.getOperationContext()
-								.getAxisOperation().getName()
-								.getLocalPart();
 						msgCtx.setWSAAction(to + "/" + operationName);
+					}
+					
+					if (msgCtx.getSoapAction()==null) {
+						msgCtx.setSoapAction("\"" + to+"/" + operationName + "\"");
 					}
 
 					//processing the response

@@ -71,20 +71,36 @@ public class NextMsgBeanMgr {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 
+		if (bean==null)
+			return beans;
+		
 		NextMsgBean temp;
 		while (iterator.hasNext()) {
 			temp = (NextMsgBean) iterator.next();
 
-			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
-					temp.getSequenceId()))
-					/*
-					 * && (bean.getNextMsgNoToProcess() != null &&
-					 * bean.getNextMsgNoToProcess().equals(temp.getNextMsgNoToProcess()))
-					 */
-					&& (bean.getNextMsgNoToProcess() > 0)) {
-
+//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
+//					temp.getSequenceId()))
+//					/*
+//					 * && (bean.getNextMsgNoToProcess() != null &&
+//					 * bean.getNextMsgNoToProcess().equals(temp.getNextMsgNoToProcess()))
+//					 */
+//					&& (bean.getNextMsgNoToProcess() > 0)) {
+//
+//				beans.add(temp);
+//			}
+			
+			
+			boolean equal = true;
+			
+			if (bean.getNextMsgNoToProcess()>0 && bean.getNextMsgNoToProcess()!=temp.getNextMsgNoToProcess())
+				equal = false;
+			
+			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
+				equal = false;
+			
+			if (equal)
 				beans.add(temp);
-			}
+			
 
 		}
 		return beans;
