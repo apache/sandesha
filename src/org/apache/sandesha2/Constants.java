@@ -257,4 +257,6 @@ public interface Constants {
 	
 	String ACK_PROCSSED = "AckProcessed";
 	
+	String RM_ENABLE_KEY = "RMEnabled";
+	
 }

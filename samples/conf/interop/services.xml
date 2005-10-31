@@ -1,11 +1,11 @@
 <service name="InteropService">
     <parameter name="ServiceClass" locked="xsd:false">org.apache.sandesha2.samples.interop.service.RMInteropService</parameter>
 
+   <parameter name="RMEnabled" >true</parameter>
+
    <description>
         This is a testing service , to test the system is working or not
     </description>
-
-  <!-- <module ref="sandesha" /> -->
 
     <operation name="ping">  
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />

@@ -27,7 +27,11 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.MessageInformationHeaders;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
@@ -53,6 +57,24 @@ public class SandeshaInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 
+		ConfigurationContext context = msgCtx.getSystemContext();
+		if (context==null)
+			throw new AxisFault ("ConfigurationContext is null");
+		
+		AxisService axisService = msgCtx.getAxisService();
+		if (axisService==null)
+			throw new AxisFault ("AxisService is null");
+		
+		Parameter keyParam = axisService.getParameter (Constants.RM_ENABLE_KEY);
+		Object keyValue = null;
+		if (keyParam!=null)
+			keyValue = keyParam.getValue();
+		
+		if (keyValue==null || !keyValue.equals("true")) {
+			//RM is not enabled for the service. Quiting SandeshaInHandler
+			return;
+		}
+		
 		RMMsgContext rmMsgCtx = null;
 		try {
 			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);

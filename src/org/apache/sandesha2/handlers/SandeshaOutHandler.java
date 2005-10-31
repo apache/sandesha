@@ -25,6 +25,10 @@ import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -61,13 +65,32 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 
-		String DONE = (String) msgCtx
-				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
-		if (null != DONE && "true".equals(DONE))
-			return;
+	
 
-		msgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE, "true");
-
+		
+		ConfigurationContext context = msgCtx.getSystemContext();
+		if (context==null)
+			throw new AxisFault ("ConfigurationContext is null");
+		
+		AxisService axisService = msgCtx.getAxisService();
+		if (axisService==null)
+			throw new AxisFault ("AxisService is null");
+		
+		if (!msgCtx.isServerSide()) {
+			//getting rm message
+			RMMsgContext rmMsgCtx = null;
+			try {
+				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+			} catch (SandeshaException ex) {
+				throw new AxisFault("Cant initialize the message");
+			}
+			
+			if ( rmMsgCtx.getMessageType()==Constants.MessageTypes.UNKNOWN) {
+				Parameter param = new ParameterImpl(Constants.RM_ENABLE_KEY,"true");
+				axisService.addParameter(param);
+			}
+		}
+		
 		//getting rm message
 		RMMsgContext rmMsgCtx = null;
 		try {
@@ -76,6 +99,25 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new AxisFault("Cant initialize the message");
 		}
 		
+		Parameter keyParam = axisService.getParameter (Constants.RM_ENABLE_KEY);
+		Object keyValue = null;
+		if (keyParam!=null)
+			keyValue = keyParam.getValue();
+		
+		if (keyValue==null || !keyValue.equals("true")) {
+			//RM is not enabled for the service. Quiting SandeshaOutHandler
+			return;
+		}
+		
+		String DONE = (String) msgCtx
+				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
+		if (null != DONE && "true".equals(DONE))
+			return;
+
+		msgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE, "true");
+
+		
+		
 		//TODO recheck
 		//continue only if an possible application message
 		if (!(rmMsgCtx.getMessageType() == Constants.MessageTypes.UNKNOWN)) {
@@ -83,7 +125,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		//Strating the sender.
-		ConfigurationContext context = msgCtx.getSystemContext();
 		SandeshaUtil.startSenderIfStopped(context);
 
 		CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(
