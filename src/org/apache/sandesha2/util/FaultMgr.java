@@ -9,6 +9,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMAttribute;
+import org.apache.axis2.om.OMConstants;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAP11Constants;
@@ -24,7 +25,6 @@ import org.apache.axis2.soap.SOAPFaultSubCode;
 import org.apache.axis2.soap.SOAPFaultText;
 import org.apache.axis2.soap.SOAPFaultValue;
 import org.apache.axis2.soap.SOAPHeader;
-import org.apache.axis2.soap.impl.llom.SOAPConstants;
 import org.apache.axis2.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
@@ -344,11 +344,12 @@ public class FaultMgr {
                 
                 faultReason = fault.getReason();
                 faultReason.getSOAPText().setText(data.reason);
+                
                 // TODO
                 OMNamespace namespace = 
                     factory.createOMNamespace(
-                            SOAP11Constants.XMLNS_URI,
-                            SOAP11Constants.XMLNS_PREFIX);
+                            OMConstants.XMLNS_URI,
+                            OMConstants.XMLNS_PREFIX);
                 faultReason.getSOAPText().addAttribute("lang", "en", namespace);
                 break;
                 

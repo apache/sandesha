@@ -118,7 +118,7 @@ public class RMMsgCreator {
 		String createSeqMsgId = SandeshaUtil.getUUID();
 		try {
 			AxisOperation appMsgOperationDesc = applicationMsgContext.getAxisOperation();
-			AxisOperation createSeqOperationDesc = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_CONSTANT_OUT_IN);
+			AxisOperation createSeqOperationDesc = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_URI_OUT_IN);
 			if (appMsgOperationDesc!=null) {
 				createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
 				createSeqOperationDesc.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
@@ -259,7 +259,7 @@ public class RMMsgCreator {
 		terminateMessage.setServiceContext(serviceContext);
 		
 		try {
-			AxisOperation terminateOperaiton = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_CONSTANT_IN_ONLY);
+			AxisOperation terminateOperaiton = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
 			AxisOperation referenceMsgOperation = referenceMessage.getAxisOperation();
 			if (referenceMsgOperation!=null) {
 				ArrayList outPhases = referenceMsgOperation.getPhasesOutFlow();

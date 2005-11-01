@@ -304,7 +304,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ackMsgCtx.setServiceContext(serviceContext);
 		
 		try {
-			AxisOperation ackOperation = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_CONSTANT_IN_ONLY);
+			AxisOperation ackOperation = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
 
 			AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext().getAxisOperation();
 			if (rmMsgOperation!=null) {
