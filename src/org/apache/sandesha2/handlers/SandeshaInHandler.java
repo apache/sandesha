@@ -81,6 +81,11 @@ public class SandeshaInHandler extends AbstractHandler {
 		} catch (SandeshaException ex) {
 			throw new AxisFault("Cant initialize the message");
 		}
+		
+		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
+		if (debug!=null && "on".equals(debug)) {
+			System.out.println("DEBUG: SandeshaInHandler got a '" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType())+  "' message.");
+		}
 
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());

@@ -100,7 +100,13 @@ public class Sender extends Thread {
 							.initializeMessage(msgCtx);
 					updateMessage(msgCtx);
 
+					Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
+					if (debug!=null && "on".equals(debug)) {
+						System.out.println("DEBUG: Sender is sending a '" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType())+  "' message.");
+					}
+					
 					new AxisEngine(context).send(msgCtx);
+					
 					//if (!msgCtx.isServerSide())
 						checkForSyncResponses(msgCtx);
 

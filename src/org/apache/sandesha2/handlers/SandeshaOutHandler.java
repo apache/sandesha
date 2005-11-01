@@ -116,6 +116,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		msgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE, "true");
 
+		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
+		if (debug!=null && "on".equals(debug)) {
+			System.out.println("DEBUG: SandeshaOutHandler got a '" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType())+  "' message.");
+		}
 		
 		
 		//TODO recheck

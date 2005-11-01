@@ -259,4 +259,6 @@ public interface Constants {
 	
 	String RM_ENABLE_KEY = "RMEnabled";
 	
+	String SANDESHA_DEBUG_MODE = "SandeshaDebugMode";
+	
 }

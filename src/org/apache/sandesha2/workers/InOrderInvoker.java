@@ -137,6 +137,11 @@ public class InOrderInvoker extends Thread {
 							//Invoking the message.
 							new AxisEngine (msgToInvoke.getSystemContext()).receive(msgToInvoke);
 							
+							Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
+							if (debug!=null && "on".equals(debug)) {
+								System.out.println("DEBUG: Invoker invoking a '" + SandeshaUtil.getMessageTypeString(rmMsg.getMessageType())+  "' message.");
+							}
+							
 							//deleting the message entry.							
 							storageMapMgr.delete(key);
 							

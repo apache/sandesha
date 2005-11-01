@@ -28,6 +28,7 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.sandesha2.Constants;
@@ -54,9 +55,20 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			RMMsgContext rmMessageContext = MsgInitializer
 					.initializeMessage(msgContext);
 			
+			ConfigurationContext context = rmMessageContext.getMessageContext().getSystemContext();
+			
+			Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
+			if (debug!=null && "on".equals(debug)) {
+				System.out.println("DEBUG: SandeshaGlobalInHandler got a '" + SandeshaUtil.getMessageTypeString(rmMessageContext.getMessageType())+  "' message.");
+			}
+			
 			//Dropping duplicates
 			boolean dropped = dropIfDuplicate (rmMessageContext);
 			if (dropped) {
+				if (debug!=null && "on".equals(debug)) {
+					System.out.println("DEBUG: SandeshaGlobalInHandler DROPPED a '" + SandeshaUtil.getMessageTypeString(rmMessageContext.getMessageType())+  "' message.");
+				}
+				
 				processDroppedMessage (rmMessageContext);
 				return;
 			}
