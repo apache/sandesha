@@ -50,110 +50,126 @@ import org.apache.sandesha2.wsrm.Sequence;
 public class SandeshaGlobalInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgContext) throws AxisFault {
-		
-		
-		try {
-			RMMsgContext rmMessageContext = MsgInitializer
-					.initializeMessage(msgContext);
-			
-			ConfigurationContext context = rmMessageContext.getMessageContext().getSystemContext();
-			
-			Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
-			if (debug!=null && "on".equals(debug)) {
-				System.out.println("DEBUG: SandeshaGlobalInHandler got a '" + SandeshaUtil.getMessageTypeString(rmMessageContext.getMessageType())+  "' message.");
-			}
-			
-			//Dropping duplicates
-			boolean dropped = dropIfDuplicate (rmMessageContext);
-			if (dropped) {
-				if (debug!=null && "on".equals(debug)) {
-					System.out.println("DEBUG: SandeshaGlobalInHandler DROPPED a '" + SandeshaUtil.getMessageTypeString(rmMessageContext.getMessageType())+  "' message.");
-				}
-				
-				processDroppedMessage (rmMessageContext);
-				return;
-			}
-			
-			//Process if global processing possible. - Currently none
-			if (SandeshaUtil.isGloballyProcessableMessageType(rmMessageContext
-					.getMessageType())) {
-				doGlobalProcessing (rmMessageContext);
+
+		RMMsgContext rmMessageContext = MsgInitializer
+				.initializeMessage(msgContext);
+
+		ConfigurationContext context = rmMessageContext.getMessageContext()
+				.getSystemContext();
+
+		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
+		if (debug != null && "on".equals(debug)) {
+			System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
+					+ SandeshaUtil.getMessageTypeString(rmMessageContext
+							.getMessageType()) + "' message.");
+		}
+
+		//Dropping duplicates
+		boolean dropped = dropIfDuplicate(rmMessageContext);
+		if (dropped) {
+			if (debug != null && "on".equals(debug)) {
+				System.out.println("DEBUG: SandeshaGlobalInHandler DROPPED a '"
+						+ SandeshaUtil.getMessageTypeString(rmMessageContext
+								.getMessageType()) + "' message.");
 			}
 
-		} catch (SandeshaException e) {
-			throw new AxisFault(e.getMessage());
+			processDroppedMessage(rmMessageContext);
+			return;
+		}
+
+		//Process if global processing possible. - Currently none
+		if (SandeshaUtil.isGloballyProcessableMessageType(rmMessageContext
+				.getMessageType())) {
+			doGlobalProcessing(rmMessageContext);
 		}
 
 	}
-	
-	private boolean dropIfDuplicate (RMMsgContext rmMsgContext) throws SandeshaException {
-		
+
+	private boolean dropIfDuplicate(RMMsgContext rmMsgContext)
+			throws SandeshaException {
+
 		boolean drop = false;
-		
-		if (rmMsgContext.getMessageType()==Constants.MessageTypes.APPLICATION) {
-			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Constants.MessageParts.SEQUENCE);
+
+		if (rmMsgContext.getMessageType() == Constants.MessageTypes.APPLICATION) {
+			Sequence sequence = (Sequence) rmMsgContext
+					.getMessagePart(Constants.MessageParts.SEQUENCE);
 			String sequenceId = null;
-			
-			if (sequence!=null) {
+
+			if (sequence != null) {
 				sequenceId = sequence.getIdentifier().getIdentifier();
 			}
-			
+
 			long msgNo = sequence.getMessageNumber().getMessageNumber();
-			
-			if (sequenceId!=null && msgNo>0) {	
-				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgContext.getMessageContext().getSystemContext());
-				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.RECEIVED_MESSAGES);
-				if (receivedMsgsBean!=null) {
-					String receivedMsgStr = (String) receivedMsgsBean.getValue();
-					ArrayList msgNoArrList = SandeshaUtil.getSplittedMsgNoArraylist(receivedMsgStr);
-					
-					if (msgNoArrList.contains(new Long (msgNo).toString())){
+
+			if (sequenceId != null && msgNo > 0) {
+				StorageManager storageManager = SandeshaUtil
+						.getSandeshaStorageManager(rmMsgContext
+								.getMessageContext().getSystemContext());
+				SequencePropertyBeanMgr seqPropMgr = storageManager
+						.getSequencePropretyBeanMgr();
+				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
+						sequenceId,
+						Constants.SequenceProperties.RECEIVED_MESSAGES);
+				if (receivedMsgsBean != null) {
+					String receivedMsgStr = (String) receivedMsgsBean
+							.getValue();
+					ArrayList msgNoArrList = SandeshaUtil
+							.getSplittedMsgNoArraylist(receivedMsgStr);
+
+					if (msgNoArrList.contains(new Long(msgNo).toString())) {
 						drop = true;
 					}
 				}
 			}
 		}
-		
+
 		if (drop) {
 			rmMsgContext.getMessageContext().setPausedTrue(getName());
 			return true;
 		}
-		
+
 		return false;
 	}
-	
-	private void processDroppedMessage (RMMsgContext rmMsgContext) throws SandeshaException {
-		if (rmMsgContext.getMessageType()==Constants.MessageTypes.APPLICATION) {
-			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Constants.MessageParts.SEQUENCE);
+
+	private void processDroppedMessage(RMMsgContext rmMsgContext)
+			throws SandeshaException {
+		if (rmMsgContext.getMessageType() == Constants.MessageTypes.APPLICATION) {
+			Sequence sequence = (Sequence) rmMsgContext
+					.getMessagePart(Constants.MessageParts.SEQUENCE);
 			String sequenceId = null;
-			
-			if (sequence!=null) {
+
+			if (sequence != null) {
 				sequenceId = sequence.getIdentifier().getIdentifier();
 			}
-			
-			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgContext.getMessageContext().getSystemContext());
-			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.RECEIVED_MESSAGES);
-			String receivedMsgStr = (String) receivedMsgsBean.getValue();
-			
-			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor ();
-			//Even though the duplicate message is dropped, hv to send the ack if needed.
-			ackProcessor.sendAckIfNeeded(rmMsgContext,receivedMsgStr);
 
+			StorageManager storageManager = SandeshaUtil
+					.getSandeshaStorageManager(rmMsgContext.getMessageContext()
+							.getSystemContext());
+			SequencePropertyBeanMgr seqPropMgr = storageManager
+					.getSequencePropretyBeanMgr();
+			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
+					sequenceId, Constants.SequenceProperties.RECEIVED_MESSAGES);
+			String receivedMsgStr = (String) receivedMsgsBean.getValue();
+
+			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
+			//Even though the duplicate message is dropped, hv to send the ack
+			// if needed.
+			ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr);
 
 		}
 	}
-	
-	private void doGlobalProcessing (RMMsgContext rmMsgCtx) throws SandeshaException {
+
+	private void doGlobalProcessing(RMMsgContext rmMsgCtx)
+			throws SandeshaException {
 		switch (rmMsgCtx.getMessageType()) {
 		case Constants.MessageTypes.ACK:
-			rmMsgCtx.setRelatesTo(null);	//Removing the relatesTo part from ackMessageIf present. 
-											//Some Frameworks tend to send this.
+			rmMsgCtx.setRelatesTo(null); //Removing the relatesTo part from
+										 // ackMessageIf present.
+		//Some Frameworks tend to send this.
 		}
 	}
-	
-	public QName getName () {
-		return new QName (Constants.GLOBAL_IN_HANDLER_NAME);
+
+	public QName getName() {
+		return new QName(Constants.GLOBAL_IN_HANDLER_NAME);
 	}
 }

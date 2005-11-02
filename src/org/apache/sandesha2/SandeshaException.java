@@ -17,13 +17,15 @@
 
 package org.apache.sandesha2;
 
+import org.apache.axis2.AxisFault;
+
 /**
  * @author Chamikara
  * @author Sanka
  */
 
 //FIXME - extends AxisFault and clean code (remove unnecessary try-catches )
-public class SandeshaException extends Exception {
+public class SandeshaException extends AxisFault  {
 
 	public SandeshaException (String message) {
 		super (message);

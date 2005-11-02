@@ -58,41 +58,43 @@ public class SandeshaInHandler extends AbstractHandler {
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 
 		ConfigurationContext context = msgCtx.getSystemContext();
-		if (context==null)
-			throw new AxisFault ("ConfigurationContext is null");
-		
+		if (context == null)
+			throw new AxisFault("ConfigurationContext is null");
+
 		AxisService axisService = msgCtx.getAxisService();
-		if (axisService==null)
-			throw new AxisFault ("AxisService is null");
-		
-		Parameter keyParam = axisService.getParameter (Constants.RM_ENABLE_KEY);
+		if (axisService == null)
+			throw new AxisFault("AxisService is null");
+
+		Parameter keyParam = axisService.getParameter(Constants.RM_ENABLE_KEY);
 		Object keyValue = null;
-		if (keyParam!=null)
+		if (keyParam != null)
 			keyValue = keyParam.getValue();
-		
-		if (keyValue==null || !keyValue.equals("true")) {
+
+		if (keyValue == null || !keyValue.equals("true")) {
 			//RM is not enabled for the service. Quiting SandeshaInHandler
 			return;
 		}
-		
+
 		RMMsgContext rmMsgCtx = null;
 		try {
 			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 		} catch (SandeshaException ex) {
 			throw new AxisFault("Cant initialize the message");
 		}
-		
+
 		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
-		if (debug!=null && "on".equals(debug)) {
-			System.out.println("DEBUG: SandeshaInHandler got a '" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType())+  "' message.");
+		if (debug != null && "on".equals(debug)) {
+			System.out.println("DEBUG: SandeshaInHandler got a '"
+					+ SandeshaUtil.getMessageTypeString(rmMsgCtx
+							.getMessageType()) + "' message.");
 		}
 
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());
 
-		if (msgProcessor==null)
-			throw new AxisFault ("Cant find a suitable message processor");
-		
+		if (msgProcessor == null)
+			throw new AxisFault("Cant find a suitable message processor");
+
 		try {
 			msgProcessor.processMessage(rmMsgCtx);
 		} catch (SandeshaException se) {

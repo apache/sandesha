@@ -87,14 +87,15 @@ public class Sender extends Thread {
 			}
 
 			StorageManager storageManager = null;
-			
+
 			try {
-				storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+				storageManager = SandeshaUtil
+						.getSandeshaStorageManager(context);
 			} catch (SandeshaException e4) {
 				e4.printStackTrace();
 				return;
 			}
-			
+
 			RetransmitterBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
 			Collection coll = mgr.findMsgsToSend();
 			Iterator iter = coll.iterator();
@@ -109,20 +110,21 @@ public class Sender extends Thread {
 							.initializeMessage(msgCtx);
 					updateMessage(msgCtx);
 
-					Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
-					if (debug!=null && "on".equals(debug)) {
-						System.out.println("DEBUG: Sender is sending a '" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType())+  "' message.");
+					Object debug = context
+							.getProperty(Constants.SANDESHA_DEBUG_MODE);
+					if (debug != null && "on".equals(debug)) {
+						System.out.println("DEBUG: Sender is sending a '"
+								+ SandeshaUtil.getMessageTypeString(rmMsgCtx
+										.getMessageType()) + "' message.");
 					}
-					
+
 					new AxisEngine(context).send(msgCtx);
-					
+
 					//if (!msgCtx.isServerSide())
-						checkForSyncResponses(msgCtx);
+					checkForSyncResponses(msgCtx);
 
 				} catch (AxisFault e1) {
 					e1.printStackTrace();
-				} catch (SandeshaException e2) {
-					e2.printStackTrace();
 				} catch (Exception e3) {
 					e3.printStackTrace();
 				}
@@ -205,33 +207,38 @@ public class Sender extends Thread {
 			//If request is REST we assume the response is REST, so set the
 			// variable
 			response.setDoingREST(msgCtx.isDoingREST());
-			response.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
+			response
+					.setServiceGroupContextId(msgCtx.getServiceGroupContextId());
 			response.setServiceGroupContext(msgCtx.getServiceGroupContext());
 			response.setServiceContext(msgCtx.getServiceContext());
-			response.setAxisService (msgCtx.getAxisService());
+			response.setAxisService(msgCtx.getAxisService());
 			response.setAxisServiceGroup(msgCtx.getAxisServiceGroup());
-			
+
 			//setting the in-flow.
-			//ArrayList inPhaseHandlers = response.getAxisOperation().getRemainingPhasesInFlow();
-			/*if (inPhaseHandlers==null || inPhaseHandlers.isEmpty()) {
-				ArrayList phases = msgCtx.getSystemContext().getAxisConfiguration().getInPhasesUptoAndIncludingPostDispatch();
-				response.getAxisOperation().setRemainingPhasesInFlow(phases);
-			}*/
-			
-			//Changed following from TransportUtils to SandeshaUtil since op. context is anavailable.
+			//ArrayList inPhaseHandlers =
+			// response.getAxisOperation().getRemainingPhasesInFlow();
+			/*
+			 * if (inPhaseHandlers==null || inPhaseHandlers.isEmpty()) {
+			 * ArrayList phases =
+			 * msgCtx.getSystemContext().getAxisConfiguration().getInPhasesUptoAndIncludingPostDispatch();
+			 * response.getAxisOperation().setRemainingPhasesInFlow(phases); }
+			 */
+
+			//Changed following from TransportUtils to SandeshaUtil since op.
+			// context is anavailable.
 			SOAPEnvelope resenvelope = null;
 			try {
-				resenvelope = SandeshaUtil.createSOAPMessage(
-						response, msgCtx.getEnvelope().getNamespace().getName());
+				resenvelope = SandeshaUtil.createSOAPMessage(response, msgCtx
+						.getEnvelope().getNamespace().getName());
 			} catch (AxisFault e) {
 				//TODO: change to log.debug
 			}
-			
+
 			if (resenvelope != null) {
 				AxisEngine engine = new AxisEngine(msgCtx.getSystemContext());
 				response.setEnvelope(resenvelope);
 				engine.receive(response);
-			} 
+			}
 		}
 	}
 
