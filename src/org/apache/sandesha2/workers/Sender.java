@@ -47,9 +47,10 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.Constants.MessageTypes;
 import org.apache.sandesha2.client.SandeshaMepClient;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -85,8 +86,16 @@ public class Sender extends Thread {
 				return;
 			}
 
-			RetransmitterBeanMgr mgr = AbstractBeanMgrFactory.getInstance(
-					context).getRetransmitterBeanMgr();
+			StorageManager storageManager = null;
+			
+			try {
+				storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+			} catch (SandeshaException e4) {
+				e4.printStackTrace();
+				return;
+			}
+			
+			RetransmitterBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
 			Collection coll = mgr.findMsgsToSend();
 			Iterator iter = coll.iterator();
 			while (iter.hasNext()) {

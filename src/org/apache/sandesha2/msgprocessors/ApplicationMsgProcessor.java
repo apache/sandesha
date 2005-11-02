@@ -45,7 +45,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.handlers.SandeshaOutHandler;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -54,6 +54,10 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryStorageMapBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.MsgValidator;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -97,9 +101,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(rmMsgCtx.getContext())
-				.getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getMessageContext().getSystemContext());
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
@@ -147,15 +150,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//		}
 
 		//		Pause the messages bean if not the right message to invoke.
-		NextMsgBeanMgr mgr = AbstractBeanMgrFactory.getInstance(configCtx)
-				.getNextMsgBeanMgr();
+		NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
 		NextMsgBean bean = mgr.retrieve(sequenceId);
 
 		if (bean == null)
 			throw new SandeshaException("Error- The sequence does not exist");
 
-		StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory.getInstance(
-				configCtx).getStorageMapBeanMgr();
+		StorageMapBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
@@ -260,10 +261,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	public void sendAckIfNeeded (RMMsgContext rmMsgCtx,String messagesStr) throws SandeshaException {
 		
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
-		
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-		.getInstance(rmMsgCtx.getContext())
-		.getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getSystemContext());
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		
 		
 		Sequence sequence = (Sequence) rmMsgCtx
@@ -354,7 +353,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(e1.getMessage());
 			}
 		} else {
-			RetransmitterBeanMgr retransmitterBeanMgr = AbstractBeanMgrFactory.getInstance(configCtx).getRetransmitterBeanMgr();
+			RetransmitterBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 			
 			String key = SandeshaUtil.storeMessageContext(ackMsgCtx);
 			RetransmitterBean ackBean = new RetransmitterBean ();

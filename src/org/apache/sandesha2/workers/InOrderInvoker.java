@@ -32,13 +32,16 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.Constants.MessageParts;
 import org.apache.sandesha2.Constants.SequenceProperties;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryStorageMapBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -88,14 +91,13 @@ public class InOrderInvoker extends Thread {
 			
 
 			try {
-				NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(
-						context).getNextMsgBeanMgr();
-
-				StorageMapBeanMgr storageMapMgr = AbstractBeanMgrFactory
-						.getInstance(context).getStorageMapBeanMgr();
 				
-				SequencePropertyBeanMgr sequencePropMgr = AbstractBeanMgrFactory
-						.getInstance(context).getSequencePropretyBeanMgr();
+				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+
+				StorageMapBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
+				
+				SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropretyBeanMgr();
 
 				
 				

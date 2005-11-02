@@ -19,7 +19,7 @@ package org.apache.sandesha2.storage.beans;
 
 import java.io.Serializable;
 
-public class RetransmitterBean implements Serializable {
+public class RetransmitterBean implements RMBean {
 
 	private String messageId;
 

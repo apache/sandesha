@@ -17,33 +17,11 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
-
-import org.apache.axis2.context.AbstractContext;
-import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
-
 /**
  * @author Chamikara
  * @author Sanka
  */
-public interface NextMsgBeanMgr extends RMBeanManager {
 
-	public boolean delete(String sequenceId);
-
-	public NextMsgBean retrieve(String sequenceId);
-
-	public boolean insert(NextMsgBean bean);
-
-	public ResultSet find(String query);
-
-	public Collection find(NextMsgBean bean);
-
-	public boolean update(NextMsgBean bean);
-
-	public Collection retrieveAll();
+public interface RMBeanManager {
+	
 }

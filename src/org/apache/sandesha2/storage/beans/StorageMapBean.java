@@ -22,7 +22,7 @@ import java.io.Serializable;
 /**
  * @author  
  */
-public class StorageMapBean implements Serializable {
+public class StorageMapBean implements RMBean {
 
 	private String Key;
 

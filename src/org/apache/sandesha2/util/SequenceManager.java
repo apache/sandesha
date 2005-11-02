@@ -23,11 +23,13 @@ import org.apache.sandesha2.Constants.MessageParts;
 import org.apache.sandesha2.Constants.SequenceProperties;
 import org.apache.sandesha2.Constants.WSA;
 import org.apache.sandesha2.handlers.SandeshaInHandler;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
@@ -41,7 +43,7 @@ public class SequenceManager {
 	public static String setupNewSequence(RMMsgContext createSequenceMsg) throws AxisFault {
 		//		SequencePropertyBean seqPropBean = new SequencePropertyBean
 		// (sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,"");
-		//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
+		//		InMemorySequencePropertyBeanMgr beanMgr = new InMemorySequencePropertyBeanMgr
 		// (Constants.DEFAULT_STORAGE_TYPE);
 		//		beanMgr.create(seqPropBean);
 
@@ -68,8 +70,15 @@ public class SequenceManager {
 		if (acksTo == null)
 			throw new AxisFault("AcksTo is null");
 
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(context).getSequencePropretyBeanMgr();
+		StorageManager storageManager = null;
+		
+		try {
+			storageManager = SandeshaUtil.getSandeshaStorageManager(createSequenceMsg.getMessageContext().getSystemContext());
+		} catch (SandeshaException e) {
+			e.printStackTrace();
+		}
+		
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 
 		//TODO - recheck following 
 		//incoming To - reply address of response messages
@@ -88,8 +97,7 @@ public class SequenceManager {
 		seqPropMgr.insert(replyToBean);
 		seqPropMgr.insert(acksToBean);
 
-		NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(context)
-				.getNextMsgBeanMgr();
+		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 		nextMsgMgr.insert(new NextMsgBean(sequenceId, 1)); // 1 will be the next
 														   // message to invoke
 		//this will apply for only in-order invocations.
@@ -104,7 +112,10 @@ public class SequenceManager {
 	public static void setupNewClientSequence (MessageContext firstAplicationMsgCtx, String tempSequenceId) throws SandeshaException {
 		
 		AbstractContext context = firstAplicationMsgCtx.getSystemContext();
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(firstAplicationMsgCtx.getSystemContext());
+		
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		
 		
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();

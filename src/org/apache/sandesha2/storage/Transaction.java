@@ -15,13 +15,12 @@
  *
  */
 
-package org.apache.sandesha2.storage.beans;
+package org.apache.sandesha2.storage;
 
-import java.io.Serializable;
+public interface Transaction {
 
-/**
- * @author  
- */
-public interface RMBean extends Serializable {
-
+	public void commit ();
+	
+	public void rollback ();
+	
 }

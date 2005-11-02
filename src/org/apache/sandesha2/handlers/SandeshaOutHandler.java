@@ -36,13 +36,16 @@ import org.apache.axis2.util.UUIDGenerator;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryCreateSeqBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -131,10 +134,17 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//Strating the sender.
 		SandeshaUtil.startSenderIfStopped(context);
 
-		CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(
-				context).getCreateSeqBeanMgr();
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(context).getSequencePropretyBeanMgr();
+		StorageManager storageManager = null;
+		
+		try {
+			storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+		} catch (SandeshaException e2) {
+			throw new AxisFault (e2.getMessage());
+		}
+		
+		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		
 		boolean serverSide = msgCtx.isServerSide();
 
 		
@@ -411,9 +421,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 			offeredSequenceBean.setSequenceId(tempSequenceId);
 			offeredSequenceBean.setValue(offeredSequenceId);
 
-			SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-					.getInstance(applicationMsg.getSystemContext())
-					.getSequencePropretyBeanMgr();
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(applicationMsg.getSystemContext());
+			
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+			
 			seqPropMgr.insert(msgsBean);
 			seqPropMgr.insert(offeredSequenceBean);
 		}
@@ -430,14 +441,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (context == null)
 			throw new SandeshaException("Context is null");
 
-		CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(
-				context).getCreateSeqBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(applicationMsg.getSystemContext());
+		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		
 		CreateSeqBean createSeqBean = new CreateSeqBean(tempSequenceId,
 				createSeqMsg.getMessageID(), null);
 		createSeqMgr.insert(createSeqBean);
 
-		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
-				.getInstance(context).getRetransmitterBeanMgr();
+		RetransmitterBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		
 		String key = SandeshaUtil.storeMessageContext(createSeqRMMessage
 				.getMessageContext());
 		RetransmitterBean createSeqEntry = new RetransmitterBean();
@@ -461,10 +473,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (context == null)
 			throw new SandeshaException("Context is null");
 
-		SequencePropertyBeanMgr sequencePropertyMgr = AbstractBeanMgrFactory
-				.getInstance(context).getSequencePropretyBeanMgr();
-		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
-				.getInstance(context).getRetransmitterBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msg.getSystemContext());
+		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		RetransmitterBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
 
 		SequencePropertyBean toBean = sequencePropertyMgr.retrieve(
 				tempSequenceId, Constants.SequenceProperties.TO_EPR);
@@ -599,10 +611,18 @@ public class SandeshaOutHandler extends AbstractHandler {
 	}
 
 	private long getNextMsgNo(ConfigurationContext context,
-			String tempSequenceId) {
+			String tempSequenceId)  {
 		//FIXME set a correct message number.
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(context).getSequencePropretyBeanMgr();
+		
+		StorageManager storageManager = null;
+		
+		try {
+			storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+		} catch (SandeshaException e) {
+			e.printStackTrace();
+		}
+		
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		SequencePropertyBean nextMsgNoBean = seqPropMgr.retrieve(
 				tempSequenceId,
 				Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);

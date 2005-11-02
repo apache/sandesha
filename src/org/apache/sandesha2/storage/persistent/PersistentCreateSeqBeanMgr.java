@@ -15,13 +15,8 @@
  *
  */
 
-package org.apache.sandesha2.storage.beans;
+package org.apache.sandesha2.storage.persistent;
 
-import java.io.Serializable;
-
-/**
- * @author  
- */
-public interface RMBean extends Serializable {
+public class PersistentCreateSeqBeanMgr {
 
 }

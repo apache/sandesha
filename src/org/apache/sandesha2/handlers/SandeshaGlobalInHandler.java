@@ -37,11 +37,12 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryStorageMapBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -99,8 +100,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			
 			long msgNo = sequence.getMessageNumber().getMessageNumber();
 			
-			if (sequenceId!=null && msgNo>0) {				
-				SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(rmMsgContext.getContext()).getSequencePropretyBeanMgr();
+			if (sequenceId!=null && msgNo>0) {	
+				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgContext.getMessageContext().getSystemContext());
+				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.RECEIVED_MESSAGES);
 				if (receivedMsgsBean!=null) {
 					String receivedMsgStr = (String) receivedMsgsBean.getValue();
@@ -130,7 +132,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				sequenceId = sequence.getIdentifier().getIdentifier();
 			}
 			
-			SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(rmMsgContext.getContext()).getSequencePropretyBeanMgr();
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgContext.getMessageContext().getSystemContext());
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(sequenceId,Constants.SequenceProperties.RECEIVED_MESSAGES);
 			String receivedMsgStr = (String) receivedMsgsBean.getValue();
 			

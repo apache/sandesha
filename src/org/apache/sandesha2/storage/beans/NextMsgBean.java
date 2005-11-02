@@ -22,7 +22,7 @@ import java.io.Serializable;
 /**
  * @author  
  */
-public class NextMsgBean implements Serializable {
+public class NextMsgBean implements RMBean {
 	private String SequenceId;
 
 	private long NextMsgNoToProcess;

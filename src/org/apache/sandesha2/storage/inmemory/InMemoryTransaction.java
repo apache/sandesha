@@ -15,13 +15,18 @@
  *
  */
 
-package org.apache.sandesha2.storage.beans;
+package org.apache.sandesha2.storage.inmemory;
 
-import java.io.Serializable;
+import org.apache.sandesha2.storage.Transaction;
 
-/**
- * @author  
- */
-public interface RMBean extends Serializable {
-
+public class InMemoryTransaction implements Transaction {
+	
+	public void commit () {
+		
+	}
+	
+	public void rollback () {
+		
+	}
+	
 }

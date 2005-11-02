@@ -20,15 +20,19 @@ package org.apache.sandesha2.msgprocessors;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryCreateSeqBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Accept;
@@ -82,10 +86,11 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				.getMessageContext().getSystemContext();
 		String createSeqMsgId = createSeqResponseRMMsgCtx.getMessageContext()
 				.getRelatesTo().getValue();
-		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
-				.getInstance(configCtx).getRetransmitterBeanMgr();
-		CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(
-				configCtx).getCreateSeqBeanMgr();
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+		
+		RetransmitterBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
 		CreateSeqBean createSeqBean = createSeqMgr.retrieve(createSeqMsgId);
 		if (createSeqBean == null)
@@ -99,8 +104,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		retransmitterMgr.delete(createSeqMsgId);
 
 		//storing new out sequence id
-		SequencePropertyBeanMgr sequencePropMgr = AbstractBeanMgrFactory
-				.getInstance(configCtx).getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropretyBeanMgr();
 		SequencePropertyBean outSequenceBean = new SequencePropertyBean(
 				tempSequenceId,
 				Constants.SequenceProperties.OUT_SEQUENCE_ID, newOutSequenceId);
@@ -134,7 +138,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			nextMsgBean.setSequenceId(offeredSequenceId);
 			nextMsgBean.setNextMsgNoToProcess(1);
 			
-			NextMsgBeanMgr nextMsgMgr = AbstractBeanMgrFactory.getInstance(configCtx).getNextMsgBeanMgr();
+			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 			nextMsgMgr.insert(nextMsgBean);
 		}
 		

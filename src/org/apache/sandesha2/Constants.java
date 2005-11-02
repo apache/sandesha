@@ -261,4 +261,6 @@ public interface Constants {
 	
 	String SANDESHA_DEBUG_MODE = "SandeshaDebugMode";
 	
+	String STORAGE_MANAGER_IMPL = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
+	
 }

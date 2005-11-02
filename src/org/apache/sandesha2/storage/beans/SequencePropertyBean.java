@@ -21,7 +21,7 @@ import java.io.Serializable;
 /**
  * @author Sanka Samaranayake <ssanka@gmail.com>
  */
-public class SequencePropertyBean implements Serializable {
+public class SequencePropertyBean implements RMBean {
 
 	private String sequenceId;
 

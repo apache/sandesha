@@ -1,3 +1,20 @@
+/*
+ * Copyright  1999-2004 The Apache Software Foundation.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package org.apache.sandesha2.util;
 
 import java.math.BigInteger;
@@ -33,17 +50,19 @@ import org.apache.sandesha2.Constants.MessageTypes;
 import org.apache.sandesha2.Constants.SOAPVersion;
 import org.apache.sandesha2.Constants.SequenceProperties;
 import org.apache.sandesha2.Constants.WSRM;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemoryStorageMapBeanMgr;
 import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceFault;
 
 /**
  * @author Sanka
- * @author Chamikara
  */
 
 public class FaultMgr {
@@ -127,8 +146,8 @@ public class FaultMgr {
     public RMMsgContext checkSequenceMsg(MessageContext msgCtx) 
             throws SandeshaException {
         
-        NextMsgBeanMgr mgr =
-            AbstractBeanMgrFactory.getInstance(msgCtx).getNextMsgBeanMgr();
+    	StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getSystemContext());
+        NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
         SOAPEnvelope envelope = msgCtx.getEnvelope();
         
         OMElement element = envelope.getHeader().getFirstChildWithName(
@@ -167,12 +186,15 @@ public class FaultMgr {
      */
     public RMMsgContext checkSequenceAcknowledgementMsg(MessageContext msgCtx) 
             throws SandeshaException {
+    	
+    	StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getSystemContext());
+    	
         NextMsgBeanMgr mgr 
-            = AbstractBeanMgrFactory.getInstance(msgCtx).getNextMsgBeanMgr();
+            = storageManager.getNextMsgBeanMgr();
         StorageMapBeanMgr smgr 
-            = AbstractBeanMgrFactory.getInstance(msgCtx).getStorageMapBeanMgr();
+            = storageManager.getStorageMapBeanMgr();
         SequencePropertyBeanMgr propertyBeanMgr 
-            = AbstractBeanMgrFactory.getInstance(msgCtx).getSequencePropretyBeanMgr();
+            = storageManager.getSequencePropretyBeanMgr();
     
         SOAPEnvelope envelope = msgCtx.getEnvelope();
         // this is a SequenceAcknowledgement message

@@ -14,51 +14,53 @@
  * limitations under the License.
  * 
  */
-package org.apache.sandesha2.storage;
+
+package org.apache.sandesha2.storage.inmemory;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemBeanMgrFactory;
+import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
-import com.sun.corba.se.internal.core.Constant;
+public class InMemoryStorageManager extends StorageManager {
+	
+	private static InMemoryStorageManager instance = null;
 
-/**
- * @author Chamikara Jayalath <chamikara@wso2.com>
- * @author Sanka Samaranayake <ssanka@gmail.com>
- */
-public class AbstractBeanMgrFactory {
-
-	AbstractContext context = null;
-
-	private static AbstractBeanMgrFactory instance = null;
-
+	public InMemoryStorageManager (ConfigurationContext context) {
+		super (context);
+	}
+	
+	public Transaction getTransaction () {
+		return new InMemoryTransaction  ();
+	}
+	
 	public CreateSeqBeanMgr getCreateSeqBeanMgr() {
-		return new CreateSeqBeanMgr(context);
+		return new InMemoryCreateSeqBeanMgr(getContext());
 	}
 
 	public NextMsgBeanMgr getNextMsgBeanMgr() {
-		return new NextMsgBeanMgr(context);
+		return new InMemoryNextMsgBeanMgr(getContext());
 	}
 
 	public RetransmitterBeanMgr getRetransmitterBeanMgr() {
-		return new RetransmitterBeanMgr(context);
+		return new InMemoryRetransmitterBeanMgr(getContext());
 	}
 
 	public SequencePropertyBeanMgr getSequencePropretyBeanMgr() {
-		return new SequencePropertyBeanMgr(context);
+		return new InMemorySequencePropertyBeanMgr(getContext());
 	}
 
 	public StorageMapBeanMgr getStorageMapBeanMgr() {
-		return new StorageMapBeanMgr(context);
+		return new InMemoryStorageMapBeanMgr(getContext());
 	}
 
-	//	public static AbstractBeanMgrFactory getBeanMgrFactory (int storageType)
+	//	public static StorageManager getBeanMgrFactory (int storageType)
 	// {
 	//		switch (storageType) {
 	//			case Constants.STORAGE_TYPE_PERSISTANCE:
@@ -70,17 +72,14 @@ public class AbstractBeanMgrFactory {
 	//		}
 	//	}
 
-	private AbstractBeanMgrFactory(AbstractContext context) {
-		this.context = context;
-	}
 
 	public void init(ConfigurationContext context) {
-		this.context = context;
+		setContext(context);
 	}
 
-	public static AbstractBeanMgrFactory getInstance(AbstractContext context) {
+	public static InMemoryStorageManager getInstance(ConfigurationContext context) {
 		if (instance == null)
-			instance = new AbstractBeanMgrFactory(context);
+			instance = new InMemoryStorageManager(context);
 
 		return instance;
 	}

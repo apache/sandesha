@@ -36,11 +36,13 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.handlers.SandeshaOutHandler;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -66,11 +68,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		if (context == null)
 			throw new SandeshaException("Context is null");
 
-		
-		RetransmitterBeanMgr retransmitterMgr = AbstractBeanMgrFactory
-				.getInstance(context).getRetransmitterBeanMgr();
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(context).getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getMessageContext().getSystemContext());
+		RetransmitterBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges()
 				.iterator();
@@ -193,9 +193,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
 
 		//detting addressing headers.
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(incomingAckRMMsg.getContext())
-				.getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext().getSystemContext());
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		
 		//SequencePropertyBean replyToBean =
 		// seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,
@@ -244,9 +244,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateBean.setSend(true);
 		terminateBean.setReSend(false);
 
-		RetransmitterBeanMgr retramsmitterMgr = AbstractBeanMgrFactory
-				.getInstance(incomingAckRMMsg.getContext())
-				.getRetransmitterBeanMgr();
+		RetransmitterBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
 		retramsmitterMgr.insert(terminateBean);
 
 	}

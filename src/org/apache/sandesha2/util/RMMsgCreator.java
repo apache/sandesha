@@ -55,9 +55,10 @@ import org.apache.sandesha2.Constants.SequenceProperties;
 import org.apache.sandesha2.Constants.WSA;
 import org.apache.sandesha2.Constants.WSRM;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -94,7 +95,8 @@ public class RMMsgCreator {
 		if (context == null)
 			throw new SandeshaException("Configuration Context is null");
 
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		MessageContext createSeqmsgContext;
 		try {
 			//creating by copying common contents. (this will not set contexts
@@ -366,8 +368,8 @@ public class RMMsgCreator {
 
 		ConfigurationContext ctx = applicationMsg.getMessageContext()
 				.getSystemContext();
-		SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory
-				.getInstance(ctx).getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(ctx);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
 				Constants.SequenceProperties.RECEIVED_MESSAGES);

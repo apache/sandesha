@@ -28,11 +28,13 @@ import org.apache.axis2.util.Utils;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.storage.AbstractBeanMgrFactory;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.inmemory.InMemoryCreateSeqBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
@@ -90,11 +92,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				createSeqBean.setTempSequenceId(newSequenceId);
 				createSeqBean.setCreateSeqMsgId(SandeshaUtil.getUUID());   //this is a dummy value.
 				
-				CreateSeqBeanMgr createSeqMgr = AbstractBeanMgrFactory.getInstance(context).getCreateSeqBeanMgr();
-				createSeqMgr.insert(createSeqBean);
+				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+				CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 				
 				//Setting sequence properties.
-				SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();
+				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 				SequencePropertyBean outSequenceBean = new SequencePropertyBean ();
 				outSequenceBean.setName(Constants.SequenceProperties.OUT_SEQUENCE_ID);
 				outSequenceBean.setValue(outSequenceId);
@@ -125,11 +127,12 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				throw new AxisFault("Acks to not present in the create sequence message");
 
 			SequencePropertyBean seqPropBean = new SequencePropertyBean(newSequenceId, Constants.SequenceProperties.ACKS_TO_EPR, acksTo);
-			//		SequencePropertyBeanMgr beanMgr = new SequencePropertyBeanMgr
+			//		InMemorySequencePropertyBeanMgr beanMgr = new InMemorySequencePropertyBeanMgr
 			// (Constants.DEFAULT_STORAGE_TYPE);
 			//		beanMgr.create(seqPropBean);
 
-			SequencePropertyBeanMgr seqPropMgr = AbstractBeanMgrFactory.getInstance(context).getSequencePropretyBeanMgr();
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 			seqPropMgr.insert(seqPropBean);
 			outMessage.setResponseWritten(true);
 

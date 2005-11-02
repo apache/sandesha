@@ -18,6 +18,7 @@ package org.apache.sandesha2.util;
 
 import java.awt.datatransfer.StringSelection;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.workers.InOrderInvoker;
 import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -68,7 +70,7 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 public class SandeshaUtil {
 
 	private static Hashtable storedMsgContexts = new Hashtable();
-
+	private static StorageManager storageManager = null;
 	private static Sender sender = new Sender();
 	private static InOrderInvoker invoker = new InOrderInvoker ();
 
@@ -453,5 +455,30 @@ public class SandeshaUtil {
 	public static String getServerSideInternalSeqIdFromIncomingSeqId (String incomingSequenceId) {
 		String internalSequenceId = incomingSequenceId;
 		return internalSequenceId;
+	}
+	
+	public static StorageManager getSandeshaStorageManager (ConfigurationContext context) throws SandeshaException {
+		String srotageManagerClassStr = Constants.STORAGE_MANAGER_IMPL;
+		
+		if (storageManager!=null)
+			return storageManager;
+		
+		try {
+			Class c = Class.forName(srotageManagerClassStr);
+			Class configContextClass = Class.forName(context.getClass().getName());
+			Constructor constructor = c.getConstructor(new Class[]{configContextClass});
+			Object obj = constructor.newInstance(new Object[] {context});
+			
+			if (obj==null || !(obj instanceof StorageManager))
+				throw new SandeshaException ("StorageManager must implement org.apache.sandeshat.storage.StorageManager");
+			
+			StorageManager mgr = (StorageManager) obj;
+			storageManager = mgr;
+			return storageManager;
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			throw new SandeshaException (e.getMessage());
+		} 
 	}
 }
