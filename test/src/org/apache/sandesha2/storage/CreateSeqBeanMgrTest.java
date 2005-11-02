@@ -2,6 +2,7 @@ package org.apache.sandesha2.storage;
 
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisConfigurationImpl;
@@ -35,7 +36,8 @@ public class CreateSeqBeanMgrTest extends SandeshaTestCase {
         AxisConfiguration axisConfig =  new AxisConfigurationImpl();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
 
-        mgr = AbstractBeanMgrFactory.getInstance(configCtx).getCreateSeqBeanMgr();
+        StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+        mgr = storageManager.getCreateSeqBeanMgr();
     }
 
     public void testDelete() {

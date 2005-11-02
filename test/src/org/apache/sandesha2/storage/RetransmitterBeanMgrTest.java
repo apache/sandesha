@@ -4,6 +4,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisConfigurationImpl;
 import org.apache.axis2.context.ConfigurationContext;
@@ -35,7 +36,8 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
     public void setUp() throws Exception {
         AxisConfiguration axisConfig = new AxisConfigurationImpl();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
-        mgr = AbstractBeanMgrFactory.getInstance(configCtx).getRetransmitterBeanMgr();
+        StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+        mgr = storageManager.getRetransmitterBeanMgr();
     }
 
     public void testDelete() {
