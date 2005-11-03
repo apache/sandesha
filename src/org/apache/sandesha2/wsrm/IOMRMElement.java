@@ -25,7 +25,6 @@ package org.apache.sandesha2.wsrm;
 
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
-import org.apache.axis2.soap.SOAPEnvelope;
 
 public interface IOMRMElement {
 	public OMElement getOMElement() throws OMException;

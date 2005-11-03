@@ -26,18 +26,12 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.miheaders.RelatesTo;
-import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
-import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;
-import org.apache.sandesha2.wsrm.TerminateSequence;
-import org.apache.wsdl.WSDLConstants;
-import org.ietf.jgss.MessageProp;
 
 /**
  * @author Chamikara
@@ -57,8 +51,8 @@ public class RMMsgContext {
 		rmMessageParts = new HashMap();
 		messageType = Constants.MessageTypes.UNKNOWN;
 	}
-	
-	public void setMessageContext (MessageContext msgCtx) {
+
+	public void setMessageContext(MessageContext msgCtx) {
 		this.msgContext = msgCtx;
 	}
 
@@ -121,12 +115,12 @@ public class RMMsgContext {
 	public String getMessageId() {
 		return msgContext.getMessageID();
 	}
-	
-	public void setFaultTo (EndpointReference epr) {
+
+	public void setFaultTo(EndpointReference epr) {
 		msgContext.setFaultTo(epr);
 	}
-	
-	public EndpointReference getFaultTo () {
+
+	public EndpointReference getFaultTo() {
 		return msgContext.getFaultTo();
 	}
 
@@ -135,16 +129,17 @@ public class RMMsgContext {
 	}
 
 	public void setSOAPEnvelop(SOAPEnvelope envelope) throws SandeshaException {
-		
+
 		try {
 			msgContext.setEnvelope(envelope);
 		} catch (AxisFault e) {
-			throw new SandeshaException (e.getMessage());
+			throw new SandeshaException(e.getMessage());
 		}
 	}
 
 	public void test() {
-		String opearaitonName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
+		String opearaitonName = msgContext.getOperationContext()
+				.getAxisOperation().getName().getLocalPart();
 		System.out.println("Operation is:" + opearaitonName);
 	}
 
@@ -182,12 +177,12 @@ public class RMMsgContext {
 	public void setRelatesTo(RelatesTo relatesTo) {
 		msgContext.setRelatesTo(relatesTo);
 	}
-	
+
 	public void setWSAAction(String URI) {
 		msgContext.setWSAAction(URI);
 	}
-	
-	public String getWSAAction () {
+
+	public String getWSAAction() {
 		return msgContext.getWSAAction();
 	}
 
@@ -217,7 +212,7 @@ public class RMMsgContext {
 		return msgContext.getSystemContext();
 	}
 
-	public void setSOAPAction (String SOAPAction) {
+	public void setSOAPAction(String SOAPAction) {
 		msgContext.setSoapAction(SOAPAction);
 	}
 }

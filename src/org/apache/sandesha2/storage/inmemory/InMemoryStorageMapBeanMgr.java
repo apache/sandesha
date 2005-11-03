@@ -21,13 +21,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-
 import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 
 /**
@@ -102,7 +98,7 @@ public class InMemoryStorageMapBeanMgr implements StorageMapBeanMgr {
 	public boolean update(StorageMapBean bean) {
 		if (!table.contains(bean))
 			return false;
-		
+
 		return table.put(bean.getKey(), bean) != null;
 	}
 

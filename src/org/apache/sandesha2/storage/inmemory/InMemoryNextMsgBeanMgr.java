@@ -23,9 +23,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 
@@ -72,36 +70,38 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 
-		if (bean==null)
+		if (bean == null)
 			return beans;
-		
+
 		NextMsgBean temp;
 		while (iterator.hasNext()) {
 			temp = (NextMsgBean) iterator.next();
 
-//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
-//					temp.getSequenceId()))
-//					/*
-//					 * && (bean.getNextMsgNoToProcess() != null &&
-//					 * bean.getNextMsgNoToProcess().equals(temp.getNextMsgNoToProcess()))
-//					 */
-//					&& (bean.getNextMsgNoToProcess() > 0)) {
-//
-//				beans.add(temp);
-//			}
-			
-			
+			//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
+			//					temp.getSequenceId()))
+			//					/*
+			//					 * && (bean.getNextMsgNoToProcess() != null &&
+			//					 *
+			// bean.getNextMsgNoToProcess().equals(temp.getNextMsgNoToProcess()))
+			//					 */
+			//					&& (bean.getNextMsgNoToProcess() > 0)) {
+			//
+			//				beans.add(temp);
+			//			}
+
 			boolean equal = true;
-			
-			if (bean.getNextMsgNoToProcess()>0 && bean.getNextMsgNoToProcess()!=temp.getNextMsgNoToProcess())
+
+			if (bean.getNextMsgNoToProcess() > 0
+					&& bean.getNextMsgNoToProcess() != temp
+							.getNextMsgNoToProcess())
 				equal = false;
-			
-			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
+
+			if (bean.getSequenceId() != null
+					&& !bean.getSequenceId().equals(temp.getSequenceId()))
 				equal = false;
-			
+
 			if (equal)
 				beans.add(temp);
-			
 
 		}
 		return beans;
@@ -110,7 +110,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 	public boolean update(NextMsgBean bean) {
 		if (!table.contains(bean))
 			return false;
-		
+
 		return table.put(bean.getSequenceId(), bean) != null;
 	}
 

@@ -19,41 +19,23 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-
 import javax.xml.namespace.QName;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.handlers.SandeshaOutHandler;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
-import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.Nack;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
-
-/**
- * @author Chamikara
- * @author Sanka
- */
 
 public class AcknowledgementProcessor implements MsgProcessor {
 
@@ -68,9 +50,13 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		if (context == null)
 			throw new SandeshaException("Context is null");
 
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getMessageContext().getSystemContext());
-		RetransmitterBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil
+				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
+						.getSystemContext());
+		RetransmitterBeanMgr retransmitterMgr = storageManager
+				.getRetransmitterBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+				.getSequencePropretyBeanMgr();
 
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges()
 				.iterator();
@@ -88,16 +74,17 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		String tempSequenceId = (String) tempSequenceBean.getValue();
 
-	
-		
 		//Following happens in the SandeshaGlobal handler
-		rmMsgCtx.getMessageContext().setProperty(Constants.ACK_PROCSSED,"true");
-		
-		//Removing relatesTo - Some WSRM endpoints tend to set relatesTo value for ack messages.
+		rmMsgCtx.getMessageContext()
+				.setProperty(Constants.ACK_PROCSSED, "true");
+
+		//Removing relatesTo - Some WSRM endpoints tend to set relatesTo value
+		// for ack messages.
 		//Because of this dispatching may go wrong.
-		//So we set relatesTo value to null for ackMessages. (this happens in the SandeshaGlobal handler)
+		//So we set relatesTo value to null for ackMessages. (this happens in
+		// the SandeshaGlobal handler)
 		rmMsgCtx.setRelatesTo(null);
-		
+
 		RetransmitterBean input = new RetransmitterBean();
 		input.setTempSequenceId(tempSequenceId);
 		Collection retransmitterEntriesOfSequence = retransmitterMgr
@@ -126,51 +113,41 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			//TODO - Process Nack
 		}
 
-		
-		
-		
-//		boolean justSendTerminateIfNeeded = false;
-//		String ackProcessed = (String) rmMsgCtx.getProperty(Constants.ACK_PROCSSED);
-//		if (ackProcessed!=null && "true".equals(ackProcessed))
-//			justSendTerminateIfNeeded = true;
-			
 		//following get called in the SandesaInHandler
 		//if (justSendTerminateIfNeeded) {
-			//If all messages up to last message have been acknowledged.
-			//Add terminate Sequence message.
-			SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
-					tempSequenceId,
-					Constants.SequenceProperties.LAST_OUT_MESSAGE);
-			if (lastOutMsgBean != null) {
-				Long lastOutMsgNoLng = (Long) lastOutMsgBean.getValue();
-				if (lastOutMsgNoLng == null)
-					throw new SandeshaException(
-							"Invalid object set for the Last Out Message");
+		//If all messages up to last message have been acknowledged.
+		//Add terminate Sequence message.
+		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
+				tempSequenceId, Constants.SequenceProperties.LAST_OUT_MESSAGE);
+		if (lastOutMsgBean != null) {
+			Long lastOutMsgNoLng = (Long) lastOutMsgBean.getValue();
+			if (lastOutMsgNoLng == null)
+				throw new SandeshaException(
+						"Invalid object set for the Last Out Message");
 
-				long lastOutMessageNo = lastOutMsgNoLng.longValue();
-				if (lastOutMessageNo <= 0)
-					throw new SandeshaException(
-							"Invalid value set for the last out message");
+			long lastOutMessageNo = lastOutMsgNoLng.longValue();
+			if (lastOutMessageNo <= 0)
+				throw new SandeshaException(
+						"Invalid value set for the last out message");
 
-				boolean complete = SandeshaUtil.verifySequenceCompletion(
-						sequenceAck.getAcknowledgementRanges().iterator(),
-						lastOutMessageNo);
+			boolean complete = SandeshaUtil.verifySequenceCompletion(
+					sequenceAck.getAcknowledgementRanges().iterator(),
+					lastOutMessageNo);
 
-				if (complete) {
-					addTerminateSequenceMessage(rmMsgCtx, outSequenceId,
-							tempSequenceId);
-				}
-				
-				//stopping the progress of the message further.
-				rmMsgCtx.getMessageContext().setPausedTrue(
-						new QName(Constants.IN_HANDLER_NAME));
-				
-				//return;
+			if (complete) {
+				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,
+						tempSequenceId);
+			}
+
+			//stopping the progress of the message further.
+			rmMsgCtx.getMessageContext().setPausedTrue(
+					new QName(Constants.IN_HANDLER_NAME));
+
+			//return;
 			//}
 		}
-		
-		int i = 1;
 
+		int i = 1;
 
 	}
 
@@ -193,35 +170,33 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
 
 		//detting addressing headers.
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext().getSystemContext());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-		
+		StorageManager storageManager = SandeshaUtil
+				.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
+						.getSystemContext());
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+				.getSequencePropretyBeanMgr();
+
 		//SequencePropertyBean replyToBean =
 		// seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,
 				Constants.SequenceProperties.TO_EPR);
-		//		if (replyToBean==null)
-		//			throw new SandeshaException ("ReplyTo property is not set");
-
-		//		EndpointReference replyToEPR = (EndpointReference)
-		// replyToBean.getValue();
-		//		if (replyToEPR==null)
-		//			throw new SandeshaException ("ReplyTo EPR has an invalid value");
 
 		EndpointReference toEPR = (EndpointReference) toBean.getValue();
 		if (toEPR == null)
 			throw new SandeshaException("To EPR has an invalid value");
 
 		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
-		terminateRMMessage.setFrom(new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS));
-		terminateRMMessage.setFaultTo(new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS));
+		terminateRMMessage.setFrom(new EndpointReference(
+				Constants.WSA.NS_URI_ANONYMOUS));
+		terminateRMMessage.setFaultTo(new EndpointReference(
+				Constants.WSA.NS_URI_ANONYMOUS));
 		//terminateRMMessage.setFrom(new EndpointReference
 		// (replyToEPR.getAddress()));
 		terminateRMMessage
 				.setWSAAction(Constants.WSRM.Actions.TERMINATE_SEQUENCE);
-		terminateRMMessage
-			.setSOAPAction("\"" + Constants.WSRM.Actions.TERMINATE_SEQUENCE + "\"");
-		
+		terminateRMMessage.setSOAPAction("\""
+				+ Constants.WSRM.Actions.TERMINATE_SEQUENCE + "\"");
+
 		try {
 			terminateRMMessage.addSOAPEnvelope();
 		} catch (AxisFault e) {
@@ -244,7 +219,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateBean.setSend(true);
 		terminateBean.setReSend(false);
 
-		RetransmitterBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		RetransmitterBeanMgr retramsmitterMgr = storageManager
+				.getRetransmitterBeanMgr();
 		retramsmitterMgr.insert(terminateBean);
 
 	}

@@ -16,49 +16,21 @@
  */
 package org.apache.sandesha2.workers;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.clientapi.Call;
-import org.apache.axis2.clientapi.InOutMEPClient;
-import org.apache.axis2.clientapi.MessageSender;
-import org.apache.axis2.clientapi.TwoWayTransportBasedSender;
-import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.om.OMException;
 import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.transport.TransportUtils;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Constants.MessageTypes;
-import org.apache.sandesha2.client.SandeshaMepClient;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
-import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.wsrm.Sequence;
-
-/**
- * @author Chamikara
- * @author Sanka
- */
 
 public class Sender extends Thread {
 
@@ -81,65 +53,62 @@ public class Sender extends Thread {
 				if (context == null)
 					throw new SandeshaException(
 							"Can't continue the Sender. Context is null");
+
+				StorageManager storageManager = SandeshaUtil
+						.getSandeshaStorageManager(context);
+
+				RetransmitterBeanMgr mgr = storageManager
+						.getRetransmitterBeanMgr();
+				Collection coll = mgr.findMsgsToSend();
+				Iterator iter = coll.iterator();
+				while (iter.hasNext()) {
+					RetransmitterBean bean = (RetransmitterBean) iter.next();
+					String key = (String) bean.getKey();
+					MessageContext msgCtx = SandeshaUtil
+							.getStoredMessageContext(key);
+
+					try {
+						RMMsgContext rmMsgCtx = MsgInitializer
+								.initializeMessage(msgCtx);
+						updateMessage(msgCtx);
+
+						Object debug = context
+								.getProperty(Constants.SANDESHA_DEBUG_MODE);
+						if (debug != null && "on".equals(debug)) {
+							System.out.println("DEBUG: Sender is sending a '"
+									+ SandeshaUtil
+											.getMessageTypeString(rmMsgCtx
+													.getMessageType())
+									+ "' message.");
+						}
+
+						new AxisEngine(context).send(msgCtx);
+
+						//if (!msgCtx.isServerSide())
+						checkForSyncResponses(msgCtx);
+
+					} catch (AxisFault e1) {
+						e1.printStackTrace();
+					} catch (Exception e3) {
+						e3.printStackTrace();
+					}
+
+					//changing the values of the sent bean.
+					bean.setLastSentTime(System.currentTimeMillis());
+					bean.setSentCount(bean.getSentCount() + 1);
+
+					//update if resend=true otherwise delete. (reSend=false
+					// means
+					// send only once).
+					if (bean.isReSend())
+						mgr.update(bean);
+					else
+						mgr.delete(bean.getMessageId());
+
+				}
 			} catch (SandeshaException e) {
 				e.printStackTrace();
 				return;
-			}
-
-			StorageManager storageManager = null;
-
-			try {
-				storageManager = SandeshaUtil
-						.getSandeshaStorageManager(context);
-			} catch (SandeshaException e4) {
-				e4.printStackTrace();
-				return;
-			}
-
-			RetransmitterBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
-			Collection coll = mgr.findMsgsToSend();
-			Iterator iter = coll.iterator();
-			while (iter.hasNext()) {
-				RetransmitterBean bean = (RetransmitterBean) iter.next();
-				String key = (String) bean.getKey();
-				MessageContext msgCtx = SandeshaUtil
-						.getStoredMessageContext(key);
-
-				try {
-					RMMsgContext rmMsgCtx = MsgInitializer
-							.initializeMessage(msgCtx);
-					updateMessage(msgCtx);
-
-					Object debug = context
-							.getProperty(Constants.SANDESHA_DEBUG_MODE);
-					if (debug != null && "on".equals(debug)) {
-						System.out.println("DEBUG: Sender is sending a '"
-								+ SandeshaUtil.getMessageTypeString(rmMsgCtx
-										.getMessageType()) + "' message.");
-					}
-
-					new AxisEngine(context).send(msgCtx);
-
-					//if (!msgCtx.isServerSide())
-					checkForSyncResponses(msgCtx);
-
-				} catch (AxisFault e1) {
-					e1.printStackTrace();
-				} catch (Exception e3) {
-					e3.printStackTrace();
-				}
-
-				//changing the values of the sent bean.
-				bean.setLastSentTime(System.currentTimeMillis());
-				bean.setSentCount(bean.getSentCount() + 1);
-
-				//update if resend=true otherwise delete. (reSend=false means
-				// send only once).
-				if (bean.isReSend())
-					mgr.update(bean);
-				else
-					mgr.delete(bean.getMessageId());
-
 			}
 
 			try {

@@ -23,9 +23,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
@@ -68,40 +66,43 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 
 	public Collection find(SequencePropertyBean bean) {
 		ArrayList beans = new ArrayList();
-		
-		if (bean==null)
+
+		if (bean == null)
 			return beans;
-		
+
 		Iterator iterator = table.values().iterator();
 		SequencePropertyBean temp;
 
 		while (iterator.hasNext()) {
 			temp = (SequencePropertyBean) iterator.next();
 
-//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
-//					temp.getSequenceId()))
-//					&& (bean.getName() != null && bean.getName().equals(
-//							temp.getName()))
-//					&& (bean.getValue() != null && bean.getValue().equals(
-//							temp.getValue()))) {
-//
-//				beans.add(temp);
-//			}
-			
+			//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
+			//					temp.getSequenceId()))
+			//					&& (bean.getName() != null && bean.getName().equals(
+			//							temp.getName()))
+			//					&& (bean.getValue() != null && bean.getValue().equals(
+			//							temp.getValue()))) {
+			//
+			//				beans.add(temp);
+			//			}
+
 			boolean equal = true;
-			
-			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
+
+			if (bean.getSequenceId() != null
+					&& !bean.getSequenceId().equals(temp.getSequenceId()))
 				equal = false;
-			
-			if (bean.getName()!=null && !bean.getName().equals(temp.getName()))
+
+			if (bean.getName() != null
+					&& !bean.getName().equals(temp.getName()))
 				equal = false;
-			
-			if (bean.getValue()!=null && !bean.getValue().equals(temp.getValue()))
+
+			if (bean.getValue() != null
+					&& !bean.getValue().equals(temp.getValue()))
 				equal = false;
-			
+
 			if (equal)
 				beans.add(temp);
-			
+
 		}
 		return beans;
 	}
@@ -109,7 +110,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	public boolean update(SequencePropertyBean bean) {
 		if (!table.contains(bean))
 			return false;
-		
+
 		return table.put(getId(bean), bean) != null;
 
 	}

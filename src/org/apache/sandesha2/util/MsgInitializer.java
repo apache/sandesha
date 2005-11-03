@@ -1,40 +1,27 @@
 /*
- * Copyright  1999-2004 The Apache Software Foundation.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Copyright 1999-2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *  
  */
 
 package org.apache.sandesha2.util;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.apache.axis2.addressing.om.AddressingHeaders;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Constants.MessageParts;
-import org.apache.sandesha2.Constants.MessageTypes;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.wsrm.RMElements;
-
-/**
- * @author Chamikara
- * @author Sanka
- * @author Jaliya
- */
 
 public class MsgInitializer {
 
@@ -78,7 +65,7 @@ public class MsgInitializer {
 		if (elements.getAckRequested() != null)
 			rmMsgContext.setMessagePart(Constants.MessageParts.ACK_REQUEST,
 					elements.getAckRequested());
-	
+
 	}
 
 	private static boolean validateMessage(RMMsgContext rmMsgCtx)
@@ -97,7 +84,8 @@ public class MsgInitializer {
 			rmMsgCtx.setMessageType(Constants.MessageTypes.TERMINATE_SEQ);
 		else if (rmMsgCtx.getMessagePart(Constants.MessageParts.SEQUENCE) != null)
 			rmMsgCtx.setMessageType(Constants.MessageTypes.APPLICATION);
-		else if (rmMsgCtx.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT)!=null)
+		else if (rmMsgCtx
+				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT) != null)
 			rmMsgCtx.setMessageType(Constants.MessageTypes.ACK);
 		else
 			rmMsgCtx.setMessageType(Constants.MessageTypes.UNKNOWN);

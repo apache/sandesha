@@ -1,18 +1,18 @@
 /*
- * Copyright  1999-2004 The Apache Software Foundation.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Copyright 1999-2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *  
  */
 
 package org.apache.sandesha2.util;
@@ -20,14 +20,9 @@ package org.apache.sandesha2.util;
 import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.MessageInformationHeaders;
-import org.apache.axis2.addressing.om.AddressingHeaders;
-import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -38,55 +33,32 @@ import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.AxisConfigurationImpl;
-import org.apache.axis2.engine.Phase;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPFactory;
-import org.apache.axis2.wsdl.builder.wsdl4j.WSDL11MEPFinder;
-import org.apache.log4j.spi.Configurator;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Constants.MessageParts;
-import org.apache.sandesha2.Constants.SOAPVersion;
-import org.apache.sandesha2.Constants.SequenceProperties;
-import org.apache.sandesha2.Constants.WSA;
-import org.apache.sandesha2.Constants.WSRM;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
 import org.apache.sandesha2.wsrm.Accept;
-import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.IOMRMElement;
-import org.apache.sandesha2.wsrm.IOMRMPart;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
-import org.apache.wsdl.WSDLConstants;
-
-
-/**
- * @author Chamikara
- * @author Sanka
- * @author Jaliya
- */
 
 public class RMMsgCreator {
 
-	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String tempSequenceId, String acksTo)
+	public static RMMsgContext createCreateSeqMsg(
+			RMMsgContext applicationRMMsg, String tempSequenceId, String acksTo)
 			throws SandeshaException {
-				
+
 		MessageContext applicationMsgContext = applicationRMMsg
 				.getMessageContext();
 		if (applicationMsgContext == null)
@@ -95,8 +67,10 @@ public class RMMsgCreator {
 		if (context == null)
 			throw new SandeshaException("Configuration Context is null");
 
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil
+				.getSandeshaStorageManager(context);
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+				.getSequencePropretyBeanMgr();
 		MessageContext createSeqmsgContext;
 		try {
 			//creating by copying common contents. (this will not set contexts
@@ -119,15 +93,23 @@ public class RMMsgCreator {
 
 		String createSeqMsgId = SandeshaUtil.getUUID();
 		try {
-			AxisOperation appMsgOperationDesc = applicationMsgContext.getAxisOperation();
-			AxisOperation createSeqOperationDesc = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_URI_OUT_IN);
-			if (appMsgOperationDesc!=null) {
-				createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
-				createSeqOperationDesc.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
-				createSeqOperationDesc.setPhasesInFaultFlow(appMsgOperationDesc.getPhasesInFaultFlow());
-				createSeqOperationDesc.setRemainingPhasesInFlow(appMsgOperationDesc.getRemainingPhasesInFlow());
+			AxisOperation appMsgOperationDesc = applicationMsgContext
+					.getAxisOperation();
+			AxisOperation createSeqOperationDesc = AxisOperationFactory
+					.getOperetionDescription(AxisOperationFactory.MEP_URI_OUT_IN);
+			if (appMsgOperationDesc != null) {
+				createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc
+						.getPhasesOutFlow());
+				createSeqOperationDesc
+						.setPhasesOutFaultFlow(appMsgOperationDesc
+								.getPhasesOutFaultFlow());
+				createSeqOperationDesc.setPhasesInFaultFlow(appMsgOperationDesc
+						.getPhasesInFaultFlow());
+				createSeqOperationDesc
+						.setRemainingPhasesInFlow(appMsgOperationDesc
+								.getRemainingPhasesInFlow());
 			}
-			
+
 			createSeqmsgContext.setAxisOperation(createSeqOperationDesc);
 			//TODO set a suitable ope. description
 			OperationContext createSeqOpContext = new OperationContext(
@@ -135,16 +117,17 @@ public class RMMsgCreator {
 			createSeqmsgContext.setOperationContext(createSeqOpContext);
 			createSeqOpContext.addMessageContext(createSeqmsgContext);
 			//registering opearion context
-			context.registerOperationContext(createSeqMsgId,createSeqOpContext);
+			context
+					.registerOperationContext(createSeqMsgId,
+							createSeqOpContext);
 
-			
 			//Setting a new SOAP Envelop.
 			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
 					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 
 			createSeqmsgContext.setEnvelope(envelope);
-//			createSeqOpContext.addMessageContext(createSeqmsgContext);
-//			createSeqmsgContext.setOperationContext(createSeqOpContext);
+			//			createSeqOpContext.addMessageContext(createSeqmsgContext);
+			//			createSeqmsgContext.setOperationContext(createSeqOpContext);
 		} catch (AxisFault e2) {
 			throw new SandeshaException(e2.getMessage());
 		}
@@ -156,55 +139,55 @@ public class RMMsgCreator {
 
 		CreateSequence createSequencePart = new CreateSequence();
 
-		
 		//Adding sequence offer - if present
-		String offeredSequence = (String) context.getProperty(Constants.OFFERED_SEQUENCE_ID);
-		if (offeredSequence!=null && !"".equals(offeredSequence))
-		{
-			SequenceOffer offerPart = new SequenceOffer ();
-			Identifier identifier = new Identifier ();
+		String offeredSequence = (String) context
+				.getProperty(Constants.OFFERED_SEQUENCE_ID);
+		if (offeredSequence != null && !"".equals(offeredSequence)) {
+			SequenceOffer offerPart = new SequenceOffer();
+			Identifier identifier = new Identifier();
 			identifier.setIndentifer(offeredSequence);
 			offerPart.setIdentifier(identifier);
 			createSequencePart.setSequenceOffer(offerPart);
 		}
-			
-		//TODO decide - where to send create seq. Acksto or replyTo
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId, Constants.SequenceProperties.REPLY_TO_EPR);
-		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.TO_EPR);
 
-		if (toBean==null || toBean.getValue()==null)
-			throw new SandeshaException ("To EPR is not set.");
-		
+		//TODO decide - where to send create seq. Acksto or replyTo
+		SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId,
+				Constants.SequenceProperties.REPLY_TO_EPR);
+		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,
+				Constants.SequenceProperties.TO_EPR);
+
+		if (toBean == null || toBean.getValue() == null)
+			throw new SandeshaException("To EPR is not set.");
+
 		EndpointReference toEPR = (EndpointReference) toBean.getValue();
 		EndpointReference replyToEPR = null;
 		EndpointReference acksToEPR = null;
-		
+
 		//AcksTo value is replyto value (if set). Otherwise anonymous.
-//		if (replyToBean==null || replyToBean.getValue()==null){
-//			if (acksTo==null)
-//			acksToEPR = new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS);
-//		}else { 
-//			acksToEPR = (EndpointReference) replyToBean.getValue();
-//		}
-		
-		if (acksTo==null || "".equals(acksTo))
+		//		if (replyToBean==null || replyToBean.getValue()==null){
+		//			if (acksTo==null)
+		//			acksToEPR = new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS);
+		//		}else {
+		//			acksToEPR = (EndpointReference) replyToBean.getValue();
+		//		}
+
+		if (acksTo == null || "".equals(acksTo))
 			acksTo = Constants.WSA.NS_URI_ANONYMOUS;
-			
-		acksToEPR = new EndpointReference (acksTo);	
-		
-		if (replyToBean!=null && replyToBean.getValue()!=null)
+
+		acksToEPR = new EndpointReference(acksTo);
+
+		if (replyToBean != null && replyToBean.getValue() != null)
 			replyToEPR = (EndpointReference) replyToBean.getValue();
 
 		createSeqRMMsg.setTo(toEPR);
-		
+
 		//ReplyTo will be set only if not null.
-		if(replyToEPR!=null) 
+		if (replyToEPR != null)
 			createSeqRMMsg.setReplyTo(replyToEPR);
-		
-		
+
 		//FIXME - Give user a seperate way to set acksTo (client side)
 		createSequencePart.setAcksTo(new AcksTo(new Address(acksToEPR)));
-		
+
 		createSeqRMMsg.setMessagePart(Constants.MessageParts.CREATE_SEQ,
 				createSequencePart);
 
@@ -215,7 +198,8 @@ public class RMMsgCreator {
 		}
 
 		createSeqRMMsg.setAction(Constants.WSRM.ACTION_CREATE_SEQ);
-		createSeqRMMsg.setSOAPAction("\"" + Constants.WSRM.ACTION_CREATE_SEQ + "\"");
+		createSeqRMMsg.setSOAPAction("\"" + Constants.WSRM.ACTION_CREATE_SEQ
+				+ "\"");
 		createSeqRMMsg.setMessageId(createSeqMsgId);
 
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
@@ -229,73 +213,87 @@ public class RMMsgCreator {
 
 		return createSeqRMMsg;
 	}
-	
-	public static RMMsgContext createTerminateSequenceMessage (RMMsgContext referenceRMMessage, String sequenceId) throws SandeshaException {
-		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
-		if (referenceMessage==null)
-			throw new SandeshaException ("MessageContext is null");
-		
-		RMMsgContext terminateRMMessage = SandeshaUtil.shallowCopy(referenceRMMessage);
-		MessageContext terminateMessage = terminateRMMessage.getMessageContext();
-		if (terminateMessage==null)
-			throw new SandeshaException ("MessageContext is null");
-			
-		MessageInformationHeaders newMessageInfoHeaders = new MessageInformationHeaders ();
+
+	public static RMMsgContext createTerminateSequenceMessage(
+			RMMsgContext referenceRMMessage, String sequenceId)
+			throws SandeshaException {
+		MessageContext referenceMessage = referenceRMMessage
+				.getMessageContext();
+		if (referenceMessage == null)
+			throw new SandeshaException("MessageContext is null");
+
+		RMMsgContext terminateRMMessage = SandeshaUtil
+				.shallowCopy(referenceRMMessage);
+		MessageContext terminateMessage = terminateRMMessage
+				.getMessageContext();
+		if (terminateMessage == null)
+			throw new SandeshaException("MessageContext is null");
+
+		MessageInformationHeaders newMessageInfoHeaders = new MessageInformationHeaders();
 		terminateMessage.setMessageInformationHeaders(newMessageInfoHeaders);
 		terminateMessage.setMessageID(SandeshaUtil.getUUID());
-		
-		
+
 		ConfigurationContext configCtx = referenceMessage.getSystemContext();
-		if (configCtx==null)
-			throw new SandeshaException ("Configuration Context is null");
-		
+		if (configCtx == null)
+			throw new SandeshaException("Configuration Context is null");
+
 		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
-		AxisServiceGroup serviceGroup = new AxisServiceGroup (axisConfig);
-		AxisService service = new AxisService (new QName ("RMClientService")); // This is a dummy service.
-		ServiceGroupContext serviceGroupContext = new ServiceGroupContext (configCtx,serviceGroup);
-		ServiceContext serviceContext = new ServiceContext (service,serviceGroupContext);
-		
+		AxisServiceGroup serviceGroup = new AxisServiceGroup(axisConfig);
+		AxisService service = new AxisService(new QName("RMClientService")); // This
+																			 // is a
+																			 // dummy
+																			 // service.
+		ServiceGroupContext serviceGroupContext = new ServiceGroupContext(
+				configCtx, serviceGroup);
+		ServiceContext serviceContext = new ServiceContext(service,
+				serviceGroupContext);
+
 		terminateMessage.setAxisServiceGroup(serviceGroup);
 		terminateMessage.setServiceGroupContext(serviceGroupContext);
 		terminateMessage.setAxisService(service);
 		terminateMessage.setServiceContext(serviceContext);
-		
+
 		try {
-			AxisOperation terminateOperaiton = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
-			AxisOperation referenceMsgOperation = referenceMessage.getAxisOperation();
-			if (referenceMsgOperation!=null) {
+			AxisOperation terminateOperaiton = AxisOperationFactory
+					.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
+			AxisOperation referenceMsgOperation = referenceMessage
+					.getAxisOperation();
+			if (referenceMsgOperation != null) {
 				ArrayList outPhases = referenceMsgOperation.getPhasesOutFlow();
-				if (outPhases!=null) {
+				if (outPhases != null) {
 					terminateOperaiton.setPhasesOutFlow(outPhases);
 					terminateOperaiton.setPhasesOutFaultFlow(outPhases);
 				}
 			}
-			
-			OperationContext terminateOpContext = new OperationContext (terminateOperaiton);
+
+			OperationContext terminateOpContext = new OperationContext(
+					terminateOperaiton);
 			terminateMessage.setAxisOperation(terminateOperaiton);
 			terminateMessage.setOperationContext(terminateOpContext);
 			terminateOpContext.addMessageContext(terminateMessage);
 			terminateMessage.setOperationContext(terminateOpContext);
-			
+
 		} catch (AxisFault e) {
-			throw new SandeshaException (e.getMessage());
+			throw new SandeshaException(e.getMessage());
 		}
-		
-		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
+
+		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 		terminateRMMessage.setSOAPEnvelop(envelope);
-		
-		TerminateSequence terminateSequencePart = new TerminateSequence ();
-		Identifier identifier = new Identifier ();
+
+		TerminateSequence terminateSequencePart = new TerminateSequence();
+		Identifier identifier = new Identifier();
 		identifier.setIndentifer(sequenceId);
 		terminateSequencePart.setIdentifier(identifier);
-		terminateRMMessage.setMessagePart(Constants.MessageParts.TERMINATE_SEQ,terminateSequencePart);
-		
+		terminateRMMessage.setMessagePart(Constants.MessageParts.TERMINATE_SEQ,
+				terminateSequencePart);
+
 		return terminateRMMessage;
 	}
 
 	public static RMMsgContext createCreateSeqResponseMsg(
-			RMMsgContext createSeqMessage, MessageContext outMessage, String newSequenceID)
-			throws AxisFault {
+			RMMsgContext createSeqMessage, MessageContext outMessage,
+			String newSequenceID) throws AxisFault {
 
 		IOMRMElement messagePart = createSeqMessage
 				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
@@ -309,12 +307,12 @@ public class RMMsgCreator {
 		response.setIdentifier(identifier);
 
 		SequenceOffer offer = cs.getSequenceOffer();
-		if (offer!=null) {
+		if (offer != null) {
 			String outSequenceId = offer.getIdentifer().getIdentifier();
-			
+
 			//TODO do a better validation for the offered out sequence id.
-			if (outSequenceId!=null && !"".equals(outSequenceId)) {
-				
+			if (outSequenceId != null && !"".equals(outSequenceId)) {
+
 				Accept accept = new Accept();
 				EndpointReference acksToEPR = createSeqMessage.getTo();
 				AcksTo acksTo = new AcksTo();
@@ -322,19 +320,17 @@ public class RMMsgCreator {
 				address.setEpr(acksToEPR);
 				acksTo.setAddress(address);
 				accept.setAcksTo(acksTo);
-				response.setAccept(accept);	
+				response.setAccept(accept);
 			}
-			
-			
-		}
 
+		}
 
 		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
 				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 		response.toOMElement(envelope.getBody());
 		outMessage.setWSAAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
 		outMessage.setSoapAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
-		
+
 		String newMessageId = SandeshaUtil.getUUID();
 		outMessage.setMessageID(newMessageId);
 
@@ -368,13 +364,15 @@ public class RMMsgCreator {
 
 		ConfigurationContext ctx = applicationMsg.getMessageContext()
 				.getSystemContext();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(ctx);
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil
+				.getSandeshaStorageManager(ctx);
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+				.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
 				Constants.SequenceProperties.RECEIVED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
-		
+
 		AcknowledgementRange[] ackRangeArr = SandeshaUtil
 				.getAckRangeArray(msgNoList);
 

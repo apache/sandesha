@@ -15,18 +15,10 @@
  *  
  */
 
-/**
- * @author Chamikara
- * @author Sanka
- */
-
 package org.apache.sandesha2.handlers;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -35,14 +27,9 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
-import org.apache.sandesha2.msgprocessors.MsgProcessor;
-import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.beans.StorageMapBean;
-import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemoryStorageMapBeanMgr;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -164,7 +151,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		switch (rmMsgCtx.getMessageType()) {
 		case Constants.MessageTypes.ACK:
 			rmMsgCtx.setRelatesTo(null); //Removing the relatesTo part from
-										 // ackMessageIf present.
+		// ackMessageIf present.
 		//Some Frameworks tend to send this.
 		}
 	}

@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.storage.beans;
 
-import java.io.Serializable;
-
 /**
  * @author  
  */

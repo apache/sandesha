@@ -18,7 +18,6 @@
 package org.apache.sandesha2.util;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.RMMsgContext;
 
 /**

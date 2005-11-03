@@ -16,33 +16,21 @@
  */
 package org.apache.sandesha2.util;
 
-import java.awt.datatransfer.StringSelection;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.StringTokenizer;
-
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.MessageInformationHeaders;
-import org.apache.axis2.addressing.miheaders.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
-
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.impl.MIMEOutputUtils;
 import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -56,7 +44,6 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.workers.InOrderInvoker;
 import org.apache.sandesha2.workers.Sender;

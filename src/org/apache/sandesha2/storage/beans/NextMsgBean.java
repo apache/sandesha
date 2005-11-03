@@ -17,10 +17,8 @@
 
 package org.apache.sandesha2.storage.beans;
 
-import java.io.Serializable;
-
 /**
- * @author  
+ * @author
  */
 public class NextMsgBean implements RMBean {
 	private String SequenceId;

@@ -5,32 +5,18 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.apache.sandesha2.util;
-
-import java.util.ArrayList;
-
-import javax.naming.Context;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Constants.ClientProperties;
-import org.apache.sandesha2.Constants.MessageParts;
-import org.apache.sandesha2.Constants.SequenceProperties;
-import org.apache.sandesha2.Constants.WSA;
-import org.apache.sandesha2.handlers.SandeshaInHandler;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
-import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
 /**

@@ -21,12 +21,6 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 
-/**
- * @author Chamikara
- * @author Sanka
- * @author Jaliya 
- */
-
 public class SandeshaModule implements Module{
 
 	//private InOrderInvoker inorderInvoker = new InOrderInvoker ();

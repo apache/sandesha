@@ -17,21 +17,12 @@
 
 package org.apache.sandesha2.storage;
 
-import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemoryCreateSeqBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemoryStorageMapBeanMgr;
-
-import com.sun.corba.se.internal.core.Constant;
 
 /**
  * @author Chamikara Jayalath <chamikara@wso2.com>
@@ -40,30 +31,30 @@ import com.sun.corba.se.internal.core.Constant;
 public abstract class StorageManager {
 
 	private ConfigurationContext context;
-	
-	public StorageManager (ConfigurationContext context) {
+
+	public StorageManager(ConfigurationContext context) {
 		this.context = context;
 	}
-	
-	public ConfigurationContext getContext () {
+
+	public ConfigurationContext getContext() {
 		return context;
 	}
-	
-	public void setContext (ConfigurationContext context) {
-		if (context!=null)
+
+	public void setContext(ConfigurationContext context) {
+		if (context != null)
 			this.context = context;
 	}
-	
-	public abstract Transaction getTransaction ();
-	
-	public abstract CreateSeqBeanMgr getCreateSeqBeanMgr ();
-	
-	public abstract NextMsgBeanMgr getNextMsgBeanMgr ();
 
-	public abstract RetransmitterBeanMgr getRetransmitterBeanMgr ();
+	public abstract Transaction getTransaction();
 
-	public abstract SequencePropertyBeanMgr getSequencePropretyBeanMgr ();
+	public abstract CreateSeqBeanMgr getCreateSeqBeanMgr();
 
-	public abstract StorageMapBeanMgr getStorageMapBeanMgr ();
+	public abstract NextMsgBeanMgr getNextMsgBeanMgr();
+
+	public abstract RetransmitterBeanMgr getRetransmitterBeanMgr();
+
+	public abstract SequencePropertyBeanMgr getSequencePropretyBeanMgr();
+
+	public abstract StorageMapBeanMgr getStorageMapBeanMgr();
 
 }

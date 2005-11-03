@@ -23,12 +23,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
-import org.apache.sandesha2.util.MsgInitializer;
 
 /**
  * @author Chamikara Jayalath <chamikara@wso2.com>
@@ -57,7 +55,7 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 
 	public boolean insert(RetransmitterBean bean) throws SandeshaException {
 		if (bean.getMessageId() == null)
-			throw new SandeshaException("Key (MessageId) is null. Cant insert.");	
+			throw new SandeshaException("Key (MessageId) is null. Cant insert.");
 		table.put(bean.getMessageId(), bean);
 		return true;
 	}
@@ -75,7 +73,7 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 			temp = (RetransmitterBean) iterator.next();
 
 			boolean add = true;
-			
+
 			if (bean.getKey() != null && !bean.getKey().equals(temp.getKey()))
 				add = false;
 
@@ -88,7 +86,8 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 				add = false;
 
 			if (bean.getTempSequenceId() != null
-					&& !bean.getTempSequenceId().equals(temp.getTempSequenceId()))
+					&& !bean.getTempSequenceId().equals(
+							temp.getTempSequenceId()))
 				add = false;
 
 			if (bean.getMessageNumber() > 0
@@ -126,7 +125,7 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 	public boolean update(RetransmitterBean bean) {
 		if (!table.contains(bean))
 			return false;
-		
+
 		return table.put(bean.getMessageId(), bean) != null;
 	}
 

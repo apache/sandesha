@@ -23,9 +23,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
@@ -38,7 +36,6 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 
 	private Hashtable table = null;
 
-	
 	//TODO change the primary key.
 	//When offered. msgId==null
 	/**
@@ -70,43 +67,47 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 	public boolean update(CreateSeqBean bean) {
 		if (!table.contains(bean))
 			return false;
-		
+
 		return table.put(bean.getCreateSeqMsgId(), bean) != null;
 	}
 
 	public Collection find(CreateSeqBean bean) {
 		ArrayList beans = new ArrayList();
-		if (bean==null)
+		if (bean == null)
 			return beans;
-		
+
 		Iterator iterator = table.values().iterator();
 
 		CreateSeqBean temp;
 		while (iterator.hasNext()) {
 			temp = (CreateSeqBean) iterator.next();
-//			if ((bean.getCreateSeqMsgId() != null && bean.getCreateSeqMsgId()
-//					.equals(temp.getCreateSeqMsgId()))
-//					&& (bean.getSequenceId() != null && bean.getSequenceId()
-//							.equals(bean.getSequenceId()))) {
-//				beans.add(temp);
-//
-//			}
-			
+			//			if ((bean.getCreateSeqMsgId() != null && bean.getCreateSeqMsgId()
+			//					.equals(temp.getCreateSeqMsgId()))
+			//					&& (bean.getSequenceId() != null && bean.getSequenceId()
+			//							.equals(bean.getSequenceId()))) {
+			//				beans.add(temp);
+			//
+			//			}
+
 			boolean equal = true;
-			
-			if (bean.getCreateSeqMsgId()!=null && !bean.getCreateSeqMsgId().equals(temp.getCreateSeqMsgId()))
+
+			if (bean.getCreateSeqMsgId() != null
+					&& !bean.getCreateSeqMsgId().equals(
+							temp.getCreateSeqMsgId()))
 				equal = false;
-			
-			if (bean.getSequenceId()!=null && !bean.getSequenceId().equals(temp.getSequenceId()))
+
+			if (bean.getSequenceId() != null
+					&& !bean.getSequenceId().equals(temp.getSequenceId()))
 				equal = false;
-			
-			if (bean.getTempSequenceId()!=null && !bean.getTempSequenceId().equals(temp.getTempSequenceId()))
+
+			if (bean.getTempSequenceId() != null
+					&& !bean.getTempSequenceId().equals(
+							temp.getTempSequenceId()))
 				equal = false;
-			
-			
+
 			if (equal)
 				beans.add(temp);
-			
+
 		}
 		return beans;
 	}

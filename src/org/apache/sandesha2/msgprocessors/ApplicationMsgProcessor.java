@@ -1,31 +1,24 @@
 /*
- * Copyright  1999-2004 The Apache Software Foundation.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * Copyright 1999-2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *  
  */
 
 package org.apache.sandesha2.msgprocessors;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.xml.namespace.QName;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -43,8 +36,6 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.handlers.SandeshaOutHandler;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
@@ -54,27 +45,12 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
-import org.apache.sandesha2.storage.inmemory.InMemoryNextMsgBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemoryRetransmitterBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemorySequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.inmemory.InMemoryStorageMapBeanMgr;
-import org.apache.sandesha2.util.MsgInitializer;
-import org.apache.sandesha2.util.MsgValidator;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.workers.InOrderInvoker;
-import org.apache.sandesha2.wsrm.AckRequested;
-import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.wsdl.WSDLConstants;
-import org.ietf.jgss.MessageProp;
-
-/**
- * @author Chamikara
- * @author Sanka
- */
 
 public class ApplicationMsgProcessor implements MsgProcessor {
 
@@ -101,8 +77,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getMessageContext().getSystemContext());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		StorageManager storageManager = SandeshaUtil
+				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
+						.getSystemContext());
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+				.getSequencePropretyBeanMgr();
 
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
@@ -143,7 +122,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		msgsBean.setValue(messagesStr);
 		seqPropMgr.update(msgsBean);
 
-		sendAckIfNeeded(rmMsgCtx,messagesStr);
+		sendAckIfNeeded(rmMsgCtx, messagesStr);
 
 		//		} else {
 		//			//TODO Add async Ack
@@ -241,7 +220,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		//SET THe RESPONSE
 
-
 	}
 
 	//TODO convert following from INT to LONG
@@ -257,19 +235,21 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		return false;
 	}
-	
-	public void sendAckIfNeeded (RMMsgContext rmMsgCtx,String messagesStr) throws SandeshaException {
-		
+
+	public void sendAckIfNeeded(RMMsgContext rmMsgCtx, String messagesStr)
+			throws SandeshaException {
+
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getSystemContext());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-		
-		
+		StorageManager storageManager = SandeshaUtil
+				.getSandeshaStorageManager(msgCtx.getSystemContext());
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+				.getSequencePropretyBeanMgr();
+
 		Sequence sequence = (Sequence) rmMsgCtx
-		.getMessagePart(Constants.MessageParts.SEQUENCE);
+				.getMessagePart(Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
-			.getSystemContext();
+				.getSystemContext();
 		if (configCtx == null)
 			throw new SandeshaException("Configuration Context is null");
 
@@ -288,40 +268,46 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
 
 		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
-		AxisServiceGroup serviceGroup = new AxisServiceGroup (axisConfig);
-		AxisService service = new AxisService (new QName ("RMClientService")); // This is a dummy service.
-		ServiceGroupContext serviceGroupContext = new ServiceGroupContext (configCtx,serviceGroup);
-		ServiceContext serviceContext = new ServiceContext (service,serviceGroupContext);
-		
+		AxisServiceGroup serviceGroup = new AxisServiceGroup(axisConfig);
+		AxisService service = new AxisService(new QName("RMClientService")); // This
+																			 // is a
+																			 // dummy
+																			 // service.
+		ServiceGroupContext serviceGroupContext = new ServiceGroupContext(
+				configCtx, serviceGroup);
+		ServiceContext serviceContext = new ServiceContext(service,
+				serviceGroupContext);
 
 		RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
 		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
-		
+
 		ackMsgCtx.setAxisServiceGroup(serviceGroup);
 		ackMsgCtx.setServiceGroupContext(serviceGroupContext);
 		ackMsgCtx.setAxisService(service);
 		ackMsgCtx.setServiceContext(serviceContext);
-		
-		try {
-			AxisOperation ackOperation = AxisOperationFactory.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
 
-			AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext().getAxisOperation();
-			if (rmMsgOperation!=null) {
+		try {
+			AxisOperation ackOperation = AxisOperationFactory
+					.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
+
+			AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext()
+					.getAxisOperation();
+			if (rmMsgOperation != null) {
 				ArrayList outFlow = rmMsgOperation.getPhasesOutFlow();
-				if (outFlow!=null) {
+				if (outFlow != null) {
 					ackOperation.setPhasesOutFlow(outFlow);
 					ackOperation.setPhasesOutFaultFlow(outFlow);
 				}
 			}
-			
-			OperationContext ackOpContext = new OperationContext (ackOperation);
+
+			OperationContext ackOpContext = new OperationContext(ackOperation);
 			ackMsgCtx.setAxisOperation(ackOperation);
 			ackMsgCtx.setOperationContext(ackOpContext);
 			ackOpContext.addMessageContext(ackMsgCtx);
 			ackMsgCtx.setOperationContext(ackOpContext);
-			
+
 		} catch (AxisFault e) {
-			throw new SandeshaException (e.getMessage());
+			throw new SandeshaException(e.getMessage());
 		}
 
 		//Set new envelope
@@ -342,30 +328,31 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getSystemContext());
 
-
 			//set CONTEXT_WRITTEN since acksto is anonymous
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN, "true");
+			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN,
+					"true");
 			try {
 				engine.send(ackRMMsgCtx.getMessageContext());
 			} catch (AxisFault e1) {
 				throw new SandeshaException(e1.getMessage());
 			}
 		} else {
-			RetransmitterBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
-			
+			RetransmitterBeanMgr retransmitterBeanMgr = storageManager
+					.getRetransmitterBeanMgr();
+
 			String key = SandeshaUtil.storeMessageContext(ackMsgCtx);
-			RetransmitterBean ackBean = new RetransmitterBean ();
+			RetransmitterBean ackBean = new RetransmitterBean();
 			ackBean.setKey(key);
 			ackBean.setMessageId(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
 			ackBean.setSend(true);
-			
+
 			retransmitterBeanMgr.insert(ackBean);
-			
+
 			SandeshaUtil.startSenderIfStopped(configCtx);
 		}
-		
+
 	}
 }
