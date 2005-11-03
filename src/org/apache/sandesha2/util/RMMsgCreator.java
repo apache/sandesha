@@ -197,9 +197,8 @@ public class RMMsgCreator {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		createSeqRMMsg.setAction(Constants.WSRM.ACTION_CREATE_SEQ);
-		createSeqRMMsg.setSOAPAction("\"" + Constants.WSRM.ACTION_CREATE_SEQ
-				+ "\"");
+		createSeqRMMsg.setAction(Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE);
+		createSeqRMMsg.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE);
 		createSeqRMMsg.setMessageId(createSeqMsgId);
 
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
@@ -328,8 +327,8 @@ public class RMMsgCreator {
 		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
 				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
 		response.toOMElement(envelope.getBody());
-		outMessage.setWSAAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
-		outMessage.setSoapAction(Constants.WSRM.NS_URI_CREATE_SEQ_RESPONSE);
+		outMessage.setWSAAction(Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE_RESPONSE);
+		outMessage.setSoapAction(Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE_RESPONSE);
 
 		String newMessageId = SandeshaUtil.getUUID();
 		outMessage.setMessageID(newMessageId);
@@ -382,8 +381,8 @@ public class RMMsgCreator {
 			sequenceAck.addAcknowledgementRanges(ackRangeArr[i]);
 
 		sequenceAck.toOMElement(envelope.getHeader());
-		applicationMsg.setAction(Constants.WSRM.ACTION_SEQ_ACK);
-		applicationMsg.setSOAPAction(Constants.WSRM.ACTION_SEQ_ACK);
+		applicationMsg.setAction(Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT);
+		applicationMsg.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT);
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
 
 	}

@@ -193,9 +193,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//terminateRMMessage.setFrom(new EndpointReference
 		// (replyToEPR.getAddress()));
 		terminateRMMessage
-				.setWSAAction(Constants.WSRM.Actions.TERMINATE_SEQUENCE);
-		terminateRMMessage.setSOAPAction("\""
-				+ Constants.WSRM.Actions.TERMINATE_SEQUENCE + "\"");
+				.setWSAAction(Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE);
+		terminateRMMessage.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_TERMINATE_SEQUENCE);
 
 		try {
 			terminateRMMessage.addSOAPEnvelope();
