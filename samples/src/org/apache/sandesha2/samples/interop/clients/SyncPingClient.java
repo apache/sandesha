@@ -25,7 +25,11 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAP11Constants;
+import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.sandesha2.Constants;
+
+import com.ibm.wsdl.extensions.soap.SOAPConstants;
 
 public class SyncPingClient {
 
@@ -44,6 +48,7 @@ public class SyncPingClient {
 	}
 	
 	public void run () throws AxisFault {
+		
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
@@ -51,8 +56,10 @@ public class SyncPingClient {
 		
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
 		sender.engageModule(new QName ("sandesha"));
+		//sender.set(Constants.SANDESHA_DEBUG_MODE,"on");
 		sender.setTo(new EndpointReference(toEPR));
 		sender.set(Constants.SEQUENCE_KEY,"sequence1");
+		sender.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		sender.send("ping",getPingOMBlock("ping1"));
 		sender.send("ping",getPingOMBlock("ping2"));
 		sender.set(Constants.LAST_MESSAGE, "true");

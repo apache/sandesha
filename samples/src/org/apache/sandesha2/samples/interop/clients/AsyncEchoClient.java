@@ -28,6 +28,7 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -61,9 +62,12 @@ public class AsyncEchoClient {
 		
 		Call call = new Call(AXIS2_CLIENT_PATH);
 		call.engageModule(new QName("sandesha"));
+		//call.set(Constants.SANDESHA_DEBUG_MODE,"on");
 		call.set(Constants.AcksTo,acksToEPR); //Optional
+		call.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		call.setTo(new EndpointReference(toEPR));
 		call.set(Constants.SEQUENCE_KEY,"sequence1");  //Optional
+		call.setSoapAction("test:soap:action");
 		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
 		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
 		Callback callback1 = new TestCallback ("Callback 1");

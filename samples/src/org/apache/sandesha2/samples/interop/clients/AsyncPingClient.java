@@ -25,6 +25,7 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.sandesha2.Constants;
 
 
@@ -58,6 +59,8 @@ public class AsyncPingClient {
 		
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
 		sender.set(Constants.AcksTo,acksToEPR);
+		sender.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		sender.setSoapAction("aaaaa");
 		sender.engageModule(new QName ("sandesha"));
 		sender.setTo(new EndpointReference(toEPR));
 		sender.set(Constants.SEQUENCE_KEY,"sequence1");

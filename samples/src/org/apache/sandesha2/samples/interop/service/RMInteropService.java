@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.samples.interop.service;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,59 +32,108 @@ import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 
 /**
- * @author 
- * 
+ * @author  
  */
 public class RMInteropService {
 
-    private static Map sequences = new HashMap();
+	private static Map sequences = new HashMap();
 
-    public OMElement echoString(OMElement in) {
-    	     	
-        String responseText = null;
-        if (in!=null) {
-        	String tempText = in.getText();
-        	if (tempText==null || "".equals(tempText)) {
-        		OMElement firstChild = in.getFirstElement();
-        		if (firstChild!=null)
-        			tempText = firstChild.getText();
-        	}
-        	
-        	if (tempText!=null)
-        		responseText = tempText;
-        }
-        	
-        
-        System.out.println("echoString got text:" + ((null==responseText)?"":responseText));
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMNamespace omNs = fac.createOMNamespace("http://tempuri.org/", "echoString");
-        OMElement method = fac.createOMElement("echoStringResponse", omNs);
+	public OMElement echoString(OMElement in) {
 
-        OMElement value = fac.createOMElement("text", omNs);
-        
-        if (responseText==null || "".equals(responseText))
-        	responseText = "echo response";
-        
-        value.setText(responseText);
-        method.addChild(value);
+		String responseText = null;
+		if (in != null) {
+			String tempText = in.getText();
+			if (tempText == null || "".equals(tempText)) {
+				OMElement firstChild = in.getFirstElement();
+				if (firstChild != null)
+					tempText = firstChild.getText();
+			}
 
-        return method;
-    }
+			if (tempText != null)
+				responseText = tempText;
+		}
 
+		System.out.println("echoString got text:"
+				+ ((null == responseText) ? "" : responseText));
+		OMFactory fac = OMAbstractFactory.getOMFactory();
+		OMNamespace omNs = fac.createOMNamespace("http://tempuri.org/",
+				"echoString");
+		OMElement method = fac.createOMElement("echoStringResponse", omNs);
 
-    public void ping(OMElement in) {
-        //Just accept the message and do some processing
+		OMElement value = fac.createOMElement("text", omNs);
 
-    	String text = null;
-    	if (in!=null) {
-    		OMElement firstElement= in.getFirstElement();
-    		if (firstElement!=null) {
-    			text = firstElement.getText();
-    		}
-    	}
-    	
-    	text = (text==null)?"":text;
-    	
-    	System.out.println("Ping got text:" + text);
-    }
+		if (responseText == null || "".equals(responseText))
+			responseText = "echo response";
+
+		value.setText(responseText);
+		method.addChild(value);
+
+		return method;
+	}
+
+	public void ping(OMElement in) {
+		//Just accept the message and do some processing
+
+		String text = null;
+		if (in != null) {
+			OMElement firstElement = in.getFirstElement();
+			if (firstElement != null) {
+				text = firstElement.getText();
+			}
+		}
+
+		text = (text == null) ? "" : text;
+
+		System.out.println("Ping got text:" + text);
+	}
+
+	public OMElement EchoString(OMElement in) {
+
+		String responseText = null;
+		if (in != null) {
+			String tempText = in.getText();
+			if (tempText == null || "".equals(tempText)) {
+				OMElement firstChild = in.getFirstElement();
+				if (firstChild != null)
+					tempText = firstChild.getText();
+			}
+
+			if (tempText != null)
+				responseText = tempText;
+		}
+
+		System.out.println("echoString got text:"
+				+ ((null == responseText) ? "" : responseText));
+		OMFactory fac = OMAbstractFactory.getOMFactory();
+		OMNamespace omNs = fac.createOMNamespace("http://tempuri.org/",
+				"echoString");
+		OMElement method = fac.createOMElement("echoStringResponse", omNs);
+
+		OMElement value = fac.createOMElement("text", omNs);
+
+		if (responseText == null || "".equals(responseText))
+			responseText = "echo response";
+
+		value.setText(responseText);
+		method.addChild(value);
+
+		return method;
+	}
+
+	public void Ping(OMElement in) {
+		//Just accept the message and do some processing
+
+		String text = null;
+		if (in != null) {
+			OMElement firstElement = in.getFirstElement();
+			if (firstElement != null) {
+				text = firstElement.getText();
+			}
+		}
+
+		text = (text == null) ? "" : text;
+
+		System.out.println("Ping got text:" + text);
+	}
+
 }
