@@ -21,26 +21,30 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.clientapi.MessageSender;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.om.impl.llom.OMNamespaceImpl;
 import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.sandesha2.Constants;
 
-public class MicrosoftSyncPingClient {
+/**
+ * @author chamikara
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
 
-	private static String to = "http://131.107.72.15/ReliableMessaging_Service_Indigo/ReliableOneWay.svc";   //IP : 131.107.153.195  Port:80
+public class MicrosoftAsyncPingClient {
+
+	private static String to = "http://131.107.72.15/ReliableMessaging_Service_Indigo/ReliableOneWayDual.svc";   //IP : 131.107.153.195  Port:80
 
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\client\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
-		new MicrosoftSyncPingClient ().run();
+		new MicrosoftAsyncPingClient ().run();
 	}
 	
 	public void run () throws AxisFault {
@@ -54,11 +58,12 @@ public class MicrosoftSyncPingClient {
 		sender.engageModule(new QName ("sandesha"));
 		
 		sender.set(Constants.SANDESHA_DEBUG_MODE,"on");   //Sets the debug on for sandesha.
-		
-		sender.setTo(new EndpointReference("http://131.107.72.15/ReliableMessaging_Service_Indigo/ReliableOneWay.svc"));
 		sender.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		sender.setTo(new EndpointReference(to));
+		sender.set(Constants.AcksTo,"http://203.94.94.136:9080/axis2/services/AnonymousService/echoString");
+		sender.setReplyTo(new EndpointReference ("http://203.94.94.136:9080/axis2/services/AnonymousService/echoString"));
+		sender.setFaultTo(new EndpointReference ("http://203.94.94.136:9080/axis2/services/AnonymousService/echoString"));
 		sender.set(Constants.SEQUENCE_KEY,"sequence1");
-		sender.setSenderTransport(org.apache.axis2.Constants.TRANSPORT_HTTP);
 		sender.setSoapAction("urn:wsrm:Ping");
 		sender.setWsaAction("urn:wsrm:Ping");
   		//sender.send("ping",getPingOMBlock("ping1"));
@@ -79,5 +84,5 @@ public class MicrosoftSyncPingClient {
 
 		return pingElement;
 	}
-	
+
 }
