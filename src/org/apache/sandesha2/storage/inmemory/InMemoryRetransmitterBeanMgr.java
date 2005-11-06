@@ -19,6 +19,7 @@ package org.apache.sandesha2.storage.inmemory;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -119,7 +120,35 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 			}
 		}
 
-		return beans;
+		//temp hack for microsoft
+		sort (beans);
+		
+		return sort(beans);
+	}
+	
+	private ArrayList sort (ArrayList beans) {
+		ArrayList newBeans = new ArrayList ();
+		HashMap tempHash = new HashMap ();
+		
+		Iterator iter = beans.iterator();
+		while (iter.hasNext()){
+			RetransmitterBean bean = (RetransmitterBean) iter.next();
+			if (bean.getMessageNumber()>0)
+				tempHash.put(new Long (bean.getMessageNumber()),bean);
+			else
+				newBeans.add(bean);
+		}
+		
+		long tempNo = 1;
+		RetransmitterBean tempBean = (RetransmitterBean) tempHash.get(new Long (tempNo));
+		while (tempBean!=null) {
+			newBeans.add(tempBean);
+			tempNo++;
+			tempBean = (RetransmitterBean) tempHash.get(new Long (tempNo));
+		}
+		
+
+		return newBeans;
 	}
 
 	public boolean update(RetransmitterBean bean) {

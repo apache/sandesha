@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -36,14 +37,16 @@ public class SequenceOffer implements IOMRMElement {
 	private Identifier identifier = null;
 
 	private Expires expires = null;
+	
+	SOAPFactory factory;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNamespace = null; 
 
-	public SequenceOffer() {
-		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public SequenceOffer(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		sequenceOfferElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
 	}
 
@@ -60,18 +63,17 @@ public class SequenceOffer implements IOMRMElement {
 			throw new OMException(
 					"The passed element does not contain a SequenceOffer part");
 
-		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		sequenceOfferElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
 
-		identifier = new Identifier();
+		identifier = new Identifier(factory);
 		identifier.fromOMElement(sequenceOfferPart);
 
 		OMElement expiresPart = sequenceOfferPart
 				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
 						Constants.WSRM.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires();
+			expires = new Expires(factory);
 			expires.fromOMElement(sequenceOfferElement);
 		}
 
@@ -95,8 +97,7 @@ public class SequenceOffer implements IOMRMElement {
 
 		createSequenceElement.addChild(sequenceOfferElement);
 
-		sequenceOfferElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		sequenceOfferElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
 
 		return createSequenceElement;

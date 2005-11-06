@@ -33,6 +33,8 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
+import org.apache.axis2.soap.SOAP11Constants;
+import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.impl.llom.builder.StAXSOAPModelBuilder;
@@ -43,6 +45,7 @@ import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.workers.InOrderInvoker;
@@ -60,13 +63,14 @@ public class SandeshaUtil {
 	private static StorageManager storageManager = null;
 	private static Sender sender = new Sender();
 	private static InOrderInvoker invoker = new InOrderInvoker ();
-
+	private static SandeshaDynamicProperties dynamicProperties = null;
+	
 	public static String getUUID() {
 		String uuid = "uuid:" + UUIDGenerator.getUUID();
 		return uuid;
 	}
 
-	public static AcknowledgementRange[] getAckRangeArray(String msgNoStr) {
+	public static AcknowledgementRange[] getAckRangeArray(String msgNoStr,SOAPFactory factory) {
 		String[] msgNoStrs = msgNoStr.split(",");
 		long[] msgNos = getLongArr(msgNoStrs);
 
@@ -92,7 +96,7 @@ public class SandeshaUtil {
 				continue;
 			}
 
-			AcknowledgementRange ackRange = new AcknowledgementRange();
+			AcknowledgementRange ackRange = new AcknowledgementRange(factory);
 			ackRange.setLowerValue(lower);
 			ackRange.setUpperValue(temp);
 			ackRanges.add(ackRange);
@@ -102,7 +106,7 @@ public class SandeshaUtil {
 
 		}
 
-		AcknowledgementRange ackRange = new AcknowledgementRange();
+		AcknowledgementRange ackRange = new AcknowledgementRange(factory);
 		ackRange.setLowerValue(lower);
 		ackRange.setUpperValue(temp);
 		ackRanges.add(ackRange);
@@ -467,5 +471,30 @@ public class SandeshaUtil {
 			System.out.println(e.getMessage());
 			throw new SandeshaException (e.getMessage());
 		} 
+	}
+	
+	public static SandeshaDynamicProperties getDynamicProperties () {
+		if (dynamicProperties==null) {
+			loadDymanicProperties ();
+		}
+		
+		return dynamicProperties;
+	}
+	
+	private static void loadDymanicProperties () {
+		dynamicProperties = new SandeshaDynamicProperties ();
+		
+		//TODO: override properties from the sandesha-config.xml
+		
+	}
+	
+	public static int getSOAPVersion (SOAPEnvelope envelope) throws SandeshaException {
+		String namespaceName = envelope.getNamespace().getName();
+		if (namespaceName.equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI)) 
+			return Constants.SOAPVersion.v1_1;
+		else if (namespaceName.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
+			return Constants.SOAPVersion.v1_2;
+		else
+			throw new SandeshaException ("Unknown SOAP version");
 	}
 }

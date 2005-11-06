@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -36,14 +37,16 @@ public class Identifier implements Constants, IOMRMElement {
 
 	private String identifier = null;
 
-	OMNamespace wsuNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace wsrmNamespace = null;
 
-	public Identifier() {
-		identifierElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
-				Constants.WSRM.IDENTIFIER, wsuNamespace);
+	private SOAPFactory factory;
+	
+	public Identifier(SOAPFactory factory) {
+		this.factory = factory;
+		wsrmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		identifierElement = factory.createOMElement(
+				Constants.WSRM.IDENTIFIER, wsrmNamespace);
 	}
 
 	public void setIndentifer(String identifier) {
@@ -65,9 +68,8 @@ public class Identifier implements Constants, IOMRMElement {
 		if (identifierPart == null)
 			throw new OMException(
 					"The parsed element does not contain an identifier part");
-		identifierElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
-				Constants.WSRM.IDENTIFIER, wsuNamespace);
+		identifierElement = factory.createOMElement(
+				Constants.WSRM.IDENTIFIER, wsrmNamespace);
 
 		String identifierText = identifierPart.getText();
 		if (identifierText == null || identifierText == "")
@@ -86,9 +88,8 @@ public class Identifier implements Constants, IOMRMElement {
 		identifierElement.setText(identifier);
 		element.addChild(identifierElement);
 
-		identifierElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
-				Constants.WSRM.IDENTIFIER, wsuNamespace);
+		identifierElement = factory.createOMElement(
+				Constants.WSRM.IDENTIFIER, wsrmNamespace);
 
 		return element;
 	}

@@ -23,6 +23,7 @@ import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -40,21 +41,23 @@ public class CreateSequence implements IOMRMPart {
 	private Expires expires = null;
 
 	private SequenceOffer sequenceOffer = null;
+	
+	private SOAPFactory factory;
 
 	//private SequritytokenReference;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNamespace = null;
 
-	public CreateSequence() {
-		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public CreateSequence(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		createSequenceElement = factory.createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 	}
 	
-	public CreateSequence (AcksTo acksTo) {
-		this ();
+	public CreateSequence (AcksTo acksTo,SOAPFactory factory) {
+		this (factory);
 		this.acksTo = acksTo;
 	}
 
@@ -71,18 +74,17 @@ public class CreateSequence implements IOMRMPart {
 			throw new OMException(
 					"Create sequence is not present in the passed element");
 
-		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		createSequenceElement = factory.createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 
-		acksTo = new AcksTo();
+		acksTo = new AcksTo(factory);
 		acksTo.fromOMElement(createSequencePart);
 
 		OMElement offerPart = createSequencePart
 				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
 						Constants.WSRM.SEQUENCE_OFFER));
 		if (offerPart != null) {
-			sequenceOffer = new SequenceOffer();
+			sequenceOffer = new SequenceOffer(factory);
 			sequenceOffer.fromOMElement(createSequencePart);
 		}
 
@@ -90,7 +92,7 @@ public class CreateSequence implements IOMRMPart {
 				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
 						Constants.WSRM.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires();
+			expires = new Expires(factory);
 			expires.fromOMElement(createSequencePart);
 		}
 
@@ -120,8 +122,7 @@ public class CreateSequence implements IOMRMPart {
 
 		soapBody.addChild(createSequenceElement);
 
-		createSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		createSequenceElement = factory.createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
 		return soapBody;
 	}

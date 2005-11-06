@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -38,18 +39,20 @@ public class AcksTo implements IOMRMElement {
 
 	//private OMElement addressElement;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	private SOAPFactory factory;
+	
+	OMNamespace rmNamespace = null;
 
-	public AcksTo() {
-		acksToElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public AcksTo(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		acksToElement = factory.createOMElement(
 				Constants.WSRM.ACKS_TO, rmNamespace);
 	}
 	
-	public AcksTo (Address address) {
-		this ();
+	public AcksTo (Address address,SOAPFactory factory) {
+		this (factory);
 		this.address = address;
 	}
 
@@ -65,11 +68,10 @@ public class AcksTo implements IOMRMElement {
 			throw new OMException(
 					"Passed element does not contain an acksTo part");
 
-		address = new Address();
+		address = new Address(factory);
 		address.fromOMElement(acksToPart);
 
-		acksToElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		acksToElement = factory.createOMElement(
 				Constants.WSRM.ACKS_TO, rmNamespace);
 
 		return this;
@@ -88,8 +90,7 @@ public class AcksTo implements IOMRMElement {
 		address.toOMElement(acksToElement);
 		element.addChild(acksToElement);
 
-		acksToElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		acksToElement =factory.createOMElement(
 				Constants.WSRM.ACKS_TO, rmNamespace);
 
 		return element;

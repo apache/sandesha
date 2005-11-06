@@ -26,6 +26,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -37,6 +38,7 @@ import org.apache.sandesha2.util.SOAPAbstractFactory;
  */
 
 public class SequenceAcknowledgement implements IOMRMPart {
+	
 	private OMElement sequenceAcknowledgementElement;
 
 	private Identifier identifier;
@@ -45,13 +47,15 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 	private ArrayList nackList;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNamespace = null;
 
-	public SequenceAcknowledgement() {
-		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	SOAPFactory factory;
+	
+	public SequenceAcknowledgement(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		sequenceAcknowledgementElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE_ACK, rmNamespace);
 		acknowledgementRangeList = new ArrayList();
 		nackList = new ArrayList();
@@ -75,7 +79,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			throw new OMException(
 					"The passed element does not contain a seqence ackknowledgement Part");
 
-		identifier = new Identifier();
+		identifier = new Identifier(factory);
 		identifier.fromOMElement(sequenceAckPart);
 
 		Iterator ackRangeParts = sequenceAckPart.getChildrenWithName(new QName(
@@ -84,7 +88,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		while (ackRangeParts.hasNext()) {
 			OMElement ackRangePart = (OMElement) ackRangeParts.next();
 
-			AcknowledgementRange ackRange = new AcknowledgementRange();
+			AcknowledgementRange ackRange = new AcknowledgementRange(factory);
 			ackRange.fromOMElement(ackRangePart);
 			acknowledgementRangeList.add(ackRange);
 		}
@@ -94,13 +98,12 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		while (nackParts.hasNext()) {
 			OMElement nackPart = (OMElement) nackParts.next();
-			Nack nack = new Nack();
+			Nack nack = new Nack(factory);
 			nack.fromOMElement(nackPart);
 			nackList.add(nack);
 		}
 
-		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		sequenceAcknowledgementElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE_ACK, rmNamespace);
 
 		return this;
@@ -138,8 +141,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		SOAPHeader.addChild(sequenceAcknowledgementElement);
 
-		sequenceAcknowledgementElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		sequenceAcknowledgementElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE_ACK, rmNamespace);
 
 		return header;

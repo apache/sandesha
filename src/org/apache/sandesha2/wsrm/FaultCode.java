@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -35,14 +36,16 @@ public class FaultCode implements IOMRMElement {
 	private OMElement faultCodeElement;
 
 	String faultCode = null;
+	
+	SOAPFactory factory;
 
-	OMNamespace rmNameSpace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNameSpace = null;
 
-	public FaultCode() {
-		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public FaultCode(SOAPFactory factory) {
+		this.factory = factory;
+		rmNameSpace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		faultCodeElement = factory.createOMElement(
 				Constants.WSRM.FAULT_CODE, rmNameSpace);
 	}
 
@@ -66,8 +69,7 @@ public class FaultCode implements IOMRMElement {
 
 		this.faultCode = faultCodePart.getText();
 
-		faultCodeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		faultCodeElement = factory.createOMElement(
 				Constants.WSRM.FAULT_CODE, rmNameSpace);
 
 		return sequenceFault;

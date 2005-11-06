@@ -22,6 +22,7 @@ import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -37,14 +38,16 @@ public class AcknowledgementRange implements IOMRMElement {
 	private long upperValue;
 
 	private long lowerValue;
+	
+	private SOAPFactory factory;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNamespace = null;
 
-	public AcknowledgementRange() {
-		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public AcknowledgementRange(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		acknowledgementRangeElement = factory.createOMElement(
 				Constants.WSRM.ACK_RANGE, rmNamespace);
 	}
 
@@ -76,8 +79,7 @@ public class AcknowledgementRange implements IOMRMElement {
 					"The ack range does not have proper long values for Upper and Lower attributes");
 		}
 
-		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		acknowledgementRangeElement = factory.createOMElement(
 				Constants.WSRM.ACK_RANGE, rmNamespace);
 
 		return this;
@@ -94,11 +96,9 @@ public class AcknowledgementRange implements IOMRMElement {
 			throw new OMException(
 					"Cant set Ack Range part since Upper or Lower is not set to the correct value");
 
-		OMAttribute lowerAttrib = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMAttribute(
+		OMAttribute lowerAttrib = factory.createOMAttribute(
 				Constants.WSRM.LOWER, null, Long.toString(lowerValue));
-		OMAttribute upperAttrib = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMAttribute(
+		OMAttribute upperAttrib = factory.createOMAttribute(
 				Constants.WSRM.UPPER, null, Long.toString(upperValue));
 
 		acknowledgementRangeElement.addAttribute(lowerAttrib);
@@ -106,8 +106,7 @@ public class AcknowledgementRange implements IOMRMElement {
 
 		sequenceAckElement.addChild(acknowledgementRangeElement);
 
-		acknowledgementRangeElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		acknowledgementRangeElement = factory.createOMElement(
 				Constants.WSRM.ACK_RANGE, rmNamespace);
 
 		return sequenceAckElement;

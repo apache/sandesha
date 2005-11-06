@@ -22,6 +22,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Constants;
@@ -39,14 +40,16 @@ public class AckRequested implements IOMRMPart {
 	private Identifier identifier;
 
 	private MessageNumber messageNumber;
+	
+	private SOAPFactory factory;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNamespace = null;
 
-	public AckRequested() {
-		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public AckRequested(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		ackRequestedElement = factory.createOMElement(
 				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 	}
 
@@ -67,19 +70,18 @@ public class AckRequested implements IOMRMPart {
 			throw new OMException(
 					"the passed element does not contain an ack requested part");
 
-		identifier = new Identifier();
+		identifier = new Identifier(factory);
 		identifier.fromOMElement(ackReqPart);
 
 		OMElement msgNoPart = ackReqPart.getFirstChildWithName(new QName(
 				Constants.WSRM.NS_URI_RM, Constants.WSRM.MSG_NUMBER));
 
 		if (msgNoPart != null) {
-			messageNumber = new MessageNumber();
+			messageNumber = new MessageNumber(factory);
 			messageNumber.fromOMElement(ackReqPart);
 		}
 
-		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		ackRequestedElement = factory.createOMElement(
 				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 
 		return this;
@@ -106,8 +108,7 @@ public class AckRequested implements IOMRMPart {
 			messageNumber.toOMElement(ackReqHdrBlock);
 		}
 
-		ackRequestedElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		ackRequestedElement = factory.createOMElement(
 				Constants.WSRM.ACK_REQUESTED, rmNamespace);
 
 		return header;

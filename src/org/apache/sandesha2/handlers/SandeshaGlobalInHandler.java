@@ -34,6 +34,11 @@ import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
+/**
+ * 
+ * @author chamikara
+ */
+
 public class SandeshaGlobalInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgContext) throws AxisFault {

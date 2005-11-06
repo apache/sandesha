@@ -17,11 +17,18 @@
 package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
+import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
  * @author Saminda
@@ -42,16 +49,26 @@ public class RMElements {
 	private TerminateSequence terminateSequence = null;
 
 	private AckRequested ackRequested = null;
-
+	
+	private SOAPFactory factory;
+	
 	public void fromSOAPEnvelope(SOAPEnvelope envelope) {
 
 		if (envelope == null)
 			throw new OMException("The passed envelope is null");
 
+		SOAPFactory factory;
+		
+		//Ya I know. Could hv done it directly :D (just to make it consistent)
+		if (envelope.getNamespace().getName().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
+			factory = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.v1_1);
+		else
+			factory = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.v1_2);
+			
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
 				new QName(Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE));
 		if (sequenceElement != null) {
-			sequence = new Sequence();
+			sequence = new Sequence(factory);
 			sequence.fromOMElement(envelope.getHeader());
 		}
 
@@ -60,15 +77,16 @@ public class RMElements {
 						new QName(Constants.WSRM.NS_URI_RM,
 								Constants.WSRM.SEQUENCE_ACK));
 		if (sequenceAckElement != null) {
-			sequenceAcknowledgement = new SequenceAcknowledgement();
+			sequenceAcknowledgement = new SequenceAcknowledgement(factory);
 			sequenceAcknowledgement.fromOMElement(envelope.getHeader());
 		}
 
 		OMElement createSeqElement = envelope.getBody().getFirstChildWithName(
 				new QName(Constants.WSRM.NS_URI_RM,
 						Constants.WSRM.CREATE_SEQUENCE));
+		
 		if (createSeqElement != null) {
-			createSequence = new CreateSequence();
+			createSequence = new CreateSequence(factory);
 			createSequence.fromOMElement(envelope.getBody());
 		}
 
@@ -77,7 +95,7 @@ public class RMElements {
 						new QName(Constants.WSRM.NS_URI_RM,
 								Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
 		if (createSeqResElement != null) {
-			createSequenceResponse = new CreateSequenceResponse();
+			createSequenceResponse = new CreateSequenceResponse(factory);
 			createSequenceResponse.fromOMElement(envelope.getBody());
 		}
 
@@ -86,7 +104,7 @@ public class RMElements {
 						new QName(Constants.WSRM.NS_URI_RM,
 								Constants.WSRM.TERMINATE_SEQUENCE));
 		if (terminateSeqElement != null) {
-			terminateSequence = new TerminateSequence();
+			terminateSequence = new TerminateSequence(factory);
 			terminateSequence.fromOMElement(envelope.getBody());
 		}
 
@@ -95,7 +113,7 @@ public class RMElements {
 						new QName(Constants.WSRM.NS_URI_RM,
 								Constants.WSRM.ACK_REQUESTED));
 		if (ackRequestedElement != null) {
-			ackRequested = new AckRequested();
+			ackRequested = new AckRequested(factory);
 			ackRequested.fromOMElement(envelope.getHeader());
 		}
 	}

@@ -23,6 +23,7 @@ import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -40,14 +41,16 @@ public class CreateSequenceResponse implements IOMRMPart {
 	private Accept accept;
 
 	private Expires expires;
+	
+	SOAPFactory factory;
 
-	OMNamespace createSeqResNoNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace createSeqResNoNamespace = null;
 
-	public CreateSequenceResponse() {
-		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public CreateSequenceResponse(SOAPFactory factory) {
+		this.factory = factory;
+		createSeqResNoNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		createSequenceResponseElement = factory.createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
 				createSeqResNoNamespace);
 	}
@@ -71,19 +74,18 @@ public class CreateSequenceResponse implements IOMRMPart {
 			throw new OMException(
 					"The passed element does not contain a create seqence response part");
 
-		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		createSequenceResponseElement = factory.createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
 				createSeqResNoNamespace);
 
-		identifier = new Identifier();
+		identifier = new Identifier(factory);
 		identifier.fromOMElement(createSeqResponsePart);
 
 		OMElement expiresPart = createSeqResponsePart
 				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
 						Constants.WSRM.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires();
+			expires = new Expires(factory);
 			expires.fromOMElement(createSeqResponsePart);
 		}
 
@@ -91,7 +93,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
 						Constants.WSRM.ACCEPT));
 		if (acceptPart != null) {
-			accept = new Accept();
+			accept = new Accept(factory);
 			accept.fromOMElement(createSeqResponsePart);
 		}
 
@@ -125,8 +127,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 
 		SOAPBody.addChild(createSequenceResponseElement);
 
-		createSequenceResponseElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		createSequenceResponseElement = factory.createOMElement(
 				Constants.WSRM.CREATE_SEQUENCE_RESPONSE,
 				createSeqResNoNamespace);
 

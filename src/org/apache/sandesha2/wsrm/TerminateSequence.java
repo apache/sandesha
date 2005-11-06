@@ -23,6 +23,7 @@ import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -38,13 +39,15 @@ public class TerminateSequence implements IOMRMPart {
 
 	private Identifier identifier;
 
-	OMNamespace rmNameSpace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNameSpace = null;
+	
+	SOAPFactory factory;
 
-	public TerminateSequence() {
-		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public TerminateSequence(SOAPFactory factory) {
+		this.factory = factory;
+		rmNameSpace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		terminateSequenceElement = factory.createOMElement(
 				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 	}
 
@@ -65,11 +68,10 @@ public class TerminateSequence implements IOMRMPart {
 			throw new OMException(
 					"passed element does not contain a terminate sequence part");
 
-		identifier = new Identifier();
+		identifier = new Identifier(factory);
 		identifier.fromOMElement(terminateSeqPart);
 
-		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		terminateSequenceElement = factory.createOMElement(
 				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return this;
@@ -92,8 +94,7 @@ public class TerminateSequence implements IOMRMPart {
 		identifier.toOMElement(terminateSequenceElement);
 		body.addChild(terminateSequenceElement);
 
-		terminateSequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		terminateSequenceElement = factory.createOMElement(
 				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return body;

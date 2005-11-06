@@ -32,6 +32,11 @@ import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
+/**
+ * 
+ * @author chamikara
+ */
+
 public class SandeshaInHandler extends AbstractHandler {
 
 	public QName getName() {

@@ -33,6 +33,7 @@ import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -240,6 +241,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throws SandeshaException {
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
+		
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(msgCtx.getEnvelope()));
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(msgCtx.getSystemContext());
 		SequencePropertyBeanMgr seqPropMgr = storageManager
@@ -311,26 +314,40 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		//Set new envelope
-		SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
+		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		try {
 			ackMsgCtx.setEnvelope(envelope);
 		} catch (AxisFault e3) {
 			throw new SandeshaException(e3.getMessage());
 		}
 
-		//FIXME set acksTo instead of ReplyTo
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgCtx.getTo());
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
 
+//		Object obj = rmMsgCtx.getMessageContext().getOperationContext().getProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN);
+		
+		
 		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getSystemContext());
 
 			//set CONTEXT_WRITTEN since acksto is anonymous
+			if (rmMsgCtx.getMessageContext().getOperationContext()==null) {
+				//operation context will be null when doing in a GLOBAL handler.
+				try {
+					AxisOperation op = AxisOperationFactory.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_IN_OUT);
+					OperationContext opCtx = new OperationContext (op);
+					rmMsgCtx.getMessageContext().setAxisOperation(op);
+					rmMsgCtx.getMessageContext().setOperationContext(opCtx);
+				} catch (AxisFault e2) {
+					throw new SandeshaException (e2.getMessage());
+				}
+			}
+			
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+			
 			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN,
 					"true");
 			try {
@@ -339,6 +356,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(e1.getMessage());
 			}
 		} else {
+			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
+					org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+			
 			RetransmitterBeanMgr retransmitterBeanMgr = storageManager
 					.getRetransmitterBeanMgr();
 

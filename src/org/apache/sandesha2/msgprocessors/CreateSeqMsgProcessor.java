@@ -154,8 +154,18 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			seqPropMgr.insert(seqPropBean);
 			outMessage.setResponseWritten(true);
 
+			Object obj1 = createSeqMsg.getOperationContext().getProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN);
+
 			AxisEngine engine = new AxisEngine(context);
 			engine.send(outMessage);
+			
+			Object obj = createSeqMsg.getOperationContext().getProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN);
+			if (Constants.WSA.NS_URI_ANONYMOUS.equals(createSeqMsg.getReplyTo().getAddress())) {
+				//So that '202 OK' get sent instead of 200 OK.
+				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,"true");
+			}else {
+				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,"false");
+			}
 		} catch (AxisFault e1) {
 			throw new SandeshaException(e1.getMessage());
 		}

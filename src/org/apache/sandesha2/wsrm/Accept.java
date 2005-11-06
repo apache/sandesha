@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -33,14 +34,16 @@ public class Accept implements IOMRMElement {
 	private OMElement acceptElement;
 
 	private AcksTo acksTo;
+	
+	private SOAPFactory factory;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNamespace = null; 
 
-	public Accept() {
-		acceptElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public Accept(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		acceptElement = factory.createOMElement(
 				Constants.WSRM.ACCEPT, rmNamespace);
 	}
 
@@ -56,11 +59,10 @@ public class Accept implements IOMRMElement {
 			throw new OMException(
 					"Passed element does not contain an Accept part");
 
-		acksTo = new AcksTo();
+		acksTo = new AcksTo(factory);
 		acksTo.fromOMElement(acceptPart);
 
-		acceptElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		acceptElement = factory.createOMElement(
 				Constants.WSRM.ACCEPT, rmNamespace);
 
 		return this;
@@ -79,8 +81,7 @@ public class Accept implements IOMRMElement {
 		acksTo.toOMElement(acceptElement);
 		element.addChild(acceptElement);
 
-		acceptElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		acceptElement = factory.createOMElement(
 				Constants.WSRM.ACCEPT, rmNamespace);
 
 		return element;

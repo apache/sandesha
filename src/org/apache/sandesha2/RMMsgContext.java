@@ -64,9 +64,13 @@ public class RMMsgContext {
 	}
 
 	public void addSOAPEnvelope() throws AxisFault {
+		int SOAPVersion = Constants.SOAPVersion.v1_1;
+		
+		if (!msgContext.isSOAP11()) 
+			SOAPVersion = Constants.SOAPVersion.v1_2;
+		
 		if (msgContext.getEnvelope() == null) {
-			msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(
-					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope());
+			msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(SOAPVersion).getDefaultEnvelope());
 		}
 
 		SOAPEnvelope envelope = msgContext.getEnvelope();

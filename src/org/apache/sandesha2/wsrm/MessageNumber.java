@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -35,11 +36,14 @@ public class MessageNumber implements IOMRMElement {
 	private long messageNumber;
 	private OMElement messageNoElement;
 	
-	OMNamespace msgNoNamespace =
-		SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	OMNamespace rmNamespace = null;
 	
-	public MessageNumber(){
-		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+	SOAPFactory factory;
+	
+	public MessageNumber(SOAPFactory factory){
+		this.factory = factory;
+	    rmNamespace = factory.createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		messageNoElement = factory.createOMElement(Constants.WSRM.MSG_NUMBER,rmNamespace);
 	}
 	
 	public long getMessageNumber(){
@@ -55,7 +59,7 @@ public class MessageNumber implements IOMRMElement {
 		if (msgNumberPart==null)
 			throw new OMException ("The passed sequnce element does not contain a message number part");
 		
-		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+		messageNoElement = factory.createOMElement(Constants.WSRM.MSG_NUMBER,rmNamespace);
 
 		String msgNoStr = msgNumberPart.getText();
 		messageNumber = Long.parseLong(msgNoStr);
@@ -70,7 +74,7 @@ public class MessageNumber implements IOMRMElement {
 		messageNoElement.setText(Long.toString(messageNumber));
 		element.addChild(messageNoElement);
 		
-		messageNoElement = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.DEFAULT).createOMElement(Constants.WSRM.MSG_NUMBER,msgNoNamespace);
+		messageNoElement = factory.createOMElement(Constants.WSRM.MSG_NUMBER,rmNamespace);
 		
 		return element;
 	}

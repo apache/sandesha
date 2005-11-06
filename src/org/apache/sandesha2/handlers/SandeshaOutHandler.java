@@ -25,13 +25,18 @@ import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.soap.SOAP11Constants;
+import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.storage.StorageManager;
@@ -46,6 +51,7 @@ import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.LastMessage;
@@ -53,6 +59,11 @@ import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.wsdl.WSDLConstants;
+
+/**
+ * 
+ * @author chamikara
+ */
 
 public class SandeshaOutHandler extends AbstractHandler {
 
@@ -179,9 +190,21 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(tempSequenceId,
 				Constants.SequenceProperties.OUT_SEQUENCE_ID);
-
-		if ((messageNumber == 1) && (outSeqBean == null)) {
-			sendCreateSequence = true;
+		
+		if (messageNumber==1) {
+			if (outSeqBean==null) {
+				sendCreateSequence = true;
+			}
+			
+//			SandeshaDynamicProperties dynamicProperties = SandeshaUtil.getDynamicProperties();
+//			if (msgCtx.isSOAP11()) {
+//				dynamicProperties.setSOAPVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+//			}else {
+//				dynamicProperties.setSOAPVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+//			}
+			
+			//TODO: set the policy bean
+			//dynamicProperties.setPolicyBean();
 		}
 
 		//if fist message - setup the sequence for the client side
@@ -204,7 +227,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 				seqPropMgr.insert(responseCreateSeqAdded);
 
 				String acksTo = (String) context.getProperty(Constants.AcksTo);
-
+				if (acksTo==null)
+					acksTo = Constants.WSA.NS_URI_ANONYMOUS;
+				
 				//If acksTo is not anonymous. Start the listner TODO: verify
 				if (!Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)
 						&& !serverSide) {
@@ -225,6 +250,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 						if (acksToEPR != null)
 							acksTo = (String) acksToEPR.getAddress();
 					}
+				}else if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)){
+					//set transport in.
+					Object trIn = msgCtx.getProperty(MessageContext.TRANSPORT_IN);
+					if (trIn==null) {
+					
+					}
 				}
 
 				addCreateSequenceMessage(rmMsgCtx, tempSequenceId, acksTo);
@@ -236,8 +267,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 		if (env == null) {
-			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
-					Constants.SOAPVersion.DEFAULT).getDefaultEnvelope();
+			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(env)).getDefaultEnvelope();
 			rmMsgCtx.setSOAPEnvelop(envelope);
 		}
 
@@ -433,6 +463,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		MessageContext msg = rmMsg.getMessageContext();
 
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(rmMsg.getSOAPEnvelope()));
+		
 		if (rmMsg == null)
 			throw new SandeshaException("Message or reques message is null");
 
@@ -477,16 +509,39 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//				|| replyToEPR.getAddress() == "")
 		//			throw new SandeshaException("ReplyTo is not set correctly");
 
-		rmMsg.setTo(toEPR);
+		//Setting wsa:To to the replyTo value of the respective request message
+		//(instead of the replyTo of the CreateSequenceMessage)
+
+		String newToStr = null;
+
+		if (msg.isServerSide()) {
+			try {
+				MessageContext requestMsg = msg.getOperationContext()
+						.getMessageContext(
+								OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+				if (requestMsg != null) {
+					newToStr = requestMsg.getReplyTo().getAddress();
+				}
+			} catch (AxisFault e) {
+				throw new SandeshaException(e.getMessage());
+			}
+		}
+
+		if (newToStr != null)
+			rmMsg.setTo(new EndpointReference(newToStr));
+		else
+			rmMsg.setTo(toEPR);
+
 		if (replyToEPR != null)
 			rmMsg.setReplyTo(replyToEPR);
 
-		Sequence sequence = new Sequence();
+		Sequence sequence = new Sequence(factory);
 
-		MessageNumber msgNumber = new MessageNumber();
+		MessageNumber msgNumber = new MessageNumber(factory);
 		msgNumber.setMessageNumber(messageNumber);
 		sequence.setMessageNumber(msgNumber);
 
+		boolean lastMessage = false;
 		//setting last message
 		if (msg.isServerSide()) {
 			//server side
@@ -508,9 +563,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 				throw new SandeshaException("Request Sequence is null");
 
 			if (requestSequence.getLastMessage() != null) {
+				lastMessage = true;
 				//FIXME - This fails if request last message has more than one
 				// responses.
-				sequence.setLastMessage(new LastMessage());
+				sequence.setLastMessage(new LastMessage(factory));
 
 				//saving the last message no.
 				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
@@ -522,11 +578,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		} else {
 			//client side
-
+			
 			Object obj = msg.getSystemContext().getProperty(
 					Constants.LAST_MESSAGE);
 			if (obj != null && "true".equals(obj)) {
-				sequence.setLastMessage(new LastMessage());
+				lastMessage = true;
+				sequence.setLastMessage(new LastMessage(factory));
 				//saving the last message no.
 				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
 						tempSequenceId,
@@ -536,22 +593,40 @@ public class SandeshaOutHandler extends AbstractHandler {
 			}
 		}
 
+		AckRequested ackRequested = null;
+
+		//TODO do this based on policies.
+		boolean addAckRequested = false;
+//		if (!lastMessage)
+//			addAckRequested = true;
+
 		//setting the Sequnece id.
 		//Set send = true/false depending on the availability of the out
 		// sequence id.
+		String identifierStr = null;
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
-			Identifier identifier = new Identifier();
-			identifier.setIndentifer(Constants.TEMP_SEQUENCE_ID);
-			sequence.setIdentifier(identifier);
+			identifierStr = Constants.TEMP_SEQUENCE_ID;
+			//			identifier.setIndentifer(Constants.TEMP_SEQUENCE_ID);
+			//			sequence.setIdentifier(identifier);
 
 		} else {
-			Identifier identifier = new Identifier();
-			identifier.setIndentifer((String) outSequenceBean.getValue());
-			sequence.setIdentifier(identifier);
+			identifierStr = (String) outSequenceBean.getValue();
+			//identifier.setIndentifer((String) outSequenceBean.getValue());
+		}
+		Identifier id1 = new Identifier(factory);
+		id1.setIndentifer(identifierStr);
+		sequence.setIdentifier(id1);
+		rmMsg.setMessagePart(Constants.MessageParts.SEQUENCE, sequence);
 
+		if (addAckRequested) {
+			ackRequested = new AckRequested(factory);
+			Identifier id2 = new Identifier(factory);
+			id2.setIndentifer(identifierStr);
+			ackRequested.setIdentifier(id2);
+			rmMsg.setMessagePart(Constants.MessageParts.ACK_REQUEST,
+					ackRequested);
 		}
 
-		rmMsg.setMessagePart(Constants.MessageParts.SEQUENCE, sequence);
 		try {
 			rmMsg.addSOAPEnvelope();
 		} catch (AxisFault e1) {

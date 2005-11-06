@@ -276,6 +276,7 @@ public class FaultMgr {
 	public RMMsgContext getFault(int type, MessageContext msgCtx)
 			throws SandeshaException {
 
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(msgCtx.getEnvelope()));
 		FaultData data = new FaultData();
 
 		switch (type) {
@@ -308,8 +309,8 @@ public class FaultMgr {
 		newMsgCtx.setServiceContext(msgCtx.getServiceContext());
 		RMMsgContext newRMMsgCtx = new RMMsgContext(newMsgCtx);
 
-		SequenceFault seqFault = new SequenceFault();
-		FaultCode faultCode = new FaultCode();
+		SequenceFault seqFault = new SequenceFault(factory);
+		FaultCode faultCode = new FaultCode(factory);
 		faultCode.setFaultCode(data.code);
 		seqFault.setFaultCode(faultCode);
 
@@ -344,7 +345,7 @@ public class FaultMgr {
 			throws SandeshaException {
 
 		SOAPFactory factory = SOAPAbstractFactory
-				.getSOAPFactory(Constants.SOAPVersion.v1_1);
+				.getSOAPFactory(SandeshaUtil.getSOAPVersion(msgCtx.getEnvelope()));
 		SOAPEnvelope faultMsgEnvelope = factory.getDefaultFaultEnvelope();
 
 		SOAPFault fault;
@@ -398,7 +399,8 @@ public class FaultMgr {
 			throws SandeshaException {
 
 		SOAPFactory factory = SOAPAbstractFactory
-				.getSOAPFactory(Constants.SOAPVersion.v1_2);
+		.getSOAPFactory(SandeshaUtil.getSOAPVersion(msgCtx.getEnvelope()));
+		
 		SOAPEnvelope envelope = factory.getDefaultFaultEnvelope();
 
 		SOAPFault fault = envelope.getBody().getFault();

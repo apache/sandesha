@@ -70,6 +70,8 @@ public class Sender extends Thread {
 					try {
 						RMMsgContext rmMsgCtx = MsgInitializer
 								.initializeMessage(msgCtx);
+						
+						
 						updateMessage(msgCtx);
 
 						Object debug = context
@@ -84,8 +86,8 @@ public class Sender extends Thread {
 
 						new AxisEngine(context).send(msgCtx);
 
-						//if (!msgCtx.isServerSide())
-						checkForSyncResponses(msgCtx);
+						if (!msgCtx.isServerSide())
+							checkForSyncResponses(msgCtx);
 
 					} catch (AxisFault e1) {
 						e1.printStackTrace();
@@ -163,6 +165,7 @@ public class Sender extends Thread {
 		boolean responsePresent = (msgCtx
 				.getProperty(MessageContext.TRANSPORT_IN) != null);
 
+	
 		if (responsePresent) {
 			//create the response
 			MessageContext response = new MessageContext(msgCtx
@@ -201,6 +204,7 @@ public class Sender extends Thread {
 						.getEnvelope().getNamespace().getName());
 			} catch (AxisFault e) {
 				//TODO: change to log.debug
+				e.printStackTrace();
 			}
 
 			if (resenvelope != null) {

@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2;
 
+import org.apache.axis2.soap.SOAPConstants;
+
 
 
 /**
@@ -114,7 +116,10 @@ public interface Constants {
 	}
 
 	public interface WSP {
-		long RETRANSMISSION_INTERVAL = 15000;
+		long RETRANSMISSION_INTERVAL = 10000;
+		long ACKNOWLEDGEMENT_INTERVAL = 3000;
+		boolean EXPONENTION_BACKOFF = false;
+		long INACTIVITY_TIMEOUT_INTERVAL = 5000000;
 	}
 
 	public interface MessageTypes {
@@ -191,8 +196,6 @@ public interface Constants {
 		int v1_1 = 1;
 
 		int v1_2 = 2;
-
-		int DEFAULT = v1_1;
 	}
 
 	public interface QOS {

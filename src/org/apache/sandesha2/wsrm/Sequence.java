@@ -22,6 +22,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Constants;
@@ -43,13 +44,15 @@ public class Sequence implements IOMRMPart {
 
 	private LastMessage lastMessage = null;
 
-	OMNamespace seqNoNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	private SOAPFactory factory;
+	
+	OMNamespace seqNoNamespace = null;
 
-	public Sequence() {
-		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public Sequence(SOAPFactory factory) {
+		this.factory = factory;
+		seqNoNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		sequenceElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
 	}
 
@@ -71,12 +74,11 @@ public class Sequence implements IOMRMPart {
 			throw new OMException(
 					"Cannot find Sequence element in the given element");
 
-		sequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		sequenceElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
 
-		identifier = new Identifier();
-		messageNumber = new MessageNumber();
+		identifier = new Identifier(factory);
+		messageNumber = new MessageNumber(factory);
 		identifier.fromOMElement(sequencePart);
 		messageNumber.fromOMElement(sequencePart);
 
@@ -85,7 +87,7 @@ public class Sequence implements IOMRMPart {
 						Constants.WSRM.LAST_MSG));
 
 		if (lastMessageElement != null) {
-			lastMessage = new LastMessage();
+			lastMessage = new LastMessage(factory);
 			lastMessage.fromOMElement(sequencePart);
 		}
 
@@ -124,8 +126,7 @@ public class Sequence implements IOMRMPart {
 
 		//resetting the element. So that subsequest toOMElement calls will
 		// attach a different object.
-		this.sequenceElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		this.sequenceElement = factory.createOMElement(
 				Constants.WSRM.SEQUENCE, seqNoNamespace);
 
 		return headerElement;

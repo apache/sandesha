@@ -12,6 +12,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -26,20 +27,21 @@ public class Address implements IOMRMElement {
 	EndpointReference epr = null;
 
 	OMElement addressElement;
+	
+	SOAPFactory factory;
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT)
-			.createOMNamespace(Constants.WSA.NS_URI_ADDRESSING,
-					Constants.WSA.NS_PREFIX_ADDRESSING);
+	OMNamespace rmNamespace = null;
 
-	public Address() {
-		addressElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public Address(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(Constants.WSA.NS_URI_ADDRESSING,
+				Constants.WSA.NS_PREFIX_ADDRESSING);
+		addressElement = factory.createOMElement(
 				Constants.WSA.ADDRESS, rmNamespace);
 	}
 	
-	public Address (EndpointReference epr) {
-		this();
+	public Address (EndpointReference epr,SOAPFactory factory) {
+		this(factory);
 		this.epr = epr;
 	}
 
@@ -57,8 +59,7 @@ public class Address implements IOMRMElement {
 
 		addressElement = addressPart;
 		epr = new EndpointReference(addressText);
-		addressElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		addressElement = factory.createOMElement(
 				Constants.WSA.ADDRESS, rmNamespace);
 		return this;
 
@@ -80,8 +81,7 @@ public class Address implements IOMRMElement {
 		addressElement.setText(epr.getAddress());
 		element.addChild(addressElement);
 
-		addressElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		addressElement = factory.createOMElement(
 				Constants.WSA.ADDRESS, rmNamespace);
 
 		return element;

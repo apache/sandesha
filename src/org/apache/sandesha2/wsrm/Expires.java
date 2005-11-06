@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
@@ -33,17 +34,19 @@ import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 public class Expires implements IOMRMElement {
 
-	OMNamespace rmNamespace = SOAPAbstractFactory.getSOAPFactory(
-			Constants.SOAPVersion.DEFAULT).createOMNamespace(
-			Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+	SOAPFactory factory;
+	
+	OMNamespace rmNamespace = null;
 
 	OMElement expiresElement = null;
 
 	String duration = null;
 
-	public Expires() {
-		expiresElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+	public Expires(SOAPFactory factory) {
+		this.factory = factory;
+		rmNamespace = factory.createOMNamespace(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		expiresElement = factory.createOMElement(
 				Constants.WSRM.EXPIRES, rmNamespace);
 	}
 
@@ -57,8 +60,7 @@ public class Expires implements IOMRMElement {
 		if (expiresText == null || expiresText == "")
 			throw new OMException("The duration value is not valid");
 
-		expiresElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		expiresElement = factory.createOMElement(
 				Constants.WSRM.EXPIRES, rmNamespace);
 
 		duration = expiresText;
@@ -80,8 +82,7 @@ public class Expires implements IOMRMElement {
 		expiresElement.setText(duration);
 		element.addChild(expiresElement);
 
-		expiresElement = SOAPAbstractFactory.getSOAPFactory(
-				Constants.SOAPVersion.DEFAULT).createOMElement(
+		expiresElement = factory.createOMElement(
 				Constants.WSRM.EXPIRES, rmNamespace);
 
 		return element;

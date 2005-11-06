@@ -30,8 +30,10 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Accept;
+import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -40,6 +42,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.soap.SOAPFactory;
+
 import java.util.Iterator;
 import javax.xml.namespace.QName;
 
@@ -47,6 +51,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {
 
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(createSeqResponseRMMsgCtx.getSOAPEnvelope()));
+		
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) createSeqResponseRMMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
@@ -153,10 +159,18 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			if (sequencePart == null)
 				throw new SandeshaException("Sequence part is null");
 
-			Identifier identifier = new Identifier();
+			Identifier identifier = new Identifier(factory);
 			identifier.setIndentifer(newOutSequenceId);
 
 			sequencePart.setIdentifier(identifier);
+			
+			AckRequested ackRequestedPart = (AckRequested) applicaionRMMsg.getMessagePart(Constants.MessageParts.ACK_REQUEST);
+			if (ackRequestedPart!=null) {
+				Identifier id1 = new Identifier (factory);
+				id1.setIndentifer(newOutSequenceId);
+				ackRequestedPart.setIdentifier(id1);
+			}
+			
 			try {
 				applicaionRMMsg.addSOAPEnvelope();
 			} catch (AxisFault e) {
