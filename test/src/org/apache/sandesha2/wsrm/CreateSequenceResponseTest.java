@@ -3,7 +3,9 @@ package org.apache.sandesha2.wsrm;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 
 import javax.xml.namespace.QName;
@@ -17,13 +19,15 @@ import javax.xml.namespace.QName;
  */
 public class CreateSequenceResponseTest extends SandeshaTestCase {
 
+	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	
     public CreateSequenceResponseTest() {
         super("CreateSequenceResponseTest");
 
     }
 
     public void testFromOMElement() {
-        CreateSequenceResponse res = new CreateSequenceResponse();
+        CreateSequenceResponse res = new CreateSequenceResponse(factory);
         SOAPEnvelope env = getSOAPEnvelope("", "CreateSequenceResponse.xml");
         res.fromOMElement(env.getBody());
 
@@ -38,15 +42,15 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() {
-        CreateSequenceResponse res = new CreateSequenceResponse();
+        CreateSequenceResponse res = new CreateSequenceResponse(factory);
 
-        Identifier identifier = new Identifier();
+        Identifier identifier = new Identifier(factory);
         identifier.setIndentifer("uuid:88754b00-161a-11da-b6d6-8198de3c47c5");
         res.setIdentifier(identifier);
 
-        Accept accept = new Accept();
-        AcksTo acksTo = new AcksTo();
-        Address address = new Address();
+        Accept accept = new Accept(factory);
+        AcksTo acksTo = new AcksTo(factory);
+        Address address = new Address(factory);
         address.setEpr(new EndpointReference("http://localhost:8070/axis/services/TestService"));
         acksTo.setAddress(address);
         accept.setAcksTo(acksTo);

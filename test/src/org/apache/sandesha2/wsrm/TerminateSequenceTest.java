@@ -3,6 +3,8 @@ package org.apache.sandesha2.wsrm;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 
 import javax.xml.namespace.QName;
@@ -16,12 +18,14 @@ import javax.xml.namespace.QName;
  */
 public class TerminateSequenceTest extends SandeshaTestCase {
 
+	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	
     public TerminateSequenceTest() {
         super("TerminateSequenceTest");
     }
 
     public void testFromOMElement() {
-        TerminateSequence terminateSequence =  new TerminateSequence();
+        TerminateSequence terminateSequence =  new TerminateSequence(factory);
         SOAPEnvelope env = getSOAPEnvelope("", "TerminateSequence.xml");
         terminateSequence.fromOMElement(env.getBody());
 
@@ -30,8 +34,8 @@ public class TerminateSequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() {
-        TerminateSequence terminateSequence = new TerminateSequence();
-        Identifier identifier = new Identifier();
+        TerminateSequence terminateSequence = new TerminateSequence(factory);
+        Identifier identifier = new Identifier(factory);
         identifier.setIndentifer("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06");
         terminateSequence.setIdentifier(identifier);
 

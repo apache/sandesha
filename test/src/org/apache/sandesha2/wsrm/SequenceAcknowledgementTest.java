@@ -3,6 +3,8 @@ package org.apache.sandesha2.wsrm;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 
 import javax.xml.namespace.QName;
@@ -17,12 +19,14 @@ import java.util.Iterator;
  */
 public class SequenceAcknowledgementTest extends SandeshaTestCase {
 
+	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	
     public SequenceAcknowledgementTest() {
         super("SequenceAcknowledgementTest");
     }
 
     public void testFromOMElement() {
-        SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement();
+        SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(factory);
         SOAPEnvelope env = getSOAPEnvelope("", "SequenceAcknowledgement.xml");
         sequenceAck.fromOMElement(env.getHeader());
 
@@ -59,8 +63,8 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
     }
 
     public void testToOMElement() {
-        SequenceAcknowledgement seqAck = new SequenceAcknowledgement();
-        Identifier identifier = new Identifier();
+        SequenceAcknowledgement seqAck = new SequenceAcknowledgement(factory);
+        Identifier identifier = new Identifier(factory);
         identifier.setIndentifer("uuid:897ee740-1624-11da-a28e-b3b9c4e71445");
         seqAck.setIdentifier(identifier);
 

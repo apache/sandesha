@@ -4,7 +4,9 @@ import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.wsrm.*;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 
 import javax.xml.namespace.QName;
@@ -18,12 +20,14 @@ import javax.xml.namespace.QName;
  */
 public class CreateSequenceTest extends SandeshaTestCase {
 
+	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	
     public CreateSequenceTest() {
         super("CreateSequenceTest");
     }
 
     public void testfromOMElement() {
-        CreateSequence createSequence = new CreateSequence();
+        CreateSequence createSequence = new CreateSequence(factory);
         createSequence.fromOMElement(getSOAPEnvelope("", "CreateSequence.xml").getBody());
 
         AcksTo acksTo = createSequence.getAcksTo();
@@ -37,16 +41,16 @@ public class CreateSequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() {
-        CreateSequence createSequence = new CreateSequence();
+        CreateSequence createSequence = new CreateSequence(factory);
 
-        AcksTo acksTo = new AcksTo();
-        Address address = new Address();
+        AcksTo acksTo = new AcksTo(factory);
+        Address address = new Address(factory);
         address.setEpr(new EndpointReference("http://127.0.0.1:9090/axis/services/RMService"));
         acksTo.setAddress(address);
         createSequence.setAcksTo(acksTo);
 
-        SequenceOffer sequenceOffer = new SequenceOffer();
-        Identifier identifier = new Identifier();
+        SequenceOffer sequenceOffer = new SequenceOffer(factory);
+        Identifier identifier = new Identifier(factory);
         identifier.setIndentifer("uuid:c3671020-15e0-11da-9b3b-f0439d4867bd");
         sequenceOffer.setIdentifier(identifier);
         createSequence.setSequenceOffer(sequenceOffer);

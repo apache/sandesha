@@ -3,6 +3,8 @@ package org.apache.sandesha2.wsrm;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 
 import javax.xml.namespace.QName;
@@ -16,6 +18,8 @@ import javax.xml.namespace.QName;
  */
 public class SequenceTest extends SandeshaTestCase {
 
+	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	
     public SequenceTest() {
         super("SequenceTest");
 
@@ -23,7 +27,7 @@ public class SequenceTest extends SandeshaTestCase {
 
     public void testFromOMElement() {
         SOAPEnvelope env = getSOAPEnvelope("", "Sequence.xml");
-        Sequence sequence = new Sequence();
+        Sequence sequence = new Sequence(factory);
         sequence.fromOMElement(env.getHeader());
 
         Identifier identifier = sequence.getIdentifier();
@@ -34,13 +38,13 @@ public class SequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() {
-        Sequence sequence = new Sequence();
+        Sequence sequence = new Sequence(factory);
 
-        Identifier identifier = new Identifier();
+        Identifier identifier = new Identifier(factory);
         identifier.setIndentifer("uuid:879da420-1624-11da-bed9-84d13db13902");
         sequence.setIdentifier(identifier);
 
-        MessageNumber msgNo = new MessageNumber();
+        MessageNumber msgNo = new MessageNumber(factory);
         msgNo.setMessageNumber(1);
         sequence.setMessageNumber(msgNo);
 
