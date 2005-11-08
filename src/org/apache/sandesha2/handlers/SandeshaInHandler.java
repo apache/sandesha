@@ -49,6 +49,12 @@ public class SandeshaInHandler extends AbstractHandler {
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
 
+		String DONE = (String) msgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE);
+		if (null != DONE && "true".equals(DONE))
+			return;
+		
+		//Shouldnt set app-processing-done here SINCE - 
+
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");

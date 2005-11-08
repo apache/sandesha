@@ -83,7 +83,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//Because of this dispatching may go wrong.
 		//So we set relatesTo value to null for ackMessages. (this happens in
 		// the SandeshaGlobal handler)
-		rmMsgCtx.setRelatesTo(null);
+		//Do this only if this is a standalone ACK.
+		if (rmMsgCtx.getMessageType()==Constants.MessageTypes.ACK)
+			rmMsgCtx.setRelatesTo(null);
 
 		RetransmitterBean input = new RetransmitterBean();
 		input.setTempSequenceId(tempSequenceId);
@@ -166,15 +168,25 @@ public class AcknowledgementProcessor implements MsgProcessor {
 	public void addTerminateSequenceMessage(RMMsgContext incomingAckRMMsg,
 			String outSequenceId, String tempSequenceId)
 			throws SandeshaException {
+		
+		StorageManager storageManager = SandeshaUtil
+		.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
+				.getSystemContext());
+		
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+		.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceId,Constants.SequenceProperties.TERMINATE_ADDED);
+		
+		if (terminated!=null && terminated.getValue()!=null && "true".equals(terminated.getValue())) {
+			System.out.println("TERMINATE WAS ADDED PREVIOUSLY....");
+			return;
+		}
+		
 		RMMsgContext terminateRMMessage = RMMsgCreator
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
 
-		//detting addressing headers.
-		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
-						.getSystemContext());
-		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+
 
 		//SequencePropertyBean replyToBean =
 		// seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
@@ -220,6 +232,14 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		RetransmitterBeanMgr retramsmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
+		
+		SequencePropertyBean terminateAdded = new SequencePropertyBean ();
+		terminateAdded.setName(Constants.SequenceProperties.TERMINATE_ADDED);
+		terminateAdded.setSequenceId(outSequenceId);
+		terminateAdded.setValue("true");
+	    
+		seqPropMgr.insert(terminateAdded);
+		
 		retramsmitterMgr.insert(terminateBean);
 
 	}

@@ -116,7 +116,7 @@ public interface Constants {
 	}
 
 	public interface WSP {
-		long RETRANSMISSION_INTERVAL = 10000;
+		long RETRANSMISSION_INTERVAL = 500000;
 		long ACKNOWLEDGEMENT_INTERVAL = 3000;
 		boolean EXPONENTION_BACKOFF = false;
 		long INACTIVITY_TIMEOUT_INTERVAL = 5000000;
@@ -190,6 +190,8 @@ public interface Constants {
 		String CHECK_RESPONSE = "CheckResponse";
 		
 		String OFFERED_SEQUENCE = "OfferedSequence";
+		
+		String TERMINATE_ADDED = "TerminateAdded";
 	}
 
 	public interface SOAPVersion {

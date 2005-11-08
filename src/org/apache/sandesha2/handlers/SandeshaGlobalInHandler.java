@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.soap.SOAPBody;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -83,6 +84,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		boolean drop = false;
 
 		if (rmMsgContext.getMessageType() == Constants.MessageTypes.APPLICATION) {
+			
 			Sequence sequence = (Sequence) rmMsgContext
 					.getMessagePart(Constants.MessageParts.SEQUENCE);
 			String sequenceId = null;
@@ -112,6 +114,43 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 						drop = true;
 					}
 				}
+				
+				
+				if (drop==false) {
+					//Checking for RM specific EMPTY_BODY LASTMESSAGE.
+					SOAPBody body = rmMsgContext.getSOAPEnvelope().getBody();
+					boolean emptyBody = false;
+					if (body.getChildElements().hasNext()==false) {
+						emptyBody = true;	
+					}
+				
+					if (emptyBody) {
+						boolean lastMessage = false;
+						if (sequence.getLastMessage()!=null) {
+							System.out.println("Empty Body Last Message Received");
+							drop = true;
+						
+							if (receivedMsgsBean==null) {
+								receivedMsgsBean = new SequencePropertyBean (sequenceId,Constants.SequenceProperties.RECEIVED_MESSAGES,"");
+								seqPropMgr.insert(receivedMsgsBean);
+							}
+							
+							String receivedMsgStr = (String) receivedMsgsBean.getValue();
+							if (receivedMsgStr != "" && receivedMsgStr != null)
+								receivedMsgStr = receivedMsgStr + "," + Long.toString(msgNo);
+							else
+								receivedMsgStr = Long.toString(msgNo);
+								
+							receivedMsgsBean.setValue(receivedMsgStr);
+							seqPropMgr.update(receivedMsgsBean);
+								
+							//ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor ();
+							//ackProcessor.sendAckIfNeeded(rmMsgContext,receivedMsgStr);
+							
+					}
+				}
+				}
+				//if (rmMsgContext.get)
 			}
 		}
 

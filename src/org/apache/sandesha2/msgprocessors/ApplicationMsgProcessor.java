@@ -59,6 +59,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
+		//Object obj = rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE);
+		
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
@@ -356,8 +358,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(e1.getMessage());
 			}
 		} else {
-			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-					org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+			//rmMsgCtx.getMessageContext().getOperationContext().setProperty(
+				//	org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 			
 			RetransmitterBeanMgr retransmitterBeanMgr = storageManager
 					.getRetransmitterBeanMgr();

@@ -398,6 +398,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(
 					"Create Sequence part is null for a CreateSequence message");
 
+	
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {
 			//Offer processing
@@ -444,6 +445,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 				createSeqMsg.getMessageID(), null);
 		createSeqMgr.insert(createSeqBean);
 
+		if (createSeqMsg.getReplyTo()==null)
+			createSeqMsg.setReplyTo(new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS));
+		
+		
 		RetransmitterBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 
@@ -597,8 +602,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//TODO do this based on policies.
 		boolean addAckRequested = false;
-//		if (!lastMessage)
-//			addAckRequested = true;
+		if (!lastMessage)
+			addAckRequested = true;
 
 		//setting the Sequnece id.
 		//Set send = true/false depending on the availability of the out
