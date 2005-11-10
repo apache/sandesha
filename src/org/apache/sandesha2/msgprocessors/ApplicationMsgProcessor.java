@@ -49,6 +49,8 @@ import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.AckRequested;
+import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.wsdl.WSDLConstants;
@@ -258,6 +260,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (configCtx == null)
 			throw new SandeshaException("Configuration Context is null");
 
+		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Constants.MessageParts.ACK_REQUEST);
+		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
+
+		boolean ackRequired = false;
+		if (ackRequested!=null || lastMessage!=null)
+			ackRequired = true;
+		
+		if (!ackRequired) {
+			return;
+		}
+		
 		//Setting the ack depending on AcksTo.
 		//TODO: Stop sending askc for every message.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,

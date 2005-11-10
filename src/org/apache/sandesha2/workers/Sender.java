@@ -84,7 +84,6 @@ public class Sender extends Thread {
 									+ "' message.");
 						}
 						
-
 						new AxisEngine(context).send(msgCtx);
 
 						if (!msgCtx.isServerSide())

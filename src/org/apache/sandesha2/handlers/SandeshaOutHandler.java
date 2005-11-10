@@ -35,6 +35,8 @@ import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.SandeshaException;
@@ -67,12 +69,18 @@ import org.apache.wsdl.WSDLConstants;
 
 public class SandeshaOutHandler extends AbstractHandler {
 
+	protected Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
+	
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-
+		
+		//try {
+			
 		ConfigurationContext context = msgCtx.getSystemContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
 
+		
+		
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");
@@ -92,7 +100,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//getting rm message
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-
+		
 		Parameter keyParam = axisService.getParameter(Constants.RM_ENABLE_KEY);
 		Object keyValue = null;
 		if (keyParam != null)
@@ -381,6 +389,13 @@ public class SandeshaOutHandler extends AbstractHandler {
 			//pausing the message
 			msgCtx.setPausedTrue(getName());
 		}
+		
+		
+		
+//		}catch (Exception e) {
+//			e.getStackTrace();
+//			throw new AxisFault ("Sandesha got an exception. See logs for details");
+//		}
 
 	}
 

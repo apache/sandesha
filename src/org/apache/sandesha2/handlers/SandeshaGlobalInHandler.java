@@ -24,6 +24,11 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -42,8 +47,12 @@ import org.apache.sandesha2.wsrm.Sequence;
 
 public class SandeshaGlobalInHandler extends AbstractHandler {
 
+	
+    protected Log log = LogFactory.getLog(SandeshaGlobalInHandler.class.getName());
+	   
 	public void invoke(MessageContext msgContext) throws AxisFault {
-
+		
+		//try {
 		RMMsgContext rmMessageContext = MsgInitializer
 				.initializeMessage(msgContext);
 
@@ -76,6 +85,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			doGlobalProcessing(rmMessageContext);
 		}
 
+//		}catch (Exception e) {
+//			e.getStackTrace();
+//			throw new AxisFault ("Sandesha got an exception. See logs for details");
+//		}
 	}
 
 	private boolean dropIfDuplicate(RMMsgContext rmMsgContext)

@@ -24,6 +24,8 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
@@ -39,12 +41,17 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class SandeshaInHandler extends AbstractHandler {
 
+	
+	protected Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
+	
 	public QName getName() {
 		return new QName(Constants.IN_HANDLER_NAME);
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-
+		
+		//try {
+			
 		ConfigurationContext context = msgCtx.getSystemContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
@@ -53,8 +60,6 @@ public class SandeshaInHandler extends AbstractHandler {
 		if (null != DONE && "true".equals(DONE))
 			return;
 		
-		//Shouldnt set app-processing-done here SINCE - 
-
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");
@@ -95,6 +100,11 @@ public class SandeshaInHandler extends AbstractHandler {
 			se.printStackTrace();
 			throw new AxisFault("Error in processing the message");
 		}
+		
+//		}catch (Exception e) {
+//			e.getStackTrace();
+//			throw new AxisFault ("Sandesha got an exception. See logs for details");
+//		}
 
 	}
 

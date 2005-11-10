@@ -178,7 +178,7 @@ public class SandeshaUtil {
 			MessageContext newMessageContext = shallowCopy(msgCtx);
 			newMessageContext.setDoingMTOM(msgCtx.isDoingMTOM());
 			newMessageContext.setDoingREST(msgCtx.isDoingREST());
-			newMessageContext.setMessageID(getUUID());
+			newMessageContext.setMessageID(msgCtx.getMessageID());
 			newMessageContext.setOutPutWritten(msgCtx.isOutPutWritten());
 			newMessageContext.setParent(msgCtx.getParent());
 			newMessageContext.setPausedPhaseName(msgCtx.getPausedPhaseName());
