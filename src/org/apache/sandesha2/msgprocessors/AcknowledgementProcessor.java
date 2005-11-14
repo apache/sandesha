@@ -41,6 +41,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
+//		boolean b = true;
+//		if (b)
+//			return;
+		
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck == null)
@@ -223,7 +227,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		// some delay.
 		//Otherwise this get send before return of the current request (ack).
 		//TODO verify that the time given is correct
-		terminateBean.setLastSentTime(System.currentTimeMillis()
+		terminateBean.setTimeToSend(System.currentTimeMillis()
 				+ Constants.TERMINATE_DELAY);
 
 		terminateBean.setMessageId(terminateRMMessage.getMessageId());

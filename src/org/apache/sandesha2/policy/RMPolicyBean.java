@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package org.apache.sandesha2.policy;
 
 /**
  * @author Sanka Samaranayake (sanka@apache.org)
  */
+package org.apache.sandesha2.policy;
+
+import org.apache.sandesha2.Constants;
 
 public class RMPolicyBean {
-    private long inactiveTimeoutInterval = -1l;
-    private long acknowledgementInterval = -1l;
-    private long retransmissionInterval = -1l;
-    private boolean exponentialBackoff = false;
+    private long inactiveTimeoutInterval = Constants.WSP.INACTIVITY_TIMEOUT_INTERVAL;
+    private long acknowledgementInterval = Constants.WSP.ACKNOWLEDGEMENT_INTERVAL;
+    private long retransmissionInterval = Constants.WSP.RETRANSMISSION_INTERVAL;
+    private boolean exponentialBackoff = Constants.WSP.EXPONENTION_BACKOFF;
     
+    public RMPolicyBean () {
+    	loadValuesFromPropertyFile ();
+    }
     
-    public RMPolicyBean() {
-        
+    private void loadValuesFromPropertyFile () {
+    	//TODO load policy values from the file.
     }
     
     public long getInactiveTimeoutInterval() {
@@ -43,7 +48,7 @@ public class RMPolicyBean {
         return retransmissionInterval;
     }
     
-    public boolean getExponentialBackoff() {
+    public boolean isExponentialBackoff() {
         return exponentialBackoff;
     }
     

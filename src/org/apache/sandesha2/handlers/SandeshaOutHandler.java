@@ -41,6 +41,7 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
@@ -50,6 +51,7 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
+import org.apache.sandesha2.util.RMPolicyManager;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
@@ -61,6 +63,7 @@ import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.wsdl.WSDLConstants;
+
 
 /**
  * 
@@ -134,6 +137,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//Strating the sender.
 		SandeshaUtil.startSenderIfStopped(context);
 
+		
+		//Adding the policy bean
+		RMPolicyBean policyBean = RMPolicyManager.getPolicyBean(rmMsgCtx);
+		rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN,policyBean);
+		
+		
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(context);
 
@@ -471,7 +480,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				.getMessageContext());
 		RetransmitterBean createSeqEntry = new RetransmitterBean();
 		createSeqEntry.setKey(key);
-		createSeqEntry.setLastSentTime(0);
+		createSeqEntry.setTimeToSend(System.currentTimeMillis());
 		createSeqEntry.setMessageId(createSeqRMMessage.getMessageId());
 		createSeqEntry.setSend(true);
 		retransmitterMgr.insert(createSeqEntry);
@@ -661,7 +670,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		String key = SandeshaUtil
 				.storeMessageContext(rmMsg.getMessageContext());
 		appMsgEntry.setKey(key);
-		appMsgEntry.setLastSentTime(0);
+		appMsgEntry.setTimeToSend(System.currentTimeMillis());
 		appMsgEntry.setMessageId(rmMsg.getMessageId());
 		appMsgEntry.setMessageNumber(messageNumber);
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {

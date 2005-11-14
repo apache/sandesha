@@ -71,6 +71,7 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 
 		RetransmitterBean temp;
 		while (iterator.hasNext()) {
+			
 			temp = (RetransmitterBean) iterator.next();
 
 			boolean add = true;
@@ -78,8 +79,8 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 			if (bean.getKey() != null && !bean.getKey().equals(temp.getKey()))
 				add = false;
 
-			if (bean.getLastSentTime() > 0
-					&& bean.getLastSentTime() != temp.getLastSentTime())
+			if (bean.getTimeToSend() > 0
+					&& bean.getTimeToSend() != temp.getTimeToSend())
 				add = false;
 
 			if (bean.getMessageId() != null
@@ -110,11 +111,14 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 		while (iterator.hasNext()) {
 			temp = (RetransmitterBean) iterator.next();
 			if (temp.isSend()) {
-				long lastSentTime = temp.getLastSentTime();
+				
+				long timeToSend = temp.getTimeToSend();
+				
 				int count = temp.getSentCount();
+				
 				long timeNow = System.currentTimeMillis();
 				if (count == 0
-						|| (timeNow > (lastSentTime + Constants.WSP.RETRANSMISSION_INTERVAL))) {
+						|| (timeNow >= timeToSend)) {
 					beans.add(temp);
 				}
 			}

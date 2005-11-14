@@ -29,6 +29,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -61,7 +62,9 @@ public class Sender extends Thread {
 						.getRetransmitterBeanMgr();
 				Collection coll = mgr.findMsgsToSend();
 				Iterator iter = coll.iterator();
+				
 				while (iter.hasNext()) {
+					
 					RetransmitterBean bean = (RetransmitterBean) iter.next();
 					String key = (String) bean.getKey();
 					MessageContext msgCtx = SandeshaUtil
@@ -85,7 +88,9 @@ public class Sender extends Thread {
 						}
 						
 						new AxisEngine(context).send(msgCtx);
-
+						MessageRetransmissionAdjuster  retransmitterAdjuster = new MessageRetransmissionAdjuster ();
+						retransmitterAdjuster.adjustRetransmittion(bean);
+						
 						if (!msgCtx.isServerSide())
 							checkForSyncResponses(msgCtx);
 
@@ -96,8 +101,8 @@ public class Sender extends Thread {
 					}
 
 					//changing the values of the sent bean.
-					bean.setLastSentTime(System.currentTimeMillis());
-					bean.setSentCount(bean.getSentCount() + 1);
+					//bean.setLastSentTime(System.currentTimeMillis());
+					//bean.setSentCount(bean.getSentCount() + 1);
 
 					//update if resend=true otherwise delete. (reSend=false
 					// means

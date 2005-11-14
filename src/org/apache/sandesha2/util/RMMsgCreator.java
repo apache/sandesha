@@ -38,6 +38,7 @@ import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -56,6 +57,14 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class RMMsgCreator {
 
+	
+	private static void setUpMessage (MessageContext rmMsgCtx) {
+		//Seting RMPolicyBean
+		RMPolicyBean policyBean = new RMPolicyBean ();
+		rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN,policyBean);
+		
+	}
+	
 	public static RMMsgContext createCreateSeqMsg(
 			RMMsgContext applicationRMMsg, String tempSequenceId, String acksTo)
 			throws SandeshaException {
@@ -94,6 +103,8 @@ public class RMMsgCreator {
 		createSeqmsgContext.setServiceContextID(applicationMsgContext
 				.getServiceContextID());
 
+		setUpMessage(createSeqmsgContext);
+		
 		String createSeqMsgId = SandeshaUtil.getUUID();
 		try {
 			AxisOperation appMsgOperationDesc = applicationMsgContext
@@ -234,6 +245,8 @@ public class RMMsgCreator {
 		if (terminateMessage == null)
 			throw new SandeshaException("MessageContext is null");
 
+		setUpMessage(terminateMessage);
+		
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion ( referenceMessage.getEnvelope()));
 
 		MessageInformationHeaders newMessageInfoHeaders = new MessageInformationHeaders();
@@ -338,11 +351,14 @@ public class RMMsgCreator {
 		outMessage.setWSAAction(Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE_RESPONSE);
 		outMessage.setSoapAction(Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE_RESPONSE);
 
+		
 		String newMessageId = SandeshaUtil.getUUID();
 		outMessage.setMessageID(newMessageId);
 
 		outMessage.setEnvelope(envelope);
 
+		setUpMessage(outMessage);
+		
 		RMMsgContext createSeqResponse = null;
 		try {
 			createSeqResponse = MsgInitializer.initializeMessage(outMessage);
@@ -419,6 +435,9 @@ public class RMMsgCreator {
 					.getAxisOperation());
 
 			ackMsgCtx.setOperationContext(ackOpCtx);
+			
+			setUpMessage(ackMsgCtx);
+			
 			ackOpCtx.addMessageContext(ackMsgCtx);
 
 			Sequence reqSequence = (Sequence) applicationRMMsgCtx

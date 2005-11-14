@@ -23,7 +23,7 @@ public class RetransmitterBean implements RMBean {
 
 	private String key;
 
-	private long LastSentTime;
+//	private long LastSentTime;
 
 	private boolean Send;
 
@@ -35,15 +35,18 @@ public class RetransmitterBean implements RMBean {
 
 	private boolean reSend = true;
 
+	private long timeToSend = 0;
+	
 	public RetransmitterBean() {
 
 	}
 
-	public RetransmitterBean(String messageId, String key, long lastSentTime,
-			boolean send, String tempSequenceId, long messageNumber) {
+	public RetransmitterBean(String messageId, String key,
+			boolean send,long timeToSend, String tempSequenceId, long messageNumber) {
 		this.messageId = messageId;
 		this.key = key;
-		this.LastSentTime = lastSentTime;
+		//this.LastSentTime = lastSentTime;
+		this.timeToSend = timeToSend;
 		this.Send = send;
 		this.tempSequenceId = tempSequenceId;
 		this.messageNumber = messageNumber;
@@ -57,13 +60,13 @@ public class RetransmitterBean implements RMBean {
 		this.key = key;
 	}
 
-	public long getLastSentTime() {
-		return LastSentTime;
-	}
-
-	public void setLastSentTime(long lastSentTime) {
-		LastSentTime = lastSentTime;
-	}
+//	public long getLastSentTime() {
+//		return LastSentTime;
+//	}
+//
+//	public void setLastSentTime(long lastSentTime) {
+//		LastSentTime = lastSentTime;
+//	}
 
 	public String getMessageId() {
 		return messageId;
@@ -112,5 +115,12 @@ public class RetransmitterBean implements RMBean {
 	public void setReSend(boolean reSend) {
 		this.reSend = reSend;
 	}
-
+	
+	public long getTimeToSend() {
+		return timeToSend;
+	}
+	
+	public void setTimeToSend(long timeToSend) {
+		this.timeToSend = timeToSend;
+	}
 }

@@ -116,10 +116,12 @@ public interface Constants {
 	}
 
 	public interface WSP {
-		long RETRANSMISSION_INTERVAL = 500000;
+		long RETRANSMISSION_INTERVAL = 1000;
 		long ACKNOWLEDGEMENT_INTERVAL = 3000;
-		boolean EXPONENTION_BACKOFF = false;
+		boolean EXPONENTION_BACKOFF = true;
 		long INACTIVITY_TIMEOUT_INTERVAL = 5000000;
+		
+		String RM_POLICY_BEAN = "RMPolicyBean";
 	}
 
 	public interface MessageTypes {
@@ -282,5 +284,7 @@ public interface Constants {
 	String SANDESHA_DEBUG_MODE = "SandeshaDebugMode";
 	
 	String STORAGE_MANAGER_IMPL = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
+	
+	int MAXIMUM_RETRANSMISSION_ATTEMPTS = 5;
 	
 }

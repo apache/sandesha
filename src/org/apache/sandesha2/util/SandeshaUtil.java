@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import org.apache.axis2.AxisFault;
@@ -31,6 +33,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.i18n.Messages;
+import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.soap.SOAP11Constants;
@@ -496,5 +499,24 @@ public class SandeshaUtil {
 			return Constants.SOAPVersion.v1_2;
 		else
 			throw new SandeshaException ("Unknown SOAP version");
+	}
+	
+	public static boolean isRMGlobalMessage (MessageContext msgCtx) {
+		boolean rmGlobalMsg = false;
+		
+		String action = msgCtx.getWSAAction();
+		SOAPEnvelope env = msgCtx.getEnvelope();
+		OMElement sequenceElem = env.getFirstChildWithName(new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE));
+		
+		if (sequenceElem!=null)
+			rmGlobalMsg = true;
+		
+		if (Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
+			rmGlobalMsg = true;
+		
+		if (Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
+			rmGlobalMsg = true;
+		
+		return rmGlobalMsg;
 	}
 }

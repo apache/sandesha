@@ -51,14 +51,24 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
     protected Log log = LogFactory.getLog(SandeshaGlobalInHandler.class.getName());
 	   
 	public void invoke(MessageContext msgContext) throws AxisFault {
-		
+	
 		//try {
+		
+		//Quit the message with minimum processing if not intended for RM.
+		boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage (msgContext);
+		if (!isRMGlobalMessage) {
+			return;
+		}
+		
 		RMMsgContext rmMessageContext = MsgInitializer
 				.initializeMessage(msgContext);
 
+		
 		ConfigurationContext context = rmMessageContext.getMessageContext()
 				.getSystemContext();
 
+		//context.setProperty (Constants.SANDESHA_DEBUG_MODE,"on");
+		
 		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
 		if (debug != null && "on".equals(debug)) {
 			System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
@@ -157,8 +167,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							receivedMsgsBean.setValue(receivedMsgStr);
 							seqPropMgr.update(receivedMsgsBean);
 								
-							//ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor ();
-							//ackProcessor.sendAckIfNeeded(rmMsgContext,receivedMsgStr);
+							ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor ();
+							ackProcessor.sendAckIfNeeded(rmMsgContext,receivedMsgStr);
 							
 					}
 				}
