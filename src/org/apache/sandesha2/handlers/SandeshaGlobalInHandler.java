@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
@@ -36,6 +37,7 @@ import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -59,6 +61,15 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		if (!isRMGlobalMessage) {
 			return;
 		}
+		
+		FaultManager faultManager = new FaultManager ();
+		RMMsgContext faultMessageContext = faultManager.checkForPossibleFaults(msgContext);
+	    if (faultMessageContext!=null){
+	    	ConfigurationContext configurationContext = msgContext.getSystemContext();
+	    	AxisEngine engine = new AxisEngine (configurationContext);
+	    	engine.send(faultMessageContext.getMessageContext());
+	    	return;
+	    }
 		
 		RMMsgContext rmMessageContext = MsgInitializer
 				.initializeMessage(msgContext);

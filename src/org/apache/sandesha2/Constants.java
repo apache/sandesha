@@ -113,6 +113,8 @@ public interface Constants {
 		String NS_PREFIX_ADDRESSING = "wsa";
 
 		String ADDRESS = "Address";
+		
+		String SOAP_FAULT_ACTION = "http://schemas.xmlsoap.org/ws/2004/08/addressing/fault";
 	}
 
 	public interface WSP {
@@ -241,6 +243,41 @@ public interface Constants {
 	public interface ClientProperties {
 		String AcksTo = "AcksToStr";
 	}
+	
+	public interface SOAPFaults {
+		
+		public interface Subcodes {
+			
+			String SEQUENCE_TERMINATED = "wsrm:SequenceTerminated";
+				
+			String UNKNOWN_SEQUENCE = "wsrm:UnknownSequence";
+				
+			String INVALID_ACKNOWLEDGEMENT = "wsrm:InvalidAcknowledgement";
+				
+		    String MESSAGE_NUMBER_ROLEOVER = "wsrm:MessageNumberRollover";
+				
+			String LAST_MESSAGE_NO_EXCEEDED = "wsrm:LastMessageNumberExceeded";
+				
+			String CREATE_SEQUENCE_REFUSED = "wsrm:CreateSequenceRefused";
+			
+		}
+
+		
+		public interface FaultType {
+			
+			public static final int UNKNOWN_SEQUENCE = 1;
+
+			public static final int MESSAGE_NUMBER_ROLLOVER = 2;
+
+			public static final int INVALID_ACKNOWLEDGEMENT = 3;
+			
+			public static final int CREATE_SEQUENCE_REFUSED = 4;
+			
+			//public static final int 
+			
+		}
+	}
+	
 	//TODO remove following three
 	int STORAGE_TYPE_IN_MEMORY = 1;
 

@@ -37,6 +37,8 @@ public class RetransmitterBean implements RMBean {
 
 	private long timeToSend = 0;
 	
+	private int messagetype =0;
+	
 	public RetransmitterBean() {
 
 	}
@@ -122,5 +124,14 @@ public class RetransmitterBean implements RMBean {
 	
 	public void setTimeToSend(long timeToSend) {
 		this.timeToSend = timeToSend;
+	}
+	
+	
+	public int getMessagetype() {
+		return messagetype;
+	}
+	
+	public void setMessagetype(int messagetype) {
+		this.messagetype = messagetype;
 	}
 }

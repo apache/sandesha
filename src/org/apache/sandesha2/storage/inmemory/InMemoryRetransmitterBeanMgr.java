@@ -96,6 +96,9 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 					&& bean.getMessageNumber() != temp.getMessageNumber())
 				add = false;
 
+			if (bean.getMessagetype()!=Constants.MessageTypes.UNKNOWN && bean.getMessagetype()!=temp.getMessagetype())
+				add = false;
+			
 			if (add)
 				beans.add(temp);
 		}

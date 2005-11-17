@@ -262,14 +262,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Constants.MessageParts.ACK_REQUEST);
 		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
-
-		boolean ackRequired = false;
-		if (ackRequested!=null || lastMessage!=null)
-			ackRequired = true;
-		
-		if (!ackRequired) {
-			return;
-		}
 		
 		//Setting the ack depending on AcksTo.
 		//TODO: Stop sending askc for every message.
@@ -284,6 +276,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					"Seqeunce properties are not set correctly");
 
 		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
+		
+		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
+			// send ack in the sync case, only if the last message or the ackRequested tag is present.
+			boolean ackRequired = false;
+			if (ackRequested!=null || lastMessage!=null)
+					ackRequired = true;
+		
+			if (!ackRequired) {
+				return;
+			}
+		}
 
 		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
 		AxisServiceGroup serviceGroup = new AxisServiceGroup(axisConfig);
@@ -344,6 +347,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		
 		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
+			
+			
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getSystemContext());
 
@@ -383,6 +388,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			ackBean.setMessageId(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
 			ackBean.setSend(true);
+			ackBean.setMessagetype(Constants.MessageTypes.ACK);
 
 			retransmitterBeanMgr.insert(ackBean);
 

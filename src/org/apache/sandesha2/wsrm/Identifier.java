@@ -58,6 +58,7 @@ public class Identifier implements Constants, IOMRMElement {
 	}
 
 	public OMElement getOMElement() throws OMException {
+		identifierElement.setText(identifier);
 		return identifierElement;
 	}
 

@@ -23,6 +23,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +32,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -60,6 +62,14 @@ public class SandeshaInHandler extends AbstractHandler {
 		if (null != DONE && "true".equals(DONE))
 			return;
 		
+		FaultManager faultManager = new FaultManager ();
+		RMMsgContext faultMessageContext = faultManager.checkForPossibleFaults(msgCtx);
+	    if (faultMessageContext!=null){
+	    	AxisEngine engine = new AxisEngine (context);
+	    	engine.send(faultMessageContext.getMessageContext());
+	    	return;
+	    }
+	    
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");

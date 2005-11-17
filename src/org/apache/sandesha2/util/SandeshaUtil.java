@@ -27,27 +27,40 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.i18n.Messages;
+import org.apache.axis2.om.OMConstants;
 import org.apache.axis2.om.OMElement;
+import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.soap.SOAPFault;
+import org.apache.axis2.soap.SOAPFaultCode;
+import org.apache.axis2.soap.SOAPFaultDetail;
+import org.apache.axis2.soap.SOAPFaultReason;
+import org.apache.axis2.soap.SOAPFaultSubCode;
+import org.apache.axis2.soap.SOAPFaultText;
+import org.apache.axis2.soap.SOAPFaultValue;
 import org.apache.axis2.soap.impl.llom.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axis2.util.Utils;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SOAPFaultEnvelopeCreator;
 import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -63,17 +76,22 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 public class SandeshaUtil {
 
 	private static Hashtable storedMsgContexts = new Hashtable();
+
 	private static StorageManager storageManager = null;
+
 	private static Sender sender = new Sender();
-	private static InOrderInvoker invoker = new InOrderInvoker ();
+
+	private static InOrderInvoker invoker = new InOrderInvoker();
+
 	private static SandeshaDynamicProperties dynamicProperties = null;
-	
+
 	public static String getUUID() {
 		String uuid = "uuid:" + UUIDGenerator.getUUID();
 		return uuid;
 	}
 
-	public static AcknowledgementRange[] getAckRangeArray(String msgNoStr,SOAPFactory factory) {
+	public static AcknowledgementRange[] getAckRangeArray(String msgNoStr,
+			SOAPFactory factory) {
 		String[] msgNoStrs = msgNoStr.split(",");
 		long[] msgNos = getLongArr(msgNoStrs);
 
@@ -188,7 +206,7 @@ public class SandeshaUtil {
 			newMessageContext.setProcessingFault(msgCtx.isProcessingFault());
 			newMessageContext.setResponseWritten(msgCtx.isResponseWritten());
 			newMessageContext.setRestThroughPOST(msgCtx.isRestThroughPOST());
-			if (msgCtx.getAxisOperation()!=null)
+			if (msgCtx.getAxisOperation() != null)
 				newMessageContext.setAxisOperation(msgCtx.getAxisOperation());
 
 			if (msgCtx.getEnvelope() != null)
@@ -230,27 +248,29 @@ public class SandeshaUtil {
 			MessageContext newMessageContext = new MessageContext(configCtx);
 			newMessageContext.setTransportIn(transportIn);
 			newMessageContext.setTransportOut(transportOut);
-			
+
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx
 					.getProperty(MessageContext.TRANSPORT_OUT));
 			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
 					msgCtx.getProperty(HTTPConstants.HTTPOutTransportInfo));
 
 			//Setting the charater set encoding
-			Object charSetEncoding = msgCtx.getProperty(MessageContext.CHARACTER_SET_ENCODING);
+			Object charSetEncoding = msgCtx
+					.getProperty(MessageContext.CHARACTER_SET_ENCODING);
 
-			//TODO - this is required due to a bug in axis2. Remove this when it get fixed
-			//BUG - Commons HTTP transport sender sets a NameValuepair to as the CHAR_SET_ENCODING 
+			//TODO - this is required due to a bug in axis2. Remove this when
+			// it get fixed
+			//BUG - Commons HTTP transport sender sets a NameValuepair to as
+			// the CHAR_SET_ENCODING
 			//instead of a String
 			if (charSetEncoding instanceof NameValuePair)
 				charSetEncoding = ((NameValuePair) charSetEncoding).getValue();
-				
-			newMessageContext
-					.setProperty(MessageContext.CHARACTER_SET_ENCODING, charSetEncoding);
+
+			newMessageContext.setProperty(
+					MessageContext.CHARACTER_SET_ENCODING, charSetEncoding);
 
 			newMessageContext.setMessageInformationHeaders(msgInfoHeaders1);
-			newMessageContext.setAxisService(msgCtx
-					.getAxisService());
+			newMessageContext.setAxisService(msgCtx.getAxisService());
 			if (msgCtx.getAxisServiceGroup() != null)
 				newMessageContext.setAxisServiceGroup(msgCtx
 						.getAxisServiceGroup());
@@ -296,14 +316,14 @@ public class SandeshaUtil {
 	public static void startSenderIfStopped(ConfigurationContext context) {
 		if (!sender.isSenderStarted()) {
 			sender.start(context);
-			System.out.println ("Sender started....");
+			System.out.println("Sender started....");
 		}
 	}
-	
+
 	public static void startInvokerIfStopped(ConfigurationContext context) {
 		if (!invoker.isInvokerStarted()) {
 			invoker.start(context);
-			System.out.println ("Invoker started....");
+			System.out.println("Invoker started....");
 		}
 	}
 
@@ -335,62 +355,61 @@ public class SandeshaUtil {
 
 		return false;
 	}
-	
-	public static SOAPEnvelope createSOAPMessage (MessageContext msgContext, String soapNamespaceURI) throws AxisFault {
-        try {
-        	
-            InputStream inStream = (InputStream) msgContext.getProperty(
-                    MessageContext.TRANSPORT_IN);
-            msgContext.setProperty(MessageContext.TRANSPORT_IN, null);
-            //this inputstram is set by the TransportSender represents a two way transport or
-            //by a Transport Recevier
-            if (inStream == null) {
-                throw new AxisFault(Messages.getMessage("inputstreamNull"));
-            }
-            
-            //This should be set later
-            //TODO check weather this affects MTOM
-            String contentType = null;
 
-            StAXBuilder builder = null;
-            SOAPEnvelope envelope = null;
+	public static SOAPEnvelope createSOAPMessage(MessageContext msgContext,
+			String soapNamespaceURI) throws AxisFault {
+		try {
 
-            String charSetEnc = (String)msgContext.getProperty(MessageContext.CHARACTER_SET_ENCODING);
-            if(charSetEnc == null) {
-            	charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
-            }
-            
+			InputStream inStream = (InputStream) msgContext
+					.getProperty(MessageContext.TRANSPORT_IN);
+			msgContext.setProperty(MessageContext.TRANSPORT_IN, null);
+			//this inputstram is set by the TransportSender represents a two
+			// way transport or
+			//by a Transport Recevier
+			if (inStream == null) {
+				throw new AxisFault(Messages.getMessage("inputstreamNull"));
+			}
+
+			//This should be set later
+			//TODO check weather this affects MTOM
+			String contentType = null;
+
+			StAXBuilder builder = null;
+			SOAPEnvelope envelope = null;
+
+			String charSetEnc = (String) msgContext
+					.getProperty(MessageContext.CHARACTER_SET_ENCODING);
+			if (charSetEnc == null) {
+				charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
+			}
+
 			if (contentType != null) {
-                msgContext.setDoingMTOM(true);
-                builder =
-                        HTTPTransportUtils.selectBuilderForMIME(msgContext,
-                                inStream,
-                                (String) contentType);
-                envelope = (SOAPEnvelope) builder.getDocumentElement();
-            } else if (msgContext.isDoingREST()) {
-                XMLStreamReader xmlreader =
-                        XMLInputFactory.newInstance().createXMLStreamReader(
-                                inStream,charSetEnc);
-                SOAPFactory soapFactory = new SOAP11Factory();
-                builder = new StAXOMBuilder(xmlreader);
-                builder.setOmbuilderFactory(soapFactory);
-                envelope = soapFactory.getDefaultEnvelope();
-                envelope.getBody().addChild(builder.getDocumentElement());
-            } else {
-                XMLStreamReader xmlreader =
-                        XMLInputFactory.newInstance().createXMLStreamReader(
-                        		inStream,charSetEnc);
-                builder = new StAXSOAPModelBuilder(xmlreader, soapNamespaceURI);
-                envelope = (SOAPEnvelope) builder.getDocumentElement();
-            }
-            return envelope;
-        } catch (Exception e) {
-            throw new AxisFault(e);
-        }
+				msgContext.setDoingMTOM(true);
+				builder = HTTPTransportUtils.selectBuilderForMIME(msgContext,
+						inStream, (String) contentType);
+				envelope = (SOAPEnvelope) builder.getDocumentElement();
+			} else if (msgContext.isDoingREST()) {
+				XMLStreamReader xmlreader = XMLInputFactory.newInstance()
+						.createXMLStreamReader(inStream, charSetEnc);
+				SOAPFactory soapFactory = new SOAP11Factory();
+				builder = new StAXOMBuilder(xmlreader);
+				builder.setOmbuilderFactory(soapFactory);
+				envelope = soapFactory.getDefaultEnvelope();
+				envelope.getBody().addChild(builder.getDocumentElement());
+			} else {
+				XMLStreamReader xmlreader = XMLInputFactory.newInstance()
+						.createXMLStreamReader(inStream, charSetEnc);
+				builder = new StAXSOAPModelBuilder(xmlreader, soapNamespaceURI);
+				envelope = (SOAPEnvelope) builder.getDocumentElement();
+			}
+			return envelope;
+		} catch (Exception e) {
+			throw new AxisFault(e);
+		}
 
 	}
-	
-	public static String getMessageTypeString (int messageType) {
+
+	public static String getMessageTypeString(int messageType) {
 		switch (messageType) {
 		case Constants.MessageTypes.CREATE_SEQ:
 			return "CreateSequence";
@@ -405,118 +424,148 @@ public class SandeshaUtil {
 		case Constants.MessageTypes.UNKNOWN:
 			return "Unknown";
 		default:
-			return "Error";	
+			return "Error";
 		}
 	}
-	
-	public static boolean isGloballyProcessableMessageType (int type) {
-		if (type==Constants.MessageTypes.ACK || type==Constants.MessageTypes.TERMINATE_SEQ) {
+
+	public static boolean isGloballyProcessableMessageType(int type) {
+		if (type == Constants.MessageTypes.ACK
+				|| type == Constants.MessageTypes.TERMINATE_SEQ) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
-	public static boolean isDuplicateDropRequiredMsgType (int rmMessageType) {
-		if (rmMessageType==Constants.MessageTypes.APPLICATION)
+
+	public static boolean isDuplicateDropRequiredMsgType(int rmMessageType) {
+		if (rmMessageType == Constants.MessageTypes.APPLICATION)
 			return true;
-		
-		if (rmMessageType==Constants.MessageTypes.CREATE_SEQ_RESPONSE)
+
+		if (rmMessageType == Constants.MessageTypes.CREATE_SEQ_RESPONSE)
 			return true;
-		
+
 		return false;
 	}
-	
+
 	//TODO: correct following to work for long.
-	public static ArrayList getSplittedMsgNoArraylist (String str) {
+	public static ArrayList getSplittedMsgNoArraylist(String str) {
 		String[] splitted = str.split(",");
-		ArrayList results = new ArrayList ();
-		
+		ArrayList results = new ArrayList();
+
 		long count = splitted.length;
-		for (int i=0;i<count;i++) {
+		for (int i = 0; i < count; i++) {
 			String s = splitted[i];
 			results.add(s);
 		}
-		
+
 		return results;
 	}
-	
-	public static String getServerSideIncomingSeqIdFromInternalSeqId (String internalSequenceId) {
+
+	public static String getServerSideIncomingSeqIdFromInternalSeqId(
+			String internalSequenceId) {
 		String incomingSequenceId = internalSequenceId;
 		return incomingSequenceId;
 	}
-	
-	public static String getServerSideInternalSeqIdFromIncomingSeqId (String incomingSequenceId) {
+
+	public static String getServerSideInternalSeqIdFromIncomingSeqId(
+			String incomingSequenceId) {
 		String internalSequenceId = incomingSequenceId;
 		return internalSequenceId;
 	}
-	
-	public static StorageManager getSandeshaStorageManager (ConfigurationContext context) throws SandeshaException {
+
+	public static StorageManager getSandeshaStorageManager(
+			ConfigurationContext context) throws SandeshaException {
 		String srotageManagerClassStr = Constants.STORAGE_MANAGER_IMPL;
-		
-		if (storageManager!=null)
+
+		if (storageManager != null)
 			return storageManager;
-		
+
 		try {
 			Class c = Class.forName(srotageManagerClassStr);
-			Class configContextClass = Class.forName(context.getClass().getName());
-			Constructor constructor = c.getConstructor(new Class[]{configContextClass});
-			Object obj = constructor.newInstance(new Object[] {context});
-			
-			if (obj==null || !(obj instanceof StorageManager))
-				throw new SandeshaException ("StorageManager must implement org.apache.sandeshat.storage.StorageManager");
-			
+			Class configContextClass = Class.forName(context.getClass()
+					.getName());
+			Constructor constructor = c
+					.getConstructor(new Class[] { configContextClass });
+			Object obj = constructor.newInstance(new Object[] { context });
+
+			if (obj == null || !(obj instanceof StorageManager))
+				throw new SandeshaException(
+						"StorageManager must implement org.apache.sandeshat.storage.StorageManager");
+
 			StorageManager mgr = (StorageManager) obj;
 			storageManager = mgr;
 			return storageManager;
-			
+
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-			throw new SandeshaException (e.getMessage());
-		} 
-	}
-	
-	public static SandeshaDynamicProperties getDynamicProperties () {
-		if (dynamicProperties==null) {
-			loadDymanicProperties ();
+			throw new SandeshaException(e.getMessage());
 		}
-		
+	}
+
+	public static SandeshaDynamicProperties getDynamicProperties() {
+		if (dynamicProperties == null) {
+			loadDymanicProperties();
+		}
+
 		return dynamicProperties;
 	}
-	
-	private static void loadDymanicProperties () {
-		dynamicProperties = new SandeshaDynamicProperties ();
-		
+
+	private static void loadDymanicProperties() {
+		dynamicProperties = new SandeshaDynamicProperties();
+
 		//TODO: override properties from the sandesha-config.xml
-		
+
 	}
-	
-	public static int getSOAPVersion (SOAPEnvelope envelope) throws SandeshaException {
+
+	public static int getSOAPVersion(SOAPEnvelope envelope)
+			throws SandeshaException {
 		String namespaceName = envelope.getNamespace().getName();
-		if (namespaceName.equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI)) 
+		if (namespaceName.equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			return Constants.SOAPVersion.v1_1;
-		else if (namespaceName.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
+		else if (namespaceName
+				.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			return Constants.SOAPVersion.v1_2;
 		else
-			throw new SandeshaException ("Unknown SOAP version");
+			throw new SandeshaException("Unknown SOAP version");
 	}
-	
-	public static boolean isRMGlobalMessage (MessageContext msgCtx) {
+
+	public static boolean isRMGlobalMessage(MessageContext msgCtx) {
 		boolean rmGlobalMsg = false;
-		
+
 		String action = msgCtx.getWSAAction();
 		SOAPEnvelope env = msgCtx.getEnvelope();
-		OMElement sequenceElem = env.getFirstChildWithName(new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.SEQUENCE));
-		
-		if (sequenceElem!=null)
+		OMElement sequenceElem = env.getFirstChildWithName(new QName(
+				Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE));
+
+		if (sequenceElem != null)
 			rmGlobalMsg = true;
-		
-		if (Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
+
+		if (Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
+				.equals(action))
 			rmGlobalMsg = true;
-		
+
 		if (Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
-		
+
 		return rmGlobalMsg;
 	}
+
+	public static RMMsgContext createResponseRMMessage(
+			RMMsgContext referenceRMMessage) throws SandeshaException {
+		try {
+			MessageContext referenceMessage = referenceRMMessage
+					.getMessageContext();
+			MessageContext faultMsgContext = Utils
+					.createOutMessageContext(referenceMessage);
+
+			RMMsgContext faultRMMsgCtx = MsgInitializer
+					.initializeMessage(faultMsgContext);
+
+			return faultRMMsgCtx;
+
+		} catch (AxisFault e) {
+			throw new SandeshaException(e.getMessage());
+		}
+	}	
+
 }
