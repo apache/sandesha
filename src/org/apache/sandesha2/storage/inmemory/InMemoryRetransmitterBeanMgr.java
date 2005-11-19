@@ -115,13 +115,9 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 			temp = (RetransmitterBean) iterator.next();
 			if (temp.isSend()) {
 				
-				long timeToSend = temp.getTimeToSend();
-				
-				int count = temp.getSentCount();
-				
+				long timeToSend = temp.getTimeToSend();	
 				long timeNow = System.currentTimeMillis();
-				if (count == 0
-						|| (timeNow >= timeToSend)) {
+				if ((timeNow >= timeToSend)) {
 					beans.add(temp);
 				}
 			}

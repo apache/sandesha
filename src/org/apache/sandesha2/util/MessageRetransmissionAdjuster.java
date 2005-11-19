@@ -20,6 +20,7 @@ package org.apache.sandesha2.util;
 import org.apache.axis2.context.MessageContext;
 import org.apache.derby.iapi.sql.dictionary.ConsInfo;
 import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
@@ -43,10 +44,8 @@ public class MessageRetransmissionAdjuster {
 		
 		RMPolicyBean policyBean = (RMPolicyBean) messageContext.getProperty(Constants.WSP.RM_POLICY_BEAN);
 		if (policyBean==null){
-			return retransmitterBean;
+			policyBean = new SandeshaDynamicProperties().getPolicyBean();
 		}
-		
-		long oldRetransmissionTime = retransmitterBean.getTimeToSend();
 		
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount()+1);
 		adjustNextRetransmissionTime (retransmitterBean,policyBean);
@@ -65,11 +64,12 @@ public class MessageRetransmissionAdjuster {
 		
 		long baseInterval = policyBean.getRetransmissionInterval();
 		
-		long timeToSendNext;
+		long newInterval = baseInterval;
 		if (policyBean.isExponentialBackoff()) {
-			long newInterval = generateNextExponentialBackedoffDifference (count,baseInterval);
-			retransmitterBean.setTimeToSend(lastSentTime+newInterval);
+			newInterval = generateNextExponentialBackedoffDifference (count,baseInterval);
 		}
+		
+		retransmitterBean.setTimeToSend(lastSentTime+newInterval);
 		
 		return retransmitterBean;
 	}
@@ -82,7 +82,7 @@ public class MessageRetransmissionAdjuster {
 	//TODO: Have to change this to be plugable
 	private long generateNextExponentialBackedoffDifference(int count,long initialInterval) {
 		long interval = initialInterval;
-		for (int i=1;i<=count;i++){
+		for (int i=1;i<count;i++){
 			interval = interval*2;
 		}
 		

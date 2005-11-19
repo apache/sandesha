@@ -87,9 +87,18 @@ public class Sender extends Thread {
 									+ "' message.");
 						}
 						
-						new AxisEngine(context).send(msgCtx);
+						try {
+							new AxisEngine(context).send(msgCtx);
+						}catch (Exception e) {
+							//Exception is sending. retry later
+							System.out.println("Exception thrown in sending...");
+							e.printStackTrace();
+						}
+						
 						MessageRetransmissionAdjuster  retransmitterAdjuster = new MessageRetransmissionAdjuster ();
 						retransmitterAdjuster.adjustRetransmittion(bean);
+						
+						mgr.update(bean);
 						
 						if (!msgCtx.isServerSide())
 							checkForSyncResponses(msgCtx);

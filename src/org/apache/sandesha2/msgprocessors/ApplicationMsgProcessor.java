@@ -18,6 +18,9 @@
 package org.apache.sandesha2.msgprocessors;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -34,9 +37,11 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.derby.tools.sysinfo;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
@@ -54,6 +59,8 @@ import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.wsdl.WSDLConstants;
+
+import com.sun.rsasign.p;
 
 public class ApplicationMsgProcessor implements MsgProcessor {
 
@@ -302,6 +309,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
 		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
 
+		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
+		
 		ackMsgCtx.setAxisServiceGroup(serviceGroup);
 		ackMsgCtx.setServiceGroupContext(serviceGroupContext);
 		ackMsgCtx.setAxisService(service);
@@ -389,7 +398,35 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			ackBean.setReSend(false);
 			ackBean.setSend(true);
 			ackBean.setMessagetype(Constants.MessageTypes.ACK);
-
+			
+			//the tempSequenceId value of the retransmitter Table for the messages related to an incoming
+			//sequence is the actual sequence ID - TODO document this.
+			ackBean.setTempSequenceId(sequenceId);
+			
+			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx.getProperty(Constants.WSP.RM_POLICY_BEAN);
+			long ackInterval = Constants.WSP.ACKNOWLEDGEMENT_INTERVAL;
+			if (policyBean!=null) {
+				ackInterval = policyBean.getAcknowledgementInaterval();
+			}
+			
+			//Ack will be sent as stand alone, only after the retransmitter interval.
+			long timeToSend = System.currentTimeMillis()+ackInterval;
+			ackBean.setTimeToSend(timeToSend);
+			
+			
+			//removing old acks.
+			RetransmitterBean findBean = new RetransmitterBean ();
+			findBean.setMessagetype(Constants.MessageTypes.ACK);
+			findBean.setTempSequenceId(sequenceId);
+			Collection coll = retransmitterBeanMgr.find(findBean);
+			Iterator it = coll.iterator();
+			while (it.hasNext()) {
+				RetransmitterBean retransmitterBean = (RetransmitterBean) it.next();
+				retransmitterBeanMgr.delete(retransmitterBean.getMessageId());
+			}
+			
+			
+			//inserting the new ack.
 			retransmitterBeanMgr.insert(ackBean);
 
 			SandeshaUtil.startSenderIfStopped(configCtx);
