@@ -22,6 +22,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.receivers.AbstractMessageReceiver;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Jaliya Ekanayaka <jaliya@opensource.lk>
+ */
 
 //Currently this is a dummy Msg Receiver.
 //All the necessary RM logic happens at MessageProcessors.

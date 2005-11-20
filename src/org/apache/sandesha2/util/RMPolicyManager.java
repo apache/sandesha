@@ -18,13 +18,17 @@
 package org.apache.sandesha2.util;
 
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.policy.RMPolicyBean;
+
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ */
 
 public class RMPolicyManager {
 
-	public static RMPolicyBean getPolicyBean (RMMsgContext msgContext) {
-		RMPolicyBean policyBean = new RMPolicyBean ();
+	public static RMPolicyBean getPolicyBean(RMMsgContext msgContext) {
+		RMPolicyBean policyBean = new RMPolicyBean();
 		return policyBean;
 	}
 }

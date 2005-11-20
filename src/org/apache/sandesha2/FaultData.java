@@ -17,12 +17,15 @@
 
 package org.apache.sandesha2;
 
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMElement;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ */
 
 public class FaultData {
-	
+
 	private int type;
 
 	private String code;
@@ -34,52 +37,51 @@ public class FaultData {
 	private OMElement detail;
 
 	private String sequenceId;
-	
-	
+
 	public OMElement getDetail() {
 		return detail;
 	}
-	
+
 	public void setDetail(OMElement detail) {
 		this.detail = detail;
 	}
-	
+
 	public String getReason() {
 		return reason;
 	}
-	
+
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
-	
+
 	public String getSubcode() {
 		return subcode;
 	}
-	
+
 	public void setSubcode(String subcode) {
 		this.subcode = subcode;
 	}
-	
+
 	public int getType() {
 		return type;
 	}
-	
+
 	public void setType(int type) {
 		this.type = type;
 	}
-	
+
 	public String getCode() {
 		return code;
 	}
-	
+
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
 	public String getSequenceId() {
 		return sequenceId;
 	}
-	
+
 	public void setSequenceId(String sequenceId) {
 		this.sequenceId = sequenceId;
 	}

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -37,7 +38,6 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.derby.tools.sysinfo;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -60,7 +60,9 @@ import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.wsdl.WSDLConstants;
 
-import com.sun.rsasign.p;
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
 
 public class ApplicationMsgProcessor implements MsgProcessor {
 
@@ -68,8 +70,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
-		//Object obj = rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE);
-		
+		//Object obj =
+		// rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE);
+
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
@@ -252,8 +255,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throws SandeshaException {
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
-		
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(msgCtx.getEnvelope()));
+
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
+				.getSOAPVersion(msgCtx.getEnvelope()));
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(msgCtx.getSystemContext());
 		SequencePropertyBeanMgr seqPropMgr = storageManager
@@ -267,9 +271,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (configCtx == null)
 			throw new SandeshaException("Configuration Context is null");
 
-		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Constants.MessageParts.ACK_REQUEST);
+		AckRequested ackRequested = (AckRequested) rmMsgCtx
+				.getMessagePart(Constants.MessageParts.ACK_REQUEST);
 		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
-		
+
 		//Setting the ack depending on AcksTo.
 		//TODO: Stop sending askc for every message.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
@@ -283,13 +288,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					"Seqeunce properties are not set correctly");
 
 		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
-		
+
 		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
-			// send ack in the sync case, only if the last message or the ackRequested tag is present.
+			// send ack in the sync case, only if the last message or the
+			// ackRequested tag is present.
 			boolean ackRequired = false;
-			if (ackRequested!=null || lastMessage!=null)
-					ackRequired = true;
-		
+			if (ackRequested != null || lastMessage != null)
+				ackRequired = true;
+
 			if (!ackRequired) {
 				return;
 			}
@@ -298,9 +304,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
 		AxisServiceGroup serviceGroup = new AxisServiceGroup(axisConfig);
 		AxisService service = new AxisService(new QName("RMClientService")); // This
-																			 // is a
-																			 // dummy
-																			 // service.
+		// is a
+		// dummy
+		// service.
 		ServiceGroupContext serviceGroupContext = new ServiceGroupContext(
 				configCtx, serviceGroup);
 		ServiceContext serviceContext = new ServiceContext(service,
@@ -310,7 +316,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
 
 		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
-		
+
 		ackMsgCtx.setAxisServiceGroup(serviceGroup);
 		ackMsgCtx.setServiceGroupContext(serviceGroupContext);
 		ackMsgCtx.setAxisService(service);
@@ -352,31 +358,32 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ackMsgCtx.setReplyTo(msgCtx.getTo());
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
 
-//		Object obj = rmMsgCtx.getMessageContext().getOperationContext().getProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN);
-		
-		
+		//		Object obj =
+		// rmMsgCtx.getMessageContext().getOperationContext().getProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN);
+
 		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
-			
-			
+
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getSystemContext());
 
 			//set CONTEXT_WRITTEN since acksto is anonymous
-			if (rmMsgCtx.getMessageContext().getOperationContext()==null) {
-				//operation context will be null when doing in a GLOBAL handler.
+			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
+				//operation context will be null when doing in a GLOBAL
+				// handler.
 				try {
-					AxisOperation op = AxisOperationFactory.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_IN_OUT);
-					OperationContext opCtx = new OperationContext (op);
+					AxisOperation op = AxisOperationFactory
+							.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_IN_OUT);
+					OperationContext opCtx = new OperationContext(op);
 					rmMsgCtx.getMessageContext().setAxisOperation(op);
 					rmMsgCtx.getMessageContext().setOperationContext(opCtx);
 				} catch (AxisFault e2) {
-					throw new SandeshaException (e2.getMessage());
+					throw new SandeshaException(e2.getMessage());
 				}
 			}
-			
+
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-			
+
 			rmMsgCtx.getMessageContext().setProperty(Constants.ACK_WRITTEN,
 					"true");
 			try {
@@ -386,8 +393,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		} else {
 			//rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-				//	org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
-			
+			//	org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+
 			RetransmitterBeanMgr retransmitterBeanMgr = storageManager
 					.getRetransmitterBeanMgr();
 
@@ -398,34 +405,36 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			ackBean.setReSend(false);
 			ackBean.setSend(true);
 			ackBean.setMessagetype(Constants.MessageTypes.ACK);
-			
-			//the tempSequenceId value of the retransmitter Table for the messages related to an incoming
+
+			//the tempSequenceId value of the retransmitter Table for the
+			// messages related to an incoming
 			//sequence is the actual sequence ID - TODO document this.
 			ackBean.setTempSequenceId(sequenceId);
-			
-			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx.getProperty(Constants.WSP.RM_POLICY_BEAN);
+
+			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
+					.getProperty(Constants.WSP.RM_POLICY_BEAN);
 			long ackInterval = Constants.WSP.ACKNOWLEDGEMENT_INTERVAL;
-			if (policyBean!=null) {
+			if (policyBean != null) {
 				ackInterval = policyBean.getAcknowledgementInaterval();
 			}
-			
-			//Ack will be sent as stand alone, only after the retransmitter interval.
-			long timeToSend = System.currentTimeMillis()+ackInterval;
+
+			//Ack will be sent as stand alone, only after the retransmitter
+			// interval.
+			long timeToSend = System.currentTimeMillis() + ackInterval;
 			ackBean.setTimeToSend(timeToSend);
-			
-			
+
 			//removing old acks.
-			RetransmitterBean findBean = new RetransmitterBean ();
+			RetransmitterBean findBean = new RetransmitterBean();
 			findBean.setMessagetype(Constants.MessageTypes.ACK);
 			findBean.setTempSequenceId(sequenceId);
 			Collection coll = retransmitterBeanMgr.find(findBean);
 			Iterator it = coll.iterator();
 			while (it.hasNext()) {
-				RetransmitterBean retransmitterBean = (RetransmitterBean) it.next();
+				RetransmitterBean retransmitterBean = (RetransmitterBean) it
+						.next();
 				retransmitterBeanMgr.delete(retransmitterBean.getMessageId());
 			}
-			
-			
+
 			//inserting the new ack.
 			retransmitterBeanMgr.insert(ackBean);
 

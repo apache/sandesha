@@ -25,9 +25,10 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
 
 /**
- * @author Chamikara Jayalath <chamikara@wso2.com>
- * @author Sanka Samaranayake <ssanka@gmail.com>
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
+
 public abstract class StorageManager {
 
 	private ConfigurationContext context;

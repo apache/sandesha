@@ -23,6 +23,10 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.wsrm.RMElements;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
+
 public class MsgInitializer {
 
 	public static RMMsgContext initializeMessage(MessageContext ctx)

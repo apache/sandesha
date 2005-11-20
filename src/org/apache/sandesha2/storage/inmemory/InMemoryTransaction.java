@@ -19,6 +19,11 @@ package org.apache.sandesha2.storage.inmemory;
 
 import org.apache.sandesha2.storage.Transaction;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ */
+
 public class InMemoryTransaction implements Transaction {
 
 	public void commit() {

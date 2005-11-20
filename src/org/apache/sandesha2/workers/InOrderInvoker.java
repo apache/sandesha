@@ -38,6 +38,10 @@ import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
+
 public class InOrderInvoker extends Thread {
 	boolean invokerStarted = false;
 
@@ -135,17 +139,19 @@ public class InOrderInvoker extends Thread {
 							new AxisEngine(msgToInvoke.getSystemContext())
 									.receive(msgToInvoke);
 
-							ServiceContext serviceContext = msgToInvoke.getServiceContext();
+							ServiceContext serviceContext = msgToInvoke
+									.getServiceContext();
 							Object debug = null;
-							if (serviceContext!=null) {
-								debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+							if (serviceContext != null) {
+								debug = serviceContext
+										.getProperty(Constants.SANDESHA_DEBUG_MODE);
 								if (debug != null && "on".equals(debug)) {
 									System.out
-										.println("DEBUG: Invoker invoking a '"
-												+ SandeshaUtil
-														.getMessageTypeString(rmMsg
-																.getMessageType())
-												+ "' message.");
+											.println("DEBUG: Invoker invoking a '"
+													+ SandeshaUtil
+															.getMessageTypeString(rmMsg
+																	.getMessageType())
+													+ "' message.");
 								}
 							}
 

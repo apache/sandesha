@@ -16,64 +16,67 @@
 
 package org.apache.sandesha2;
 
-import org.apache.axis2.soap.SOAP11Constants;
-import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
 
 public class SandeshaDynamicProperties {
 
 	private String storageManagerImpl = Constants.STORAGE_MANAGER_IMPL;
+
 	private RMPolicyBean policyBean = null;
+
 	//private String SOAPVersionURI = null;
-	
-	public SandeshaDynamicProperties () {
-	
-		loadPolicyBeanFromConstants ();
+
+	public SandeshaDynamicProperties() {
+
+		loadPolicyBeanFromConstants();
 	}
-	
-	private void loadPolicyBeanFromConstants () {
-		//loading default properties. these will be overriden later (most of the time).
-		policyBean = new RMPolicyBean ();
-		policyBean.setAcknowledgementInterval(Constants.WSP.ACKNOWLEDGEMENT_INTERVAL);
-		policyBean.setRetransmissionInterval(Constants.WSP.RETRANSMISSION_INTERVAL);
+
+	private void loadPolicyBeanFromConstants() {
+		//loading default properties. these will be overriden later (most of
+		// the time).
+		policyBean = new RMPolicyBean();
+		policyBean
+				.setAcknowledgementInterval(Constants.WSP.ACKNOWLEDGEMENT_INTERVAL);
+		policyBean
+				.setRetransmissionInterval(Constants.WSP.RETRANSMISSION_INTERVAL);
 		policyBean.setExponentialBackoff(Constants.WSP.EXPONENTION_BACKOFF);
-		policyBean.setInactiveTimeoutInterval(Constants.WSP.INACTIVITY_TIMEOUT_INTERVAL);
-		
-//		if (Constants.SOAPVersion.DEFAULT==Constants.SOAPVersion.v1_1){
-//			SOAPVersionURI = SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI;
-//		}else {
-//			SOAPVersionURI = SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI;
-//		}
-		
+		policyBean
+				.setInactiveTimeoutInterval(Constants.WSP.INACTIVITY_TIMEOUT_INTERVAL);
+
+		//		if (Constants.SOAPVersion.DEFAULT==Constants.SOAPVersion.v1_1){
+		//			SOAPVersionURI = SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI;
+		//		}else {
+		//			SOAPVersionURI = SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI;
+		//		}
+
 		//default is SOAP 1.1
 		//SOAPVersionURI = SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI;
 	}
-	
-	
-	
-	
-	
+
 	public RMPolicyBean getPolicyBean() {
 		return policyBean;
 	}
-	
+
 	public void setPolicyBean(RMPolicyBean policyBean) {
 		this.policyBean = policyBean;
 	}
-	
-//	public String getSOAPVersionURI() {
-//		return SOAPVersionURI;
-//	}
-//	
-//	public void setSOAPVersionURI(String versionURI) {
-//		SOAPVersionURI = versionURI;
-//	}
-	
+
+	//	public String getSOAPVersionURI() {
+	//		return SOAPVersionURI;
+	//	}
+	//	
+	//	public void setSOAPVersionURI(String versionURI) {
+	//		SOAPVersionURI = versionURI;
+	//	}
+
 	public String getStorageManagerImpl() {
 		return storageManagerImpl;
 	}
-	
+
 	public void setStorageManagerImpl(String storageManagerImpl) {
 		this.storageManagerImpl = storageManagerImpl;
 	}

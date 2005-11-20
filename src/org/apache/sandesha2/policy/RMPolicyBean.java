@@ -16,8 +16,10 @@
 
 
 /**
- * @author Sanka Samaranayake (sanka@apache.org)
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
+
 package org.apache.sandesha2.policy;
 
 import org.apache.sandesha2.Constants;

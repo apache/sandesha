@@ -29,58 +29,71 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.wsrm.IOMRMPart;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
- * @author chamikara
- * 
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
+
 public class AcknowledgementManager {
 
-	public static void piggybackAckIfPresent (RMMsgContext applicationRMMsgContext) throws SandeshaException {
-		ConfigurationContext configurationContext = applicationRMMsgContext.getMessageContext().getSystemContext();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-		RetransmitterBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
-		
-		RetransmitterBean findBean = new RetransmitterBean ();
-		
-		Sequence sequence = (Sequence) applicationRMMsgContext.getMessagePart(Constants.MessageParts.SEQUENCE);
-		if (sequence==null)
-			throw new SandeshaException ("Application message does not contain a sequence part");
-		
+	public static void piggybackAckIfPresent(
+			RMMsgContext applicationRMMsgContext) throws SandeshaException {
+		ConfigurationContext configurationContext = applicationRMMsgContext
+				.getMessageContext().getSystemContext();
+		StorageManager storageManager = SandeshaUtil
+				.getSandeshaStorageManager(configurationContext);
+		RetransmitterBeanMgr retransmitterBeanMgr = storageManager
+				.getRetransmitterBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
+				.getSequencePropretyBeanMgr();
+
+		RetransmitterBean findBean = new RetransmitterBean();
+
+		Sequence sequence = (Sequence) applicationRMMsgContext
+				.getMessagePart(Constants.MessageParts.SEQUENCE);
+		if (sequence == null)
+			throw new SandeshaException(
+					"Application message does not contain a sequence part");
+
 		String sequenceId = sequence.getIdentifier().getIdentifier();
-		
-		SequencePropertyBean tempSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceId,Constants.SequenceProperties.TEMP_SEQUENCE_ID);
-		if (tempSequenceBean==null)
-			throw new SandeshaException ("Temp Sequence is not set");
-		
+
+		SequencePropertyBean tempSequenceBean = sequencePropertyBeanMgr
+				.retrieve(sequenceId,
+						Constants.SequenceProperties.TEMP_SEQUENCE_ID);
+		if (tempSequenceBean == null)
+			throw new SandeshaException("Temp Sequence is not set");
+
 		String tempSequenceId = (String) tempSequenceBean.getValue();
 		findBean.setTempSequenceId(tempSequenceId);
 		findBean.setMessagetype(Constants.MessageTypes.ACK);
-		
+
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		Iterator it = collection.iterator();
-		
+
 		if (it.hasNext()) {
 			RetransmitterBean ackBean = (RetransmitterBean) it.next();
-			
+
 			//deleting the ack entry.
 			retransmitterBeanMgr.delete(ackBean.getMessageId());
-			
+
 			//Adding the ack to the application message
-			MessageContext ackMsgContext = SandeshaUtil.getStoredMessageContext(ackBean.getKey());
-			RMMsgContext ackRMMsgContext = MsgInitializer.initializeMessage(ackMsgContext);
-			if (ackRMMsgContext.getMessageType()!=Constants.MessageTypes.ACK)
-				throw new SandeshaException ("Invalid ack message entry");
-			
-			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-			applicationRMMsgContext.setMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,sequenceAcknowledgement);
-			
+			MessageContext ackMsgContext = SandeshaUtil
+					.getStoredMessageContext(ackBean.getKey());
+			RMMsgContext ackRMMsgContext = MsgInitializer
+					.initializeMessage(ackMsgContext);
+			if (ackRMMsgContext.getMessageType() != Constants.MessageTypes.ACK)
+				throw new SandeshaException("Invalid ack message entry");
+
+			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext
+					.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+			applicationRMMsgContext.setMessagePart(
+					Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
+					sequenceAcknowledgement);
+
 			applicationRMMsgContext.addSOAPEnvelope();
 		}
-		
+
 	}
 }

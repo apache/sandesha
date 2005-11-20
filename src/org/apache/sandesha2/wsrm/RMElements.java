@@ -17,10 +17,6 @@
 package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
@@ -31,9 +27,9 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
- * @author Saminda
- * @author chamikara
- * @author sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ * @author Saminda Abeyruwan  <saminda@opensource.lk>
  */
 
 public class RMElements {

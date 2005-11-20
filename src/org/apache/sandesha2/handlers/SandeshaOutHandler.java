@@ -18,6 +18,7 @@
 package org.apache.sandesha2.handlers;
 
 import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.ListenerManager;
@@ -31,17 +32,14 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.soap.SOAP11Constants;
-import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.SandeshaDynamicProperties;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -65,26 +63,22 @@ import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.wsdl.WSDLConstants;
 
-
 /**
- * 
- * @author chamikara
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaOutHandler extends AbstractHandler {
 
 	protected Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
-	
+
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-		
+
 		//try {
-			
+
 		ConfigurationContext context = msgCtx.getSystemContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
 
-		
-		
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");
@@ -104,7 +98,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//getting rm message
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-		
+
 		Parameter keyParam = axisService.getParameter(Constants.RM_ENABLE_KEY);
 		Object keyValue = null;
 		if (keyParam != null)
@@ -124,7 +118,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		ServiceContext serviceContext = msgCtx.getServiceContext();
 		Object debug = null;
-		if (serviceContext!=null) {
+		if (serviceContext != null) {
 			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaOutHandler got a '"
@@ -142,12 +136,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//Strating the sender.
 		SandeshaUtil.startSenderIfStopped(context);
 
-		
 		//Adding the policy bean
 		RMPolicyBean policyBean = RMPolicyManager.getPolicyBean(rmMsgCtx);
-		rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN,policyBean);
-		
-		
+		rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN, policyBean);
+
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(context);
 
@@ -212,19 +204,20 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(tempSequenceId,
 				Constants.SequenceProperties.OUT_SEQUENCE_ID);
-		
-		if (messageNumber==1) {
-			if (outSeqBean==null) {
+
+		if (messageNumber == 1) {
+			if (outSeqBean == null) {
 				sendCreateSequence = true;
 			}
-			
-//			SandeshaDynamicProperties dynamicProperties = SandeshaUtil.getDynamicProperties();
-//			if (msgCtx.isSOAP11()) {
-//				dynamicProperties.setSOAPVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-//			}else {
-//				dynamicProperties.setSOAPVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-//			}
-			
+
+			//			SandeshaDynamicProperties dynamicProperties =
+			// SandeshaUtil.getDynamicProperties();
+			//			if (msgCtx.isSOAP11()) {
+			//				dynamicProperties.setSOAPVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+			//			}else {
+			//				dynamicProperties.setSOAPVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+			//			}
+
 			//TODO: set the policy bean
 			//dynamicProperties.setPolicyBean();
 		}
@@ -249,13 +242,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 				seqPropMgr.insert(responseCreateSeqAdded);
 
 				String acksTo = null;
-				if (serviceContext!=null) {
-					acksTo = (String) serviceContext.getProperty(Constants.AcksTo);
+				if (serviceContext != null) {
+					acksTo = (String) serviceContext
+							.getProperty(Constants.AcksTo);
 				}
-				
-				if (acksTo==null)
+
+				if (acksTo == null)
 					acksTo = Constants.WSA.NS_URI_ANONYMOUS;
-				
+
 				//If acksTo is not anonymous. Start the listner TODO: verify
 				if (!Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)
 						&& !serverSide) {
@@ -276,11 +270,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 						if (acksToEPR != null)
 							acksTo = (String) acksToEPR.getAddress();
 					}
-				}else if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)){
+				} else if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
 					//set transport in.
-					Object trIn = msgCtx.getProperty(MessageContext.TRANSPORT_IN);
-					if (trIn==null) {
-					
+					Object trIn = msgCtx
+							.getProperty(MessageContext.TRANSPORT_IN);
+					if (trIn == null) {
+
 					}
 				}
 
@@ -293,7 +288,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 		if (env == null) {
-			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(env)).getDefaultEnvelope();
+			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
+					SandeshaUtil.getSOAPVersion(env)).getDefaultEnvelope();
 			rmMsgCtx.setSOAPEnvelop(envelope);
 		}
 
@@ -407,13 +403,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 			//pausing the message
 			msgCtx.setPausedTrue(getName());
 		}
-		
-		
-		
-//		}catch (Exception e) {
-//			e.getStackTrace();
-//			throw new AxisFault ("Sandesha got an exception. See logs for details");
-//		}
+
+		//		}catch (Exception e) {
+		//			e.getStackTrace();
+		//			throw new AxisFault ("Sandesha got an exception. See logs for
+		// details");
+		//		}
 
 	}
 
@@ -431,7 +426,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(
 					"Create Sequence part is null for a CreateSequence message");
 
-	
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {
 			//Offer processing
@@ -478,10 +472,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 				createSeqMsg.getMessageID(), null);
 		createSeqMgr.insert(createSeqBean);
 
-		if (createSeqMsg.getReplyTo()==null)
-			createSeqMsg.setReplyTo(new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS));
-		
-		
+		if (createSeqMsg.getReplyTo() == null)
+			createSeqMsg.setReplyTo(new EndpointReference(
+					Constants.WSA.NS_URI_ANONYMOUS));
+
 		RetransmitterBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 
@@ -501,8 +495,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		MessageContext msg = rmMsg.getMessageContext();
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(rmMsg.getSOAPEnvelope()));
-		
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
+				.getSOAPVersion(rmMsg.getSOAPEnvelope()));
+
 		if (rmMsg == null)
 			throw new SandeshaException("Message or reques message is null");
 
@@ -616,20 +611,18 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		} else {
 			//client side
-			
-			
+
 			ServiceContext serviceContext = msg.getServiceContext();
-			if (serviceContext!=null) {
-				Object obj = serviceContext.getProperty(
-					Constants.LAST_MESSAGE);
+			if (serviceContext != null) {
+				Object obj = serviceContext.getProperty(Constants.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 					lastMessage = true;
 					sequence.setLastMessage(new LastMessage(factory));
 					//saving the last message no.
 					SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
-						tempSequenceId,
-						Constants.SequenceProperties.LAST_OUT_MESSAGE,
-						new Long(messageNumber));
+							tempSequenceId,
+							Constants.SequenceProperties.LAST_OUT_MESSAGE,
+							new Long(messageNumber));
 					sequencePropertyMgr.insert(lastOutMsgBean);
 				}
 			}

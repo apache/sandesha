@@ -18,26 +18,21 @@
 package org.apache.sandesha2.util;
 
 import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.soap.SOAP11Constants;
-import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
 
 /**
- * @author Chamikara
- * @author Sanka
- * @author Jaliya 
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
-
 
 public class SOAPAbstractFactory {
 
-	public static SOAPFactory getSOAPFactory (int SOAPVersion) {
-		
-		if (SOAPVersion==Constants.SOAPVersion.v1_1)
+	public static SOAPFactory getSOAPFactory(int SOAPVersion) {
+
+		if (SOAPVersion == Constants.SOAPVersion.v1_1)
 			return OMAbstractFactory.getSOAP11Factory();
-		else 
+		else
 			return OMAbstractFactory.getSOAP12Factory();
-		
+
 	}
 }

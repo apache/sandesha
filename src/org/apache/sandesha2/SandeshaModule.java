@@ -21,21 +21,25 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 
-public class SandeshaModule implements Module{
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
+
+public class SandeshaModule implements Module {
 
 	//private InOrderInvoker inorderInvoker = new InOrderInvoker ();
-	
-    // initialize the module
-    public void init(AxisConfiguration axisSystem) throws AxisFault {
-       
-    	//Start invoker thread
-    	//axisSystem.get
-    	//inorderInvoker.start();
-    	
-    }
 
-    // shutdown the module
-    public void shutdown(AxisConfiguration axisSystem) throws AxisFault {
-    	//inorderInvoker.stopWork();
-    }
+	// initialize the module
+	public void init(AxisConfiguration axisSystem) throws AxisFault {
+
+		//Start invoker thread
+		//axisSystem.get
+		//inorderInvoker.start();
+
+	}
+
+	// shutdown the module
+	public void shutdown(AxisConfiguration axisSystem) throws AxisFault {
+		//inorderInvoker.stopWork();
+	}
 }

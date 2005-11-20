@@ -17,11 +17,10 @@
 package org.apache.sandesha2.wsrm;
 
 /**
- * @author Saminda
- * @author chamikara
- * @author sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ * @author Saminda Abeyruwan  <saminda@opensource.lk>
  */
-
 
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;

@@ -18,8 +18,8 @@
 package org.apache.sandesha2.storage.beanmanagers;
 
 /**
- * @author Chamikara
- * @author Sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public interface RMBeanManager {

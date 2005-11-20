@@ -35,6 +35,10 @@ import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
+
 public class Sender extends Thread {
 
 	private boolean senderStarted = false;
@@ -64,9 +68,9 @@ public class Sender extends Thread {
 						.getRetransmitterBeanMgr();
 				Collection coll = mgr.findMsgsToSend();
 				Iterator iter = coll.iterator();
-				
+
 				while (iter.hasNext()) {
-					
+
 					RetransmitterBean bean = (RetransmitterBean) iter.next();
 					String key = (String) bean.getKey();
 					MessageContext msgCtx = SandeshaUtil
@@ -75,41 +79,46 @@ public class Sender extends Thread {
 					try {
 						RMMsgContext rmMsgCtx = MsgInitializer
 								.initializeMessage(msgCtx);
-						
-						
+
 						updateMessage(msgCtx);
 
-						ServiceContext serviceContext = msgCtx.getServiceContext();
+						ServiceContext serviceContext = msgCtx
+								.getServiceContext();
 						Object debug = null;
-						if (serviceContext!=null) {
-							debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+						if (serviceContext != null) {
+							debug = serviceContext
+									.getProperty(Constants.SANDESHA_DEBUG_MODE);
 							if (debug != null && "on".equals(debug)) {
-								System.out.println("DEBUG: Sender is sending a '"
-									+ SandeshaUtil
-											.getMessageTypeString(rmMsgCtx
-													.getMessageType())
-									+ "' message.");
+								System.out
+										.println("DEBUG: Sender is sending a '"
+												+ SandeshaUtil
+														.getMessageTypeString(rmMsgCtx
+																.getMessageType())
+												+ "' message.");
 							}
 						}
-						
-						if (rmMsgCtx.getMessageType()==Constants.MessageTypes.APPLICATION) {
-							//piggybacking if an ack if available for the same sequence.
-							AcknowledgementManager.piggybackAckIfPresent(rmMsgCtx);
+
+						if (rmMsgCtx.getMessageType() == Constants.MessageTypes.APPLICATION) {
+							//piggybacking if an ack if available for the same
+							// sequence.
+							AcknowledgementManager
+									.piggybackAckIfPresent(rmMsgCtx);
 						}
-						
+
 						try {
 							new AxisEngine(context).send(msgCtx);
-						}catch (Exception e) {
+						} catch (Exception e) {
 							//Exception is sending. retry later
-							System.out.println("Exception thrown in sending...");
+							System.out
+									.println("Exception thrown in sending...");
 							e.printStackTrace();
 						}
-						
-						MessageRetransmissionAdjuster  retransmitterAdjuster = new MessageRetransmissionAdjuster ();
+
+						MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
 						retransmitterAdjuster.adjustRetransmittion(bean);
-						
+
 						mgr.update(bean);
-						
+
 						if (!msgCtx.isServerSide())
 							checkForSyncResponses(msgCtx);
 
@@ -189,7 +198,6 @@ public class Sender extends Thread {
 		boolean responsePresent = (msgCtx
 				.getProperty(MessageContext.TRANSPORT_IN) != null);
 
-	
 		if (responsePresent) {
 			//create the response
 			MessageContext response = new MessageContext(msgCtx

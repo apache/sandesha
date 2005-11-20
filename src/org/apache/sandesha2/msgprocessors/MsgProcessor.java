@@ -20,10 +20,9 @@ package org.apache.sandesha2.msgprocessors;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 
-
 /**
- * @author Chamikara
- * @author Sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public interface MsgProcessor {

@@ -20,8 +20,10 @@ package org.apache.sandesha2.storage.beans;
 import java.io.Serializable;
 
 /**
- * @author  
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
+
 public interface RMBean extends Serializable {
 
 }

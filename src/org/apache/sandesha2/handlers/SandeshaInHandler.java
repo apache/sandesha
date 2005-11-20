@@ -38,39 +38,39 @@ import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
- * 
- * @author chamikara
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaInHandler extends AbstractHandler {
 
-	
 	protected Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
-	
+
 	public QName getName() {
 		return new QName(Constants.IN_HANDLER_NAME);
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-		
+
 		//try {
-			
+
 		ConfigurationContext context = msgCtx.getSystemContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
 
-		String DONE = (String) msgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE);
+		String DONE = (String) msgCtx
+				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE))
 			return;
-		
-		FaultManager faultManager = new FaultManager ();
-		RMMsgContext faultMessageContext = faultManager.checkForPossibleFaults(msgCtx);
-	    if (faultMessageContext!=null){
-	    	AxisEngine engine = new AxisEngine (context);
-	    	engine.send(faultMessageContext.getMessageContext());
-	    	return;
-	    }
-	    
+
+		FaultManager faultManager = new FaultManager();
+		RMMsgContext faultMessageContext = faultManager
+				.checkForPossibleFaults(msgCtx);
+		if (faultMessageContext != null) {
+			AxisEngine engine = new AxisEngine(context);
+			engine.send(faultMessageContext.getMessageContext());
+			return;
+		}
+
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");
@@ -94,12 +94,12 @@ public class SandeshaInHandler extends AbstractHandler {
 
 		ServiceContext serviceContext = msgCtx.getServiceContext();
 		Object debug = null;
-		if (serviceContext!=null) {
+		if (serviceContext != null) {
 			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaInHandler got a '"
-					+ SandeshaUtil.getMessageTypeString(rmMsgCtx
-							.getMessageType()) + "' message.");
+						+ SandeshaUtil.getMessageTypeString(rmMsgCtx
+								.getMessageType()) + "' message.");
 			}
 		}
 
@@ -115,11 +115,12 @@ public class SandeshaInHandler extends AbstractHandler {
 			se.printStackTrace();
 			throw new AxisFault("Error in processing the message");
 		}
-		
-//		}catch (Exception e) {
-//			e.getStackTrace();
-//			throw new AxisFault ("Sandesha got an exception. See logs for details");
-//		}
+
+		//		}catch (Exception e) {
+		//			e.getStackTrace();
+		//			throw new AxisFault ("Sandesha got an exception. See logs for
+		// details");
+		//		}
 
 	}
 

@@ -37,14 +37,18 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Nack;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
+
 public class AcknowledgementProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
-//		boolean b = true;
-//		if (b)
-//			return;
-		
+		//		boolean b = true;
+		//		if (b)
+		//			return;
+
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck == null)
@@ -88,7 +92,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//So we set relatesTo value to null for ackMessages. (this happens in
 		// the SandeshaGlobal handler)
 		//Do this only if this is a standalone ACK.
-		if (rmMsgCtx.getMessageType()==Constants.MessageTypes.ACK)
+		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.ACK)
 			rmMsgCtx.setRelatesTo(null);
 
 		RetransmitterBean input = new RetransmitterBean();
@@ -172,25 +176,25 @@ public class AcknowledgementProcessor implements MsgProcessor {
 	public void addTerminateSequenceMessage(RMMsgContext incomingAckRMMsg,
 			String outSequenceId, String tempSequenceId)
 			throws SandeshaException {
-		
+
 		StorageManager storageManager = SandeshaUtil
-		.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
-				.getSystemContext());
-		
+				.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
+						.getSystemContext());
+
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-		.getSequencePropretyBeanMgr();
-		
-		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceId,Constants.SequenceProperties.TERMINATE_ADDED);
-		
-		if (terminated!=null && terminated.getValue()!=null && "true".equals(terminated.getValue())) {
+				.getSequencePropretyBeanMgr();
+
+		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceId,
+				Constants.SequenceProperties.TERMINATE_ADDED);
+
+		if (terminated != null && terminated.getValue() != null
+				&& "true".equals(terminated.getValue())) {
 			System.out.println("TERMINATE WAS ADDED PREVIOUSLY....");
 			return;
 		}
-		
+
 		RMMsgContext terminateRMMessage = RMMsgCreator
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
-
-
 
 		//SequencePropertyBean replyToBean =
 		// seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
@@ -210,7 +214,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		// (replyToEPR.getAddress()));
 		terminateRMMessage
 				.setWSAAction(Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE);
-		terminateRMMessage.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_TERMINATE_SEQUENCE);
+		terminateRMMessage
+				.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_TERMINATE_SEQUENCE);
 
 		try {
 			terminateRMMessage.addSOAPEnvelope();
@@ -236,14 +241,14 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		RetransmitterBeanMgr retramsmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
-		
-		SequencePropertyBean terminateAdded = new SequencePropertyBean ();
+
+		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Constants.SequenceProperties.TERMINATE_ADDED);
 		terminateAdded.setSequenceId(outSequenceId);
 		terminateAdded.setValue("true");
-	    
+
 		seqPropMgr.insert(terminateAdded);
-		
+
 		retramsmitterMgr.insert(terminateBean);
 
 	}

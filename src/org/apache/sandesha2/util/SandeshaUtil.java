@@ -26,30 +26,21 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.om.OMConstants;
 import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.axis2.soap.SOAPFault;
-import org.apache.axis2.soap.SOAPFaultCode;
-import org.apache.axis2.soap.SOAPFaultDetail;
-import org.apache.axis2.soap.SOAPFaultReason;
-import org.apache.axis2.soap.SOAPFaultSubCode;
-import org.apache.axis2.soap.SOAPFaultText;
-import org.apache.axis2.soap.SOAPFaultValue;
 import org.apache.axis2.soap.impl.llom.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -58,9 +49,7 @@ import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.SOAPFaultEnvelopeCreator;
 import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -69,8 +58,7 @@ import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 /**
- * @author chamikara
- * @author sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaUtil {
@@ -566,6 +554,6 @@ public class SandeshaUtil {
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
 		}
-	}	
+	}
 
 }

@@ -18,76 +18,78 @@
 package org.apache.sandesha2.util;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.derby.iapi.sql.dictionary.ConsInfo;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
-
 /**
- * @author chamikara
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class MessageRetransmissionAdjuster {
 
-	public RetransmitterBean adjustRetransmittion (RetransmitterBean retransmitterBean) {
+	public RetransmitterBean adjustRetransmittion(
+			RetransmitterBean retransmitterBean) {
 		String storedKey = (String) retransmitterBean.getKey();
-		
-		if (storedKey==null)
+
+		if (storedKey == null)
 			return retransmitterBean;
-		
-		MessageContext messageContext = SandeshaUtil.getStoredMessageContext(storedKey);
-		
-		if (messageContext.getSystemContext()==null)
+
+		MessageContext messageContext = SandeshaUtil
+				.getStoredMessageContext(storedKey);
+
+		if (messageContext.getSystemContext() == null)
 			return retransmitterBean;
-		
-		RMPolicyBean policyBean = (RMPolicyBean) messageContext.getProperty(Constants.WSP.RM_POLICY_BEAN);
-		if (policyBean==null){
+
+		RMPolicyBean policyBean = (RMPolicyBean) messageContext
+				.getProperty(Constants.WSP.RM_POLICY_BEAN);
+		if (policyBean == null) {
 			policyBean = new SandeshaDynamicProperties().getPolicyBean();
 		}
-		
-		retransmitterBean.setSentCount(retransmitterBean.getSentCount()+1);
-		adjustNextRetransmissionTime (retransmitterBean,policyBean);
-		
-		if (retransmitterBean.getSentCount()>=Constants.MAXIMUM_RETRANSMISSION_ATTEMPTS)
-			stopRetransmission (retransmitterBean);
-		
+
+		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
+		adjustNextRetransmissionTime(retransmitterBean, policyBean);
+
+		if (retransmitterBean.getSentCount() >= Constants.MAXIMUM_RETRANSMISSION_ATTEMPTS)
+			stopRetransmission(retransmitterBean);
+
 		return retransmitterBean;
 	}
-	
-	private RetransmitterBean adjustNextRetransmissionTime (RetransmitterBean retransmitterBean,RMPolicyBean policyBean) {
-		
+
+	private RetransmitterBean adjustNextRetransmissionTime(
+			RetransmitterBean retransmitterBean, RMPolicyBean policyBean) {
+
 		long lastSentTime = retransmitterBean.getTimeToSend();
-		
+
 		int count = retransmitterBean.getSentCount();
-		
+
 		long baseInterval = policyBean.getRetransmissionInterval();
-		
+
 		long newInterval = baseInterval;
 		if (policyBean.isExponentialBackoff()) {
-			newInterval = generateNextExponentialBackedoffDifference (count,baseInterval);
+			newInterval = generateNextExponentialBackedoffDifference(count,
+					baseInterval);
 		}
-		
-		retransmitterBean.setTimeToSend(lastSentTime+newInterval);
-		
+
+		retransmitterBean.setTimeToSend(lastSentTime + newInterval);
+
 		return retransmitterBean;
 	}
-	
-	private void stopRetransmission (RetransmitterBean bean) {
+
+	private void stopRetransmission(RetransmitterBean bean) {
 		bean.setReSend(false);
 	}
-	
-	
+
 	//TODO: Have to change this to be plugable
-	private long generateNextExponentialBackedoffDifference(int count,long initialInterval) {
+	private long generateNextExponentialBackedoffDifference(int count,
+			long initialInterval) {
 		long interval = initialInterval;
-		for (int i=1;i<count;i++){
-			interval = interval*2;
+		for (int i = 1; i < count; i++) {
+			interval = interval * 2;
 		}
-		
+
 		return interval;
 	}
-	
-	
+
 }

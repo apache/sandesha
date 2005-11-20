@@ -23,9 +23,10 @@ import java.util.Collection;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 /**
- * @author Chamikara
- * @author Sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
+
 
 public interface CreateSeqBeanMgr extends RMBeanManager {
 

@@ -17,13 +17,16 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-
 import javax.xml.namespace.QName;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
 
 public class TerminateSeqMsgProcessor implements MsgProcessor {
 

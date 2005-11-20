@@ -29,15 +29,14 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPProcessingException;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;
 
 /**
- * @author Chamikara
- * @author Sanka
- * @author Jaliya
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ * @author Jaliya Ekanayaka <jaliya@opensource.lk>
  */
 
 public class RMMsgContext {
@@ -66,15 +65,16 @@ public class RMMsgContext {
 
 	public void addSOAPEnvelope() throws SandeshaException {
 		int SOAPVersion = Constants.SOAPVersion.v1_1;
-		
-		if (!msgContext.isSOAP11()) 
+
+		if (!msgContext.isSOAP11())
 			SOAPVersion = Constants.SOAPVersion.v1_2;
-		
+
 		if (msgContext.getEnvelope() == null) {
 			try {
-				msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(SOAPVersion).getDefaultEnvelope());
+				msgContext.setEnvelope(SOAPAbstractFactory.getSOAPFactory(
+						SOAPVersion).getDefaultEnvelope());
 			} catch (AxisFault e) {
-				throw new SandeshaException (e.getMessage());
+				throw new SandeshaException(e.getMessage());
 			}
 		}
 

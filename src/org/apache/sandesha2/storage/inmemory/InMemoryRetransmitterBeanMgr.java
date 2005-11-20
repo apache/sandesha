@@ -30,9 +30,10 @@ import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
 /**
- * @author Chamikara Jayalath <chamikara@wso2.com>
- * @author Sanka Samaranayake <ssanka@gmail.com>
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
+
 public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 	private Hashtable table = null;
 
@@ -71,7 +72,7 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 
 		RetransmitterBean temp;
 		while (iterator.hasNext()) {
-			
+
 			temp = (RetransmitterBean) iterator.next();
 
 			boolean add = true;
@@ -96,9 +97,10 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 					&& bean.getMessageNumber() != temp.getMessageNumber())
 				add = false;
 
-			if (bean.getMessagetype()!=Constants.MessageTypes.UNKNOWN && bean.getMessagetype()!=temp.getMessagetype())
+			if (bean.getMessagetype() != Constants.MessageTypes.UNKNOWN
+					&& bean.getMessagetype() != temp.getMessagetype())
 				add = false;
-			
+
 			if (add)
 				beans.add(temp);
 		}
@@ -111,105 +113,105 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 		Iterator iterator = table.values().iterator();
 
 		RetransmitterBean temp;
-		
+
 		while (iterator.hasNext()) {
 			temp = (RetransmitterBean) iterator.next();
-			
+
 			if (temp.isSend()) {
-				
-				long timeToSend = temp.getTimeToSend();	
+
+				long timeToSend = temp.getTimeToSend();
 				long timeNow = System.currentTimeMillis();
 				if ((timeNow >= timeToSend)) {
 					beans.add(temp);
 				}
 			}
 		}
-		
-//		beans = sort (beans);
-//		beans = reverse (beans);
-		
+
+		//		beans = sort (beans);
+		//		beans = reverse (beans);
+
 		return beans;
 	}
-	
-	private ArrayList reverse (ArrayList beans) {
-		ArrayList newBeans = new ArrayList ();
+
+	private ArrayList reverse(ArrayList beans) {
+		ArrayList newBeans = new ArrayList();
 		int count = beans.size();
-		
-	
-		for (int i=count;i>0;i--) {
-			newBeans.add(beans.get((i-1)));
+
+		for (int i = count; i > 0; i--) {
+			newBeans.add(beans.get((i - 1)));
 		}
-		
+
 		return newBeans;
 	}
-	
+
 	//FIXME - not complete
 	//SENDER SORTING
 	//--------------
 	//Sender Sorting is used to arrange the messages that get sent.
 	//This sending order may get dsturbed due to network latencies.
-	//But doing the sort here, could improve the server preformance when network latencies are low (this is the common case).
-	//Sender sorting will be enabled, when invocation type is InOrder. 
-	private ArrayList sort (ArrayList beans) {
-		ArrayList newBeans = new ArrayList ();
-		HashMap tempHash = new HashMap ();
-		
+	//But doing the sort here, could improve the server preformance when
+	// network latencies are low (this is the common case).
+	//Sender sorting will be enabled, when invocation type is InOrder.
+	private ArrayList sort(ArrayList beans) {
+		ArrayList newBeans = new ArrayList();
+		HashMap tempHash = new HashMap();
+
 		Iterator iter1 = beans.iterator();
 		while (iter1.hasNext()) {
 			RetransmitterBean bean = (RetransmitterBean) iter1.next();
-			if (!(bean.getMessageNumber()>0)) {
+			if (!(bean.getMessageNumber() > 0)) {
 				newBeans.add(bean);
 			}
 		}
-		
+
 		Iterator iter2 = beans.iterator();
 		long maxMsgNo = 0;
 		long minMsgNo = 0;
 		while (iter2.hasNext()) {
 			RetransmitterBean bean = (RetransmitterBean) iter2.next();
-			
-			if (bean.getMessageNumber()>0) {
+
+			if (bean.getMessageNumber() > 0) {
 				maxMsgNo = bean.getMessageNumber();
 				minMsgNo = bean.getMessageNumber();
 				break;
 			}
 		}
-		
+
 		//finding Max and Min msg numbers present in the current list.
-		while (iter2.hasNext()){
+		while (iter2.hasNext()) {
 			RetransmitterBean bean = (RetransmitterBean) iter2.next();
 			long msgNo = bean.getMessageNumber();
-			if (msgNo>0) {
+			if (msgNo > 0) {
 				//tempHash.put(new Long (bean.getMessageNumber()),bean);
-				if (msgNo>maxMsgNo)
+				if (msgNo > maxMsgNo)
 					maxMsgNo = msgNo;
-				
-				if (msgNo<minMsgNo) 
+
+				if (msgNo < minMsgNo)
 					minMsgNo = msgNo;
 			}
 		}
-		
-		for (long msgNo=minMsgNo;msgNo<=maxMsgNo;msgNo++) {
-			ArrayList beansOfMsgNo = findBeansWithMsgNo(beans,msgNo);
+
+		for (long msgNo = minMsgNo; msgNo <= maxMsgNo; msgNo++) {
+			ArrayList beansOfMsgNo = findBeansWithMsgNo(beans, msgNo);
 			Iterator iter = beansOfMsgNo.iterator();
 			while (iter.hasNext()) {
-				
+
 			}
 		}
 
 		return newBeans;
 	}
-	
-	private ArrayList findBeansWithMsgNo (ArrayList list, long msgNo) {
-		ArrayList beans = new ArrayList ();
-		
+
+	private ArrayList findBeansWithMsgNo(ArrayList list, long msgNo) {
+		ArrayList beans = new ArrayList();
+
 		Iterator it = list.iterator();
 		while (it.hasNext()) {
 			RetransmitterBean bean = (RetransmitterBean) it.next();
-			if (bean.getMessageNumber()==msgNo) 
+			if (bean.getMessageNumber() == msgNo)
 				beans.add(bean);
 		}
-		
+
 		return beans;
 	}
 
@@ -217,7 +219,8 @@ public class InMemoryRetransmitterBeanMgr implements RetransmitterBeanMgr {
 		if (!table.contains(bean))
 			return false;
 
-		return true; //No need to update. Being a reference does the job:) //table.put(bean.getMessageId(), bean) != null;
+		return true; //No need to update. Being a reference does the job:)
+					 // //table.put(bean.getMessageId(), bean) != null;
 	}
 
 }

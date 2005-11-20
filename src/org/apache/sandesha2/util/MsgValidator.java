@@ -21,18 +21,15 @@ import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.RMMsgContext;
 
 /**
- * @author Chamikara
- * @author Sanka
- * @author Jaliya 
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 //TODO remove this class.
 public class MsgValidator {
 
-	
-	private static void validateMessage(RMMsgContext rmMsgCtx) throws AxisFault{
+	private static void validateMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 
-			//no need of this method any more.
-			//Validation is done in the message initialized
-    }
+		//no need of this method any more.
+		//Validation is done in the message initialized
+	}
 }

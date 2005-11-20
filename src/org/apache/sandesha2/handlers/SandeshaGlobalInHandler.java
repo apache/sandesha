@@ -18,7 +18,9 @@
 package org.apache.sandesha2.handlers;
 
 import java.util.ArrayList;
+
 import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -26,11 +28,8 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.PropertyConfigurator;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -44,51 +43,51 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
- * 
- * @author chamikara
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaGlobalInHandler extends AbstractHandler {
 
-	
-    protected Log log = LogFactory.getLog(SandeshaGlobalInHandler.class.getName());
-	   
+	protected Log log = LogFactory.getLog(SandeshaGlobalInHandler.class
+			.getName());
+
 	public void invoke(MessageContext msgContext) throws AxisFault {
-	
+
 		//try {
-		
+
 		//Quit the message with minimum processing if not intended for RM.
-		boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage (msgContext);
+		boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
 		if (!isRMGlobalMessage) {
 			return;
 		}
-		
-		FaultManager faultManager = new FaultManager ();
-		RMMsgContext faultMessageContext = faultManager.checkForPossibleFaults(msgContext);
-	    if (faultMessageContext!=null){
-	    	ConfigurationContext configurationContext = msgContext.getSystemContext();
-	    	AxisEngine engine = new AxisEngine (configurationContext);
-	    	engine.send(faultMessageContext.getMessageContext());
-	    	return;
-	    }
-		
+
+		FaultManager faultManager = new FaultManager();
+		RMMsgContext faultMessageContext = faultManager
+				.checkForPossibleFaults(msgContext);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = msgContext
+					.getSystemContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			engine.send(faultMessageContext.getMessageContext());
+			return;
+		}
+
 		RMMsgContext rmMessageContext = MsgInitializer
 				.initializeMessage(msgContext);
 
-		
 		ConfigurationContext context = rmMessageContext.getMessageContext()
 				.getSystemContext();
 
 		//context.setProperty (Constants.SANDESHA_DEBUG_MODE,"on");
-		
+
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		Object debug = null;
-		if (serviceContext!=null) {
+		if (serviceContext != null) {
 			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
-					+ SandeshaUtil.getMessageTypeString(rmMessageContext
-							.getMessageType()) + "' message.");
+						+ SandeshaUtil.getMessageTypeString(rmMessageContext
+								.getMessageType()) + "' message.");
 			}
 		}
 
@@ -111,10 +110,11 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			doGlobalProcessing(rmMessageContext);
 		}
 
-//		}catch (Exception e) {
-//			e.getStackTrace();
-//			throw new AxisFault ("Sandesha got an exception. See logs for details");
-//		}
+		//		}catch (Exception e) {
+		//			e.getStackTrace();
+		//			throw new AxisFault ("Sandesha got an exception. See logs for
+		// details");
+		//		}
 	}
 
 	private boolean dropIfDuplicate(RMMsgContext rmMsgContext)
@@ -123,7 +123,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		boolean drop = false;
 
 		if (rmMsgContext.getMessageType() == Constants.MessageTypes.APPLICATION) {
-			
+
 			Sequence sequence = (Sequence) rmMsgContext
 					.getMessagePart(Constants.MessageParts.SEQUENCE);
 			String sequenceId = null;
@@ -153,41 +153,47 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 						drop = true;
 					}
 				}
-				
-				
-				if (drop==false) {
+
+				if (drop == false) {
 					//Checking for RM specific EMPTY_BODY LASTMESSAGE.
 					SOAPBody body = rmMsgContext.getSOAPEnvelope().getBody();
 					boolean emptyBody = false;
-					if (body.getChildElements().hasNext()==false) {
-						emptyBody = true;	
+					if (body.getChildElements().hasNext() == false) {
+						emptyBody = true;
 					}
-				
+
 					if (emptyBody) {
 						boolean lastMessage = false;
-						if (sequence.getLastMessage()!=null) {
-							System.out.println("Empty Body Last Message Received");
+						if (sequence.getLastMessage() != null) {
+							System.out
+									.println("Empty Body Last Message Received");
 							drop = true;
-						
-							if (receivedMsgsBean==null) {
-								receivedMsgsBean = new SequencePropertyBean (sequenceId,Constants.SequenceProperties.RECEIVED_MESSAGES,"");
+
+							if (receivedMsgsBean == null) {
+								receivedMsgsBean = new SequencePropertyBean(
+										sequenceId,
+										Constants.SequenceProperties.RECEIVED_MESSAGES,
+										"");
 								seqPropMgr.insert(receivedMsgsBean);
 							}
-							
-							String receivedMsgStr = (String) receivedMsgsBean.getValue();
+
+							String receivedMsgStr = (String) receivedMsgsBean
+									.getValue();
 							if (receivedMsgStr != "" && receivedMsgStr != null)
-								receivedMsgStr = receivedMsgStr + "," + Long.toString(msgNo);
+								receivedMsgStr = receivedMsgStr + ","
+										+ Long.toString(msgNo);
 							else
 								receivedMsgStr = Long.toString(msgNo);
-								
+
 							receivedMsgsBean.setValue(receivedMsgStr);
 							seqPropMgr.update(receivedMsgsBean);
-								
-							ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor ();
-							ackProcessor.sendAckIfNeeded(rmMsgContext,receivedMsgStr);
-							
+
+							ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
+							ackProcessor.sendAckIfNeeded(rmMsgContext,
+									receivedMsgStr);
+
+						}
 					}
-				}
 				}
 				//if (rmMsgContext.get)
 			}

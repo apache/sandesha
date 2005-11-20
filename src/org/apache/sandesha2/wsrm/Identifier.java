@@ -17,9 +17,9 @@
 package org.apache.sandesha2.wsrm;
 
 /**
- * @author Saminda
- * @author chamikara
- * @author sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ * @author Saminda Abeyruwan  <saminda@opensource.lk>
  */
 
 import javax.xml.namespace.QName;
@@ -29,7 +29,6 @@ import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 public class Identifier implements Constants, IOMRMElement {
 

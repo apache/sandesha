@@ -17,8 +17,10 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
- * @author Sanka Samaranayake <ssanka@gmail.com>
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
+
 public class SequencePropertyBean implements RMBean {
 
 	private String sequenceId;

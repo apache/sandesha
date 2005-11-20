@@ -28,8 +28,8 @@ import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 /**
- * @author Chamikara Jayalath <chamikara@wso2.com>
- * @author Sanka Samaranayake <ssanka@gmail.com>
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {

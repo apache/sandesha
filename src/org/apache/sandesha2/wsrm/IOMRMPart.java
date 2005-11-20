@@ -19,6 +19,11 @@ package org.apache.sandesha2.wsrm;
 
 import org.apache.axis2.soap.SOAPEnvelope;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
+ * @author Saminda Abeyruwan  <saminda@opensource.lk>
+ */
 
 public interface IOMRMPart extends IOMRMElement {
 	public void toSOAPEnvelope (SOAPEnvelope envelope);

@@ -18,8 +18,10 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
- * @author
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
+
 public class NextMsgBean implements RMBean {
 	private String SequenceId;
 

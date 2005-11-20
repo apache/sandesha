@@ -19,6 +19,10 @@ package org.apache.sandesha2.msgprocessors;
 
 import org.apache.sandesha2.Constants;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
+
 public class MsgProcessorFactory {
 
 	public static MsgProcessor getMessageProcessor(int msgType) {

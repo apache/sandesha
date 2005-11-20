@@ -20,8 +20,8 @@ package org.apache.sandesha2;
 import org.apache.axis2.AxisFault;
 
 /**
- * @author Chamikara
- * @author Sanka
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 //FIXME - extends AxisFault and clean code (remove unnecessary try-catches )

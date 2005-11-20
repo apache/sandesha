@@ -47,12 +47,17 @@ import org.apache.axis2.soap.SOAPFactory;
 import java.util.Iterator;
 import javax.xml.namespace.QName;
 
+/**
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
+
 public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(createSeqResponseRMMsgCtx.getSOAPEnvelope()));
-		
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
+				.getSOAPVersion(createSeqResponseRMMsgCtx.getSOAPEnvelope()));
+
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) createSeqResponseRMMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
@@ -163,14 +168,15 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			identifier.setIndentifer(newOutSequenceId);
 
 			sequencePart.setIdentifier(identifier);
-			
-			AckRequested ackRequestedPart = (AckRequested) applicaionRMMsg.getMessagePart(Constants.MessageParts.ACK_REQUEST);
-			if (ackRequestedPart!=null) {
-				Identifier id1 = new Identifier (factory);
+
+			AckRequested ackRequestedPart = (AckRequested) applicaionRMMsg
+					.getMessagePart(Constants.MessageParts.ACK_REQUEST);
+			if (ackRequestedPart != null) {
+				Identifier id1 = new Identifier(factory);
 				id1.setIndentifer(newOutSequenceId);
 				ackRequestedPart.setIdentifier(id1);
 			}
-			
+
 			try {
 				applicaionRMMsg.addSOAPEnvelope();
 			} catch (AxisFault e) {
