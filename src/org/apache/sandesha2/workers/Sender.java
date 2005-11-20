@@ -24,6 +24,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -89,6 +90,11 @@ public class Sender extends Thread {
 													.getMessageType())
 									+ "' message.");
 							}
+						}
+						
+						if (rmMsgCtx.getMessageType()==Constants.MessageTypes.APPLICATION) {
+							//piggybacking if an ack if available for the same sequence.
+							AcknowledgementManager.piggybackAckIfPresent(rmMsgCtx);
 						}
 						
 						try {
