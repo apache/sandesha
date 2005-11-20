@@ -157,14 +157,17 @@ public class RMMsgCreator {
 		CreateSequence createSequencePart = new CreateSequence(factory);
 
 		//Adding sequence offer - if present
-		String offeredSequence = (String) context
+		ServiceContext serviceContext = applicationMsgContext.getServiceContext();
+		if (serviceContext!=null) {
+			String offeredSequence = (String) serviceContext
 				.getProperty(Constants.OFFERED_SEQUENCE_ID);
-		if (offeredSequence != null && !"".equals(offeredSequence)) {
-			SequenceOffer offerPart = new SequenceOffer(factory);
-			Identifier identifier = new Identifier(factory);
-			identifier.setIndentifer(offeredSequence);
-			offerPart.setIdentifier(identifier);
-			createSequencePart.setSequenceOffer(offerPart);
+			if (offeredSequence != null && !"".equals(offeredSequence)) {
+				SequenceOffer offerPart = new SequenceOffer(factory);
+				Identifier identifier = new Identifier(factory);
+				identifier.setIndentifer(offeredSequence);
+				offerPart.setIdentifier(identifier);
+				createSequencePart.setSequenceOffer(offerPart);
+			}
 		}
 
 		//TODO decide - where to send create seq. Acksto or replyTo

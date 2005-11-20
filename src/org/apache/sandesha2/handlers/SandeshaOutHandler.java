@@ -20,12 +20,13 @@ package org.apache.sandesha2.handlers;
 import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.clientapi.ListenerManager;
+import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
+import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
@@ -121,11 +122,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		msgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE, "true");
 
-		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
-		if (debug != null && "on".equals(debug)) {
-			System.out.println("DEBUG: SandeshaOutHandler got a '"
-					+ SandeshaUtil.getMessageTypeString(rmMsgCtx
-							.getMessageType()) + "' message.");
+		ServiceContext serviceContext = msgCtx.getServiceContext();
+		Object debug = null;
+		if (serviceContext!=null) {
+			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+			if (debug != null && "on".equals(debug)) {
+				System.out.println("DEBUG: SandeshaOutHandler got a '"
+						+ SandeshaUtil.getMessageTypeString(rmMsgCtx
+								.getMessageType()) + "' message.");
+			}
 		}
 
 		//TODO recheck
@@ -243,7 +248,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 						"true");
 				seqPropMgr.insert(responseCreateSeqAdded);
 
-				String acksTo = (String) context.getProperty(Constants.AcksTo);
+				String acksTo = null;
+				if (serviceContext!=null) {
+					acksTo = (String) serviceContext.getProperty(Constants.AcksTo);
+				}
+				
 				if (acksTo==null)
 					acksTo = Constants.WSA.NS_URI_ANONYMOUS;
 				
@@ -608,17 +617,21 @@ public class SandeshaOutHandler extends AbstractHandler {
 		} else {
 			//client side
 			
-			Object obj = msg.getSystemContext().getProperty(
+			
+			ServiceContext serviceContext = msg.getServiceContext();
+			if (serviceContext!=null) {
+				Object obj = serviceContext.getProperty(
 					Constants.LAST_MESSAGE);
-			if (obj != null && "true".equals(obj)) {
-				lastMessage = true;
-				sequence.setLastMessage(new LastMessage(factory));
-				//saving the last message no.
-				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
+				if (obj != null && "true".equals(obj)) {
+					lastMessage = true;
+					sequence.setLastMessage(new LastMessage(factory));
+					//saving the last message no.
+					SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
 						tempSequenceId,
 						Constants.SequenceProperties.LAST_OUT_MESSAGE,
 						new Long(messageNumber));
-				sequencePropertyMgr.insert(lastOutMsgBean);
+					sequencePropertyMgr.insert(lastOutMsgBean);
+				}
 			}
 		}
 

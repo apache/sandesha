@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
@@ -80,11 +81,15 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		//context.setProperty (Constants.SANDESHA_DEBUG_MODE,"on");
 		
-		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
-		if (debug != null && "on".equals(debug)) {
-			System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
+		ServiceContext serviceContext = msgContext.getServiceContext();
+		Object debug = null;
+		if (serviceContext!=null) {
+			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+			if (debug != null && "on".equals(debug)) {
+				System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
 					+ SandeshaUtil.getMessageTypeString(rmMessageContext
 							.getMessageType()) + "' message.");
+			}
 		}
 
 		//Dropping duplicates

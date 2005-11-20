@@ -22,6 +22,7 @@ import java.util.Iterator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
@@ -134,15 +135,18 @@ public class InOrderInvoker extends Thread {
 							new AxisEngine(msgToInvoke.getSystemContext())
 									.receive(msgToInvoke);
 
-							Object debug = context
-									.getProperty(Constants.SANDESHA_DEBUG_MODE);
-							if (debug != null && "on".equals(debug)) {
-								System.out
+							ServiceContext serviceContext = msgToInvoke.getServiceContext();
+							Object debug = null;
+							if (serviceContext!=null) {
+								debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+								if (debug != null && "on".equals(debug)) {
+									System.out
 										.println("DEBUG: Invoker invoking a '"
 												+ SandeshaUtil
 														.getMessageTypeString(rmMsg
 																.getMessageType())
 												+ "' message.");
+								}
 							}
 
 							//deleting the message entry.

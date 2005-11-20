@@ -6,8 +6,9 @@
  */
 package org.apache.sandesha2.client;
 
-import org.apache.axis2.clientapi.AsyncResult;
-import org.apache.axis2.clientapi.Callback;
+import org.apache.axis2.client.AsyncResult;
+import org.apache.axis2.client.Callback;
+
 
 
 public class SandeshaCallback extends Callback {

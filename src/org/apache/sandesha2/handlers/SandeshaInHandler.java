@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
@@ -91,11 +92,15 @@ public class SandeshaInHandler extends AbstractHandler {
 			throw new AxisFault("Cant initialize the message");
 		}
 
-		Object debug = context.getProperty(Constants.SANDESHA_DEBUG_MODE);
-		if (debug != null && "on".equals(debug)) {
-			System.out.println("DEBUG: SandeshaInHandler got a '"
+		ServiceContext serviceContext = msgCtx.getServiceContext();
+		Object debug = null;
+		if (serviceContext!=null) {
+			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+			if (debug != null && "on".equals(debug)) {
+				System.out.println("DEBUG: SandeshaInHandler got a '"
 					+ SandeshaUtil.getMessageTypeString(rmMsgCtx
 							.getMessageType()) + "' message.");
+			}
 		}
 
 		MsgProcessor msgProcessor = MsgProcessorFactory
