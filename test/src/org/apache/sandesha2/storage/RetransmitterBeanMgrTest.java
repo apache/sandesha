@@ -43,7 +43,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
     public void testDelete() {
         assertNull(mgr.retrieve(""));
         try {
-            mgr.insert(new RetransmitterBean("MsgId1", "Key1", 1001, false, "TmpSeqId1", 1001));
+            mgr.insert(new RetransmitterBean("MsgId1", "Key1", false , 1001 , "TmpSeqId1", 1001));
         } catch (Exception ex) {
             fail("should not throw an exception");
         }
@@ -52,8 +52,8 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
 
     public void testFind() {
         try {
-            mgr.insert(new RetransmitterBean("MsgId2", "Key2", 1002, false, "TmpSeqId2", 1002));
-            mgr.insert(new RetransmitterBean("MsgId3", "Key3", 1003, false, "TmpSeqId2", 1003));
+            mgr.insert(new RetransmitterBean("MsgId2", "Key2", false , 1001 , "TmpSeqId2", 1002));
+            mgr.insert(new RetransmitterBean("MsgId3", "Key3", false , 1001 , "TmpSeqId2", 1003));
 
             RetransmitterBean target = new RetransmitterBean();
             target.setTempSequenceId("TmpSeqId2");
@@ -86,7 +86,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
         }
 
         try {
-            mgr.insert(new RetransmitterBean("MsgId4","Key4", 1004, false, "TmpSeqId4", 1004));
+            mgr.insert(new RetransmitterBean("MsgId4","Key4", false , 1001 , "TmpSeqId4", 1004));
             RetransmitterBean tmp = mgr.retrieve("MsgId4");
             assertTrue(tmp.getKey().equals("Key4"));
 
@@ -100,7 +100,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
     public void testRetrieve() {
         assertNull(mgr.retrieve("MsgId5"));
         try {
-            mgr.insert(new RetransmitterBean("MsgId5", "Key5", 1005, false, "TmpSeqId5", 1005));
+            mgr.insert(new RetransmitterBean("MsgId5", "Key5", false , 1001 , "TmpSeqId5", 1005));
         } catch (SandeshaException e) {
             fail("this should not throw an exception");
         }
@@ -108,7 +108,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
     }
 
     public void testUpdate() {
-        RetransmitterBean bean = new RetransmitterBean("MsgId6", "Key6", 1006, false, "TmpSeqId6", 1006);
+        RetransmitterBean bean = new RetransmitterBean("MsgId6", "Key6", false , 1001 , "TmpSeqId6", 1006);
         try {
             mgr.insert(bean);
         } catch (SandeshaException e) {
