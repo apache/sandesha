@@ -20,7 +20,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.clientapi.MessageSender;
+import org.apache.axis2.client.MessageSender;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
@@ -39,6 +40,8 @@ public class MicrosoftAsyncPingClient {
 
 	private static String to = "http://131.107.72.15/ReliableMessaging_Service_Indigo/ReliableOneWayDual.svc";   //IP : 131.107.153.195  Port:80
 
+	private static String transportTo = "http://127.0.0.1:8070/ReliableMessaging_Service_Indigo/ReliableOneWayDual.svc";
+	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\client\\";   //this will be available after a maven build
@@ -60,25 +63,26 @@ public class MicrosoftAsyncPingClient {
 		sender.set(Constants.SANDESHA_DEBUG_MODE,"on");   //Sets the debug on for sandesha.
 		sender.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		sender.setTo(new EndpointReference(to));
-		sender.set(Constants.AcksTo,"http://203.94.94.136:9080/axis2/services/AnonymousService/echoString");
-		sender.setReplyTo(new EndpointReference ("http://203.94.94.136:9080/axis2/services/AnonymousService/echoString"));
-		sender.setFaultTo(new EndpointReference ("http://203.94.94.136:9080/axis2/services/AnonymousService/echoString"));
+		sender.set(MessageContextConstants.TRANSPORT_URL,transportTo);
+		sender.set(Constants.AcksTo,"http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString");
+		sender.setReplyTo(new EndpointReference ("http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"));
+		sender.setFaultTo(new EndpointReference ("http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"));
 		sender.set(Constants.SEQUENCE_KEY,"sequence1");
 		sender.setSoapAction("urn:wsrm:Ping");
 		sender.setWsaAction("urn:wsrm:Ping");
-  		//sender.send("ping",getPingOMBlock("ping1"));
-		//sender.send("ping",getPingOMBlock("ping2"));
+  		sender.send("ping",getPingOMBlock("Microsoft-1"));
+		sender.send("ping",getPingOMBlock("Microsoft-2"));
 		sender.set(Constants.LAST_MESSAGE, "true");
-		sender.send("ping",getPingOMBlock("ping3"));
+		sender.send("ping",getPingOMBlock("Microsoft-3"));
 	}
 	
 	private static OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace ns = fac.createOMNamespace("http://tempuri.apache.org",
+		OMNamespace ns = fac.createOMNamespace("http://tempuri.org/",
 				"ns1");
 		OMNamespace defautNS = fac.createOMNamespace("",null);
 		OMElement pingElement = fac.createOMElement("Ping", ns);
-		OMElement paramElement = fac.createOMElement("Text", defautNS);
+		OMElement paramElement = fac.createOMElement("Text", ns);
 		pingElement.addChild(paramElement);
 		paramElement.setText(text);
 
