@@ -21,6 +21,9 @@ package org.apache.sandesha2.msgreceivers;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.receivers.AbstractMessageReceiver;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -36,6 +39,9 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 	public final void receive(MessageContext messgeCtx) throws AxisFault {
 		System.out.println("RM MESSSAGE RECEIVER WAS CALLED");
+		
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
+		System.out.println("MsgReceiver got type:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));
 	}
 	
 }

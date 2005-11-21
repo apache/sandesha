@@ -27,6 +27,7 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -101,7 +102,7 @@ public class InOrderInvoker extends Thread {
 						.getValue();
 				Iterator seqPropIt = seqPropList.iterator();
 
-				while (seqPropIt.hasNext()) {
+				currentIteration: while (seqPropIt.hasNext()) {
 
 					String sequenceId = (String) seqPropIt.next();
 
@@ -168,10 +169,24 @@ public class InOrderInvoker extends Thread {
 								.find(
 										new StorageMapBean(null, nextMsgno,
 												sequenceId)).iterator();
+
+						//terminate (AfterInvocation)
+						if (rmMsg.getMessageType() == Constants.MessageTypes.APPLICATION) {
+							Sequence sequence = (Sequence) rmMsg
+									.getMessagePart(Constants.MessageParts.SEQUENCE);
+							if (sequence.getLastMessage() != null) {
+								TerminateManager.terminateAfterInvocation(
+										context, sequenceId);
+								
+								//exit from current iteration. (since an entry was removed)
+								break currentIteration;
+							}
+						}
 					}
 
 					nextMsgBean.setNextMsgNoToProcess(nextMsgno);
 					nextMsgMgr.update(nextMsgBean);
+
 				}
 			} catch (SandeshaException e1) {
 				// TODO Auto-generated catch block

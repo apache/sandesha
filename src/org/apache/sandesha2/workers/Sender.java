@@ -28,12 +28,14 @@ import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -121,6 +123,16 @@ public class Sender extends Thread {
 
 						if (!msgCtx.isServerSide())
 							checkForSyncResponses(msgCtx);
+						
+						
+						if (rmMsgCtx.getMessageType()==Constants.MessageTypes.TERMINATE_SEQ) {
+							//terminate sending side.
+							TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Constants.MessageParts.TERMINATE_SEQ);
+							String sequenceID = terminateSequence.getIdentifier().getIdentifier();
+							ConfigurationContext configContext = msgCtx.getSystemContext();
+							
+							TerminateManager.terminateSendingSide(configContext,sequenceID);
+						}
 
 					} catch (AxisFault e1) {
 						e1.printStackTrace();

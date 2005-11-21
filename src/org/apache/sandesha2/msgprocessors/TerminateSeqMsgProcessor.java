@@ -18,11 +18,20 @@
 package org.apache.sandesha2.msgprocessors;
 
 import javax.xml.namespace.QName;
+
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.TerminateManager;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -44,6 +53,19 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		//Processing the terminate message
 		//TODO Add terminate sequence message logic.
+		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMSg.getMessagePart(Constants.MessageParts.TERMINATE_SEQ);
+		if (terminateSequence==null)
+			throw new SandeshaException ("Terminate Sequence part is not available");
+		
+		String sequenceId = terminateSequence.getIdentifier().getIdentifier();
+		if (sequenceId==null || "".equals(sequenceId))
+			throw new SandeshaException ("Invalid sequence id");
+		
+		ConfigurationContext context = terminateSeqMsg.getSystemContext();
+
+		
+		TerminateManager.terminateReceivingSide(context,sequenceId);
+		
 
 		terminateSeqMsg.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
 
