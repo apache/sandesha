@@ -45,10 +45,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
-		//		boolean b = true;
-		//		if (b)
-		//			return;
-
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck == null)
@@ -152,9 +148,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			//stopping the progress of the message further.
 			rmMsgCtx.getMessageContext().setPausedTrue(
 					new QName(Constants.IN_HANDLER_NAME));
-
-			//return;
-			//}
 		}
 
 		int i = 1;

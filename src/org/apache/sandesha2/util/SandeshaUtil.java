@@ -31,6 +31,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.i18n.Messages;
@@ -172,133 +174,6 @@ public class SandeshaUtil {
 
 	public static MessageContext getStoredMessageContext(String key) {
 		return (MessageContext) storedMsgContexts.get(key);
-	}
-
-	//	public static void main (String[] args) {
-	//		String msgList = "13,2,6,4,4,1,999,12,3";
-	//		getAckRangeArray( msgList);
-	//		
-	//	}
-
-	public static MessageContext deepCopy(MessageContext msgCtx)
-			throws SandeshaException {
-
-		try {
-			MessageContext newMessageContext = shallowCopy(msgCtx);
-			newMessageContext.setDoingMTOM(msgCtx.isDoingMTOM());
-			newMessageContext.setDoingREST(msgCtx.isDoingREST());
-			newMessageContext.setMessageID(msgCtx.getMessageID());
-			newMessageContext.setOutPutWritten(msgCtx.isOutPutWritten());
-			newMessageContext.setParent(msgCtx.getParent());
-			newMessageContext.setPausedPhaseName(msgCtx.getPausedPhaseName());
-			newMessageContext.setProcessingFault(msgCtx.isProcessingFault());
-			newMessageContext.setResponseWritten(msgCtx.isResponseWritten());
-			newMessageContext.setRestThroughPOST(msgCtx.isRestThroughPOST());
-			if (msgCtx.getAxisOperation() != null)
-				newMessageContext.setAxisOperation(msgCtx.getAxisOperation());
-
-			if (msgCtx.getEnvelope() != null)
-				newMessageContext.setEnvelope(msgCtx.getEnvelope());
-
-			//copying transport info. TODO remove http specific ness.
-			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx
-					.getProperty(MessageContext.TRANSPORT_OUT));
-			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
-					msgCtx.getProperty(HTTPConstants.HTTPOutTransportInfo));
-			return newMessageContext;
-
-		} catch (AxisFault e) {
-			throw new SandeshaException("Cannot copy message");
-		}
-	}
-
-	public static MessageContext shallowCopy(MessageContext msgCtx)
-			throws SandeshaException {
-		ConfigurationContext configCtx = msgCtx.getSystemContext();
-		TransportInDescription transportIn = msgCtx.getTransportIn();
-		TransportOutDescription transportOut = msgCtx.getTransportOut();
-		MessageInformationHeaders msgInfoHeaders1 = new MessageInformationHeaders();
-		MessageInformationHeaders oldMsgInfoHeaders = msgCtx
-				.getMessageInformationHeaders();
-
-		msgInfoHeaders1.setTo(oldMsgInfoHeaders.getTo());
-		msgInfoHeaders1.setFrom(oldMsgInfoHeaders.getFrom());
-		msgInfoHeaders1.setReplyTo(oldMsgInfoHeaders.getReplyTo());
-		msgInfoHeaders1.setFaultTo(oldMsgInfoHeaders.getFaultTo());
-		msgInfoHeaders1.setMessageId(getUUID());
-		msgInfoHeaders1.setRelatesTo(oldMsgInfoHeaders.getRelatesTo());
-		msgInfoHeaders1.setAction(oldMsgInfoHeaders.getAction());
-		msgInfoHeaders1.setReferenceParameters(oldMsgInfoHeaders
-				.getReferenceParameters());
-
-		try {
-
-			MessageContext newMessageContext = new MessageContext(configCtx);
-			newMessageContext.setTransportIn(transportIn);
-			newMessageContext.setTransportOut(transportOut);
-
-			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx
-					.getProperty(MessageContext.TRANSPORT_OUT));
-			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
-					msgCtx.getProperty(HTTPConstants.HTTPOutTransportInfo));
-
-			//Setting the charater set encoding
-			Object charSetEncoding = msgCtx
-					.getProperty(MessageContext.CHARACTER_SET_ENCODING);
-
-			//TODO - this is required due to a bug in axis2. Remove this when
-			// it get fixed
-			//BUG - Commons HTTP transport sender sets a NameValuepair to as
-			// the CHAR_SET_ENCODING
-			//instead of a String
-			if (charSetEncoding instanceof NameValuePair)
-				charSetEncoding = ((NameValuePair) charSetEncoding).getValue();
-
-			newMessageContext.setProperty(
-					MessageContext.CHARACTER_SET_ENCODING, charSetEncoding);
-
-			newMessageContext.setMessageInformationHeaders(msgInfoHeaders1);
-			newMessageContext.setAxisService(msgCtx.getAxisService());
-			if (msgCtx.getAxisServiceGroup() != null)
-				newMessageContext.setAxisServiceGroup(msgCtx
-						.getAxisServiceGroup());
-
-			newMessageContext.setSoapAction(msgCtx.getSoapAction());
-			newMessageContext.setWSAAction(msgCtx.getWSAAction());
-
-			newMessageContext.setServerSide(msgCtx.isServerSide());
-			return newMessageContext;
-
-		} catch (AxisFault e) {
-			throw new SandeshaException("Cannot copy message");
-		}
-
-	}
-
-	public static RMMsgContext deepCopy(RMMsgContext rmMsgContext)
-			throws SandeshaException {
-		MessageContext msgCtx = null;
-		if (rmMsgContext.getMessageContext() != null)
-			msgCtx = deepCopy(rmMsgContext.getMessageContext());
-
-		RMMsgContext newRMMsgCtx = new RMMsgContext();
-		if (msgCtx != null)
-			newRMMsgCtx.setMessageContext(msgCtx);
-
-		return newRMMsgCtx;
-	}
-
-	public static RMMsgContext shallowCopy(RMMsgContext rmMsgContext)
-			throws SandeshaException {
-		MessageContext msgCtx = null;
-		if (rmMsgContext.getMessageContext() != null)
-			msgCtx = shallowCopy(rmMsgContext.getMessageContext());
-
-		RMMsgContext newRMMsgCtx = new RMMsgContext();
-		if (msgCtx != null)
-			newRMMsgCtx.setMessageContext(msgCtx);
-
-		return newRMMsgCtx;
 	}
 
 	public static void startSenderIfStopped(ConfigurationContext context) {
@@ -554,6 +429,58 @@ public class SandeshaUtil {
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
 		}
+	}
+
+	public static MessageContext createNewRelatedMessageContext(
+			RMMsgContext referenceRMMessage, AxisOperation operation)
+			throws SandeshaException {
+		try {
+			MessageContext referenceMessage = referenceRMMessage
+					.getMessageContext();
+			ConfigurationContext configContext = referenceMessage
+					.getSystemContext();
+			MessageContext newMessageContext = new MessageContext(configContext);
+
+			newMessageContext.setAxisServiceGroup(referenceMessage
+					.getAxisServiceGroup());
+			newMessageContext.setAxisService(referenceMessage.getAxisService());
+			newMessageContext.setAxisOperation(operation);
+			newMessageContext.setServiceGroupContext(referenceMessage
+					.getServiceGroupContext());
+			newMessageContext.setServiceGroupContextId(referenceMessage
+					.getServiceGroupContextId());
+			newMessageContext.setServiceContext(referenceMessage
+					.getServiceContext());
+			newMessageContext.setServiceContextID(referenceMessage
+					.getServiceContextID());
+
+			OperationContext operationContext = new OperationContext(operation);
+			newMessageContext.setOperationContext(operationContext);
+			operationContext.addMessageContext(newMessageContext);
+
+			//adding a blank envelope
+			SOAPFactory factory = SOAPAbstractFactory
+					.getSOAPFactory(SandeshaUtil
+							.getSOAPVersion(referenceMessage.getEnvelope()));
+			newMessageContext.setEnvelope(factory.getDefaultEnvelope());
+
+			newMessageContext.setTransportIn(referenceMessage.getTransportIn());
+			newMessageContext.setTransportOut(referenceMessage
+					.getTransportOut());
+
+			//copying transport info. TODO remove http specific ness.
+			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,
+					referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
+			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
+					referenceMessage
+							.getProperty(HTTPConstants.HTTPOutTransportInfo));
+
+			return newMessageContext;
+
+		} catch (AxisFault e) {
+			throw new SandeshaException(e.getMessage());
+		}
+
 	}
 
 }

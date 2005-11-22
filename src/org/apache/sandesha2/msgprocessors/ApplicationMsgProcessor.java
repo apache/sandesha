@@ -51,6 +51,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -300,51 +301,30 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				return;
 			}
 		}
-
-		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
-		AxisServiceGroup serviceGroup = new AxisServiceGroup(axisConfig);
-		AxisService service = new AxisService(new QName("RMClientService")); // This
-		// is a
-		// dummy
-		// service.
-		ServiceGroupContext serviceGroupContext = new ServiceGroupContext(
-				configCtx, serviceGroup);
-		ServiceContext serviceContext = new ServiceContext(service,
-				serviceGroupContext);
-
-		RMMsgContext ackRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
-		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
-
-		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
-
-		ackMsgCtx.setAxisServiceGroup(serviceGroup);
-		ackMsgCtx.setServiceGroupContext(serviceGroupContext);
-		ackMsgCtx.setAxisService(service);
-		ackMsgCtx.setServiceContext(serviceContext);
+		AxisOperation ackOperation = null;
 
 		try {
-			AxisOperation ackOperation = AxisOperationFactory
+			ackOperation = AxisOperationFactory
 					.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
-
-			AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext()
-					.getAxisOperation();
-			if (rmMsgOperation != null) {
-				ArrayList outFlow = rmMsgOperation.getPhasesOutFlow();
-				if (outFlow != null) {
-					ackOperation.setPhasesOutFlow(outFlow);
-					ackOperation.setPhasesOutFaultFlow(outFlow);
-				}
-			}
-
-			OperationContext ackOpContext = new OperationContext(ackOperation);
-			ackMsgCtx.setAxisOperation(ackOperation);
-			ackMsgCtx.setOperationContext(ackOpContext);
-			ackOpContext.addMessageContext(ackMsgCtx);
-			ackMsgCtx.setOperationContext(ackOpContext);
-
 		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
+			throw new SandeshaException("Could not create the Operation");
 		}
+
+		AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext()
+				.getAxisOperation();
+		if (rmMsgOperation != null) {
+			ArrayList outFlow = rmMsgOperation.getPhasesOutFlow();
+			if (outFlow != null) {
+				ackOperation.setPhasesOutFlow(outFlow);
+				ackOperation.setPhasesOutFaultFlow(outFlow);
+			}
+		}
+
+		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(
+				rmMsgCtx, ackOperation);
+		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
+
+		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
 
 		//Set new envelope
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
@@ -357,9 +337,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgCtx.getTo());
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
-
-		//		Object obj =
-		// rmMsgCtx.getMessageContext().getOperationContext().getProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN);
 
 		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
 

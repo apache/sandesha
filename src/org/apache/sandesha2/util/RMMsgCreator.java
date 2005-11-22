@@ -91,68 +91,41 @@ public class RMMsgCreator {
 		try {
 			//creating by copying common contents. (this will not set contexts
 			// except for configCtx).
-			createSeqmsgContext = SandeshaUtil
-					.shallowCopy(applicationMsgContext);
-		} catch (SandeshaException e) {
+			AxisOperation createSequenceOperation = AxisOperationFactory
+					.getAxisOperation(AxisOperation.MEP_CONSTANT_OUT_IN);
+
+			createSeqmsgContext = SandeshaUtil.createNewRelatedMessageContext(
+					applicationRMMsg, createSequenceOperation);
+			OperationContext createSeqOpCtx = createSeqmsgContext
+					.getOperationContext();
+			String createSeqMsgId = SandeshaUtil.getUUID();
+			createSeqmsgContext.setMessageID(createSeqMsgId);
+			context.registerOperationContext(createSeqMsgId, createSeqOpCtx);
+
+		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
 		}
 
-		//setting contexts
-		createSeqmsgContext.setServiceGroupContext(applicationMsgContext
-				.getServiceGroupContext());
-		createSeqmsgContext.setServiceGroupContextId(applicationMsgContext
-				.getServiceGroupContextId());
-		createSeqmsgContext.setServiceContext(applicationMsgContext
-				.getServiceContext());
-		createSeqmsgContext.setServiceContextID(applicationMsgContext
-				.getServiceContextID());
-
 		setUpMessage(createSeqmsgContext);
 
-		String createSeqMsgId = SandeshaUtil.getUUID();
-		try {
-			AxisOperation appMsgOperationDesc = applicationMsgContext
-					.getAxisOperation();
-			AxisOperation createSeqOperationDesc = AxisOperationFactory
-					.getOperetionDescription(AxisOperationFactory.MEP_URI_OUT_IN);
+		AxisOperation appMsgOperationDesc = applicationMsgContext
+				.getAxisOperation();
 
-			createSeqOperationDesc
-					.setName(new QName("CreateSequenceOperation"));
-			if (appMsgOperationDesc != null) {
-				createSeqOperationDesc.setPhasesOutFlow(appMsgOperationDesc
-						.getPhasesOutFlow());
-				createSeqOperationDesc
-						.setPhasesOutFaultFlow(appMsgOperationDesc
-								.getPhasesOutFaultFlow());
-				createSeqOperationDesc.setPhasesInFaultFlow(appMsgOperationDesc
-						.getPhasesInFaultFlow());
-				createSeqOperationDesc
-						.setRemainingPhasesInFlow(appMsgOperationDesc
-								.getRemainingPhasesInFlow());
-			}
-
-			createSeqmsgContext.setAxisOperation(createSeqOperationDesc);
-			//TODO set a suitable ope. description
-			OperationContext createSeqOpContext = new OperationContext(
-					createSeqmsgContext.getAxisOperation());
-
-			createSeqmsgContext.setOperationContext(createSeqOpContext);
-			createSeqOpContext.addMessageContext(createSeqmsgContext);
-			//registering opearion context
-			context
-					.registerOperationContext(createSeqMsgId,
-							createSeqOpContext);
-
-			//Setting a new SOAP Envelop.
-
-			SOAPEnvelope envelope = factory.getDefaultEnvelope();
-
-			createSeqmsgContext.setEnvelope(envelope);
-			//			createSeqOpContext.addMessageContext(createSeqmsgContext);
-			//			createSeqmsgContext.setOperationContext(createSeqOpContext);
-		} catch (AxisFault e2) {
-			throw new SandeshaException(e2.getMessage());
+		AxisOperation createSeqOperation = createSeqmsgContext
+				.getAxisOperation();
+		createSeqOperation.setName(new QName("CreateSequenceOperation"));
+		if (appMsgOperationDesc != null) {
+			createSeqOperation.setPhasesOutFlow(appMsgOperationDesc
+					.getPhasesOutFlow());
+			createSeqOperation.setPhasesOutFaultFlow(appMsgOperationDesc
+					.getPhasesOutFaultFlow());
+			createSeqOperation.setPhasesInFaultFlow(appMsgOperationDesc
+					.getPhasesInFaultFlow());
+			createSeqOperation.setRemainingPhasesInFlow(appMsgOperationDesc
+					.getRemainingPhasesInFlow());
 		}
+
+		createSeqmsgContext.setAxisOperation(createSeqOperation);
 
 		createSeqmsgContext.setTo(applicationRMMsg.getTo());
 		createSeqmsgContext.setReplyTo(applicationRMMsg.getReplyTo());
@@ -189,14 +162,6 @@ public class RMMsgCreator {
 		EndpointReference replyToEPR = null;
 		EndpointReference acksToEPR = null;
 
-		//AcksTo value is replyto value (if set). Otherwise anonymous.
-		//		if (replyToBean==null || replyToBean.getValue()==null){
-		//			if (acksTo==null)
-		//			acksToEPR = new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS);
-		//		}else {
-		//			acksToEPR = (EndpointReference) replyToBean.getValue();
-		//		}
-
 		if (acksTo == null || "".equals(acksTo))
 			acksTo = Constants.WSA.NS_URI_ANONYMOUS;
 
@@ -227,16 +192,6 @@ public class RMMsgCreator {
 		createSeqRMMsg.setAction(Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE);
 		createSeqRMMsg
 				.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE);
-		createSeqRMMsg.setMessageId(createSeqMsgId);
-
-		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
-		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
-		createSeqMsg.setServiceGroupContext(applicationMsg
-				.getServiceGroupContext());
-		createSeqMsg.setServiceGroupContextId(applicationMsg
-				.getServiceGroupContextId());
-		createSeqMsg.setServiceContext(applicationMsg.getServiceContext());
-		createSeqMsg.setServiceContextID(applicationMsg.getServiceContextID());
 
 		return createSeqRMMsg;
 	}
@@ -249,10 +204,24 @@ public class RMMsgCreator {
 		if (referenceMessage == null)
 			throw new SandeshaException("MessageContext is null");
 
-		RMMsgContext terminateRMMessage = SandeshaUtil
-				.shallowCopy(referenceRMMessage);
-		MessageContext terminateMessage = terminateRMMessage
-				.getMessageContext();
+		AxisOperation terminateOperation = null;
+
+		try {
+			terminateOperation = AxisOperationFactory
+					.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_OUT_ONLY);
+		} catch (AxisFault e1) {
+			throw new SandeshaException(e1.getMessage());
+		}
+
+		if (terminateOperation == null)
+			throw new SandeshaException("Terminate Operation was null");
+
+		MessageContext terminateMessage = SandeshaUtil
+				.createNewRelatedMessageContext(referenceRMMessage,
+						terminateOperation);
+		RMMsgContext terminateRMMessage = MsgInitializer
+				.initializeMessage(terminateMessage);
+
 		if (terminateMessage == null)
 			throw new SandeshaException("MessageContext is null");
 
@@ -269,44 +238,14 @@ public class RMMsgCreator {
 		if (configCtx == null)
 			throw new SandeshaException("Configuration Context is null");
 
-		AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
-		AxisServiceGroup serviceGroup = new AxisServiceGroup(axisConfig);
-		AxisService service = new AxisService(new QName("RMClientService")); // This
-		// is a
-		// dummy
-		// service.
-		ServiceGroupContext serviceGroupContext = new ServiceGroupContext(
-				configCtx, serviceGroup);
-		ServiceContext serviceContext = new ServiceContext(service,
-				serviceGroupContext);
-
-		terminateMessage.setAxisServiceGroup(serviceGroup);
-		terminateMessage.setServiceGroupContext(serviceGroupContext);
-		terminateMessage.setAxisService(service);
-		terminateMessage.setServiceContext(serviceContext);
-
-		try {
-			AxisOperation terminateOperaiton = AxisOperationFactory
-					.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
-			AxisOperation referenceMsgOperation = referenceMessage
-					.getAxisOperation();
-			if (referenceMsgOperation != null) {
-				ArrayList outPhases = referenceMsgOperation.getPhasesOutFlow();
-				if (outPhases != null) {
-					terminateOperaiton.setPhasesOutFlow(outPhases);
-					terminateOperaiton.setPhasesOutFaultFlow(outPhases);
-				}
+		AxisOperation referenceMsgOperation = referenceMessage
+				.getAxisOperation();
+		if (referenceMsgOperation != null) {
+			ArrayList outPhases = referenceMsgOperation.getPhasesOutFlow();
+			if (outPhases != null) {
+				terminateOperation.setPhasesOutFlow(outPhases);
+				terminateOperation.setPhasesOutFaultFlow(outPhases);
 			}
-
-			OperationContext terminateOpContext = new OperationContext(
-					terminateOperaiton);
-			terminateMessage.setAxisOperation(terminateOperaiton);
-			terminateMessage.setOperationContext(terminateOpContext);
-			terminateOpContext.addMessageContext(terminateMessage);
-			terminateMessage.setOperationContext(terminateOpContext);
-
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
 		}
 
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
@@ -436,27 +375,17 @@ public class RMMsgCreator {
 		try {
 			MessageContext applicationMsgCtx = applicationRMMsgCtx
 					.getMessageContext();
+
+			AxisOperation ackOperation = AxisOperationFactory
+					.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_OUT_ONLY);
+
 			MessageContext ackMsgCtx = SandeshaUtil
-					.shallowCopy(applicationMsgCtx);
-			ackMsgCtx.setServiceGroupContext(applicationMsgCtx
-					.getServiceGroupContext());
-			ackMsgCtx.setServiceGroupContextId(applicationMsgCtx
-					.getServiceGroupContextId());
-			ackMsgCtx.setServiceContext(applicationMsgCtx.getServiceContext());
-			ackMsgCtx.setServiceContextID(applicationMsgCtx
-					.getServiceContextID());
-
-			RMMsgContext ackRMMsgCtx = new RMMsgContext(ackMsgCtx);
-
-			//TODO set a suitable description
-			OperationContext ackOpCtx = new OperationContext(applicationMsgCtx
-					.getAxisOperation());
-
-			ackMsgCtx.setOperationContext(ackOpCtx);
+					.createNewRelatedMessageContext(applicationRMMsgCtx,
+							ackOperation);
+			RMMsgContext ackRMMsgCtx = MsgInitializer
+					.initializeMessage(ackMsgCtx);
 
 			setUpMessage(ackMsgCtx);
-
-			ackOpCtx.addMessageContext(ackMsgCtx);
 
 			Sequence reqSequence = (Sequence) applicationRMMsgCtx
 					.getMessagePart(Constants.MessageParts.SEQUENCE);
@@ -472,4 +401,5 @@ public class RMMsgCreator {
 			throw new SandeshaException(e.getMessage());
 		}
 	}
+
 }

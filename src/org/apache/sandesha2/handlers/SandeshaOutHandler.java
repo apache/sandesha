@@ -314,44 +314,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 			if (rmMsgCtx.getMessageId() == null) {
 				rmMsgCtx.setMessageId(messageId1);
 			}
-			//OperationContext opCtx = msgCtx.getOperationContext();
-			//				msgCtx.getSystemContext().registerOperationContext(messageId,
-			//						opCtx);
 
 			if (serverSide) {
 
-				//FIXME - do not copy application messages. Coz u loose
-				// properties etc.
-				RMMsgContext newRMMsgCtx = SandeshaUtil.deepCopy(rmMsgCtx);
-				MessageContext newMsgCtx = newRMMsgCtx.getMessageContext();
-
-				//setting contexts
-				newMsgCtx.setServiceGroupContext(msgCtx
-						.getServiceGroupContext());
-				newMsgCtx.setServiceGroupContextId(msgCtx
-						.getServiceGroupContextId());
-				newMsgCtx.setServiceContext(msgCtx.getServiceContext());
-				newMsgCtx.setServiceContextID(msgCtx.getServiceContextID());
-				OperationContext newOpContext = new OperationContext(newMsgCtx
-						.getAxisOperation());
-
-				//if server side add request message
-				if (msgCtx.isServerSide()) {
-					MessageContext reqMsgCtx = msgCtx.getOperationContext()
-							.getMessageContext(
-									WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					newOpContext.addMessageContext(reqMsgCtx);
-				}
-
-				newOpContext.addMessageContext(newMsgCtx);
-				newMsgCtx.setOperationContext(newOpContext);
-
-				//Thid does not have to be processed again by RMHandlers
-				newMsgCtx.setProperty(Constants.APPLICATION_PROCESSING_DONE,
-						"true");
-
 				//processing the response
-				processResponseMessage(newRMMsgCtx, tempSequenceId,
+				processResponseMessage(rmMsgCtx, tempSequenceId,
 						messageNumber);
 
 				MessageContext reqMsgCtx = msgCtx
