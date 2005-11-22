@@ -18,8 +18,10 @@
 package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.MessageInformationHeaders;
@@ -27,12 +29,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisServiceGroup;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Constants;
@@ -353,13 +351,12 @@ public class RMMsgCreator {
 				Constants.SequenceProperties.RECEIVED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
 
-		AcknowledgementRange[] ackRangeArr = SandeshaUtil.getAckRangeArray(
-				msgNoList, factory);
-
-		int length = ackRangeArr.length;
-
-		for (int i = 0; i < length; i++)
-			sequenceAck.addAcknowledgementRanges(ackRangeArr[i]);
+		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(msgNoList,factory);
+		Iterator iterator = ackRangeArrayList.iterator();
+		while (iterator.hasNext()) {
+			AcknowledgementRange ackRange = (AcknowledgementRange) iterator.next();
+			sequenceAck.addAcknowledgementRanges(ackRange);
+		}
 
 		sequenceAck.toOMElement(envelope.getHeader());
 		applicationMsg

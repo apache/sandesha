@@ -22,19 +22,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.MessageInformationHeaders;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
@@ -43,13 +41,13 @@ import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.impl.llom.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
-import org.apache.commons.httpclient.NameValuePair;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaDynamicProperties;
@@ -80,86 +78,96 @@ public class SandeshaUtil {
 		return uuid;
 	}
 
-	public static AcknowledgementRange[] getAckRangeArray(String msgNoStr,
-			SOAPFactory factory) {
-		String[] msgNoStrs = msgNoStr.split(",");
-		long[] msgNos = getLongArr(msgNoStrs);
-
-		long[] sortedMsgNos = sort(msgNos);
-
-		int length = sortedMsgNos.length;
-		if (length == 0)
-			return null;
-		//for (int i=0;i<length;i++)
-		//	System.out.println (sortedMsgNos[i]);
+	public static ArrayList getAckRangeArrayList(String msgNoStr,
+			SOAPFactory factory) throws SandeshaException {
 
 		ArrayList ackRanges = new ArrayList();
-		// upper = 0;
-		long lower = sortedMsgNos[0];
-		//long max = sortedMsgNos[sortedMsgNos.length];
-		long temp = sortedMsgNos[0];
 
-		for (long i = 1; i < length; i++) {
-			int intI = (int) i;
-			if ((sortedMsgNos[intI] == (temp + 1))
-					|| (sortedMsgNos[intI] == (temp))) {
-				temp = sortedMsgNos[intI];
-				continue;
+		StringTokenizer tokenizer = new StringTokenizer(msgNoStr, ",");
+		ArrayList sortedMsgNoArrayList = getSortedMsgNoArrayList(tokenizer);
+
+		Iterator iterator = sortedMsgNoArrayList.iterator();
+		long lower = 0;
+		long upper = 0;
+		boolean completed = true;
+
+		while (iterator.hasNext()) {
+			Long tempLng = (Long) iterator.next();
+			long temp = tempLng.longValue();
+			if (lower == 0) {
+				lower = temp;
+				upper = temp;
+				completed = false;
+			} else if (temp == (upper + 1)) {
+				upper = temp;
+				completed = false;
+			} else {
+				//add ackRange (lower,upper)
+				AcknowledgementRange ackRange = new AcknowledgementRange(
+						factory);
+				ackRange.setLowerValue(lower);
+				ackRange.setUpperValue(upper);
+				ackRanges.add(ackRange);
+
+				lower = temp;
+				upper = temp;
+				completed = false;
 			}
+		}
 
+		if (!completed) {
 			AcknowledgementRange ackRange = new AcknowledgementRange(factory);
 			ackRange.setLowerValue(lower);
-			ackRange.setUpperValue(temp);
+			ackRange.setUpperValue(upper);
 			ackRanges.add(ackRange);
-
-			lower = sortedMsgNos[intI];
-			temp = sortedMsgNos[intI];
-
+			completed = true;
 		}
 
-		AcknowledgementRange ackRange = new AcknowledgementRange(factory);
-		ackRange.setLowerValue(lower);
-		ackRange.setUpperValue(temp);
-		ackRanges.add(ackRange);
-
-		Object[] objs = ackRanges.toArray();
-		int l = objs.length;
-		AcknowledgementRange[] ackRangeArr = new AcknowledgementRange[l];
-		for (int i = 0; i < l; i++)
-			ackRangeArr[i] = (AcknowledgementRange) objs[i];
-
-		return ackRangeArr;
+		return ackRanges;
 	}
 
-	//	TODO remove int from folowing methods. (to make them truly Long :) )
+	private static ArrayList getSortedMsgNoArrayList(StringTokenizer tokenizer)
+			throws SandeshaException {
+		ArrayList msgNubers = new ArrayList();
 
-	private static long[] sort(long[] input) {
-		int length = input.length;
+		while (tokenizer.hasMoreElements()) {
+			String temp = tokenizer.nextToken();
 
-		long temp = 0;
-		for (int i = 0; i < length; i++) {
-			temp = 0;
-			for (int j = i; j < length; j++) {
-				if (input[j] < input[i]) {
-					//swap
-					temp = input[i];
-					input[i] = input[j];
-					input[j] = temp;
-				}
+			try {
+				long msgNo = Long.parseLong(temp);
+				msgNubers.add(new Long(msgNo));
+			} catch (Exception ex) {
+				throw new SandeshaException("Invalid msg number list");
 			}
 		}
 
-		return input;
+		ArrayList sortedMsgNumberList = sort(msgNubers);
+		return sortedMsgNumberList;
 	}
 
-	public static long[] getLongArr(String[] strings) {
-		int length = strings.length;
-		long[] longs = new long[length];
-		for (int i = 0; i < length; i++) {
-			longs[i] = Long.parseLong(strings[i]);
+	public static ArrayList sort(ArrayList list) {
+
+		ArrayList sortedList = new ArrayList();
+
+		long max = 0;
+		Iterator it1 = list.iterator();
+		while (it1.hasNext()) {
+			Long tempLng = (Long) it1.next();
+			long temp = tempLng.longValue();
+			if (temp > max)
+				max = temp;
 		}
 
-		return longs;
+		int item = 0;
+		for (long i = 1; i <= max; i++) {
+			Long temp = new Long(i);
+			if (list.contains(temp)) {
+				sortedList.add(item, temp);
+				item++;
+			}
+		}
+
+		return sortedList;
 	}
 
 	public static String storeMessageContext(MessageContext ctx)
@@ -312,13 +320,13 @@ public class SandeshaUtil {
 
 	//TODO: correct following to work for long.
 	public static ArrayList getSplittedMsgNoArraylist(String str) {
-		String[] splitted = str.split(",");
+
+		StringTokenizer tokenizer = new StringTokenizer(str, ",");
+
 		ArrayList results = new ArrayList();
 
-		long count = splitted.length;
-		for (int i = 0; i < count; i++) {
-			String s = splitted[i];
-			results.add(s);
+		while (tokenizer.hasMoreTokens()) {
+			results.add(tokenizer.nextToken());
 		}
 
 		return results;
@@ -397,8 +405,14 @@ public class SandeshaUtil {
 
 		String action = msgCtx.getWSAAction();
 		SOAPEnvelope env = msgCtx.getEnvelope();
-		OMElement sequenceElem = env.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE));
+		SOAPHeader header = null;
+		if (env != null)
+			header = env.getHeader();
+
+		OMElement sequenceElem = null;
+		if (header != null)
+			sequenceElem = header.getFirstChildWithName(new QName(
+					Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE));
 
 		if (sequenceElem != null)
 			rmGlobalMsg = true;
@@ -441,18 +455,31 @@ public class SandeshaUtil {
 					.getSystemContext();
 			MessageContext newMessageContext = new MessageContext(configContext);
 
-			newMessageContext.setAxisServiceGroup(referenceMessage
-					.getAxisServiceGroup());
-			newMessageContext.setAxisService(referenceMessage.getAxisService());
+			if (referenceMessage.getAxisServiceGroup() != null) {
+				newMessageContext.setAxisServiceGroup(referenceMessage
+						.getAxisServiceGroup());
+			}
+
+			if (referenceMessage.getAxisService() != null) {
+				newMessageContext.setAxisService(referenceMessage
+						.getAxisService());
+			}
+
 			newMessageContext.setAxisOperation(operation);
-			newMessageContext.setServiceGroupContext(referenceMessage
-					.getServiceGroupContext());
-			newMessageContext.setServiceGroupContextId(referenceMessage
-					.getServiceGroupContextId());
-			newMessageContext.setServiceContext(referenceMessage
-					.getServiceContext());
-			newMessageContext.setServiceContextID(referenceMessage
-					.getServiceContextID());
+
+			if (referenceMessage.getServiceGroupContext() != null) {
+				newMessageContext.setServiceGroupContext(referenceMessage
+						.getServiceGroupContext());
+				newMessageContext.setServiceGroupContextId(referenceMessage
+						.getServiceGroupContextId());
+			}
+
+			if (referenceMessage.getServiceContext() != null) {
+				newMessageContext.setServiceContext(referenceMessage
+						.getServiceContext());
+				newMessageContext.setServiceContextID(referenceMessage
+						.getServiceContextID());
+			}
 
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);

@@ -18,6 +18,7 @@
 package org.apache.sandesha2.handlers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
@@ -149,9 +150,15 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					ArrayList msgNoArrList = SandeshaUtil
 							.getSplittedMsgNoArraylist(receivedMsgStr);
 
-					if (msgNoArrList.contains(new Long(msgNo).toString())) {
-						drop = true;
+					Iterator iterator = msgNoArrList.iterator();
+					while (iterator.hasNext()) {
+						String temp = (String) iterator.next();
+						String msgNoStr = new Long(msgNo).toString();
+						if (msgNoStr.equals(temp)) {
+							drop = true;
+						}
 					}
+					
 				}
 
 				if (drop == false) {
