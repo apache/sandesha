@@ -52,6 +52,7 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.StorageMapBean;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -390,7 +391,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
 					.getProperty(Constants.WSP.RM_POLICY_BEAN);
-			long ackInterval = Constants.WSP.ACKNOWLEDGEMENT_INTERVAL;
+			long ackInterval = PropertyManager.getInstance().getAcknowledgementInterval();
 			if (policyBean != null) {
 				ackInterval = policyBean.getAcknowledgementInaterval();
 			}

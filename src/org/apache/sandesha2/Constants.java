@@ -120,13 +120,13 @@ public interface Constants {
 	}
 
 	public interface WSP {
-		long RETRANSMISSION_INTERVAL = 20000;
-
-		long ACKNOWLEDGEMENT_INTERVAL = 4000;
-
-		boolean EXPONENTION_BACKOFF = true;
-
-		long INACTIVITY_TIMEOUT_INTERVAL = 5000000;
+//		long RETRANSMISSION_INTERVAL = 20000;
+//
+//		long ACKNOWLEDGEMENT_INTERVAL = 4000;
+//
+//		boolean EXPONENTION_BACKOFF = true;
+//
+//		long INACTIVITY_TIMEOUT_INTERVAL = 5000000;
 
 		String RM_POLICY_BEAN = "RMPolicyBean";
 	}
@@ -284,12 +284,43 @@ public interface Constants {
 		}
 	}
 
+	public interface Properties {
+		
+		String RetransmissionInterval = "RetransmissionInterval";
+		
+		String AcknowledgementInterval = "AcknowledgementInterval";
+		
+		String ExponentialBackoff = "ExponentialBackoff";
+		
+		String InactivityTimeout = "InactivityTimeout";
+		
+		String InactivityTimeoutMeasure = "InactivityTimeoutMeasure";
+		
+		String StorageManager = "StorageManager";
+		
+		public interface DefaultValues {
+			
+			int RetransmissionInterval = 10000;
+			
+			int AcknowledgementInterval = 4000;
+			
+			boolean ExponentialBackoff = true;
+			
+			int InactivityTimeout = -1;
+			
+			String InactivityTimeoutMeasure = "seconds";   //this can be - seconds,minutes,hours,days
+			
+			String StorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
+		}
+		
+	}
+	
 	//TODO remove following three
-	int STORAGE_TYPE_IN_MEMORY = 1;
+	//int STORAGE_TYPE_IN_MEMORY = 1;
 
-	int STORAGE_TYPE_PERSISTANCE = 2;
+	//int STORAGE_TYPE_PERSISTANCE = 2;
 
-	int DEFAULT_STORAGE_TYPE = STORAGE_TYPE_IN_MEMORY;
+	//int DEFAULT_STORAGE_TYPE = STORAGE_TYPE_IN_MEMORY;
 
 	String IN_HANDLER_NAME = "SandeshaInHandler";
 
@@ -329,5 +360,7 @@ public interface Constants {
 	String STORAGE_MANAGER_IMPL = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 
 	int MAXIMUM_RETRANSMISSION_ATTEMPTS = 5;
+	
+	String PROPERTY_FILE = "sandesha2.properties";
 
 }

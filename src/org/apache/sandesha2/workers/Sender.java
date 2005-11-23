@@ -108,6 +108,7 @@ public class Sender extends Thread {
 						}
 
 						try {
+							System.out.println("Sending message:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));
 							new AxisEngine(context).send(msgCtx);
 						} catch (Exception e) {
 							//Exception is sending. retry later

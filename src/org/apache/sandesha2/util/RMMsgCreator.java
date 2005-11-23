@@ -61,9 +61,8 @@ public class RMMsgCreator {
 
 	private static void setUpMessage(MessageContext rmMsgCtx) {
 		//Seting RMPolicyBean
-		RMPolicyBean policyBean = new RMPolicyBean();
-		rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN, policyBean);
-
+		if (rmMsgCtx.getProperty(Constants.WSP.RM_POLICY_BEAN)==null)
+			rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN, PropertyManager.getInstance().getRMPolicyBean());
 	}
 
 	public static RMMsgContext createCreateSeqMsg(

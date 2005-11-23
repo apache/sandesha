@@ -45,7 +45,8 @@ public class MessageRetransmissionAdjuster {
 		RMPolicyBean policyBean = (RMPolicyBean) messageContext
 				.getProperty(Constants.WSP.RM_POLICY_BEAN);
 		if (policyBean == null) {
-			policyBean = new SandeshaDynamicProperties().getPolicyBean();
+			//loading default policies.
+			policyBean = PropertyManager.getInstance().getRMPolicyBean();
 		}
 
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);

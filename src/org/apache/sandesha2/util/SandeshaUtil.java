@@ -32,7 +32,12 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisServiceGroup;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
@@ -453,33 +458,57 @@ public class SandeshaUtil {
 					.getMessageContext();
 			ConfigurationContext configContext = referenceMessage
 					.getSystemContext();
+			AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
+			
 			MessageContext newMessageContext = new MessageContext(configContext);
 
 			if (referenceMessage.getAxisServiceGroup() != null) {
 				newMessageContext.setAxisServiceGroup(referenceMessage
 						.getAxisServiceGroup());
+				newMessageContext.setServiceGroupContext(referenceMessage
+						.getServiceGroupContext());
+				newMessageContext.setServiceGroupContextId(referenceMessage
+						.getServiceGroupContextId());
+			} else {
+				AxisServiceGroup axisServiceGroup = new AxisServiceGroup (axisConfiguration);
+				ServiceGroupContext serviceGroupContext = new ServiceGroupContext (configContext,axisServiceGroup);
+				
+				newMessageContext.setAxisServiceGroup(axisServiceGroup);
+				newMessageContext.setServiceGroupContext (serviceGroupContext);
 			}
 
 			if (referenceMessage.getAxisService() != null) {
 				newMessageContext.setAxisService(referenceMessage
 						.getAxisService());
-			}
-
-			newMessageContext.setAxisOperation(operation);
-
-			if (referenceMessage.getServiceGroupContext() != null) {
-				newMessageContext.setServiceGroupContext(referenceMessage
-						.getServiceGroupContext());
-				newMessageContext.setServiceGroupContextId(referenceMessage
-						.getServiceGroupContextId());
-			}
-
-			if (referenceMessage.getServiceContext() != null) {
 				newMessageContext.setServiceContext(referenceMessage
 						.getServiceContext());
 				newMessageContext.setServiceContextID(referenceMessage
 						.getServiceContextID());
+			} else {
+				AxisService axisService = new AxisService (new QName ("AnonymousRMService")); //just a dummy name.
+				ServiceContext serviceContext = new ServiceContext (axisService,newMessageContext.getServiceGroupContext());
+				
+				newMessageContext.setAxisService(axisService);
+				newMessageContext.setServiceContext(serviceContext);
 			}
+
+			newMessageContext.setAxisOperation(operation);
+
+//			if (referenceMessage.getServiceGroupContext() != null) {
+//				newMessageContext.setServiceGroupContext(referenceMessage
+//						.getServiceGroupContext());
+//				newMessageContext.setServiceGroupContextId(referenceMessage
+//						.getServiceGroupContextId());
+//			}
+//
+//			if (referenceMessage.getServiceContext() != null) {
+//				newMessageContext.setServiceContext(referenceMessage
+//						.getServiceContext());
+//				newMessageContext.setServiceContextID(referenceMessage
+//						.getServiceContextID());
+//			} else {
+//				
+//			}
 
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);
@@ -501,6 +530,9 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
 					referenceMessage
 							.getProperty(HTTPConstants.HTTPOutTransportInfo));
+			newMessageContext.setProperty(Constants.WSP.RM_POLICY_BEAN,
+					referenceMessage
+					.getProperty(Constants.WSP.RM_POLICY_BEAN));
 
 			return newMessageContext;
 

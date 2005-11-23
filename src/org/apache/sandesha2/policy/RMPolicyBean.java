@@ -25,10 +25,10 @@ package org.apache.sandesha2.policy;
 import org.apache.sandesha2.Constants;
 
 public class RMPolicyBean {
-    private long inactiveTimeoutInterval = Constants.WSP.INACTIVITY_TIMEOUT_INTERVAL;
-    private long acknowledgementInterval = Constants.WSP.ACKNOWLEDGEMENT_INTERVAL;
-    private long retransmissionInterval = Constants.WSP.RETRANSMISSION_INTERVAL;
-    private boolean exponentialBackoff = Constants.WSP.EXPONENTION_BACKOFF;
+    private long inactiveTimeoutInterval;
+    private long acknowledgementInterval;
+    private long retransmissionInterval;
+    private boolean exponentialBackoff;
     
     public RMPolicyBean () {
     	loadValuesFromPropertyFile ();

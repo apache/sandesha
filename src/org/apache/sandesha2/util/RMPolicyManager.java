@@ -28,7 +28,9 @@ import org.apache.sandesha2.policy.RMPolicyBean;
 public class RMPolicyManager {
 
 	public static RMPolicyBean getPolicyBean(RMMsgContext msgContext) {
-		RMPolicyBean policyBean = new RMPolicyBean();
+		//TODO extract policies from the msgCtx.
+		
+		RMPolicyBean policyBean = PropertyManager.getInstance().getRMPolicyBean();
 		return policyBean;
 	}
 }
