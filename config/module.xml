@@ -15,15 +15,20 @@
         </handler>   
     </outflow>
 
-<!--
+
     <operation name="RMInOnlyOperation" mep="http://www.w3.org/2004/08/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</parameter>
+        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</parameter>
         <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse</parameter>
+    </operation>
+ 
+     <operation name="RMInOutOperation" mep="http://www.w3.org/2004/08/wsdl/in-out">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
     </operation>
- -->
     
+    <!--
      <operation name="RMInOnlyOperation1" mep="http://www.w3.org/2004/08/wsdl/in-only">
      	 <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
          <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</parameter>
@@ -45,7 +50,7 @@
          <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
          <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
     </operation>  
-   
+   -->
 <!--
     <operation name="TerminateSequence" mep="http://www.w3.org/2004/08/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
