@@ -100,7 +100,7 @@ public class SequenceManager {
 	}
 
 	public static void setupNewClientSequence(
-			MessageContext firstAplicationMsgCtx, String tempSequenceId)
+			MessageContext firstAplicationMsgCtx, String iternalSequenceId)
 			throws SandeshaException {
 
 		AbstractContext context = firstAplicationMsgCtx.getSystemContext();
@@ -120,7 +120,7 @@ public class SequenceManager {
 		if (toEPR == null)
 			throw new SandeshaException("WS-Addressing To is null");
 
-		SequencePropertyBean toBean = new SequencePropertyBean(tempSequenceId,
+		SequencePropertyBean toBean = new SequencePropertyBean(iternalSequenceId,
 				Constants.SequenceProperties.TO_EPR, toEPR);
 
 		//Default value for acksTo is anonymous
@@ -129,7 +129,7 @@ public class SequenceManager {
 
 		EndpointReference acksToEPR = new EndpointReference(acksTo);
 		SequencePropertyBean acksToBean = new SequencePropertyBean(
-				tempSequenceId, Constants.SequenceProperties.ACKS_TO_EPR,
+				iternalSequenceId, Constants.SequenceProperties.ACKS_TO_EPR,
 				acksToEPR);
 
 		//		//TODO - make default for replyTo anonymous

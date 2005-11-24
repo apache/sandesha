@@ -44,13 +44,13 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -152,7 +152,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (bean == null)
 			throw new SandeshaException("Error- The sequence does not exist");
 
-		StorageMapBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
+		InvokerBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
@@ -196,7 +196,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				try {
 					String key = SandeshaUtil.storeMessageContext(rmMsgCtx
 							.getMessageContext());
-					storageMapMgr.insert(new StorageMapBean(key, msgNo,
+					storageMapMgr.insert(new InvokerBean(key, msgNo,
 							sequenceId));
 
 					//This will avoid performing application processing more
@@ -373,21 +373,21 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//rmMsgCtx.getMessageContext().getOperationContext().setProperty(
 			//	org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 
-			RetransmitterBeanMgr retransmitterBeanMgr = storageManager
+			SenderBeanMgr retransmitterBeanMgr = storageManager
 					.getRetransmitterBeanMgr();
 
 			String key = SandeshaUtil.storeMessageContext(ackMsgCtx);
-			RetransmitterBean ackBean = new RetransmitterBean();
+			SenderBean ackBean = new SenderBean();
 			ackBean.setKey(key);
 			ackBean.setMessageId(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
 			ackBean.setSend(true);
 			ackBean.setMessagetype(Constants.MessageTypes.ACK);
 
-			//the tempSequenceId value of the retransmitter Table for the
+			//the internalSequenceId value of the retransmitter Table for the
 			// messages related to an incoming
 			//sequence is the actual sequence ID - TODO document this.
-			ackBean.setTempSequenceId(sequenceId);
+			ackBean.setInternalSequenceId(sequenceId);
 
 			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
 					.getProperty(Constants.WSP.RM_POLICY_BEAN);
@@ -402,13 +402,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			ackBean.setTimeToSend(timeToSend);
 
 			//removing old acks.
-			RetransmitterBean findBean = new RetransmitterBean();
+			SenderBean findBean = new SenderBean();
 			findBean.setMessagetype(Constants.MessageTypes.ACK);
-			findBean.setTempSequenceId(sequenceId);
+			findBean.setInternalSequenceId(sequenceId);
 			Collection coll = retransmitterBeanMgr.find(findBean);
 			Iterator it = coll.iterator();
 			while (it.hasNext()) {
-				RetransmitterBean retransmitterBean = (RetransmitterBean) it
+				SenderBean retransmitterBean = (SenderBean) it
 						.next();
 				retransmitterBeanMgr.delete(retransmitterBean.getMessageId());
 			}

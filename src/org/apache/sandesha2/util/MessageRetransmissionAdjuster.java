@@ -21,7 +21,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.policy.RMPolicyBean;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -29,8 +29,8 @@ import org.apache.sandesha2.storage.beans.RetransmitterBean;
 
 public class MessageRetransmissionAdjuster {
 
-	public RetransmitterBean adjustRetransmittion(
-			RetransmitterBean retransmitterBean) {
+	public SenderBean adjustRetransmittion(
+			SenderBean retransmitterBean) {
 		String storedKey = (String) retransmitterBean.getKey();
 
 		if (storedKey == null)
@@ -58,8 +58,8 @@ public class MessageRetransmissionAdjuster {
 		return retransmitterBean;
 	}
 
-	private RetransmitterBean adjustNextRetransmissionTime(
-			RetransmitterBean retransmitterBean, RMPolicyBean policyBean) {
+	private SenderBean adjustNextRetransmissionTime(
+			SenderBean retransmitterBean, RMPolicyBean policyBean) {
 
 		long lastSentTime = retransmitterBean.getTimeToSend();
 
@@ -78,7 +78,7 @@ public class MessageRetransmissionAdjuster {
 		return retransmitterBean;
 	}
 
-	private void stopRetransmission(RetransmitterBean bean) {
+	private void stopRetransmission(SenderBean bean) {
 		bean.setReSend(false);
 	}
 

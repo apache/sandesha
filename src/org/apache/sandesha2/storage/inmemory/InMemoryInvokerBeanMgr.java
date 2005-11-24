@@ -23,21 +23,21 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
-import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class InMemoryStorageMapBeanMgr implements StorageMapBeanMgr {
+public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 	private Hashtable table = null;
 
 	/**
 	 *  
 	 */
-	public InMemoryStorageMapBeanMgr(AbstractContext context) {
+	public InMemoryInvokerBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.BeanMAPs.STORAGE_MAP);
 		if (obj != null) {
 			table = (Hashtable) obj;
@@ -47,7 +47,7 @@ public class InMemoryStorageMapBeanMgr implements StorageMapBeanMgr {
 		}
 	}
 
-	public boolean insert(StorageMapBean bean) {
+	public boolean insert(InvokerBean bean) {
 		table.put(bean.getKey(), bean);
 		return true;
 	}
@@ -56,21 +56,21 @@ public class InMemoryStorageMapBeanMgr implements StorageMapBeanMgr {
 		return table.remove(key) != null;
 	}
 
-	public StorageMapBean retrieve(String key) {
-		return (StorageMapBean) table.get(key);
+	public InvokerBean retrieve(String key) {
+		return (InvokerBean) table.get(key);
 	}
 
 	public ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not implemented");
 	}
 
-	public Collection find(StorageMapBean bean) {
+	public Collection find(InvokerBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 
-		StorageMapBean temp = new StorageMapBean();
+		InvokerBean temp = new InvokerBean();
 		while (iterator.hasNext()) {
-			temp = (StorageMapBean) iterator.next();
+			temp = (InvokerBean) iterator.next();
 			boolean select = true;
 			/*
 			 * if ((temp.getKey() != null &&
@@ -96,7 +96,7 @@ public class InMemoryStorageMapBeanMgr implements StorageMapBeanMgr {
 		return beans;
 	}
 
-	public boolean update(StorageMapBean bean) {
+	public boolean update(InvokerBean bean) {
 		if (!table.contains(bean))
 			return false;
 

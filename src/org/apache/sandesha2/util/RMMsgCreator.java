@@ -66,7 +66,7 @@ public class RMMsgCreator {
 	}
 
 	public static RMMsgContext createCreateSeqMsg(
-			RMMsgContext applicationRMMsg, String tempSequenceId, String acksTo)
+			RMMsgContext applicationRMMsg, String internalSequenceId, String acksTo)
 			throws SandeshaException {
 
 		MessageContext applicationMsgContext = applicationRMMsg
@@ -147,9 +147,9 @@ public class RMMsgCreator {
 		}
 
 		//TODO decide - where to send create seq. Acksto or replyTo
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(tempSequenceId,
+		SequencePropertyBean replyToBean = seqPropMgr.retrieve(internalSequenceId,
 				Constants.SequenceProperties.REPLY_TO_EPR);
-		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,
+		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
 				Constants.SequenceProperties.TO_EPR);
 
 		if (toBean == null || toBean.getValue() == null)

@@ -20,9 +20,9 @@ package org.apache.sandesha2.storage;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -52,10 +52,10 @@ public abstract class StorageManager {
 
 	public abstract NextMsgBeanMgr getNextMsgBeanMgr();
 
-	public abstract RetransmitterBeanMgr getRetransmitterBeanMgr();
+	public abstract SenderBeanMgr getRetransmitterBeanMgr();
 
 	public abstract SequencePropertyBeanMgr getSequencePropretyBeanMgr();
 
-	public abstract StorageMapBeanMgr getStorageMapBeanMgr();
+	public abstract InvokerBeanMgr getStorageMapBeanMgr();
 
 }

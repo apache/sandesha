@@ -100,9 +100,9 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 					&& !bean.getSequenceId().equals(temp.getSequenceId()))
 				equal = false;
 
-			if (bean.getTempSequenceId() != null
-					&& !bean.getTempSequenceId().equals(
-							temp.getTempSequenceId()))
+			if (bean.getInternalSequenceId() != null
+					&& !bean.getInternalSequenceId().equals(
+							temp.getInternalSequenceId()))
 				equal = false;
 
 			if (equal)

@@ -31,10 +31,10 @@ import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -84,7 +84,7 @@ public class InOrderInvoker extends Thread {
 						.getSandeshaStorageManager(context);
 				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 
-				StorageMapBeanMgr storageMapMgr = storageManager
+				InvokerBeanMgr storageMapMgr = storageManager
 						.getStorageMapBeanMgr();
 
 				SequencePropertyBeanMgr sequencePropMgr = storageManager
@@ -117,12 +117,12 @@ public class InOrderInvoker extends Thread {
 								"Invalid messaage number for the nextMsgNo");
 
 					Iterator stMapIt = storageMapMgr.find(
-							new StorageMapBean(null, nextMsgno, sequenceId))
+							new InvokerBean(null, nextMsgno, sequenceId))
 							.iterator();
 
 					while (stMapIt.hasNext()) {
 
-						StorageMapBean stMapBean = (StorageMapBean) stMapIt
+						InvokerBean stMapBean = (InvokerBean) stMapIt
 								.next();
 						String key = stMapBean.getKey();
 
@@ -167,7 +167,7 @@ public class InOrderInvoker extends Thread {
 						nextMsgno++;
 						stMapIt = storageMapMgr
 								.find(
-										new StorageMapBean(null, nextMsgno,
+										new InvokerBean(null, nextMsgno,
 												sequenceId)).iterator();
 
 						//terminate (AfterInvocation)

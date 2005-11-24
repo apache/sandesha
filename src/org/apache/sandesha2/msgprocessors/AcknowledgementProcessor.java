@@ -27,9 +27,9 @@ import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -57,7 +57,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
 						.getSystemContext());
-		RetransmitterBeanMgr retransmitterMgr = storageManager
+		SenderBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
@@ -70,13 +70,13 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		if (outSequenceId == null || "".equals(outSequenceId))
 			throw new SandeshaException("OutSequenceId is null");
 
-		SequencePropertyBean tempSequenceBean = seqPropMgr.retrieve(
-				outSequenceId, Constants.SequenceProperties.TEMP_SEQUENCE_ID);
+		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(
+				outSequenceId, Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 
-		if (tempSequenceBean == null || tempSequenceBean.getValue() == null)
+		if (internalSequenceBean == null || internalSequenceBean.getValue() == null)
 			throw new SandeshaException("TempSequenceId is not set correctly");
 
-		String tempSequenceId = (String) tempSequenceBean.getValue();
+		String internalSequenceId = (String) internalSequenceBean.getValue();
 
 		//Following happens in the SandeshaGlobal handler
 		rmMsgCtx.getMessageContext()
@@ -91,8 +91,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.ACK)
 			rmMsgCtx.setRelatesTo(null);
 
-		RetransmitterBean input = new RetransmitterBean();
-		input.setTempSequenceId(tempSequenceId);
+		SenderBean input = new SenderBean();
+		input.setInternalSequenceId(internalSequenceId);
 		Collection retransmitterEntriesOfSequence = retransmitterMgr
 				.find(input);
 
@@ -104,7 +104,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			long upper = ackRange.getUpperValue();
 
 			for (long messageNo = lower; messageNo <= upper; messageNo++) {
-				RetransmitterBean retransmitterBean = getRetransmitterEntry(
+				SenderBean retransmitterBean = getRetransmitterEntry(
 						retransmitterEntriesOfSequence, messageNo);
 				if (retransmitterBean != null)
 					retransmitterMgr.delete(retransmitterBean.getMessageId());
@@ -124,7 +124,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//If all messages up to last message have been acknowledged.
 		//Add terminate Sequence message.
 		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
-				tempSequenceId, Constants.SequenceProperties.LAST_OUT_MESSAGE);
+				internalSequenceId, Constants.SequenceProperties.LAST_OUT_MESSAGE);
 		if (lastOutMsgBean != null) {
 			Long lastOutMsgNoLng = (Long) lastOutMsgBean.getValue();
 			if (lastOutMsgNoLng == null)
@@ -142,7 +142,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 			if (complete) {
 				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,
-						tempSequenceId);
+						internalSequenceId);
 			}
 
 			//stopping the progress of the message further.
@@ -154,11 +154,11 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 	}
 
-	private RetransmitterBean getRetransmitterEntry(Collection collection,
+	private SenderBean getRetransmitterEntry(Collection collection,
 			long msgNo) {
 		Iterator it = collection.iterator();
 		while (it.hasNext()) {
-			RetransmitterBean bean = (RetransmitterBean) it.next();
+			SenderBean bean = (SenderBean) it.next();
 			if (bean.getMessageNumber() == msgNo)
 				return bean;
 		}
@@ -167,7 +167,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 	}
 
 	public void addTerminateSequenceMessage(RMMsgContext incomingAckRMMsg,
-			String outSequenceId, String tempSequenceId)
+			String outSequenceId, String internalSequenceId)
 			throws SandeshaException {
 
 		StorageManager storageManager = SandeshaUtil
@@ -190,8 +190,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
 
 		//SequencePropertyBean replyToBean =
-		// seqPropMgr.retrieve(tempSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
-		SequencePropertyBean toBean = seqPropMgr.retrieve(tempSequenceId,
+		// seqPropMgr.retrieve(internalSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
+		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
 				Constants.SequenceProperties.TO_EPR);
 
 		EndpointReference toEPR = (EndpointReference) toBean.getValue();
@@ -218,7 +218,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		String key = SandeshaUtil.storeMessageContext(terminateRMMessage
 				.getMessageContext());
-		RetransmitterBean terminateBean = new RetransmitterBean();
+		SenderBean terminateBean = new SenderBean();
 		terminateBean.setKey(key);
 
 		//Set a retransmitter lastSentTime so that terminate will be send with
@@ -232,7 +232,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateBean.setSend(true);
 		terminateBean.setReSend(false);
 
-		RetransmitterBeanMgr retramsmitterMgr = storageManager
+		SenderBeanMgr retramsmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();

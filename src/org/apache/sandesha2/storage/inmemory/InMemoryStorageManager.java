@@ -22,9 +22,9 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -51,16 +51,16 @@ public class InMemoryStorageManager extends StorageManager {
 		return new InMemoryNextMsgBeanMgr(getContext());
 	}
 
-	public RetransmitterBeanMgr getRetransmitterBeanMgr() {
-		return new InMemoryRetransmitterBeanMgr(getContext());
+	public SenderBeanMgr getRetransmitterBeanMgr() {
+		return new InMemorySenderBeanMgr(getContext());
 	}
 
 	public SequencePropertyBeanMgr getSequencePropretyBeanMgr() {
 		return new InMemorySequencePropertyBeanMgr(getContext());
 	}
 
-	public StorageMapBeanMgr getStorageMapBeanMgr() {
-		return new InMemoryStorageMapBeanMgr(getContext());
+	public InvokerBeanMgr getStorageMapBeanMgr() {
+		return new InMemoryInvokerBeanMgr(getContext());
 	}
 
 	//	public static StorageManager getBeanMgrFactory (int storageType)

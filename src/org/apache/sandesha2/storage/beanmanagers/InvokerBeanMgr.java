@@ -19,28 +19,25 @@ package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
 import java.util.Collection;
-import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public interface RetransmitterBeanMgr extends RMBeanManager {
+public interface InvokerBeanMgr extends RMBeanManager {
 
-	public boolean delete(String MessageId);
+	public boolean insert(InvokerBean bean);
 
-	public RetransmitterBean retrieve(String MessageId);
+	public boolean delete(String key);
 
-	public boolean insert(RetransmitterBean bean) throws SandeshaException;
+	public InvokerBean retrieve(String key);
 
 	public ResultSet find(String query);
 
-	public Collection find(RetransmitterBean bean);
+	public Collection find(InvokerBean bean);
 
-	public Collection findMsgsToSend();
-
-	public boolean update(RetransmitterBean bean);
+	public boolean update(InvokerBean bean);
 
 }

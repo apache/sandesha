@@ -15,29 +15,8 @@
  *
  */
 
-package org.apache.sandesha2.storage.beanmanagers;
+package org.apache.sandesha2.storage.persistent;
 
-import java.sql.ResultSet;
-import java.util.Collection;
-import org.apache.sandesha2.storage.beans.StorageMapBean;
-
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- */
-
-public interface StorageMapBeanMgr extends RMBeanManager {
-
-	public boolean insert(StorageMapBean bean);
-
-	public boolean delete(String key);
-
-	public StorageMapBean retrieve(String key);
-
-	public ResultSet find(String query);
-
-	public Collection find(StorageMapBean bean);
-
-	public boolean update(StorageMapBean bean);
+public class PersistentInvokerBeanMgr {
 
 }

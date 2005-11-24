@@ -93,7 +93,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				String outSequenceId = offer.getIdentifer().getIdentifier();
 				CreateSeqBean createSeqBean = new CreateSeqBean();
 				createSeqBean.setSequenceId(outSequenceId);
-				createSeqBean.setTempSequenceId(newSequenceId);
+				createSeqBean.setInternalSequenceId(newSequenceId);
 				createSeqBean.setCreateSeqMsgId(SandeshaUtil.getUUID()); //this
 				// is a
 				// dummy
@@ -115,17 +115,17 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				seqPropMgr.insert(outSequenceBean);
 
 				//Temp sequence id should be set for the server side.
-				//If temp sequence id is not set. this implies server side.
-				SequencePropertyBean tempSeqBean = seqPropMgr.retrieve(
+				//If internal sequence id is not set. this implies server side.
+				SequencePropertyBean internalSeqBean = seqPropMgr.retrieve(
 						outSequenceId,
-						Constants.SequenceProperties.TEMP_SEQUENCE_ID);
-				if (tempSeqBean == null) {
-					SequencePropertyBean tempSequenceBean = new SequencePropertyBean();
-					tempSequenceBean
-							.setName(Constants.SequenceProperties.TEMP_SEQUENCE_ID);
-					tempSequenceBean.setSequenceId(outSequenceId);
-					tempSequenceBean.setValue(newSequenceId);
-					seqPropMgr.insert(tempSequenceBean);
+						Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+				if (internalSeqBean == null) {
+					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
+					internalSequenceBean
+							.setName(Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+					internalSequenceBean.setSequenceId(outSequenceId);
+					internalSequenceBean.setValue(newSequenceId);
+					seqPropMgr.insert(internalSequenceBean);
 				}
 
 			}

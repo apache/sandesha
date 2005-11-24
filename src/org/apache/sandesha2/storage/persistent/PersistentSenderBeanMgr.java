@@ -17,6 +17,6 @@
 
 package org.apache.sandesha2.storage.persistent;
 
-public class PersistentRetransmitterBeanMgr {
+public class PersistentSenderBeanMgr {
 
 }

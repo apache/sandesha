@@ -23,9 +23,9 @@ import java.util.Iterator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -44,12 +44,12 @@ public class AcknowledgementManager {
 				.getMessageContext().getSystemContext();
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(configurationContext);
-		RetransmitterBeanMgr retransmitterBeanMgr = storageManager
+		SenderBeanMgr retransmitterBeanMgr = storageManager
 				.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
-		RetransmitterBean findBean = new RetransmitterBean();
+		SenderBean findBean = new SenderBean();
 
 		Sequence sequence = (Sequence) applicationRMMsgContext
 				.getMessagePart(Constants.MessageParts.SEQUENCE);
@@ -59,21 +59,21 @@ public class AcknowledgementManager {
 
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 
-		SequencePropertyBean tempSequenceBean = sequencePropertyBeanMgr
+		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr
 				.retrieve(sequenceId,
-						Constants.SequenceProperties.TEMP_SEQUENCE_ID);
-		if (tempSequenceBean == null)
+						Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		if (internalSequenceBean == null)
 			throw new SandeshaException("Temp Sequence is not set");
 
-		String tempSequenceId = (String) tempSequenceBean.getValue();
-		findBean.setTempSequenceId(tempSequenceId);
+		String internalSequenceId = (String) internalSequenceBean.getValue();
+		findBean.setInternalSequenceId(internalSequenceId);
 		findBean.setMessagetype(Constants.MessageTypes.ACK);
 
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		Iterator it = collection.iterator();
 
 		if (it.hasNext()) {
-			RetransmitterBean ackBean = (RetransmitterBean) it.next();
+			SenderBean ackBean = (SenderBean) it.next();
 
 			//deleting the ack entry.
 			retransmitterBeanMgr.delete(ackBean.getMessageId());

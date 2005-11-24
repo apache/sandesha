@@ -22,7 +22,7 @@ package org.apache.sandesha2.storage.beans;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class StorageMapBean implements RMBean {
+public class InvokerBean implements RMBean {
 
 	private String Key;
 
@@ -32,11 +32,11 @@ public class StorageMapBean implements RMBean {
 	
 	private boolean invoked = false;
 
-	public StorageMapBean() {
+	public InvokerBean() {
 
 	}
 
-	public StorageMapBean(String key, long msgNo, String sequenceId) {
+	public InvokerBean(String key, long msgNo, String sequenceId) {
 		this.Key = key;
 		this.MsgNo = msgNo;
 		this.sequenceId = sequenceId;

@@ -23,11 +23,11 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -85,7 +85,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(configCtx);
 
-		RetransmitterBeanMgr retransmitterMgr = storageManager
+		SenderBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
@@ -93,8 +93,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		if (createSeqBean == null)
 			throw new SandeshaException("Create Sequence entry is not found");
 
-		String tempSequenceId = createSeqBean.getTempSequenceId();
-		if (tempSequenceId == null || "".equals(tempSequenceId))
+		String internalSequenceId = createSeqBean.getInternalSequenceId();
+		if (internalSequenceId == null || "".equals(internalSequenceId))
 			throw new SandeshaException("TempSequenceId has is not set");
 
 		//deleting the create sequence entry.
@@ -104,20 +104,20 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr sequencePropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 		SequencePropertyBean outSequenceBean = new SequencePropertyBean(
-				tempSequenceId, Constants.SequenceProperties.OUT_SEQUENCE_ID,
+				internalSequenceId, Constants.SequenceProperties.OUT_SEQUENCE_ID,
 				newOutSequenceId);
-		SequencePropertyBean tempSequenceBean = new SequencePropertyBean(
+		SequencePropertyBean internalSequenceBean = new SequencePropertyBean(
 				newOutSequenceId,
-				Constants.SequenceProperties.TEMP_SEQUENCE_ID, tempSequenceId);
+				Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, internalSequenceId);
 		sequencePropMgr.insert(outSequenceBean);
-		sequencePropMgr.insert(tempSequenceBean);
+		sequencePropMgr.insert(internalSequenceBean);
 
 		//processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();
 		if (accept != null) {
-			//Find offered sequence from temp sequence id.
+			//Find offered sequence from internal sequence id.
 			SequencePropertyBean offeredSequenceBean = sequencePropMgr
-					.retrieve(tempSequenceId,
+					.retrieve(internalSequenceId,
 							Constants.SequenceProperties.OFFERED_SEQUENCE);
 
 			//TODO this should be detected in the Fault manager.
@@ -144,12 +144,12 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			nextMsgMgr.insert(nextMsgBean);
 		}
 
-		RetransmitterBean target = new RetransmitterBean();
-		target.setTempSequenceId(tempSequenceId);
+		SenderBean target = new SenderBean();
+		target.setInternalSequenceId(internalSequenceId);
 
 		Iterator iterator = retransmitterMgr.find(target).iterator();
 		while (iterator.hasNext()) {
-			RetransmitterBean tempBean = (RetransmitterBean) iterator.next();
+			SenderBean tempBean = (SenderBean) iterator.next();
 
 			//updating the application message
 			String key = tempBean.getKey();

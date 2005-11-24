@@ -22,7 +22,7 @@ package org.apache.sandesha2.storage.beans;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class RetransmitterBean implements RMBean {
+public class SenderBean implements RMBean {
 
 	private String messageId;
 
@@ -32,7 +32,7 @@ public class RetransmitterBean implements RMBean {
 
 	private boolean Send;
 
-	private String tempSequenceId;
+	private String internalSequenceId;
 
 	private int sentCount = 0;
 
@@ -44,18 +44,18 @@ public class RetransmitterBean implements RMBean {
 	
 	private int messagetype =0;
 	
-	public RetransmitterBean() {
+	public SenderBean() {
 
 	}
 
-	public RetransmitterBean(String messageId, String key,
-			boolean send,long timeToSend, String tempSequenceId, long messageNumber) {
+	public SenderBean(String messageId, String key,
+			boolean send,long timeToSend, String internalSequenceId, long messageNumber) {
 		this.messageId = messageId;
 		this.key = key;
 		//this.LastSentTime = lastSentTime;
 		this.timeToSend = timeToSend;
 		this.Send = send;
-		this.tempSequenceId = tempSequenceId;
+		this.internalSequenceId = internalSequenceId;
 		this.messageNumber = messageNumber;
 	}
 
@@ -91,12 +91,12 @@ public class RetransmitterBean implements RMBean {
 		this.Send = send;
 	}
 
-	public String getTempSequenceId() {
-		return tempSequenceId;
+	public String getInternalSequenceId() {
+		return internalSequenceId;
 	}
 
-	public void setTempSequenceId(String tempSequenceId) {
-		this.tempSequenceId = tempSequenceId;
+	public void setInternalSequenceId(String internalSequenceId) {
+		this.internalSequenceId = internalSequenceId;
 	}
 
 	public int getSentCount() {

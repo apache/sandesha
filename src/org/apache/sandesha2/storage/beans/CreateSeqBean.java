@@ -23,7 +23,7 @@ package org.apache.sandesha2.storage.beans;
  */
 
 public class CreateSeqBean implements RMBean {
-	private String tempSequenceId;
+	private String internalSequenceId;
 
 	private String CreateSeqMsgId;
 
@@ -33,9 +33,9 @@ public class CreateSeqBean implements RMBean {
 
 	}
 
-	public CreateSeqBean(String tempSeqId, String CreateSeqMsgId,
+	public CreateSeqBean(String internalSeqId, String CreateSeqMsgId,
 			String sequenceId) {
-		this.tempSequenceId = tempSeqId;
+		this.internalSequenceId = internalSeqId;
 		this.CreateSeqMsgId = CreateSeqMsgId;
 		this.SequenceId = sequenceId;
 	}
@@ -70,12 +70,12 @@ public class CreateSeqBean implements RMBean {
 		SequenceId = sequenceId;
 	}
 
-	public String getTempSequenceId() {
-		return tempSequenceId;
+	public String getInternalSequenceId() {
+		return internalSequenceId;
 	}
 
-	public void setTempSequenceId(String tempSequenceId) {
-		this.tempSequenceId = tempSequenceId;
+	public void setInternalSequenceId(String internalSequenceId) {
+		this.internalSequenceId = internalSequenceId;
 	}
 
 }

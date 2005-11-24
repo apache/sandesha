@@ -185,7 +185,7 @@ public interface Constants {
 		//FIXME - rema
 		//String INCOMING_SEQUENCE_ID = "IncomingSequenceId";
 
-		String TEMP_SEQUENCE_ID = "TempSequenceId";
+		String INTERNAL_SEQUENCE_ID = "TempSequenceId";
 
 		String REPLY_TO_EPR = "ReplyToEPR";
 
