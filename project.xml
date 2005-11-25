@@ -189,7 +189,7 @@
            <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2</artifactId>
-            <version>0.92</version>
+            <version>0.93-dev</version>
             </dependency>
 
         <dependency>
