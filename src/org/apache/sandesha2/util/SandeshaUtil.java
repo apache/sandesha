@@ -63,6 +63,8 @@ import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 /**
+ * Contains utility methods that are used in many plases of Sandesha2.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
@@ -78,11 +80,26 @@ public class SandeshaUtil {
 
 	private static SandeshaDynamicProperties dynamicProperties = null;
 
+	/**
+	 * Create a new UUID.
+	 * 
+	 * @return
+	 */
 	public static String getUUID() {
 		String uuid = "uuid:" + UUIDGenerator.getUUID();
 		return uuid;
 	}
 
+	/**
+	 * Used to convert a message number list (a comma seperated list of message numbers) into
+	 * a set of AcknowledgementRanges. This breaks the list, sort the items and group them to create
+	 * the AcknowledgementRange objects.
+	 * 
+	 * @param msgNoStr
+	 * @param factory
+	 * @return
+	 * @throws SandeshaException
+	 */
 	public static ArrayList getAckRangeArrayList(String msgNoStr,
 			SOAPFactory factory) throws SandeshaException {
 
@@ -175,6 +192,14 @@ public class SandeshaUtil {
 		return sortedList;
 	}
 
+	/**
+	 * Used to store message context objects. Currently they are stored in a in-memory HashMap.
+	 * Returned key can be used to retrieve the message context.
+	 * 
+	 * @param ctx
+	 * @return
+	 * @throws SandeshaException
+	 */
 	public static String storeMessageContext(MessageContext ctx)
 			throws SandeshaException {
 		if (ctx == null)
@@ -185,6 +210,12 @@ public class SandeshaUtil {
 		return key;
 	}
 
+	/**
+	 * Retrieve the MessageContexts saved by the above method.
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public static MessageContext getStoredMessageContext(String key) {
 		return (MessageContext) storedMsgContexts.get(key);
 	}
@@ -323,7 +354,6 @@ public class SandeshaUtil {
 		return false;
 	}
 
-	//TODO: correct following to work for long.
 	public static ArrayList getSplittedMsgNoArraylist(String str) {
 
 		StringTokenizer tokenizer = new StringTokenizer(str, ",");
@@ -349,9 +379,16 @@ public class SandeshaUtil {
 		return internalSequenceId;
 	}
 
+	/**
+	 * Used to obtain the storage Manager Implementation. 
+	 * @param context
+	 * @return
+	 * @throws SandeshaException
+	 */
 	public static StorageManager getSandeshaStorageManager(
 			ConfigurationContext context) throws SandeshaException {
-		String srotageManagerClassStr = Constants.STORAGE_MANAGER_IMPL;
+		
+		String srotageManagerClassStr = PropertyManager.getInstance().getStorageManagerClass();
 
 		if (storageManager != null)
 			return storageManager;

@@ -21,6 +21,8 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
 /**
+ * This is used to set up a new sequence, both at the sending side and the receiving side.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

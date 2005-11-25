@@ -63,6 +63,8 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.wsdl.WSDLConstants;
 
 /**
+ * Responsible for processing an incoming Application message.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

@@ -38,6 +38,9 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
+ * This is responsible for sending and re-sending messages of Sandesha2. This represent a thread that keep running all
+ * the time. This keep looking at the Sender table to find out any entries that should be sent.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

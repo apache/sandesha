@@ -36,9 +36,6 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 
 	private Hashtable table = null;
 
-	/**
-	 *  
-	 */
 	public InMemoryNextMsgBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.BeanMAPs.NEXT_MESSAGE);
 

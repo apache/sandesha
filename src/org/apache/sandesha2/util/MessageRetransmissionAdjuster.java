@@ -24,6 +24,8 @@ import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
+ * This is used to adjust retransmission infoamation after each time the message is sent.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
@@ -58,6 +60,14 @@ public class MessageRetransmissionAdjuster {
 		return retransmitterBean;
 	}
 
+	/**
+	 * This sets the next time the message has to be retransmitted. This uses the base retransmission interval
+	 * and exponentialBackoff properties to calculate the correct time.
+	 * 
+	 * @param retransmitterBean
+	 * @param policyBean
+	 * @return
+	 */
 	private SenderBean adjustNextRetransmissionTime(
 			SenderBean retransmitterBean, RMPolicyBean policyBean) {
 

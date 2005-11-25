@@ -21,6 +21,8 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
+ * This is used to manage RM Policies.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */

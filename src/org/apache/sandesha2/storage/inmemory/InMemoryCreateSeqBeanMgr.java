@@ -38,9 +38,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 
 	//TODO change the primary key.
 	//When offered. msgId==null
-	/**
-	 *  
-	 */
+
 	public InMemoryCreateSeqBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.BeanMAPs.CREATE_SEQUECE);
 		if (obj != null) {

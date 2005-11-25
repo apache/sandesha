@@ -34,6 +34,8 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
+ * Responsible for processing an incoming Terminate Sequence message.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

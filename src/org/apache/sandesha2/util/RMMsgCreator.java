@@ -54,6 +54,7 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
+ * Used to create new RM messages.
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
@@ -65,6 +66,15 @@ public class RMMsgCreator {
 			rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN, PropertyManager.getInstance().getRMPolicyBean());
 	}
 
+	/**
+	 * Create a new CreateSeqnence message.
+	 * 
+	 * @param applicationRMMsg
+	 * @param internalSequenceId
+	 * @param acksTo
+	 * @return
+	 * @throws SandeshaException
+	 */
 	public static RMMsgContext createCreateSeqMsg(
 			RMMsgContext applicationRMMsg, String internalSequenceId, String acksTo)
 			throws SandeshaException {
@@ -193,6 +203,14 @@ public class RMMsgCreator {
 		return createSeqRMMsg;
 	}
 
+	/**
+	 * Creates a new TerminateSequence message.
+	 * 
+	 * @param referenceRMMessage
+	 * @param sequenceId
+	 * @return
+	 * @throws SandeshaException
+	 */
 	public static RMMsgContext createTerminateSequenceMessage(
 			RMMsgContext referenceRMMessage, String sequenceId)
 			throws SandeshaException {
@@ -258,6 +276,15 @@ public class RMMsgCreator {
 		return terminateRMMessage;
 	}
 
+	/**
+	 * Create a new CreateSequenceResponse message.
+	 * 
+	 * @param createSeqMessage
+	 * @param outMessage
+	 * @param newSequenceID
+	 * @return
+	 * @throws AxisFault
+	 */
 	public static RMMsgContext createCreateSeqResponseMsg(
 			RMMsgContext createSeqMessage, MessageContext outMessage,
 			String newSequenceID) throws AxisFault {
@@ -319,7 +346,13 @@ public class RMMsgCreator {
 		return createSeqResponse;
 	}
 
-	//Adds a ack message to the following message.
+	/**
+	 * Adds an ack message to the given application message.
+	 * 
+	 * @param applicationMsg
+	 * @param sequenceId
+	 * @throws SandeshaException
+	 */
 	public static void addAckMessage(RMMsgContext applicationMsg,
 			String sequenceId) throws SandeshaException {
 
@@ -366,6 +399,13 @@ public class RMMsgCreator {
 
 	}
 
+	/**
+	 * Create a new Acknowledgement message.
+	 * 
+	 * @param applicationRMMsgCtx
+	 * @return
+	 * @throws SandeshaException
+	 */
 	public static RMMsgContext createAckMessage(RMMsgContext applicationRMMsgCtx)
 			throws SandeshaException {
 		try {

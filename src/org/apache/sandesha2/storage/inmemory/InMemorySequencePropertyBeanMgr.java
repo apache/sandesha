@@ -35,9 +35,6 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr {
 	private Hashtable table = null;
 
-	/**
-	 *  
-	 */
 	public InMemorySequencePropertyBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.BeanMAPs.SEQUENCE_PROPERTY);
 		if (obj != null) {

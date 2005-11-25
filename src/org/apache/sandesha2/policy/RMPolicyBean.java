@@ -16,6 +16,8 @@
 
 
 /**
+ * Used to hold RM Policy information.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */

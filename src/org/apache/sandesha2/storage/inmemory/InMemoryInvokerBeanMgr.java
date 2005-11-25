@@ -34,9 +34,6 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 	private Hashtable table = null;
 
-	/**
-	 *  
-	 */
 	public InMemoryInvokerBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.BeanMAPs.STORAGE_MAP);
 		if (obj != null) {

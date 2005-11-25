@@ -18,18 +18,38 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
+ * This bean is used at the receiving side (of both server and client)
+ * There is one object for each application message to be invoked.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class InvokerBean implements RMBean {
 
+	/**
+	 * Comment for <code>Key</code>
+	 * 
+	 * This is the key that is obtained after saving a message context in a storage.
+	 */
 	private String Key;
 
+	/**
+	 * Comment for <code>MsgNo</code>
+	 * The message number of the message.
+	 */
 	private long MsgNo;
 
+	/**
+	 * Comment for <code>sequenceId</code>
+	 * The sequence ID of the sequence the message belong to.
+	 */
 	private String sequenceId;
 	
+	/**
+	 * Comment for <code>invoked</code>
+	 * Weather the message has been invoked by the invoker.
+	 */
 	private boolean invoked = false;
 
 	public InvokerBean() {

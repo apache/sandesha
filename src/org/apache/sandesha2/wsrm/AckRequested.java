@@ -28,6 +28,8 @@ import org.apache.axis2.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Constants;
 
 /**
+ * Represent the AckRequested header block.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  * @author Saminda Abeyruwan  <saminda@opensource.lk>

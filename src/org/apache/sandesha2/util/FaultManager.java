@@ -54,6 +54,8 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
+ * Has logic to check for possible RM related faults and create it.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
@@ -121,6 +123,13 @@ public class FaultManager {
 
 	}
 
+	/**
+	 * Check weather the CreateSequence should be refused and generate the fault if it should.
+	 * 
+	 * @param messageContext
+	 * @return
+	 * @throws SandeshaException
+	 */
 	private RMMsgContext checkForCreateSequenceRefused(
 			MessageContext messageContext) throws SandeshaException {
 
@@ -212,6 +221,12 @@ public class FaultManager {
 
 	}
 
+	/**
+	 * Check weather the LastMessage number has been exceeded and generate the fault if it is.
+	 * 
+	 * @param msgCtx
+	 * @return
+	 */
 	private RMMsgContext checkForLastMsgNumberExceeded(MessageContext msgCtx) {
 		return null;
 	}
@@ -309,6 +324,7 @@ public class FaultManager {
 	}
 
 	/**
+	 * Check weather the Acknowledgement is invalid and generate a fault if it is.
 	 * 
 	 * @param msgCtx
 	 * @return @throws
@@ -358,12 +374,14 @@ public class FaultManager {
 		return null;
 	}
 
+
 	/**
+	 * Returns a RMMessageContext for the fault message. Data for generating the fault is given in the data parameter.
 	 * 
-	 * @param type
-	 * @param msgCtx
-	 * @return @throws
-	 *         SandeshaException
+	 * @param referenceRMMsgContext
+	 * @param data
+	 * @return
+	 * @throws SandeshaException
 	 */
 	public RMMsgContext getFault(RMMsgContext referenceRMMsgContext,
 			FaultData data) throws SandeshaException {

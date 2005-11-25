@@ -17,16 +17,31 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
+ * This bean is used to store properties of a certain sequence.
+ * Used by both sending and receiving sides.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class SequencePropertyBean implements RMBean {
 
+	/**
+	 * Comment for <code>sequenceId</code>
+	 * Sequence ID of the sequence this property belong to.
+	 */
 	private String sequenceId;
 
+	/**
+	 * Comment for <code>name</code>
+	 * The name of the property. Possible names are given in the Constants.SequenceProperties interface.
+	 */
 	private String name;
 
+	/**
+	 * Comment for <code>value</code>
+	 * The value of the property.
+	 */
 	private Object value;
 
 	public SequencePropertyBean(String seqId, String propertyName, Object value) {

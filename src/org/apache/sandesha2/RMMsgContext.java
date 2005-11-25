@@ -34,6 +34,10 @@ import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;
 
 /**
+ * This class is used to hold a MessageContext within Sandesha. This is used to
+ * easily manupilate the properties of a MessageContext.
+ * 
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  * @author Jaliya Ekanayaka <jaliya@opensource.lk>
@@ -59,10 +63,14 @@ public class RMMsgContext {
 	public RMMsgContext(MessageContext ctx) {
 		this();
 		this.msgContext = ctx;
-
-		//MsgInitializer.populateRMMsgContext(ctx,this);
 	}
 
+	/**
+	 * To add a new SOAP envelope to the message. The generated envelope will belong 
+	 * to the SOAP version of the MessageContext.
+	 * 
+	 * @throws SandeshaException
+	 */
 	public void addSOAPEnvelope() throws SandeshaException {
 		int SOAPVersion = Constants.SOAPVersion.v1_1;
 
@@ -91,11 +99,26 @@ public class RMMsgContext {
 		return messageType;
 	}
 
+	
+	/**
+	 * The message type can be used to easily identify what this message is.
+	 * Possible message types are given in the Constnts.MessageTypes interface.
+	 * 
+	 * @param msgType
+	 */
 	public void setMessageType(int msgType) {
 		if (msgType >= 0 && msgType <= Constants.MessageTypes.MAX_MESSAGE_TYPE)
 			this.messageType = msgType;
 	}
 
+	
+	/**
+	 * Sets an IRMPart object to the MessageContext. Possible parts are give in the 
+	 * 
+	 * 
+	 * @param partId
+	 * @param part
+	 */
 	public void setMessagePart(int partId, IOMRMPart part) {
 		if (partId >= 0 && partId <= Constants.MessageParts.MAX_MSG_PART_ID)
 			rmMessageParts.put(new Integer(partId), part);

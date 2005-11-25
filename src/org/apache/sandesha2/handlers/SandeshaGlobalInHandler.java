@@ -44,6 +44,9 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
+ * The Global handler of Sandesha2. This is used to perform things that should be done before
+ * diapatching such as duplicate detection.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

@@ -18,13 +18,25 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
+ * This bean is used at the receiving side (of both server and client)
+ * There is one entry for each sequence.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class NextMsgBean implements RMBean {
+	
+	/**
+	 * Comment for <code>SequenceId</code>
+	 * The sequenceID of the representing sequence.
+	 */
 	private String SequenceId;
 
+	/**
+	 * Comment for <code>NextMsgNoToProcess</code>
+	 * The next message to be invoked of the representing sequence.
+	 */
 	private long NextMsgNoToProcess;
 
 	public NextMsgBean() {

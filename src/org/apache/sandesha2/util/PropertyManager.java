@@ -21,12 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.axis2.InavalidModuleImpl;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
+ * Loads properties from sandesha2.properties file (from Constants if this is not available).
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
@@ -46,11 +47,11 @@ public class PropertyManager {
 			if (in==null)
 				in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.PROPERTY_FILE);
 			
-			if (in==null)
-				throw new IOException ("sandesha2 property file not found");
-			
 			Properties properties = new Properties ();
-			properties.load(in);
+			if (in!=null) {
+				//throw new IOException ("sandesha2 property file not found");
+				properties.load(in);
+			}
 			
 			loadPropertiesToBean (properties);
 		} catch (IOException e) {
@@ -81,6 +82,11 @@ public class PropertyManager {
 		
 	}
 	
+	/**
+	 * Loads wsp:exponentianbackoff.
+	 * 
+	 * @param properties
+	 */
 	private void loadExponentialBackoff (Properties properties) {
 		
 		String expoBackoffStr = properties.getProperty(Constants.Properties.ExponentialBackoff);
@@ -101,6 +107,12 @@ public class PropertyManager {
 			propertyBean.setExponentialBackoff(Constants.Properties.DefaultValues.ExponentialBackoff);
 	}
 	
+	
+	/**
+	 * Loads wsp:retransmissionInterval.
+	 * 
+	 * @param properties
+	 */
 	private void loadRetransmissionInterval (Properties properties) {
 		
 		String retransmissionIntStr = properties.getProperty(Constants.Properties.RetransmissionInterval);
@@ -124,6 +136,11 @@ public class PropertyManager {
 			propertyBean.setRetransmissionInterval(Constants.Properties.DefaultValues.RetransmissionInterval);
 	}
 	
+	/**
+	 * Loads wsp:acknowldgementInterval.
+	 * 
+	 * @param properties
+	 */
 	private void loadAcknowledgementInterval (Properties properties) {
 		
 		String acknowledgementIntStr = properties.getProperty(Constants.Properties.AcknowledgementInterval);
@@ -147,6 +164,11 @@ public class PropertyManager {
 			propertyBean.setAcknowledgementInterval(Constants.Properties.DefaultValues.AcknowledgementInterval);
 	}
 	
+	/**
+	 * Loads wsp:inactivityInterval.
+	 * 
+	 * @param properties
+	 */
 	private void loadInactivityTimeout (Properties properties) {
 		
 		String inactivityTimeoutStr = properties.getProperty(Constants.Properties.InactivityTimeout);
@@ -175,6 +197,11 @@ public class PropertyManager {
 			propertyBean.setInactiveTimeoutInterval(Constants.Properties.DefaultValues.InactivityTimeout,Constants.Properties.DefaultValues.InactivityTimeoutMeasure);
 	}
 	
+	/**
+	 * Loads the StorageManager class name.
+	 * 
+	 * @param properties
+	 */
 	private void loadStoragemanagerClass (Properties properties) {
 		String storageMgrClassStr = properties.getProperty(Constants.Properties.StorageManager);
 		boolean loaded = false;

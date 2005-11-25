@@ -18,30 +18,69 @@
 package org.apache.sandesha2.storage.beans;
 
 /**
+ * This bean is used at the sending side (of both server and client)
+ * There is one eatry for each message to be sent.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class SenderBean implements RMBean {
 
+	/**
+	 * Comment for <code>messageId</code>
+	 * The message id of the representing message.
+	 * 
+	 */
 	private String messageId;
 
+	/**
+	 * Comment for <code>key</code>
+	 * Key retrieved by the storage mechanism after storing the message.
+	 */
 	private String key;
 
-//	private long LastSentTime;
-
+	/**
+	 * Comment for <code>Send</code>
+	 * The sender will not send the message unless this property is true.
+	 */
 	private boolean Send;
 
+	/**
+	 * Comment for <code>internalSequenceId</code>
+	 * Please see the comment of CreateSeqBean.
+	 */
 	private String internalSequenceId;
 
+	/**
+	 * Comment for <code>sentCount</code>
+	 * The number of times current message has been sent.
+	 */
 	private int sentCount = 0;
 
+	/**
+	 * Comment for <code>messageNumber</code>
+	 * The message number of the current message.
+	 */
 	private long messageNumber = 0;
 
+	/**
+	 * Comment for <code>reSend</code>
+	 * If this property if false. The message has to be sent only once. The entry has to be deleted after sending.
+	 */
 	private boolean reSend = true;
 
+	/**
+	 * Comment for <code>timeToSend</code>
+	 * Message has to be sent only after this time.
+	 */
 	private long timeToSend = 0;
 	
+	/**
+	 * Comment for <code>messagetype</code>
+	 * The type of the current message.
+	 * Possible types are given in Constants.MessageTypes interface.
+	 */
 	private int messagetype =0;
 	
 	public SenderBean() {

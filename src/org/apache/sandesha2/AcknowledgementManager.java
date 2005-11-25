@@ -33,11 +33,19 @@ import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
+ * Contains logic for managing acknowledgements.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class AcknowledgementManager {
 
+	/**
+	 * Piggybacks any available acks of the same sequence to the given application message.
+	 * 
+	 * @param applicationRMMsgContext
+	 * @throws SandeshaException
+	 */
 	public static void piggybackAckIfPresent(
 			RMMsgContext applicationRMMsgContext) throws SandeshaException {
 		ConfigurationContext configurationContext = applicationRMMsgContext

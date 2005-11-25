@@ -36,11 +36,23 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
+ * Contains logic to remove all the storad data of a sequence.
+ * Methods of this are called by sending side and the receiving side when appropriate
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class TerminateManager {
 
+	/**
+	 * Called by the receiving side to remove data related to a sequence.
+	 * e.g. After sending the TerminateSequence message. Calling this methods will complete all
+	 * the data if InOrder invocation is not sequired.
+	 * 
+	 * @param configContext
+	 * @param sequenceID
+	 * @throws SandeshaException
+	 */
 	public static void terminateReceivingSide (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
@@ -61,6 +73,14 @@ public class TerminateManager {
 
 	}
 	
+	/**
+	 * When InOrder invocation is anabled this had to be called to clean the data left by the 
+	 * above method. This had to be called after the Invocation of the Last Message.
+	 * 
+	 * @param configContext
+	 * @param sequenceID
+	 * @throws SandeshaException
+	 */
 	public static void terminateAfterInvocation (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
@@ -105,6 +125,15 @@ public class TerminateManager {
 		return false;
 	}
 	
+	
+	/**
+	 * This is called by the sending side to clean data related to a sequence.
+	 * e.g. after sending the TerminateSequence message.
+	 * 
+	 * @param configContext
+	 * @param sequenceID
+	 * @throws SandeshaException
+	 */
 	public static void terminateSendingSide (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();

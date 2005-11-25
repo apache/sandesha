@@ -20,6 +20,8 @@ package org.apache.sandesha2.msgprocessors;
 import org.apache.sandesha2.Constants;
 
 /**
+ * Used to get a suitable message processor. Given the message type.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

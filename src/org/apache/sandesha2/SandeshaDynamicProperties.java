@@ -19,6 +19,7 @@ package org.apache.sandesha2;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
+ * Unused class - TODO remove this
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

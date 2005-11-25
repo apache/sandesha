@@ -48,6 +48,8 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 
 /**
+ * Responsible for processing an incoming Create Sequence Response message.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

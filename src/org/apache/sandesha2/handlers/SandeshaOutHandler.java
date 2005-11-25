@@ -64,6 +64,8 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.wsdl.WSDLConstants;
 
 /**
+ * This is invoked in the outFlow of an RM endpoint
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 

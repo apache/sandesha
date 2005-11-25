@@ -18,6 +18,9 @@
 package org.apache.sandesha2;
 
 /**
+ * Contains all the Constants of Sandesha2.
+ * Please see sub-interfaces to see grouped data.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  * @author Jaliya Ekanayaka <jaliya@opensource.lk>
@@ -300,7 +303,7 @@ public interface Constants {
 		
 		public interface DefaultValues {
 			
-			int RetransmissionInterval = 10000;
+			int RetransmissionInterval = 20000;
 			
 			int AcknowledgementInterval = 4000;
 			
@@ -312,7 +315,6 @@ public interface Constants {
 			
 			String StorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 		}
-		
 	}
 	
 	//TODO remove following three

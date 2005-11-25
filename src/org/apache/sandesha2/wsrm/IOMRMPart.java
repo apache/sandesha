@@ -20,6 +20,9 @@ package org.apache.sandesha2.wsrm;
 import org.apache.axis2.soap.SOAPEnvelope;
 
 /**
+ * This is the base interface for RM infoset objects that are added directly so 
+ * SOAPBody or SOAPHeader (we call them MessageParts).
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  * @author Saminda Abeyruwan  <saminda@opensource.lk>

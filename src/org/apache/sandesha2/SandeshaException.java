@@ -20,11 +20,12 @@ package org.apache.sandesha2;
 import org.apache.axis2.AxisFault;
 
 /**
+ * Exception class of Sandesa2.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-//FIXME - extends AxisFault and clean code (remove unnecessary try-catches )
 public class SandeshaException extends AxisFault  {
 
 	public SandeshaException (String message) {

@@ -23,6 +23,8 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
+ * Used to manage Sender beans.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */

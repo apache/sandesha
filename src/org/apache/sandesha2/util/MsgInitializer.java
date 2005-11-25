@@ -24,6 +24,8 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.wsrm.RMElements;
 
 /**
+ * This class is used to create an RMMessageContext out of an MessageContext.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
@@ -37,6 +39,12 @@ public class MsgInitializer {
 		return rmMsgCtx;
 	}
 
+	/**
+	 * Adds the message parts the the RMMessageContext.
+	 * 
+	 * @param msgCtx
+	 * @param rmMsgContext
+	 */
 	private static void populateRMMsgContext(MessageContext msgCtx,
 			RMMsgContext rmMsgContext) {
 		//TODO set message parts
@@ -72,12 +80,19 @@ public class MsgInitializer {
 
 	}
 
+	/**
+	 * This is used to validate the message.
+	 * Also set an Message type. Possible types are given in the Constants.MessageTypes interface.
+	 * 
+	 * @param rmMsgCtx
+	 * @return
+	 * @throws SandeshaException
+	 */
 	private static boolean validateMessage(RMMsgContext rmMsgCtx)
 			throws SandeshaException {
 
 		//TODO: performa validation
 
-		int a = 1;
 		//Setting message type.
 		if (rmMsgCtx.getMessagePart(Constants.MessageParts.CREATE_SEQ) != null)
 			rmMsgCtx.setMessageType(Constants.MessageTypes.CREATE_SEQ);

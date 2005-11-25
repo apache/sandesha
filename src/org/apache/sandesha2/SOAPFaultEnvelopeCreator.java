@@ -37,11 +37,23 @@ import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceFault;
 
 /**
+ * Used to create an SOAP Envelope for a RM Related Fault.
+ * Support both SOAP 1.1 and SOAP 1.2 encoding.
+ * 
+ * @author Sanka Samaranayaka <ssanka@gmail.com>
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SOAPFaultEnvelopeCreator {
 
+	/**
+	 * Adding the SOAP Fault Envelope. 
+	 * 
+	 * @param faultMsgContext
+	 * @param SOAPVersion
+	 * @param faultData
+	 * @throws SandeshaException
+	 */
 	public static void addSOAPFaultEnvelope(MessageContext faultMsgContext,
 			int SOAPVersion, FaultData faultData) throws SandeshaException {
 
@@ -61,6 +73,13 @@ public class SOAPFaultEnvelopeCreator {
 
 	}
 
+	/**
+	 * To find out weather this is a sequence fault. These faults are handeled differently 
+	 * accodting to the RM spec.
+	 * 
+	 * @param faultData
+	 * @return
+	 */
 	private static boolean isSequenceFault(FaultData faultData) {
 
 		boolean sequenceFault = false;
@@ -80,6 +99,13 @@ public class SOAPFaultEnvelopeCreator {
 
 	}
 
+	/**
+	 * Adding the SequenceFault header. Only for Sequence faults.
+	 * 
+	 * @param faultMessageContext
+	 * @param faultData
+	 * @param factory
+	 */
 	private static void addSequenceFaultHeader(
 			MessageContext faultMessageContext, FaultData faultData,
 			SOAPFactory factory) {
@@ -91,6 +117,13 @@ public class SOAPFaultEnvelopeCreator {
 		sequenceFault.setFaultCode(faultCode);
 	}
 
+	/**
+	 * Building the envelope with SOAP 1.1
+	 * 
+	 * @param faultMsgContext
+	 * @param data
+	 * @throws SandeshaException
+	 */
 	private static void doSOAP11Encoding(MessageContext faultMsgContext,
 			FaultData data) throws SandeshaException {
 
@@ -129,6 +162,14 @@ public class SOAPFaultEnvelopeCreator {
 
 	}
 
+	
+	/**
+	 * Building the envelope with SOAP 1.2
+	 * 
+	 * @param faultMsgContext
+	 * @param data
+	 * @throws SandeshaException
+	 */
 	private static void doSOAP12Encoding(MessageContext faultMsgContext,
 			FaultData data) throws SandeshaException {
 		//MessageContext faultMsgCtx = faultRMMsgContext.getMessageContext();

@@ -42,6 +42,8 @@ import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 
 /**
+ * Responsible for processing an incoming Create Sequence message.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
