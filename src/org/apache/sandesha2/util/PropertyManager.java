@@ -79,6 +79,7 @@ public class PropertyManager {
 		loadAcknowledgementInterval(properties);
 		loadInactivityTimeout(properties);
 		loadStoragemanagerClass(properties);
+		loadInOrderInvocation (properties);
 		
 	}
 	
@@ -216,6 +217,26 @@ public class PropertyManager {
 			propertyBean.setStorageManagerClass(Constants.Properties.DefaultValues.StorageManager);
 	}
 	
+	private void loadInOrderInvocation (Properties properties) {
+		String inOrderInvocation = properties.getProperty(Constants.Properties.InOrderInvocation);
+		boolean loaded = false;
+		
+		if (inOrderInvocation!=null) {
+			inOrderInvocation = inOrderInvocation.trim();
+			if (inOrderInvocation.equalsIgnoreCase("true")) {
+				propertyBean.setInOrder(true);
+				loaded = true;
+			}else if (inOrderInvocation.equalsIgnoreCase("false")) {
+				propertyBean.setInOrder(false);
+				loaded = true;
+			}
+		}
+		
+		if (!loaded)
+			propertyBean.setInOrder(Constants.Properties.DefaultValues.InvokeInOrder);
+		
+	}
+	
 	
 	
 	public boolean isExponentialBackoff () {
@@ -241,6 +262,10 @@ public class PropertyManager {
 	
 	public RMPolicyBean getRMPolicyBean () {
 		return propertyBean.getPolicyBean();
+	}
+	
+	public boolean isInOrderInvocation () {
+		return propertyBean.isInOrder();
 	}
 	
 }

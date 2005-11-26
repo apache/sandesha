@@ -33,6 +33,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.storage.beans.InvokerBean;
+import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
@@ -67,7 +68,8 @@ public class TerminateManager {
 			nextMsgBeanMgr.delete(nextMsgBean.getSequenceId());
 		}
 		
-		if(Constants.QOS.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE!=Constants.QOS.DeliveryAssurance.IN_ORDER) { 
+		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
+		if(inOrderInvocation) { 
 			terminateAfterInvocation(configContext,sequenceID);
 		}
 

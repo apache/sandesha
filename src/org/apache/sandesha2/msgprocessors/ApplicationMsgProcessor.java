@@ -161,7 +161,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//FIXME - fix delivery assurances for the client side
 
 		if (msgCtx.isServerSide()) {
-			if (Constants.QOS.DeliveryAssurance.DEFAULT_DELIVERY_ASSURANCE == Constants.QOS.DeliveryAssurance.IN_ORDER) {
+			boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
+			if (inOrderInvocation) {
 				//pause the message
 				msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
 

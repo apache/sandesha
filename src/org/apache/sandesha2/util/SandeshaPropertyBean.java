@@ -29,6 +29,7 @@ public class SandeshaPropertyBean {
 
 	RMPolicyBean policyBean = new RMPolicyBean ();
 	String storageManagerClass = null;
+	boolean inOrder = true;
     
     public long getInactiveTimeoutInterval() {
         return policyBean.getInactiveTimeoutInterval();
@@ -88,5 +89,14 @@ public class SandeshaPropertyBean {
 	
 	public RMPolicyBean getPolicyBean () {
 		return policyBean;
+	}
+	
+	
+	public boolean isInOrder() {
+		return inOrder;
+	}
+	
+	public void setInOrder(boolean inOrder) {
+		this.inOrder = inOrder;
 	}
 }

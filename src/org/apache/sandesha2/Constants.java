@@ -301,6 +301,8 @@ public interface Constants {
 		
 		String StorageManager = "StorageManager";
 		
+		String InOrderInvocation = "InvokeInOrder";
+		
 		public interface DefaultValues {
 			
 			int RetransmissionInterval = 20000;
@@ -314,6 +316,8 @@ public interface Constants {
 			String InactivityTimeoutMeasure = "seconds";   //this can be - seconds,minutes,hours,days
 			
 			String StorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
+		
+			boolean InvokeInOrder = true;
 		}
 	}
 	
