@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+       "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  <title>Sandesha2 User Guide</title>
+  <meta name="generator" content="amaya 9.2.2, see http://www.w3.org/Amaya/"
+  />
+</head>
+
+<body>
+<h2>Sandesha2 User Guide</h2>
+
+<p>This document introduces you to Apache Sandesha2. Sandesha2 is the
+WS-ReliableMessaging implementation for Axis2. With Sandesha2 you can host
+some reliable web services or interact with reliable web services hosted by
+others.</p>
+
+<p></p>
+
+<h2>Using Sandesha2 in the server side</h2>
+
+<p>First lets look at how to use Sandesha2 in the server side.</p>
+
+<p>You can set up Sandesha2 for the server side in three steps.</p>
+<ol>
+  <li>Download and deploy axis2(please see Axis2 user guide for more
+  details).</li>
+  <li>Add a user phase called RMPhase to all four flows of axis2.xml.</li>
+  <li>Download latest Sandesha2 distribution and add sandesha.mar file to
+    &lt;AXIS2_HOME&gt;\WEB_INF\modules directory.</li>
+</ol>
+
+<p>Now your sandesha2 module is setup and deployed.</p>
+
+<p></p>
+
+<p>To host reliable web service you have to create a service archive (aar)
+file with the given details (please see Axis2 user guide for more details on
+creating aar files).</p>
+
+<p>Add sandesha module reference to the services.xml (within the aar file) as
+given below.</p>
+<source><pre>&lt;service name="OneWayService"&gt;
+&lt;module ref="sandesha"/&gt;
+.......................
+&lt;!-- Your operation definitions and other stuff
+........................
+&lt;/service&gt;</pre></source>
+
+<p>Create the service archieve file.</p>
+
+<p>Deploy it by dropping it to &lt;AXIS2_HOME&gt;/WEB-INF/services
+directory.</p>
+
+<p>Now your service is deployed with reliable messaging support.</p>
+
+<p></p>
+
+<h2>Using Sandesha2 in the client side</h2>
+
+<p>Add Sandesha2 module (sandesha.mar) in the way you normally add a module
+to the Axis2 client side (see Axis2 user guide for more details). Following
+scenarios will explain you how to write the client code.</p>
+
+<p></p>
+
+<h3>Basic scenarios</h3>
+
+<p></p>
+
+<p><b>Sample RM enabled client code for a one way service call.</b></p>
+
+<p></p>
+<source><pre>MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
+<span style="background-color: #CCCCCC">sender.engageModule(new QName ("sandesha"));</span>
+sender.setTo(new EndpointReference(toEPR));
+sender.set(MessageContextConstants.TRANSPORT_URL,toEPR);
+sender.send("ping",getPingOMBlock("ping1"));
+sender.send("ping",getPingOMBlock("ping2"));
+<span style="background-color: #CCCCCC">sender.set(org.apache.sandesha2.Constants.LAST_MESSAGE, "true");</span>
+sender.send("ping",getPingOMBlock("ping3"));</pre></source>
+
+<p></p>
+
+<p></p>
+
+<p>There are only two difference here from your normal client code.</p>
+
+<p>First you have to engage the sandesha module as given in the line 2.</p>
+
+<p>Before the last message you must set the last message property, which is
+given in the line 7.</p>
+
+<p></p>
+
+<p><b>Simple RM enabled client code for a request reply service call.</b></p>
+
+<p>First thing to remember is that you are not able to get synchronous
+responses with Sandesha2. Because of this if you expect response message, you
+must have a return endpoint accessible from the server side. But making two
+channel blocking invocation is perfectly valid. But please make sure tht you
+have set a suitable time out interval.</p>
+
+<p></p>
+
+<p>Here is a code sample for this scenario.</p>
+
+<p></p>
+<source><pre>Call call = new Call(AXIS2_CLIENT_PATH);
+<span style="background-color: #CCCCCC">call.engageModule(new QName("sandesha"));</span>
+call.setTo(new EndpointReference(toEPR));
+call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
+Callback callback1 = new TestCallback ("Callback 1");
+call.invokeNonBlocking("echoString",getEchoOMBlock("echo1"),callback1);
+Callback callback2 = new TestCallback ("Callback 2");
+call.invokeNonBlocking("echoString",getEchoOMBlock("echo2"),callback2);
+<span style="background-color: #CCCCCC">call.set(Constants.LAST_MESSAGE, "true");</span>
+Callback callback3 = new TestCallback ("Callback 3");
+call.invokeNonBlocking("echoString",getEchoOMBlock("echo3"),callback3);</pre></source>
+
+<p></p>
+
+<p>Here also the only difference from a normal client code is addition of the
+sandesha module reference and the last message tag.</p>
+
+<p></p>
+
+<h3>Advance scenarios</h3>
+
+<p><b>Getting acknowledgements and faults to a given endpoint.</b></p>
+
+<p>In the dafault configuration response path for acknowledgements and faults
+related to a sequene is the anonymous endpoint. Because of this for example
+HTTP transport will send acknowledgements and faults in the HTTP response. If
+you want to avaoid this and if you want to get acknowledgements and faults to
+a different endpoing add following part to the client code before doing any
+incovation.</p>
+<source><pre>sender.set(Constants.AcksTo,&lt;endpoint&gt;); //example endpoing - http://tempuri.org/acks.</pre></source>
+
+<p></p>
+
+<p><b>Managing sequences.</b></p>
+
+<p>I the default behavious Sandesha 2 assumes that messages going to the same
+endpoing should go in the same RM sequence. If you invoke two endpoints they
+will go in two sequences. If you want you can tell sandesha2 to start two
+sequences for the same endpoint as well. To do this you have to set a
+property called Sequence Key.</p>
+<source><pre>call.set(Constants.SEQUENCE_KEY,&lt;a string to identify the sequence&gt;);</pre></source>
+
+<p>If the sequence key is different Sandesha2 will send messages in two
+sequences even if they are sent to the same endpoint.</p>
+
+<p></p>
+
+<p><b>Offering a sequence ID for the response sequence.</b></p>
+
+<p>This is a concept of reliable messaging which may not be very useful to
+you as a user. Here what you do is offering a sequene ID for the sequence to
+be created in the response side withing the first Create Sequence Request
+message itself. with this you can avoid sending of a extra Create Sequence
+message from the server to the client. To do this add following to the client
+code.</p>
+<source><pre>call.set(Constants.OFFERED_SEQUENCE_ID,&lt;new uuid&gt;);</pre></source>
+
+<p></p>
+
+<p></p>
+</body>
+</html>
