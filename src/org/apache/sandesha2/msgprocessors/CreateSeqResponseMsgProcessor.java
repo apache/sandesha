@@ -194,8 +194,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				.setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,
 						"false");
 
-		//FIXME - Dont have to de below if the correct operation description is
-		// set.
 		createSeqResponseRMMsgCtx.getMessageContext().setPausedTrue(
 				new QName(Constants.IN_HANDLER_NAME));
 	}

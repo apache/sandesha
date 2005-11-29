@@ -190,7 +190,6 @@ public class FaultManager {
 							reason = "A sequence with offered sequenceId, already axists";
 						}
 
-						System.out.println("OutSequenceId:" + outSequenceId);
 					}
 				}
 			}
@@ -361,10 +360,8 @@ public class FaultManager {
 				else
 					data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
-				data
-						.setSubcode(Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
-				data
-						.setSubcode("The SequenceAcknowledgement is invalid. Lower value is larger than upper value");
+				data.setSubcode(Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
+				data.setSubcode("The SequenceAcknowledgement is invalid. Lower value is larger than upper value");
 				data.setDetail(sequenceAcknowledgement.getOMElement());
 
 				return getFault(rmMsgContext, data);
@@ -420,7 +417,6 @@ public class FaultManager {
 			faultMsgContext.setAxisOperation(operation);
 			faultMsgContext.setOperationContext(operationContext);
 
-			//String toStr = null;
 			String acksToStr = null;
 			if (referenceRMMsgContext.getMessageType() == Constants.MessageTypes.CREATE_SEQ) {
 				CreateSequence createSequence = (CreateSequence) referenceRMMsgContext

@@ -75,18 +75,6 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		while (iterator.hasNext()) {
 			temp = (NextMsgBean) iterator.next();
 
-			//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
-			//					temp.getSequenceId()))
-			//					/*
-			//					 * && (bean.getNextMsgNoToProcess() != null &&
-			//					 *
-			// bean.getNextMsgNoToProcess().equals(temp.getNextMsgNoToProcess()))
-			//					 */
-			//					&& (bean.getNextMsgNoToProcess() > 0)) {
-			//
-			//				beans.add(temp);
-			//			}
-
 			boolean equal = true;
 
 			if (bean.getNextMsgNoToProcess() > 0

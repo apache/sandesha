@@ -30,12 +30,6 @@ public class SequenceManager {
 
 	public static String setupNewSequence(RMMsgContext createSequenceMsg)
 			throws AxisFault {
-		//		SequencePropertyBean seqPropBean = new SequencePropertyBean
-		// (sequenceId,Constants.SEQ_PROPERTY_RECEIVED_MESSAGES,"");
-		//		InMemorySequencePropertyBeanMgr beanMgr = new
-		// InMemorySequencePropertyBeanMgr
-		// (Constants.DEFAULT_STORAGE_TYPE);
-		//		beanMgr.create(seqPropBean);
 
 		String sequenceId = SandeshaUtil.getUUID();
 		AbstractContext context = createSequenceMsg.getContext();
@@ -72,9 +66,6 @@ public class SequenceManager {
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
-		//TODO - recheck following
-		//incoming To - reply address of response messages
-		//imcoming replyTo - to address of response messages
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
 				sequenceId, Constants.SequenceProperties.RECEIVED_MESSAGES, "");
 		SequencePropertyBean toBean = new SequencePropertyBean(sequenceId,
@@ -133,11 +124,6 @@ public class SequenceManager {
 		SequencePropertyBean acksToBean = new SequencePropertyBean(
 				iternalSequenceId, Constants.SequenceProperties.ACKS_TO_EPR,
 				acksToEPR);
-
-		//		//TODO - make default for replyTo anonymous
-		//		if (replyToEPR==null)
-		//			replyToEPR = new EndpointReference (Constants.WSA.NS_URI_ANONYMOUS);
-
 		seqPropMgr.insert(toBean);
 		seqPropMgr.insert(acksToBean);
 

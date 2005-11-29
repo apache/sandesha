@@ -36,9 +36,6 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 
 	private Hashtable table = null;
 
-	//TODO change the primary key.
-	//When offered. msgId==null
-
 	public InMemoryCreateSeqBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Constants.BeanMAPs.CREATE_SEQUECE);
 		if (obj != null) {
@@ -79,13 +76,6 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		CreateSeqBean temp;
 		while (iterator.hasNext()) {
 			temp = (CreateSeqBean) iterator.next();
-			//			if ((bean.getCreateSeqMsgId() != null && bean.getCreateSeqMsgId()
-			//					.equals(temp.getCreateSeqMsgId()))
-			//					&& (bean.getSequenceId() != null && bean.getSequenceId()
-			//							.equals(bean.getSequenceId()))) {
-			//				beans.add(temp);
-			//
-			//			}
 
 			boolean equal = true;
 

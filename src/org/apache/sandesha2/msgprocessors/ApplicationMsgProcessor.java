@@ -74,9 +74,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
-		//Object obj =
-		// rmMsgCtx.getProperty(Constants.APPLICATION_PROCESSING_DONE);
-
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
@@ -125,10 +122,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 
-			//throw new SandeshaException(
-			//		"Duplicate message - Invocation type is EXACTLY_ONCE");
-
-			//TODO is this enough
 			msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
 
 		}
@@ -143,11 +136,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		sendAckIfNeeded(rmMsgCtx, messagesStr);
 
-		//		} else {
-		//			//TODO Add async Ack
-		//		}
-
-		//		Pause the messages bean if not the right message to invoke.
+		//	Pause the messages bean if not the right message to invoke.
 		NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
 		NextMsgBean bean = mgr.retrieve(sequenceId);
 
@@ -158,17 +147,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		long nextMsgno = bean.getNextMsgNoToProcess();
 
-		//FIXME - fix delivery assurances for the client side
-
 		if (msgCtx.isServerSide()) {
 			boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
 			if (inOrderInvocation) {
 				//pause the message
 				msgCtx.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
 
-				//Adding an entry in the SequencesToInvoke List TODO - add this
-				// to
-				// a module init kind of place.
 				SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
 						.retrieve(
 								Constants.SequenceProperties.ALL_SEQUENCES,
@@ -186,7 +170,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					seqPropMgr.insert(incomingSequenceListBean);
 				}
 
-				//This must be a List :D
 				ArrayList incomingSequenceList = (ArrayList) incomingSequenceListBean
 						.getValue();
 
@@ -218,9 +201,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		}
 
-		//client side - SET CheckResponse to true.
-		//FIXME this will not work. Even in client side inServerSide () is true
-		// for the messages.
 		try {
 			MessageContext requestMessage = rmMsgCtx.getMessageContext()
 					.getOperationContext().getMessageContext(
@@ -237,9 +217,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
 		}
-
-		//SET THe RESPONSE
-
 	}
 
 	//TODO convert following from INT to LONG
@@ -281,7 +258,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
 
 		//Setting the ack depending on AcksTo.
-		//TODO: Stop sending askc for every message.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
 				Constants.SequenceProperties.ACKS_TO_EPR);
 
@@ -291,8 +267,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (acksToStr == null || messagesStr == null)
 			throw new SandeshaException(
 					"Seqeunce properties are not set correctly");
-
-		//if (acksToStr.equals(Constants.WSA.NS_URI_ANONYMOUS)) {
 
 		if (Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
 			// send ack in the sync case, only if the last message or the
@@ -330,7 +304,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
 
-		//Set new envelope
+		//Setting new envelope
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		try {
 			ackMsgCtx.setEnvelope(envelope);
@@ -347,7 +321,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getSystemContext());
 
-			//set CONTEXT_WRITTEN since acksto is anonymous
+			//setting CONTEXT_WRITTEN since acksto is anonymous
 			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
 				//operation context will be null when doing in a GLOBAL
 				// handler.
@@ -373,8 +347,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(e1.getMessage());
 			}
 		} else {
-			//rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-			//	org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 
 			SenderBeanMgr retransmitterBeanMgr = storageManager
 					.getRetransmitterBeanMgr();
@@ -389,7 +361,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			//the internalSequenceId value of the retransmitter Table for the
 			// messages related to an incoming
-			//sequence is the actual sequence ID - TODO document this.
+			//sequence is the actual sequence ID
 			ackBean.setInternalSequenceId(sequenceId);
 
 			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx

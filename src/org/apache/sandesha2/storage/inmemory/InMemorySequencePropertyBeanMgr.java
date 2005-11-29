@@ -74,16 +74,6 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 		while (iterator.hasNext()) {
 			temp = (SequencePropertyBean) iterator.next();
 
-			//			if ((bean.getSequenceId() != null && bean.getSequenceId().equals(
-			//					temp.getSequenceId()))
-			//					&& (bean.getName() != null && bean.getName().equals(
-			//							temp.getName()))
-			//					&& (bean.getValue() != null && bean.getValue().equals(
-			//							temp.getValue()))) {
-			//
-			//				beans.add(temp);
-			//			}
-
 			boolean equal = true;
 
 			if (bean.getSequenceId() != null

@@ -19,7 +19,6 @@ package org.apache.sandesha2.util;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Constants;
-import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
@@ -92,7 +91,6 @@ public class MessageRetransmissionAdjuster {
 		bean.setReSend(false);
 	}
 
-	//TODO: Have to change this to be plugable
 	private long generateNextExponentialBackedoffDifference(int count,
 			long initialInterval) {
 		long interval = initialInterval;

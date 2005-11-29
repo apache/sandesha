@@ -69,14 +69,7 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 		while (iterator.hasNext()) {
 			temp = (InvokerBean) iterator.next();
 			boolean select = true;
-			/*
-			 * if ((temp.getKey() != null &&
-			 * bean.getKey().equals(temp.getKey())) && (bean.getMsgNo() != -1 &&
-			 * bean.getMsgNo() == temp.getMsgNo()) && (bean.getSequenceId() !=
-			 * null && bean.getSequenceId().equals(temp.getSequenceId()))) {
-			 */
 
-			//}
 			if (bean.getKey() != null && !bean.getKey().equals(temp.getKey()))
 				select = false;
 

@@ -75,8 +75,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 
-		//try {
-
 		ConfigurationContext context = msgCtx.getSystemContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
@@ -106,7 +104,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			}
 		}
 
-		//TODO recheck
 		//continue only if an possible application message
 		if (!(rmMsgCtx.getMessageType() == Constants.MessageTypes.UNKNOWN)) {
 			return;
@@ -139,7 +136,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//Temp sequence id is the one used to refer to the sequence (since
 		//actual sequence id is not available when first msg arrives)
 		//server side - sequenceId if the incoming sequence
-		//client side - xxxxxxxxx
+		//client side - wsaTo + SeequenceKey
+
 		if (serverSide) {
 			//getting the request message and rmMessage.
 			MessageContext reqMsgCtx = msgCtx.getOperationContext()
@@ -175,30 +173,20 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		}
 
-		//check if the fist message
+		//check if the first message
 
 		long messageNumber = getNextMsgNo(context, internalSequenceId);
 
 		boolean sendCreateSequence = false;
 
-		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(internalSequenceId,
+		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(
+				internalSequenceId,
 				Constants.SequenceProperties.OUT_SEQUENCE_ID);
 
 		if (messageNumber == 1) {
 			if (outSeqBean == null) {
 				sendCreateSequence = true;
 			}
-
-			//			SandeshaDynamicProperties dynamicProperties =
-			// SandeshaUtil.getDynamicProperties();
-			//			if (msgCtx.isSOAP11()) {
-			//				dynamicProperties.setSOAPVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-			//			}else {
-			//				dynamicProperties.setSOAPVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-			//			}
-
-			//TODO: set the policy bean
-			//dynamicProperties.setPolicyBean();
 		}
 
 		//if fist message - setup the sequence for the client side
@@ -277,85 +265,53 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(
 					"Invalid SOAP message. Body is not present");
 
-		//TODO - Is this a correct way to find out validity of app.
-		// messages.
-		boolean validAppMessage = false;
-		if (soapBody.getChildElements().hasNext())
-			validAppMessage = true;
-
-		if (validAppMessage) {
-
-			//valid response
-
-			//Changing message Id.
-			//TODO remove this when Axis2 start sending uuids as uuid:xxxx
-			String messageId1 = SandeshaUtil.getUUID();
-			if (rmMsgCtx.getMessageId() == null) {
-				rmMsgCtx.setMessageId(messageId1);
-			}
-
-			if (serverSide) {
-
-				//processing the response
-				processResponseMessage(rmMsgCtx, internalSequenceId,
-						messageNumber);
-
-				MessageContext reqMsgCtx = msgCtx
-						.getOperationContext()
-						.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-				RMMsgContext requestRMMsgCtx = MsgInitializer
-						.initializeMessage(reqMsgCtx);
-
-				//let the request end with 202 if a ack has not been
-				// written in the incoming thread.
-				if (reqMsgCtx.getProperty(Constants.ACK_WRITTEN) == null
-						|| !"true".equals(reqMsgCtx
-								.getProperty(Constants.ACK_WRITTEN)))
-					reqMsgCtx.getOperationContext().setProperty(
-							org.apache.axis2.Constants.RESPONSE_WRITTEN,
-							"false");
-			} else {
-
-				//setting reply to FIXME
-				//msgCtx.setReplyTo(new EndpointReference
-				// ("http://localhost:9070/somethingWorking"));
-
-				//Setting WSA Action if null
-				//TODO: Recheck weather this actions are correct
-				EndpointReference toEPR = msgCtx.getTo();
-
-				if (toEPR == null)
-					throw new SandeshaException("To EPR is not found");
-
-				String to = toEPR.getAddress();
-				String operationName = msgCtx.getOperationContext()
-						.getAxisOperation().getName().getLocalPart();
-
-				if (msgCtx.getWSAAction() == null) {
-					msgCtx.setWSAAction(to + "/" + operationName);
-				}
-
-				if (msgCtx.getSoapAction() == null) {
-					msgCtx
-							.setSoapAction("\"" + to + "/" + operationName
-									+ "\"");
-				}
-
-				//processing the response
-				processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber);
-
-			}
-
-			//pausing the message
-			msgCtx.setPausedTrue(getName());
+		String messageId1 = SandeshaUtil.getUUID();
+		if (rmMsgCtx.getMessageId() == null) {
+			rmMsgCtx.setMessageId(messageId1);
 		}
 
-		//		}catch (Exception e) {
-		//			e.getStackTrace();
-		//			throw new AxisFault ("Sandesha got an exception. See logs for
-		// details");
-		//		}
+		if (serverSide) {
 
+			//processing the response
+			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber);
+
+			MessageContext reqMsgCtx = msgCtx.getOperationContext()
+					.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+			RMMsgContext requestRMMsgCtx = MsgInitializer
+					.initializeMessage(reqMsgCtx);
+
+			//let the request end with 202 if a ack has not been
+			// written in the incoming thread.
+			if (reqMsgCtx.getProperty(Constants.ACK_WRITTEN) == null
+					|| !"true".equals(reqMsgCtx
+							.getProperty(Constants.ACK_WRITTEN)))
+				reqMsgCtx.getOperationContext().setProperty(
+						org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+		} else {
+			EndpointReference toEPR = msgCtx.getTo();
+
+			if (toEPR == null)
+				throw new SandeshaException("To EPR is not found");
+
+			String to = toEPR.getAddress();
+			String operationName = msgCtx.getOperationContext()
+					.getAxisOperation().getName().getLocalPart();
+
+			if (msgCtx.getWSAAction() == null) {
+				msgCtx.setWSAAction(to + "/" + operationName);
+			}
+
+			if (msgCtx.getSoapAction() == null) {
+				msgCtx.setSoapAction("\"" + to + "/" + operationName + "\"");
+			}
+
+			//processing the response
+			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber);
+
+		}
+
+		//pausing the message
+		msgCtx.setPausedTrue(getName());
 	}
 
 	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg,
@@ -399,11 +355,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
-
-		//TODO remove below
-		//createSeqMsg.setReplyTo(new EndpointReference
-		// ("http://localhost:9070/somethingWorking"));
-
 		createSeqMsg.setRelatesTo(null); //create seq msg does not relateTo
 		// anything
 		AbstractContext context = applicationRMMsg.getContext();
@@ -433,11 +384,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		createSeqEntry.setMessageId(createSeqRMMessage.getMessageId());
 		createSeqEntry.setSend(true);
 		retransmitterMgr.insert(createSeqEntry);
-
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg,
-			String internalSequenceId, long messageNumber) throws SandeshaException {
+			String internalSequenceId, long messageNumber)
+			throws SandeshaException {
 
 		MessageContext msg = rmMsg.getMessageContext();
 
@@ -466,12 +417,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//again - looks weird in the client side - but consistent
 		SequencePropertyBean outSequenceBean = sequencePropertyMgr.retrieve(
-				internalSequenceId, Constants.SequenceProperties.OUT_SEQUENCE_ID);
+				internalSequenceId,
+				Constants.SequenceProperties.OUT_SEQUENCE_ID);
 
 		if (toBean == null)
 			throw new SandeshaException("To is null");
-		//		if (replyToBean == null)
-		//			throw new SandeshaException("Replyto is null");
 
 		EndpointReference toEPR = (EndpointReference) toBean.getValue();
 		EndpointReference replyToEPR = null;
@@ -483,13 +433,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (toEPR == null || toEPR.getAddress() == null
 				|| toEPR.getAddress() == "")
 			throw new SandeshaException("To Property has an invalid value");
-
-		//		if (replyToEPR == null || replyToEPR.getAddress() == null
-		//				|| replyToEPR.getAddress() == "")
-		//			throw new SandeshaException("ReplyTo is not set correctly");
-
-		//Setting wsa:To to the replyTo value of the respective request message
-		//(instead of the replyTo of the CreateSequenceMessage)
 
 		String newToStr = null;
 
@@ -543,8 +486,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 			if (requestSequence.getLastMessage() != null) {
 				lastMessage = true;
-				//FIXME - This fails if request last message has more than one
-				// responses.
 				sequence.setLastMessage(new LastMessage(factory));
 
 				//saving the last message no.
@@ -576,7 +517,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		AckRequested ackRequested = null;
 
-		//TODO do this based on policies.
 		boolean addAckRequested = false;
 		if (!lastMessage)
 			addAckRequested = true;
@@ -587,13 +527,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		String identifierStr = null;
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
 			identifierStr = Constants.TEMP_SEQUENCE_ID;
-			//			identifier.setIndentifer(Constants.INTERNAL_SEQUENCE_ID);
-			//			sequence.setIdentifier(identifier);
 
 		} else {
 			identifierStr = (String) outSequenceBean.getValue();
-			//identifier.setIndentifer((String) outSequenceBean.getValue());
 		}
+
 		Identifier id1 = new Identifier(factory);
 		id1.setIndentifer(identifierStr);
 		sequence.setIdentifier(id1);
@@ -614,9 +552,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		//		//send the message through sender only in the server case.
-		//		//in the client case use the normal flow.
-		//		if (msg.isServerSide()) {
 		//Retransmitter bean entry for the application message
 		SenderBean appMsgEntry = new SenderBean();
 		String key = SandeshaUtil
@@ -633,12 +568,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 		appMsgEntry.setInternalSequenceId(internalSequenceId);
 		retransmitterMgr.insert(appMsgEntry);
-		//		}
 	}
 
 	private long getNextMsgNo(ConfigurationContext context,
 			String internalSequenceId) throws SandeshaException {
-		//FIXME set a correct message number.
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(context);

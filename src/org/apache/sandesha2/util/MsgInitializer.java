@@ -47,7 +47,6 @@ public class MsgInitializer {
 	 */
 	private static void populateRMMsgContext(MessageContext msgCtx,
 			RMMsgContext rmMsgContext) {
-		//TODO set message parts
 
 		RMElements elements = new RMElements();
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
@@ -90,8 +89,6 @@ public class MsgInitializer {
 	 */
 	private static boolean validateMessage(RMMsgContext rmMsgCtx)
 			throws SandeshaException {
-
-		//TODO: performa validation
 
 		//Setting message type.
 		if (rmMsgCtx.getMessagePart(Constants.MessageParts.CREATE_SEQ) != null)

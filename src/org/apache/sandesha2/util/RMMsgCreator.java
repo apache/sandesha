@@ -156,7 +156,6 @@ public class RMMsgCreator {
 			}
 		}
 
-		//TODO decide - where to send create seq. Acksto or replyTo
 		SequencePropertyBean replyToBean = seqPropMgr.retrieve(internalSequenceId,
 				Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
@@ -183,7 +182,6 @@ public class RMMsgCreator {
 		if (replyToEPR != null)
 			createSeqRMMsg.setReplyTo(replyToEPR);
 
-		//FIXME - Give user a seperate way to set acksTo (client side)
 		createSequencePart.setAcksTo(new AcksTo(
 				new Address(acksToEPR, factory), factory));
 
@@ -305,7 +303,6 @@ public class RMMsgCreator {
 		if (offer != null) {
 			String outSequenceId = offer.getIdentifer().getIdentifier();
 
-			//TODO do a better validation for the offered out sequence id.
 			if (outSequenceId != null && !"".equals(outSequenceId)) {
 
 				Accept accept = new Accept(factory);

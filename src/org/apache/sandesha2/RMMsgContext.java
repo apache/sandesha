@@ -169,12 +169,6 @@ public class RMMsgContext {
 		}
 	}
 
-	public void test() {
-		String opearaitonName = msgContext.getOperationContext()
-				.getAxisOperation().getName().getLocalPart();
-		System.out.println("Operation is:" + opearaitonName);
-	}
-
 	public void serializeSOAPEnvelop() {
 		try {
 			SOAPEnvelope envelop = msgContext.getEnvelope();

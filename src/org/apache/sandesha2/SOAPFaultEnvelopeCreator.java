@@ -127,9 +127,6 @@ public class SOAPFaultEnvelopeCreator {
 	private static void doSOAP11Encoding(MessageContext faultMsgContext,
 			FaultData data) throws SandeshaException {
 
-		//MessageContext faultMsgContext =
-		// faultRMMsgContext.getMessageContext();
-
 		SOAPEnvelope faultMsgEnvelope = faultMsgContext.getEnvelope();
 		if (faultMsgEnvelope == null)
 			throw new SandeshaException("SOAP Envelope is null");
@@ -172,7 +169,6 @@ public class SOAPFaultEnvelopeCreator {
 	 */
 	private static void doSOAP12Encoding(MessageContext faultMsgContext,
 			FaultData data) throws SandeshaException {
-		//MessageContext faultMsgCtx = faultRMMsgContext.getMessageContext();
 
 		SOAPEnvelope faultEnvelope = faultMsgContext.getEnvelope();
 		if (faultEnvelope == null)
@@ -207,87 +203,6 @@ public class SOAPFaultEnvelopeCreator {
 			faultDetail.addChild(detailElement);
 
 		faultMsgContext.setWSAAction(Constants.WSA.SOAP_FAULT_ACTION);
-
-		//		if (detailElement!=null) {
-		//			String subcode = data.getSubcode();
-		//			
-		//			if (Constants.SOAPFaults.Subcodes.SequenceTerminated.equals(subcode))
-		// {
-		//				
-		//			}else if
-		// (Constants.SOAPFaults.Subcodes.UnknownSequence.equals(subcode)) {
-		//				
-		//			}else if
-		// (Constants.SOAPFaults.Subcodes.InvalidAcknowledgement.equals(subcode))
-		// {
-		//				
-		//			}else if
-		// (Constants.SOAPFaults.Subcodes.MessageNumberRoleover.equals(subcode))
-		// {
-		//				
-		//			}else if
-		// (Constants.SOAPFaults.Subcodes.LastMessageNumberExceeded.equals(subcode))
-		// {
-		//				
-		//			}else if
-		// (Constants.SOAPFaults.Subcodes.CreateSequenceRefused.equals(subcode))
-		// {
-		//				
-		//			}
-
-		//		switch (data.type) {
-		//		case Constants.MessageTypes.APPLICATION:
-		//
-		//			/* Sequence */
-		//			OMElement sequence = ienvelope.getHeader()
-		//					.getFirstChildWithName(
-		//							new QName(Constants.WSRM.NS_URI_RM,
-		//									Constants.WSRM.SEQUENCE));
-		//			OMElement sidentifier = sequence.getFirstChildWithName(new QName(
-		//					Constants.WSRM.NS_URI_RM, Constants.WSRM.IDENTIFIER));
-		//
-		//			OMNamespace snamespace = factory.createOMNamespace(
-		//					Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-		//			OMElement selement = factory.createOMElement(
-		//					Constants.WSRM.IDENTIFIER, snamespace);
-		//
-		//			selement.setText(sidentifier.getText());
-		//			faultDetail.addChild(selement);
-		//			break;
-		//
-		//		case Constants.MessageTypes.ACK:
-		//
-		//			/* SequenceAcknowledge */
-		//
-		//			OMElement sequenceAck = ienvelope.getHeader()
-		//					.getFirstChildWithName(
-		//							new QName(Constants.WSRM.NS_URI_RM,
-		//									Constants.WSRM.SEQUENCE_ACK));
-		//			OMElement aidentifier = sequenceAck
-		//					.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
-		//							Constants.WSRM.IDENTIFIER));
-		//			OMNamespace anamespace = factory.createOMNamespace(
-		//					Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-		//			OMElement aelement = factory.createOMElement(
-		//					Constants.WSRM.IDENTIFIER, anamespace);
-		//
-		//			aelement.setText(aidentifier.getText());
-		//			faultDetail.addChild(aelement);
-		//			break;
-		//
-		//		default:
-		//
-		//			/* TODO for other message types */
-		//			break;
-		//
-		//		}
-		//		}
-
-		//		try {
-		//			msgCtx.setEnvelope(envelope);
-		//		} catch (AxisFault e) {
-		//			throw new SandeshaException(e.getMessage());
-		//		}
 	}
 
 }

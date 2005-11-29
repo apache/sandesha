@@ -49,7 +49,6 @@ public class PropertyManager {
 			
 			Properties properties = new Properties ();
 			if (in!=null) {
-				//throw new IOException ("sandesha2 property file not found");
 				properties.load(in);
 			}
 			

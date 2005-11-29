@@ -148,8 +148,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		if (!table.contains(bean))
 			return false;
 
-		return true; //No need to update. Being a reference does the job:)
-					 // //table.put(bean.getMessageId(), bean) != null;
+		return true; //No need to update. Being a reference does the job.
 	}
 
 }

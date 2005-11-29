@@ -98,7 +98,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		Collection retransmitterEntriesOfSequence = retransmitterMgr
 				.find(input);
 
-		//TODO - make following more efficient
 		while (ackRangeIterator.hasNext()) {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator
 					.next();
@@ -113,7 +112,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			}
 		}
 
-		//TODO - make following more efficient
 		while (nackIterator.hasNext()) {
 			Nack nack = (Nack) nackIterator.next();
 			long msgNo = nack.getNackNumber();
@@ -151,9 +149,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			rmMsgCtx.getMessageContext().setPausedTrue(
 					new QName(Constants.IN_HANDLER_NAME));
 		}
-
-		int i = 1;
-
 	}
 
 	private SenderBean getRetransmitterEntry(Collection collection,
@@ -191,8 +186,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		RMMsgContext terminateRMMessage = RMMsgCreator
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
 
-		//SequencePropertyBean replyToBean =
-		// seqPropMgr.retrieve(internalSequenceId,Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
 				Constants.SequenceProperties.TO_EPR);
 
@@ -205,8 +198,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				Constants.WSA.NS_URI_ANONYMOUS));
 		terminateRMMessage.setFaultTo(new EndpointReference(
 				Constants.WSA.NS_URI_ANONYMOUS));
-		//terminateRMMessage.setFrom(new EndpointReference
-		// (replyToEPR.getAddress()));
 		terminateRMMessage
 				.setWSAAction(Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE);
 		terminateRMMessage
@@ -226,7 +217,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//Set a retransmitter lastSentTime so that terminate will be send with
 		// some delay.
 		//Otherwise this get send before return of the current request (ack).
-		//TODO verify that the time given is correct
 		terminateBean.setTimeToSend(System.currentTimeMillis()
 				+ Constants.TERMINATE_DELAY);
 

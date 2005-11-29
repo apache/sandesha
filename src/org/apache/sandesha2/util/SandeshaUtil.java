@@ -55,7 +55,6 @@ import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
 import org.apache.sandesha2.Constants;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.SandeshaDynamicProperties;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.workers.InOrderInvoker;
@@ -77,8 +76,6 @@ public class SandeshaUtil {
 	private static Sender sender = new Sender();
 
 	private static InOrderInvoker invoker = new InOrderInvoker();
-
-	private static SandeshaDynamicProperties dynamicProperties = null;
 
 	/**
 	 * Create a new UUID.
@@ -223,14 +220,12 @@ public class SandeshaUtil {
 	public static void startSenderIfStopped(ConfigurationContext context) {
 		if (!sender.isSenderStarted()) {
 			sender.start(context);
-			System.out.println("Sender started....");
 		}
 	}
 
 	public static void startInvokerIfStopped(ConfigurationContext context) {
 		if (!invoker.isInvokerStarted()) {
 			invoker.start(context);
-			System.out.println("Invoker started....");
 		}
 	}
 
@@ -277,8 +272,6 @@ public class SandeshaUtil {
 				throw new AxisFault(Messages.getMessage("inputstreamNull"));
 			}
 
-			//This should be set later
-			//TODO check weather this affects MTOM
 			String contentType = null;
 
 			StAXBuilder builder = null;
@@ -415,21 +408,6 @@ public class SandeshaUtil {
 		}
 	}
 
-	public static SandeshaDynamicProperties getDynamicProperties() {
-		if (dynamicProperties == null) {
-			loadDymanicProperties();
-		}
-
-		return dynamicProperties;
-	}
-
-	private static void loadDymanicProperties() {
-		dynamicProperties = new SandeshaDynamicProperties();
-
-		//TODO: override properties from the sandesha-config.xml
-
-	}
-
 	public static int getSOAPVersion(SOAPEnvelope envelope)
 			throws SandeshaException {
 		String namespaceName = envelope.getNamespace().getName();
@@ -531,22 +509,6 @@ public class SandeshaUtil {
 
 			newMessageContext.setAxisOperation(operation);
 
-//			if (referenceMessage.getServiceGroupContext() != null) {
-//				newMessageContext.setServiceGroupContext(referenceMessage
-//						.getServiceGroupContext());
-//				newMessageContext.setServiceGroupContextId(referenceMessage
-//						.getServiceGroupContextId());
-//			}
-//
-//			if (referenceMessage.getServiceContext() != null) {
-//				newMessageContext.setServiceContext(referenceMessage
-//						.getServiceContext());
-//				newMessageContext.setServiceContextID(referenceMessage
-//						.getServiceContextID());
-//			} else {
-//				
-//			}
-
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);
 			operationContext.addMessageContext(newMessageContext);
@@ -561,7 +523,7 @@ public class SandeshaUtil {
 			newMessageContext.setTransportOut(referenceMessage
 					.getTransportOut());
 
-			//copying transport info. TODO remove http specific ness.
+			//copying transport info.
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,
 					referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
 			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,

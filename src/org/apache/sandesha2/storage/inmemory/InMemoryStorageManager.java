@@ -63,18 +63,6 @@ public class InMemoryStorageManager extends StorageManager {
 		return new InMemoryInvokerBeanMgr(getContext());
 	}
 
-	//	public static StorageManager getBeanMgrFactory (int storageType)
-	// {
-	//		switch (storageType) {
-	//			case Constants.STORAGE_TYPE_PERSISTANCE:
-	//				return new PersistentBeanMgrFactory();
-	//			case Constants.STORAGE_TYPE_IN_MEMORY:
-	//				return new InMemBeanMgrFactory();
-	//			default:
-	//				return null;
-	//		}
-	//	}
-
 	public void init(ConfigurationContext context) {
 		setContext(context);
 	}

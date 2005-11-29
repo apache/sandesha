@@ -148,10 +148,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			SequencePropertyBean seqPropBean = new SequencePropertyBean(
 					newSequenceId, Constants.SequenceProperties.ACKS_TO_EPR,
 					acksTo);
-			//		InMemorySequencePropertyBeanMgr beanMgr = new
-			// InMemorySequencePropertyBeanMgr
-			// (Constants.DEFAULT_STORAGE_TYPE);
-			//		beanMgr.create(seqPropBean);
 
 			StorageManager storageManager = SandeshaUtil
 					.getSandeshaStorageManager(context);
@@ -170,7 +166,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					org.apache.axis2.Constants.RESPONSE_WRITTEN);
 			if (Constants.WSA.NS_URI_ANONYMOUS.equals(createSeqMsg.getReplyTo()
 					.getAddress())) {
-				//So that '202 OK' get sent instead of 200 OK.
 				createSeqMsg.getOperationContext().setProperty(
 						org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 			} else {

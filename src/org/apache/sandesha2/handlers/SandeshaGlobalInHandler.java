@@ -57,9 +57,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgContext) throws AxisFault {
 
-		//try {
-
-		//Quit the message with minimum processing if not intended for RM.
+		//Quitting the message with minimum processing if not intended for RM.
 		boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
 		if (!isRMGlobalMessage) {
 			return;
@@ -81,8 +79,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		ConfigurationContext context = rmMessageContext.getMessageContext()
 				.getSystemContext();
-
-		//context.setProperty (Constants.SANDESHA_DEBUG_MODE,"on");
 
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		Object debug = null;
@@ -113,12 +109,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				.getMessageType())) {
 			doGlobalProcessing(rmMessageContext);
 		}
-
-		//		}catch (Exception e) {
-		//			e.getStackTrace();
-		//			throw new AxisFault ("Sandesha got an exception. See logs for
-		// details");
-		//		}
 	}
 
 	private boolean dropIfDuplicate(RMMsgContext rmMsgContext)
@@ -205,7 +195,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 						}
 					}
 				}
-				//if (rmMsgContext.get)
 			}
 		}
 

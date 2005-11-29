@@ -54,8 +54,6 @@ public class SandeshaInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 	
-		//System.out.println("In Sandesha In Handler....");
-		
 		ConfigurationContext context = msgCtx.getSystemContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
@@ -108,12 +106,6 @@ public class SandeshaInHandler extends AbstractHandler {
 			se.printStackTrace();
 			throw new AxisFault("Error in processing the message");
 		}
-
-		//		}catch (Exception e) {
-		//			e.getStackTrace();
-		//			throw new AxisFault ("Sandesha got an exception. See logs for
-		// details");
-		//		}
 
 	}
 

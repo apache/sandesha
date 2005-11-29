@@ -106,14 +106,6 @@ public class SenderBean implements RMBean {
 		this.key = key;
 	}
 
-//	public long getLastSentTime() {
-//		return LastSentTime;
-//	}
-//
-//	public void setLastSentTime(long lastSentTime) {
-//		LastSentTime = lastSentTime;
-//	}
-
 	public String getMessageId() {
 		return messageId;
 	}

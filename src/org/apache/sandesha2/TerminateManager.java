@@ -98,19 +98,6 @@ public class TerminateManager {
 			storageMapBeanMgr.delete(storageMapBean.getKey());
 		}
 		
-		//TODO - refine below (removing sequence properties of the receiving side).
-		//removing sequencePropertyEntries.
-//		SequencePropertyBean findSequencePropBean = new SequencePropertyBean ();
-//		findSequencePropBean.setSequenceId(sequenceID);
-//		collection = sequencePropertyBeanMgr.find(findSequencePropBean);
-//		iterator = collection.iterator();
-//		while (iterator.hasNext()) {
-//			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-//			boolean propertyRequiredForResponses = isRequiredForResponseSide (sequencePropertyBean.getName());
-//			if (!propertyRequiredForResponses)
-//				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceId(),sequencePropertyBean.getName());
-//		}
-		
 		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(Constants.SequenceProperties.ALL_SEQUENCES,Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 		ArrayList allSequenceList = (ArrayList) allSequenceBean.getValue();
 		
