@@ -85,31 +85,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");
 
-		if (!msgCtx.isServerSide()) {
-			//getting rm message
-			RMMsgContext rmMsgCtx = null;
-
-			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-
-			if (rmMsgCtx.getMessageType() == Constants.MessageTypes.UNKNOWN) {
-				Parameter param = new ParameterImpl(Constants.RM_ENABLE_KEY,
-						"true");
-				axisService.addParameter(param);
-			}
-		}
-
 		//getting rm message
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-
-		Parameter keyParam = axisService.getParameter(Constants.RM_ENABLE_KEY);
-		Object keyValue = null;
-		if (keyParam != null)
-			keyValue = keyParam.getValue();
-
-		if (keyValue == null || !keyValue.equals("true")) {
-			//RM is not enabled for the service. Quiting SandeshaOutHandler
-			return;
-		}
 
 		String DONE = (String) msgCtx
 				.getProperty(Constants.APPLICATION_PROCESSING_DONE);

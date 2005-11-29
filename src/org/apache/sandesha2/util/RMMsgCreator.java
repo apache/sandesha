@@ -245,8 +245,6 @@ public class RMMsgCreator {
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
 				.getSOAPVersion(referenceMessage.getEnvelope()));
 
-		MessageInformationHeaders newMessageInfoHeaders = new MessageInformationHeaders();
-		terminateMessage.setMessageInformationHeaders(newMessageInfoHeaders);
 		terminateMessage.setMessageID(SandeshaUtil.getUUID());
 
 		ConfigurationContext configCtx = referenceMessage.getSystemContext();

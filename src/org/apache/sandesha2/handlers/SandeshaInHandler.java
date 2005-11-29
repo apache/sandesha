@@ -54,6 +54,8 @@ public class SandeshaInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 	
+		//System.out.println("In Sandesha In Handler....");
+		
 		ConfigurationContext context = msgCtx.getSystemContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
@@ -75,16 +77,6 @@ public class SandeshaInHandler extends AbstractHandler {
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null)
 			throw new AxisFault("AxisService is null");
-
-		Parameter keyParam = axisService.getParameter(Constants.RM_ENABLE_KEY);
-		Object keyValue = null;
-		if (keyParam != null)
-			keyValue = keyParam.getValue();
-
-		if (keyValue == null || !keyValue.equals("true")) {
-			//RM is not enabled for the service. Quiting SandeshaInHandler
-			return;
-		}
 
 		RMMsgContext rmMsgCtx = null;
 		try {

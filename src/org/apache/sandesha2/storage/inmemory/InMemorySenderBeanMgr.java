@@ -110,12 +110,13 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 
 	public Collection findMsgsToSend() {
 		ArrayList beans = new ArrayList();
-		Iterator iterator = table.values().iterator();
+		Iterator iterator = table.keySet().iterator();
 
 		SenderBean temp;
 
 		while (iterator.hasNext()) {
-			temp = (SenderBean) iterator.next();
+			Object key = iterator.next();
+			temp = (SenderBean) table.get(key);
 
 			if (temp.isSend()) {
 
@@ -127,79 +128,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 			}
 		}
 
-		//		beans = sort (beans);
-		//		beans = reverse (beans);
-
 		return beans;
-	}
-
-	private ArrayList reverse(ArrayList beans) {
-		ArrayList newBeans = new ArrayList();
-		int count = beans.size();
-
-		for (int i = count; i > 0; i--) {
-			newBeans.add(beans.get((i - 1)));
-		}
-
-		return newBeans;
-	}
-
-	//FIXME - not complete
-	//SENDER SORTING
-	//--------------
-	//Sender Sorting is used to arrange the messages that get sent.
-	//This sending order may get dsturbed due to network latencies.
-	//But doing the sort here, could improve the server preformance when
-	// network latencies are low (this is the common case).
-	//Sender sorting will be enabled, when invocation type is InOrder.
-	private ArrayList sort(ArrayList beans) {
-		ArrayList newBeans = new ArrayList();
-		HashMap tempHash = new HashMap();
-
-		Iterator iter1 = beans.iterator();
-		while (iter1.hasNext()) {
-			SenderBean bean = (SenderBean) iter1.next();
-			if (!(bean.getMessageNumber() > 0)) {
-				newBeans.add(bean);
-			}
-		}
-
-		Iterator iter2 = beans.iterator();
-		long maxMsgNo = 0;
-		long minMsgNo = 0;
-		while (iter2.hasNext()) {
-			SenderBean bean = (SenderBean) iter2.next();
-
-			if (bean.getMessageNumber() > 0) {
-				maxMsgNo = bean.getMessageNumber();
-				minMsgNo = bean.getMessageNumber();
-				break;
-			}
-		}
-
-		//finding Max and Min msg numbers present in the current list.
-		while (iter2.hasNext()) {
-			SenderBean bean = (SenderBean) iter2.next();
-			long msgNo = bean.getMessageNumber();
-			if (msgNo > 0) {
-				//tempHash.put(new Long (bean.getMessageNumber()),bean);
-				if (msgNo > maxMsgNo)
-					maxMsgNo = msgNo;
-
-				if (msgNo < minMsgNo)
-					minMsgNo = msgNo;
-			}
-		}
-
-		for (long msgNo = minMsgNo; msgNo <= maxMsgNo; msgNo++) {
-			ArrayList beansOfMsgNo = findBeansWithMsgNo(beans, msgNo);
-			Iterator iter = beansOfMsgNo.iterator();
-			while (iter.hasNext()) {
-
-			}
-		}
-
-		return newBeans;
 	}
 
 	private ArrayList findBeansWithMsgNo(ArrayList list, long msgNo) {
