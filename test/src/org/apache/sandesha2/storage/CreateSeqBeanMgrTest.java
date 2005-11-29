@@ -51,7 +51,7 @@ public class CreateSeqBeanMgrTest extends SandeshaTestCase {
         mgr.insert(new CreateSeqBean("TmpSeqId2", "CreateSeqMsgId3", "SeqId3"));
 
         CreateSeqBean target = new CreateSeqBean();
-        target.setTempSequenceId("TmpSeqId2");
+        target.setInternalSequenceId("TmpSeqId2");
 
         Iterator iter = mgr.find(target).iterator();
         CreateSeqBean tmp = (CreateSeqBean) iter.next();
@@ -71,7 +71,7 @@ public class CreateSeqBeanMgrTest extends SandeshaTestCase {
         CreateSeqBean tmpbean = mgr.retrieve("CreateSeqMsgId4");
         assertTrue(tmpbean.getCreateSeqMsgId().equals("CreateSeqMsgId4"));
         assertTrue(tmpbean.getSequenceId().equals("SeqId4"));
-        assertTrue(tmpbean.getTempSequenceId().equals("TmpSeqId4"));
+        assertTrue(tmpbean.getInternalSequenceId().equals("TmpSeqId4"));
     }
 
 
@@ -88,9 +88,9 @@ public class CreateSeqBeanMgrTest extends SandeshaTestCase {
 
         CreateSeqBean bean = new CreateSeqBean("TmpSeqId6", "CreateSeqMsgId6", "SeqId6");
         mgr.insert(bean);
-        bean.setTempSequenceId("TmpSeqId7");
+        bean.setInternalSequenceId("TmpSeqId7");
         mgr.update(bean);
         CreateSeqBean tmp = mgr.retrieve("CreateSeqMsgId6");
-        assertTrue(tmp.getTempSequenceId().equals("TmpSeqId7"));
+        assertTrue(tmp.getInternalSequenceId().equals("TmpSeqId7"));
     }
 }

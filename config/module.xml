@@ -2,7 +2,7 @@
 
     <inflow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
-            <order phase="PreDispatch"/>
+            <order after="AddressingInHandler" phase="PreDispatch"/>
         </handler> 
         <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">
             <order phase="RMPhase"/>

@@ -1,7 +1,7 @@
 package org.apache.sandesha2.storage;
 
-import org.apache.sandesha2.storage.beanmanagers.StorageMapBeanMgr;
-import org.apache.sandesha2.storage.beans.StorageMapBean;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -27,7 +27,7 @@ import java.util.Iterator;
 
 public class StorageMapBeanMgrTest extends SandeshaTestCase {
 
-    StorageMapBeanMgr mgr;
+    InvokerBeanMgr mgr;
 
     public StorageMapBeanMgrTest() {
         super ("StorageMapBeanMgrTest");
@@ -41,48 +41,48 @@ public class StorageMapBeanMgrTest extends SandeshaTestCase {
     }
 
     public void testDelete() {
-        mgr.insert(new StorageMapBean("Key1", 1001, "SeqId1"));
+        mgr.insert(new InvokerBean("Key1", 1001, "SeqId1"));
         mgr.delete("Key1");
         assertNull(mgr.retrieve("Key1"));
     }
 
     public void testFind() {
-        mgr.insert(new StorageMapBean("Key2", 1002, "SeqId2"));
-        mgr.insert(new StorageMapBean("Key3", 1003, "SeqId2"));
+        mgr.insert(new InvokerBean("Key2", 1002, "SeqId2"));
+        mgr.insert(new InvokerBean("Key3", 1003, "SeqId2"));
 
-        StorageMapBean bean = new StorageMapBean();
+        InvokerBean bean = new InvokerBean();
         bean.setSequenceId("SeqId2");
 
         Iterator iter = mgr.find(bean).iterator();
-        StorageMapBean tmp = (StorageMapBean) iter.next();
+        InvokerBean tmp = (InvokerBean) iter.next();
 
         if (tmp.getKey().equals("Key2")) {
-            tmp = (StorageMapBean) iter.next();
+            tmp = (InvokerBean) iter.next();
             assertTrue(tmp.getKey().equals("Key3"));
         } else {
-            tmp = (StorageMapBean) iter.next();
+            tmp = (InvokerBean) iter.next();
             assertTrue(tmp.getKey().equals("Key2"));
 
         }
     }
 
     public void testInsert() {
-        mgr.insert(new StorageMapBean("Key4", 1004, "SeqId4"));
-        StorageMapBean tmp = mgr.retrieve("Key4");
+        mgr.insert(new InvokerBean("Key4", 1004, "SeqId4"));
+        InvokerBean tmp = mgr.retrieve("Key4");
         assertTrue(tmp.getKey().equals("Key4"));
     }
 
     public void testRetrieve() {
         assertNull(mgr.retrieve("Key5"));
-        mgr.insert(new StorageMapBean("Key5", 1004, "SeqId5"));
+        mgr.insert(new InvokerBean("Key5", 1004, "SeqId5"));
         assertNotNull(mgr.retrieve("Key5"));
     }
 
     public void testUpdate() {
-        StorageMapBean bean = new StorageMapBean("Key6", 1006, "SeqId6");
+        InvokerBean bean = new InvokerBean("Key6", 1006, "SeqId6");
         mgr.insert(bean);
         bean.setMsgNo(1007);
-        StorageMapBean tmp = mgr.retrieve("Key6");
+        InvokerBean tmp = mgr.retrieve("Key6");
         assertTrue(tmp.getMsgNo() == 1007);
     }
 }

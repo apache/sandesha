@@ -90,7 +90,7 @@
     <!-- ================================================= -->
     <!-- Comment this to disable Addressing -->
     <module ref="addressing"/>
-    <module ref="sandesha"/>
+    <!-- <module ref="sandesha"/> -->
 
 
     <!--Configuring module , providing paramters for modules whether they refer or not-->

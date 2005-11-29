@@ -2,8 +2,8 @@ package org.apache.sandesha2.storage;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
-import org.apache.sandesha2.storage.beanmanagers.RetransmitterBeanMgr;
-import org.apache.sandesha2.storage.beans.RetransmitterBean;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisConfigurationImpl;
@@ -27,7 +27,7 @@ import java.util.Iterator;
  */
 
 public class RetransmitterBeanMgrTest extends SandeshaTestCase {
-    private RetransmitterBeanMgr mgr;
+    private SenderBeanMgr mgr;
 
     public RetransmitterBeanMgrTest() {
         super("RetransmitterBeanMgrTest");
@@ -43,7 +43,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
     public void testDelete() {
         assertNull(mgr.retrieve(""));
         try {
-            mgr.insert(new RetransmitterBean("MsgId1", "Key1", false , 1001 , "TmpSeqId1", 1001));
+            mgr.insert(new SenderBean("MsgId1", "Key1", false , 1001 , "TmpSeqId1", 1001));
         } catch (Exception ex) {
             fail("should not throw an exception");
         }
@@ -52,20 +52,20 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
 
     public void testFind() {
         try {
-            mgr.insert(new RetransmitterBean("MsgId2", "Key2", false , 1001 , "TmpSeqId2", 1002));
-            mgr.insert(new RetransmitterBean("MsgId3", "Key3", false , 1001 , "TmpSeqId2", 1003));
+            mgr.insert(new SenderBean("MsgId2", "Key2", false , 1001 , "TmpSeqId2", 1002));
+            mgr.insert(new SenderBean("MsgId3", "Key3", false , 1001 , "TmpSeqId2", 1003));
 
-            RetransmitterBean target = new RetransmitterBean();
-            target.setTempSequenceId("TmpSeqId2");
+            SenderBean target = new SenderBean();
+            target.setInternalSequenceId("TmpSeqId2");
 
             Iterator iterator = mgr.find(target).iterator();
-            RetransmitterBean tmp = (RetransmitterBean) iterator.next();
+            SenderBean tmp = (SenderBean) iterator.next();
 
             if (tmp.getMessageId().equals("MsgId2")) {
-                tmp = (RetransmitterBean) iterator.next();
+                tmp = (SenderBean) iterator.next();
                 assertTrue(tmp.getMessageId().equals("MsgId3"));
             } else {
-                tmp = (RetransmitterBean) iterator.next();
+                tmp = (SenderBean) iterator.next();
                 assertTrue(tmp.getMessageId().equals("MsgId2"));
             }
 
@@ -79,15 +79,15 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
 
     public void testInsert() {
         try {
-            mgr.insert(new RetransmitterBean());
+            mgr.insert(new SenderBean());
             fail("should throw an exception");
 
         } catch (SandeshaException ex) {
         }
 
         try {
-            mgr.insert(new RetransmitterBean("MsgId4","Key4", false , 1001 , "TmpSeqId4", 1004));
-            RetransmitterBean tmp = mgr.retrieve("MsgId4");
+            mgr.insert(new SenderBean("MsgId4","Key4", false , 1001 , "TmpSeqId4", 1004));
+            SenderBean tmp = mgr.retrieve("MsgId4");
             assertTrue(tmp.getKey().equals("Key4"));
 
 
@@ -100,7 +100,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
     public void testRetrieve() {
         assertNull(mgr.retrieve("MsgId5"));
         try {
-            mgr.insert(new RetransmitterBean("MsgId5", "Key5", false , 1001 , "TmpSeqId5", 1005));
+            mgr.insert(new SenderBean("MsgId5", "Key5", false , 1001 , "TmpSeqId5", 1005));
         } catch (SandeshaException e) {
             fail("this should not throw an exception");
         }
@@ -108,7 +108,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
     }
 
     public void testUpdate() {
-        RetransmitterBean bean = new RetransmitterBean("MsgId6", "Key6", false , 1001 , "TmpSeqId6", 1006);
+        SenderBean bean = new SenderBean("MsgId6", "Key6", false , 1001 , "TmpSeqId6", 1006);
         try {
             mgr.insert(bean);
         } catch (SandeshaException e) {
@@ -117,7 +117,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
         bean.setSend(true);
         mgr.update(bean);
 
-        RetransmitterBean tmp = mgr.retrieve("MsgId6");
+        SenderBean tmp = mgr.retrieve("MsgId6");
         assertTrue(tmp.isSend());
     }
 }

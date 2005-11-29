@@ -1,24 +1,26 @@
-<service name="InteropService">
+<service name="OneWayService">
     <parameter name="ServiceClass" locked="xsd:false">org.apache.sandesha2.samples.interop.service.RMInteropService</parameter>
 
-   <parameter name="RMEnabled" >true</parameter>
+   <module ref="sandesha"/>
 
    <description>
         This is a testing service , to test the system is working or not
-    </description>
+   </description>
 
     <operation name="ping">  
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
     </operation>
 
+    <operation name="Ping">  
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+    </operation>
+    
     <operation name="echoString">
             <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
     </operation>
 
-<!--
-    <operation name="ping">
-		<messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver" />
-	</operation> 
--->
+    <operation name="EchoString">
+            <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+    </operation>
     
 </service>
