@@ -28,9 +28,10 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.util.FaultManager;
@@ -49,7 +50,7 @@ public class SandeshaInHandler extends AbstractHandler {
 	protected Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
 
 	public QName getName() {
-		return new QName(Constants.IN_HANDLER_NAME);
+		return new QName(Sandesha2Constants.IN_HANDLER_NAME);
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
@@ -59,7 +60,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			throw new AxisFault("ConfigurationContext is null");
 
 		String DONE = (String) msgCtx
-				.getProperty(Constants.APPLICATION_PROCESSING_DONE);
+				.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE))
 			return;
 
@@ -86,7 +87,7 @@ public class SandeshaInHandler extends AbstractHandler {
 		ServiceContext serviceContext = msgCtx.getServiceContext();
 		Object debug = null;
 		if (serviceContext != null) {
-			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+			debug = serviceContext.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaInHandler got a '"
 						+ SandeshaUtil.getMessageTypeString(rmMsgCtx

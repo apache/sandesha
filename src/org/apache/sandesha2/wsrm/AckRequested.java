@@ -25,7 +25,7 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * Represent the AckRequested header block.
@@ -49,9 +49,9 @@ public class AckRequested implements IOMRMPart {
 	public AckRequested(SOAPFactory factory) {
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		ackRequestedElement = factory.createOMElement(
-				Constants.WSRM.ACK_REQUESTED, rmNamespace);
+				Sandesha2Constants.WSRM.ACK_REQUESTED, rmNamespace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -65,7 +65,7 @@ public class AckRequested implements IOMRMPart {
 					"Cant add the Ack Requested part to a non-header element");
 
 		OMElement ackReqPart = header.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.ACK_REQUESTED));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.ACK_REQUESTED));
 
 		if (ackReqPart == null)
 			throw new OMException(
@@ -75,7 +75,7 @@ public class AckRequested implements IOMRMPart {
 		identifier.fromOMElement(ackReqPart);
 
 		OMElement msgNoPart = ackReqPart.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.MSG_NUMBER));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.MSG_NUMBER));
 
 		if (msgNoPart != null) {
 			messageNumber = new MessageNumber(factory);
@@ -83,7 +83,7 @@ public class AckRequested implements IOMRMPart {
 		}
 
 		ackRequestedElement = factory.createOMElement(
-				Constants.WSRM.ACK_REQUESTED, rmNamespace);
+				Sandesha2Constants.WSRM.ACK_REQUESTED, rmNamespace);
 
 		return this;
 	}
@@ -100,7 +100,7 @@ public class AckRequested implements IOMRMPart {
 
 		SOAPHeader SOAPHdr = (SOAPHeader) header;
 		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(
-				Constants.WSRM.ACK_REQUESTED, rmNamespace);
+				Sandesha2Constants.WSRM.ACK_REQUESTED, rmNamespace);
 		ackReqHdrBlock.setMustUnderstand(true);
 
 		identifier.toOMElement(ackReqHdrBlock);
@@ -110,7 +110,7 @@ public class AckRequested implements IOMRMPart {
 		}
 
 		ackRequestedElement = factory.createOMElement(
-				Constants.WSRM.ACK_REQUESTED, rmNamespace);
+				Sandesha2Constants.WSRM.ACK_REQUESTED, rmNamespace);
 
 		return header;
 	}
@@ -135,8 +135,8 @@ public class AckRequested implements IOMRMPart {
 		SOAPHeader header = envelope.getHeader();
 		
 		//detach if already exist.
-		OMElement elem = header.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
-				Constants.WSRM.ACK_REQUESTED));
+		OMElement elem = header.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+				Sandesha2Constants.WSRM.ACK_REQUESTED));
 		if (elem!=null)
 			elem.detach();
 		

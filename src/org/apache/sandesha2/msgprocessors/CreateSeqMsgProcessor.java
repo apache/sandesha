@@ -25,7 +25,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -54,7 +54,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
 		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg
-				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		if (createSeqPart == null)
 			throw new SandeshaException(
 					"No create sequence part is present in the create sequence message");
@@ -79,7 +79,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
 							newSequenceId);
 			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
-					.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
+					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
 
 			//If an offer is accepted do necessary procesing.
 			Accept accept = createSeqResPart.getAccept();
@@ -111,7 +111,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						.getSequencePropretyBeanMgr();
 				SequencePropertyBean outSequenceBean = new SequencePropertyBean();
 				outSequenceBean
-						.setName(Constants.SequenceProperties.OUT_SEQUENCE_ID);
+						.setName(Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 				outSequenceBean.setValue(outSequenceId);
 				outSequenceBean.setSequenceId(newSequenceId);
 				seqPropMgr.insert(outSequenceBean);
@@ -120,11 +120,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				//If internal sequence id is not set. this implies server side.
 				SequencePropertyBean internalSeqBean = seqPropMgr.retrieve(
 						outSequenceId,
-						Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 				if (internalSeqBean == null) {
 					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
 					internalSequenceBean
-							.setName(Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+							.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 					internalSequenceBean.setSequenceId(outSequenceId);
 					internalSequenceBean.setValue(newSequenceId);
 					seqPropMgr.insert(internalSequenceBean);
@@ -133,7 +133,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			}
 
 			CreateSequence createSeq = (CreateSequence) createSeqRMMsg
-					.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 			if (createSeq == null)
 				throw new AxisFault(
 						"Create sequence part not present in the create sequence message");
@@ -146,7 +146,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						"Acks to not present in the create sequence message");
 
 			SequencePropertyBean seqPropBean = new SequencePropertyBean(
-					newSequenceId, Constants.SequenceProperties.ACKS_TO_EPR,
+					newSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
 					acksTo);
 
 			StorageManager storageManager = SandeshaUtil
@@ -164,7 +164,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 			Object obj = createSeqMsg.getOperationContext().getProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN);
-			if (Constants.WSA.NS_URI_ANONYMOUS.equals(createSeqMsg.getReplyTo()
+			if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(createSeqMsg.getReplyTo()
 					.getAddress())) {
 				createSeqMsg.getOperationContext().setProperty(
 						org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
@@ -176,6 +176,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		createSeqMsg.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
+		createSeqMsg.setPausedTrue(new QName(Sandesha2Constants.IN_HANDLER_NAME));
 	}
 }

@@ -33,9 +33,10 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -62,8 +63,8 @@ public class RMMsgCreator {
 
 	private static void setUpMessage(MessageContext rmMsgCtx) {
 		//Seting RMPolicyBean
-		if (rmMsgCtx.getProperty(Constants.WSP.RM_POLICY_BEAN)==null)
-			rmMsgCtx.setProperty(Constants.WSP.RM_POLICY_BEAN, PropertyManager.getInstance().getRMPolicyBean());
+		if (rmMsgCtx.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN)==null)
+			rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, PropertyManager.getInstance().getRMPolicyBean());
 	}
 
 	/**
@@ -146,7 +147,7 @@ public class RMMsgCreator {
 				.getServiceContext();
 		if (serviceContext != null) {
 			String offeredSequence = (String) serviceContext
-					.getProperty(Constants.OFFERED_SEQUENCE_ID);
+					.getProperty(ClientAPI.OFFERED_SEQUENCE_ID);
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(factory);
 				Identifier identifier = new Identifier(factory);
@@ -157,9 +158,9 @@ public class RMMsgCreator {
 		}
 
 		SequencePropertyBean replyToBean = seqPropMgr.retrieve(internalSequenceId,
-				Constants.SequenceProperties.REPLY_TO_EPR);
+				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
-				Constants.SequenceProperties.TO_EPR);
+				Sandesha2Constants.SequenceProperties.TO_EPR);
 
 		if (toBean == null || toBean.getValue() == null)
 			throw new SandeshaException("To EPR is not set.");
@@ -169,7 +170,7 @@ public class RMMsgCreator {
 		EndpointReference acksToEPR = null;
 
 		if (acksTo == null || "".equals(acksTo))
-			acksTo = Constants.WSA.NS_URI_ANONYMOUS;
+			acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
 
 		acksToEPR = new EndpointReference(acksTo);
 
@@ -185,7 +186,7 @@ public class RMMsgCreator {
 		createSequencePart.setAcksTo(new AcksTo(
 				new Address(acksToEPR, factory), factory));
 
-		createSeqRMMsg.setMessagePart(Constants.MessageParts.CREATE_SEQ,
+		createSeqRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ,
 				createSequencePart);
 
 		try {
@@ -194,9 +195,9 @@ public class RMMsgCreator {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		createSeqRMMsg.setAction(Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE);
+		createSeqRMMsg.setAction(Sandesha2Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE);
 		createSeqRMMsg
-				.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE);
+				.setSOAPAction(Sandesha2Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE);
 
 		return createSeqRMMsg;
 	}
@@ -266,7 +267,7 @@ public class RMMsgCreator {
 		Identifier identifier = new Identifier(factory);
 		identifier.setIndentifer(sequenceId);
 		terminateSequencePart.setIdentifier(identifier);
-		terminateRMMessage.setMessagePart(Constants.MessageParts.TERMINATE_SEQ,
+		terminateRMMessage.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ,
 				terminateSequencePart);
 
 		return terminateRMMessage;
@@ -289,7 +290,7 @@ public class RMMsgCreator {
 				.getSOAPVersion(createSeqMessage.getSOAPEnvelope()));
 
 		IOMRMElement messagePart = createSeqMessage
-				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		CreateSequence cs = (CreateSequence) messagePart;
 
 		CreateSequenceResponse response = new CreateSequenceResponse(factory);
@@ -320,9 +321,9 @@ public class RMMsgCreator {
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		response.toOMElement(envelope.getBody());
 		outMessage
-				.setWSAAction(Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE_RESPONSE);
+				.setWSAAction(Sandesha2Constants.WSRM.Actions.ACTION_CREATE_SEQUENCE_RESPONSE);
 		outMessage
-				.setSoapAction(Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE_RESPONSE);
+				.setSoapAction(Sandesha2Constants.WSRM.Actions.SOAP_ACTION_CREATE_SEQUENCE_RESPONSE);
 
 		String newMessageId = SandeshaUtil.getUUID();
 		outMessage.setMessageID(newMessageId);
@@ -375,7 +376,7 @@ public class RMMsgCreator {
 				.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
-				Constants.SequenceProperties.RECEIVED_MESSAGES);
+				Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
 
 		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(msgNoList,factory);
@@ -387,9 +388,9 @@ public class RMMsgCreator {
 
 		sequenceAck.toOMElement(envelope.getHeader());
 		applicationMsg
-				.setAction(Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT);
+				.setAction(Sandesha2Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT);
 		applicationMsg
-				.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT);
+				.setSOAPAction(Sandesha2Constants.WSRM.Actions.SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT);
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
 
 	}
@@ -419,7 +420,7 @@ public class RMMsgCreator {
 			setUpMessage(ackMsgCtx);
 
 			Sequence reqSequence = (Sequence) applicationRMMsgCtx
-					.getMessagePart(Constants.MessageParts.SEQUENCE);
+					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			if (reqSequence == null)
 				throw new SandeshaException(
 						"Sequence part of application message is null");

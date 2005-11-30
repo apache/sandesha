@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import org.apache.axis2.context.AbstractContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 
@@ -35,12 +35,12 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 	private Hashtable table = null;
 
 	public InMemoryInvokerBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.BeanMAPs.STORAGE_MAP);
+		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.STORAGE_MAP);
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.BeanMAPs.STORAGE_MAP, table);
+			context.setProperty(Sandesha2Constants.BeanMAPs.STORAGE_MAP, table);
 		}
 	}
 

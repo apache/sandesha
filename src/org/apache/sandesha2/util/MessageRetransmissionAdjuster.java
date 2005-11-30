@@ -18,7 +18,7 @@
 package org.apache.sandesha2.util;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
@@ -44,7 +44,7 @@ public class MessageRetransmissionAdjuster {
 			return retransmitterBean;
 
 		RMPolicyBean policyBean = (RMPolicyBean) messageContext
-				.getProperty(Constants.WSP.RM_POLICY_BEAN);
+				.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
 		if (policyBean == null) {
 			//loading default policies.
 			policyBean = PropertyManager.getInstance().getRMPolicyBean();
@@ -53,7 +53,7 @@ public class MessageRetransmissionAdjuster {
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, policyBean);
 
-		if (retransmitterBean.getSentCount() >= Constants.MAXIMUM_RETRANSMISSION_ATTEMPTS)
+		if (retransmitterBean.getSentCount() >= Sandesha2Constants.MAXIMUM_RETRANSMISSION_ATTEMPTS)
 			stopRetransmission(retransmitterBean);
 
 		return retransmitterBean;

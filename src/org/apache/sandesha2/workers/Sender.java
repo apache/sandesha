@@ -25,10 +25,11 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.sandesha2.AcknowledgementManager;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -92,7 +93,7 @@ public class Sender extends Thread {
 						Object debug = null;
 						if (serviceContext != null) {
 							debug = serviceContext
-									.getProperty(Constants.SANDESHA_DEBUG_MODE);
+									.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 							if (debug != null && "on".equals(debug)) {
 								System.out
 										.println("DEBUG: Sender is sending a '"
@@ -103,7 +104,7 @@ public class Sender extends Thread {
 							}
 						}
 
-						if (rmMsgCtx.getMessageType() == Constants.MessageTypes.APPLICATION) {
+						if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 							//piggybacking if an ack if available for the same
 							// sequence.
 							AcknowledgementManager
@@ -128,9 +129,9 @@ public class Sender extends Thread {
 							checkForSyncResponses(msgCtx);
 						
 						
-						if (rmMsgCtx.getMessageType()==Constants.MessageTypes.TERMINATE_SEQ) {
+						if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
 							//terminate sending side.
-							TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Constants.MessageParts.TERMINATE_SEQ);
+							TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 							String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 							ConfigurationContext configContext = msgCtx.getSystemContext();
 							
@@ -176,10 +177,10 @@ public class Sender extends Thread {
 	private boolean isResponseExpected(RMMsgContext rmMsgCtx) {
 		boolean responseExpected = false;
 
-		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.CREATE_SEQ) {
+		if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.CREATE_SEQ) {
 			responseExpected = true;
 		}
-		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.APPLICATION) {
+		if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 			//a ack may arrive. (not a application response)
 			if (rmMsgCtx.getMessageContext().getAxisOperation()
 					.getMessageExchangePattern().equals(

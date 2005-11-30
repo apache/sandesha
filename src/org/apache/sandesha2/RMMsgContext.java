@@ -53,7 +53,7 @@ public class RMMsgContext {
 
 	public RMMsgContext() {
 		rmMessageParts = new HashMap();
-		messageType = Constants.MessageTypes.UNKNOWN;
+		messageType = Sandesha2Constants.MessageTypes.UNKNOWN;
 	}
 
 	public void setMessageContext(MessageContext msgCtx) {
@@ -72,10 +72,10 @@ public class RMMsgContext {
 	 * @throws SandeshaException
 	 */
 	public void addSOAPEnvelope() throws SandeshaException {
-		int SOAPVersion = Constants.SOAPVersion.v1_1;
+		int SOAPVersion = Sandesha2Constants.SOAPVersion.v1_1;
 
 		if (!msgContext.isSOAP11())
-			SOAPVersion = Constants.SOAPVersion.v1_2;
+			SOAPVersion = Sandesha2Constants.SOAPVersion.v1_2;
 
 		if (msgContext.getEnvelope() == null) {
 			try {
@@ -107,7 +107,7 @@ public class RMMsgContext {
 	 * @param msgType
 	 */
 	public void setMessageType(int msgType) {
-		if (msgType >= 0 && msgType <= Constants.MessageTypes.MAX_MESSAGE_TYPE)
+		if (msgType >= 0 && msgType <= Sandesha2Constants.MessageTypes.MAX_MESSAGE_TYPE)
 			this.messageType = msgType;
 	}
 
@@ -120,7 +120,7 @@ public class RMMsgContext {
 	 * @param part
 	 */
 	public void setMessagePart(int partId, IOMRMPart part) {
-		if (partId >= 0 && partId <= Constants.MessageParts.MAX_MSG_PART_ID)
+		if (partId >= 0 && partId <= Sandesha2Constants.MessageParts.MAX_MSG_PART_ID)
 			rmMessageParts.put(new Integer(partId), part);
 	}
 

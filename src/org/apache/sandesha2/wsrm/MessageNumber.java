@@ -22,7 +22,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -41,8 +41,8 @@ public class MessageNumber implements IOMRMElement {
 	
 	public MessageNumber(SOAPFactory factory){
 		this.factory = factory;
-	    rmNamespace = factory.createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
-		messageNoElement = factory.createOMElement(Constants.WSRM.MSG_NUMBER,rmNamespace);
+	    rmNamespace = factory.createOMNamespace(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM.MSG_NUMBER,rmNamespace);
 	}
 	
 	public long getMessageNumber(){
@@ -54,11 +54,11 @@ public class MessageNumber implements IOMRMElement {
 	
 	public Object fromOMElement(OMElement seqenceElement) throws OMException {
 		OMElement msgNumberPart = seqenceElement.getFirstChildWithName( 
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.MSG_NUMBER));
+				new QName (Sandesha2Constants.WSRM.NS_URI_RM,Sandesha2Constants.WSRM.MSG_NUMBER));
 		if (msgNumberPart==null)
 			throw new OMException ("The passed sequnce element does not contain a message number part");
 		
-		messageNoElement = factory.createOMElement(Constants.WSRM.MSG_NUMBER,rmNamespace);
+		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM.MSG_NUMBER,rmNamespace);
 
 		String msgNoStr = msgNumberPart.getText();
 		messageNumber = Long.parseLong(msgNoStr);
@@ -73,7 +73,7 @@ public class MessageNumber implements IOMRMElement {
 		messageNoElement.setText(Long.toString(messageNumber));
 		element.addChild(messageNoElement);
 		
-		messageNoElement = factory.createOMElement(Constants.WSRM.MSG_NUMBER,rmNamespace);
+		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM.MSG_NUMBER,rmNamespace);
 		
 		return element;
 	}

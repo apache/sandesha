@@ -79,7 +79,7 @@ public class SenderBean implements RMBean {
 	/**
 	 * Comment for <code>messagetype</code>
 	 * The type of the current message.
-	 * Possible types are given in Constants.MessageTypes interface.
+	 * Possible types are given in Sandesha2Constants.MessageTypes interface.
 	 */
 	private int messagetype =0;
 	

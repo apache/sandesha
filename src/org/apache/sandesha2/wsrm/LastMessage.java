@@ -22,7 +22,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -41,9 +41,9 @@ public class LastMessage implements IOMRMElement {
 	public LastMessage(SOAPFactory factory) {
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		lastMessageElement = factory.createOMElement(
-				Constants.WSRM.LAST_MSG, rmNamespace);
+				Sandesha2Constants.WSRM.LAST_MSG, rmNamespace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -52,13 +52,13 @@ public class LastMessage implements IOMRMElement {
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		OMElement lastMessagePart = element.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.LAST_MSG));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.LAST_MSG));
 		if (lastMessagePart == null)
 			throw new OMException(
 					"The passed element does not contain a Last Message part");
 
 		lastMessageElement = factory.createOMElement(
-				Constants.WSRM.LAST_MSG, rmNamespace);
+				Sandesha2Constants.WSRM.LAST_MSG, rmNamespace);
 
 		return this;
 	}
@@ -71,7 +71,7 @@ public class LastMessage implements IOMRMElement {
 		sequenceElement.addChild(lastMessageElement);
 
 		lastMessageElement = factory.createOMElement(
-				Constants.WSRM.LAST_MSG, rmNamespace);
+				Sandesha2Constants.WSRM.LAST_MSG, rmNamespace);
 
 		return sequenceElement;
 	}

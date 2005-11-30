@@ -24,10 +24,11 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -97,8 +98,8 @@ public class InOrderInvoker extends Thread {
 				//Getting the incomingSequenceIdList
 				SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) sequencePropMgr
 						.retrieve(
-								Constants.SequenceProperties.ALL_SEQUENCES,
-								Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+								Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
+								Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 				if (sequencePropertyBean == null)
 					continue;
 
@@ -136,7 +137,7 @@ public class InOrderInvoker extends Thread {
 						RMMsgContext rmMsg = MsgInitializer
 								.initializeMessage(msgToInvoke);
 						Sequence seq = (Sequence) rmMsg
-								.getMessagePart(Constants.MessageParts.SEQUENCE);
+								.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 						long msgNo = seq.getMessageNumber().getMessageNumber();
 
 						try {
@@ -149,7 +150,7 @@ public class InOrderInvoker extends Thread {
 							Object debug = null;
 							if (serviceContext != null) {
 								debug = serviceContext
-										.getProperty(Constants.SANDESHA_DEBUG_MODE);
+										.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 								if (debug != null && "on".equals(debug)) {
 									System.out
 											.println("DEBUG: Invoker invoking a '"
@@ -175,9 +176,9 @@ public class InOrderInvoker extends Thread {
 												sequenceId)).iterator();
 
 						//terminate (AfterInvocation)
-						if (rmMsg.getMessageType() == Constants.MessageTypes.APPLICATION) {
+						if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 							Sequence sequence = (Sequence) rmMsg
-									.getMessagePart(Constants.MessageParts.SEQUENCE);
+									.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 							if (sequence.getLastMessage() != null) {
 								TerminateManager.terminateAfterInvocation(
 										context, sequenceId);

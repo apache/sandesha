@@ -66,7 +66,7 @@ public class SOAPFaultEnvelopeCreator {
 			throw new SandeshaException(e.getMessage());
 		}
 
-		if (SOAPVersion == Constants.SOAPVersion.v1_1)
+		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
 			doSOAP11Encoding(faultMsgContext, faultData);
 		else
 			doSOAP12Encoding(faultMsgContext, faultData);
@@ -89,10 +89,10 @@ public class SOAPFaultEnvelopeCreator {
 		if (faultType <= 0)
 			return false;
 
-		if (faultType == Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED)
+		if (faultType == Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED)
 			sequenceFault = true;
 
-		if (faultType == Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE)
+		if (faultType == Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE)
 			sequenceFault = true;
 
 		return sequenceFault;
@@ -202,7 +202,7 @@ public class SOAPFaultEnvelopeCreator {
 		if (detailElement != null)
 			faultDetail.addChild(detailElement);
 
-		faultMsgContext.setWSAAction(Constants.WSA.SOAP_FAULT_ACTION);
+		faultMsgContext.setWSAAction(Sandesha2Constants.WSA.SOAP_FAULT_ACTION);
 	}
 
 }

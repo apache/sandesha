@@ -23,7 +23,7 @@ import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * Adds the SequenceFault header block.
@@ -45,9 +45,9 @@ public class SequenceFault implements IOMRMElement {
 	public SequenceFault(SOAPFactory factory) {
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		sequenceFaultElement = factory.createOMElement(
-				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
+				Sandesha2Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -61,15 +61,15 @@ public class SequenceFault implements IOMRMElement {
 					"Cant get Sequence Fault part from a non-header element");
 
 		OMElement sequenceFaultPart = body.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE_FAULT));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE_FAULT));
 
 		if (sequenceFaultPart == null)
 			throw new OMException(
 					"The passed element does not contain a Sequence Fault element");
 
 		OMElement faultCodePart = sequenceFaultPart
-				.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
-						Constants.WSRM.FAULT_CODE));
+				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+						Sandesha2Constants.WSRM.FAULT_CODE));
 
 		if (faultCodePart != null) {
 			faultCode = new FaultCode(factory);
@@ -77,7 +77,7 @@ public class SequenceFault implements IOMRMElement {
 		}
 
 		sequenceFaultElement = factory.createOMElement(
-				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
+				Sandesha2Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
 
 		return this;
 
@@ -99,7 +99,7 @@ public class SequenceFault implements IOMRMElement {
 		body.addChild(sequenceFaultElement);
 
 		sequenceFaultElement = factory.createOMElement(
-				Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
+				Sandesha2Constants.WSRM.SEQUENCE_FAULT, rmNamespace);
 
 		return body;
 	}

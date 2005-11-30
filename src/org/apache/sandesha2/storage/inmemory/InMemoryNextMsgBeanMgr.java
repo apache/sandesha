@@ -23,7 +23,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 
@@ -37,13 +37,13 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 	private Hashtable table = null;
 
 	public InMemoryNextMsgBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.BeanMAPs.NEXT_MESSAGE);
+		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.NEXT_MESSAGE);
 
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.BeanMAPs.NEXT_MESSAGE, table);
+			context.setProperty(Sandesha2Constants.BeanMAPs.NEXT_MESSAGE, table);
 		}
 	}
 

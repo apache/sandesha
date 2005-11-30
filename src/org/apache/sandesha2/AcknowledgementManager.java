@@ -60,7 +60,7 @@ public class AcknowledgementManager {
 		SenderBean findBean = new SenderBean();
 
 		Sequence sequence = (Sequence) applicationRMMsgContext
-				.getMessagePart(Constants.MessageParts.SEQUENCE);
+				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		if (sequence == null)
 			throw new SandeshaException(
 					"Application message does not contain a sequence part");
@@ -69,13 +69,13 @@ public class AcknowledgementManager {
 
 		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr
 				.retrieve(sequenceId,
-						Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		if (internalSequenceBean == null)
 			throw new SandeshaException("Temp Sequence is not set");
 
 		String internalSequenceId = (String) internalSequenceBean.getValue();
 		findBean.setInternalSequenceId(internalSequenceId);
-		findBean.setMessagetype(Constants.MessageTypes.ACK);
+		findBean.setMessagetype(Sandesha2Constants.MessageTypes.ACK);
 
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		Iterator it = collection.iterator();
@@ -91,13 +91,13 @@ public class AcknowledgementManager {
 					.getStoredMessageContext(ackBean.getKey());
 			RMMsgContext ackRMMsgContext = MsgInitializer
 					.initializeMessage(ackMsgContext);
-			if (ackRMMsgContext.getMessageType() != Constants.MessageTypes.ACK)
+			if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK)
 				throw new SandeshaException("Invalid ack message entry");
 
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext
-					.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+					.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 			applicationRMMsgContext.setMessagePart(
-					Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
+					Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
 					sequenceAcknowledgement);
 
 			applicationRMMsgContext.addSOAPEnvelope();

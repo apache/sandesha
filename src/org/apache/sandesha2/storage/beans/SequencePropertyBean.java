@@ -34,7 +34,7 @@ public class SequencePropertyBean implements RMBean {
 
 	/**
 	 * Comment for <code>name</code>
-	 * The name of the property. Possible names are given in the Constants.SequenceProperties interface.
+	 * The name of the property. Possible names are given in the Sandesha2Constants.SequenceProperties interface.
 	 */
 	private String name;
 

@@ -21,7 +21,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
@@ -47,7 +47,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		MessageContext terminateSeqMsg = terminateSeqRMMSg.getMessageContext();
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) terminateSeqRMMSg
-				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck != null) {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
 			ackProcessor.processMessage(terminateSeqRMMSg);
@@ -55,7 +55,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		//Processing the terminate message
 		//TODO Add terminate sequence message logic.
-		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMSg.getMessagePart(Constants.MessageParts.TERMINATE_SEQ);
+		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMSg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 		if (terminateSequence==null)
 			throw new SandeshaException ("Terminate Sequence part is not available");
 		
@@ -69,7 +69,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		TerminateManager.terminateReceivingSide(context,sequenceId);
 		
 
-		terminateSeqMsg.setPausedTrue(new QName(Constants.IN_HANDLER_NAME));
+		terminateSeqMsg.setPausedTrue(new QName(Sandesha2Constants.IN_HANDLER_NAME));
 
 	}
 }

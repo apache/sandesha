@@ -24,7 +24,7 @@ import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * Adds the Terminate Sequence body part.
@@ -47,9 +47,9 @@ public class TerminateSequence implements IOMRMPart {
 	public TerminateSequence(SOAPFactory factory) {
 		this.factory = factory;
 		rmNameSpace = factory.createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		terminateSequenceElement = factory.createOMElement(
-				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
+				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -63,7 +63,7 @@ public class TerminateSequence implements IOMRMPart {
 					"Cant add terminate sequence to a non body element");
 
 		OMElement terminateSeqPart = body.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.TERMINATE_SEQUENCE));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.TERMINATE_SEQUENCE));
 
 		if (terminateSeqPart == null)
 			throw new OMException(
@@ -73,7 +73,7 @@ public class TerminateSequence implements IOMRMPart {
 		identifier.fromOMElement(terminateSeqPart);
 
 		terminateSequenceElement = factory.createOMElement(
-				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
+				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return this;
 	}
@@ -96,7 +96,7 @@ public class TerminateSequence implements IOMRMPart {
 		body.addChild(terminateSequenceElement);
 
 		terminateSequenceElement = factory.createOMElement(
-				Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
+				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return body;
 	}
@@ -113,8 +113,8 @@ public class TerminateSequence implements IOMRMPart {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.
-		OMElement elem = body.getFirstChildWithName(new QName(Constants.WSRM.NS_URI_RM,
-				Constants.WSRM.TERMINATE_SEQUENCE));
+		OMElement elem = body.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE));
 		if (elem!=null)
 			elem.detach();
 		

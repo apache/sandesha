@@ -98,17 +98,17 @@ public class TerminateManager {
 			storageMapBeanMgr.delete(storageMapBean.getKey());
 		}
 		
-		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(Constants.SequenceProperties.ALL_SEQUENCES,Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 		ArrayList allSequenceList = (ArrayList) allSequenceBean.getValue();
 		
 		allSequenceList.remove(sequenceID);
 	}
 	
 	private static boolean isRequiredForResponseSide (String name) {
-		if (name==null && name.equals(Constants.SequenceProperties.LAST_OUT_MESSAGE))
+		if (name==null && name.equals(Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE))
 			return false;
 		
-		if (name.equals(Constants.SequenceProperties.LAST_OUT_MESSAGE))
+		if (name.equals(Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE))
 			return false;
 		
 		return false;
@@ -129,7 +129,7 @@ public class TerminateManager {
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 		
-		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		if (internalSequenceBean==null)
 			throw new SandeshaException ("TempSequence entry not found");
 		

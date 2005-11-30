@@ -31,9 +31,10 @@ import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -83,7 +84,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		Object debug = null;
 		if (serviceContext != null) {
-			debug = serviceContext.getProperty(Constants.SANDESHA_DEBUG_MODE);
+			debug = serviceContext.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
 						+ SandeshaUtil.getMessageTypeString(rmMessageContext
@@ -116,10 +117,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		boolean drop = false;
 
-		if (rmMsgContext.getMessageType() == Constants.MessageTypes.APPLICATION) {
+		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 
 			Sequence sequence = (Sequence) rmMsgContext
-					.getMessagePart(Constants.MessageParts.SEQUENCE);
+					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			String sequenceId = null;
 
 			if (sequence != null) {
@@ -136,7 +137,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 						.getSequencePropretyBeanMgr();
 				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
 						sequenceId,
-						Constants.SequenceProperties.RECEIVED_MESSAGES);
+						Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
 				if (receivedMsgsBean != null) {
 					String receivedMsgStr = (String) receivedMsgsBean
 							.getValue();
@@ -172,7 +173,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							if (receivedMsgsBean == null) {
 								receivedMsgsBean = new SequencePropertyBean(
 										sequenceId,
-										Constants.SequenceProperties.RECEIVED_MESSAGES,
+										Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES,
 										"");
 								seqPropMgr.insert(receivedMsgsBean);
 							}
@@ -208,9 +209,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 	private void processDroppedMessage(RMMsgContext rmMsgContext)
 			throws SandeshaException {
-		if (rmMsgContext.getMessageType() == Constants.MessageTypes.APPLICATION) {
+		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 			Sequence sequence = (Sequence) rmMsgContext
-					.getMessagePart(Constants.MessageParts.SEQUENCE);
+					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			String sequenceId = null;
 
 			if (sequence != null) {
@@ -223,7 +224,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			SequencePropertyBeanMgr seqPropMgr = storageManager
 					.getSequencePropretyBeanMgr();
 			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
-					sequenceId, Constants.SequenceProperties.RECEIVED_MESSAGES);
+					sequenceId, Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
 			String receivedMsgStr = (String) receivedMsgsBean.getValue();
 
 			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
@@ -237,7 +238,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	private void doGlobalProcessing(RMMsgContext rmMsgCtx)
 			throws SandeshaException {
 		switch (rmMsgCtx.getMessageType()) {
-		case Constants.MessageTypes.ACK:
+		case Sandesha2Constants.MessageTypes.ACK:
 			rmMsgCtx.setRelatesTo(null); //Removing the relatesTo part from
 		// ackMessageIf present.
 		//Some Frameworks tend to send this.
@@ -245,6 +246,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	}
 
 	public QName getName() {
-		return new QName(Constants.GLOBAL_IN_HANDLER_NAME);
+		return new QName(Sandesha2Constants.GLOBAL_IN_HANDLER_NAME);
 	}
 }

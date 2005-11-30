@@ -10,7 +10,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -43,7 +43,7 @@ public class SequenceManager {
 			throw new AxisFault("ReplyTo is null");
 
 		CreateSequence createSequence = (CreateSequence) createSequenceMsg
-				.getMessagePart(Constants.MessageParts.CREATE_SEQ);
+				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		if (createSequence == null)
 			throw new AxisFault("Create Sequence Part is null");
 
@@ -67,13 +67,13 @@ public class SequenceManager {
 				.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
-				sequenceId, Constants.SequenceProperties.RECEIVED_MESSAGES, "");
+				sequenceId, Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES, "");
 		SequencePropertyBean toBean = new SequencePropertyBean(sequenceId,
-				Constants.SequenceProperties.TO_EPR, replyTo);
+				Sandesha2Constants.SequenceProperties.TO_EPR, replyTo);
 		SequencePropertyBean replyToBean = new SequencePropertyBean(sequenceId,
-				Constants.SequenceProperties.REPLY_TO_EPR, to);
+				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, to);
 		SequencePropertyBean acksToBean = new SequencePropertyBean(sequenceId,
-				Constants.SequenceProperties.ACKS_TO_EPR, acksTo);
+				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, acksTo);
 
 		seqPropMgr.insert(receivedMsgBean);
 		seqPropMgr.insert(toBean);
@@ -108,21 +108,21 @@ public class SequenceManager {
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
 		String acksTo = (String) firstAplicationMsgCtx
-				.getProperty(Constants.ClientProperties.AcksTo);
+				.getProperty(Sandesha2Constants.ClientAPI.AcksTo);
 
 		if (toEPR == null)
 			throw new SandeshaException("WS-Addressing To is null");
 
 		SequencePropertyBean toBean = new SequencePropertyBean(iternalSequenceId,
-				Constants.SequenceProperties.TO_EPR, toEPR);
+				Sandesha2Constants.SequenceProperties.TO_EPR, toEPR);
 
 		//Default value for acksTo is anonymous
 		if (acksTo == null)
-			acksTo = Constants.WSA.NS_URI_ANONYMOUS;
+			acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
 
 		EndpointReference acksToEPR = new EndpointReference(acksTo);
 		SequencePropertyBean acksToBean = new SequencePropertyBean(
-				iternalSequenceId, Constants.SequenceProperties.ACKS_TO_EPR,
+				iternalSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
 				acksToEPR);
 		seqPropMgr.insert(toBean);
 		seqPropMgr.insert(acksToBean);

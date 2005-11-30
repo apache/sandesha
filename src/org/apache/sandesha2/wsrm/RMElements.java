@@ -23,7 +23,7 @@ import org.apache.axis2.om.OMException;
 import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
@@ -57,12 +57,12 @@ public class RMElements {
 		
 		//Ya I know. Could hv done it directly :D (just to make it consistent)
 		if (envelope.getNamespace().getName().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
-			factory = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.v1_1);
+			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_1);
 		else
-			factory = SOAPAbstractFactory.getSOAPFactory(Constants.SOAPVersion.v1_2);
+			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_2);
 			
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
-				new QName(Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE));
+				new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE));
 		if (sequenceElement != null) {
 			sequence = new Sequence(factory);
 			sequence.fromOMElement(envelope.getHeader());
@@ -70,16 +70,16 @@ public class RMElements {
 
 		OMElement sequenceAckElement = envelope.getHeader()
 				.getFirstChildWithName(
-						new QName(Constants.WSRM.NS_URI_RM,
-								Constants.WSRM.SEQUENCE_ACK));
+						new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+								Sandesha2Constants.WSRM.SEQUENCE_ACK));
 		if (sequenceAckElement != null) {
 			sequenceAcknowledgement = new SequenceAcknowledgement(factory);
 			sequenceAcknowledgement.fromOMElement(envelope.getHeader());
 		}
 
 		OMElement createSeqElement = envelope.getBody().getFirstChildWithName(
-				new QName(Constants.WSRM.NS_URI_RM,
-						Constants.WSRM.CREATE_SEQUENCE));
+				new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+						Sandesha2Constants.WSRM.CREATE_SEQUENCE));
 		
 		if (createSeqElement != null) {
 			createSequence = new CreateSequence(factory);
@@ -88,8 +88,8 @@ public class RMElements {
 
 		OMElement createSeqResElement = envelope.getBody()
 				.getFirstChildWithName(
-						new QName(Constants.WSRM.NS_URI_RM,
-								Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
+						new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+								Sandesha2Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
 		if (createSeqResElement != null) {
 			createSequenceResponse = new CreateSequenceResponse(factory);
 			createSequenceResponse.fromOMElement(envelope.getBody());
@@ -97,8 +97,8 @@ public class RMElements {
 
 		OMElement terminateSeqElement = envelope.getBody()
 				.getFirstChildWithName(
-						new QName(Constants.WSRM.NS_URI_RM,
-								Constants.WSRM.TERMINATE_SEQUENCE));
+						new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+								Sandesha2Constants.WSRM.TERMINATE_SEQUENCE));
 		if (terminateSeqElement != null) {
 			terminateSequence = new TerminateSequence(factory);
 			terminateSequence.fromOMElement(envelope.getBody());
@@ -106,8 +106,8 @@ public class RMElements {
 
 		OMElement ackRequestedElement = envelope.getHeader()
 				.getFirstChildWithName(
-						new QName(Constants.WSRM.NS_URI_RM,
-								Constants.WSRM.ACK_REQUESTED));
+						new QName(Sandesha2Constants.WSRM.NS_URI_RM,
+								Sandesha2Constants.WSRM.ACK_REQUESTED));
 		if (ackRequestedElement != null) {
 			ackRequested = new AckRequested(factory);
 			ackRequested.fromOMElement(envelope.getHeader());

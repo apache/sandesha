@@ -28,9 +28,9 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
-public class Identifier implements Constants, IOMRMElement {
+public class Identifier implements Sandesha2Constants, IOMRMElement {
 
 	private OMElement identifierElement;
 
@@ -43,9 +43,9 @@ public class Identifier implements Constants, IOMRMElement {
 	public Identifier(SOAPFactory factory) {
 		this.factory = factory;
 		wsrmNamespace = factory.createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		identifierElement = factory.createOMElement(
-				Constants.WSRM.IDENTIFIER, wsrmNamespace);
+				Sandesha2Constants.WSRM.IDENTIFIER, wsrmNamespace);
 	}
 
 	public void setIndentifer(String identifier) {
@@ -64,12 +64,12 @@ public class Identifier implements Constants, IOMRMElement {
 	public Object fromOMElement(OMElement element) throws OMException {
 		
 		OMElement identifierPart = element.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.IDENTIFIER));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.IDENTIFIER));
 		if (identifierPart == null)
 			throw new OMException(
 					"The parsed element does not contain an identifier part");
 		identifierElement = factory.createOMElement(
-				Constants.WSRM.IDENTIFIER, wsrmNamespace);
+				Sandesha2Constants.WSRM.IDENTIFIER, wsrmNamespace);
 
 		String identifierText = identifierPart.getText();
 		if (identifierText == null || identifierText == "")
@@ -89,7 +89,7 @@ public class Identifier implements Constants, IOMRMElement {
 		element.addChild(identifierElement);
 
 		identifierElement = factory.createOMElement(
-				Constants.WSRM.IDENTIFIER, wsrmNamespace);
+				Sandesha2Constants.WSRM.IDENTIFIER, wsrmNamespace);
 
 		return element;
 	}

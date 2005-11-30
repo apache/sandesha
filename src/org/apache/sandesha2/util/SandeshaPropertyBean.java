@@ -20,7 +20,7 @@ package org.apache.sandesha2.util;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
- * Used to hold peoperties loaded from sandesha2.properties file or Constants.
+ * Used to hold peoperties loaded from sandesha2.properties file or Sandesha2Constants.
  * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */

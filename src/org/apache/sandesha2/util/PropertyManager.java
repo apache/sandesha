@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
- * Loads properties from sandesha2.properties file (from Constants if this is not available).
+ * Loads properties from sandesha2.properties file (from Sandesha2Constants if this is not available).
  * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
@@ -45,7 +45,7 @@ public class PropertyManager {
 	private void loadProperties (InputStream in) {
 		try {
 			if (in==null)
-				in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Constants.PROPERTY_FILE);
+				in = Thread.currentThread().getContextClassLoader().getResourceAsStream(Sandesha2Constants.PROPERTY_FILE);
 			
 			Properties properties = new Properties ();
 			if (in!=null) {
@@ -89,7 +89,7 @@ public class PropertyManager {
 	 */
 	private void loadExponentialBackoff (Properties properties) {
 		
-		String expoBackoffStr = properties.getProperty(Constants.Properties.ExponentialBackoff);
+		String expoBackoffStr = properties.getProperty(Sandesha2Constants.Properties.ExponentialBackoff);
 		boolean loaded = false;
 		
 		if (expoBackoffStr!=null) {
@@ -104,7 +104,7 @@ public class PropertyManager {
 		}
 		
 		if (!loaded)
-			propertyBean.setExponentialBackoff(Constants.Properties.DefaultValues.ExponentialBackoff);
+			propertyBean.setExponentialBackoff(Sandesha2Constants.Properties.DefaultValues.ExponentialBackoff);
 	}
 	
 	
@@ -115,7 +115,7 @@ public class PropertyManager {
 	 */
 	private void loadRetransmissionInterval (Properties properties) {
 		
-		String retransmissionIntStr = properties.getProperty(Constants.Properties.RetransmissionInterval);
+		String retransmissionIntStr = properties.getProperty(Sandesha2Constants.Properties.RetransmissionInterval);
 		boolean loaded = false;
 		
 		if (retransmissionIntStr!=null) {
@@ -133,7 +133,7 @@ public class PropertyManager {
 		}
 		
 		if (!loaded)
-			propertyBean.setRetransmissionInterval(Constants.Properties.DefaultValues.RetransmissionInterval);
+			propertyBean.setRetransmissionInterval(Sandesha2Constants.Properties.DefaultValues.RetransmissionInterval);
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class PropertyManager {
 	 */
 	private void loadAcknowledgementInterval (Properties properties) {
 		
-		String acknowledgementIntStr = properties.getProperty(Constants.Properties.AcknowledgementInterval);
+		String acknowledgementIntStr = properties.getProperty(Sandesha2Constants.Properties.AcknowledgementInterval);
 		boolean loaded = false;
 		
 		if (acknowledgementIntStr!=null) {
@@ -161,7 +161,7 @@ public class PropertyManager {
 		}
 		
 		if (!loaded)
-			propertyBean.setAcknowledgementInterval(Constants.Properties.DefaultValues.AcknowledgementInterval);
+			propertyBean.setAcknowledgementInterval(Sandesha2Constants.Properties.DefaultValues.AcknowledgementInterval);
 	}
 	
 	/**
@@ -171,8 +171,8 @@ public class PropertyManager {
 	 */
 	private void loadInactivityTimeout (Properties properties) {
 		
-		String inactivityTimeoutStr = properties.getProperty(Constants.Properties.InactivityTimeout);
-		String inactivityTimeoutMeasure = properties.getProperty(Constants.Properties.InactivityTimeoutMeasure);
+		String inactivityTimeoutStr = properties.getProperty(Sandesha2Constants.Properties.InactivityTimeout);
+		String inactivityTimeoutMeasure = properties.getProperty(Sandesha2Constants.Properties.InactivityTimeoutMeasure);
 		
 		
 		boolean loaded = false;
@@ -194,7 +194,7 @@ public class PropertyManager {
 		}
 		
 		if (!loaded)
-			propertyBean.setInactiveTimeoutInterval(Constants.Properties.DefaultValues.InactivityTimeout,Constants.Properties.DefaultValues.InactivityTimeoutMeasure);
+			propertyBean.setInactiveTimeoutInterval(Sandesha2Constants.Properties.DefaultValues.InactivityTimeout,Sandesha2Constants.Properties.DefaultValues.InactivityTimeoutMeasure);
 	}
 	
 	/**
@@ -203,7 +203,7 @@ public class PropertyManager {
 	 * @param properties
 	 */
 	private void loadStoragemanagerClass (Properties properties) {
-		String storageMgrClassStr = properties.getProperty(Constants.Properties.StorageManager);
+		String storageMgrClassStr = properties.getProperty(Sandesha2Constants.Properties.StorageManager);
 		boolean loaded = false;
 		
 		if (storageMgrClassStr!=null) {
@@ -213,11 +213,11 @@ public class PropertyManager {
 		}
 		
 		if (!loaded)
-			propertyBean.setStorageManagerClass(Constants.Properties.DefaultValues.StorageManager);
+			propertyBean.setStorageManagerClass(Sandesha2Constants.Properties.DefaultValues.StorageManager);
 	}
 	
 	private void loadInOrderInvocation (Properties properties) {
-		String inOrderInvocation = properties.getProperty(Constants.Properties.InOrderInvocation);
+		String inOrderInvocation = properties.getProperty(Sandesha2Constants.Properties.InOrderInvocation);
 		boolean loaded = false;
 		
 		if (inOrderInvocation!=null) {
@@ -232,7 +232,7 @@ public class PropertyManager {
 		}
 		
 		if (!loaded)
-			propertyBean.setInOrder(Constants.Properties.DefaultValues.InvokeInOrder);
+			propertyBean.setInOrder(Sandesha2Constants.Properties.DefaultValues.InvokeInOrder);
 		
 	}
 	

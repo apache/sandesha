@@ -18,7 +18,7 @@
 package org.apache.sandesha2.util;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.wsrm.RMElements;
@@ -52,36 +52,36 @@ public class MsgInitializer {
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
 
 		if (elements.getCreateSequence() != null)
-			rmMsgContext.setMessagePart(Constants.MessageParts.CREATE_SEQ,
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ,
 					elements.getCreateSequence());
 
 		if (elements.getCreateSequenceResponse() != null)
 			rmMsgContext.setMessagePart(
-					Constants.MessageParts.CREATE_SEQ_RESPONSE, elements
+					Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE, elements
 							.getCreateSequenceResponse());
 
 		if (elements.getSequence() != null)
-			rmMsgContext.setMessagePart(Constants.MessageParts.SEQUENCE,
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE,
 					elements.getSequence());
 
 		if (elements.getSequenceAcknowledgement() != null)
 			rmMsgContext.setMessagePart(
-					Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, elements
+					Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, elements
 							.getSequenceAcknowledgement());
 
 		if (elements.getTerminateSequence() != null)
-			rmMsgContext.setMessagePart(Constants.MessageParts.TERMINATE_SEQ,
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ,
 					elements.getTerminateSequence());
 
 		if (elements.getAckRequested() != null)
-			rmMsgContext.setMessagePart(Constants.MessageParts.ACK_REQUEST,
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST,
 					elements.getAckRequested());
 
 	}
 
 	/**
 	 * This is used to validate the message.
-	 * Also set an Message type. Possible types are given in the Constants.MessageTypes interface.
+	 * Also set an Message type. Possible types are given in the Sandesha2Constants.MessageTypes interface.
 	 * 
 	 * @param rmMsgCtx
 	 * @return
@@ -91,20 +91,20 @@ public class MsgInitializer {
 			throws SandeshaException {
 
 		//Setting message type.
-		if (rmMsgCtx.getMessagePart(Constants.MessageParts.CREATE_SEQ) != null)
-			rmMsgCtx.setMessageType(Constants.MessageTypes.CREATE_SEQ);
+		if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ) != null)
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
 		else if (rmMsgCtx
-				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE) != null)
-			rmMsgCtx.setMessageType(Constants.MessageTypes.CREATE_SEQ_RESPONSE);
-		else if (rmMsgCtx.getMessagePart(Constants.MessageParts.TERMINATE_SEQ) != null)
-			rmMsgCtx.setMessageType(Constants.MessageTypes.TERMINATE_SEQ);
-		else if (rmMsgCtx.getMessagePart(Constants.MessageParts.SEQUENCE) != null)
-			rmMsgCtx.setMessageType(Constants.MessageTypes.APPLICATION);
+				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE) != null)
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE);
+		else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ) != null)
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
+		else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null)
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 		else if (rmMsgCtx
-				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT) != null)
-			rmMsgCtx.setMessageType(Constants.MessageTypes.ACK);
+				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT) != null)
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		else
-			rmMsgCtx.setMessageType(Constants.MessageTypes.UNKNOWN);
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 
 		return true;
 	}

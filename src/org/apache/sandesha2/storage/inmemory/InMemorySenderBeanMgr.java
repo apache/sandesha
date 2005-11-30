@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -38,12 +38,12 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 	private Hashtable table = null;
 
 	public InMemorySenderBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.BeanMAPs.RETRANSMITTER);
+		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.RETRANSMITTER);
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.BeanMAPs.RETRANSMITTER, table);
+			context.setProperty(Sandesha2Constants.BeanMAPs.RETRANSMITTER, table);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 					&& bean.getMessageNumber() != temp.getMessageNumber())
 				add = false;
 
-			if (bean.getMessagetype() != Constants.MessageTypes.UNKNOWN
+			if (bean.getMessagetype() != Sandesha2Constants.MessageTypes.UNKNOWN
 					&& bean.getMessagetype() != temp.getMessagetype())
 				add = false;
 

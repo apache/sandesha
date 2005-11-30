@@ -23,7 +23,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
@@ -36,12 +36,12 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	private Hashtable table = null;
 
 	public InMemorySequencePropertyBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Constants.BeanMAPs.SEQUENCE_PROPERTY);
+		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.SEQUENCE_PROPERTY);
 		if (obj != null) {
 			table = (Hashtable) obj;
 		} else {
 			table = new Hashtable();
-			context.setProperty(Constants.BeanMAPs.SEQUENCE_PROPERTY, table);
+			context.setProperty(Sandesha2Constants.BeanMAPs.SEQUENCE_PROPERTY, table);
 		}
 	}
 

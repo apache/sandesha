@@ -20,7 +20,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -39,9 +39,9 @@ public class Nack implements IOMRMElement {
 		
 	public Nack(SOAPFactory factory){
 		this.factory = factory;
-		rmNamespace = factory.createOMNamespace(Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+		rmNamespace = factory.createOMNamespace(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		nackElement = factory.createOMElement(
-				Constants.WSRM.NACK,rmNamespace);
+				Sandesha2Constants.WSRM.NACK,rmNamespace);
 	}
 	
 	public OMElement getOMElement() throws OMException {
@@ -51,7 +51,7 @@ public class Nack implements IOMRMElement {
 
 	public Object fromOMElement(OMElement nackElement) throws OMException{
 		/*OMElement nackPart = sequenceAckElement.getFirstChildWithName(
-				new QName (Constants.WSRM.NS_URI_RM,Constants.WSRM.NACK));*/
+				new QName (Sandesha2Constants.WSRM.NS_URI_RM,Sandesha2Constants.WSRM.NACK));*/
 		
 		if (nackElement==null)
 			throw new OMException ("Passed seq ack element does not contain a nack part");
@@ -63,7 +63,7 @@ public class Nack implements IOMRMElement {
 		}
 		
 		nackElement = factory.createOMElement(
-				Constants.WSRM.NACK,rmNamespace);
+				Sandesha2Constants.WSRM.NACK,rmNamespace);
 		
 		return this;
 	} 
@@ -82,7 +82,7 @@ public class Nack implements IOMRMElement {
 		sequenceAckElement.addChild(nackElement);
 
 		nackElement = factory.createOMElement(
-				Constants.WSRM.NACK,rmNamespace);
+				Sandesha2Constants.WSRM.NACK,rmNamespace);
 		
 		return sequenceAckElement;
 	}

@@ -23,7 +23,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -44,14 +44,14 @@ public class Expires implements IOMRMElement {
 	public Expires(SOAPFactory factory) {
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		expiresElement = factory.createOMElement(
-				Constants.WSRM.EXPIRES, rmNamespace);
+				Sandesha2Constants.WSRM.EXPIRES, rmNamespace);
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		OMElement expiresPart = element.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.EXPIRES));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.EXPIRES));
 		if (expiresPart == null)
 			throw new OMException(
 					"Passed elemenet does not have a Expires part");
@@ -60,7 +60,7 @@ public class Expires implements IOMRMElement {
 			throw new OMException("The duration value is not valid");
 
 		expiresElement = factory.createOMElement(
-				Constants.WSRM.EXPIRES, rmNamespace);
+				Sandesha2Constants.WSRM.EXPIRES, rmNamespace);
 
 		duration = expiresText;
 		return element;
@@ -82,7 +82,7 @@ public class Expires implements IOMRMElement {
 		element.addChild(expiresElement);
 
 		expiresElement = factory.createOMElement(
-				Constants.WSRM.EXPIRES, rmNamespace);
+				Sandesha2Constants.WSRM.EXPIRES, rmNamespace);
 
 		return element;
 	}

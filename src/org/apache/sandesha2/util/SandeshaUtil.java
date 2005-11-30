@@ -53,7 +53,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -311,17 +311,17 @@ public class SandeshaUtil {
 
 	public static String getMessageTypeString(int messageType) {
 		switch (messageType) {
-		case Constants.MessageTypes.CREATE_SEQ:
+		case Sandesha2Constants.MessageTypes.CREATE_SEQ:
 			return "CreateSequence";
-		case Constants.MessageTypes.CREATE_SEQ_RESPONSE:
+		case Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE:
 			return "CreateSequenceResponse";
-		case Constants.MessageTypes.ACK:
+		case Sandesha2Constants.MessageTypes.ACK:
 			return "Acknowledgement";
-		case Constants.MessageTypes.APPLICATION:
+		case Sandesha2Constants.MessageTypes.APPLICATION:
 			return "Application";
-		case Constants.MessageTypes.TERMINATE_SEQ:
+		case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
 			return "TerminateSequence";
-		case Constants.MessageTypes.UNKNOWN:
+		case Sandesha2Constants.MessageTypes.UNKNOWN:
 			return "Unknown";
 		default:
 			return "Error";
@@ -329,8 +329,8 @@ public class SandeshaUtil {
 	}
 
 	public static boolean isGloballyProcessableMessageType(int type) {
-		if (type == Constants.MessageTypes.ACK
-				|| type == Constants.MessageTypes.TERMINATE_SEQ) {
+		if (type == Sandesha2Constants.MessageTypes.ACK
+				|| type == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
 			return true;
 		}
 
@@ -338,10 +338,10 @@ public class SandeshaUtil {
 	}
 
 	public static boolean isDuplicateDropRequiredMsgType(int rmMessageType) {
-		if (rmMessageType == Constants.MessageTypes.APPLICATION)
+		if (rmMessageType == Sandesha2Constants.MessageTypes.APPLICATION)
 			return true;
 
-		if (rmMessageType == Constants.MessageTypes.CREATE_SEQ_RESPONSE)
+		if (rmMessageType == Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE)
 			return true;
 
 		return false;
@@ -412,10 +412,10 @@ public class SandeshaUtil {
 			throws SandeshaException {
 		String namespaceName = envelope.getNamespace().getName();
 		if (namespaceName.equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
-			return Constants.SOAPVersion.v1_1;
+			return Sandesha2Constants.SOAPVersion.v1_1;
 		else if (namespaceName
 				.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
-			return Constants.SOAPVersion.v1_2;
+			return Sandesha2Constants.SOAPVersion.v1_2;
 		else
 			throw new SandeshaException("Unknown SOAP version");
 	}
@@ -432,16 +432,16 @@ public class SandeshaUtil {
 		OMElement sequenceElem = null;
 		if (header != null)
 			sequenceElem = header.getFirstChildWithName(new QName(
-					Constants.WSRM.NS_URI_RM, Constants.WSRM.SEQUENCE));
+					Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE));
 
 		if (sequenceElem != null)
 			rmGlobalMsg = true;
 
-		if (Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
+		if (Sandesha2Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
 				.equals(action))
 			rmGlobalMsg = true;
 
-		if (Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
+		if (Sandesha2Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
 
 		return rmGlobalMsg;
@@ -529,9 +529,9 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
 					referenceMessage
 							.getProperty(HTTPConstants.HTTPOutTransportInfo));
-			newMessageContext.setProperty(Constants.WSP.RM_POLICY_BEAN,
+			newMessageContext.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN,
 					referenceMessage
-					.getProperty(Constants.WSP.RM_POLICY_BEAN));
+					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN));
 
 			return newMessageContext;
 

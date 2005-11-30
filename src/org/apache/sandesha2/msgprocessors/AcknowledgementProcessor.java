@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -48,7 +48,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
-				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck == null)
 			throw new SandeshaException("Sequence acknowledgement part is null");
 
@@ -73,7 +73,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			throw new SandeshaException("OutSequenceId is null");
 
 		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(
-				outSequenceId, Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+				outSequenceId, Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 
 		if (internalSequenceBean == null || internalSequenceBean.getValue() == null)
 			throw new SandeshaException("TempSequenceId is not set correctly");
@@ -82,7 +82,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		//Following happens in the SandeshaGlobal handler
 		rmMsgCtx.getMessageContext()
-				.setProperty(Constants.ACK_PROCSSED, "true");
+				.setProperty(Sandesha2Constants.ACK_PROCSSED, "true");
 
 		//Removing relatesTo - Some WSRM endpoints tend to set relatesTo value
 		// for ack messages.
@@ -90,7 +90,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//So we set relatesTo value to null for ackMessages. (this happens in
 		// the SandeshaGlobal handler)
 		//Do this only if this is a standalone ACK.
-		if (rmMsgCtx.getMessageType() == Constants.MessageTypes.ACK)
+		if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.ACK)
 			rmMsgCtx.setRelatesTo(null);
 
 		SenderBean input = new SenderBean();
@@ -124,7 +124,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//If all messages up to last message have been acknowledged.
 		//Add terminate Sequence message.
 		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
-				internalSequenceId, Constants.SequenceProperties.LAST_OUT_MESSAGE);
+				internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE);
 		if (lastOutMsgBean != null) {
 			Long lastOutMsgNoLng = (Long) lastOutMsgBean.getValue();
 			if (lastOutMsgNoLng == null)
@@ -147,7 +147,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 			//stopping the progress of the message further.
 			rmMsgCtx.getMessageContext().setPausedTrue(
-					new QName(Constants.IN_HANDLER_NAME));
+					new QName(Sandesha2Constants.IN_HANDLER_NAME));
 		}
 	}
 
@@ -175,7 +175,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceId,
-				Constants.SequenceProperties.TERMINATE_ADDED);
+				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 
 		if (terminated != null && terminated.getValue() != null
 				&& "true".equals(terminated.getValue())) {
@@ -187,7 +187,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
 
 		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
-				Constants.SequenceProperties.TO_EPR);
+				Sandesha2Constants.SequenceProperties.TO_EPR);
 
 		EndpointReference toEPR = (EndpointReference) toBean.getValue();
 		if (toEPR == null)
@@ -195,13 +195,13 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
 		terminateRMMessage.setFrom(new EndpointReference(
-				Constants.WSA.NS_URI_ANONYMOUS));
+				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
 		terminateRMMessage.setFaultTo(new EndpointReference(
-				Constants.WSA.NS_URI_ANONYMOUS));
+				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
 		terminateRMMessage
-				.setWSAAction(Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE);
+				.setWSAAction(Sandesha2Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE);
 		terminateRMMessage
-				.setSOAPAction(Constants.WSRM.Actions.SOAP_ACTION_TERMINATE_SEQUENCE);
+				.setSOAPAction(Sandesha2Constants.WSRM.Actions.SOAP_ACTION_TERMINATE_SEQUENCE);
 
 		try {
 			terminateRMMessage.addSOAPEnvelope();
@@ -218,7 +218,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		// some delay.
 		//Otherwise this get send before return of the current request (ack).
 		terminateBean.setTimeToSend(System.currentTimeMillis()
-				+ Constants.TERMINATE_DELAY);
+				+ Sandesha2Constants.TERMINATE_DELAY);
 
 		terminateBean.setMessageId(terminateRMMessage.getMessageId());
 		terminateBean.setSend(true);
@@ -228,7 +228,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.getRetransmitterBeanMgr();
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
-		terminateAdded.setName(Constants.SequenceProperties.TERMINATE_ADDED);
+		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 		terminateAdded.setSequenceId(outSequenceId);
 		terminateAdded.setValue("true");
 

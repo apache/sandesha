@@ -22,7 +22,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMException;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -45,9 +45,9 @@ public class AcksTo implements IOMRMElement {
 	public AcksTo(SOAPFactory factory) {
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.NS_PREFIX_RM);
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
 		acksToElement = factory.createOMElement(
-				Constants.WSRM.ACKS_TO, rmNamespace);
+				Sandesha2Constants.WSRM.ACKS_TO, rmNamespace);
 	}
 	
 	public AcksTo (Address address,SOAPFactory factory) {
@@ -61,7 +61,7 @@ public class AcksTo implements IOMRMElement {
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		OMElement acksToPart = element.getFirstChildWithName(new QName(
-				Constants.WSRM.NS_URI_RM, Constants.WSRM.ACKS_TO));
+				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.ACKS_TO));
 
 		if (acksToPart == null)
 			throw new OMException(
@@ -71,7 +71,7 @@ public class AcksTo implements IOMRMElement {
 		address.fromOMElement(acksToPart);
 
 		acksToElement = factory.createOMElement(
-				Constants.WSRM.ACKS_TO, rmNamespace);
+				Sandesha2Constants.WSRM.ACKS_TO, rmNamespace);
 
 		return this;
 	}
@@ -84,13 +84,13 @@ public class AcksTo implements IOMRMElement {
 			throw new OMException("Cant set AcksTo. Address is null");
 
 		OMElement acksToPart = element.getFirstChildWithName(new QName(
-				Constants.WSA.NS_URI_ADDRESSING, Constants.WSRM.ACKS_TO));
+				Sandesha2Constants.WSA.NS_URI_ADDRESSING, Sandesha2Constants.WSRM.ACKS_TO));
 
 		address.toOMElement(acksToElement);
 		element.addChild(acksToElement);
 
 		acksToElement =factory.createOMElement(
-				Constants.WSRM.ACKS_TO, rmNamespace);
+				Sandesha2Constants.WSRM.ACKS_TO, rmNamespace);
 
 		return element;
 	}

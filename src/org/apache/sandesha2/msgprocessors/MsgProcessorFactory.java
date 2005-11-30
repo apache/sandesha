@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * Used to get a suitable message processor. Given the message type.
@@ -29,15 +29,15 @@ public class MsgProcessorFactory {
 
 	public static MsgProcessor getMessageProcessor(int msgType) {
 		switch (msgType) {
-		case (Constants.MessageTypes.CREATE_SEQ):
+		case (Sandesha2Constants.MessageTypes.CREATE_SEQ):
 			return new CreateSeqMsgProcessor();
-		case (Constants.MessageTypes.TERMINATE_SEQ):
+		case (Sandesha2Constants.MessageTypes.TERMINATE_SEQ):
 			return new TerminateSeqMsgProcessor();
-		case (Constants.MessageTypes.APPLICATION):
+		case (Sandesha2Constants.MessageTypes.APPLICATION):
 			return new ApplicationMsgProcessor();
-		case (Constants.MessageTypes.CREATE_SEQ_RESPONSE):
+		case (Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE):
 			return new CreateSeqResponseMsgProcessor();
-		case (Constants.MessageTypes.ACK):
+		case (Sandesha2Constants.MessageTypes.ACK):
 			return new AcknowledgementProcessor();
 		default:
 			return null;

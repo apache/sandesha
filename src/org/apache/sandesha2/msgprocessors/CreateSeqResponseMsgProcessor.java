@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -62,7 +62,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		//Processing for ack if any
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) createSeqResponseRMMsgCtx
-				.getMessagePart(Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck != null) {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
 			ackProcessor.processMessage(createSeqResponseRMMsgCtx);
@@ -70,7 +70,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		//Processing the create sequence response.
 		CreateSequenceResponse createSeqResponsePart = (CreateSequenceResponse) createSeqResponseRMMsgCtx
-				.getMessagePart(Constants.MessageParts.CREATE_SEQ_RESPONSE);
+				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
 		if (createSeqResponsePart == null)
 			throw new SandeshaException("Create Sequence Response part is null");
 
@@ -106,11 +106,11 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr sequencePropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 		SequencePropertyBean outSequenceBean = new SequencePropertyBean(
-				internalSequenceId, Constants.SequenceProperties.OUT_SEQUENCE_ID,
+				internalSequenceId, Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID,
 				newOutSequenceId);
 		SequencePropertyBean internalSequenceBean = new SequencePropertyBean(
 				newOutSequenceId,
-				Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, internalSequenceId);
+				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, internalSequenceId);
 		sequencePropMgr.insert(outSequenceBean);
 		sequencePropMgr.insert(internalSequenceBean);
 
@@ -120,7 +120,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			//Find offered sequence from internal sequence id.
 			SequencePropertyBean offeredSequenceBean = sequencePropMgr
 					.retrieve(internalSequenceId,
-							Constants.SequenceProperties.OFFERED_SEQUENCE);
+							Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE);
 
 			//TODO this should be detected in the Fault manager.
 			if (offeredSequenceBean == null)
@@ -132,7 +132,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			EndpointReference acksToEPR = accept.getAcksTo().getAddress()
 					.getEpr();
 			SequencePropertyBean acksToBean = new SequencePropertyBean();
-			acksToBean.setName(Constants.SequenceProperties.ACKS_TO_EPR);
+			acksToBean.setName(Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 			acksToBean.setSequenceId(offeredSequenceId);
 			acksToBean.setValue(acksToEPR);
 
@@ -162,7 +162,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 					.initializeMessage(applicationMsg);
 
 			Sequence sequencePart = (Sequence) applicaionRMMsg
-					.getMessagePart(Constants.MessageParts.SEQUENCE);
+					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			if (sequencePart == null)
 				throw new SandeshaException("Sequence part is null");
 
@@ -172,7 +172,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			sequencePart.setIdentifier(identifier);
 
 			AckRequested ackRequestedPart = (AckRequested) applicaionRMMsg
-					.getMessagePart(Constants.MessageParts.ACK_REQUEST);
+					.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
 			if (ackRequestedPart != null) {
 				Identifier id1 = new Identifier(factory);
 				id1.setIndentifer(newOutSequenceId);
@@ -195,6 +195,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 						"false");
 
 		createSeqResponseRMMsgCtx.getMessageContext().setPausedTrue(
-				new QName(Constants.IN_HANDLER_NAME));
+				new QName(Sandesha2Constants.IN_HANDLER_NAME));
 	}
 }
