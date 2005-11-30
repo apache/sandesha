@@ -34,7 +34,7 @@
     <!-- the project home page -->
     <url>http://ws.apache.org/ws-fx/sandesha/</url>
 
-    <issueTrackingUrl>http://nagoya.apache.org/jira/browse/WSFX</issueTrackingUrl>
+    <issueTrackingUrl>http://issues.apache.org/jira/browse/SAND</issueTrackingUrl>
     <siteAddress>ws.apache.org</siteAddress>
 
     <siteDirectory>/ws-fx/sandesha/</siteDirectory>

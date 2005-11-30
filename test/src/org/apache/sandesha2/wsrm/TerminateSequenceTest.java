@@ -1,7 +1,7 @@
 package org.apache.sandesha2.wsrm;
 
 import org.apache.sandesha2.SandeshaTestCase;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.om.OMAbstractFactory;
@@ -43,9 +43,9 @@ public class TerminateSequenceTest extends SandeshaTestCase {
         terminateSequence.toSOAPEnvelope(env);
 
         OMElement terminateSeqPart = env.getBody().getFirstChildWithName(
-                new QName(Constants.WSRM.NS_URI_RM, Constants.WSRM.TERMINATE_SEQUENCE));
+                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.TERMINATE_SEQUENCE));
         OMElement identifierPart = terminateSeqPart.getFirstChildWithName(
-                new QName(Constants.WSRM.NS_URI_RM, Constants.WSRM.IDENTIFIER));
+                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.IDENTIFIER));
         assertEquals("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06", identifierPart.getText());
     }
 }

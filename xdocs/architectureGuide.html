@@ -26,7 +26,7 @@ one.</p>
 Source is required to send each messages one or more times. RM Destination
 send back acknowledgements to notify the successful reception of messages.
 After receiving the acknowledgement for a certain message RM Source can stop
-retransmission of that message.</p>
+the retransmission of that message.</p>
 
 <p>When all messages of a certain sequence have been successfully transmitted
 to the RM Destination, RM Source sends a TerminateSequence message to the RM
@@ -50,7 +50,7 @@ TerminateSequence message to the RM Destination.</p>
 <p></p>
 
 <p>RM Destination will obtain the messages and invoke them by passing to the
-Application Destination. If RM Destination is confugired to invoke the
+Application Destination. If RM Destination is configured to invoke the
 messages in order, it will have to pause the invocation of some messages
 until all previous once have been received and invoked.</p>
 
@@ -66,7 +66,7 @@ until all previous once have been received and invoked.</p>
 
 <p></p>
 
-<p>Above diagram explains the basic architecture of Sandesha2. Let's try to
+<p>Above diagram gives the basic architecture of Sandesha2. Let's try to
 understand each part of this in detail.</p>
 
 <p></p>
@@ -104,19 +104,19 @@ get called only for messages that come to RM enabled services.</p>
 
 <h3>Sender</h3>
 
-<p>Sender is responsible for transmitting and retransmitting messages. The
-sender is a seperated thread that keeps running all the time. At each
+<p>Sender is responsible for transmition and retransmition of messages. The
+Sender is a seperate thread that keeps running all the time. At each
 iteration Sender check the Sandesha2 Storage to see weather there are any
-messages to be sent. If there are any those messages are sent. If the message
-does not have to be retransmitted the Sender delete this entry from the
-Storage. Otherwise the entry is only modified, and will be sent at some other
-time. How exactly this happens will be explained later.</p>
+messages to be sent. If there are any, they are sent. If a message does not
+have to be retransmitted the Sender delete this entry from the Storage.
+Otherwise the entry is only modified, and will be sent at some other time.
+How exactly this happens will be explained later.</p>
 
 <p></p>
 
 <h3>Message Processors</h3>
 
-<p>Sandesha2 have a set of message processors each extend the
+<p>Sandesha2 have a set of message processors each extending the
 MessageProcessor interface. Each message processor is responsible for
 processing a certain type of message. For example CreateSequenceProcessor
 will process incoming Create Sequence messages and Acknowledgement processor
@@ -127,30 +127,32 @@ diagram to see all the MessageProcessors.</p>
 
 <h3>InOrderInvoker</h3>
 
-<p>InOrderInvoker is another seperate thread started by the sandesha2 system.
-This is started only if Sadesha2 has been configured to support InOrder
-Invocation delivery assurance. This is responsible for invoking messages of a
-sequence in the order of message numbers.</p>
+<p>InOrderInvoker is another seperate thread that get started by the
+Sandesha2 system. This is started only if Sadesha2 has been configured to
+support InOrder Invocation delivery assurance. InOrderInvoker is responsible
+for invoking messages of a sequence in the order of message numbers.</p>
 
 <p></p>
 
-<h3>Sandesha Storage Framework</h3>
+<h3>Sandesha2 Storage Framework</h3>
 
-<p>Sandesha Storage Framework is the cornerstone of Sandesha2. This was
-designed to support the RM Message exchage while being independent of the
-storage implementation used. Two main storage implementations are InMemory
-storage implementation and Database based storage implementations.</p>
+<p>Sandesha2 Storage Framework cab be given as the cornerstone of Sandesha2
+system. This was designed to support the RM Message exchage while being
+independent of the storage implementation used. Two main storage
+implementations are InMemory storage implementation and Database based
+storage implementation.</p>
 
 <p>Storage framework define several beans that extend the RMBean storage (so
-these are called RMBeans). Currently there are five RMBeans. They are.</p>
+these are called RM Beans). Currently there are five RM Beans. They are.</p>
 <ol>
   <li>CreateSequenceBean (fields - InternalSequenceID, CreateSequenceMsgID,
     SequenceID)</li>
   <li>SenderBean (fields - key, internalSequenceID, msgNo, msgID, msgType,
     send, resent, sentCount)</li>
-  <li>NextMsgBean (fields sequenceID, nextMsgToInvoke)</li>
-  <li>InvokerBean (fields are key, sequenceID, msgNo)</li>
-  <li>SequencePropertyBean (sequenceID, propertyName, propertyValue)</li>
+  <li>NextMsgBean (fields - sequenceID, nextMsgToInvoke)</li>
+  <li>InvokerBean (fields - key, sequenceID, msgNo)</li>
+  <li>SequencePropertyBean (fields - sequenceID, propertyName,
+  propertyValue)</li>
 </ol>
 
 <p>Each storage implementation should have five BeanManagers that define how
@@ -180,11 +182,11 @@ engine).</p>
 
 <p>You can instruct Sandesha2 to give the delivery assurance you want. The
 bacis configurable delivery assurance we provide is the odering of messages.
-By setting the InOrderInvocation property of sandesha2.properties file to
-true (the default), you can tell sandesha2 to invoke messages of a sequence
+By setting the InOrderInvocation property of Sandesha2.properties file to
+true (the default), you can tell Sandesha2 to invoke messages of a sequence
 in the order. Order will be decided based on the wsrm:messageNumber. If you
-set this property to false, sandesha2 will invoke messages as they come.
-Please note that if you set an invalid value to this property, sandesha2 will
+set this property to false, Sandesha2 will invoke messages as they come.
+Please note that if you set an invalid value to this property, Sandesha2 will
 use the defult.</p>
 
 <p>Which delivery assurance to use depend on your requirements. If you want
@@ -193,13 +195,13 @@ ordering, set the property to false. If you want ordering, set it to true.
 There could be a considerable performance improvement if you set this to
 false.</p>
 
-<p>Internally sandesha2 start a special thread if inorder invocation is
+<p>Internally sandesha2 start a special thread if in-order invocation is
 required (InOrderInvoker). This thread which is continuously running will
 only invoke the messages in order.</p>
 
 <p>In the current implementation each message (identified by sequenceID and
 message number) will be invoked only once. So exactly once delivey assurance
-is guaranteed. You cannot ask sandesha2 to invoke the same message more than
+is guaranteed. You cannot ask Sandesha2 to invoke the same message more than
 once.</p>
 
 <p></p>
@@ -210,7 +212,7 @@ once.</p>
 common RM scenario. Which is the sending of a couple of Ping messages from a
 client to the server. We will mailnly look at how Sandesha2 use its storage
 to do the RM message exchange correctly. While reading this please keep in
-mind the RMBeans and their fields which were mentioned before.</p>
+mind the RM Beans and their fields which were mentioned before.</p>
 
 <p><b>Client side</b></p>
 <ul>
@@ -220,7 +222,7 @@ mind the RMBeans and their fields which were mentioned before.</p>
   <li>SandeshaOutHandler adds an entry to the CreateSequenceBeanManager. The
     internalSequenceId is an identifier unique to the whole sequence. For the
     client side this is the concantination of wsa:To and a constants set by
-    the client (SEQUENCE_KEY). The seqienceId property is initially null. The
+    the client (SEQUENCE_KEY). The seqenceID property is initially null. The
     createSeqMsgID is the message ID of the crerated Create Sequence
   message.</li>
   <li>SandeshaOutHandler adds two entries to the SenderBeanManager. One which
@@ -236,11 +238,11 @@ mind the RMBeans and their fields which were mentioned before.</p>
     (the value of the create sequence message ID comes in the relatesTo part
     of the Create Sequence Response message).</p>
   </li>
-  <li>Client update the sequenceId property of the CreateSequence entry. Also
-    the send value of the application message entries are set to true, so
-    that the sender start sending (and retransmitting) them.</li>
+  <li>Client update the sequenceID property of the CreateSequence BeanManager
+    entry. Also the send value of the application message entries are set to
+    true, so that the sender start sending (and retransmitting) them.</li>
   <li>When the client receive acknowlegements for the messages it sent, the
-    tast is deligate to the Acknwoledgement processor, It removes the
+    task is deligate to the Acknwoledgement processor, It removes the
     corresponsing entry of that application message ifrom the
     SenderBeanManager.</li>
   <li>If an acknowledgement says that all the sent messages (upto last
@@ -264,12 +266,12 @@ mind the RMBeans and their fields which were mentioned before.</p>
     enabled, an entry is added to the InvokerBeanManager representing this.
     (suppose the message number of this message is 2)</li>
   <li>The InOrderInvoker which keeps looking at the InvokerBeanManager
-    entries sees that there are entries to be invoked. </li>
+    entries sees that there are entries to be invoked.</li>
   <li>the InOrderInvoker checks the entry of the NextMessageBeanManager of
     the relevent sequence and sees that it is 1. But since only message
     number 2 is present in the invokerBeanManager entries the invocation is
     not done.</li>
-  <li>After some time application message 1 also comes. Now the invoker sees
+  <li>After some time application message 1 also comes. Now the Invoker sees
     this entry and invoke the message. It also update the
     NextMessageBeanManager nextMessageToInvoke property to 2. The invoker
     again check weather the new entry for the NextMessageToInvoke (2) is
