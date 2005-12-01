@@ -20,16 +20,19 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.clientapi.AsyncResult;
-import org.apache.axis2.clientapi.Call;
-import org.apache.axis2.clientapi.Callback;
-import org.apache.axis2.clientapi.MessageSender;
+import org.apache.axis2.client.Call;
+import org.apache.axis2.client.MessageSender;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.async.AsyncResult;
+import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class AsyncEchoClient {
@@ -42,7 +45,7 @@ public class AsyncEchoClient {
 	
 	private String ackPort = "9070";
 	
-	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/InteropService";
+	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
 
 	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/AnonymousService/echoString";
 	
@@ -50,11 +53,11 @@ public class AsyncEchoClient {
 	
 	private String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\client\\";   //this will be available after a maven build
 	
-	public static void main(String[] args) throws AxisFault {		
+	public static void main(String[] args) throws Exception {		
 		new AsyncEchoClient ().run();
 	}
 	
-	private void run () throws AxisFault {
+	private void run () throws Exception {
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
@@ -62,28 +65,39 @@ public class AsyncEchoClient {
 		
 		Call call = new Call(AXIS2_CLIENT_PATH);
 		call.engageModule(new QName("sandesha"));
-		//call.set(Constants.SANDESHA_DEBUG_MODE,"on");
-		call.set(Constants.AcksTo,acksToEPR); //Optional
-		call.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		call.setTo(new EndpointReference(toEPR));
-		call.set(Constants.SEQUENCE_KEY,"sequence1");  //Optional
-		call.setSoapAction("test:soap:action");
-		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
-		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
+		
+		Options clientOptions = new Options ();
+		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+		call.setClientOptions(clientOptions);
+		//call.set(Sandesha2Constants.SANDESHA_DEBUG_MODE,"on");
+		clientOptions.setProperty(ClientAPI.AcksTo,acksToEPR);
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		clientOptions.setTo(new EndpointReference(toEPR));
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,toEPR);
+		clientOptions.setProperty(ClientAPI.SEQUENCE_KEY,"sequence1");  //Optional
+		clientOptions.setSoapAction("test:soap:action");
+		clientOptions.setProperty(ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
+		clientOptions.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
 		Callback callback1 = new TestCallback ("Callback 1");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
 		Callback callback2 = new TestCallback ("Callback 2");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
-		call.set(Constants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(ClientAPI.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
+		
+        while (!callback3.isComplete()) {
+            Thread.sleep(1000);
+        }
+		
+		call.close();
 	}
 
 	private static OMElement getEchoOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace defaultNS = fac.createOMNamespace("",null);
-		OMElement echoElement = fac.createOMElement("echoString", defaultNS);
-		OMElement paramElement = fac.createOMElement("text", defaultNS);
+		OMNamespace defaultNS = fac.createOMNamespace("http://tempuri.apache.org","ns1");
+		OMElement echoElement = fac.createOMElement("echoString", null);
+		OMElement paramElement = fac.createOMElement("text", null);
 		echoElement.addChild(paramElement);
 		paramElement.setText(text);
 

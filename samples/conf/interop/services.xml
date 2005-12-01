@@ -1,4 +1,4 @@
-<service name="OneWayService">
+<service name="RMInteropService">
     <parameter name="ServiceClass" locked="xsd:false">org.apache.sandesha2.samples.interop.service.RMInteropService</parameter>
 
    <module ref="sandesha"/>

@@ -19,18 +19,21 @@ package org.apache.sandesha2.samples.interop.clients;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.clientapi.AsyncResult;
-import org.apache.axis2.clientapi.Call;
-import org.apache.axis2.clientapi.Callback;
-import org.apache.axis2.clientapi.MessageSender;
+import org.apache.axis2.client.Call;
+import org.apache.axis2.client.MessageSender;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.async.AsyncResult;
+import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPConstants;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class SyncEchoClient {
@@ -39,7 +42,7 @@ public class SyncEchoClient {
 	
 	private String toPort = "8070";
 	
-	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/InteropService";
+	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
 
 	private String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
@@ -57,24 +60,27 @@ public class SyncEchoClient {
 		
 		Call call = new Call(AXIS2_CLIENT_PATH);
 		call.engageModule(new QName("sandesha"));
-		call.setTo(new EndpointReference(toEPR));
-		call.set(Constants.SEQUENCE_KEY,"sequence1");  //Optional
-		//call.set(Constants.SANDESHA_DEBUG_MODE,"on");
-		call.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
-		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
+		Options clientOptions = new Options ();
+		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+		clientOptions.setSenderTransportProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		call.setClientOptions(clientOptions);
+		clientOptions.setTo(new EndpointReference(toEPR));
+		clientOptions.setProperty(ClientAPI.SEQUENCE_KEY,"sequence1");
+		clientOptions.setProperty(ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
+		clientOptions.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
 		Callback callback1 = new TestCallback ("Callback 1");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
 		Callback callback2 = new TestCallback ("Callback 2");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
-		call.set(Constants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(ClientAPI.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 	}
 
 	private static OMElement getEchoOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace defaultNS = fac.createOMNamespace("",null);
+		OMNamespace defaultNS = fac.createOMNamespace("http://tempuri.apache.org","ns1");
 		OMElement echoElement = fac.createOMElement("echoString", defaultNS);
 		OMElement paramElement = fac.createOMElement("text", defaultNS);
 		echoElement.addChild(paramElement);
@@ -89,6 +95,10 @@ public class SyncEchoClient {
 		
 		public TestCallback (String name) {
 			this.name = name;
+		}
+		
+		public String toString () {
+			return name;
 		}
 		
 		public void onComplete(AsyncResult result) {
