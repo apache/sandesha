@@ -37,6 +37,7 @@ import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.derby.iapi.util.Operator;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -95,9 +96,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
 		ServiceContext serviceContext = msgCtx.getServiceContext();
+		OperationContext operationContext = msgCtx.getOperationContext();
 		Object debug = null;
 		if (serviceContext != null) {
-			debug = serviceContext.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
+			debug = msgCtx.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaOutHandler got a '"
 						+ SandeshaUtil.getMessageTypeString(rmMsgCtx
@@ -167,7 +169,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 						"TO End Point Reference is not set correctly. This is a must for the sandesha client side.");
 
 			internalSequenceId = toEPR.getAddress();
-			String sequenceKey = (String) context
+			OperationContext opContext = msgCtx.getOperationContext();
+			String sequenceKey = (String) msgCtx
 					.getProperty(ClientAPI.SEQUENCE_KEY);
 			if (sequenceKey != null)
 				internalSequenceId = internalSequenceId + sequenceKey;
@@ -211,7 +214,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 				String acksTo = null;
 				if (serviceContext != null) {
-					acksTo = (String) serviceContext
+					acksTo = (String) msgCtx
 							.getProperty(ClientAPI.AcksTo);
 				}
 
@@ -500,9 +503,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 		} else {
 			//client side
 
-			ServiceContext serviceContext = msg.getServiceContext();
-			if (serviceContext != null) {
-				Object obj = serviceContext.getProperty(ClientAPI.LAST_MESSAGE);
+			OperationContext operationContext = msg.getOperationContext();
+			if (operationContext != null) {
+				Object obj = msg.getProperty(ClientAPI.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 					lastMessage = true;
 					sequence.setLastMessage(new LastMessage(factory));

@@ -149,7 +149,7 @@ public class InOrderInvoker extends Thread {
 									.getServiceContext();
 							Object debug = null;
 							if (serviceContext != null) {
-								debug = serviceContext
+								debug = msgToInvoke
 										.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 								if (debug != null && "on".equals(debug)) {
 									System.out

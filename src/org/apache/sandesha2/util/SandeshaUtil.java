@@ -533,6 +533,7 @@ public class SandeshaUtil {
 					referenceMessage
 					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN));
 
+			//newMessageContext.
 			return newMessageContext;
 
 		} catch (AxisFault e) {

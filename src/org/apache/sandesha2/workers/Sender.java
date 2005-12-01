@@ -92,7 +92,7 @@ public class Sender extends Thread {
 								.getServiceContext();
 						Object debug = null;
 						if (serviceContext != null) {
-							debug = serviceContext
+							debug = msgCtx
 									.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 							if (debug != null && "on".equals(debug)) {
 								System.out

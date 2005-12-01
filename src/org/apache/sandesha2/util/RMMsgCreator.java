@@ -143,10 +143,10 @@ public class RMMsgCreator {
 		CreateSequence createSequencePart = new CreateSequence(factory);
 
 		//Adding sequence offer - if present
-		ServiceContext serviceContext = applicationMsgContext
-				.getServiceContext();
-		if (serviceContext != null) {
-			String offeredSequence = (String) serviceContext
+		OperationContext operationcontext = applicationMsgContext
+				.getOperationContext();
+		if (operationcontext != null) {
+			String offeredSequence = (String) applicationMsgContext
 					.getProperty(ClientAPI.OFFERED_SEQUENCE_ID);
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(factory);

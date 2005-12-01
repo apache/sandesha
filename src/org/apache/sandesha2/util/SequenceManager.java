@@ -97,7 +97,7 @@ public class SequenceManager {
 			throws SandeshaException {
 
 		AbstractContext context = firstAplicationMsgCtx.getSystemContext();
-
+ 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(firstAplicationMsgCtx
 						.getSystemContext());

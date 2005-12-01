@@ -84,7 +84,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		Object debug = null;
 		if (serviceContext != null) {
-			debug = serviceContext.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
+			debug = msgContext.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
 						+ SandeshaUtil.getMessageTypeString(rmMessageContext
