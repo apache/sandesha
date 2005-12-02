@@ -31,6 +31,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.Flow;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -84,7 +85,7 @@ public class RMMsgCreator {
 				.getMessageContext();
 		if (applicationMsgContext == null)
 			throw new SandeshaException("Application message is null");
-		ConfigurationContext context = applicationMsgContext.getSystemContext();
+		ConfigurationContext context = applicationMsgContext.getConfigurationContext();
 		if (context == null)
 			throw new SandeshaException("Configuration Context is null");
 
@@ -101,7 +102,7 @@ public class RMMsgCreator {
 			// except for configCtx).
 			AxisOperation createSequenceOperation = AxisOperationFactory
 					.getAxisOperation(AxisOperation.MEP_CONSTANT_OUT_IN);
-
+			
 			createSeqmsgContext = SandeshaUtil.createNewRelatedMessageContext(
 					applicationRMMsg, createSequenceOperation);
 			OperationContext createSeqOpCtx = createSeqmsgContext
@@ -246,7 +247,7 @@ public class RMMsgCreator {
 
 		terminateMessage.setMessageID(SandeshaUtil.getUUID());
 
-		ConfigurationContext configCtx = referenceMessage.getSystemContext();
+		ConfigurationContext configCtx = referenceMessage.getConfigurationContext();
 		if (configCtx == null)
 			throw new SandeshaException("Configuration Context is null");
 
@@ -369,7 +370,7 @@ public class RMMsgCreator {
 		sequenceAck.setIdentifier(id);
 
 		ConfigurationContext ctx = applicationMsg.getMessageContext()
-				.getSystemContext();
+				.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(ctx);
 		SequencePropertyBeanMgr seqPropMgr = storageManager

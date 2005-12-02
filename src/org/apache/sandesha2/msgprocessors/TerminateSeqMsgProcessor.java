@@ -63,7 +63,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		if (sequenceId==null || "".equals(sequenceId))
 			throw new SandeshaException ("Invalid sequence id");
 		
-		ConfigurationContext context = terminateSeqMsg.getSystemContext();
+		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
 
 		
 		TerminateManager.terminateReceivingSide(context,sequenceId);

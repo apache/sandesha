@@ -142,7 +142,7 @@ public class FaultManager {
 			throw new SandeshaException(
 					"CreateSequence message does not have a CreateSequence part");
 
-		ConfigurationContext context = messageContext.getSystemContext();
+		ConfigurationContext context = messageContext.getConfigurationContext();
 		StorageManager storageManager = (StorageManager) SandeshaUtil
 				.getSandeshaStorageManager(context);
 		if (storageManager == null)
@@ -275,7 +275,7 @@ public class FaultManager {
 		}
 
 		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(messageContext.getSystemContext());
+				.getSandeshaStorageManager(messageContext.getConfigurationContext());
 
 		NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
 		SOAPEnvelope envelope = messageContext.getEnvelope();
@@ -392,7 +392,7 @@ public class FaultManager {
 
 			StorageManager storageManager = SandeshaUtil
 					.getSandeshaStorageManager(referenceMessage
-							.getSystemContext());
+							.getConfigurationContext());
 
 			//setting contexts.
 			faultMsgContext.setAxisServiceGroup(referenceMessage

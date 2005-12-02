@@ -70,7 +70,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			String newSequenceId = SequenceManager
 					.setupNewSequence(createSeqRMMsg);
 			ConfigurationContext context = createSeqRMMsg.getMessageContext()
-					.getSystemContext();
+					.getConfigurationContext();
 			if (newSequenceId == null)
 				throw new AxisFault(
 						"Internal error - Generated sequence id is null");

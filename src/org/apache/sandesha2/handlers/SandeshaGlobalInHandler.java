@@ -69,7 +69,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				.checkForPossibleFaults(msgContext);
 		if (faultMessageContext != null) {
 			ConfigurationContext configurationContext = msgContext
-					.getSystemContext();
+					.getConfigurationContext();
 			AxisEngine engine = new AxisEngine(configurationContext);
 			engine.send(faultMessageContext.getMessageContext());
 			return;
@@ -79,7 +79,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				.initializeMessage(msgContext);
 
 		ConfigurationContext context = rmMessageContext.getMessageContext()
-				.getSystemContext();
+				.getConfigurationContext();
 
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		Object debug = null;
@@ -132,7 +132,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			if (sequenceId != null && msgNo > 0) {
 				StorageManager storageManager = SandeshaUtil
 						.getSandeshaStorageManager(rmMsgContext
-								.getMessageContext().getSystemContext());
+								.getMessageContext().getConfigurationContext());
 				SequencePropertyBeanMgr seqPropMgr = storageManager
 						.getSequencePropretyBeanMgr();
 				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
@@ -220,7 +220,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 			StorageManager storageManager = SandeshaUtil
 					.getSandeshaStorageManager(rmMsgContext.getMessageContext()
-							.getSystemContext());
+							.getConfigurationContext());
 			SequencePropertyBeanMgr seqPropMgr = storageManager
 					.getSequencePropretyBeanMgr();
 			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(

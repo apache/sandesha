@@ -55,7 +55,7 @@ public class SandeshaInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 	
-		ConfigurationContext context = msgCtx.getSystemContext();
+		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
 

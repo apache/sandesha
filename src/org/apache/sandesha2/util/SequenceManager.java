@@ -58,7 +58,7 @@ public class SequenceManager {
 		try {
 			storageManager = SandeshaUtil
 					.getSandeshaStorageManager(createSequenceMsg
-							.getMessageContext().getSystemContext());
+							.getMessageContext().getConfigurationContext());
 		} catch (SandeshaException e) {
 			e.printStackTrace();
 		}
@@ -96,11 +96,11 @@ public class SequenceManager {
 			MessageContext firstAplicationMsgCtx, String iternalSequenceId)
 			throws SandeshaException {
 
-		AbstractContext context = firstAplicationMsgCtx.getSystemContext();
+		AbstractContext context = firstAplicationMsgCtx.getConfigurationContext();
  
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(firstAplicationMsgCtx
-						.getSystemContext());
+						.getConfigurationContext());
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();

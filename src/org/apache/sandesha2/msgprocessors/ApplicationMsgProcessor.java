@@ -95,7 +95,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
-						.getSystemContext());
+						.getConfigurationContext());
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
@@ -104,7 +104,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
-				.getSystemContext();
+				.getConfigurationContext();
 		if (configCtx == null)
 			throw new SandeshaException("Configuration Context is null");
 
@@ -196,7 +196,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				}
 
 				//Starting the invoker if stopped.
-				SandeshaUtil.startInvokerIfStopped(msgCtx.getSystemContext());
+				SandeshaUtil.startInvokerIfStopped(msgCtx.getConfigurationContext());
 
 			}
 		}
@@ -241,7 +241,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
 				.getSOAPVersion(msgCtx.getEnvelope()));
 		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(msgCtx.getSystemContext());
+				.getSandeshaStorageManager(msgCtx.getConfigurationContext());
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
@@ -249,7 +249,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
-				.getSystemContext();
+				.getConfigurationContext();
 		if (configCtx == null)
 			throw new SandeshaException("Configuration Context is null");
 
@@ -319,7 +319,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
 
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
-					.getSystemContext());
+					.getConfigurationContext());
 
 			//setting CONTEXT_WRITTEN since acksto is anonymous
 			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {

@@ -40,7 +40,7 @@ public class MessageRetransmissionAdjuster {
 		MessageContext messageContext = SandeshaUtil
 				.getStoredMessageContext(storedKey);
 
-		if (messageContext.getSystemContext() == null)
+		if (messageContext.getConfigurationContext() == null)
 			return retransmitterBean;
 
 		RMPolicyBean policyBean = (RMPolicyBean) messageContext

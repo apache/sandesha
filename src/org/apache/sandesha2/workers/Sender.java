@@ -133,7 +133,7 @@ public class Sender extends Thread {
 							//terminate sending side.
 							TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 							String sequenceID = terminateSequence.getIdentifier().getIdentifier();
-							ConfigurationContext configContext = msgCtx.getSystemContext();
+							ConfigurationContext configContext = msgCtx.getConfigurationContext();
 							
 							TerminateManager.terminateSendingSide(configContext,sequenceID);
 						}
@@ -217,7 +217,7 @@ public class Sender extends Thread {
 		if (responsePresent) {
 			//create the response
 			MessageContext response = new MessageContext(msgCtx
-					.getSystemContext(), msgCtx.getSessionContext(), msgCtx
+					.getConfigurationContext(), msgCtx.getSessionContext(), msgCtx
 					.getTransportIn(), msgCtx.getTransportOut());
 			response.setProperty(MessageContext.TRANSPORT_IN, msgCtx
 					.getProperty(MessageContext.TRANSPORT_IN));
@@ -256,7 +256,7 @@ public class Sender extends Thread {
 			}
 
 			if (resenvelope != null) {
-				AxisEngine engine = new AxisEngine(msgCtx.getSystemContext());
+				AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
 				response.setEnvelope(resenvelope);
 				engine.receive(response);
 			}

@@ -235,7 +235,7 @@ public class RMMsgContext {
 		if (msgContext == null)
 			return null;
 
-		return msgContext.getSystemContext();
+		return msgContext.getConfigurationContext();
 	}
 
 	public void setSOAPAction(String SOAPAction) {

@@ -472,7 +472,7 @@ public class SandeshaUtil {
 			MessageContext referenceMessage = referenceRMMessage
 					.getMessageContext();
 			ConfigurationContext configContext = referenceMessage
-					.getSystemContext();
+					.getConfigurationContext();
 			AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
 			
 			MessageContext newMessageContext = new MessageContext(configContext);

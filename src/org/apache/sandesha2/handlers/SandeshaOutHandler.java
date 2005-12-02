@@ -29,17 +29,14 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.derby.iapi.util.Operator;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.policy.RMPolicyBean;
@@ -77,7 +74,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 
-		ConfigurationContext context = msgCtx.getSystemContext();
+		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null)
 			throw new AxisFault("ConfigurationContext is null");
 
@@ -349,7 +346,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 			StorageManager storageManager = SandeshaUtil
 					.getSandeshaStorageManager(applicationMsg
-							.getSystemContext());
+							.getConfigurationContext());
 
 			SequencePropertyBeanMgr seqPropMgr = storageManager
 					.getSequencePropretyBeanMgr();
@@ -366,7 +363,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException("Context is null");
 
 		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(applicationMsg.getSystemContext());
+				.getSandeshaStorageManager(applicationMsg.getConfigurationContext());
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
 		CreateSeqBean createSeqBean = new CreateSeqBean(internalSequenceId,
@@ -407,7 +404,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException("Context is null");
 
 		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(msg.getSystemContext());
+				.getSandeshaStorageManager(msg.getConfigurationContext());
 		SequencePropertyBeanMgr sequencePropertyMgr = storageManager
 				.getSequencePropretyBeanMgr();
 

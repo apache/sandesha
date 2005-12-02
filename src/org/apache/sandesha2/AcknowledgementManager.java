@@ -49,7 +49,7 @@ public class AcknowledgementManager {
 	public static void piggybackAckIfPresent(
 			RMMsgContext applicationRMMsgContext) throws SandeshaException {
 		ConfigurationContext configurationContext = applicationRMMsgContext
-				.getMessageContext().getSystemContext();
+				.getMessageContext().getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(configurationContext);
 		SenderBeanMgr retransmitterBeanMgr = storageManager

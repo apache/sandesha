@@ -80,7 +80,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			throw new SandeshaException("New sequence Id is null");
 
 		ConfigurationContext configCtx = createSeqResponseRMMsgCtx
-				.getMessageContext().getSystemContext();
+				.getMessageContext().getConfigurationContext();
 		String createSeqMsgId = createSeqResponseRMMsgCtx.getMessageContext()
 				.getRelatesTo().getValue();
 

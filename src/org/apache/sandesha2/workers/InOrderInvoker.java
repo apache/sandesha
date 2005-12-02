@@ -142,7 +142,7 @@ public class InOrderInvoker extends Thread {
 
 						try {
 							//Invoking the message.
-							new AxisEngine(msgToInvoke.getSystemContext())
+							new AxisEngine(msgToInvoke.getConfigurationContext())
 									.receive(msgToInvoke);
 
 							ServiceContext serviceContext = msgToInvoke

@@ -58,7 +58,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
-						.getSystemContext());
+						.getConfigurationContext());
 		SenderBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager
@@ -169,7 +169,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
-						.getSystemContext());
+						.getConfigurationContext());
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
