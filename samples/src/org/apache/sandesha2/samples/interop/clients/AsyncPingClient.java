@@ -19,7 +19,6 @@ package org.apache.sandesha2.samples.interop.clients;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
@@ -28,7 +27,6 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 
 
@@ -63,7 +61,6 @@ public class AsyncPingClient {
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setSenderTransportProtocol(Constants.TRANSPORT_HTTP);
 		sender.setClientOptions(clientOptions);
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		clientOptions.setProperty(ClientAPI.AcksTo,acksToEPR);

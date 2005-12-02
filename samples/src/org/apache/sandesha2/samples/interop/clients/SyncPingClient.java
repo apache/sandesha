@@ -19,18 +19,14 @@ package org.apache.sandesha2.samples.interop.clients;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 
 
@@ -59,14 +55,10 @@ public class SyncPingClient {
 		
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
 		sender.engageModule(new QName ("sandesha"));
-		//sender.set(Sandesha2Constants.SANDESHA_DEBUG_MODE,"on");
 		Options clientOptions = new Options ();
 		sender.setClientOptions(clientOptions);
-		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setSenderTransportProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		
 		clientOptions.setTo(new EndpointReference(toEPR));
 		clientOptions.setProperty(ClientAPI.SEQUENCE_KEY,"sequence1");
 		sender.send("ping",getPingOMBlock("ping1"));
