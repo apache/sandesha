@@ -21,16 +21,13 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
-import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.om.impl.llom.OMNamespaceImpl;
-import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 
 public class MicrosoftSyncPingClient {
 
@@ -54,21 +51,18 @@ public class MicrosoftSyncPingClient {
 		}
 		
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
+		Options clientOptions = new Options ();
+		sender.setClientOptions(clientOptions);
 		sender.engageModule(new QName ("sandesha"));
-		
-		sender.set(Constants.SANDESHA_DEBUG_MODE,"on");   //Sets the debug on for sandesha.
-		
-		sender.setTo(new EndpointReference("http://131.107.72.15/ReliableMessaging_Service_Indigo/ReliableOneWay.svc"));
-		sender.set(MessageContextConstants.TRANSPORT_URL,transportTo);
-		
-		sender.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		sender.set(Constants.SEQUENCE_KEY,"sequence1");
-		sender.setSenderTransport(org.apache.axis2.Constants.TRANSPORT_HTTP);
-		sender.setSoapAction("urn:wsrm:Ping");
-		sender.setWsaAction("urn:wsrm:Ping");
+		clientOptions.setProperty(ClientAPI.SANDESHA_DEBUG_MODE,"on");   //Sets the debug on for sandesha.
+		clientOptions.setTo(new EndpointReference("http://131.107.72.15/ReliableMessaging_Service_Indigo/ReliableOneWay.svc"));
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+		clientOptions.setProperty(ClientAPI.SEQUENCE_KEY,"sequence1");
+		clientOptions.setSoapAction("urn:wsrm:Ping");
+		clientOptions.setAction("urn:wsrm:Ping");
   		sender.send("ping",getPingOMBlock("Microsoft-1"));
 		sender.send("ping",getPingOMBlock("Microsoft-2"));
-		sender.set(Constants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(ClientAPI.LAST_MESSAGE, "true");
 		sender.send("ping",getPingOMBlock("Microsoft-3"));
 	}
 	

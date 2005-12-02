@@ -21,7 +21,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Call;
-import org.apache.axis2.client.MessageSender;
+import org.apache.axis2.client.Options;
 import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.MessageContextConstants;
@@ -29,8 +29,7 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class MicrosoftAsyncEchoClient {
@@ -50,24 +49,18 @@ public class MicrosoftAsyncEchoClient {
 	
 	private void run () throws AxisFault {
 		Call call = new Call(AXIS2_CLIENT_PATH);
+		Options clientOptions = new Options ();
+		call.setClientOptions(clientOptions);
+		
 		call.engageModule(new QName("sandesha"));
-		call.set(Constants.AcksTo,"http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"); //Optional
+		clientOptions.setProperty(ClientAPI.AcksTo,"http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"); //Optional
 		
-		call.setTo(new EndpointReference(to));
-		call.set(MessageContextConstants.TRANSPORT_URL,transportTo);
-		call.set(Constants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
-		call.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
-		//call.set(Constants.SANDESHA_DEBUG_MODE,"on");
-		call.setWsaAction("urn:wsrm:EchoString");
-		call.setSoapAction("urn:wsrm:EchoString");
-		
-//		Callback callback1 = new TestCallback ("Callback 1");
-//		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
-//		Callback callback2 = new TestCallback ("Callback 2");
-//		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
-		
-		call.set(Constants.LAST_MESSAGE, "true");
+		clientOptions.setTo(new EndpointReference(to));
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+		clientOptions.setProperty(ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
+		clientOptions.setAction("urn:wsrm:EchoString");
+		clientOptions.setSoapAction("urn:wsrm:EchoString");
+		clientOptions.setProperty(ClientAPI.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 	}

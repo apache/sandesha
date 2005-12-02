@@ -21,13 +21,13 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
+import org.apache.axis2.client.Options;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Constants;
+import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 
 /**
  * @author chamikara
@@ -58,21 +58,21 @@ public class MicrosoftAsyncPingClient {
 		}
 		
 		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
+		Options clientOptions = new Options ();
+		sender.setClientOptions(clientOptions);
 		sender.engageModule(new QName ("sandesha"));
-		
-		sender.set(Constants.SANDESHA_DEBUG_MODE,"on");   //Sets the debug on for sandesha.
-		sender.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		sender.setTo(new EndpointReference(to));
-		sender.set(MessageContextConstants.TRANSPORT_URL,transportTo);
-		sender.set(Constants.AcksTo,"http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString");
-		sender.setReplyTo(new EndpointReference ("http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"));
-		sender.setFaultTo(new EndpointReference ("http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"));
-		sender.set(Constants.SEQUENCE_KEY,"sequence1");
-		sender.setSoapAction("urn:wsrm:Ping");
-		sender.setWsaAction("urn:wsrm:Ping");
+		clientOptions.setProperty(ClientAPI.SANDESHA_DEBUG_MODE,"on");   //Sets the debug on for sandesha.
+		clientOptions.setTo(new EndpointReference(to));
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+		clientOptions.setProperty(ClientAPI.AcksTo,"http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString");
+		clientOptions.setReplyTo(new EndpointReference ("http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"));
+		clientOptions.setFaultTo(new EndpointReference ("http://www-lk.wso2.com:9080/axis2/services/AnonymousService/echoString"));
+		clientOptions.setProperty(ClientAPI.SEQUENCE_KEY,"sequence1");
+		clientOptions.setSoapAction("urn:wsrm:Ping");
+		clientOptions.setAction("urn:wsrm:Ping");
   		sender.send("ping",getPingOMBlock("Microsoft-1"));
 		sender.send("ping",getPingOMBlock("Microsoft-2"));
-		sender.set(Constants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(ClientAPI.LAST_MESSAGE, "true");
 		sender.send("ping",getPingOMBlock("Microsoft-3"));
 	}
 	
