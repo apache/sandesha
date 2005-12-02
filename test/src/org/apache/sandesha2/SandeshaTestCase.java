@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.AxisConfigurationImpl;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMXMLParserWrapper;
@@ -76,7 +75,7 @@ public class SandeshaTestCase extends TestCase {
 
 
     private MessageContext getMessageContext() throws Exception{
-        AxisConfiguration axisConfig = new AxisConfigurationImpl();
+        AxisConfiguration axisConfig = new AxisConfiguration ();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
         MessageContext msgCtx = new MessageContext(configCtx);
         return msgCtx;

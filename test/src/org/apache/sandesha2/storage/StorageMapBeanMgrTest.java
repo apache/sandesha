@@ -5,7 +5,6 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.AxisConfigurationImpl;
 import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.Iterator;
@@ -34,7 +33,7 @@ public class StorageMapBeanMgrTest extends SandeshaTestCase {
     }
 
     public void setUp() throws Exception {
-        AxisConfiguration axisConfig = new AxisConfigurationImpl();
+        AxisConfiguration axisConfig = new AxisConfiguration();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
         StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
         mgr = storageManager.getStorageMapBeanMgr();
