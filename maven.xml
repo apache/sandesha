@@ -14,6 +14,8 @@
 	<ant:property name="jar.name" value="${dist.name}.jar"/>
 	<ant:property name="dir.samples" value="samples"/>
 	<ant:property name="dir.config" value="config"/>
+	<ant:property name="apache.license.file" value="LICENSE.txt" />
+	<ant:property name="release.notes.file" value="release-notes.html" />
 	
     <goal name="all" prereqs="jar,mar:create,sample:create,client:create,server:create" />
 
@@ -139,7 +141,9 @@
     <!-- ================================================================ -->
 
     <goal name="dist-bin" prereqs="all,javadoc">
-        <property name="dir.temp.dist.bin" value="${build.temp.dir}/dist-bin" />
+        <property name="dir.temp.dist.bin.parent" value="${build.temp.dir}/dist-bin" />
+        <property name="dir.temp.dist.bin" value="${build.temp.dir}/dist-bin/${dist.name}-bin" />
+        
         <ant:mkdir dir="${dir.temp.dist.bin}"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/docs"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/samples"/>
@@ -168,6 +172,8 @@
         <ant:copy file="target/${jar.name}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="target/${mar.name}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="${dir.config}/sandesha2.properties" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="${apache.license.file}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="${release.notes.file}" todir="${dir.temp.dist.bin}" />
         
         <ant:copy todir="${dir.temp.dist.bin}/samples">
             <ant:fileset dir="${build.samples.dir}">
@@ -185,8 +191,8 @@
     
         <mkdir dir="${build.dist.dir}" />
     
-        <ant:zip file="${build.dist.dir}/${dist.name}-bin.zip" basedir="${dir.temp.dist.bin}" />
-        <ant:tar tarfile="${build.dist.dir}/${dist.name}-bin.tar" basedir="${dir.temp.dist.bin}" />
+        <ant:zip file="${build.dist.dir}/${dist.name}-bin.zip" basedir="${dir.temp.dist.bin.parent}" />
+        <ant:tar tarfile="${build.dist.dir}/${dist.name}-bin.tar" basedir="${dir.temp.dist.bin.parent}" />
         <gzip src="${build.dist.dir}/${dist.name}-bin.tar" zipfile="${build.dist.dir}/${dist.name}-bin.tar.gz" />
        
         <ant:delete file="${build.dist.dir}/${dist.name}-bin.tar" />

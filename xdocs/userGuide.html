@@ -10,7 +10,7 @@
 </head>
 
 <body>
-<h2>Sandesha2 User Guide</h2>
+<h1>Sandesha2 User Guide</h1>
 
 <p>This document introduces you to Apache Sandesha2. Sandesha2 is the
 WS-ReliableMessaging implementation for Axis2. With Sandesha2 you can host
@@ -23,7 +23,7 @@ others.</p>
 
 <p>First lets look at how to use Sandesha2 in the server side.</p>
 
-<p>You can set up Sandesha2 for the server side in three steps.</p>
+<p>You can set up Sandesha2 for the server side with following steps.</p>
 <ol>
   <li>Download and deploy axis2(please see Axis2 user guide for more
   details).</li>
@@ -44,8 +44,8 @@ creating aar files).</p>
 
 <p>Add a module reference for Sandesha2 to the services.xml (within the aar
 file) as given below.</p>
-<pre>&lt;service name="OneWayService"&gt;
-&lt;module ref="&lt;Sandesha2 module name&gt;"/&gt;
+<pre>&lt;service name="TestService"&gt;
+&lt;module ref="Sandesha2-0.9"/&gt;
 .......................
 &lt;!-- Your operation definitions and other stuff
 ........................
@@ -71,23 +71,26 @@ explain you how to write the client code.</p>
 <h3>Basic scenarios</h3>
 
 <p><b>Sample RM enabled client code for a one way service call.</b></p>
-<source><pre>MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
-<span style="background-color: #CCCCCC">sender.engageModule(new QName ("&lt;Sandesha2 module name&gt;"));</span>
-sender.setTo(new EndpointReference(toEPR));
-sender.set(MessageContextConstants.TRANSPORT_URL,toEPR);
+<source><pre>MessageSender sender = new MessageSender (AXIS2_CLIENT_REPO_PATH);
+<span style="background-color: #CCCCCC">sender.engageModule(new QName ("Sandesha2-0.9"));</span>
+Options clientOptions = new Options ();
+sender.setClientOptions(clientOptions);
+<span style="background-color: #CCCCCC">clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));</span>
+clientOptions.setTo(new EndpointReference(toEPR));
 sender.send("ping",getPingOMBlock("ping1"));
 sender.send("ping",getPingOMBlock("ping2"));
-<span style="background-color: #CCCCCC">sender.set(org.apache.sandesha2.Constants.LAST_MESSAGE, "true");</span>
+<span style="background-color: #CCCCCC">clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");</span>
 sender.send("ping",getPingOMBlock("ping3"));</pre></source>
 
-<p></p>
-
-<p>There are only two difference here from your normal client code.</p>
+<p>There are only three difference here from your normal client code.</p>
 
 <p>First you have to engage the sandesha module as given in the line 2.</p>
 
+<p>Make sure you set the copy properties property of the options object to
+true as given in line 5.</p>
+
 <p>Before the last message you must set the last message property, which is
-given in the line 7.</p>
+given in the line 9.</p>
 
 <p></p>
 
@@ -103,22 +106,34 @@ call object.</p>
 <p></p>
 
 <p>Here is a code sample for this scenario.</p>
-<source><pre>Call call = new Call(AXIS2_CLIENT_PATH);
-<span style="background-color: #CCCCCC">call.engageModule(new QName("&lt;Sandesha2 module name&gt;"));</span>
-call.setTo(new EndpointReference(toEPR));
-call.setTransportInfo(org.apache.axis2.Constants.TRANSPORT_HTTP,org.apache.axis2.Constants.TRANSPORT_HTTP,true);
-Callback callback1 = new TestCallback ("Callback 1");
-call.invokeNonBlocking("echoString",getEchoOMBlock("echo1"),callback1);
-Callback callback2 = new TestCallback ("Callback 2");
-call.invokeNonBlocking("echoString",getEchoOMBlock("echo2"),callback2);
-<span style="background-color: #CCCCCC">call.set(Constants.LAST_MESSAGE, "true");</span>
+<source><pre>Call call = new Call(AXIS2_CLIENT_REPO_PATH);
+<span style="background-color: #CCCCCC">call.engageModule(new QName("Sandesha2-0.9"));</span>
+Options clientOptions = new Options ();
+<span style="background-color: #CCCCCC">clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));</span>
+call.setClientOptions(clientOptions);
+//Make sure set the following two properties in the request-reply case.
+<span style="background-color: #CCCCCC">clientOptions.setListenerTransportProtocol(Constants.TRANSPORT_HTTP);</span>
+<span style="background-color: #CCCCCC">clientOptions.setUseSeparateListener(true);</span>
+clientOptions.setTo(ne EndpointReference(toEPR));
+Callback callback1 = new TestCallback ("Callbck 1");
+call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
+<span style="background-color: #CCCCCC">clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");</span>
 Callback callback3 = new TestCallback ("Callback 3");
-call.invokeNonBlocking("echoString",getEchoOMBlock("echo3"),callback3);</pre></source>
-
+call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);</pre>
+</source>
 <p></p>
 
-<p>Here also the only difference from a normal client code is addition of the
-Sandesha2 module reference and setting the last message property.</p>
+<p>Here also let me explaing the differences from a normal request-reply
+client code.</p>
+
+<p>As in the request only case that was explained before, you have to engage
+the Sandesha2 module.</p>
+
+<p>You have to tell axis enging to use a seperate channel for the responses
+as given in the line 8. Also make sure that you set the listner transport as
+given in line 7.</p>
+
+<p> Also you have to set the last message property.</p>
 
 <p></p>
 
@@ -129,21 +144,21 @@ Sandesha2 module reference and setting the last message property.</p>
 <p>In the dafault configuration response path for acknowledgements and faults
 related to a sequene is the anonymous endpoint. Because of this for example
 HTTP transport will send acknowledgements and faults in the HTTP response. If
-you want to avaoid this and if you want to get acknowledgements and faults to
+you want to avoid this and if you want to get acknowledgements and faults to
 a different endpoing add following part to the client code before doing any
 incovation.</p>
-<pre>sender.set(Constants.AcksTo,&lt;endpoint&gt;); //example endpoint - http://tempuri.org/acks.</pre>
+<pre>sender.set(Sandesha2ClientAPI.AcksTo,&lt;endpoint&gt;); //example endpoint - http://tempuri.org/acks.</pre>
 
 <p></p>
 
 <p><b>Managing sequences.</b></p>
 
-<p>I the default behavious Sandesha 2 assumes that messages going to the same
+<p>I the default behaviour Sandesha 2 assumes that messages going to the same
 endpoing should go in the same RM sequence. If you invoke two endpoints they
 will go in two sequences. If you want you can tell sandesha2 to start two
 sequences for the same endpoint as well. To do this you have to set a
 property called Sequence Key.</p>
-<pre>call.set(Constants.SEQUENCE_KEY,&lt;a string to identify the sequence&gt;);</pre>
+<pre>call.set(Sandesha2ClientAPI.SEQUENCE_KEY,&lt;a string to identify the sequence&gt;);</pre>
 
 <p>If the sequence key is different Sandesha2 will send messages in two
 sequences even if they are sent to the same endpoint.</p>
