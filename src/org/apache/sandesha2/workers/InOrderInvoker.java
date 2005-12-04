@@ -24,11 +24,11 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
-import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -150,7 +150,7 @@ public class InOrderInvoker extends Thread {
 							Object debug = null;
 							if (serviceContext != null) {
 								debug = msgToInvoke
-										.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
+										.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
 								if (debug != null && "on".equals(debug)) {
 									System.out
 											.println("DEBUG: Invoker invoking a '"

@@ -10,6 +10,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -108,7 +109,7 @@ public class SequenceManager {
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
 		String acksTo = (String) firstAplicationMsgCtx
-				.getProperty(Sandesha2Constants.ClientAPI.AcksTo);
+				.getProperty(Sandesha2ClientAPI.AcksTo);
 
 		if (toEPR == null)
 			throw new SandeshaException("WS-Addressing To is null");

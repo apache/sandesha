@@ -34,10 +34,10 @@ import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Flow;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -148,7 +148,7 @@ public class RMMsgCreator {
 				.getOperationContext();
 		if (operationcontext != null) {
 			String offeredSequence = (String) applicationMsgContext
-					.getProperty(ClientAPI.OFFERED_SEQUENCE_ID);
+					.getProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID);
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(factory);
 				Identifier identifier = new Identifier(factory);

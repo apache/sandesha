@@ -36,9 +36,9 @@ import org.apache.axis2.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -96,7 +96,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		OperationContext operationContext = msgCtx.getOperationContext();
 		Object debug = null;
 		if (serviceContext != null) {
-			debug = msgCtx.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
+			debug = msgCtx.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaOutHandler got a '"
 						+ SandeshaUtil.getMessageTypeString(rmMsgCtx
@@ -168,7 +168,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			internalSequenceId = toEPR.getAddress();
 			OperationContext opContext = msgCtx.getOperationContext();
 			String sequenceKey = (String) msgCtx
-					.getProperty(ClientAPI.SEQUENCE_KEY);
+					.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
 			if (sequenceKey != null)
 				internalSequenceId = internalSequenceId + sequenceKey;
 
@@ -212,7 +212,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				String acksTo = null;
 				if (serviceContext != null) {
 					acksTo = (String) msgCtx
-							.getProperty(ClientAPI.AcksTo);
+							.getProperty(Sandesha2ClientAPI.AcksTo);
 				}
 
 				if (acksTo == null)
@@ -502,7 +502,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 			OperationContext operationContext = msg.getOperationContext();
 			if (operationContext != null) {
-				Object obj = msg.getProperty(ClientAPI.LAST_MESSAGE);
+				Object obj = msg.getProperty(Sandesha2ClientAPI.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 					lastMessage = true;
 					sequence.setLastMessage(new LastMessage(factory));

@@ -28,10 +28,10 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.util.FaultManager;
@@ -87,7 +87,7 @@ public class SandeshaInHandler extends AbstractHandler {
 		ServiceContext serviceContext = msgCtx.getServiceContext();
 		Object debug = null;
 		if (serviceContext != null) {
-			debug = msgCtx.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
+			debug = msgCtx.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaInHandler got a '"
 						+ SandeshaUtil.getMessageTypeString(rmMsgCtx

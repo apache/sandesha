@@ -286,14 +286,6 @@ public interface Sandesha2Constants {
 		}
 	}
 	
-	public interface ClientAPI {
-		String SEQUENCE_KEY = "Sandesha2ClientAPIPropertySequenceKey";
-		String SANDESHA_DEBUG_MODE = "Sandesha2ClientAPIPropertyDebugMode";
-		String OFFERED_SEQUENCE_ID = "Sandesha2ClientAPIPropertyOfferedSequenceId";
-		String LAST_MESSAGE = "Sandesha2ClientAPIPropertyWSRMLastMessage";
-		String AcksTo = "Sandesha2ClientAPIPropertyAcksTo";
-	}
-	
 	String IN_HANDLER_NAME = "SandeshaInHandler";
 
 	String OUT_HANDLER_NAME = "SandeshaOutHandler";

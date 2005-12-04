@@ -31,10 +31,10 @@ import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -84,7 +84,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		Object debug = null;
 		if (serviceContext != null) {
-			debug = msgContext.getProperty(ClientAPI.SANDESHA_DEBUG_MODE);
+			debug = msgContext.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
 			if (debug != null && "on".equals(debug)) {
 				System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
 						+ SandeshaUtil.getMessageTypeString(rmMessageContext
