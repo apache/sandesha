@@ -14,10 +14,11 @@
  * the License.
  */
 
-package org.apache.sandesha2.samples.interop.clients;
+package sandesha2.samples.interop;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Call;
 import org.apache.axis2.client.Options;
@@ -29,7 +30,8 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Sandesha2Constants.ClientAPI;
+import org.apache.sandesha2.Sandesha2ClientAPI;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class AsyncEchoClient {
@@ -46,37 +48,53 @@ public class AsyncEchoClient {
 
 	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/AnonymousService/echoString";
 	
-	private String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
+	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
-	private String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\client\\";   //this will be available after a maven build
+	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";   //this will be available after a maven build
 	
-	public static void main(String[] args) throws Exception {		
+	public static void main(String[] args) throws Exception {
+		
+		String sandesha2HomeDir = null;
+		if (args!=null && args.length>0)
+			sandesha2HomeDir = args[0];
+		
+		if (sandesha2HomeDir!=null && !"".equals(sandesha2HomeDir)) {
+			SANDESHA2_HOME = sandesha2HomeDir;
+			AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";
+		}
+		
 		new AsyncEchoClient ().run();
 	}
 	
 	private void run () throws Exception {
+		
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
-			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
+			System.out.println("ERROR: Please set the directory you unzipped Sandesha2 as the first option.");
 			return;
 		}
 		
 		Call call = new Call(AXIS2_CLIENT_PATH);
-		call.engageModule(new QName("sandesha"));
+		call.engageModule(new QName("Sandesha2-0.9"));
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		call.setClientOptions(clientOptions);
-		clientOptions.setProperty(ClientAPI.AcksTo,acksToEPR);
+		
+		//You must set the following two properties in the request-reply case.
+		clientOptions.setListenerTransportProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setUseSeparateListener(true);
+		
+		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		clientOptions.setTo(new EndpointReference(toEPR));
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,toEPR);
-		clientOptions.setProperty(ClientAPI.SEQUENCE_KEY,"sequence1");  //Optional
+		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");  //Optional
 		clientOptions.setSoapAction("test:soap:action");
-		clientOptions.setProperty(ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
+		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Optional
 		Callback callback1 = new TestCallback ("Callback 1");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
 		Callback callback2 = new TestCallback ("Callback 2");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
-		clientOptions.setProperty(ClientAPI.LAST_MESSAGE, "true");
+		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
 		
@@ -131,6 +149,7 @@ public class AsyncEchoClient {
 		public void reportError(Exception e) {
 			// TODO Auto-generated method stub
 			System.out.println("Error reported for test call back");
+			e.printStackTrace();
 		}
 	}
 

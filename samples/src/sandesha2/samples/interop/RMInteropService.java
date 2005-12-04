@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.sandesha2.samples.interop.service;
+package sandesha2.samples.interop;
 
 import java.util.HashMap;
 import java.util.Map;
