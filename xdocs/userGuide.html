@@ -71,7 +71,7 @@ explain you how to write the client code.</p>
 <h3>Basic scenarios</h3>
 
 <p><b>Sample RM enabled client code for a one way service call.</b></p>
-<source><pre>MessageSender sender = new MessageSender (AXIS2_CLIENT_REPO_PATH);
+<pre>MessageSender sender = new MessageSender (AXIS2_CLIENT_REPO_PATH);
 <span style="background-color: #CCCCCC">sender.engageModule(new QName ("Sandesha2-0.9"));</span>
 Options clientOptions = new Options ();
 sender.setClientOptions(clientOptions);
@@ -80,7 +80,7 @@ clientOptions.setTo(new EndpointReference(toEPR));
 sender.send("ping",getPingOMBlock("ping1"));
 sender.send("ping",getPingOMBlock("ping2"));
 <span style="background-color: #CCCCCC">clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");</span>
-sender.send("ping",getPingOMBlock("ping3"));</pre></source>
+sender.send("ping",getPingOMBlock("ping3"));</pre>
 
 <p>There are only three difference here from your normal client code.</p>
 
@@ -106,7 +106,7 @@ call object.</p>
 <p></p>
 
 <p>Here is a code sample for this scenario.</p>
-<source><pre>Call call = new Call(AXIS2_CLIENT_REPO_PATH);
+<pre>Call call = new Call(AXIS2_CLIENT_REPO_PATH);
 <span style="background-color: #CCCCCC">call.engageModule(new QName("Sandesha2-0.9"));</span>
 Options clientOptions = new Options ();
 <span style="background-color: #CCCCCC">clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));</span>
@@ -120,7 +120,7 @@ call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
 <span style="background-color: #CCCCCC">clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");</span>
 Callback callback3 = new TestCallback ("Callback 3");
 call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);</pre>
-</source>
+
 <p></p>
 
 <p>Here also let me explaing the differences from a normal request-reply
@@ -133,7 +133,7 @@ the Sandesha2 module.</p>
 as given in the line 8. Also make sure that you set the listner transport as
 given in line 7.</p>
 
-<p> Also you have to set the last message property.</p>
+<p>Also you have to set the last message property.</p>
 
 <p></p>
 
@@ -173,7 +173,7 @@ be created in the response side withing the first Create Sequence Request
 message itself. with this you can avoid sending of a extra Create Sequence
 message from the server to the client. To do this add following to the client
 code.</p>
-<pre>call.set(Constants.OFFERED_SEQUENCE_ID,&lt;new uuid&gt;);</pre>
+<pre>call.set(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,&lt;new uuid&gt;);</pre>
 
 <p></p>
 
