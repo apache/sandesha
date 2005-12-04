@@ -1,4 +1,4 @@
-<module name="sandesha" class="org.apache.sandesha2.SandeshaModule">
+<module name="Sandesha2-0.9" class="org.apache.sandesha2.SandeshaModule">
 
     <inflow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
