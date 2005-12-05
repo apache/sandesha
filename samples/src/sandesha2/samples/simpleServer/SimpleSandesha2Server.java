@@ -26,12 +26,15 @@ public class SimpleSandesha2Server {
 	private static String AXIS2_SERVER_PATH = SANDESHA2_HOME + "\\target\\repos\\server\\";   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
-		String sandesha2HomeDir = null;
-		if (args!=null && args.length>0)
-			sandesha2HomeDir = args[0];
+
 		
-		if (sandesha2HomeDir!=null && !"".equals(sandesha2HomeDir))
-			SANDESHA2_HOME = sandesha2HomeDir;
+		String axisServerRepo = null;
+		if (args!=null && args.length>0)
+			axisServerRepo = args[0];
+		
+		if (axisServerRepo!=null && !"".equals(axisServerRepo)) {
+			AXIS2_SERVER_PATH = axisServerRepo;
+		}
 
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");

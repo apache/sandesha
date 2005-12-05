@@ -54,13 +54,14 @@ public class AsyncEchoClient {
 	
 	public static void main(String[] args) throws Exception {
 		
-		String sandesha2HomeDir = null;
-		if (args!=null && args.length>0)
-			sandesha2HomeDir = args[0];
 		
-		if (sandesha2HomeDir!=null && !"".equals(sandesha2HomeDir)) {
-			SANDESHA2_HOME = sandesha2HomeDir;
-			AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";
+		String axisClientRepo = null;
+		if (args!=null && args.length>0)
+			axisClientRepo = args[0];
+		
+		if (axisClientRepo!=null && !"".equals(axisClientRepo)) {
+			AXIS2_CLIENT_PATH = axisClientRepo;
+			SANDESHA2_HOME = "";
 		}
 		
 		new AsyncEchoClient ().run();

@@ -47,13 +47,13 @@ public class SyncEchoClient {
 	
 	public static void main(String[] args) throws AxisFault {
 		
-		String sandesha2HomeDir = null;
+		String axisClientRepo = null;
 		if (args!=null && args.length>0)
-			sandesha2HomeDir = args[0];
+			axisClientRepo = args[0];
 		
-		if (sandesha2HomeDir!=null && !"".equals(sandesha2HomeDir)) {
-			SANDESHA2_HOME = sandesha2HomeDir;
-			AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";
+		if (axisClientRepo!=null && !"".equals(axisClientRepo)) {
+			AXIS2_CLIENT_PATH = axisClientRepo;
+			SANDESHA2_HOME = "";
 		}
 		
 		new SyncEchoClient().run();
