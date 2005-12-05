@@ -15,6 +15,7 @@
 	<ant:property name="dir.samples" value="samples"/>
 	<ant:property name="dir.config" value="config"/>
 	<ant:property name="apache.license.file" value="LICENSE.txt" />
+	<ant:property name="readme.file" value="README.txt" />
 	<ant:property name="release.notes.file" value="release-notes.html" />
 	
     <goal name="all" prereqs="jar,mar:create,sample:create,client:create,server:create" />
@@ -103,6 +104,13 @@
         <ant:jar jarfile="${build.samples.services.dir}/${interop.service.aar.name}" basedir="${dir.sample.interop.temp}" />
     	<ant:jar jarfile="${build.samples.clients.dir}/${interop.client.jar.name}" basedir="${dir.sample.interopclients.temp}" />
     	 
+    	<ant:copy todir="${build.samples.clients.dir}" >
+            <ant:fileset dir="${dir.samples}/conf/interop">
+                <ant:include name="*.bat" />
+                <ant:include name="*.sh" />
+            </ant:fileset>
+        </ant:copy>
+         
     	<!-- <delete dir="${build.temp.dir}" /> -->
     </goal>
     
@@ -148,9 +156,20 @@
         <ant:mkdir dir="${dir.temp.dist.bin}/docs"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/samples"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients/services"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients/modules"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients/lib"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/samples/services"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/docs/api"/>
     
+    	<ant:copy file="${dir.config}/axis2.xml" todir="${dir.temp.dist.bin}/samples/clients" />
+    	        
+        <ant:copy todir="${dir.temp.dist.bin}/docs/api">
+            <ant:fileset dir="target/docs/apidocs/">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        
         <ant:copy todir="${dir.temp.dist.bin}/docs/api">
             <ant:fileset dir="target/docs/apidocs/">
                 <ant:include name="**"/>
@@ -174,11 +193,15 @@
         <ant:copy file="${dir.config}/sandesha2.properties" todir="${dir.temp.dist.bin}" />
         <ant:copy file="${apache.license.file}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="${release.notes.file}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="${readme.file}" todir="${dir.temp.dist.bin}" />
         
         <ant:copy todir="${dir.temp.dist.bin}/samples">
             <ant:fileset dir="${build.samples.dir}">
                 <ant:include name="classes/**/*.class" />
                 <ant:include name="clients/*.jar" />
+                <ant:include name="clients/*.bat"/>
+                <ant:include name="clients/*.sh"/>
+                <ant:include name="clients/*.xml"/>
             </ant:fileset>
         </ant:copy>
     

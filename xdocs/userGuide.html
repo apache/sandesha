@@ -69,7 +69,7 @@ explain you how to write the client code.</p>
 <p></p>
 
 <h3>Basic scenarios</h3>
-
+<source>
 <p><b>Sample RM enabled client code for a one way service call.</b></p>
 <pre>MessageSender sender = new MessageSender (AXIS2_CLIENT_REPO_PATH);
 <span style="background-color: #CCCCCC">sender.engageModule(new QName ("Sandesha2-0.9"));</span>
@@ -81,7 +81,7 @@ sender.send("ping",getPingOMBlock("ping1"));
 sender.send("ping",getPingOMBlock("ping2"));
 <span style="background-color: #CCCCCC">clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");</span>
 sender.send("ping",getPingOMBlock("ping3"));</pre>
-
+</source>
 <p>There are only three difference here from your normal client code.</p>
 
 <p>First you have to engage the sandesha module as given in the line 2.</p>
@@ -106,7 +106,7 @@ call object.</p>
 <p></p>
 
 <p>Here is a code sample for this scenario.</p>
-<pre>Call call = new Call(AXIS2_CLIENT_REPO_PATH);
+<source><pre>Call call = new Call(AXIS2_CLIENT_REPO_PATH);
 <span style="background-color: #CCCCCC">call.engageModule(new QName("Sandesha2-0.9"));</span>
 Options clientOptions = new Options ();
 <span style="background-color: #CCCCCC">clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));</span>
@@ -120,7 +120,7 @@ call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
 <span style="background-color: #CCCCCC">clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");</span>
 Callback callback3 = new TestCallback ("Callback 3");
 call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);</pre>
-
+</source>
 <p></p>
 
 <p>Here also let me explaing the differences from a normal request-reply

@@ -10,6 +10,7 @@
 		<item name="Documentation">
 			<item name="User Guide" href="userGuide.html"/>
  			<item name="Architecture Guide" href="architectureGuide.html"/>
+			<item name="Samples Guide" href="samplesGuide.html"/>
   			<item name="Java Docs" href="apidocs/index.html" />
             </item>
             <item name="Project Information">
