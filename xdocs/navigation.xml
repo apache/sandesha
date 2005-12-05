@@ -4,7 +4,7 @@
         <menu name="Apache Sandesha2">
             <item name="Home" href="index.html" />
             <item name="Downloads">
-                <item name="Releases" href="releases.html"/>
+                <item name="Releases" href="download.cgi"/>
                 <item name="Source Code" href="http://svn.apache.org/repos/asf/webservices/sandesha/trunk"/>
             </item>
 		<item name="Documentation">
