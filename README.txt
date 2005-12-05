@@ -1,5 +1,5 @@
 ==========================================================================
-Apache Sandesha2 0.9 build (30 November 2005)
+Apache Sandesha2 0.9 build (05 December 2005)
 
 http://ws.apache.org/sandesha/sandesha2
 ---------------------------------------------------------------------------
@@ -44,13 +44,15 @@ org.apache.sandesha2.ClientProperties.LAST_MESSAGE ) to "true", before doing the
 last invocation. 
 
 Example code:
-MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
+MessageSender sender = new MessageSender (AXIS2_CLIENT_REPO_PATH);
 sender.engageModule(new QName ("Sandesha2-0.9"));
-sender.setTo(new EndpointReference(toEPR));
-sender.set(MessageContextConstants.TRANSPORT_URL,toEPR);
+Options clientOptions = new Options ();
+sender.setClientOptions(clientOptions);
+clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+clientOptions.setTo(new EndpointReference(toEPR));
 sender.send("ping",getPingOMBlock("ping1"));
 sender.send("ping",getPingOMBlock("ping2"));
-sender.set(org.apache.sandesha2.Constants.LAST_MESSAGE, "true");
+clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 sender.send("ping",getPingOMBlock("ping3"));
 
 Please see Sandesha2 user guide for more advance details on configuring Sandesha2.
