@@ -33,7 +33,6 @@ public class SandeshaModule implements Module {
 	// initialize the module
 	public void init(AxisConfiguration axisSystem) throws AxisFault {
 
-
 	}
 
 	// shutdown the module

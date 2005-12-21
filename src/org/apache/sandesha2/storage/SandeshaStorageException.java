@@ -14,9 +14,18 @@
  *  limitations under the License.
  *
  */
+package org.apache.sandesha2.storage;
 
-package org.apache.sandesha2.storage.persistent;
+import org.apache.sandesha2.SandeshaException;
 
-public class PersistentSequencePropertyBeanMgr {
+/**
+ * To easily track exceptions happening in the storage area.
+ * 
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
 
+public class SandeshaStorageException extends SandeshaException {
+	public SandeshaStorageException (String message) {
+		super (message);
+	}
 }

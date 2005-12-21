@@ -19,6 +19,8 @@ package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
 import java.util.Collection;
+
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 
 /**
@@ -30,17 +32,17 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 
 public interface NextMsgBeanMgr extends RMBeanManager {
 
-	public boolean delete(String sequenceId);
+	public boolean delete(String sequenceId) throws SandeshaStorageException;
 
-	public NextMsgBean retrieve(String sequenceId);
+	public NextMsgBean retrieve(String sequenceId) throws SandeshaStorageException;
 
-	public boolean insert(NextMsgBean bean);
+	public boolean insert(NextMsgBean bean) throws SandeshaStorageException;
 
-	public ResultSet find(String query);
+	//public ResultSet find(String query);
 
-	public Collection find(NextMsgBean bean);
+	public Collection find(NextMsgBean bean) throws SandeshaStorageException;
 
-	public boolean update(NextMsgBean bean);
+	public boolean update(NextMsgBean bean) throws SandeshaStorageException;
 
 	public Collection retrieveAll();
 }

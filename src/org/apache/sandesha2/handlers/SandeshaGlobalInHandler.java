@@ -200,7 +200,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		}
 
 		if (drop) {
-			rmMsgContext.getMessageContext().setPausedTrue(getName());
+			//rmMsgContext.getMessageContext().pause();
+			rmMsgContext.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
 			return true;
 		}
 

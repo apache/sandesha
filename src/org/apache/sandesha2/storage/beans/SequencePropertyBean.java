@@ -24,13 +24,13 @@ package org.apache.sandesha2.storage.beans;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class SequencePropertyBean implements RMBean {
+public class SequencePropertyBean extends RMBean {
 
 	/**
-	 * Comment for <code>sequenceId</code>
+	 * Comment for <code>sequenceID</code>
 	 * Sequence ID of the sequence this property belong to.
 	 */
-	private String sequenceId;
+	private String sequenceID;
 
 	/**
 	 * Comment for <code>name</code>
@@ -42,10 +42,10 @@ public class SequencePropertyBean implements RMBean {
 	 * Comment for <code>value</code>
 	 * The value of the property.
 	 */
-	private Object value;
+	private String value;
 
-	public SequencePropertyBean(String seqId, String propertyName, Object value) {
-		this.sequenceId = seqId;
+	public SequencePropertyBean(String seqID, String propertyName, String value) {
+		this.sequenceID = seqID;
 		this.name = propertyName;
 		this.value = value;
 	}
@@ -62,19 +62,19 @@ public class SequencePropertyBean implements RMBean {
 		this.name = name;
 	}
 
-	public String getSequenceId() {
-		return sequenceId;
+	public String getSequenceID() {
+		return sequenceID;
 	}
 
-	public void setSequenceId(String sequenceId) {
-		this.sequenceId = sequenceId;
+	public void setSequenceID(String sequenceID) {
+		this.sequenceID = sequenceID;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 }

@@ -20,6 +20,9 @@ package org.apache.sandesha2.storage.inmemory;
 import org.apache.sandesha2.storage.Transaction;
 
 /**
+ * This class does nothing special. Just to be consistent with the transaction
+ * based behavious of other 'Persistant' StorageManager implementations.
+ * 
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */

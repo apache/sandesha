@@ -47,7 +47,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 	}
 
 	public boolean insert(CreateSeqBean bean) {
-		table.put(bean.getCreateSeqMsgId(), bean);
+		table.put(bean.getCreateSeqMsgID(), bean);
 		return true;
 	}
 
@@ -63,7 +63,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		if (!table.contains(bean))
 			return false;
 
-		return table.put(bean.getCreateSeqMsgId(), bean) != null;
+		return table.put(bean.getCreateSeqMsgID(), bean) != null;
 	}
 
 	public Collection find(CreateSeqBean bean) {
@@ -79,18 +79,18 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 
 			boolean equal = true;
 
-			if (bean.getCreateSeqMsgId() != null
-					&& !bean.getCreateSeqMsgId().equals(
-							temp.getCreateSeqMsgId()))
+			if (bean.getCreateSeqMsgID() != null
+					&& !bean.getCreateSeqMsgID().equals(
+							temp.getCreateSeqMsgID()))
 				equal = false;
 
-			if (bean.getSequenceId() != null
-					&& !bean.getSequenceId().equals(temp.getSequenceId()))
+			if (bean.getSequenceID() != null
+					&& !bean.getSequenceID().equals(temp.getSequenceID()))
 				equal = false;
 
-			if (bean.getInternalSequenceId() != null
-					&& !bean.getInternalSequenceId().equals(
-							temp.getInternalSequenceId()))
+			if (bean.getInternalSequenceID() != null
+					&& !bean.getInternalSequenceID().equals(
+							temp.getInternalSequenceID()))
 				equal = false;
 
 			if (equal)

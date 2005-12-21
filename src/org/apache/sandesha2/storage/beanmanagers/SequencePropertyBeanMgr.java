@@ -19,6 +19,8 @@ package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
 import java.util.Collection;
+
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
@@ -30,16 +32,16 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 public interface SequencePropertyBeanMgr extends RMBeanManager {
 
-	public boolean delete(String sequenceId, String name);
+	public boolean delete(String sequenceId, String name) throws SandeshaStorageException;
 
-	public SequencePropertyBean retrieve(String sequenceId, String name);
+	public SequencePropertyBean retrieve(String sequenceId, String name) throws SandeshaStorageException;
 
-	public boolean insert(SequencePropertyBean bean);
+	public boolean insert(SequencePropertyBean bean) throws SandeshaStorageException;
 
-	public ResultSet find(String query);
+	//public ResultSet find(String query);
 
-	public Collection find(SequencePropertyBean bean);
+	public Collection find(SequencePropertyBean bean) throws SandeshaStorageException;
 
-	public boolean update(SequencePropertyBean bean);
+	public boolean update(SequencePropertyBean bean) throws SandeshaStorageException;
 
 }

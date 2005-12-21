@@ -60,16 +60,16 @@ public class TerminateManager {
 		
 		//removing nextMsgMgr entries
 		NextMsgBean findNextMsgBean = new NextMsgBean ();
-		findNextMsgBean.setSequenceId(sequenceID);
+		findNextMsgBean.setSequenceID(sequenceID);
 		Collection collection = nextMsgBeanMgr.find(findNextMsgBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			NextMsgBean nextMsgBean = (NextMsgBean) iterator.next();
-			nextMsgBeanMgr.delete(nextMsgBean.getSequenceId());
+			nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
 		}
 		
 		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
-		if(inOrderInvocation) { 
+		if(!inOrderInvocation) { 
 			terminateAfterInvocation(configContext,sequenceID);
 		}
 
@@ -90,18 +90,21 @@ public class TerminateManager {
 
 		//removing storageMap entries
 		InvokerBean findStorageMapBean = new InvokerBean ();
-		findStorageMapBean.setSequenceId(sequenceID);
+		findStorageMapBean.setSequenceID(sequenceID);
 		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			InvokerBean storageMapBean = (InvokerBean) iterator.next();
-			storageMapBeanMgr.delete(storageMapBean.getKey());
+			storageMapBeanMgr.delete(storageMapBean.getMessageContextRefKey());
 		}
 		
 		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-		ArrayList allSequenceList = (ArrayList) allSequenceBean.getValue();
-		
+		ArrayList allSequenceList = SandeshaUtil.getArrayListFromString(allSequenceBean.getValue());
 		allSequenceList.remove(sequenceID);
+		
+		//updating 
+		allSequenceBean.setValue(allSequenceList.toString());
+		sequencePropertyBeanMgr.update(allSequenceBean);
 	}
 	
 	private static boolean isRequiredForResponseSide (String name) {
@@ -136,42 +139,42 @@ public class TerminateManager {
 		String internalSequenceId = (String) internalSequenceBean.getValue();
 		
 		//removing retransmitterMgr entries
-		SenderBean findRetransmitterBean = new SenderBean ();
-		findRetransmitterBean.setInternalSequenceId(internalSequenceId);
-		Collection collection = retransmitterBeanMgr.find(findRetransmitterBean);
+		//SenderBean findRetransmitterBean = new SenderBean ();
+		//findRetransmitterBean.setInternalSequenceID(internalSequenceId);
+		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SenderBean retransmitterBean = (SenderBean) iterator.next();
-			retransmitterBeanMgr.delete(retransmitterBean.getMessageId());
+			retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
 		}
 		
 		//removing the createSeqMgrEntry
 		CreateSeqBean findCreateSequenceBean = new CreateSeqBean ();
-		findCreateSequenceBean.setInternalSequenceId(internalSequenceId);
+		findCreateSequenceBean.setInternalSequenceID(internalSequenceId);
 		collection = createSeqBeanMgr.find(findCreateSequenceBean);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			CreateSeqBean createSeqBean = (CreateSeqBean) iterator.next();
-			createSeqBeanMgr.delete(createSeqBean.getCreateSeqMsgId());
+			createSeqBeanMgr.delete(createSeqBean.getCreateSeqMsgID());
 		}
 		
 		//removing sequence properties
 		SequencePropertyBean findSequencePropertyBean1 = new SequencePropertyBean ();
-		findSequencePropertyBean1.setSequenceId(internalSequenceId);
+		findSequencePropertyBean1.setSequenceID(internalSequenceId);
 		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean1);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceId(),sequencePropertyBean.getName());
+			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 		}
 		
 		SequencePropertyBean findSequencePropertyBean2 = new SequencePropertyBean ();
-		findSequencePropertyBean2.setSequenceId(internalSequenceId);
+		findSequencePropertyBean2.setSequenceID(internalSequenceId);
 		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean2);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceId(),sequencePropertyBean.getName());
+			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 		}
 		
 	}

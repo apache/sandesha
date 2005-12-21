@@ -21,14 +21,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
@@ -65,11 +63,16 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
 
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+		
+		Transaction terminateTransaction = storageManager.getTransaction();
 		
 		TerminateManager.terminateReceivingSide(context,sequenceId);
 		
+		terminateTransaction.commit(); 
 
-		terminateSeqMsg.setPausedTrue(new QName(Sandesha2Constants.IN_HANDLER_NAME));
+		//terminateSeqMsg.pause();
+		terminateSeqRMMSg.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
 
 	}
 }

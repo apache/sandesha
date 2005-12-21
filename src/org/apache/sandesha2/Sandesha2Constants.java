@@ -310,7 +310,7 @@ public interface Sandesha2Constants {
 
 	String RM_ENABLE_KEY = "RMEnabled";
 
-	String STORAGE_MANAGER_IMPL = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
+	//String STORAGE_MANAGER_IMPL = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 
 	int MAXIMUM_RETRANSMISSION_ATTEMPTS = 5;
 	

@@ -56,7 +56,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 	}
 
 	public boolean insert(NextMsgBean bean) {
-		table.put(bean.getSequenceId(), bean);
+		table.put(bean.getSequenceID(), bean);
 		return true;
 	}
 
@@ -82,8 +82,8 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 							.getNextMsgNoToProcess())
 				equal = false;
 
-			if (bean.getSequenceId() != null
-					&& !bean.getSequenceId().equals(temp.getSequenceId()))
+			if (bean.getSequenceID() != null
+					&& !bean.getSequenceID().equals(temp.getSequenceID()))
 				equal = false;
 
 			if (equal)
@@ -97,7 +97,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		if (!table.contains(bean))
 			return false;
 
-		return table.put(bean.getSequenceId(), bean) != null;
+		return table.put(bean.getSequenceID(), bean) != null;
 	}
 
 	public Collection retrieveAll() {

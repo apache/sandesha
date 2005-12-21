@@ -29,6 +29,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
@@ -65,12 +66,18 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
 		}
+		
+		ConfigurationContext context = createSeqRMMsg.getMessageContext()
+			.getConfigurationContext();
+		
+		StorageManager storageManager = SandeshaUtil
+		.getSandeshaStorageManager(context);
+
+		Transaction createSequenceTransaction = storageManager.getTransaction();
 
 		try {
 			String newSequenceId = SequenceManager
 					.setupNewSequence(createSeqRMMsg);
-			ConfigurationContext context = createSeqRMMsg.getMessageContext()
-					.getConfigurationContext();
 			if (newSequenceId == null)
 				throw new AxisFault(
 						"Internal error - Generated sequence id is null");
@@ -78,6 +85,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			RMMsgContext createSeqResponse = RMMsgCreator
 					.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
 							newSequenceId);
+			
+			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
 			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
 					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
 
@@ -94,15 +103,14 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						.getIdentifier();
 				String outSequenceId = offer.getIdentifer().getIdentifier();
 				CreateSeqBean createSeqBean = new CreateSeqBean();
-				createSeqBean.setSequenceId(outSequenceId);
-				createSeqBean.setInternalSequenceId(newSequenceId);
-				createSeqBean.setCreateSeqMsgId(SandeshaUtil.getUUID()); //this
+				createSeqBean.setSequenceID(outSequenceId);
+				createSeqBean.setInternalSequenceID(newSequenceId);
+				createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); //this
 				// is a
 				// dummy
 				// value.
 
-				StorageManager storageManager = SandeshaUtil
-						.getSandeshaStorageManager(context);
+				
 				CreateSeqBeanMgr createSeqMgr = storageManager
 						.getCreateSeqBeanMgr();
 
@@ -113,7 +121,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				outSequenceBean
 						.setName(Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 				outSequenceBean.setValue(outSequenceId);
-				outSequenceBean.setSequenceId(newSequenceId);
+				outSequenceBean.setSequenceID(newSequenceId);
 				seqPropMgr.insert(outSequenceBean);
 
 				//Temp sequence id should be set for the server side.
@@ -125,7 +133,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
 					internalSequenceBean
 							.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-					internalSequenceBean.setSequenceId(outSequenceId);
+					internalSequenceBean.setSequenceID(outSequenceId);
 					internalSequenceBean.setValue(newSequenceId);
 					seqPropMgr.insert(internalSequenceBean);
 				}
@@ -147,10 +155,10 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 			SequencePropertyBean seqPropBean = new SequencePropertyBean(
 					newSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
-					acksTo);
+					acksTo.getAddress());
 
-			StorageManager storageManager = SandeshaUtil
-					.getSandeshaStorageManager(context);
+//			StorageManager storageManager = SandeshaUtil
+//					.getSandeshaStorageManager(context);
 			SequencePropertyBeanMgr seqPropMgr = storageManager
 					.getSequencePropretyBeanMgr();
 			seqPropMgr.insert(seqPropBean);
@@ -164,7 +172,15 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 			Object obj = createSeqMsg.getOperationContext().getProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN);
-			if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(createSeqMsg.getReplyTo()
+			
+			SequencePropertyBean toBean = seqPropMgr.retrieve(newSequenceId,Sandesha2Constants.SequenceProperties.TO_EPR);
+			
+			if (toBean==null)
+				throw new SandeshaException ("Internal Error: wsa:To value is not set");
+			
+			EndpointReference toEPR = new EndpointReference (toBean.getValue());
+			
+			if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(toEPR
 					.getAddress())) {
 				createSeqMsg.getOperationContext().setProperty(
 						org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
@@ -176,6 +192,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		createSeqMsg.setPausedTrue(new QName(Sandesha2Constants.IN_HANDLER_NAME));
+		//createSeqMsg.pause();
+		createSeqRMMsg.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
+		
+		createSequenceTransaction.commit();
 	}
 }

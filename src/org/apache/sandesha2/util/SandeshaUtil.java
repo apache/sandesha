@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
@@ -53,8 +54,8 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.workers.InOrderInvoker;
@@ -381,6 +382,9 @@ public class SandeshaUtil {
 	public static StorageManager getSandeshaStorageManager(
 			ConfigurationContext context) throws SandeshaException {
 		
+		if (storageManager!=null)
+			return storageManager;
+		
 		String srotageManagerClassStr = PropertyManager.getInstance().getStorageManagerClass();
 
 		if (storageManager != null)
@@ -523,6 +527,7 @@ public class SandeshaUtil {
 			newMessageContext.setTransportOut(referenceMessage
 					.getTransportOut());
 
+			copyNecessaryPropertiesFromRelatedContext (referenceMessage,newMessageContext);
 			//copying transport info.
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,
 					referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
@@ -533,13 +538,49 @@ public class SandeshaUtil {
 					referenceMessage
 					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN));
 
-			//newMessageContext.
+//			newMessageContext.setProperty(Constants.OUT_TRANSPORT_INFO,referenceMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
+//			newMessageContext.setProperty(MessageContext.TRANSPORT_HEADERS,referenceMessage.getProperty(MessageContext.TRANSPORT_HEADERS));
+//			newMessageContext.setProperty(MessageContext.TRANSPORT_IN,referenceMessage.getProperty(MessageContext.TRANSPORT_IN));
+//			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
+//			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
+			
+			
 			return newMessageContext;
 
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
 		}
 
+	}
+	
+	private static void copyNecessaryPropertiesFromRelatedContext (MessageContext fromMessage, MessageContext toMessage) {
+		toMessage.setProperty(MessageContextConstants.TRANSPORT_URL,fromMessage.getProperty(MessageContextConstants.TRANSPORT_URL));
+	}
+	
+	public static ArrayList getArrayListFromString (String str) throws SandeshaException {
+		if (str==null)
+			return new ArrayList ();
+		
+		if (str.length()<2)
+			throw new SandeshaException ("Invalid String array");
+		
+		int length = str.length();
+		
+		if (str.charAt(0)!='[' || str.charAt(length-1)!=']')
+			throw new SandeshaException ("Invalid String array");
+		
+		ArrayList retArr = new ArrayList ();
+		
+		String subStr = str.substring(1,length-1);
+		
+		String[] sequenceIDs = subStr.split(",");
+		
+		for (int i=0;i<sequenceIDs.length;i++) {
+			if (!"".equals(sequenceIDs[i]))
+				retArr.add(sequenceIDs[i]);
+		}
+		
+		return retArr;
 	}
 
 }

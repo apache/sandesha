@@ -25,7 +25,7 @@ package org.apache.sandesha2.storage;
  */
 
 public interface Transaction {
-
+	
 	public void commit ();
 	
 	public void rollback ();

@@ -45,7 +45,7 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 	}
 
 	public boolean insert(InvokerBean bean) {
-		table.put(bean.getKey(), bean);
+		table.put(bean.getMessageContextRefKey(), bean);
 		return true;
 	}
 
@@ -70,14 +70,14 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 			temp = (InvokerBean) iterator.next();
 			boolean select = true;
 
-			if (bean.getKey() != null && !bean.getKey().equals(temp.getKey()))
+			if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey()))
 				select = false;
 
 			if (bean.getMsgNo() != 0 && bean.getMsgNo() != temp.getMsgNo())
 				select = false;
 
-			if (bean.getSequenceId() != null
-					&& !bean.getSequenceId().equals(temp.getSequenceId()))
+			if (bean.getSequenceID() != null
+					&& !bean.getSequenceID().equals(temp.getSequenceID()))
 				select = false;
 
 			if (select)
@@ -90,7 +90,7 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 		if (!table.contains(bean))
 			return false;
 
-		return table.put(bean.getKey(), bean) != null;
+		return table.put(bean.getMessageContextRefKey(), bean) != null;
 	}
 
 }

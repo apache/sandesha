@@ -25,63 +25,64 @@ package org.apache.sandesha2.storage.beans;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class InvokerBean implements RMBean {
+public class InvokerBean extends RMBean {
 
 	/**
-	 * Comment for <code>Key</code>
+	 * Comment for <code>messageContextRefKey</code>
 	 * 
-	 * This is the key that is obtained after saving a message context in a storage.
+	 * This is the messageContextRefKey that is obtained after saving a message context in a storage.
 	 */
-	private String Key;
+	private String messageContextRefKey;
 
 	/**
-	 * Comment for <code>MsgNo</code>
+	 * Comment for <code>msgNo</code>
 	 * The message number of the message.
 	 */
-	private long MsgNo;
+	private long msgNo;
 
 	/**
-	 * Comment for <code>sequenceId</code>
+	 * Comment for <code>sequenceID</code>
 	 * The sequence ID of the sequence the message belong to.
 	 */
-	private String sequenceId;
+	private String sequenceID;
 	
 	/**
 	 * Comment for <code>invoked</code>
 	 * Weather the message has been invoked by the invoker.
 	 */
 	private boolean invoked = false;
+	
 
 	public InvokerBean() {
 
 	}
 
 	public InvokerBean(String key, long msgNo, String sequenceId) {
-		this.Key = key;
-		this.MsgNo = msgNo;
-		this.sequenceId = sequenceId;
+		this.messageContextRefKey = key;
+		this.msgNo = msgNo;
+		this.sequenceID = sequenceId;
 	}
 
 	/**
-	 * @return Returns the key.
+	 * @return Returns the messageContextRefKey.
 	 */
-	public String getKey() {
-		return Key;
+	public String getMessageContextRefKey() {
+		return messageContextRefKey;
 	}
 
 	/**
-	 * @param key
-	 *            The key to set.
+	 * @param messageContextRefKey
+	 *            The messageContextRefKey to set.
 	 */
-	public void setKey(String key) {
-		Key = key;
+	public void setMessageContextRefKey(String messageContextRefKey) {
+		this.messageContextRefKey = messageContextRefKey;
 	}
 
 	/**
 	 * @return Returns the msgNo.
 	 */
 	public long getMsgNo() {
-		return MsgNo;
+		return msgNo;
 	}
 
 	/**
@@ -89,22 +90,22 @@ public class InvokerBean implements RMBean {
 	 *            The msgNo to set.
 	 */
 	public void setMsgNo(long msgNo) {
-		MsgNo = msgNo;
+		this.msgNo = msgNo;
 	}
 
 	/**
-	 * @return Returns the sequenceId.
+	 * @return Returns the sequenceID.
 	 */
-	public String getSequenceId() {
-		return sequenceId;
+	public String getSequenceID() {
+		return sequenceID;
 	}
 
 	/**
-	 * @param sequenceId
-	 *            The sequenceId to set.
+	 * @param sequenceID
+	 *            The sequenceID to set.
 	 */
-	public void setSequenceId(String sequenceId) {
-		this.sequenceId = sequenceId;
+	public void setSequenceID(String sequenceId) {
+		this.sequenceID = sequenceId;
 	}
 	
 	public boolean isInvoked() {

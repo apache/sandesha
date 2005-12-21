@@ -24,7 +24,6 @@
 
 package org.apache.sandesha2.policy;
 
-import org.apache.sandesha2.Sandesha2Constants;
 
 public class RMPolicyBean {
     private long inactiveTimeoutInterval;

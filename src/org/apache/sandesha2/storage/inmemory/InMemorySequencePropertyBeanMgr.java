@@ -54,7 +54,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	public boolean insert(SequencePropertyBean bean) {
-		table.put(bean.getSequenceId() + ":" + bean.getName(), bean);
+		table.put(bean.getSequenceID() + ":" + bean.getName(), bean);
 		return true;
 	}
 
@@ -76,8 +76,8 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 
 			boolean equal = true;
 
-			if (bean.getSequenceId() != null
-					&& !bean.getSequenceId().equals(temp.getSequenceId()))
+			if (bean.getSequenceID() != null
+					&& !bean.getSequenceID().equals(temp.getSequenceID()))
 				equal = false;
 
 			if (bean.getName() != null
@@ -104,7 +104,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	private String getId(SequencePropertyBean bean) {
-		return bean.getSequenceId() + ":" + bean.getName();
+		return bean.getSequenceID() + ":" + bean.getName();
 	}
 
 }

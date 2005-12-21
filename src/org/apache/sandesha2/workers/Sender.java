@@ -31,6 +31,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
@@ -61,15 +62,27 @@ public class Sender extends Thread {
 
 	public void run() {
 
+		StorageManager storageManager = null;
+		
+		try {
+			storageManager = SandeshaUtil
+			.getSandeshaStorageManager(context);
+		} catch (SandeshaException e2) {
+			// TODO Auto-generated catch block
+			System.out.println("ERROR: Could not start sender");
+			e2.printStackTrace();
+			return;
+		}
+		
 		while (senderStarted) {
 			try {
 				if (context == null)
 					throw new SandeshaException(
 							"Can't continue the Sender. Context is null");
 
-				StorageManager storageManager = SandeshaUtil
-						.getSandeshaStorageManager(context);
 
+				Transaction sendTransaction = storageManager.getTransaction(); //starting a new transaction
+				
 				SenderBeanMgr mgr = storageManager
 						.getRetransmitterBeanMgr();
 				Collection coll = mgr.findMsgsToSend();
@@ -78,11 +91,16 @@ public class Sender extends Thread {
 				while (iter.hasNext()) {
 
 					SenderBean bean = (SenderBean) iter.next();
-					String key = (String) bean.getKey();
+					String key = (String) bean.getMessageContextRefKey();
 					MessageContext msgCtx = SandeshaUtil
 							.getStoredMessageContext(key);
 
 					try {
+						
+						if (msgCtx==null) {
+							System.out.println("ERROR: Sender has an Unavailable Message entry");
+							break;
+						}
 						RMMsgContext rmMsgCtx = MsgInitializer
 								.initializeMessage(msgCtx);
 
@@ -112,7 +130,13 @@ public class Sender extends Thread {
 						}
 
 						try {
-							new AxisEngine(context).send(msgCtx);
+							AxisEngine engine = new AxisEngine (msgCtx.getConfigurationContext());
+							engine.send(msgCtx);
+//							if (msgCtx.isPaused())
+//								engine.resumeSend(msgCtx);
+//							else
+//								engine.send(msgCtx);
+							
 						} catch (Exception e) {
 							//Exception is sending. retry later
 							System.out
@@ -123,12 +147,22 @@ public class Sender extends Thread {
 						MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
 						retransmitterAdjuster.adjustRetransmittion(bean);
 
-						mgr.update(bean);
+//						mgr.update(bean);
+						
+						if (bean.isReSend())
+							mgr.update(bean);
+						else
+							mgr.delete(bean.getMessageID());
+						
+						sendTransaction.commit();		//commiting the current transaction
 
+						Transaction processResponseTransaction = storageManager.getTransaction();
 						if (!msgCtx.isServerSide())
 							checkForSyncResponses(msgCtx);
 						
+						processResponseTransaction.commit();
 						
+						Transaction terminateCleaningTransaction = storageManager.getTransaction();
 						if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
 							//terminate sending side.
 							TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
@@ -137,6 +171,8 @@ public class Sender extends Thread {
 							
 							TerminateManager.terminateSendingSide(configContext,sequenceID);
 						}
+						
+						terminateCleaningTransaction.commit();
 
 					} catch (AxisFault e1) {
 						e1.printStackTrace();
@@ -151,12 +187,15 @@ public class Sender extends Thread {
 					//update if resend=true otherwise delete. (reSend=false
 					// means
 					// send only once).
-					if (bean.isReSend())
-						mgr.update(bean);
-					else
-						mgr.delete(bean.getMessageId());
+//					if (bean.isReSend())
+//						mgr.update(bean);
+//					else
+//						mgr.delete(bean.getMessageID());
 
 				}
+				
+				
+				
 			} catch (SandeshaException e) {
 				e.printStackTrace();
 				return;
@@ -209,8 +248,9 @@ public class Sender extends Thread {
 
 	}
 
-	private void checkForSyncResponses(MessageContext msgCtx) throws AxisFault {
+	private void checkForSyncResponses(MessageContext msgCtx)  {
 
+		try {
 		boolean responsePresent = (msgCtx
 				.getProperty(MessageContext.TRANSPORT_IN) != null);
 
@@ -247,19 +287,19 @@ public class Sender extends Thread {
 			//Changed following from TransportUtils to SandeshaUtil since op.
 			// context is anavailable.
 			SOAPEnvelope resenvelope = null;
-			try {
-				resenvelope = SandeshaUtil.createSOAPMessage(response, msgCtx
-						.getEnvelope().getNamespace().getName());
-			} catch (AxisFault e) {
-				//TODO: change to log.debug
-				e.printStackTrace();
-			}
+			resenvelope = SandeshaUtil.createSOAPMessage(response, msgCtx
+					.getEnvelope().getNamespace().getName());
+
 
 			if (resenvelope != null) {
 				AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
 				response.setEnvelope(resenvelope);
 				engine.receive(response);
 			}
+		}
+		
+		}catch (Exception e) {
+			System.out.println("Exception was throws in processing the sync response...");
 		}
 	}
 

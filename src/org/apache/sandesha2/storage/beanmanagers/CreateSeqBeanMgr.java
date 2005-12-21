@@ -20,6 +20,7 @@ package org.apache.sandesha2.storage.beanmanagers;
 import java.sql.ResultSet;
 import java.util.Collection;
 
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 /**
@@ -32,15 +33,15 @@ import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 public interface CreateSeqBeanMgr extends RMBeanManager {
 
-	public boolean insert(CreateSeqBean bean);
+	public boolean insert(CreateSeqBean bean) throws SandeshaStorageException;
 
-	public boolean delete(String msgId);
+	public boolean delete(String msgId) throws SandeshaStorageException;
 
-	public CreateSeqBean retrieve(String msgId);
+	public CreateSeqBean retrieve(String msgId) throws SandeshaStorageException;
 
-	public boolean update(CreateSeqBean bean);
+	public boolean update(CreateSeqBean bean) throws SandeshaStorageException;
 
-	public Collection find(CreateSeqBean bean);
+	public Collection find(CreateSeqBean bean) throws SandeshaStorageException;
 
-	public ResultSet find(String query);
+	//public ResultSet find(String query);
 }

@@ -25,32 +25,32 @@ package org.apache.sandesha2.storage.beans;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class SenderBean implements RMBean {
+public class SenderBean extends RMBean {
 
 	/**
-	 * Comment for <code>messageId</code>
+	 * Comment for <code>messageID</code>
 	 * The message id of the representing message.
 	 * 
 	 */
-	private String messageId;
+	private String messageID;
 
 	/**
-	 * Comment for <code>key</code>
+	 * Comment for <code>messageContextRefKey</code>
 	 * Key retrieved by the storage mechanism after storing the message.
 	 */
-	private String key;
+	private String messageContextRefKey;
 
 	/**
-	 * Comment for <code>Send</code>
+	 * Comment for <code>send</code>
 	 * The sender will not send the message unless this property is true.
 	 */
-	private boolean Send;
+	private boolean send;
 
 	/**
-	 * Comment for <code>internalSequenceId</code>
+	 * Comment for <code>internalSequenceID</code>
 	 * Please see the comment of CreateSeqBean.
 	 */
-	private String internalSequenceId;
+	private String internalSequenceID;
 
 	/**
 	 * Comment for <code>sentCount</code>
@@ -77,57 +77,57 @@ public class SenderBean implements RMBean {
 	private long timeToSend = 0;
 	
 	/**
-	 * Comment for <code>messagetype</code>
+	 * Comment for <code>messageType</code>
 	 * The type of the current message.
 	 * Possible types are given in Sandesha2Constants.MessageTypes interface.
 	 */
-	private int messagetype =0;
+	private int messageType =0;
 	
 	public SenderBean() {
 
 	}
 
-	public SenderBean(String messageId, String key,
-			boolean send,long timeToSend, String internalSequenceId, long messageNumber) {
-		this.messageId = messageId;
-		this.key = key;
+	public SenderBean(String messageID, String key,
+			boolean send,long timeToSend, String internalSequenceID, long messageNumber) {
+		this.messageID = messageID;
+		this.messageContextRefKey = key;
 		//this.LastSentTime = lastSentTime;
 		this.timeToSend = timeToSend;
-		this.Send = send;
-		this.internalSequenceId = internalSequenceId;
+		this.send = send;
+		this.internalSequenceID = internalSequenceID;
 		this.messageNumber = messageNumber;
 	}
 
-	public String getKey() {
-		return key;
+	public String getMessageContextRefKey() {
+		return messageContextRefKey;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setMessageContextRefKey(String messageContextRefKey) {
+		this.messageContextRefKey = messageContextRefKey;
 	}
 
-	public String getMessageId() {
-		return messageId;
+	public String getMessageID() {
+		return messageID;
 	}
 
-	public void setMessageId(String messageId) {
-		this.messageId = messageId;
+	public void setMessageID(String messageID) {
+		this.messageID = messageID;
 	}
 
 	public boolean isSend() {
-		return Send;
+		return send;
 	}
 
 	public void setSend(boolean send) {
-		this.Send = send;
+		this.send = send;
 	}
 
-	public String getInternalSequenceId() {
-		return internalSequenceId;
+	public String getInternalSequenceID() {
+		return internalSequenceID;
 	}
 
-	public void setInternalSequenceId(String internalSequenceId) {
-		this.internalSequenceId = internalSequenceId;
+	public void setInternalSequenceID(String internalSequenceId) {
+		this.internalSequenceID = internalSequenceId;
 	}
 
 	public int getSentCount() {
@@ -163,11 +163,11 @@ public class SenderBean implements RMBean {
 	}
 	
 	
-	public int getMessagetype() {
-		return messagetype;
+	public int getMessageType() {
+		return messageType;
 	}
 	
-	public void setMessagetype(int messagetype) {
-		this.messagetype = messagetype;
+	public void setMessageType(int messagetype) {
+		this.messageType = messagetype;
 	}
 }

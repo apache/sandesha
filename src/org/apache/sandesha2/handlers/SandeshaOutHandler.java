@@ -41,6 +41,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -92,6 +93,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
+		StorageManager storageManager = SandeshaUtil
+		.getSandeshaStorageManager(context);
+		
+		Transaction transaction = storageManager.getTransaction();
+		
 		ServiceContext serviceContext = msgCtx.getServiceContext();
 		OperationContext operationContext = msgCtx.getOperationContext();
 		Object debug = null;
@@ -115,9 +121,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//Adding the policy bean
 		RMPolicyBean policyBean = RMPolicyManager.getPolicyBean(rmMsgCtx);
 		rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, policyBean);
-
-		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(context);
 
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager
@@ -174,6 +177,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		}
 
+		
 		//check if the first message
 
 		long messageNumber = getNextMsgNo(context, internalSequenceId);
@@ -233,8 +237,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 							incomingSequencId,
 							Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
 					if (bean != null) {
-						EndpointReference acksToEPR = (EndpointReference) bean
-								.getValue();
+						EndpointReference acksToEPR = new EndpointReference (bean
+								.getValue());
 						if (acksToEPR != null)
 							acksTo = (String) acksToEPR.getAddress();
 					}
@@ -312,7 +316,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		//pausing the message
-		msgCtx.setPausedTrue(getName());
+		//msgCtx.pause();
+		rmMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.OUT_HANDLER_NAME));
+		
+		transaction.commit();
 	}
 
 	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg,
@@ -334,14 +341,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 			//Offer processing
 			String offeredSequenceId = offer.getIdentifer().getIdentifier();
 			SequencePropertyBean msgsBean = new SequencePropertyBean();
-			msgsBean.setSequenceId(offeredSequenceId);
+			msgsBean.setSequenceID(offeredSequenceId);
 			msgsBean.setName(Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
 			msgsBean.setValue("");
 
 			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean();
 			offeredSequenceBean
 					.setName(Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE);
-			offeredSequenceBean.setSequenceId(internalSequenceId);
+			offeredSequenceBean.setSequenceID(internalSequenceId);
 			offeredSequenceBean.setValue(offeredSequenceId);
 
 			StorageManager storageManager = SandeshaUtil
@@ -380,10 +387,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		String key = SandeshaUtil.storeMessageContext(createSeqRMMessage
 				.getMessageContext());
 		SenderBean createSeqEntry = new SenderBean();
-		createSeqEntry.setKey(key);
+		createSeqEntry.setMessageContextRefKey(key);
 		createSeqEntry.setTimeToSend(System.currentTimeMillis());
-		createSeqEntry.setMessageId(createSeqRMMessage.getMessageId());
+		createSeqEntry.setMessageID(createSeqRMMessage.getMessageId());
 		createSeqEntry.setSend(true);
+		createSeqEntry.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ); 
 		retransmitterMgr.insert(createSeqEntry);
 	}
 
@@ -424,11 +432,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (toBean == null)
 			throw new SandeshaException("To is null");
 
-		EndpointReference toEPR = (EndpointReference) toBean.getValue();
+		EndpointReference toEPR = new EndpointReference (toBean.getValue());
 		EndpointReference replyToEPR = null;
 
 		if (replyToBean != null) {
-			replyToEPR = (EndpointReference) replyToBean.getValue();
+			replyToEPR = new EndpointReference ( replyToBean.getValue());
 		}
 
 		if (toEPR == null || toEPR.getAddress() == null
@@ -493,7 +501,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
 						internalSequenceId,
 						Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE,
-						new Long(messageNumber));
+						new Long(messageNumber).toString());
 				sequencePropertyMgr.insert(lastOutMsgBean);
 			}
 
@@ -510,7 +518,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 					SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
 							internalSequenceId,
 							Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE,
-							new Long(messageNumber));
+							new Long(messageNumber).toString());
 					sequencePropertyMgr.insert(lastOutMsgBean);
 				}
 			}
@@ -557,17 +565,18 @@ public class SandeshaOutHandler extends AbstractHandler {
 		SenderBean appMsgEntry = new SenderBean();
 		String key = SandeshaUtil
 				.storeMessageContext(rmMsg.getMessageContext());
-		appMsgEntry.setKey(key);
+		appMsgEntry.setMessageContextRefKey(key);
 		appMsgEntry.setTimeToSend(System.currentTimeMillis());
-		appMsgEntry.setMessageId(rmMsg.getMessageId());
+		appMsgEntry.setMessageID(rmMsg.getMessageId());
 		appMsgEntry.setMessageNumber(messageNumber);
+		appMsgEntry.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
 			appMsgEntry.setSend(false);
 		} else {
 			appMsgEntry.setSend(true);
 
 		}
-		appMsgEntry.setInternalSequenceId(internalSequenceId);
+		appMsgEntry.setInternalSequenceID(internalSequenceId);
 		retransmitterMgr.insert(appMsgEntry);
 	}
 
@@ -586,16 +595,16 @@ public class SandeshaOutHandler extends AbstractHandler {
 		boolean update = false;
 		if (nextMsgNoBean != null) {
 			update = true;
-			Long nextMsgNoLng = (Long) nextMsgNoBean.getValue();
+			Long nextMsgNoLng = new Long(nextMsgNoBean.getValue());
 			nextMsgNo = nextMsgNoLng.longValue();
 		} else {
 			nextMsgNoBean = new SequencePropertyBean();
-			nextMsgNoBean.setSequenceId(internalSequenceId);
+			nextMsgNoBean.setSequenceID(internalSequenceId);
 			nextMsgNoBean
 					.setName(Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
 		}
 
-		nextMsgNoBean.setValue(new Long(nextMsgNo + 1));
+		nextMsgNoBean.setValue(new Long(nextMsgNo + 1).toString());
 		if (update)
 			seqPropMgr.update(nextMsgNoBean);
 		else

@@ -19,6 +19,8 @@ package org.apache.sandesha2.storage.beanmanagers;
 
 import java.sql.ResultSet;
 import java.util.Collection;
+
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 
 /**
@@ -30,16 +32,16 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 
 public interface InvokerBeanMgr extends RMBeanManager {
 
-	public boolean insert(InvokerBean bean);
+	public boolean insert(InvokerBean bean) throws SandeshaStorageException;
 
-	public boolean delete(String key);
+	public boolean delete(String key) throws SandeshaStorageException;
 
-	public InvokerBean retrieve(String key);
+	public InvokerBean retrieve(String key) throws SandeshaStorageException;
 
-	public ResultSet find(String query);
+	//public ResultSet find(String query);
 
-	public Collection find(InvokerBean bean);
+	public Collection find(InvokerBean bean) throws SandeshaStorageException;
 
-	public boolean update(InvokerBean bean);
+	public boolean update(InvokerBean bean) throws SandeshaStorageException;
 
 }

@@ -24,6 +24,16 @@ import java.io.Serializable;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public interface RMBean extends Serializable {
-
+public abstract class RMBean implements Serializable {
+		
+		private long id;
+		
+		
+		public long getId() {
+			return id;
+		}
+		
+		protected void setId(long id) {
+			this.id = id;
+		}
 }

@@ -74,9 +74,10 @@ public class AcknowledgementManager {
 			throw new SandeshaException("Temp Sequence is not set");
 
 		String internalSequenceId = (String) internalSequenceBean.getValue();
-		findBean.setInternalSequenceId(internalSequenceId);
-		findBean.setMessagetype(Sandesha2Constants.MessageTypes.ACK);
-
+		findBean.setInternalSequenceID(internalSequenceId);
+		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+		findBean.setSend(true);
+		findBean.setReSend(false);
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		Iterator it = collection.iterator();
 
@@ -84,11 +85,11 @@ public class AcknowledgementManager {
 			SenderBean ackBean = (SenderBean) it.next();
 
 			//deleting the ack entry.
-			retransmitterBeanMgr.delete(ackBean.getMessageId());
+			retransmitterBeanMgr.delete(ackBean.getMessageID());
 
 			//Adding the ack to the application message
 			MessageContext ackMsgContext = SandeshaUtil
-					.getStoredMessageContext(ackBean.getKey());
+					.getStoredMessageContext(ackBean.getMessageContextRefKey());
 			RMMsgContext ackRMMsgContext = MsgInitializer
 					.initializeMessage(ackMsgContext);
 			if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK)

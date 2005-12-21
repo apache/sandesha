@@ -32,7 +32,7 @@ public class MessageRetransmissionAdjuster {
 
 	public SenderBean adjustRetransmittion(
 			SenderBean retransmitterBean) {
-		String storedKey = (String) retransmitterBean.getKey();
+		String storedKey = (String) retransmitterBean.getMessageContextRefKey();
 
 		if (storedKey == null)
 			return retransmitterBean;

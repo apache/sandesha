@@ -24,33 +24,30 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisServiceGroup;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -60,7 +57,6 @@ import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
-import org.apache.wsdl.WSDLConstants;
 
 /**
  * Responsible for processing an incoming Application message.
@@ -93,9 +89,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
+		//RM will not rend sync responses. If sync acks are there this will be made true again later.
+		if(rmMsgCtx.getMessageContext().getOperationContext()!=null) {
+			rmMsgCtx.getMessageContext().getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,Constants.VALUE_FALSE);
+		}
+		
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
 						.getConfigurationContext());
+		
+		Transaction applicationMsgTransaction = storageManager.getTransaction();
+		
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
@@ -122,7 +126,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 
-			msgCtx.setPausedTrue(new QName(Sandesha2Constants.IN_HANDLER_NAME));
+			//msgCtx.pause();
+			rmMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
 
 		}
 
@@ -151,8 +156,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
 			if (inOrderInvocation) {
 				//pause the message
-				msgCtx.setPausedTrue(new QName(Sandesha2Constants.IN_HANDLER_NAME));
-
+				//msgCtx.pause();
+				rmMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
 				SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
 						.retrieve(
 								Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
@@ -162,20 +167,24 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					ArrayList incomingSequenceList = new ArrayList();
 					incomingSequenceListBean = new SequencePropertyBean();
 					incomingSequenceListBean
-							.setSequenceId(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
+							.setSequenceID(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
 					incomingSequenceListBean
 							.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-					incomingSequenceListBean.setValue(incomingSequenceList);
+					incomingSequenceListBean.setValue(incomingSequenceList.toString());
 
 					seqPropMgr.insert(incomingSequenceListBean);
 				}
 
-				ArrayList incomingSequenceList = (ArrayList) incomingSequenceListBean
-						.getValue();
+				ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean
+						.getValue());
 
 				//Adding current sequence to the incoming sequence List.
 				if (!incomingSequenceList.contains(sequenceId)) {
 					incomingSequenceList.add(sequenceId);
+					
+					//saving the property.
+					incomingSequenceListBean.setValue(incomingSequenceList.toString());
+					seqPropMgr.insert(incomingSequenceListBean);
 				}
 
 				//saving the message.
@@ -201,22 +210,24 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		}
 
-		try {
-			MessageContext requestMessage = rmMsgCtx.getMessageContext()
-					.getOperationContext().getMessageContext(
-							WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-			String requestMessageId = requestMessage.getMessageID();
-			SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(
-					requestMessageId,
-					Sandesha2Constants.SequenceProperties.CHECK_RESPONSE);
-			if (checkResponseBean != null) {
-				checkResponseBean.setValue(msgCtx);
-				seqPropMgr.update(checkResponseBean);
-			}
-
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
+//		try {
+//			MessageContext requestMessage = rmMsgCtx.getMessageContext()
+//					.getOperationContext().getMessageContext(
+//							WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+//			String requestMessageId = requestMessage.getMessageID();
+//			SequencePropertyBean checkResponseBean = seqPropMgr.retrieve(
+//					requestMessageId,
+//					Sandesha2Constants.SequenceProperties.CHECK_RESPONSE);
+//			if (checkResponseBean != null) {
+//				checkResponseBean.setValue(msgCtx);
+//				seqPropMgr.update(checkResponseBean);
+//			}
+//
+//		} catch (AxisFault e) {
+//			throw new SandeshaException(e.getMessage());
+//		}
+		
+		applicationMsgTransaction.commit();
 	}
 
 	//TODO convert following from INT to LONG
@@ -261,7 +272,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
 				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 
-		EndpointReference acksTo = (EndpointReference) acksToBean.getValue();
+		EndpointReference acksTo = new EndpointReference (acksToBean.getValue());
 		String acksToStr = acksTo.getAddress();
 
 		if (acksToStr == null || messagesStr == null)
@@ -300,6 +311,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(
 				rmMsgCtx, ackOperation);
+		
+		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
+		
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
 
 		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
@@ -337,7 +351,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-					org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
 
 			rmMsgCtx.getMessageContext().setProperty(Sandesha2Constants.ACK_WRITTEN,
 					"true");
@@ -353,16 +367,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			String key = SandeshaUtil.storeMessageContext(ackMsgCtx);
 			SenderBean ackBean = new SenderBean();
-			ackBean.setKey(key);
-			ackBean.setMessageId(ackMsgCtx.getMessageID());
+			ackBean.setMessageContextRefKey(key);
+			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
 			ackBean.setSend(true);
-			ackBean.setMessagetype(Sandesha2Constants.MessageTypes.ACK);
+			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 
 			//the internalSequenceId value of the retransmitter Table for the
 			// messages related to an incoming
 			//sequence is the actual sequence ID
-			ackBean.setInternalSequenceId(sequenceId);
+			ackBean.setInternalSequenceID(sequenceId);
 
 			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
 					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
@@ -378,14 +392,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			//removing old acks.
 			SenderBean findBean = new SenderBean();
-			findBean.setMessagetype(Sandesha2Constants.MessageTypes.ACK);
-			findBean.setInternalSequenceId(sequenceId);
+			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+			findBean.setInternalSequenceID(sequenceId);
+			findBean.setSend(true);
+			findBean.setReSend(false);
 			Collection coll = retransmitterBeanMgr.find(findBean);
 			Iterator it = coll.iterator();
 			while (it.hasNext()) {
 				SenderBean retransmitterBean = (SenderBean) it
 						.next();
-				retransmitterBeanMgr.delete(retransmitterBean.getMessageId());
+				retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
 			}
 
 			//inserting the new ack.

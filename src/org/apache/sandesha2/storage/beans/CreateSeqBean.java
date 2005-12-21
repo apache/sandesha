@@ -25,61 +25,61 @@ package org.apache.sandesha2.storage.beans;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class CreateSeqBean implements RMBean {
+public class CreateSeqBean extends RMBean {
 	
 	/**
-	 * Comment for <code>internalSequenceId</code>
+	 * Comment for <code>internalSequenceID</code>
 	 * This property is a unique identifier that can be used to identify the messages of a certain sequence.
 	 * This is specially used by the sending side, since sequence id is not available in the begining.
 	 * For the client side, indernal sequence id is a concantination of wsa:To and SEQUENCE_KEY (SEQUENCE_KEY can be set as a property).
 	 * For the server side, this is the sequenceId of the incoming sequence.
 	 */
-	private String internalSequenceId;
+	private String internalSequenceID;
 
 	/**
-	 * Comment for <code>CreateSeqMsgId</code>
+	 * Comment for <code>createSeqMsgID</code>
 	 * This is the message ID of the create sequence message.
 	 */
-	private String CreateSeqMsgId;
+	private String createSeqMsgID;
 
 	/**
-	 * Comment for <code>SequenceId</code>
+	 * Comment for <code>sequenceID</code>
 	 * This is the actual Sequence ID of the sequence.
 	 */
-	private String SequenceId;
+	private String sequenceID;
 
 	public CreateSeqBean() {
 	}
 
-	public CreateSeqBean(String internalSeqId, String CreateSeqMsgId,
-			String sequenceId) {
-		this.internalSequenceId = internalSeqId;
-		this.CreateSeqMsgId = CreateSeqMsgId;
-		this.SequenceId = sequenceId;
+	public CreateSeqBean(String internalSeqID, String CreateSeqMsgID,
+			String sequenceID) {
+		this.internalSequenceID = internalSeqID;
+		this.createSeqMsgID = CreateSeqMsgID;
+		this.sequenceID = sequenceID;
 	}
 
-	public String getCreateSeqMsgId() {
-		return CreateSeqMsgId;
+	public String getCreateSeqMsgID() {
+		return createSeqMsgID;
 	}
 
-	public void setCreateSeqMsgId(String createSeqMsgId) {
-		CreateSeqMsgId = createSeqMsgId;
+	public void setCreateSeqMsgID(String createSeqMsgID) {
+		this.createSeqMsgID = createSeqMsgID;
 	}
 
-	public String getSequenceId() {
-		return SequenceId;
+	public String getSequenceID() {
+		return sequenceID;
 	}
 
-	public void setSequenceId(String sequenceId) {
-		SequenceId = sequenceId;
+	public void setSequenceID(String sequenceID) {
+		this.sequenceID = sequenceID;
 	}
 
-	public String getInternalSequenceId() {
-		return internalSequenceId;
+	public String getInternalSequenceID() {
+		return internalSequenceID;
 	}
 
-	public void setInternalSequenceId(String internalSequenceId) {
-		this.internalSequenceId = internalSequenceId;
+	public void setInternalSequenceID(String internalSequenceID) {
+		this.internalSequenceID = internalSequenceID;
 	}
 
 }

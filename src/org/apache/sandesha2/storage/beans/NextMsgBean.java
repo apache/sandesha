@@ -25,34 +25,34 @@ package org.apache.sandesha2.storage.beans;
  * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
-public class NextMsgBean implements RMBean {
+public class NextMsgBean extends RMBean {
 	
 	/**
-	 * Comment for <code>SequenceId</code>
+	 * Comment for <code>sequenceID</code>
 	 * The sequenceID of the representing sequence.
 	 */
-	private String SequenceId;
+	private String sequenceID;
 
 	/**
-	 * Comment for <code>NextMsgNoToProcess</code>
+	 * Comment for <code>nextMsgNoToProcess</code>
 	 * The next message to be invoked of the representing sequence.
 	 */
-	private long NextMsgNoToProcess;
+	private long nextMsgNoToProcess;
 
 	public NextMsgBean() {
 
 	}
 
-	public NextMsgBean(String sequenceId, long nextNsgNo) {
-		this.SequenceId = sequenceId;
-		this.NextMsgNoToProcess = nextNsgNo;
+	public NextMsgBean(String sequenceID, long nextNsgNo) {
+		this.sequenceID = sequenceID;
+		this.nextMsgNoToProcess = nextNsgNo;
 	}
 
 	/**
 	 * @return Returns the nextMsgNoToProcess.
 	 */
 	public long getNextMsgNoToProcess() {
-		return NextMsgNoToProcess;
+		return nextMsgNoToProcess;
 	}
 
 	/**
@@ -60,21 +60,21 @@ public class NextMsgBean implements RMBean {
 	 *            The nextMsgNoToProcess to set.
 	 */
 	public void setNextMsgNoToProcess(long nextMsgNoToProcess) {
-		NextMsgNoToProcess = nextMsgNoToProcess;
+		this.nextMsgNoToProcess = nextMsgNoToProcess;
 	}
 
 	/**
 	 * @return Returns the sequenceId.
 	 */
-	public String getSequenceId() {
-		return SequenceId;
+	public String getSequenceID() {
+		return sequenceID;
 	}
 
 	/**
 	 * @param sequenceId
 	 *            The sequenceId to set.
 	 */
-	public void setSequenceId(String sequenceId) {
-		SequenceId = sequenceId;
+	public void setSequenceID(String sequenceID) {
+		this.sequenceID = sequenceID;
 	}
 }

@@ -26,6 +26,8 @@ import java.util.Iterator;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.storage.RetransmitterBeanMgrTest;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
@@ -55,15 +57,28 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return (SenderBean) table.get(MessageId);
 	}
 
-	public boolean insert(SenderBean bean) throws SandeshaException {
-		if (bean.getMessageId() == null)
-			throw new SandeshaException("Key (MessageId) is null. Cant insert.");
-		table.put(bean.getMessageId(), bean);
+	public boolean insert(SenderBean bean) throws SandeshaStorageException {
+		if (bean.getMessageID() == null)
+			throw new SandeshaStorageException("Key (MessageId) is null. Cant insert.");
+		table.put(bean.getMessageID(), bean);
 		return true;
 	}
 
-	public ResultSet find(String query) {
-		throw new UnsupportedOperationException("selectRS() is not supported");
+	public Collection find(String internalSequenceID) {
+		
+		ArrayList arrayList = new ArrayList ();
+		if (internalSequenceID==null || "".equals(internalSequenceID))
+			return arrayList;
+		
+		Iterator iterator = table.keySet().iterator();
+		
+		while (iterator.hasNext()) {
+			SenderBean senderBean = (SenderBean) table.get(iterator.next());
+			if (internalSequenceID.equals(senderBean.getInternalSequenceID())) 
+					arrayList.add(internalSequenceID);
+		}
+		
+		return arrayList;
 	}
 
 	public Collection find(SenderBean bean) {
@@ -77,30 +92,36 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 
 			boolean add = true;
 
-			if (bean.getKey() != null && !bean.getKey().equals(temp.getKey()))
+			if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey()))
 				add = false;
 
 			if (bean.getTimeToSend() > 0
 					&& bean.getTimeToSend() != temp.getTimeToSend())
 				add = false;
 
-			if (bean.getMessageId() != null
-					&& !bean.getMessageId().equals(temp.getMessageId()))
+			if (bean.getMessageID() != null
+					&& !bean.getMessageID().equals(temp.getMessageID()))
 				add = false;
 
-			if (bean.getInternalSequenceId() != null
-					&& !bean.getInternalSequenceId().equals(
-							temp.getInternalSequenceId()))
+			if (bean.getInternalSequenceID() != null
+					&& !bean.getInternalSequenceID().equals(
+							temp.getInternalSequenceID()))
 				add = false;
 
 			if (bean.getMessageNumber() > 0
 					&& bean.getMessageNumber() != temp.getMessageNumber())
 				add = false;
 
-			if (bean.getMessagetype() != Sandesha2Constants.MessageTypes.UNKNOWN
-					&& bean.getMessagetype() != temp.getMessagetype())
+			if (bean.getMessageType() != Sandesha2Constants.MessageTypes.UNKNOWN
+					&& bean.getMessageType() != temp.getMessageType())
+				add = false;
+			
+			if (bean.isSend() != temp.isSend())
 				add = false;
 
+			if (bean.isReSend() != temp.isReSend())
+				add = false;
+			
 			if (add)
 				beans.add(temp);
 		}

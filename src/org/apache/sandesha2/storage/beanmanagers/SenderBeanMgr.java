@@ -20,6 +20,7 @@ package org.apache.sandesha2.storage.beanmanagers;
 import java.sql.ResultSet;
 import java.util.Collection;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
@@ -31,18 +32,20 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 
 public interface SenderBeanMgr extends RMBeanManager {
 
-	public boolean delete(String MessageId);
+	public boolean delete(String MessageId) throws SandeshaStorageException ;
 
-	public SenderBean retrieve(String MessageId);
+	public SenderBean retrieve(String MessageId) throws SandeshaStorageException;
 
-	public boolean insert(SenderBean bean) throws SandeshaException;
+	public boolean insert(SenderBean bean) throws SandeshaStorageException;
 
-	public ResultSet find(String query);
+	//public ResultSet find(String query);
 
-	public Collection find(SenderBean bean);
+	public Collection find(SenderBean bean) throws SandeshaStorageException;
 
-	public Collection findMsgsToSend();
+	public Collection find(String internalSequenceID) throws SandeshaStorageException;
+	
+	public Collection findMsgsToSend() throws SandeshaStorageException;
 
-	public boolean update(SenderBean bean);
+	public boolean update(SenderBean bean) throws SandeshaStorageException;
 
 }

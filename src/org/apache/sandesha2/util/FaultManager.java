@@ -153,46 +153,54 @@ public class FaultManager {
 
 		SequenceOffer offer = createSequence.getSequenceOffer();
 		if (offer != null) {
+	
 			String offeredSequenceId = offer.getIdentifer().getIdentifier();
 			if (offeredSequenceId == null || "".equals(offeredSequenceId)) {
 				refuseSequence = true;
 				reason = "Offered sequenceId is invalid";
-			} else {
+			}
+			
+			if (!refuseSequence) {
+				//TODO throw a fault if offered id contains an invalid char e.g.: [ ] ,
+			}
+
+			if (!refuseSequence) {
 				NextMsgBeanMgr nextMsgBeanMgr = storageManager
 						.getNextMsgBeanMgr();
 				Collection collection = nextMsgBeanMgr.retrieveAll();
 				Iterator it = collection.iterator();
 				while (it.hasNext()) {
 
-					//checking weather a incoming sequence with the given id
-					// exists.
-					NextMsgBean nextMsgBean = (NextMsgBean) it.next();
-					String sequenceId = nextMsgBean.getSequenceId();
-					if (sequenceId.equals(offeredSequenceId)) {
+				//checking weather a incoming sequence with the given id
+				// exists.
+				NextMsgBean nextMsgBean = (NextMsgBean) it.next();
+				String sequenceId = nextMsgBean.getSequenceID();
+				if (sequenceId.equals(offeredSequenceId)) {
+					refuseSequence = true;
+					reason = "A sequence with offered sequenceId, already axists";
+				}
+
+				//checking weather an outgoing sequence with the given id
+				// exists.
+				SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
+						.getSequencePropretyBeanMgr();
+				SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr
+						.retrieve(
+								sequenceId,
+								Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+				if (sequencePropertyBean != null) {
+					String outSequenceId = (String) sequencePropertyBean
+							.getValue();
+					if (outSequenceId != null
+							&& outSequenceId.equals(offeredSequenceId)) {
 						refuseSequence = true;
 						reason = "A sequence with offered sequenceId, already axists";
 					}
 
-					//checking weather an outgoing sequence with the given id
-					// exists.
-					SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
-							.getSequencePropretyBeanMgr();
-					SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr
-							.retrieve(
-									sequenceId,
-									Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-					if (sequencePropertyBean != null) {
-						String outSequenceId = (String) sequencePropertyBean
-								.getValue();
-						if (outSequenceId != null
-								&& outSequenceId.equals(offeredSequenceId)) {
-							refuseSequence = true;
-							reason = "A sequence with offered sequenceId, already axists";
-						}
-
-					}
 				}
 			}
+			}
+			
 		}
 
 		//TODO - if (securityTokenReference is present RefuseCreateSequence)
@@ -287,7 +295,7 @@ public class FaultManager {
 
 		while (it.hasNext()) {
 			NextMsgBean nextMsgBean = (NextMsgBean) it.next();
-			String tempId = nextMsgBean.getSequenceId();
+			String tempId = nextMsgBean.getSequenceID();
 			if (tempId.equals(sequenceId)) {
 				validSequence = true;
 				break;
@@ -430,8 +438,8 @@ public class FaultManager {
 				SequencePropertyBean acksToBean = seqPropMgr.retrieve(
 						sequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 				if (acksToBean != null) {
-					EndpointReference epr = (EndpointReference) acksToBean
-							.getValue();
+					EndpointReference epr = new EndpointReference (acksToBean
+							.getValue());
 					if (epr != null)
 						acksToStr = epr.getAddress();
 				}

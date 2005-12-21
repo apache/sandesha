@@ -103,8 +103,8 @@ public class InOrderInvoker extends Thread {
 				if (sequencePropertyBean == null)
 					continue;
 
-				ArrayList seqPropList = (ArrayList) sequencePropertyBean
-						.getValue();
+				ArrayList seqPropList = SandeshaUtil.getArrayListFromString( sequencePropertyBean
+						.getValue());
 				Iterator seqPropIt = seqPropList.iterator();
 
 				currentIteration: while (seqPropIt.hasNext()) {
@@ -129,7 +129,7 @@ public class InOrderInvoker extends Thread {
 
 						InvokerBean stMapBean = (InvokerBean) stMapIt
 								.next();
-						String key = stMapBean.getKey();
+						String key = stMapBean.getMessageContextRefKey();
 
 						MessageContext msgToInvoke = SandeshaUtil
 								.getStoredMessageContext(key);
@@ -144,7 +144,9 @@ public class InOrderInvoker extends Thread {
 							//Invoking the message.
 							new AxisEngine(msgToInvoke.getConfigurationContext())
 									.receive(msgToInvoke);
-
+//							new AxisEngine (msgToInvoke.getConfigurationContext())
+//									.resumeReceive(msgToInvoke);
+							
 							ServiceContext serviceContext = msgToInvoke
 									.getServiceContext();
 							Object debug = null;
@@ -168,7 +170,7 @@ public class InOrderInvoker extends Thread {
 							throw new SandeshaException(e.getMessage());
 						}
 
-						//undating the next mst to invoke
+						//undating the next msg to invoke
 						nextMsgno++;
 						stMapIt = storageMapMgr
 								.find(

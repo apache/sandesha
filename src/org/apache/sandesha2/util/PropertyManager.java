@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
