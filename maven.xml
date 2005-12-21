@@ -87,6 +87,7 @@
         <ant:mkdir dir="${dir.sample.interop.temp}" />
         <ant:mkdir dir="${dir.sample.interop.temp}/META-INF" />
         <ant:copy file="${dir.samples}/conf/interop/services.xml" todir="${dir.sample.interop.temp}/META-INF" /> 
+        <ant:copy file="${dir.samples}/conf/interop/RMInteropService.wsdl" todir="${dir.sample.interop.temp}" /> 
         <ant:copy todir="${dir.sample.interop.temp}" >
             <ant:fileset dir="${maven.build.dir}/samples/classes">
                 <ant:include name="sandesha2/samples/interop/**/*Service*.class" />

@@ -136,7 +136,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2</artifactId>
-            <version>0.93-SNAPSHOT</version>
+            <version>0.93</version>
         </dependency>
 
         <dependency>
