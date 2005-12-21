@@ -135,7 +135,6 @@
         <phase name="userphase1"/>
 	  <phase name="RMPhase"/>
     </phaseOrder>
-
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
 	  <phase name="RMPhase"/>
@@ -148,11 +147,11 @@
     <phaseOrder type="INfaultflow">
         <!--      user can add his own phases to this area  -->
         <phase name="userphase1"/>
-	  <phase name="RMPhase"/>
+        <phase name="RMPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
-	  <phase name="RMPhase"/>
+        <phase name="RMPhase"/>
         <phase name="userphase1"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>
