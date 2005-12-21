@@ -27,7 +27,8 @@ import java.util.Iterator;
 public class StorageMapBeanMgrTest extends SandeshaTestCase {
 
     InvokerBeanMgr mgr;
-
+    Transaction transaction;
+    
     public StorageMapBeanMgrTest() {
         super ("StorageMapBeanMgrTest");
     }
@@ -36,51 +37,57 @@ public class StorageMapBeanMgrTest extends SandeshaTestCase {
         AxisConfiguration axisConfig = new AxisConfiguration();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
         StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+        transaction = storageManager.getTransaction();
         mgr = storageManager.getStorageMapBeanMgr();
     }
+    
+    public void tearDown() throws Exception {
+    	transaction.commit();
+    }
 
-    public void testDelete() {
+    public void testDelete() throws SandeshaStorageException {
         mgr.insert(new InvokerBean("Key1", 1001, "SeqId1"));
         mgr.delete("Key1");
         assertNull(mgr.retrieve("Key1"));
     }
 
-    public void testFind() {
+    public void testFind() throws SandeshaStorageException {
         mgr.insert(new InvokerBean("Key2", 1002, "SeqId2"));
         mgr.insert(new InvokerBean("Key3", 1003, "SeqId2"));
 
         InvokerBean bean = new InvokerBean();
-        bean.setSequenceId("SeqId2");
+        bean.setSequenceID("SeqId2");
 
         Iterator iter = mgr.find(bean).iterator();
         InvokerBean tmp = (InvokerBean) iter.next();
 
-        if (tmp.getKey().equals("Key2")) {
+        if (tmp.getMessageContextRefKey().equals("Key2")) {
             tmp = (InvokerBean) iter.next();
-            assertTrue(tmp.getKey().equals("Key3"));
+            assertTrue(tmp.getMessageContextRefKey().equals("Key3"));
         } else {
             tmp = (InvokerBean) iter.next();
-            assertTrue(tmp.getKey().equals("Key2"));
+            assertTrue(tmp.getMessageContextRefKey().equals("Key2"));
 
         }
     }
 
-    public void testInsert() {
+    public void testInsert() throws SandeshaStorageException {
         mgr.insert(new InvokerBean("Key4", 1004, "SeqId4"));
         InvokerBean tmp = mgr.retrieve("Key4");
-        assertTrue(tmp.getKey().equals("Key4"));
+        assertTrue(tmp.getMessageContextRefKey().equals("Key4"));
     }
 
-    public void testRetrieve() {
+    public void testRetrieve() throws SandeshaStorageException {
         assertNull(mgr.retrieve("Key5"));
         mgr.insert(new InvokerBean("Key5", 1004, "SeqId5"));
         assertNotNull(mgr.retrieve("Key5"));
     }
 
-    public void testUpdate() {
+    public void testUpdate() throws SandeshaStorageException {
         InvokerBean bean = new InvokerBean("Key6", 1006, "SeqId6");
         mgr.insert(bean);
         bean.setMsgNo(1007);
+        mgr.update(bean);
         InvokerBean tmp = mgr.retrieve("Key6");
         assertTrue(tmp.getMsgNo() == 1007);
     }

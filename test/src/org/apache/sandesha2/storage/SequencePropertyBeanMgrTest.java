@@ -26,7 +26,8 @@ import java.util.Iterator;
 
 public class SequencePropertyBeanMgrTest extends SandeshaTestCase {
     SequencePropertyBeanMgr mgr;
-
+    Transaction transaction;
+    
     public SequencePropertyBeanMgrTest() {
         super("SequencePropertyBeanMgrTest");
     }
@@ -34,18 +35,23 @@ public class SequencePropertyBeanMgrTest extends SandeshaTestCase {
     public void setUp() throws Exception {
         AxisConfiguration axisConfig = new AxisConfiguration();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
-        StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);;
+        StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+        transaction = storageManager.getTransaction();
         mgr = storageManager.getSequencePropretyBeanMgr();
 
     }
+    
+    public void tearDown() throws Exception {
+    	transaction.commit();
+    }
 
-    public void testDelete() {
+    public void testDelete() throws SandeshaStorageException {
         mgr.insert(new SequencePropertyBean("SeqId1", "Name1", "Value1"));
         mgr.delete("SeqId1", "Name1");
         assertNull(mgr.retrieve("SeqId1", "Name1"));
     }
 
-    public void testFind() {
+    public void testFind() throws SandeshaStorageException {
         mgr.insert(new SequencePropertyBean("SeqId2", "Name2", "Value2"));
         mgr.insert(new SequencePropertyBean("SeqId3", "Name3", "Value2"));
 
@@ -53,30 +59,30 @@ public class SequencePropertyBeanMgrTest extends SandeshaTestCase {
         bean.setValue("Value2");
         Iterator iter = mgr.find(bean).iterator();
         SequencePropertyBean tmp = (SequencePropertyBean) iter.next();
-        if (tmp.getSequenceId().equals("SeqId2")) {
+        if (tmp.getSequenceID().equals("SeqId2")) {
             tmp = (SequencePropertyBean) iter.next();
-            assertTrue(tmp.getSequenceId().equals("SeqId3"));
+            assertTrue(tmp.getSequenceID().equals("SeqId3"));
         } else {
             tmp = (SequencePropertyBean) iter.next();
-            assertTrue(tmp.getSequenceId().equals("SeqId2"));
+            assertTrue(tmp.getSequenceID().equals("SeqId2"));
         }
     }
 
-    public void testInsert() {
+    public void testInsert() throws SandeshaStorageException {
         mgr.insert(new SequencePropertyBean("SeqId4", "Name4", "Value4"));
         SequencePropertyBean tmp = mgr.retrieve("SeqId4", "Name4");
         assertTrue(tmp.getValue().equals("Value4"));
 
     }
 
-    public void testRetrieve() {
+    public void testRetrieve() throws SandeshaStorageException {
         assertNull(mgr.retrieve("SeqId5", "Name5"));
         mgr.insert(new SequencePropertyBean("SeqId5", "Name5", "Value5"));
         assertNotNull(mgr.retrieve("SeqId5", "Name5"));
     }
 
 
-    public void testUpdate() {
+    public void testUpdate() throws SandeshaStorageException {
         SequencePropertyBean bean = new SequencePropertyBean("SeqId6", "Name6", "Value6");
         mgr.insert(bean);
         bean.setValue("Value7");

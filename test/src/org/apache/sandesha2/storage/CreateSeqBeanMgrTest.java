@@ -26,70 +26,77 @@ import java.util.Iterator;
 
 public class CreateSeqBeanMgrTest extends SandeshaTestCase {
     private CreateSeqBeanMgr mgr;
-
+    Transaction transaction;
+    
     public CreateSeqBeanMgrTest() {
         super("CreateSeqBeanMgrTest");
     }
 
     public void setUp() throws Exception {
+    	
         AxisConfiguration axisConfig =  new AxisConfiguration();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
 
         StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+        transaction = storageManager.getTransaction();
         mgr = storageManager.getCreateSeqBeanMgr();
     }
+    
+    public void tearDown() throws Exception {
+    	transaction.commit();
+    }
 
-    public void testDelete() {
+    public void testDelete() throws SandeshaStorageException {
         mgr.insert(new CreateSeqBean("TmpSeqId1", "CreateSeqMsgId1", "SeqId1"));
         mgr.delete("CreateSeqMsgId1");
         assertNull(mgr.retrieve("CreateSeqMsgId1"));
     }
 
-    public void testFind() {
+    public void testFind() throws SandeshaStorageException {
         mgr.insert(new CreateSeqBean("TmpSeqId2", "CreateSeqMsgId2", "SeqId2"));
         mgr.insert(new CreateSeqBean("TmpSeqId2", "CreateSeqMsgId3", "SeqId3"));
 
         CreateSeqBean target = new CreateSeqBean();
-        target.setInternalSequenceId("TmpSeqId2");
+        target.setInternalSequenceID("TmpSeqId2");
 
         Iterator iter = mgr.find(target).iterator();
         CreateSeqBean tmp = (CreateSeqBean) iter.next();
-        if (tmp.getCreateSeqMsgId().equals("CreateSeqMsgId1")) {
+        if (tmp.getCreateSeqMsgID().equals("CreateSeqMsgId1")) {
             tmp = (CreateSeqBean) iter.next();
-            assertTrue(tmp.getCreateSeqMsgId().equals("CreateSeqMsgId2"));
+            assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId2"));
 
         }   else {
             tmp = (CreateSeqBean) iter.next();
-            assertTrue(tmp.getCreateSeqMsgId().equals("CreateSeqMsgId3"));
+            assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId3"));
         }
     }
 
-    public void testInsert() {
+    public void testInsert() throws SandeshaStorageException{
         CreateSeqBean bean = new CreateSeqBean("TmpSeqId4", "CreateSeqMsgId4", "SeqId4");
         mgr.insert(bean);
         CreateSeqBean tmpbean = mgr.retrieve("CreateSeqMsgId4");
-        assertTrue(tmpbean.getCreateSeqMsgId().equals("CreateSeqMsgId4"));
-        assertTrue(tmpbean.getSequenceId().equals("SeqId4"));
-        assertTrue(tmpbean.getInternalSequenceId().equals("TmpSeqId4"));
+        assertTrue(tmpbean.getCreateSeqMsgID().equals("CreateSeqMsgId4"));
+        assertTrue(tmpbean.getSequenceID().equals("SeqId4"));
+        assertTrue(tmpbean.getInternalSequenceID().equals("TmpSeqId4"));
     }
 
 
-    public void testRetrieve() {
+    public void testRetrieve() throws SandeshaStorageException{
         assertNull(mgr.retrieve("CreateSeqMsgId5"));
 
         CreateSeqBean bean = new CreateSeqBean("TmpSeqId5", "CreateSeqMsgId5", "SeqId5");
         mgr.insert(bean);
         CreateSeqBean tmp = mgr.retrieve("CreateSeqMsgId5");
-        assertTrue(tmp.getCreateSeqMsgId().equals("CreateSeqMsgId5"));
+        assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId5"));
     }
 
-    public void testUpdate() {
+    public void testUpdate() throws SandeshaStorageException {
 
         CreateSeqBean bean = new CreateSeqBean("TmpSeqId6", "CreateSeqMsgId6", "SeqId6");
         mgr.insert(bean);
-        bean.setInternalSequenceId("TmpSeqId7");
+        bean.setInternalSequenceID("TmpSeqId7");
         mgr.update(bean);
         CreateSeqBean tmp = mgr.retrieve("CreateSeqMsgId6");
-        assertTrue(tmp.getInternalSequenceId().equals("TmpSeqId7"));
+        assertTrue(tmp.getInternalSequenceID().equals("TmpSeqId7"));
     }
 }
