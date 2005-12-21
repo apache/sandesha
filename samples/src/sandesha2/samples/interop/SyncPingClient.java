@@ -26,6 +26,7 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.sandesha2.Sandesha2ClientAPI;
 
@@ -37,7 +38,7 @@ public class SyncPingClient {
 	private String toPort = "8070";
 	
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
-
+	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";   //this will be available after a maven build
@@ -68,9 +69,14 @@ public class SyncPingClient {
 		sender.engageModule(new QName ("Sandesha2-0.9"));
 		Options clientOptions = new Options ();
 		sender.setClientOptions(clientOptions);
+		
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		clientOptions.setTo(new EndpointReference(toEPR));
+		//clientOptions.
+		
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
 		sender.send("ping",getPingOMBlock("ping1"));
 		sender.send("ping",getPingOMBlock("ping2"));

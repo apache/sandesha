@@ -41,7 +41,7 @@ public class AsyncPingClient {
 	private String ackPort = "9070";
 
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
-
+	
 	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/AnonymousService/echoString";
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
@@ -72,7 +72,7 @@ public class AsyncPingClient {
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		sender.setClientOptions(clientOptions);
-		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
 		sender.engageModule(new QName ("Sandesha2-0.9"));
 		clientOptions.setTo(new EndpointReference(toEPR));

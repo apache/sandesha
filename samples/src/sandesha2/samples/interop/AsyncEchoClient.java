@@ -40,9 +40,9 @@ public class AsyncEchoClient {
 	
 	private String toPort = "8070";
 	
-	private String ackIP = "127.0.0.1";
+	private String ackIP = "www-lk.wso2.com"; //"127.0.0.1";
 	
-	private String ackPort = "9070";
+	private String ackPort = "9080"; //"9070";
 	
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
 
