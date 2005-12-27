@@ -85,12 +85,12 @@ public class TerminateManager {
 	 */
 	public static void terminateAfterInvocation (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
 
 		//removing storageMap entries
 		InvokerBean findStorageMapBean = new InvokerBean ();
 		findStorageMapBean.setSequenceID(sequenceID);
+		findStorageMapBean.setInvoked(true);
 		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
@@ -98,6 +98,13 @@ public class TerminateManager {
 			storageMapBeanMgr.delete(storageMapBean.getMessageContextRefKey());
 		}
 		
+		removeReceivingSideProperties(configContext,sequenceID);
+
+	}
+	
+	private static void removeReceivingSideProperties (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 		ArrayList allSequenceList = SandeshaUtil.getArrayListFromString(allSequenceBean.getValue());
 		allSequenceList.remove(sequenceID);

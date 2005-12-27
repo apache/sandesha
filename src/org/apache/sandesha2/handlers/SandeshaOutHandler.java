@@ -218,9 +218,23 @@ public class SandeshaOutHandler extends AbstractHandler {
 					acksTo = (String) msgCtx
 							.getProperty(Sandesha2ClientAPI.AcksTo);
 				}
+				
+				if (msgCtx.isServerSide()) {
+					//we do not set acksTo value to anonymous when the create sequence is send from the server.
+					
+					MessageContext requestMessage = operationContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					if (requestMessage==null) {
+						throw new SandeshaException ("Request message is not present");
+					}
+					
+					acksTo = requestMessage.getTo().getAddress();
+					
+				} else {
+					if (acksTo == null)
+						acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
+				}
 
-				if (acksTo == null)
-					acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
+
 
 				//If acksTo is not anonymous. Start the listner TODO: verify
 				if (!Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)

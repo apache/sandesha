@@ -18,8 +18,11 @@
 package org.apache.sandesha2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * The Module class of Sandesha2.
@@ -32,12 +35,21 @@ public class SandeshaModule implements Module {
 
 	// initialize the module
 	public void init(AxisConfiguration axisSystem) throws AxisFault {
-
+		cleanStorage (axisSystem);
 	}
 
 	// shutdown the module
 	public void shutdown(AxisConfiguration axisSystem) throws AxisFault {
 
+	}
+	
+	private void cleanStorage (AxisConfiguration axisSystem) throws AxisFault {
+		
+		ConfigurationContext configurationContext = new ConfigurationContext (axisSystem);
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		
+		storageManager.initStorage();
+		
 	}
 	
 }

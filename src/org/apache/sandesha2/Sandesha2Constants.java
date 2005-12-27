@@ -178,6 +178,8 @@ public interface Sandesha2Constants {
 		String OFFERED_SEQUENCE = "OfferedSequence";
 
 		String TERMINATE_ADDED = "TerminateAdded";
+		
+		String LAST_ACTIVATED_TIME = "LastActivatedTime";
 	}
 
 	public interface SOAPVersion {
@@ -298,11 +300,11 @@ public interface Sandesha2Constants {
 
 	int INVOKER_SLEEP_TIME = 1000;
 
-	int SENDER_SLEEP_TIME = 1000;
+	int SENDER_SLEEP_TIME = 500;
 
 	int CLIENT_SLEEP_TIME = 10000;
 
-	int TERMINATE_DELAY = 1000;
+	int TERMINATE_DELAY = 100;
 
 	String TEMP_SEQUENCE_ID = "uuid:tempID";
 

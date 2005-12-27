@@ -36,6 +36,7 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Nack;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -80,6 +81,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		if (outSequenceId == null || "".equals(outSequenceId))
 			throw new SandeshaException("OutSequenceId is null");
 
+		//updating the last activated time of the sequence.
+		SequenceManager.updateLastActivatedTime(outSequenceId,rmMsgCtx.getMessageContext().getConfigurationContext());
+		
 		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(
 				outSequenceId, Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 
@@ -154,8 +158,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,
 						internalSequenceId);
 			}
-
-
 		}
 		
 		//stopping the progress of the message further.

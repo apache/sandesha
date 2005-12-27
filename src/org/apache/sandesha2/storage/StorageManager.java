@@ -47,6 +47,8 @@ public abstract class StorageManager {
 		if (context != null)
 			this.context = context;
 	}
+	
+	public abstract void initStorage ();
 
 	public abstract Transaction getTransaction();
 

@@ -74,4 +74,8 @@ public class InMemoryStorageManager extends StorageManager {
 
 		return instance;
 	}
+	
+	public void  initStorage () {
+		
+	}
 }

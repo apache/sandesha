@@ -79,6 +79,9 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 			if (bean.getSequenceID() != null
 					&& !bean.getSequenceID().equals(temp.getSequenceID()))
 				select = false;
+			
+			if (bean.isInvoked()!=temp.isInvoked())
+				select = false;
 
 			if (select)
 				beans.add(temp);

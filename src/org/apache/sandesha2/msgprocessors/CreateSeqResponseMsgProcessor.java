@@ -33,6 +33,7 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
@@ -215,6 +216,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			retransmitterMgr.update(tempBean);
 		}
 
+		SequenceManager.updateLastActivatedTime(newOutSequenceId,configCtx);
+		
 		updateAppMessagesTransaction.commit();
 		
 		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext()

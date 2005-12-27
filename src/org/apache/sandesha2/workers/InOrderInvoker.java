@@ -182,6 +182,7 @@ public class InOrderInvoker extends Thread {
 							Sequence sequence = (Sequence) rmMsg
 									.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 							if (sequence.getLastMessage() != null) {
+								
 								TerminateManager.terminateAfterInvocation(
 										context, sequenceId);
 								

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -41,7 +42,8 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 public class AcknowledgementManager {
 
 	/**
-	 * Piggybacks any available acks of the same sequence to the given application message.
+	 * Piggybacks any available acks of the same sequence to the given
+	 * application message.
 	 * 
 	 * @param applicationRMMsgContext
 	 * @throws SandeshaException
@@ -52,6 +54,7 @@ public class AcknowledgementManager {
 				.getMessageContext().getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(configurationContext);
+
 		SenderBeanMgr retransmitterBeanMgr = storageManager
 				.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
@@ -68,7 +71,8 @@ public class AcknowledgementManager {
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 
 		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr
-				.retrieve(sequenceId,
+				.retrieve(
+						sequenceId,
 						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		if (internalSequenceBean == null)
 			throw new SandeshaException("Temp Sequence is not set");
@@ -82,27 +86,32 @@ public class AcknowledgementManager {
 		Iterator it = collection.iterator();
 
 		if (it.hasNext()) {
+
 			SenderBean ackBean = (SenderBean) it.next();
 
-			//deleting the ack entry.
-			retransmitterBeanMgr.delete(ackBean.getMessageID());
+			long timeNow = System.currentTimeMillis();
+			if (ackBean.getTimeToSend() > timeNow) { //Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
 
-			//Adding the ack to the application message
-			MessageContext ackMsgContext = SandeshaUtil
-					.getStoredMessageContext(ackBean.getMessageContextRefKey());
-			RMMsgContext ackRMMsgContext = MsgInitializer
-					.initializeMessage(ackMsgContext);
-			if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK)
-				throw new SandeshaException("Invalid ack message entry");
+				//deleting the ack entry.
+				retransmitterBeanMgr.delete(ackBean.getMessageID());
 
-			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext
-					.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-			applicationRMMsgContext.setMessagePart(
-					Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
-					sequenceAcknowledgement);
+				//Adding the ack to the application message
+				MessageContext ackMsgContext = SandeshaUtil
+						.getStoredMessageContext(ackBean
+								.getMessageContextRefKey());
+				RMMsgContext ackRMMsgContext = MsgInitializer
+						.initializeMessage(ackMsgContext);
+				if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK)
+					throw new SandeshaException("Invalid ack message entry");
 
-			applicationRMMsgContext.addSOAPEnvelope();
+				SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext
+						.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+				applicationRMMsgContext.setMessagePart(
+						Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
+						sequenceAcknowledgement);
+
+				applicationRMMsgContext.addSOAPEnvelope();
+			}
 		}
-
 	}
 }

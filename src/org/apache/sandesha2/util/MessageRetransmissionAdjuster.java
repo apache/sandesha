@@ -82,7 +82,13 @@ public class MessageRetransmissionAdjuster {
 					baseInterval);
 		}
 
-		retransmitterBean.setTimeToSend(lastSentTime + newInterval);
+		long newTimeToSend = 0;
+		//newTimeToSend = lastSentTime + newInterval;
+		
+		long timeNow = System.currentTimeMillis();
+		newTimeToSend = timeNow + newInterval;
+		
+		retransmitterBean.setTimeToSend(newTimeToSend);
 
 		return retransmitterBean;
 	}

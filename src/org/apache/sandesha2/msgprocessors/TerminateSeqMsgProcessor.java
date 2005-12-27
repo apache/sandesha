@@ -28,6 +28,7 @@ import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
@@ -70,6 +71,8 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		TerminateManager.terminateReceivingSide(context,sequenceId);
 		
 		terminateTransaction.commit(); 
+		
+		SequenceManager.updateLastActivatedTime(sequenceId,context);
 
 		//terminateSeqMsg.pause();
 		terminateSeqRMMSg.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));

@@ -9,12 +9,15 @@ package org.apache.sandesha2.util;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
@@ -97,6 +100,8 @@ public class SequenceManager {
 		// message to invoke
 		//this will apply for only in-order invocations.
 
+		updateLastActivatedTime(sequenceId,createSequenceMsg.getMessageContext().getConfigurationContext());
+		
 		return sequenceId;
 	}
 
@@ -140,4 +145,71 @@ public class SequenceManager {
 		seqPropMgr.insert(acksToBean);
 
 	}
+	
+	public static void updateLastActivatedTime (String sequenceID, ConfigurationContext configContext) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		Transaction lastActivatedTransaction = storageManager.getTransaction();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBean lastActivatedBean = sequencePropertyBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
+		
+		boolean added = false;
+		
+		if (lastActivatedBean==null) {
+			added = true;
+			lastActivatedBean = new SequencePropertyBean ();
+			lastActivatedBean.setSequenceID(sequenceID);
+			lastActivatedBean.setName(Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
+		}
+		
+		long currentTime = System.currentTimeMillis();
+		lastActivatedBean.setValue(Long.toString(currentTime));
+		
+		if (added)
+			sequencePropertyBeanMgr.insert(lastActivatedBean);
+		else
+			sequencePropertyBeanMgr.update(lastActivatedBean);
+		
+		lastActivatedTransaction.commit();
+	}
+	
+	public static long getLastActivatedTime (String sequenceID, ConfigurationContext configContext) throws SandeshaException {
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean lastActivatedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
+		
+		long lastActivatedTime = -1;
+		
+		if (lastActivatedBean!=null) {
+			lastActivatedTime = Long.parseLong(lastActivatedBean.getValue());
+		}
+		
+		return lastActivatedTime;
+	}
+		
+	public static boolean hasSequenceTimedOut (String sequenceID, RMMsgContext rmMsgCtx) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getMessageContext().getConfigurationContext());
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
+			.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
+		if (policyBean == null) {
+			//loading default policies.
+			policyBean = PropertyManager.getInstance().getRMPolicyBean();
+		}
+
+		boolean sequenceTimedOut = false;
+		
+		SequencePropertyBean lastActivatedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
+		if (lastActivatedBean!=null) {
+			long lastActivatedTime = Long.parseLong(lastActivatedBean.getValue());
+			long timeNow = System.currentTimeMillis();
+			if (lastActivatedTime+policyBean.getInactiveTimeoutInterval()<timeNow)
+				sequenceTimedOut = true;
+		}
+		
+		return sequenceTimedOut;
+	}
+	
 }
