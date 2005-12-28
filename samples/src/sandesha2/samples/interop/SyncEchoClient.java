@@ -78,7 +78,7 @@ public class SyncEchoClient {
 		
 		clientOptions.setTo(new EndpointReference(toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
-		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
+		//clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
 		Callback callback1 = new TestCallback ("Callback 1");
 		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
 		Callback callback2 = new TestCallback ("Callback 2");

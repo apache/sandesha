@@ -20,20 +20,11 @@ package sandesha2.samples.interop;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 
-/**
- * @author  
- */
 public class RMInteropService {
 
 	private static Map sequences = new HashMap();
