@@ -36,10 +36,10 @@ public class PorpertyLoaderTest extends TestCase {
 	
 	public void setUp () {
 		manager = PropertyManager.getInstance();
-		String fileName = "./test/resources/sandesha2.properties";
+		String fileName = "./test-resources/sandesha2.properties";
 		File file= new File (fileName);
 		if (!file.exists()) {
-			fail("'test/resources/sandesha2.prop' not found");
+			fail("'test-resources/sandesha2.properties' not found");
 		}
 		
 		try {
