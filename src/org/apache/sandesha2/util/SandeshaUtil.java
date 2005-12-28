@@ -582,5 +582,16 @@ public class SandeshaUtil {
 		
 		return retArr;
 	}
+	
+	public static String getInternalSequenceID (String to, String sequenceKey) {
+		if (to==null && sequenceKey==null)
+			return null;
+		else if (to==null) 
+			return sequenceKey;
+		else if (sequenceKey==null)
+			return to;
+		else 
+			return to + ":" +sequenceKey;
+	}
 
 }

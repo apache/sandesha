@@ -6,11 +6,15 @@
  */
 package org.apache.sandesha2.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -18,8 +22,10 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -110,7 +116,7 @@ public class SequenceManager {
 	}
 
 	public static void setupNewClientSequence(
-			MessageContext firstAplicationMsgCtx, String iternalSequenceId)
+			MessageContext firstAplicationMsgCtx, String internalSequenceId)
 			throws SandeshaException {
 
 		AbstractContext context = firstAplicationMsgCtx.getConfigurationContext();
@@ -130,7 +136,7 @@ public class SequenceManager {
 		if (toEPR == null)
 			throw new SandeshaException("WS-Addressing To is null");
 
-		SequencePropertyBean toBean = new SequencePropertyBean(iternalSequenceId,
+		SequencePropertyBean toBean = new SequencePropertyBean(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.TO_EPR, toEPR.getAddress());
 
 		//Default value for acksTo is anonymous
@@ -139,10 +145,21 @@ public class SequenceManager {
 
 		EndpointReference acksToEPR = new EndpointReference(acksTo);
 		SequencePropertyBean acksToBean = new SequencePropertyBean(
-				iternalSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
+				internalSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
 				acksToEPR.getAddress());
 		seqPropMgr.insert(toBean);
 		seqPropMgr.insert(acksToBean);
+		
+		//saving transportTo value;
+		String transportTo = (String) firstAplicationMsgCtx.getProperty(MessageContextConstants.TRANSPORT_URL);
+		if (transportTo!=null) {
+			SequencePropertyBean transportToBean = new SequencePropertyBean ();
+			transportToBean.setSequenceID(internalSequenceId);
+			transportToBean.setName(Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
+			transportToBean.setValue(transportTo);
+			
+			seqPropMgr.insert(transportToBean);
+		}
 
 	}
 	
@@ -198,6 +215,9 @@ public class SequenceManager {
 			//loading default policies.
 			policyBean = PropertyManager.getInstance().getRMPolicyBean();
 		}
+		
+		if (policyBean.getInactiveTimeoutInterval()<=0)
+			return false;
 
 		boolean sequenceTimedOut = false;
 		
@@ -211,5 +231,63 @@ public class SequenceManager {
 		
 		return sequenceTimedOut;
 	}
+	
+	public static long getAckedMessageCount (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		Transaction transaction = storageManager.getTransaction();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean findSeqIDBean = new SequencePropertyBean ();
+		findSeqIDBean.setValue(internalSequenceID);
+		findSeqIDBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		Collection seqIDBeans = seqPropBeanMgr.find(findSeqIDBean);
+		
+		if (seqIDBeans.size()==0)
+			throw new SandeshaException ("A sequence with give data has not been created");
+		
+		if (seqIDBeans.size()>1) 
+			throw new SandeshaException ("Sequence data is not unique. Cant generate report");
+		
+		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
+		String sequenceID = seqIDBean.getSequenceID();
+
+		SequencePropertyBean ackedMsgBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED);
+		if (ackedMsgBean==null)
+			return 0; //No acknowledgement has been received yet.
+		
+		long noOfMessagesAcked = Long.parseLong(ackedMsgBean.getValue());
+		
+		return noOfMessagesAcked;
+	}
+	
+	public static boolean isSequenceCompleted (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		Transaction transaction = storageManager.getTransaction();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean findSeqIDBean = new SequencePropertyBean ();
+		findSeqIDBean.setValue(internalSequenceID);
+		findSeqIDBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		Collection seqIDBeans = seqPropBeanMgr.find(findSeqIDBean);
+		
+		if (seqIDBeans.size()==0)
+			throw new SandeshaException ("A sequence with give data has not been created");
+		
+		if (seqIDBeans.size()>1) 
+			throw new SandeshaException ("Sequence data is not unique. Cant generate report");
+		
+		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
+		String sequenceID = seqIDBean.getSequenceID();
+		
+		SequencePropertyBean terminateAddedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
+		if (terminateAddedBean==null)
+			return false;
+		
+		if ("true".equals(terminateAddedBean.getValue()))
+			return true;
+
+		return false;
+	}
+	
 	
 }

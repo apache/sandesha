@@ -168,12 +168,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 				throw new AxisFault(
 						"TO End Point Reference is not set correctly. This is a must for the sandesha client side.");
 
-			internalSequenceId = toEPR.getAddress();
+			String to = toEPR.getAddress();
 			OperationContext opContext = msgCtx.getOperationContext();
 			String sequenceKey = (String) msgCtx
 					.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
-			if (sequenceKey != null)
-				internalSequenceId = internalSequenceId + sequenceKey;
+			
+			internalSequenceId = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
 
 		}
 

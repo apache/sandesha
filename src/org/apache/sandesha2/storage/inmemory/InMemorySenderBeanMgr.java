@@ -71,7 +71,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		while (iterator.hasNext()) {
 			SenderBean senderBean = (SenderBean) table.get(iterator.next());
 			if (internalSequenceID.equals(senderBean.getInternalSequenceID())) 
-					arrayList.add(internalSequenceID);
+					arrayList.add(senderBean);
 		}
 		
 		return arrayList;

@@ -180,6 +180,10 @@ public interface Sandesha2Constants {
 		String TERMINATE_ADDED = "TerminateAdded";
 		
 		String LAST_ACTIVATED_TIME = "LastActivatedTime";
+		
+		String NO_OF_MSGS_ACKED = "NoOfMessagesAcked";
+		
+		String TRANSPORT_TO = "TransportTo";
 	}
 
 	public interface SOAPVersion {

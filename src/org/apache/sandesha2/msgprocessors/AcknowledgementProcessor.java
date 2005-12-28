@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -133,6 +134,28 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			//TODO - Process Nack
 		}
 
+		
+		//setting acked message date.
+		//TODO add details specific to each message.
+		long noOfMsgsAcked = getNoOfMessagesAcked(sequenceAck.getAcknowledgementRanges().iterator());
+		SequencePropertyBean ackedMessagesBean = seqPropMgr.retrieve(outSequenceId,Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED);
+		boolean added = false;
+		
+		if (ackedMessagesBean==null) {
+			added = true;
+			ackedMessagesBean = new SequencePropertyBean ();
+			ackedMessagesBean.setSequenceID(outSequenceId);
+			ackedMessagesBean.setName(Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED);
+		}
+		
+		ackedMessagesBean.setValue(Long.toString(noOfMsgsAcked));
+		
+		if (added) 
+			seqPropMgr.insert(ackedMessagesBean);
+		else
+			seqPropMgr.update(ackedMessagesBean);
+		
+		
 		//following get called in the SandesaInHandler
 		//if (justSendTerminateIfNeeded) {
 		//If all messages up to last message have been acknowledged.
@@ -159,6 +182,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 						internalSequenceId);
 			}
 		}
+		
+	
 		
 		//stopping the progress of the message further.
 		//rmMsgCtx.getMessageContext().pause();
@@ -222,6 +247,11 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateRMMessage
 				.setSOAPAction(Sandesha2Constants.WSRM.Actions.SOAP_ACTION_TERMINATE_SEQUENCE);
 
+		SequencePropertyBean transportToBean = seqPropMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
+		if (transportToBean!=null) {
+			terminateRMMessage.setProperty(MessageContextConstants.TRANSPORT_URL,transportToBean.getValue());
+		}
+		
 		try {
 			terminateRMMessage.addSOAPEnvelope();
 		} catch (AxisFault e) {
@@ -246,15 +276,34 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		SenderBeanMgr retramsmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 
+		
+
+		retramsmitterMgr.insert(terminateBean);
+		
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 		terminateAdded.setSequenceID(outSequenceId);
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);
+		
+		
 
-		retramsmitterMgr.insert(terminateBean);
-
+	}
+	
+	private static long getNoOfMessagesAcked (Iterator ackRangeIterator) {
+		long noOfMsgs = 0;
+		while (ackRangeIterator.hasNext()) {
+			AcknowledgementRange acknowledgementRange = (AcknowledgementRange) ackRangeIterator.next();
+			long lower = acknowledgementRange.getLowerValue();
+			long upper = acknowledgementRange.getUpperValue();
+			
+			for (long i=lower;i<=upper;i++) {
+				noOfMsgs++;
+			}
+		}
+		
+		return noOfMsgs;
 	}
 
 }

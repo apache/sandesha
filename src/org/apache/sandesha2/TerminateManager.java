@@ -151,7 +151,9 @@ public class TerminateManager {
 		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			SenderBean retransmitterBean = (SenderBean) iterator.next();
+			Object obj = iterator.next();
+			System.out.println(obj);
+			SenderBean retransmitterBean = (SenderBean) obj;
 			retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
 		}
 		
@@ -183,6 +185,20 @@ public class TerminateManager {
 			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
 			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 		}
+	}
+	
+	private boolean isProportyDeletable (String name) {
+		boolean deleatable = true;
 		
+		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))
+			deleatable = false;
+		
+		return deleatable;
 	}
 }
