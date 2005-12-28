@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project default="all" xmlns:j="jelly:core" xmlns:maven="jelly:maven" xmlns:deploy="deploy" xmlns:ant="jelly:ant">
+<project default="default" xmlns:j="jelly:core" xmlns:maven="jelly:maven" xmlns:deploy="deploy" xmlns:ant="jelly:ant">
 
     <j:set var="dist.name" value="${pom.artifactId}-${pom.currentVersion}"/>
     
@@ -13,13 +13,19 @@
 	<ant:property name="mar.name" value="${dist.name}.mar"/>
 	<ant:property name="jar.name" value="${dist.name}.jar"/>
 	<ant:property name="dir.samples" value="samples"/>
+	<ant:property name="dir.test.resources" value="test-resources"/>
+	<ant:property name="addressing.module.name" value="addressing.mar"/>
 	<ant:property name="dir.config" value="config"/>
 	<ant:property name="apache.license.file" value="LICENSE.txt" />
 	<ant:property name="readme.file" value="README.txt" />
 	<ant:property name="release.notes.file" value="release-notes.html" />
 	
-    <goal name="all" prereqs="jar,mar:create,sample:create,client:create,server:create" />
-
+    <goal name="all" prereqs="jar,mar:create,samples:create,javadoc" />
+    
+    <goal name="default">
+        <attainGoal name="jar:install"/>
+    </goal>
+    
     <goal name="mar:create" prereqs="java:compile">
     	<ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
     	<ant:mkdir dir="${metainf.path}" />
@@ -115,6 +121,14 @@
     	<!-- <delete dir="${build.temp.dir}" /> -->
     </goal>
     
+    <preGoal name="test:test" > 
+    	<attainGoal name="server:create"/>
+    	<attainGoal name="client:create"/>   
+    	
+    	<!-- check for the availability of addretting module and fail if not available-->
+    	<ant:copy file="${dir.test.resources}/modules/${addressing.module.name}" todir="${build.repo.dir}/server/modules"/>
+    	<ant:copy file="${dir.test.resources}/modules/${addressing.module.name}" todir="${build.repo.dir}/client/modules"/>
+    </preGoal>
     
     <goal name="server.copy.tomcat" prereqs="server:create">
         <property environment="env1"/>
@@ -149,7 +163,7 @@
     <!--- Create the Binary Distribution -->
     <!-- ================================================================ -->
 
-    <goal name="dist-bin" prereqs="all,javadoc">
+    <goal name="dist-bin" prereqs="default,javadoc">
         <property name="dir.temp.dist.bin.parent" value="${build.temp.dir}/dist-bin" />
         <property name="dir.temp.dist.bin" value="${build.temp.dir}/dist-bin/${dist.name}-bin" />
         
