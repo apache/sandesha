@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
-import java.sql.ResultSet;
 import java.util.Collection;
 
 import org.apache.sandesha2.storage.SandeshaStorageException;

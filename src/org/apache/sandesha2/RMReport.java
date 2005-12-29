@@ -24,8 +24,7 @@ public class RMReport {
 	
 	private long ackedMessageCount = 0;
 	private boolean sequenceCompleted = false;
-	
-	
+	private boolean outGoingSequence = false;
 
 	public long getAckedMessageCount() {
 		return ackedMessageCount;
@@ -42,4 +41,13 @@ public class RMReport {
 	public void setSequenceCompleted(boolean sequenceCompleted) {
 		this.sequenceCompleted = sequenceCompleted;
 	}
+	
+	public boolean isOutGoingSequence() {
+		return outGoingSequence;
+	}
+	
+	public void setOutGoingSequence(boolean outGoingSequence) {
+		this.outGoingSequence = outGoingSequence;
+	}
+	
 }

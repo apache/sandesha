@@ -193,7 +193,7 @@ public class TerminateManager {
 		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
 			deleatable = false;
 		
-		if (Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED.equals(name))
+		if (Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED.equals(name))
 			deleatable = false;
 		
 		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))

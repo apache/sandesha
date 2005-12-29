@@ -38,11 +38,22 @@ public class Sandesha2ClientAPI {
 	public static RMReport getRMReport (String to, String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
 		
 		String internalSequenceID = SandeshaUtil.getInternalSequenceID (to,sequenceKey);
+		RMReport report = new RMReport ();
 		
-		RMReport rmReport = new RMReport ();
-		rmReport.setAckedMessageCount(SequenceManager.getAckedMessageCount (internalSequenceID,configurationContext));
-		rmReport.setSequenceCompleted(SequenceManager.isSequenceCompleted (internalSequenceID,configurationContext));
+		report.setAckedMessageCount(SequenceManager.getOutGoingSequenceAckedMessageCount (internalSequenceID,configurationContext));
+		report.setSequenceCompleted(SequenceManager.isOutGoingSequenceCompleted (internalSequenceID,configurationContext));
+		report.setOutGoingSequence(true);
+					
+		return report;
+	}
+	
+	public static RMReport getIncomingSequenceReport (String sequenceID,ConfigurationContext configurationContext) throws SandeshaException {
 		
-		return rmReport;
+		RMReport report = new RMReport ();
+		report.setOutGoingSequence(false);
+		report.setAckedMessageCount(SequenceManager.getIncomingSequenceAckedMessageCount(sequenceID,configurationContext));
+		report.setSequenceCompleted(SequenceManager.isIncomingSequenceCompleted(sequenceID,configurationContext));
+		
+		return report;
 	}
 }

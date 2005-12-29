@@ -138,14 +138,14 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//setting acked message date.
 		//TODO add details specific to each message.
 		long noOfMsgsAcked = getNoOfMessagesAcked(sequenceAck.getAcknowledgementRanges().iterator());
-		SequencePropertyBean ackedMessagesBean = seqPropMgr.retrieve(outSequenceId,Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED);
+		SequencePropertyBean ackedMessagesBean = seqPropMgr.retrieve(outSequenceId,Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		boolean added = false;
 		
 		if (ackedMessagesBean==null) {
 			added = true;
 			ackedMessagesBean = new SequencePropertyBean ();
 			ackedMessagesBean.setSequenceID(outSequenceId);
-			ackedMessagesBean.setName(Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED);
+			ackedMessagesBean.setName(Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		}
 		
 		ackedMessagesBean.setValue(Long.toString(noOfMsgsAcked));

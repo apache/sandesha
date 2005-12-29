@@ -58,6 +58,8 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.workers.InOrderInvoker;
 import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -592,6 +594,20 @@ public class SandeshaUtil {
 			return to;
 		else 
 			return to + ":" +sequenceKey;
+	}
+	
+	public static String getSequenceIDFromInternalSequenceID (String internalSequenceID, ConfigurationContext configurationContext)  throws SandeshaException {
+		
+		StorageManager storageManager = getSandeshaStorageManager(configurationContext);
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean outSequenceBean = sequencePropertyBeanMgr.retrieve(internalSequenceID, Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		
+		String sequeunceID = null;
+		if (outSequenceBean!=null)
+			sequeunceID = outSequenceBean.getValue();
+		
+		return sequeunceID;
 	}
 
 }

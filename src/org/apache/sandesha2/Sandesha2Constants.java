@@ -179,9 +179,11 @@ public interface Sandesha2Constants {
 
 		String TERMINATE_ADDED = "TerminateAdded";
 		
+		String TERMINATE_RECEIVED = "TerminateReceived";
+		
 		String LAST_ACTIVATED_TIME = "LastActivatedTime";
 		
-		String NO_OF_MSGS_ACKED = "NoOfMessagesAcked";
+		String NO_OF_OUTGOING_MSGS_ACKED = "NoOfOutGoingMessagesAcked";
 		
 		String TRANSPORT_TO = "TransportTo";
 	}

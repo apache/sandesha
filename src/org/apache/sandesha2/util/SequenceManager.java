@@ -6,8 +6,8 @@
  */
 package org.apache.sandesha2.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -22,10 +22,8 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -232,7 +230,7 @@ public class SequenceManager {
 		return sequenceTimedOut;
 	}
 	
-	public static long getAckedMessageCount (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
+	public static long getOutGoingSequenceAckedMessageCount (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
 		Transaction transaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
@@ -251,16 +249,17 @@ public class SequenceManager {
 		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
 		String sequenceID = seqIDBean.getSequenceID();
 
-		SequencePropertyBean ackedMsgBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.NO_OF_MSGS_ACKED);
+		SequencePropertyBean ackedMsgBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		if (ackedMsgBean==null)
 			return 0; //No acknowledgement has been received yet.
 		
 		long noOfMessagesAcked = Long.parseLong(ackedMsgBean.getValue());
+		transaction.commit();
 		
 		return noOfMessagesAcked;
 	}
 	
-	public static boolean isSequenceCompleted (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
+	public static boolean isOutGoingSequenceCompleted (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
 		Transaction transaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
@@ -286,7 +285,47 @@ public class SequenceManager {
 		if ("true".equals(terminateAddedBean.getValue()))
 			return true;
 
+		transaction.commit();
 		return false;
+	}
+	
+	public static long getIncomingSequenceAckedMessageCount (String sequenceID, ConfigurationContext configurationContext) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		Transaction transaction = storageManager.getTransaction();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean receivedMsgsBean = seqPropBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
+		
+		//we should be able to assume that all the received messages has been acked.
+		String receivedMsgsStr = receivedMsgsBean.getValue();
+
+		StringTokenizer tokenizer = new StringTokenizer (receivedMsgsStr,",");
+		
+		long count = 0;
+		while (tokenizer.hasMoreTokens()) {
+			String temp = tokenizer.nextToken();
+			count++;
+		}
+
+
+		transaction.commit();
+		return count;
+	}
+	
+	public static boolean isIncomingSequenceCompleted (String sequenceID, ConfigurationContext configurationContext) throws SandeshaException {
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		Transaction transaction = storageManager.getTransaction();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean terminateReceivedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.TERMINATE_RECEIVED);
+		boolean complete = false;
+		
+		if (terminateReceivedBean!=null && "true".equals(terminateReceivedBean.getValue()))
+			complete = true;
+		
+		transaction.commit();
+		return complete;
 	}
 	
 	

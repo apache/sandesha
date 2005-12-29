@@ -27,6 +27,8 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -51,7 +53,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
 			ackProcessor.processMessage(terminateSeqRMMSg);
 		}
-
+		
 		//Processing the terminate message
 		//TODO Add terminate sequence message logic.
 		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMSg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
@@ -63,8 +65,18 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException ("Invalid sequence id");
 		
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
-
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+
+		Transaction terminateReceivedTransaction = storageManager.getTransaction();
+		SequencePropertyBean terminateReceivedBean = new SequencePropertyBean ();
+		terminateReceivedBean.setSequenceID(sequenceId);
+		terminateReceivedBean.setName(Sandesha2Constants.SequenceProperties.TERMINATE_RECEIVED);
+		terminateReceivedBean.setValue("true");
+		
+		sequencePropertyBeanMgr.insert(terminateReceivedBean);
+		
+		terminateReceivedTransaction.commit();
 		
 		Transaction terminateTransaction = storageManager.getTransaction();
 		
