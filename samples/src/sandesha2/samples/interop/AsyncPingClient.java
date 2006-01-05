@@ -22,12 +22,15 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 
 
 public class AsyncPingClient {
@@ -42,7 +45,7 @@ public class AsyncPingClient {
 
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
 	
-	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/AnonymousService/echoString";
+	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
@@ -68,19 +71,26 @@ public class AsyncPingClient {
 			return;
 		}
 		
-		MessageSender sender = new MessageSender (AXIS2_CLIENT_PATH);
+		ConfigurationContext configContext = new ConfigurationContextFactory().createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH);
+
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		
 		Options clientOptions = new Options ();
+		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		sender.setClientOptions(clientOptions);
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
-		sender.engageModule(new QName ("Sandesha2-0.9"));
-		clientOptions.setTo(new EndpointReference(toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
-		sender.send("ping",getPingOMBlock("ping1"));
-		sender.send("ping",getPingOMBlock("ping2"));
+		
+		serviceClient.setOptions(clientOptions);
+		serviceClient.engageModule(new QName ("Sandesha2-0.9"));
+		
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));
+		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		
 		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
-		sender.send("ping",getPingOMBlock("ping3"));
+		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

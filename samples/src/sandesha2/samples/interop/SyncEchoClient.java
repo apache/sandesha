@@ -23,15 +23,22 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Call;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.sandesha2.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
+
+import sandesha2.samples.interop.AsyncEchoClient.TestCallback;
 
 public class SyncEchoClient {
 
@@ -45,7 +52,7 @@ public class SyncEchoClient {
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";   //this will be available after a maven build
 	
-	public static void main(String[] args) throws AxisFault {
+	public static void main(String[] args) throws Exception {
 		
 		String axisClientRepo = null;
 		if (args!=null && args.length>0)
@@ -59,33 +66,47 @@ public class SyncEchoClient {
 		new SyncEchoClient().run();
 	}
 	
-	private void run () throws AxisFault {
+	private void run () throws Exception {
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
 		}
 		
-		Call call = new Call(AXIS2_CLIENT_PATH);
-		call.engageModule(new QName("Sandesha2-0.9"));
-		Options clientOptions = new Options ();
-		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		call.setClientOptions(clientOptions);
 		
+		ConfigurationContext configContext = new ConfigurationContextFactory().createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH);
+
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		
+		
+		Options clientOptions = new Options ();
+		
+		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+		clientOptions.setTo(new EndpointReference (toEPR));
+		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
+
 		//You must set the following two properties in the request-reply case.
-		clientOptions.setListenerTransportProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
-		clientOptions.setTo(new EndpointReference(toEPR));
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
-		//clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
+		serviceClient.setOptions(clientOptions);
+		serviceClient.engageModule(new QName ("Sandesha2-0.9"));
+		
+		String offeredSequenceID = SandeshaUtil.getUUID();
+		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,offeredSequenceID);  //Optional
+		
 		Callback callback1 = new TestCallback ("Callback 1");
-		call.invokeNonBlocking("echoString", getEchoOMBlock("echo1"),callback1);
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1"),callback1);
 		Callback callback2 = new TestCallback ("Callback 2");
-		call.invokeNonBlocking("echoString", getEchoOMBlock("echo2"),callback2);
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2"),callback2);
+		
 		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
-		call.invokeNonBlocking("echoString", getEchoOMBlock("echo3"),callback3);
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3"),callback3);
+		
+        while (!callback3.isComplete()) {
+            Thread.sleep(1000);
+        }
+
 	}
 
 	private static OMElement getEchoOMBlock(String text) {
@@ -133,7 +154,7 @@ public class SyncEchoClient {
 			
 		}
 
-		public void reportError(Exception e) {
+		public void onError(Exception e) {
 			// TODO Auto-generated method stub
 			System.out.println("Error reported for test call back");
 		}
