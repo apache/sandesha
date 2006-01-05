@@ -24,16 +24,13 @@ import java.util.Iterator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
@@ -55,7 +52,7 @@ public class TerminateManager {
 	 * @throws SandeshaException
 	 */
 	public static void terminateReceivingSide (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		/*StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
 		
 		//removing nextMsgMgr entries
@@ -71,7 +68,7 @@ public class TerminateManager {
 		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
 		if(!inOrderInvocation) { 
 			terminateAfterInvocation(configContext,sequenceID);
-		}
+		}*/
 
 	}
 	
@@ -151,9 +148,7 @@ public class TerminateManager {
 		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			Object obj = iterator.next();
-			System.out.println(obj);
-			SenderBean retransmitterBean = (SenderBean) obj;
+			SenderBean retransmitterBean = (SenderBean) iterator.next();
 			retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
 		}
 		
@@ -174,21 +169,29 @@ public class TerminateManager {
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
+			
+			if (isProportyDeletable(sequencePropertyBean.getName())) {
+				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
+			}
+			
 		}
 		
-		SequencePropertyBean findSequencePropertyBean2 = new SequencePropertyBean ();
-		findSequencePropertyBean2.setSequenceID(internalSequenceId);
-		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean2);
-		iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
-		}
+//		SequencePropertyBean findSequencePropertyBean2 = new SequencePropertyBean ();
+//		findSequencePropertyBean2.setSequenceID(internalSequenceId);
+//		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean2);
+//		iterator = collection.iterator();
+//		while (iterator.hasNext()) {
+//			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
+//			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
+//		}
 	}
 	
-	private boolean isProportyDeletable (String name) {
+	private static boolean isProportyDeletable (String name) {
 		boolean deleatable = true;
+		
+//		if (name.equals(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID)) {
+//			int i=1;
+//		}
 		
 		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
 			deleatable = false;

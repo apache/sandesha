@@ -17,10 +17,10 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -42,27 +42,35 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class TerminateSeqMsgProcessor implements MsgProcessor {
 
-	public void processMessage(RMMsgContext terminateSeqRMMSg)
+	private Log log = LogFactory.getLog(getClass());
+	
+	public void processMessage(RMMsgContext terminateSeqRMMsg)
 			throws SandeshaException {
 
-		MessageContext terminateSeqMsg = terminateSeqRMMSg.getMessageContext();
+		MessageContext terminateSeqMsg = terminateSeqRMMsg.getMessageContext();
 		//Processing for ack if any
-		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) terminateSeqRMMSg
+		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) terminateSeqRMMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck != null) {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
-			ackProcessor.processMessage(terminateSeqRMMSg);
+			ackProcessor.processMessage(terminateSeqRMMsg);
 		}
 		
 		//Processing the terminate message
 		//TODO Add terminate sequence message logic.
-		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMSg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
-		if (terminateSequence==null)
-			throw new SandeshaException ("Terminate Sequence part is not available");
+		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+		if (terminateSequence==null) {
+			String message = "Terminate Sequence part is not available";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
 		String sequenceId = terminateSequence.getIdentifier().getIdentifier();
-		if (sequenceId==null || "".equals(sequenceId))
-			throw new SandeshaException ("Invalid sequence id");
+		if (sequenceId==null || "".equals(sequenceId)) {
+			String message = "Invalid sequence id";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
@@ -86,8 +94,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		SequenceManager.updateLastActivatedTime(sequenceId,context);
 
-		//terminateSeqMsg.pause();
-		terminateSeqRMMSg.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
-
+		terminateSeqRMMsg.pause();
 	}
 }

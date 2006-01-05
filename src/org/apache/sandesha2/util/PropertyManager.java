@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
@@ -33,6 +35,8 @@ import org.apache.sandesha2.policy.RMPolicyBean;
 public class PropertyManager {
 
 	public static PropertyManager instance = null;
+	
+	Log log = LogFactory.getLog(getClass());
 	
 	private SandeshaPropertyBean propertyBean = null;
 	 
@@ -53,7 +57,7 @@ public class PropertyManager {
 			
 			loadPropertiesToBean (properties);
 		} catch (IOException e) {
-			System.out.println("A valid property file was not found. Using default values...");
+			log.info ("A valid property file was not found. Using default values...");
 		}
 	}
 	

@@ -36,9 +36,9 @@ import org.apache.axis2.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -76,12 +76,18 @@ public class SandeshaOutHandler extends AbstractHandler {
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 
 		ConfigurationContext context = msgCtx.getConfigurationContext();
-		if (context == null)
-			throw new AxisFault("ConfigurationContext is null");
+		if (context == null) {
+			String message = "ConfigurationContext is null";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		AxisService axisService = msgCtx.getAxisService();
-		if (axisService == null)
-			throw new AxisFault("AxisService is null");
+		if (axisService == null) {
+			String message = "AxisService is null";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		//getting rm message
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
@@ -100,15 +106,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		
 		ServiceContext serviceContext = msgCtx.getServiceContext();
 		OperationContext operationContext = msgCtx.getOperationContext();
-		Object debug = null;
-		if (serviceContext != null) {
-			debug = msgCtx.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
-			if (debug != null && "on".equals(debug)) {
-				System.out.println("DEBUG: SandeshaOutHandler got a '"
-						+ SandeshaUtil.getMessageTypeString(rmMsgCtx
-								.getMessageType()) + "' message.");
-			}
-		}
 
 		//continue only if an possible application message
 		if (!(rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.UNKNOWN)) {
@@ -151,12 +148,18 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 			Sequence reqSequence = (Sequence) requestRMMsgCtx
 					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			if (reqSequence == null)
-				throw new SandeshaException("Sequence part is null");
+			if (reqSequence == null) {
+				String message = "Sequence part is null";
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
 
 			String incomingSeqId = reqSequence.getIdentifier().getIdentifier();
-			if (incomingSeqId == null || incomingSeqId == "")
-				throw new SandeshaException("Invalid seqence Id");
+			if (incomingSeqId == null || incomingSeqId == "") {
+				String message = "Invalid seqence Id";
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
 
 			internalSequenceId = incomingSeqId;
 
@@ -164,12 +167,13 @@ public class SandeshaOutHandler extends AbstractHandler {
 			//set the internal sequence id for the client side.
 			EndpointReference toEPR = msgCtx.getTo();
 			if (toEPR == null || toEPR.getAddress() == null
-					|| "".equals(toEPR.getAddress()))
-				throw new AxisFault(
-						"TO End Point Reference is not set correctly. This is a must for the sandesha client side.");
-
+					|| "".equals(toEPR.getAddress())){
+				String message = "TO End Point Reference is not set correctly. This is a must for the sandesha client side.";
+				log.debug(message);
+				throw new AxisFault(message);
+			}
+			
 			String to = toEPR.getAddress();
-			OperationContext opContext = msgCtx.getOperationContext();
 			String sequenceKey = (String) msgCtx
 					.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
 			
@@ -224,7 +228,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 					
 					MessageContext requestMessage = operationContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
 					if (requestMessage==null) {
-						throw new SandeshaException ("Request message is not present");
+						String message = "Request message is not present";
+						log.debug(message);
+						throw new SandeshaException (message);
 					}
 					
 					acksTo = requestMessage.getTo().getAddress();
@@ -264,9 +270,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 					}
 				}
-
 				addCreateSequenceMessage(rmMsgCtx, internalSequenceId, acksTo);
-
 			}
 		}
 
@@ -280,10 +284,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		SOAPBody soapBody = rmMsgCtx.getSOAPEnvelope().getBody();
-		if (soapBody == null)
-			throw new SandeshaException(
-					"Invalid SOAP message. Body is not present");
-
+		if (soapBody == null) {
+			String message = "Invalid SOAP message. Body is not present";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
+		
 		String messageId1 = SandeshaUtil.getUUID();
 		if (rmMsgCtx.getMessageId() == null) {
 			rmMsgCtx.setMessageId(messageId1);
@@ -309,8 +315,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		} else {
 			EndpointReference toEPR = msgCtx.getTo();
 
-			if (toEPR == null)
-				throw new SandeshaException("To EPR is not found");
+			if (toEPR == null) {
+				String message = "To EPR is not found";
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
 
 			String to = toEPR.getAddress();
 			String operationName = msgCtx.getOperationContext()
@@ -330,8 +339,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		//pausing the message
-		//msgCtx.pause();
-		rmMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.OUT_HANDLER_NAME));
+		msgCtx.pause();
+		//rmMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.OUT_HANDLER_NAME));
 		
 		transaction.commit();
 	}
@@ -340,15 +349,21 @@ public class SandeshaOutHandler extends AbstractHandler {
 			String internalSequenceId, String acksTo) throws SandeshaException {
 
 		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
-		if (applicationMsg == null)
-			throw new SandeshaException("Message context is null");
+		if (applicationMsg == null) {
+			String message = "Message context is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
+		
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
 				applicationRMMsg, internalSequenceId, acksTo);
 		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-		if (createSequencePart == null)
-			throw new SandeshaException(
-					"Create Sequence part is null for a CreateSequence message");
+		if (createSequencePart == null) {
+			String message = "Create Sequence part is null for a CreateSequence message"; 
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {
@@ -380,8 +395,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		createSeqMsg.setRelatesTo(null); //create seq msg does not relateTo
 		// anything
 		AbstractContext context = applicationRMMsg.getContext();
-		if (context == null)
-			throw new SandeshaException("Context is null");
+		if (context == null) {
+			String message = "Context is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(applicationMsg.getConfigurationContext());
@@ -418,12 +436,18 @@ public class SandeshaOutHandler extends AbstractHandler {
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
 				.getSOAPVersion(rmMsg.getSOAPEnvelope()));
 
-		if (rmMsg == null)
-			throw new SandeshaException("Message or reques message is null");
+		if (rmMsg == null) {
+			String message = "Message or reques message is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		AbstractContext context = rmMsg.getContext();
-		if (context == null)
-			throw new SandeshaException("Context is null");
+		if (context == null) {
+			String message = "Context is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(msg.getConfigurationContext());
@@ -443,8 +467,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 				internalSequenceId,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 
-		if (toBean == null)
-			throw new SandeshaException("To is null");
+		if (toBean == null) {
+			String message = "To is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		EndpointReference toEPR = new EndpointReference (toBean.getValue());
 		EndpointReference replyToEPR = null;
@@ -454,8 +481,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		if (toEPR == null || toEPR.getAddress() == null
-				|| toEPR.getAddress() == "")
-			throw new SandeshaException("To Property has an invalid value");
+				|| toEPR.getAddress() == "") {
+			String message = "To Property has an invalid value";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String newToStr = null;
 
@@ -504,8 +534,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 					.initializeMessage(requestMsg);
 			Sequence requestSequence = (Sequence) reqRMMsgCtx
 					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			if (requestSequence == null)
-				throw new SandeshaException("Request Sequence is null");
+			if (requestSequence == null) {
+				String message = "Request Sequence is null";
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
 
 			if (requestSequence.getLastMessage() != null) {
 				lastMessage = true;

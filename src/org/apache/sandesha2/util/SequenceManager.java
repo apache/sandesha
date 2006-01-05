@@ -11,14 +11,15 @@ import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -36,30 +37,38 @@ import org.apache.sandesha2.wsrm.CreateSequence;
 
 public class SequenceManager {
 
+	private static Log log = LogFactory.getLog(SequenceManager.class);
+	
 	public static String setupNewSequence(RMMsgContext createSequenceMsg)
 			throws AxisFault {
 
 		String sequenceId = SandeshaUtil.getUUID();
-		AbstractContext context = createSequenceMsg.getContext();
 
 		EndpointReference to = createSequenceMsg.getTo();
-		if (to == null)
-			throw new AxisFault("To is null");
+		if (to == null) {
+			String message = "To is null";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		EndpointReference replyTo = createSequenceMsg.getReplyTo();
-//		if (replyTo == null)
-//			throw new AxisFault("ReplyTo is null");
 
 		CreateSequence createSequence = (CreateSequence) createSequenceMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-		if (createSequence == null)
-			throw new AxisFault("Create Sequence Part is null");
+		if (createSequence == null) {
+			String message = "Create Sequence Part is null";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		EndpointReference acksTo = createSequence.getAcksTo().getAddress()
 				.getEpr();
 
-		if (acksTo == null)
-			throw new AxisFault("AcksTo is null");
+		if (acksTo == null) {
+			String message = "AcksTo is null";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		StorageManager storageManager = null;
 
@@ -101,8 +110,7 @@ public class SequenceManager {
 
 		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 		nextMsgMgr.insert(new NextMsgBean(sequenceId, 1)); // 1 will be the next
-		// message to invoke
-		//this will apply for only in-order invocations.
+		// message to invoke. This will apply for only in-order invocations.
 
 		updateLastActivatedTime(sequenceId,createSequenceMsg.getMessageContext().getConfigurationContext());
 		
@@ -117,8 +125,6 @@ public class SequenceManager {
 			MessageContext firstAplicationMsgCtx, String internalSequenceId)
 			throws SandeshaException {
 
-		AbstractContext context = firstAplicationMsgCtx.getConfigurationContext();
- 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(firstAplicationMsgCtx
 						.getConfigurationContext());
@@ -127,12 +133,14 @@ public class SequenceManager {
 				.getSequencePropretyBeanMgr();
 
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
-		EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
 		String acksTo = (String) firstAplicationMsgCtx
 				.getProperty(Sandesha2ClientAPI.AcksTo);
 
-		if (toEPR == null)
-			throw new SandeshaException("WS-Addressing To is null");
+		if (toEPR == null) {
+			String message = "WS-Addressing To is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		SequencePropertyBean toBean = new SequencePropertyBean(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.TO_EPR, toEPR.getAddress());
@@ -240,11 +248,17 @@ public class SequenceManager {
 		findSeqIDBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		Collection seqIDBeans = seqPropBeanMgr.find(findSeqIDBean);
 		
-		if (seqIDBeans.size()==0)
-			throw new SandeshaException ("A sequence with give data has not been created");
+		if (seqIDBeans.size()==0) {
+			String message = "A sequence with give data has not been created";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
-		if (seqIDBeans.size()>1) 
-			throw new SandeshaException ("Sequence data is not unique. Cant generate report");
+		if (seqIDBeans.size()>1) {
+			String message = "Sequence data is not unique. Cant generate report";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
 		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
 		String sequenceID = seqIDBean.getSequenceID();
@@ -269,11 +283,17 @@ public class SequenceManager {
 		findSeqIDBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		Collection seqIDBeans = seqPropBeanMgr.find(findSeqIDBean);
 		
-		if (seqIDBeans.size()==0)
-			throw new SandeshaException ("A sequence with give data has not been created");
+		if (seqIDBeans.size()==0) {
+			String message = "A sequence with give data has not been created";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
-		if (seqIDBeans.size()>1) 
-			throw new SandeshaException ("Sequence data is not unique. Cant generate report");
+		if (seqIDBeans.size()>1) {
+			String message = "Sequence data is not unique. Cant generate report";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
 		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
 		String sequenceID = seqIDBean.getSequenceID();
@@ -306,7 +326,6 @@ public class SequenceManager {
 			String temp = tokenizer.nextToken();
 			count++;
 		}
-
 
 		transaction.commit();
 		return count;

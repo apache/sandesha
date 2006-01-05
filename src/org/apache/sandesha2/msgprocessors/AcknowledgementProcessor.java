@@ -20,12 +20,12 @@ package org.apache.sandesha2.msgprocessors;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -50,37 +50,48 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 public class AcknowledgementProcessor implements MsgProcessor {
 
+	Log log = LogFactory.getLog(getClass());
+	
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
-		
-		
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		if (sequenceAck == null)
-			throw new SandeshaException("Sequence acknowledgement part is null");
+		if (sequenceAck == null) {
+			String message = "Sequence acknowledgement part is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 		
 		AbstractContext context = rmMsgCtx.getContext();
 		if (context == null)
-			throw new SandeshaException("Context is null");
+		{
+			String message = "Context is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
 						.getConfigurationContext());
-		
-		Transaction ackTransaction = storageManager.getTransaction();
-		
 		SenderBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
+
+
+		//Starting transaction
+		Transaction ackTransaction = storageManager.getTransaction();
 
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges()
 				.iterator();
 
 		Iterator nackIterator = sequenceAck.getNackList().iterator();
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
-		if (outSequenceId == null || "".equals(outSequenceId))
-			throw new SandeshaException("OutSequenceId is null");
+		if (outSequenceId == null || "".equals(outSequenceId)) {
+			String message = "OutSequenceId is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		//updating the last activated time of the sequence.
 		SequenceManager.updateLastActivatedTime(outSequenceId,rmMsgCtx.getMessageContext().getConfigurationContext());
@@ -88,8 +99,11 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(
 				outSequenceId, Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 
-		if (internalSequenceBean == null || internalSequenceBean.getValue() == null)
-			throw new SandeshaException("TempSequenceId is not set correctly");
+		if (internalSequenceBean == null || internalSequenceBean.getValue() == null) {
+			String message = "TempSequenceId is not set correctly";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String internalSequenceId = (String) internalSequenceBean.getValue();
 
@@ -97,12 +111,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		rmMsgCtx.getMessageContext()
 				.setProperty(Sandesha2Constants.ACK_PROCSSED, "true");
 
-		//Removing relatesTo - Some WSRM endpoints tend to set relatesTo value
-		// for ack messages.
-		//Because of this dispatching may go wrong.
-		//So we set relatesTo value to null for ackMessages. (this happens in
-		// the SandeshaGlobal handler)
-		//Do this only if this is a standalone ACK.
+		//Removing relatesTo - Some WSRM endpoints tend to set relatesTo value for ack messages.
+		//Because of this dispatching may go wrong. So we set relatesTo value to null for ackMessages. 
+		//(this happens in the SandeshaGlobal handler). Do this only if this is a standalone ACK.
 		if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.ACK)
 			rmMsgCtx.setRelatesTo(null);
 
@@ -156,22 +167,23 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			seqPropMgr.update(ackedMessagesBean);
 		
 		
-		//following get called in the SandesaInHandler
-		//if (justSendTerminateIfNeeded) {
-		//If all messages up to last message have been acknowledged.
-		//Add terminate Sequence message.
+		//If all messages up to last message have been acknowledged. Add terminate Sequence message.
 		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
 				internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE);
 		if (lastOutMsgBean != null) {
 			Long lastOutMsgNoLng = new Long (lastOutMsgBean.getValue());
-			if (lastOutMsgNoLng == null)
-				throw new SandeshaException(
-						"Invalid object set for the Last Out Message");
-
+			if (lastOutMsgNoLng == null) {
+				String message = "Invalid object set for the Last Out Message";
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
+			
 			long lastOutMessageNo = lastOutMsgNoLng.longValue();
-			if (lastOutMessageNo <= 0)
-				throw new SandeshaException(
-						"Invalid value set for the last out message");
+			if (lastOutMessageNo <= 0) {
+				String message = "Invalid value set for the last out message";
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
 
 			boolean complete = SandeshaUtil.verifySequenceCompletion(
 					sequenceAck.getAcknowledgementRanges().iterator(),
@@ -184,13 +196,11 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		}
 		
 	
-		
 		//stopping the progress of the message further.
-		//rmMsgCtx.getMessageContext().pause();
-		rmMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
+		rmMsgCtx.pause();	
 		
+		//commiting transaction
 		ackTransaction.commit();
-		
 	}
 
 	private SenderBean getRetransmitterEntry(Collection collection,
@@ -221,7 +231,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 		if (terminated != null && terminated.getValue() != null
 				&& "true".equals(terminated.getValue())) {
-			System.out.println("TERMINATE WAS ADDED PREVIOUSLY....");
+			String message = "Terminate was added previously.";
+			log.info(message);
 			return;
 		}
 
@@ -234,8 +245,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				Sandesha2Constants.SequenceProperties.TO_EPR);
 
 		EndpointReference toEPR = new EndpointReference ( toBean.getValue());
-		if (toEPR == null)
-			throw new SandeshaException("To EPR has an invalid value");
+		if (toEPR == null) {
+			String message = "To EPR has an invalid value";
+			throw new SandeshaException(message);
+		}
 
 		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
 		terminateRMMessage.setFrom(new EndpointReference(
@@ -266,6 +279,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//Set a retransmitter lastSentTime so that terminate will be send with
 		// some delay.
 		//Otherwise this get send before return of the current request (ack).
+		//TODO: refine the terminate delay.
 		terminateBean.setTimeToSend(System.currentTimeMillis()
 				+ Sandesha2Constants.TERMINATE_DELAY);
 
@@ -276,8 +290,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		SenderBeanMgr retramsmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 
-		
-
 		retramsmitterMgr.insert(terminateBean);
 		
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
@@ -286,9 +298,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);
-		
-		
-
 	}
 	
 	private static long getNoOfMessagesAcked (Iterator ackRangeIterator) {
@@ -305,5 +314,4 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		
 		return noOfMsgs;
 	}
-
 }

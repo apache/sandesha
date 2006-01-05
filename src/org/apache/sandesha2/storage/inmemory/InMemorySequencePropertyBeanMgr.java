@@ -46,6 +46,13 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	public boolean delete(String sequenceId, String name) {
+		
+		SequencePropertyBean bean = retrieve( sequenceId,name);
+		
+		if (bean.getName().equals(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID)) {
+			int i=1;
+		}
+		
 		return table.remove(sequenceId + ":" + name) != null;
 	}
 
@@ -54,6 +61,9 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	public boolean insert(SequencePropertyBean bean) {
+		
+
+		
 		table.put(bean.getSequenceID() + ":" + bean.getName(), bean);
 		return true;
 	}

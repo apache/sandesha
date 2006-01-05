@@ -34,6 +34,8 @@ import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -69,6 +71,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private boolean letInvoke = false;
 
+	private Log log = LogFactory.getLog(getClass());
+	
 	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
 		//Processing for ack if any
@@ -81,8 +85,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		//Processing the application message.
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
-		if (msgCtx == null)
-			throw new SandeshaException("Message context is null");
+		if (msgCtx == null) {
+			String message = "Message context is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		if (rmMsgCtx
 				.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE) != null
@@ -115,8 +122,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
 				.getConfigurationContext();
-		if (configCtx == null)
-			throw new SandeshaException("Configuration Context is null");
+		if (configCtx == null) {
+			String message = "Configuration Context is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		//updating the last activated time of the sequence.
 		SequenceManager.updateLastActivatedTime(sequenceId,configCtx);
@@ -125,9 +135,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
 
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
-		if (msgNo == 0)
-			throw new SandeshaException("Wrong message number");
-
+		if (msgNo == 0) {
+			String message = "Wrong message number";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
+		
 		String messagesStr = (String) msgsBean.getValue();
 
 		if (msgNoPresentInList(messagesStr, msgNo)
@@ -135,9 +148,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 
-			//msgCtx.pause();
-			rmMsgCtx.getMessageContext().setPausedTrue(
-					new QName(Sandesha2Constants.IN_HANDLER_NAME));
+			rmMsgCtx.pause();
 
 		}
 
@@ -169,10 +180,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		boolean inOrderInvocation = PropertyManager.getInstance()
 				.isInOrderInvocation();
 		if (inOrderInvocation) {
+			
 			//pause the message
-			//msgCtx.pause();
-			rmMsgCtx.getMessageContext().setPausedTrue(
-					new QName(Sandesha2Constants.IN_HANDLER_NAME));
+			rmMsgCtx.pause();
+//			rmMsgCtx.getMessageContext().setPausedTrue(
+//					new QName(Sandesha2Constants.IN_HANDLER_NAME));
+			
 			SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
 					.retrieve(
 							Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
@@ -296,8 +309,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		AxisOperation ackOperation = null;
 
 		try {
-			ackOperation = AxisOperationFactory
-					.getOperetionDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
+			ackOperation = AxisOperationFactory.getOperationDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
 		} catch (AxisFault e) {
 			throw new SandeshaException("Could not create the Operation");
 		}

@@ -22,6 +22,8 @@ import java.util.Iterator;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -40,6 +42,8 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 public class AcknowledgementManager {
 
+	private static Log log = LogFactory.getLog(AcknowledgementManager.class);
+	
 	/**
 	 * Piggybacks any available acks of the same sequence to the given
 	 * application message.
@@ -63,9 +67,11 @@ public class AcknowledgementManager {
 
 		Sequence sequence = (Sequence) applicationRMMsgContext
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-		if (sequence == null)
-			throw new SandeshaException(
-					"Application message does not contain a sequence part");
+		if (sequence == null) {
+			String message = "Application message does not contain a sequence part";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 
@@ -73,8 +79,11 @@ public class AcknowledgementManager {
 				.retrieve(
 						sequenceId,
 						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-		if (internalSequenceBean == null)
-			throw new SandeshaException("Temp Sequence is not set");
+		if (internalSequenceBean == null) {
+			String message = "Temp Sequence is not set";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String internalSequenceId = (String) internalSequenceBean.getValue();
 		findBean.setInternalSequenceID(internalSequenceId);
@@ -89,7 +98,8 @@ public class AcknowledgementManager {
 			SenderBean ackBean = (SenderBean) it.next();
 
 			long timeNow = System.currentTimeMillis();
-			if (ackBean.getTimeToSend() > timeNow) { //Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
+			if (ackBean.getTimeToSend() > timeNow) { 
+				//Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
 
 				//deleting the ack entry.
 				retransmitterBeanMgr.delete(ackBean.getMessageID());
@@ -100,8 +110,11 @@ public class AcknowledgementManager {
 								.getMessageContextRefKey());
 				RMMsgContext ackRMMsgContext = MsgInitializer
 						.initializeMessage(ackMsgContext);
-				if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK)
-					throw new SandeshaException("Invalid ack message entry");
+				if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
+					String message = "Invalid ack message entry";
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
 
 				SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);

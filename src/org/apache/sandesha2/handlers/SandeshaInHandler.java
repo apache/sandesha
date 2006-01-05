@@ -22,22 +22,18 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
-import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
-import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * This is invoked in the inFlow of an RM endpoint. This is responsible for selecting an suitable
@@ -57,8 +53,11 @@ public class SandeshaInHandler extends AbstractHandler {
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 	
 		ConfigurationContext context = msgCtx.getConfigurationContext();
-		if (context == null)
-			throw new AxisFault("ConfigurationContext is null");
+		if (context == null) {
+			String message = "ConfigurationContext is null";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		String DONE = (String) msgCtx
 				.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
@@ -75,41 +74,36 @@ public class SandeshaInHandler extends AbstractHandler {
 		}
 
 		AxisService axisService = msgCtx.getAxisService();
-		if (axisService == null)
-			throw new AxisFault("AxisService is null");
+		if (axisService == null) {
+			String message = "AxisService is null";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		RMMsgContext rmMsgCtx = null;
 		try {
 			rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 		} catch (SandeshaException ex) {
-			throw new AxisFault("Cant initialize the message");
-		}
-
-		ServiceContext serviceContext = msgCtx.getServiceContext();
-		Object debug = null;
-		if (serviceContext != null) {
-			debug = msgCtx.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
-			if (debug != null && "on".equals(debug)) {
-				System.out.println("DEBUG: SandeshaInHandler got a '"
-						+ SandeshaUtil.getMessageTypeString(rmMsgCtx
-								.getMessageType()) + "' message.");
-			}
+			String message = "Cant initialize the message";
+			log.debug(message);
+			throw new AxisFault(message);
 		}
 
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());
 
-		if (msgProcessor == null)
-			throw new AxisFault("Cant find a suitable message processor");
+		if (msgProcessor == null) {
+			String message = "Cant find a suitable message processor";
+			log.debug(message);
+			throw new AxisFault(message);
+		}
 
 		try {
-			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getMessageContext().getConfigurationContext());
-
 			msgProcessor.processMessage(rmMsgCtx);
-			
 		} catch (SandeshaException se) {
-			se.printStackTrace();
-			throw new AxisFault("Error in processing the message");
+			String message = "Error in processing the message";
+			log.debug(message);
+			throw new AxisFault(message);
 		}
 
 	}

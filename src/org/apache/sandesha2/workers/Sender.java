@@ -22,12 +22,16 @@ import java.util.Iterator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.transport.TransportUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.Sandesha2ClientAPI;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
@@ -55,6 +59,8 @@ public class Sender extends Thread {
 	private boolean senderStarted = false;
 
 	private ConfigurationContext context = null;
+	
+	Log log = LogFactory.getLog(getClass());
 
 	public synchronized void stopSender() {
 		senderStarted = false;
@@ -72,16 +78,18 @@ public class Sender extends Thread {
 			storageManager = SandeshaUtil.getSandeshaStorageManager(context);
 		} catch (SandeshaException e2) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR: Could not start sender");
+			log.debug ("ERROR: Could not start sender");
 			e2.printStackTrace();
 			return;
 		}
 
 		while (senderStarted) {
 			try {
-				if (context == null)
-					throw new SandeshaException(
-							"Can't continue the Sender. Context is null");
+				if (context == null) {
+					String message = "Can't continue the Sender. Context is null";
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
 
 				Transaction pickMessagesToSendTransaction = storageManager.getTransaction(); //starting
 																			   // a
@@ -105,8 +113,7 @@ public class Sender extends Thread {
 					try {
 
 						if (msgCtx == null) {
-							System.out
-									.println("ERROR: Sender has an Unavailable Message entry");
+							log.debug ("ERROR: Sender has an Unavailable Message entry");
 							break;
 						}
 						RMMsgContext rmMsgCtx = MsgInitializer
@@ -114,21 +121,9 @@ public class Sender extends Thread {
 
 						updateMessage(msgCtx);
 
-						ServiceContext serviceContext = msgCtx
-								.getServiceContext();
-						Object debug = null;
-						if (serviceContext != null) {
-							debug = msgCtx
-									.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
-							if (debug != null && "on".equals(debug)) {
-								System.out
-										.println("DEBUG: Sender is sending a '"
-												+ SandeshaUtil
-														.getMessageTypeString(rmMsgCtx
-																.getMessageType())
-												+ "' message.");
-							}
-						}
+						
+						log.info("Sender is sending a '" + SandeshaUtil
+									.getMessageTypeString(rmMsgCtx.getMessageType()) + "' message.");
 						
 						Transaction preSendTransaction = storageManager.getTransaction();
 
@@ -145,34 +140,36 @@ public class Sender extends Thread {
 								//do time out processing.
 								
 								TerminateManager.terminateSendingSide(context,sequenceID);
-								throw new SandeshaException ("Sequence timed out");
+								String message = "Sequence timed out";
+								log.debug(message);
+								throw new SandeshaException (message);
 							}
 							
 							//piggybacking if an ack if available for the same
 							// sequence.
 							AcknowledgementManager
 									.piggybackAckIfPresent(rmMsgCtx);
-							
 						}
 						
 						preSendTransaction.commit();
 
 						try {
+							//every message should be resumed (pause==false) when sending
+							boolean paused = msgCtx.isPaused();
 							
 							AxisEngine engine = new AxisEngine(msgCtx
 									.getConfigurationContext());
-							engine.send(msgCtx);
-							//							if (msgCtx.isPaused())
-							//								engine.resumeSend(msgCtx);
-							//							else
-							//								engine.send(msgCtx);
-
+							if (paused) {
+								engine.resume(msgCtx);
+							}else  {
+								engine.send(msgCtx);
+							}
+							
 						} catch (Exception e) {
 							//Exception is sending. retry later
-							System.out
-									.println("Exception thrown in sending...");
-							e.printStackTrace();
-							//e.printStackTrace();
+							String message = "Exception thrown in sending...";
+							log.debug(message);
+							log.debug(e.getMessage());
 
 						}
 						
@@ -241,9 +238,9 @@ public class Sender extends Thread {
 				Thread.sleep(Sandesha2Constants.SENDER_SLEEP_TIME);
 			} catch (InterruptedException e1) {
 				//e1.printStackTrace();
-				System.out.println("Sender was interupted...");
-				e1.printStackTrace();
-				System.out.println("End printing Interrupt...");
+				log.debug("Sender was interupted...");
+				log.debug(e1.getMessage());
+				log.debug("End printing Interrupt...");
 			}
 		}
 
@@ -279,7 +276,9 @@ public class Sender extends Thread {
 			rmMsgCtx1.addSOAPEnvelope();
 
 		} catch (AxisFault e) {
-			throw new SandeshaException("Exception in updating contexts");
+			String message = "Exception in updating contexts";
+			log.debug(message);
+			throw new SandeshaException(message);
 		}
 
 	}
@@ -287,7 +286,54 @@ public class Sender extends Thread {
 	private void checkForSyncResponses(MessageContext msgCtx) {
 
 		try {
+			
 			boolean responsePresent = (msgCtx
+					.getProperty(MessageContext.TRANSPORT_IN) != null);
+			if (!responsePresent)
+				return;
+			
+			//we never expect sync responses. so we can freely create a new operation context for the incoming RM Specific message.
+	        // create the responseMessageContext
+	        MessageContext responseMessageContext = new MessageContext(msgCtx.getConfigurationContext(),
+	        		msgCtx.getSessionContext(), msgCtx.getTransportIn(),
+	        		msgCtx.getTransportOut());
+
+	        responseMessageContext.setProperty(MessageContext.TRANSPORT_IN,
+	        		msgCtx.getProperty(MessageContext.TRANSPORT_IN));
+	       // msgCtx.getAxisOperation().registerOperationContext(responseMessageContext, msgCtx.getOperationContext());
+	        responseMessageContext.setServerSide(false);
+	        responseMessageContext.setServiceContext(msgCtx.getServiceContext());
+	        responseMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
+
+	        //we never expect sync responses. so we can freely create a new operation context for the incoming RM Specific message.
+	        AxisOperation inOnlyOperation = AxisOperationFactory.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_IN_ONLY);
+	        inOnlyOperation.setRemainingPhasesInFlow(msgCtx.getAxisOperation().getRemainingPhasesInFlow());
+	        
+	        OperationContext inOnlyOperationContext = new OperationContext (inOnlyOperation);
+	        responseMessageContext.setAxisOperation(inOnlyOperation);
+	        responseMessageContext.setOperationContext(inOnlyOperationContext);
+	        
+	        // If request is REST we assume the responseMessageContext is REST, so set the variable
+	        responseMessageContext.setDoingREST(msgCtx.isDoingREST());
+
+	        SOAPEnvelope resenvelope = TransportUtils.createSOAPMessage(responseMessageContext,
+	        		msgCtx.getEnvelope().getNamespace().getName());
+
+	        if (resenvelope != null) {
+	            responseMessageContext.setEnvelope(resenvelope);
+	            AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
+	            engine.receive(responseMessageContext);
+	        } else {
+	        	String message = "Exception is Receiving message...";
+	        	log.debug(message);
+	            throw new AxisFault(message);
+	        }
+			
+			
+			
+			
+			
+			/*boolean responsePresent = (msgCtx
 					.getProperty(MessageContext.TRANSPORT_IN) != null);
 
 			if (responsePresent) {
@@ -311,34 +357,36 @@ public class Sender extends Thread {
 				response.setAxisService(msgCtx.getAxisService());
 				response.setAxisServiceGroup(msgCtx.getAxisServiceGroup());
 
+				
 				//setting the in-flow.
 				//ArrayList inPhaseHandlers =
 				// response.getAxisOperation().getRemainingPhasesInFlow();
-				/*
-				 * if (inPhaseHandlers==null || inPhaseHandlers.isEmpty()) {
-				 * ArrayList phases =
-				 * msgCtx.getSystemContext().getAxisConfiguration().getInPhasesUptoAndIncludingPostDispatch();
-				 * response.getAxisOperation().setRemainingPhasesInFlow(phases); }
-				 */
+				//
+				// if (inPhaseHandlers==null || inPhaseHandlers.isEmpty()) {
+				// ArrayList phases =
+				// msgCtx.getSystemContext().getAxisConfiguration().getInPhasesUptoAndIncludingPostDispatch();
+				// response.getAxisOperation().setRemainingPhasesInFlow(phases); }
+				//
 
 				//Changed following from TransportUtils to SandeshaUtil since
 				// op.
 				// context is anavailable.
 				SOAPEnvelope resenvelope = null;
-				resenvelope = SandeshaUtil.createSOAPMessage(response, msgCtx
-						.getEnvelope().getNamespace().getName());
+//				resenvelope = SandeshaUtil.createSOAPMessage(response, msgCtx
+//						.getEnvelope().getNamespace().getName());
 
+				resenvelope = TransportUtils.createSOAPMessage(response,msgCtx
+  						.getEnvelope().getNamespace().getName());
 				if (resenvelope != null) {
 					AxisEngine engine = new AxisEngine(msgCtx
 							.getConfigurationContext());
 					response.setEnvelope(resenvelope);
 					engine.receive(response);
 				}
-			}
+			} */
 
 		} catch (Exception e) {
-			System.out
-					.println("Exception was throws in processing the sync response...");
+			log.info("No valid Sync response...");
 		}
 	}
 

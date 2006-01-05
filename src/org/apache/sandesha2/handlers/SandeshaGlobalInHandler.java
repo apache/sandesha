@@ -31,9 +31,8 @@ import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.Sandesha2ClientAPI;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
@@ -83,24 +82,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		Object debug = null;
-		if (serviceContext != null) {
-			debug = msgContext.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
-			if (debug != null && "on".equals(debug)) {
-				System.out.println("DEBUG: SandeshaGlobalInHandler got a '"
-						+ SandeshaUtil.getMessageTypeString(rmMessageContext
-								.getMessageType()) + "' message.");
-			}
-		}
 
 		//Dropping duplicates
 		boolean dropped = dropIfDuplicate(rmMessageContext);
 		if (dropped) {
-			if (debug != null && "on".equals(debug)) {
-				System.out.println("DEBUG: SandeshaGlobalInHandler DROPPED a '"
-						+ SandeshaUtil.getMessageTypeString(rmMessageContext
-								.getMessageType()) + "' message.");
-			}
-
 			processDroppedMessage(rmMessageContext);
 			return;
 		}
@@ -152,7 +137,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							drop = true;
 						}
 					}
-					
 				}
 
 				if (drop == false) {
@@ -164,10 +148,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					}
 
 					if (emptyBody) {
-						boolean lastMessage = false;
 						if (sequence.getLastMessage() != null) {
-							System.out
-									.println("Empty Body Last Message Received");
+							log.info ("Empty Body LastMessage Received");
 							drop = true;
 
 							if (receivedMsgsBean == null) {
@@ -200,8 +182,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		}
 
 		if (drop) {
-			//rmMsgContext.getMessageContext().pause();
-			rmMsgContext.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
+			rmMsgContext.getMessageContext().pause();
 			return true;
 		}
 
@@ -229,8 +210,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			String receivedMsgStr = (String) receivedMsgsBean.getValue();
 
 			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
-			//Even though the duplicate message is dropped, hv to send the ack
-			// if needed.
+			//Even though the duplicate message is dropped, hv to send the ack if needed.
 			ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr);
 
 		}
@@ -240,9 +220,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			throws SandeshaException {
 		switch (rmMsgCtx.getMessageType()) {
 		case Sandesha2Constants.MessageTypes.ACK:
-			rmMsgCtx.setRelatesTo(null); //Removing the relatesTo part from
-		// ackMessageIf present.
-		//Some Frameworks tend to send this.
+			rmMsgCtx.setRelatesTo(null); 
+			//Removing the relatesTo part from ackMessageIf present. Some Frameworks tend to send this.
 		}
 	}
 

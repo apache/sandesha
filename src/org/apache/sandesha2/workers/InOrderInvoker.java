@@ -24,11 +24,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.sandesha2.Sandesha2ClientAPI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -52,6 +54,8 @@ public class InOrderInvoker extends Thread {
 	boolean invokerStarted = false;
 
 	ConfigurationContext context = null;
+	
+	Log log = LogFactory.getLog(getClass());
 
 	public synchronized void stopInvoker() {
 		invokerStarted = false;
@@ -78,9 +82,8 @@ public class InOrderInvoker extends Thread {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
-				System.out.println("Invoker was Inturrepted....");
-				ex.printStackTrace();
-				System.out.println("End printing Interrupt...");
+				log.debug("Invoker was Inturrepted....");
+				log.debug(ex.getMessage());
 			}
 
 			try {
@@ -142,27 +145,14 @@ public class InOrderInvoker extends Thread {
 
 						try {
 							//Invoking the message.
-							new AxisEngine(msgToInvoke.getConfigurationContext())
-									.receive(msgToInvoke);
-//							new AxisEngine (msgToInvoke.getConfigurationContext())
-//									.resumeReceive(msgToInvoke);
+//							new AxisEngine(msgToInvoke.getConfigurationContext())
+//									.receive(msgToInvoke);
+							new AxisEngine (msgToInvoke.getConfigurationContext())
+									.resume(msgToInvoke);
 							
-							ServiceContext serviceContext = msgToInvoke
-									.getServiceContext();
-							Object debug = null;
-							if (serviceContext != null) {
-								debug = msgToInvoke
-										.getProperty(Sandesha2ClientAPI.SANDESHA_DEBUG_MODE);
-								if (debug != null && "on".equals(debug)) {
-									System.out
-											.println("DEBUG: Invoker invoking a '"
-													+ SandeshaUtil
-															.getMessageTypeString(rmMsg
-																	.getMessageType())
-													+ "' message.");
-								}
-							}
-
+							log.info("Invoker invoking a '" + SandeshaUtil.getMessageTypeString(rmMsg
+												.getMessageType()) + "' message.");
+							
 							//deleting the message entry.
 							storageMapMgr.delete(key);
 

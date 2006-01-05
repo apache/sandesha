@@ -16,7 +16,6 @@
  */
 package org.apache.sandesha2.util;
 
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +24,9 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
@@ -39,21 +37,16 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.impl.llom.builder.StAXBuilder;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.SOAPHeader;
-import org.apache.axis2.soap.impl.llom.builder.StAXSOAPModelBuilder;
-import org.apache.axis2.soap.impl.llom.soap11.SOAP11Factory;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -79,6 +72,8 @@ public class SandeshaUtil {
 	private static Sender sender = new Sender();
 
 	private static InOrderInvoker invoker = new InOrderInvoker();
+	
+	private static Log log = LogFactory.getLog(SandeshaUtil.class);
 
 	/**
 	 * Create a new UUID.
@@ -159,7 +154,9 @@ public class SandeshaUtil {
 				long msgNo = Long.parseLong(temp);
 				msgNubers.add(new Long(msgNo));
 			} catch (Exception ex) {
-				throw new SandeshaException("Invalid msg number list");
+				String message = "Invalid msg number list";
+				log.debug(message);
+				throw new SandeshaException(message);
 			}
 		}
 
@@ -202,8 +199,11 @@ public class SandeshaUtil {
 	 */
 	public static String storeMessageContext(MessageContext ctx)
 			throws SandeshaException {
-		if (ctx == null)
-			throw new SandeshaException("Stored Msg Ctx is null");
+		if (ctx == null) {
+			String message = "Stored Msg Ctx is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String key = getUUID();
 		storedMsgContexts.put(key, ctx);
@@ -261,7 +261,7 @@ public class SandeshaUtil {
 		return false;
 	}
 
-	public static SOAPEnvelope createSOAPMessage(MessageContext msgContext,
+	/*public static SOAPEnvelope createSOAPMessage(MessageContext msgContext,
 			String soapNamespaceURI) throws AxisFault {
 		try {
 
@@ -310,7 +310,7 @@ public class SandeshaUtil {
 			throw new AxisFault(e);
 		}
 
-	}
+	}*/
 
 	public static String getMessageTypeString(int messageType) {
 		switch (messageType) {
@@ -409,7 +409,6 @@ public class SandeshaUtil {
 			return storageManager;
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new SandeshaException(e.getMessage());
 		}
 	}
@@ -467,6 +466,7 @@ public class SandeshaUtil {
 			return faultRMMsgCtx;
 
 		} catch (AxisFault e) {
+			log.debug(e.getMessage());
 			throw new SandeshaException(e.getMessage());
 		}
 	}
@@ -506,7 +506,7 @@ public class SandeshaUtil {
 				newMessageContext.setServiceContextID(referenceMessage
 						.getServiceContextID());
 			} else {
-				AxisService axisService = new AxisService (new QName ("AnonymousRMService")); //just a dummy name.
+				AxisService axisService = new AxisService ("AnonymousRMService"); //just a dummy name.
 				ServiceContext serviceContext = new ServiceContext (axisService,newMessageContext.getServiceGroupContext());
 				
 				newMessageContext.setAxisService(axisService);
@@ -530,26 +530,25 @@ public class SandeshaUtil {
 					.getTransportOut());
 
 			copyNecessaryPropertiesFromRelatedContext (referenceMessage,newMessageContext);
+			
 			//copying transport info.
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,
 					referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
-			newMessageContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
-					referenceMessage
-							.getProperty(HTTPConstants.HTTPOutTransportInfo));
 			newMessageContext.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN,
 					referenceMessage
 					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN));
 
-//			newMessageContext.setProperty(Constants.OUT_TRANSPORT_INFO,referenceMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
-//			newMessageContext.setProperty(MessageContext.TRANSPORT_HEADERS,referenceMessage.getProperty(MessageContext.TRANSPORT_HEADERS));
-//			newMessageContext.setProperty(MessageContext.TRANSPORT_IN,referenceMessage.getProperty(MessageContext.TRANSPORT_IN));
-//			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
-//			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
+			newMessageContext.setProperty(Constants.OUT_TRANSPORT_INFO,referenceMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
+			newMessageContext.setProperty(MessageContext.TRANSPORT_HEADERS,referenceMessage.getProperty(MessageContext.TRANSPORT_HEADERS));
+			newMessageContext.setProperty(MessageContext.TRANSPORT_IN,referenceMessage.getProperty(MessageContext.TRANSPORT_IN));
+			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
+			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
 			
 			
 			return newMessageContext;
 
 		} catch (AxisFault e) {
+			log.debug(e.getMessage());
 			throw new SandeshaException(e.getMessage());
 		}
 
@@ -563,13 +562,19 @@ public class SandeshaUtil {
 		if (str==null)
 			return new ArrayList ();
 		
-		if (str.length()<2)
-			throw new SandeshaException ("Invalid String array");
+		if (str.length()<2) {
+			String message = "Invalid String array";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
 		int length = str.length();
 		
-		if (str.charAt(0)!='[' || str.charAt(length-1)!=']')
-			throw new SandeshaException ("Invalid String array");
+		if (str.charAt(0)!='[' || str.charAt(length-1)!=']') {
+			String message = "Invalid String array";
+			log.debug(message);
+			throw new SandeshaException (message);
+		}
 		
 		ArrayList retArr = new ArrayList ();
 		

@@ -17,8 +17,17 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import org.apache.sandesha2.Sandesha2Constants;
+import java.util.Iterator;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.soap.SOAPFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -40,14 +49,6 @@ import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.soap.SOAPFactory;
-
-import java.util.Iterator;
-import javax.xml.namespace.QName;
 
 /**
  * Responsible for processing an incoming Create Sequence Response message.
@@ -56,6 +57,9 @@ import javax.xml.namespace.QName;
  */
 
 public class CreateSeqResponseMsgProcessor implements MsgProcessor {
+	
+	private Log log = LogFactory.getLog(getClass());
+	
 	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {
 
@@ -66,8 +70,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			.getMessageContext().getConfigurationContext();		
 		StorageManager storageManager = SandeshaUtil
 			.getSandeshaStorageManager(configCtx);
-		//Processing for ack if any
 		
+		//Processing for ack if available
 		Transaction ackProcessTransaction = storageManager.getTransaction();
 		
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) createSeqResponseRMMsgCtx
@@ -86,17 +90,22 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		CreateSequenceResponse createSeqResponsePart = (CreateSequenceResponse) createSeqResponseRMMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
-		if (createSeqResponsePart == null)
-			throw new SandeshaException("Create Sequence Response part is null");
+		if (createSeqResponsePart == null) {
+			String message = "Create Sequence Response part is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String newOutSequenceId = createSeqResponsePart.getIdentifier()
 				.getIdentifier();
-		if (newOutSequenceId == null)
-			throw new SandeshaException("New sequence Id is null");
+		if (newOutSequenceId == null) {
+			String message = "New sequence Id is null";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String createSeqMsgId = createSeqResponseRMMsgCtx.getMessageContext()
 				.getRelatesTo().getValue();
-
 
 
 		SenderBeanMgr retransmitterMgr = storageManager
@@ -104,12 +113,18 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
 		CreateSeqBean createSeqBean = createSeqMgr.retrieve(createSeqMsgId);
-		if (createSeqBean == null)
-			throw new SandeshaException("Create Sequence entry is not found");
+		if (createSeqBean == null) {
+			String message = "Create Sequence entry is not found";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		String internalSequenceId = createSeqBean.getInternalSequenceID();
-		if (internalSequenceId == null || "".equals(internalSequenceId))
-			throw new SandeshaException("TempSequenceId has is not set");
+		if (internalSequenceId == null || "".equals(internalSequenceId)) {
+			String message = "TempSequenceId has is not set";
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		//deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);
@@ -142,9 +157,11 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 							Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE);
 
 			//TODO this should be detected in the Fault manager.
-			if (offeredSequenceBean == null)
-				throw new SandeshaException(
-						"No offered sequence. But an accept was received");
+			if (offeredSequenceBean == null) {
+				String message = "No offered sequence. But an accept was received"; 
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
 
 			String offeredSequenceId = (String) offeredSequenceBean.getValue();
 
@@ -189,9 +206,11 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			Sequence sequencePart = (Sequence) applicaionRMMsg
 					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			if (sequencePart == null)
-				throw new SandeshaException("Sequence part is null");
-
+			if (sequencePart == null) {
+				String message = "Sequence part is null";
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
 			Identifier identifier = new Identifier(factory);
 			identifier.setIndentifer(newOutSequenceId);
 
@@ -210,7 +229,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			} catch (AxisFault e) {
 				throw new SandeshaException(e.getMessage());
 			}
-
+			
 			//asking to send the application msssage
 			tempBean.setSend(true);
 			retransmitterMgr.update(tempBean);
@@ -224,7 +243,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				.setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,
 						"false");
 
-		//createSeqResponseRMMsgCtx.getMessageContext().pause();
-		createSeqResponseRMMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
+		createSeqResponseRMMsgCtx.pause();
 	}
 }

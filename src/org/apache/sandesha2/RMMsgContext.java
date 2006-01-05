@@ -20,9 +20,6 @@ package org.apache.sandesha2;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
@@ -169,17 +166,6 @@ public class RMMsgContext {
 		}
 	}
 
-	public void serializeSOAPEnvelop() {
-		try {
-			SOAPEnvelope envelop = msgContext.getEnvelope();
-			XMLStreamWriter writer = XMLOutputFactory.newInstance()
-					.createXMLStreamWriter(System.out);
-			envelop.serialize(writer);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
 	public void setFrom(EndpointReference epr) {
 		msgContext.setFrom(epr);
 	}
@@ -240,5 +226,15 @@ public class RMMsgContext {
 
 	public void setSOAPAction(String SOAPAction) {
 		msgContext.setSoapAction(SOAPAction);
+	}
+	
+	public void pause () {
+		if (msgContext!=null)
+			msgContext.pause();
+	}
+	
+	public void setPaused (boolean pause) {
+		if (msgContext!=null)
+			msgContext.setPaused(pause);
 	}
 }

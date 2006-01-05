@@ -25,6 +25,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
@@ -50,22 +52,22 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 
 public class CreateSeqMsgProcessor implements MsgProcessor {
 
+	private Log log = LogFactory.getLog(getClass());
+	
 	public void processMessage(RMMsgContext createSeqRMMsg)
 			throws SandeshaException {
 
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
 		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-		if (createSeqPart == null)
-			throw new SandeshaException(
-					"No create sequence part is present in the create sequence message");
+		if (createSeqPart == null) {
+			String message = "No create sequence part is present in the create sequence message"; 
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
 
 		MessageContext outMessage = null;
-		try {
-			outMessage = Utils.createOutMessageContext(createSeqMsg);
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
+		outMessage = Utils.createOutMessageContext(createSeqMsg);
 		
 		ConfigurationContext context = createSeqRMMsg.getMessageContext()
 			.getConfigurationContext();
@@ -94,9 +96,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			Accept accept = createSeqResPart.getAccept();
 			if (accept != null) {
 				SequenceOffer offer = createSeqPart.getSequenceOffer();
-				if (offer == null)
-					throw new SandeshaException(
-							"Internal error - no offer for the response message with Accept");
+				if (offer == null) {
+					String message = "Internal error - no offer for the response message with Accept"; 
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
 
 				//Setting the CreateSequence table entry.
 				String incomingSeqId = createSeqResPart.getIdentifier()
@@ -105,11 +109,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				CreateSeqBean createSeqBean = new CreateSeqBean();
 				createSeqBean.setSequenceID(outSequenceId);
 				createSeqBean.setInternalSequenceID(newSequenceId);
-				createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); //this
-				// is a
-				// dummy
-				// value.
-
+				createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); //this is a dummy value.
 				
 				CreateSeqBeanMgr createSeqMgr = storageManager
 						.getCreateSeqBeanMgr();
@@ -142,23 +142,25 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 			CreateSequence createSeq = (CreateSequence) createSeqRMMsg
 					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-			if (createSeq == null)
-				throw new AxisFault(
-						"Create sequence part not present in the create sequence message");
+			if (createSeq == null) {
+				String message = "Create sequence part not present in the create sequence message";
+				log.debug(message);
+				throw new AxisFault(message);
+			}
 
 			EndpointReference acksTo = createSeq.getAcksTo().getAddress()
 					.getEpr();
 			if (acksTo == null || acksTo.getAddress() == null
-					|| acksTo.getAddress() == "")
-				throw new AxisFault(
-						"Acks to not present in the create sequence message");
+					|| acksTo.getAddress() == "") {
+				String message = "Acks to not present in the create sequence message";
+				log.debug(message);
+				throw new AxisFault(message);
+			}
 
 			SequencePropertyBean seqPropBean = new SequencePropertyBean(
 					newSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
 					acksTo.getAddress());
 
-//			StorageManager storageManager = SandeshaUtil
-//					.getSandeshaStorageManager(context);
 			SequencePropertyBeanMgr seqPropMgr = storageManager
 					.getSequencePropretyBeanMgr();
 			seqPropMgr.insert(seqPropBean);
@@ -175,8 +177,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			
 			SequencePropertyBean toBean = seqPropMgr.retrieve(newSequenceId,Sandesha2Constants.SequenceProperties.TO_EPR);
 			
-			if (toBean==null)
-				throw new SandeshaException ("Internal Error: wsa:To value is not set");
+			if (toBean==null) {
+				String message = "Internal Error: wsa:To value is not set";
+				log.debug(message);
+				throw new SandeshaException (message);
+			}
 			
 			EndpointReference toEPR = new EndpointReference (toBean.getValue());
 			
@@ -192,8 +197,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(e1.getMessage());
 		}
 
-		//createSeqMsg.pause();
-		createSeqRMMsg.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.IN_HANDLER_NAME));
+		createSeqRMMsg.pause();
 		
 		createSequenceTransaction.commit();
 	}
