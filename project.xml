@@ -136,7 +136,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2</artifactId>
-            <version>0.93</version>
+            <version>0.94-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -180,7 +180,31 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <artifactId>axis-wsdl4j</artifactId>
             <version>1.2-RC3</version>
         </dependency>
-        
+
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>ws-policy</artifactId>
+            <version>SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>annogen</groupId>
+            <artifactId>annogen</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>2.0_01_pd</version>
+        </dependency>
+                                        
     </dependencies>
 
 
