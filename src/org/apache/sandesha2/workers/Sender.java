@@ -294,9 +294,12 @@ public class Sender extends Thread {
 			
 			//we never expect sync responses. so we can freely create a new operation context for the incoming RM Specific message.
 	        // create the responseMessageContext
-	        MessageContext responseMessageContext = new MessageContext(msgCtx.getConfigurationContext(),
-	        		msgCtx.getSessionContext(), msgCtx.getTransportIn(),
-	        		msgCtx.getTransportOut());
+
+			MessageContext responseMessageContext = new MessageContext();
+			responseMessageContext.setConfigurationContext(msgCtx.getConfigurationContext());
+			responseMessageContext.setSessionContext(msgCtx.getSessionContext());
+			responseMessageContext.setTransportIn(msgCtx.getTransportIn());
+			responseMessageContext.setTransportOut(msgCtx.getTransportOut());
 
 	        responseMessageContext.setProperty(MessageContext.TRANSPORT_IN,
 	        		msgCtx.getProperty(MessageContext.TRANSPORT_IN));

@@ -77,7 +77,8 @@ public class SandeshaTestCase extends TestCase {
     private MessageContext getMessageContext() throws Exception{
         AxisConfiguration axisConfig = new AxisConfiguration ();
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
-        MessageContext msgCtx = new MessageContext(configCtx);
+        MessageContext msgCtx = new MessageContext();
+        msgCtx.setConfigurationContext(configCtx);
         return msgCtx;
 
     }

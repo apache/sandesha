@@ -340,7 +340,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//pausing the message
 		msgCtx.pause();
-		//rmMsgCtx.getMessageContext().setPausedTrue(new QName (Sandesha2Constants.OUT_HANDLER_NAME));
 		
 		transaction.commit();
 	}

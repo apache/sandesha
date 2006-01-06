@@ -481,7 +481,8 @@ public class SandeshaUtil {
 					.getConfigurationContext();
 			AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
 			
-			MessageContext newMessageContext = new MessageContext(configContext);
+			MessageContext newMessageContext = new MessageContext();
+			newMessageContext.setConfigurationContext(configContext);
 
 			if (referenceMessage.getAxisServiceGroup() != null) {
 				newMessageContext.setAxisServiceGroup(referenceMessage

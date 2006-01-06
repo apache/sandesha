@@ -300,7 +300,7 @@ public interface Sandesha2Constants {
 
 	String GLOBAL_IN_HANDLER_NAME = "GlobalInHandler";
 
-	String APPLICATION_PROCESSING_DONE = "AppProcessingDone";
+	String APPLICATION_PROCESSING_DONE = "Sandesha2AppProcessingDone";
 
 	String ACK_WRITTEN = "AckWritten";
 
@@ -317,8 +317,6 @@ public interface Sandesha2Constants {
 	String ACK_PROCSSED = "AckProcessed";
 
 	String RM_ENABLE_KEY = "RMEnabled";
-
-	//String STORAGE_MANAGER_IMPL = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 
 	int MAXIMUM_RETRANSMISSION_ATTEMPTS = 5;
 	
