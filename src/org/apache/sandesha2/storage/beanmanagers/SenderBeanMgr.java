@@ -19,7 +19,10 @@ package org.apache.sandesha2.storage.beanmanagers;
 
 import java.util.Collection;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
+import org.apache.sandesha2.storage.beans.InvokerBean;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
@@ -42,6 +45,8 @@ public interface SenderBeanMgr extends RMBeanManager {
 	public Collection find(SenderBean bean) throws SandeshaStorageException;
 
 	public Collection find(String internalSequenceID) throws SandeshaStorageException;
+	
+	public SenderBean findUnique (SenderBean bean) throws SandeshaException;
 	
 	public Collection findMsgsToSend() throws SandeshaStorageException;
 

@@ -51,33 +51,47 @@ import org.apache.sandesha2.wsrm.Sequence;
  */
 
 public class InOrderInvoker extends Thread {
-	boolean invokerStarted = false;
-
-	ConfigurationContext context = null;
+	
+	private boolean runInvoker = false;
+	//private boolean stopInvokerAfterWork = false;
+	private ArrayList workingSequences = new ArrayList();
+	
+	private ConfigurationContext context = null;
 	
 	Log log = LogFactory.getLog(getClass());
 
-	public synchronized void stopInvoker() {
-		invokerStarted = false;
+	public synchronized void stopInvokerForTheSequence(String sequenceID) {
+		workingSequences.remove(sequenceID);
+		if (workingSequences.size()==0) {
+			
+			//runInvoker = false;
+		}
 	}
 
 	public synchronized boolean isInvokerStarted() {
-		return invokerStarted;
+		return runInvoker;
 	}
 
 	public void setConfugurationContext(ConfigurationContext context) {
 		this.context = context;
 	}
 
-	public void start(ConfigurationContext context) {
-		invokerStarted = true;
-		this.context = context;
-		super.start();
+	public synchronized void runInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
+		
+		if (!workingSequences.contains(sequenceID))
+			workingSequences.add(sequenceID);
+		
+
+		if (!isInvokerStarted()) {
+			runInvoker = true;     //so that isSenderStarted()=true.
+			super.start();
+			this.context = context;
+		}
 	}
 
 	public void run() {
 
-		while (isInvokerStarted()) {
+		while (runInvoker) {
 
 			try {
 				Thread.sleep(1000);
@@ -99,30 +113,41 @@ public class InOrderInvoker extends Thread {
 						.getSequencePropretyBeanMgr();
 
 				//Getting the incomingSequenceIdList
-				SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) sequencePropMgr
+				SequencePropertyBean allSequencesBean = (SequencePropertyBean) sequencePropMgr
 						.retrieve(
 								Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
 								Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-				if (sequencePropertyBean == null)
+				if (allSequencesBean == null)
 					continue;
 
-				ArrayList seqPropList = SandeshaUtil.getArrayListFromString( sequencePropertyBean
+				ArrayList allSequencesList = SandeshaUtil.getArrayListFromString( allSequencesBean
 						.getValue());
-				Iterator seqPropIt = seqPropList.iterator();
+				Iterator allSequencesItr = allSequencesList.iterator();
 
-				currentIteration: while (seqPropIt.hasNext()) {
+				currentIteration: while (allSequencesItr.hasNext()) {
 
-					String sequenceId = (String) seqPropIt.next();
+					String sequenceId = (String) allSequencesItr.next();
 
 					NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
-					if (nextMsgBean == null)
-						throw new SandeshaException(
-								"Next message not set correctly");
+					if (nextMsgBean == null) {
+
+						String message = "Next message not set correctly. Removing invalid entry.";
+						log.debug(message);
+						allSequencesItr.remove();
+						
+						//cleaning the invalid data of the all sequences.
+						allSequencesBean.setValue(allSequencesList.toString());
+						sequencePropMgr.update(allSequencesBean);	
+						
+						throw new SandeshaException (message);
+					}
 
 					long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
-					if (nextMsgno <= 0)
-						throw new SandeshaException(
-								"Invalid messaage number for the nextMsgNo");
+					if (nextMsgno <= 0) { 
+						String message = "Invalid messaage number as the Next Message Number. Removing invalid entry";
+						
+						throw new SandeshaException(message);
+					}
 
 					Iterator stMapIt = storageMapMgr.find(
 							new InvokerBean(null, nextMsgno, sequenceId))
@@ -173,8 +198,10 @@ public class InOrderInvoker extends Thread {
 									.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 							if (sequence.getLastMessage() != null) {
 								
-								TerminateManager.terminateAfterInvocation(
+								TerminateManager.cleanReceivingSideAfterInvocation(
 										context, sequenceId);
+								//this sequence has no more invocations
+								stopInvokerForTheSequence(sequenceId);
 								
 								//exit from current iteration. (since an entry was removed)
 								break currentIteration;

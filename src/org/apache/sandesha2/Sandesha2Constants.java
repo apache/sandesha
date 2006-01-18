@@ -29,6 +29,7 @@ package org.apache.sandesha2;
 public interface Sandesha2Constants {
 
 	public interface WSRM {
+		
 		String NS_PREFIX_RM = "wsrm";
 
 		String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2005/02/rm";
@@ -151,7 +152,11 @@ public interface Sandesha2Constants {
 											   // sequenceId to share data b/w
 											   // sequences
 
-		String RECEIVED_MESSAGES = "SeqMsgListProperty";
+		//For incoming sequences this gives the msg no's of the messages that were
+		//received (may be an ack was sent - depending on the policy)
+		//For out going sequences this gives the messages that were sent and that were successfully
+		//acked by the other end point.
+		String COMPLETED_MESSAGES = "CompletedMessages";
 
 		String TO_EPR = "ToEPR";
 
@@ -276,6 +281,8 @@ public interface Sandesha2Constants {
 		
 		String InOrderInvocation = "InvokeInOrder";
 		
+		String MessageTypesToDrop = "MessageTypesToDrop";
+		
 		public interface DefaultValues {
 			
 			int RetransmissionInterval = 20000;
@@ -291,6 +298,8 @@ public interface Sandesha2Constants {
 			String StorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 		
 			boolean InvokeInOrder = true;
+			
+			String MessageTypesToDrop=VALUE_NONE;
 		}
 	}
 	
@@ -321,5 +330,9 @@ public interface Sandesha2Constants {
 	int MAXIMUM_RETRANSMISSION_ATTEMPTS = 5;
 	
 	String PROPERTY_FILE = "sandesha2.properties";
+	
+	String VALUE_NONE = "none";
+	
+	String SANDESHA2_INTERNAL_SEQUENCE_ID = "Sandesha2IntSeq";
 
 }

@@ -220,16 +220,22 @@ public class SandeshaUtil {
 		return (MessageContext) storedMsgContexts.get(key);
 	}
 
-	public static void startSenderIfStopped(ConfigurationContext context) {
-		if (!sender.isSenderStarted()) {
-			sender.start(context);
-		}
+	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) {
+		sender.runSenderForTheSequence (context,sequenceID);
 	}
 
-	public static void startInvokerIfStopped(ConfigurationContext context) {
+	public static void stopSenderForTheSequence(String sequenceID) {
+		sender.stopSenderForTheSequence (sequenceID);
+	}
+	
+	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
 		if (!invoker.isInvokerStarted()) {
-			invoker.start(context);
+			invoker.runInvokerForTheSequence(context,sequenceID);
 		}
+	}
+	
+	public static void stopInvokerForTheSequence(String sequenceID) {
+		invoker.stopInvokerForTheSequence (sequenceID);
 	}
 
 	public static boolean verifySequenceCompletion(Iterator ackRangesIterator,
@@ -363,15 +369,21 @@ public class SandeshaUtil {
 		return results;
 	}
 
-	public static String getServerSideIncomingSeqIdFromInternalSeqId(
-			String internalSequenceId) {
-		String incomingSequenceId = internalSequenceId;
+	public static String getServerSideIncomingSeqIdFromInternalSeqId (
+			String internalSequenceId) throws SandeshaException  {
+		
+		String startStr = Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":";
+		if (!internalSequenceId.startsWith(startStr)){
+			throw new SandeshaException ("Invalid internal sequence ID");
+		}
+		
+		String incomingSequenceId = internalSequenceId.substring(startStr.length());
 		return incomingSequenceId;
 	}
 
 	public static String getServerSideInternalSeqIdFromIncomingSeqId(
 			String incomingSequenceId) {
-		String internalSequenceId = incomingSequenceId;
+		String internalSequenceId =  Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":" + incomingSequenceId;
 		return internalSequenceId;
 	}
 
@@ -560,6 +572,7 @@ public class SandeshaUtil {
 	}
 	
 	public static ArrayList getArrayListFromString (String str) throws SandeshaException {
+		
 		if (str==null)
 			return new ArrayList ();
 		
@@ -581,11 +594,11 @@ public class SandeshaUtil {
 		
 		String subStr = str.substring(1,length-1);
 		
-		String[] sequenceIDs = subStr.split(",");
+		String[] parts = subStr.split(",");
 		
-		for (int i=0;i<sequenceIDs.length;i++) {
-			if (!"".equals(sequenceIDs[i]))
-				retArr.add(sequenceIDs[i]);
+		for (int i=0;i<parts.length;i++) {
+			if (!"".equals(parts[i]))
+				retArr.add(parts[i].trim());
 		}
 		
 		return retArr;
@@ -601,6 +614,10 @@ public class SandeshaUtil {
 		else 
 			return to + ":" +sequenceKey;
 	}
+	
+//	public static String getServerSideInternalSeqID (String incomingSeqId) {
+//		return (Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":" + incomingSeqId);
+//	}
 	
 	public static String getSequenceIDFromInternalSequenceID (String internalSequenceID, ConfigurationContext configurationContext)  throws SandeshaException {
 		

@@ -132,7 +132,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequenceManager.updateLastActivatedTime(sequenceId,configCtx);
 		
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
-				Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
+				Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
 
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo == 0) {
@@ -175,7 +175,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		InvokerBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
 
-		long nextMsgno = bean.getNextMsgNoToProcess();
+	//	long nextMsgno = bean.getNextMsgNoToProcess();
 
 		boolean inOrderInvocation = PropertyManager.getInstance()
 				.isInOrderInvocation();
@@ -235,7 +235,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			//Starting the invoker if stopped.
 			SandeshaUtil
-					.startInvokerIfStopped(msgCtx.getConfigurationContext());
+					.startInvokerForTheSequence(msgCtx.getConfigurationContext(),sequenceId);
 
 		}
 
@@ -431,7 +431,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			asyncAckTransaction.commit();
 
-			SandeshaUtil.startSenderIfStopped(configCtx);
+			SandeshaUtil.startSenderForTheSequence(configCtx,sequenceId);
 		}
 
 	}

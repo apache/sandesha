@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.util;
 
+import java.util.ArrayList;
+
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
@@ -30,6 +32,7 @@ public class SandeshaPropertyBean {
 	RMPolicyBean policyBean = new RMPolicyBean ();
 	String storageManagerClass = null;
 	boolean inOrder = true;
+	ArrayList msgTypesToDrop = null;
     
     public long getInactiveTimeoutInterval() {
         return policyBean.getInactiveTimeoutInterval();
@@ -99,4 +102,24 @@ public class SandeshaPropertyBean {
 	public void setInOrder(boolean inOrder) {
 		this.inOrder = inOrder;
 	}
+
+	public ArrayList getMsgTypesToDrop() {
+		return msgTypesToDrop;
+	}
+
+	public void setMsgTypesToDrop(ArrayList msgTypesToDrop) {
+		this.msgTypesToDrop = msgTypesToDrop;
+	}
+	
+	public void addMsgTypeToDrop (Integer typeNo) {
+		
+		if (typeNo!=null) {
+			if (msgTypesToDrop==null) 
+				msgTypesToDrop = new ArrayList ();
+			
+			msgTypesToDrop.add(typeNo);
+		}
+	}
+	
+	
 }

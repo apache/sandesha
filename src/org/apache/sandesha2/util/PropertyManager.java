@@ -19,11 +19,14 @@ package org.apache.sandesha2.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
@@ -82,7 +85,7 @@ public class PropertyManager {
 		loadInactivityTimeout(properties);
 		loadStoragemanagerClass(properties);
 		loadInOrderInvocation (properties);
-		
+		loadMessageTypesToDrop (properties);
 	}
 	
 	/**
@@ -239,6 +242,35 @@ public class PropertyManager {
 		
 	}
 	
+	private void loadMessageTypesToDrop (Properties properties) {
+		String messageTypesToDrop = properties.getProperty(Sandesha2Constants.Properties.MessageTypesToDrop);
+		boolean loaded=false;
+		
+		try {
+			if (messageTypesToDrop!=null && !Sandesha2Constants.VALUE_NONE.equals(messageTypesToDrop)) {
+				messageTypesToDrop = messageTypesToDrop.trim();
+				messageTypesToDrop = "[" + messageTypesToDrop + "]";
+				ArrayList messageTypesLst =  SandeshaUtil.getArrayListFromString(messageTypesToDrop);
+				
+				Iterator itr = messageTypesLst.iterator();
+				while (itr.hasNext()) {
+					String typeStr = (String) itr.next();
+					Integer typeNo = new Integer (typeStr);
+					propertyBean.addMsgTypeToDrop(typeNo);
+				}
+			}
+			
+		} catch (SandeshaException e) {
+			log.error(e.getMessage());
+		} catch (NumberFormatException e) {
+			String message = "Property '" + Sandesha2Constants.Properties.MessageTypesToDrop + "' contains an invalid value.";
+			log.error(message);
+			log.error(e.getMessage());
+		}
+		
+		
+	}
+	
 	
 	
 	public boolean isExponentialBackoff () {
@@ -268,6 +300,10 @@ public class PropertyManager {
 	
 	public boolean isInOrderInvocation () {
 		return propertyBean.isInOrder();
+	}
+	
+	public ArrayList getMessagesNotToSend () {
+		return propertyBean.getMsgTypesToDrop();
 	}
 	
 }

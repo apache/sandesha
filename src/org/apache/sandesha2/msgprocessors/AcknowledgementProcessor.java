@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -124,6 +125,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		Collection retransmitterEntriesOfSequence = retransmitterMgr
 				.find(input);
 
+		ArrayList ackedMessagesList = new ArrayList ();
 		while (ackRangeIterator.hasNext()) {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator
 					.next();
@@ -135,6 +137,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 						retransmitterEntriesOfSequence, messageNo);
 				if (retransmitterBean != null)
 					retransmitterMgr.delete(retransmitterBean.getMessageID());
+				
+				ackedMessagesList.add(new Long (messageNo));
 			}
 		}
 
@@ -149,23 +153,37 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//setting acked message date.
 		//TODO add details specific to each message.
 		long noOfMsgsAcked = getNoOfMessagesAcked(sequenceAck.getAcknowledgementRanges().iterator());
-		SequencePropertyBean ackedMessagesBean = seqPropMgr.retrieve(outSequenceId,Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
+		SequencePropertyBean noOfMsgsAckedBean = seqPropMgr.retrieve(outSequenceId,Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		boolean added = false;
 		
-		if (ackedMessagesBean==null) {
+		if (noOfMsgsAckedBean==null) {
 			added = true;
-			ackedMessagesBean = new SequencePropertyBean ();
-			ackedMessagesBean.setSequenceID(outSequenceId);
-			ackedMessagesBean.setName(Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
+			noOfMsgsAckedBean = new SequencePropertyBean ();
+			noOfMsgsAckedBean.setSequenceID(outSequenceId);
+			noOfMsgsAckedBean.setName(Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		}
 		
-		ackedMessagesBean.setValue(Long.toString(noOfMsgsAcked));
+		noOfMsgsAckedBean.setValue(Long.toString(noOfMsgsAcked));
 		
 		if (added) 
-			seqPropMgr.insert(ackedMessagesBean);
+			seqPropMgr.insert(noOfMsgsAckedBean);
 		else
-			seqPropMgr.update(ackedMessagesBean);
+			seqPropMgr.update(noOfMsgsAckedBean);
 		
+		
+		//setting the completed_messages list. This gives all the messages of the sequence that were acked.
+		SequencePropertyBean allCompletedMsgsBean = seqPropMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+		if (allCompletedMsgsBean==null) {
+			allCompletedMsgsBean = new SequencePropertyBean ();
+			allCompletedMsgsBean.setSequenceID(internalSequenceId);
+			allCompletedMsgsBean.setName(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+			
+			seqPropMgr.insert(allCompletedMsgsBean);
+		}
+				
+		String str = ackedMessagesList.toString();
+		allCompletedMsgsBean.setValue(str);
+		seqPropMgr.update(allCompletedMsgsBean);
 		
 		//If all messages up to last message have been acknowledged. Add terminate Sequence message.
 		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
@@ -185,13 +203,19 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				throw new SandeshaException(message);
 			}
 
+
+			//commiting transaction
+			ackTransaction.commit();
+
 			boolean complete = SandeshaUtil.verifySequenceCompletion(
 					sequenceAck.getAcknowledgementRanges().iterator(),
 					lastOutMessageNo);
-
+			
 			if (complete) {
+				Transaction terminateTransaction = storageManager.getTransaction();
 				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,
 						internalSequenceId);
+				terminateTransaction.commit();
 			}
 		}
 		
@@ -199,8 +223,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		//stopping the progress of the message further.
 		rmMsgCtx.pause();	
 		
-		//commiting transaction
-		ackTransaction.commit();
+
 	}
 
 	private SenderBean getRetransmitterEntry(Collection collection,

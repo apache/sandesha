@@ -16,10 +16,17 @@
  */
 package org.apache.sandesha2.workers;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -41,6 +48,7 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -56,18 +64,23 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class Sender extends Thread {
 
-	private boolean senderStarted = false;
-
+	private boolean runSender = false;
+	private boolean stopSenderAfterWork = false;
+	private ArrayList workingSequences = new ArrayList();
+	
 	private ConfigurationContext context = null;
 	
 	Log log = LogFactory.getLog(getClass());
 
-	public synchronized void stopSender() {
-		senderStarted = false;
+	public synchronized void stopSenderForTheSequence(String sequenceID) {
+		workingSequences.remove(sequenceID);
+		if (workingSequences.size()==0) {
+			//stopSenderAfterWork = true;
+		}
 	}
 
 	public synchronized boolean isSenderStarted() {
-		return senderStarted;
+		return runSender;
 	}
 
 	public void run() {
@@ -82,8 +95,10 @@ public class Sender extends Thread {
 			e2.printStackTrace();
 			return;
 		}
-
-		while (senderStarted) {
+		
+		while (runSender) {
+			
+			
 			try {
 				if (context == null) {
 					String message = "Can't continue the Sender. Context is null";
@@ -98,7 +113,12 @@ public class Sender extends Thread {
 
 				SenderBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
 				Collection coll = mgr.findMsgsToSend();
-
+				if (coll.size()==0 && stopSenderAfterWork) {
+					runSender = false;
+					pickMessagesToSendTransaction.commit();
+					continue;
+				}
+				
 				pickMessagesToSendTransaction.commit();
 				
 				Iterator iter = coll.iterator();
@@ -116,9 +136,16 @@ public class Sender extends Thread {
 							log.debug ("ERROR: Sender has an Unavailable Message entry");
 							break;
 						}
+												
 						RMMsgContext rmMsgCtx = MsgInitializer
 								.initializeMessage(msgCtx);
 
+						//skip sending if this message has been mentioned as a message not to send (within sandesha2.properties)
+						ArrayList msgsNotToSend = PropertyManager.getInstance().getMessagesNotToSend();
+						if (msgsNotToSend!=null && msgsNotToSend.contains(new Integer (rmMsgCtx.getMessageType()))) {
+							continue;
+						}
+						
 						updateMessage(msgCtx);
 
 						
@@ -151,11 +178,14 @@ public class Sender extends Thread {
 									.piggybackAckIfPresent(rmMsgCtx);
 						}
 						
-						preSendTransaction.commit();
 
+						
+						preSendTransaction.commit();
+						
 						try {
 							//every message should be resumed (pause==false) when sending
 							boolean paused = msgCtx.isPaused();
+							
 							
 							AxisEngine engine = new AxisEngine(msgCtx
 									.getConfigurationContext());
@@ -218,6 +248,13 @@ public class Sender extends Thread {
 
 							TerminateManager.terminateSendingSide(
 									configContext, sequenceID);
+							
+							//removing a entry from the Listener
+							String transport = msgCtx.getTransportOut().getName().getLocalPart();
+							
+							
+							//TODO complete below. Need a more eligent method which finishes the current message before ending.
+							//ListenerManager.stop(configContext,transport);
 						}
 
 						terminateCleaningTransaction.commit();
@@ -264,22 +301,29 @@ public class Sender extends Thread {
 		return true;
 	}
 
-	public void start(ConfigurationContext context) {
-		senderStarted = true;
-		this.context = context;
-		super.start();
+	public synchronized void runSenderForTheSequence(ConfigurationContext context, String sequenceID) {
+		
+		if (!workingSequences.contains(sequenceID))
+			workingSequences.add(sequenceID);
+		
+
+		if (!isSenderStarted()) {
+			runSender = true;     //so that isSenderStarted()=true.
+			super.start();
+			this.context = context;
+		}
 	}
 
 	private void updateMessage(MessageContext msgCtx1) throws SandeshaException {
-		try {
-			RMMsgContext rmMsgCtx1 = MsgInitializer.initializeMessage(msgCtx1);
-			rmMsgCtx1.addSOAPEnvelope();
-
-		} catch (AxisFault e) {
-			String message = "Exception in updating contexts";
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
+//		try {
+//			RMMsgContext rmMsgCtx1 = MsgInitializer.initializeMessage(msgCtx1);
+//			rmMsgCtx1.addSOAPEnvelope();
+//
+//		} catch (AxisFault e) {
+//			String message = "Exception in updating contexts";
+//			log.debug(message);
+//			throw new SandeshaException(message);
+//		}
 
 	}
 

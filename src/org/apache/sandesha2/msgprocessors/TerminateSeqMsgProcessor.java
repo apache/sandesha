@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
@@ -88,7 +90,21 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		Transaction terminateTransaction = storageManager.getTransaction();
 		
-		TerminateManager.terminateReceivingSide(context,sequenceId);
+		TerminateManager.cleanReceivingSideOnTerminateMessage(context,sequenceId);
+		SandeshaUtil.stopSenderForTheSequence(sequenceId);
+		
+		//removing an entry from the listener
+		String transport = terminateSeqMsg.getTransportIn().getName().getLocalPart();
+//		try {
+			//This will throw an exception in the server side. //TODO find a better method.
+			//TODO : following causes the SAS to stop withot returning 202. find a better method or correct this
+			//ListenerManager.stop(context, transport);
+//		} catch (AxisFault e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			String message = "Cant stop listener...";
+//			log.debug(message);
+//		}
 		
 		terminateTransaction.commit(); 
 		

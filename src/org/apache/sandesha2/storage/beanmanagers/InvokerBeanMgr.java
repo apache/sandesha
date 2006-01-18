@@ -19,6 +19,7 @@ package org.apache.sandesha2.storage.beanmanagers;
 
 import java.util.Collection;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 
@@ -41,6 +42,8 @@ public interface InvokerBeanMgr extends RMBeanManager {
 
 	public Collection find(InvokerBean bean) throws SandeshaStorageException;
 
+	public InvokerBean findUnique (InvokerBean bean) throws SandeshaException;
+	
 	public boolean update(InvokerBean bean) throws SandeshaStorageException;
 
 }

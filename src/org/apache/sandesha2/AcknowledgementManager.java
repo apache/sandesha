@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -125,5 +126,34 @@ public class AcknowledgementManager {
 				applicationRMMsgContext.addSOAPEnvelope();
 			}
 		}
+	}
+	
+	/**this is used to get the acked messages of a sequence. If this is an outgoing message the sequenceIdentifier should
+	 * be the internal sequenceID.
+	 * 
+	 * @param sequenceIdentifier
+	 * @param outGoingMessage
+	 * @return
+	 */
+	public static ArrayList getCompletedMessagesList (String sequenceIdentifier,ConfigurationContext configurationContext) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBean completedMessagesBean = sequencePropertyBeanMgr.retrieve(sequenceIdentifier,Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+		
+		ArrayList completedMsgList = null;
+		if (completedMessagesBean!=null) {
+			completedMsgList = SandeshaUtil.getArrayListFromString(completedMessagesBean.getValue());
+		}
+		
+		return completedMsgList;
+	}
+	
+	public static void sendSyncAck () {
+		
+	}
+	
+	public static void sendAsyncAck () {
+		
 	}
 }

@@ -23,7 +23,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
@@ -34,7 +37,9 @@ import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 
+	Log log = LogFactory.getLog(getClass());
 	private Hashtable table = null;
+	
 
 	public InMemoryCreateSeqBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
@@ -102,6 +107,21 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 
 	public ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not supported");
+	}
+	
+	public CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException {
+		Collection coll = find(bean);
+		if (coll.size()>1) {
+			String message = "Non-Unique result";
+			log.error(message);
+			throw new SandeshaException (message);
+		}
+		
+		Iterator iter = coll.iterator();
+		if (iter.hasNext())
+			return (CreateSeqBean) iter.next();
+		else 
+			return null;
 	}
 
 }

@@ -6,11 +6,13 @@
  */
 package org.apache.sandesha2.util;
 
+import java.net.BindException;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
@@ -71,11 +73,11 @@ public class SequenceManager {
 		}
 
 		StorageManager storageManager = null;
-
+		ConfigurationContext configurationContext = createSequenceMsg.getMessageContext()
+									.getConfigurationContext();
 		try {
 			storageManager = SandeshaUtil
-					.getSandeshaStorageManager(createSequenceMsg
-							.getMessageContext().getConfigurationContext());
+					.getSandeshaStorageManager(configurationContext);
 		} catch (SandeshaException e) {
 			e.printStackTrace();
 		}
@@ -84,7 +86,7 @@ public class SequenceManager {
 				.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
-				sequenceId, Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES, "");
+				sequenceId, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES, "");
 		
 		//If no replyTo value. Send responses as sync.
 		SequencePropertyBean toBean = null;
@@ -112,6 +114,21 @@ public class SequenceManager {
 		nextMsgMgr.insert(new NextMsgBean(sequenceId, 1)); // 1 will be the next
 		// message to invoke. This will apply for only in-order invocations.
 
+		
+		SandeshaUtil.startSenderForTheSequence(configurationContext,sequenceId);
+		
+		//Adding another entry to the ListnerManager to wait till the terminate sequence message.
+		String transport = createSequenceMsg.getMessageContext().getTransportIn().getName().getLocalPart();
+		
+		
+		//Only the client side should call below.
+//		try {
+//			//An bind method is thrown when this is done in the server side. TODO find a better method to do this.
+//			ListenerManager.makeSureStarted(transport,configurationContext);
+//		} catch (AxisFault ex) {
+//			log.info("Counght exception when starting listner. Possible server side start.");
+//		}
+		
 		updateLastActivatedTime(sequenceId,createSequenceMsg.getMessageContext().getConfigurationContext());
 		
 		return sequenceId;
@@ -124,10 +141,12 @@ public class SequenceManager {
 	public static void setupNewClientSequence(
 			MessageContext firstAplicationMsgCtx, String internalSequenceId)
 			throws SandeshaException {
+		
+		ConfigurationContext configurationContext = firstAplicationMsgCtx
+										.getConfigurationContext();
 
 		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(firstAplicationMsgCtx
-						.getConfigurationContext());
+				.getSandeshaStorageManager(configurationContext);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
@@ -167,12 +186,31 @@ public class SequenceManager {
 			seqPropMgr.insert(transportToBean);
 		}
 
+
+		SandeshaUtil.startSenderForTheSequence(configurationContext,internalSequenceId);
+		
 	}
 	
+	/**
+	 * Takes the internalSeqID as the param. Not the sequenceID.
+	 * @param internalSequenceID
+	 * @param configContext
+	 * @throws SandeshaException
+	 */
 	public static void updateLastActivatedTime (String sequenceID, ConfigurationContext configContext) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		Transaction lastActivatedTransaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+//		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID,null);
+//		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.findUnique(internalSequenceFindBean);
+//		if (internalSequenceBean==null) {
+//			String message = "InternalSequenceBean is not set";
+//			log.error(message);
+//			throw new SandeshaException (message);
+//		}
+//		
+//		String internalSequenceID = internalSequenceBean.getValue();
 		SequencePropertyBean lastActivatedBean = sequencePropertyBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
 		
 		boolean added = false;
@@ -194,6 +232,7 @@ public class SequenceManager {
 		
 		lastActivatedTransaction.commit();
 	}
+	
 	
 	public static long getLastActivatedTime (String sequenceID, ConfigurationContext configContext) throws SandeshaException {
 		
@@ -314,7 +353,7 @@ public class SequenceManager {
 		Transaction transaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		
-		SequencePropertyBean receivedMsgsBean = seqPropBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
+		SequencePropertyBean receivedMsgsBean = seqPropBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
 		
 		//we should be able to assume that all the received messages has been acked.
 		String receivedMsgsStr = receivedMsgsBean.getValue();

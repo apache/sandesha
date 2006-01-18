@@ -35,7 +35,30 @@ public class SandeshaModule implements Module {
 
 	// initialize the module
 	public void init(AxisConfiguration axisSystem) throws AxisFault {
-		cleanStorage (axisSystem);
+		ConfigurationContext configurationContext = new ConfigurationContext (axisSystem);
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		
+	//	cleanStorage (storageManager);
+		
+		ConfigurationContext configCtx = null;
+		//continueUncompletedSequences (storageManager,configCtx);
+	}
+	
+	private void continueUncompletedSequences (StorageManager storageManager,ConfigurationContext configCtx) {
+		//server side continues
+		//SandeshaUtil.startInvokerIfStopped(configCtx);
+		
+		//server side re-injections
+		
+		//reinject everything that has been acked within the in-handler but have not been invoked.
+		
+		
+		//client side continues
+		//SandeshaUtil.startSenderIfStopped(configCtx);
+		
+		//client side re-injections
+		
+		
 	}
 
 	// shutdown the module
@@ -43,12 +66,23 @@ public class SandeshaModule implements Module {
 
 	}
 	
-	private void cleanStorage (AxisConfiguration axisSystem) throws AxisFault {
-		
-		ConfigurationContext configurationContext = new ConfigurationContext (axisSystem);
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+	//Removing data of uncontinuuable sequences so that the sandesha2 system will not be confused
+	private void cleanStorage (StorageManager storageManager) throws AxisFault {
 		
 		storageManager.initStorage();
+		
+		//server side cleaning
+		
+		//cleaning NextMsgData
+		//Cleaning InvokerData
+		
+		
+		//client side cleaning
+		
+		//cleaning RetransmitterData
+		//cleaning CreateSequenceData
+		
+		//cleaning sequence properties
 		
 	}
 	

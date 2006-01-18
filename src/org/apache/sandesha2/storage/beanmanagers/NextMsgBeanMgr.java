@@ -19,7 +19,9 @@ package org.apache.sandesha2.storage.beanmanagers;
 
 import java.util.Collection;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 
 /**
@@ -42,6 +44,8 @@ public interface NextMsgBeanMgr extends RMBeanManager {
 	public Collection find(NextMsgBean bean) throws SandeshaStorageException;
 
 	public boolean update(NextMsgBean bean) throws SandeshaStorageException;
+	
+	public NextMsgBean findUnique (NextMsgBean bean) throws SandeshaException;
 
 	public Collection retrieveAll();
 }

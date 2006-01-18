@@ -112,9 +112,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			return;
 		}
 
-		//Strating the sender.
-		SandeshaUtil.startSenderIfStopped(context);
-
 		//Adding the policy bean
 		RMPolicyBean policyBean = RMPolicyManager.getPolicyBean(rmMsgCtx);
 		rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, policyBean);
@@ -161,7 +158,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				throw new SandeshaException(message);
 			}
 
-			internalSequenceId = incomingSeqId;
+			internalSequenceId = SandeshaUtil.getServerSideInternalSeqIdFromIncomingSeqId ( incomingSeqId);
 
 		} else {
 			//set the internal sequence id for the client side.
@@ -181,6 +178,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		}
 
+		//Strating the sender.
+		//SandeshaUtil.startSenderForTheSequence(context,internalSequenceId);
+
 		
 		//check if the first message
 
@@ -192,16 +192,27 @@ public class SandeshaOutHandler extends AbstractHandler {
 				internalSequenceId,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 
+		//setting async ack endpoint for the server side. (if present)
+		if (serverSide) {
+			String incomingSequenceID = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
+			SequencePropertyBean incomingToBean = seqPropMgr.retrieve(incomingSequenceID,Sandesha2Constants.SequenceProperties.TO_EPR);
+			if (incomingToBean!=null) {
+				String incomingTo = incomingToBean.getValue();
+				msgCtx.setProperty(Sandesha2ClientAPI.AcksTo,incomingTo);
+			}
+		}
+		
 		if (messageNumber == 1) {
 			if (outSeqBean == null) {
 				sendCreateSequence = true;
 			}
-		}
-
-		//if fist message - setup the sequence for the client side
-		if (!serverSide && sendCreateSequence) {
+			
+			//if fist message - setup the sending side sequence - both for the server and the client sides
+			//if (!serverSide && sendCreateSequence) {
 			SequenceManager.setupNewClientSequence(msgCtx, internalSequenceId);
 		}
+
+
 
 		//if first message - add create sequence
 		if (sendCreateSequence) {
@@ -249,7 +260,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 							.getProperty(MessageContext.TRANSPORT_IN);
 					if (transportIn == null)
 						transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
-					ListenerManager.makeSureStarted(transportIn, context);
+					
+					//For receiving async Ack messages.
+//					try {
+						ListenerManager.makeSureStarted(transportIn, context);
+//					} catch (AxisFault e) {
+//						log.debug("Could not start listener...");
+//						log.debug(e.getStackTrace());
+//					}
+					
 				} else if (acksTo == null && serverSide) {
 					String incomingSequencId = SandeshaUtil
 							.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
@@ -370,7 +389,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			String offeredSequenceId = offer.getIdentifer().getIdentifier();
 			SequencePropertyBean msgsBean = new SequencePropertyBean();
 			msgsBean.setSequenceID(offeredSequenceId);
-			msgsBean.setName(Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
+			msgsBean.setName(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
 			msgsBean.setValue("");
 
 			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean();

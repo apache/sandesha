@@ -19,18 +19,27 @@ package org.apache.sandesha2;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.InvokerBean;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
@@ -42,6 +51,10 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class TerminateManager {
 
+	private static String CLEANED_ON_TERMINATE_MSG = "CleanedOnTerminateMsg";
+	private static String CLEANED_AFTER_INVOCATION = "CleanedAfterInvocation";
+	
+	public static HashMap receivingSideCleanMap = new HashMap ();
 	/**
 	 * Called by the receiving side to remove data related to a sequence.
 	 * e.g. After sending the TerminateSequence message. Calling this methods will complete all
@@ -51,8 +64,63 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void terminateReceivingSide (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
-		/*StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+	public static void cleanReceivingSideOnTerminateMessage (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+
+		//clean senderMap
+		
+		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
+		if(!inOrderInvocation) { 
+			//there is no invoking by Sandesha2. So clean invocations storages.
+			cleanReceivingSideAfterInvocation(configContext,sequenceID);
+		}
+
+		String cleanStatus = (String) receivingSideCleanMap.get(sequenceID);
+		if (cleanStatus!=null && CLEANED_AFTER_INVOCATION.equals(cleanStatus))
+			completeTerminationOfReceivingSide(configContext,sequenceID);
+		else {
+			receivingSideCleanMap.put(sequenceID,CLEANED_ON_TERMINATE_MSG);
+		}
+	}
+	
+	/**
+	 * When InOrder invocation is anabled this had to be called to clean the data left by the 
+	 * above method. This had to be called after the Invocation of the Last Message.
+	 * 
+	 * @param configContext
+	 * @param sequenceID
+	 * @throws SandeshaException
+	 */
+	public static void cleanReceivingSideAfterInvocation (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
+				
+		//removing storageMap entries
+		InvokerBean findStorageMapBean = new InvokerBean ();
+		findStorageMapBean.setSequenceID(sequenceID);
+		findStorageMapBean.setInvoked(true);
+		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
+		Iterator iterator = collection.iterator();
+		while (iterator.hasNext()) {
+			InvokerBean storageMapBean = (InvokerBean) iterator.next();
+			storageMapBeanMgr.delete(storageMapBean.getMessageContextRefKey());
+		}
+		
+		String cleanStatus = (String) receivingSideCleanMap.get(sequenceID);
+		if (cleanStatus!=null && CLEANED_ON_TERMINATE_MSG.equals(cleanStatus))
+			completeTerminationOfReceivingSide(configContext,sequenceID);
+		else {
+			receivingSideCleanMap.put(sequenceID,CLEANED_AFTER_INVOCATION);
+		}
+	}
+	
+	/**
+	 * This has to be called by the lastly invocated one of the above two methods.
+	 *
+	 */
+	private static void completeTerminationOfReceivingSide (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
 		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
 		
 		//removing nextMsgMgr entries
@@ -65,40 +133,9 @@ public class TerminateManager {
 			nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
 		}
 		
-		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
-		if(!inOrderInvocation) { 
-			terminateAfterInvocation(configContext,sequenceID);
-		}*/
-
-	}
-	
-	/**
-	 * When InOrder invocation is anabled this had to be called to clean the data left by the 
-	 * above method. This had to be called after the Invocation of the Last Message.
-	 * 
-	 * @param configContext
-	 * @param sequenceID
-	 * @throws SandeshaException
-	 */
-	public static void terminateAfterInvocation (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
-		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
-
-		//removing storageMap entries
-		InvokerBean findStorageMapBean = new InvokerBean ();
-		findStorageMapBean.setSequenceID(sequenceID);
-		findStorageMapBean.setInvoked(true);
-		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
-		Iterator iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			InvokerBean storageMapBean = (InvokerBean) iterator.next();
-			storageMapBeanMgr.delete(storageMapBean.getMessageContextRefKey());
-		}
-		
 		removeReceivingSideProperties(configContext,sequenceID);
-
 	}
-	
+
 	private static void removeReceivingSideProperties (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
@@ -132,6 +169,10 @@ public class TerminateManager {
 	 */
 	public static void terminateSendingSide (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		
+		//TODO - remove folowing redundant transaction
+		Transaction terminateSendingTransaction = storageManager.getTransaction();
+		
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
@@ -169,30 +210,50 @@ public class TerminateManager {
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
+
+			doUpdatesIfNeeded (sequenceID,sequencePropertyBean,sequencePropertyBeanMgr);
 			
 			if (isProportyDeletable(sequencePropertyBean.getName())) {
 				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 			}
-			
 		}
 		
-//		SequencePropertyBean findSequencePropertyBean2 = new SequencePropertyBean ();
-//		findSequencePropertyBean2.setSequenceID(internalSequenceId);
-//		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean2);
-//		iterator = collection.iterator();
-//		while (iterator.hasNext()) {
-//			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-//			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
-//		}
+		terminateSendingTransaction.commit();
+		
+		//asking the listner to stop.
+		//if (clientSide)
+//			try {
+//				ListenerManager.stop(configContext,Constants.TRANSPORT_HTTP);
+//			} catch (AxisFault e) {
+//				throw new SandeshaException (e.getMessage());
+//			}
+		
+		SandeshaUtil.stopSenderForTheSequence(internalSequenceId);
+		
+	}
+	
+	private static void doUpdatesIfNeeded (String sequenceID, SequencePropertyBean propertyBean, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
+		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES)) {
+			
+			//this value cannot be completely deleted since this data will be needed by SequenceReports
+			//so saving it with the sequenceID value being the out sequenceID.
+			
+			SequencePropertyBean newBean = new SequencePropertyBean ();
+			newBean.setSequenceID(sequenceID);
+			newBean.setName(propertyBean.getName());
+			newBean.setValue(propertyBean.getValue());
+			
+			seqPropMgr.insert(newBean);
+			
+			//TODO amazingly this property does not seem to get deleted without following - in the hibernate impl 
+			//(even though the lines efter current methodcall do this).
+			seqPropMgr.delete (propertyBean.getSequenceID(),propertyBean.getName());			
+		}
 	}
 	
 	private static boolean isProportyDeletable (String name) {
 		boolean deleatable = true;
-		
-//		if (name.equals(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID)) {
-//			int i=1;
-//		}
-		
+				
 		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
 			deleatable = false;
 		

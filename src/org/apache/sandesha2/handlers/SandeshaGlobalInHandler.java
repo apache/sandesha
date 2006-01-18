@@ -122,7 +122,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 						.getSequencePropretyBeanMgr();
 				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
 						sequenceId,
-						Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
+						Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
 				if (receivedMsgsBean != null) {
 					String receivedMsgStr = (String) receivedMsgsBean
 							.getValue();
@@ -155,7 +155,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							if (receivedMsgsBean == null) {
 								receivedMsgsBean = new SequencePropertyBean(
 										sequenceId,
-										Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES,
+										Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES,
 										"");
 								seqPropMgr.insert(receivedMsgsBean);
 							}
@@ -206,7 +206,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			SequencePropertyBeanMgr seqPropMgr = storageManager
 					.getSequencePropretyBeanMgr();
 			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
-					sequenceId, Sandesha2Constants.SequenceProperties.RECEIVED_MESSAGES);
+					sequenceId, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
 			String receivedMsgStr = (String) receivedMsgsBean.getValue();
 
 			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();

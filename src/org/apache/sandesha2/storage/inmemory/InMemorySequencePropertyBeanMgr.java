@@ -23,8 +23,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
@@ -33,6 +37,8 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
  */
 
 public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr {
+	
+	Log log = LogFactory.getLog(getClass());
 	private Hashtable table = null;
 
 	public InMemorySequencePropertyBeanMgr(AbstractContext context) {
@@ -48,11 +54,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	public boolean delete(String sequenceId, String name) {
 		
 		SequencePropertyBean bean = retrieve( sequenceId,name);
-		
-		if (bean.getName().equals(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID)) {
-			int i=1;
-		}
-		
+				
 		return table.remove(sequenceId + ":" + name) != null;
 	}
 
@@ -61,9 +63,6 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	public boolean insert(SequencePropertyBean bean) {
-		
-
-		
 		table.put(bean.getSequenceID() + ":" + bean.getName(), bean);
 		return true;
 	}
@@ -106,6 +105,11 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	public boolean update(SequencePropertyBean bean) {
+		
+		if (bean.getName().equals(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES)) {
+			int i = 1;
+		}
+	
 		if (!table.contains(bean))
 			return false;
 
@@ -115,6 +119,21 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 
 	private String getId(SequencePropertyBean bean) {
 		return bean.getSequenceID() + ":" + bean.getName();
+	}
+	
+	public SequencePropertyBean findUnique(SequencePropertyBean bean) throws SandeshaException {
+		Collection coll = find(bean);
+		if (coll.size()>1) {
+			String message = "Non-Unique result";
+			log.error(message);
+			throw new SandeshaException (message);
+		}
+		
+		Iterator iter = coll.iterator();
+		if (iter.hasNext())
+			return (SequencePropertyBean) iter.next();
+		else 
+			return null;
 	}
 
 }

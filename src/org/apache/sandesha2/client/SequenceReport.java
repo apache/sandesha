@@ -25,8 +25,8 @@ import java.util.ArrayList;
 public class SequenceReport {
 
 	public static final byte SEQUENCE_STATUS_ACTIVE = 1;
-	public static final byte SEQUENCE_STATUS_TERMINATED = 2;
-	public static final byte SEQUENCE_STATUS_TIMEDOUT = 3;
+	public static final byte SEQUENCE_STATUS_COMPLETED = 2;
+	public static final byte SEQUENCE_STATUS_TIMED_OUT = 3;
 	
 	public static final byte SEQUENCE_DIRECTION_IN=1;
 	public static final byte SEQUENCE_DIRECTION_OUT=2;
@@ -34,15 +34,15 @@ public class SequenceReport {
 	private byte sequenceStatus = SEQUENCE_STATUS_ACTIVE;
 	private byte sequenceDirection = SEQUENCE_DIRECTION_OUT;
 	private String sequenceID = null;
-	private ArrayList ackedMessages = null;
+	private ArrayList completedMessages = null;
 	private boolean sequenceEstablished = false;
 	
 	public SequenceReport () {
-		ackedMessages = new ArrayList ();
+		completedMessages = new ArrayList ();
 	}
 	
 	public void setSequenceStatus (byte sequenceStatus) {
-		if (sequenceStatus>=SEQUENCE_STATUS_ACTIVE && sequenceStatus<=SEQUENCE_STATUS_TIMEDOUT) {
+		if (sequenceStatus>=SEQUENCE_STATUS_ACTIVE && sequenceStatus<=SEQUENCE_STATUS_TIMED_OUT) {
 			this.sequenceStatus = sequenceStatus;
 		}
 	}
@@ -69,8 +69,8 @@ public class SequenceReport {
 		this.sequenceID = sequenceID;
 	}
 	
-	public ArrayList getAckedMessages () {
-		return ackedMessages;
+	public ArrayList getCompletedMessages () {
+		return completedMessages;
 	}
 
 	public boolean isSequenceEstablished() {
@@ -82,8 +82,12 @@ public class SequenceReport {
 	}
 	
 	
-	public void setAckedMessage (String ackedMessage) {
-		ackedMessages.add(ackedMessage);
+	public void addCompletedMessage (Long messageNo) {
+		completedMessages.add(messageNo);
+	}
+	
+	public void setCompletedMessages (ArrayList completedMessages) {
+		this.completedMessages = completedMessages;
 	}
 	
 	

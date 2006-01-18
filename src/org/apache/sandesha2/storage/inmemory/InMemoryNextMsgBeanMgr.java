@@ -23,8 +23,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.axis2.context.AbstractContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 
 /**
@@ -34,6 +38,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 
 public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 
+	Log log = LogFactory.getLog(getClass());
 	private Hashtable table = null;
 
 	public InMemoryNextMsgBeanMgr(AbstractContext context) {
@@ -102,5 +107,20 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 
 	public Collection retrieveAll() {
 		return table.values();
+	}
+	
+	public NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
+		Collection coll = find(bean);
+		if (coll.size()>1) {
+			String message = "Non-Unique result";
+			log.error(message);
+			throw new SandeshaException (message);
+		}
+		
+		Iterator iter = coll.iterator();
+		if (iter.hasNext())
+			return (NextMsgBean) iter.next();
+		else 
+			return null;
 	}
 }

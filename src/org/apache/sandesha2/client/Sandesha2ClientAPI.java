@@ -16,8 +16,17 @@
 
 package org.apache.sandesha2.client;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.sandesha2.AcknowledgementManager;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 
@@ -41,20 +50,56 @@ public class Sandesha2ClientAPI {
 		String internalSequenceID = SandeshaUtil.getInternalSequenceID (to,sequenceKey);
 		SequenceReport sequenceReport = new SequenceReport ();
 		
-//		report.setAckedMessageCount(SequenceManager.getOutGoingSequenceAckedMessageCount (internalSequenceID,configurationContext));
-//		report.setSequenceCompleted(SequenceManager.isOutGoingSequenceCompleted (internalSequenceID,configurationContext));
-//		report.setOutGoingSequence(true);
-					
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		SequencePropertyBeanMgr seqpPropMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		Transaction reportTransaction = storageManager.getTransaction();
+		SequencePropertyBean findBean =  new SequencePropertyBean ();
+		findBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		findBean.setValue(internalSequenceID);
+		SequencePropertyBean internalSequenceBean = seqpPropMgr.findUnique(findBean);
+		String sequenceID = internalSequenceBean.getSequenceID();
+		
+		//finding the actual seq
+		ArrayList completedMessageList =  AcknowledgementManager.getCompletedMessagesList (sequenceID,configurationContext);
+		
+		Iterator iter = completedMessageList.iterator();
+		while (iter.hasNext()) {
+			Long lng = new Long (Long.parseLong((String) iter.next()));
+			sequenceReport.addCompletedMessage(lng);
+		}
+		
+		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
+		boolean completed  = SequenceManager.isOutGoingSequenceCompleted(internalSequenceID,configurationContext);
+		if (completed)
+			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_COMPLETED);
+		
+		//TODO complete
+		
+		
+		reportTransaction.commit();
+		
 		return sequenceReport;
 	}
 	
 	public static SequenceReport getIncomingSequenceReport (String sequenceID,ConfigurationContext configurationContext) throws SandeshaException {
 		
 		SequenceReport sequenceReport = new SequenceReport ();
+
+		ArrayList completedMessageList =  AcknowledgementManager.getCompletedMessagesList (sequenceID,configurationContext);
+
+		Iterator iter = completedMessageList.iterator();
+		while (iter.hasNext()) {
+			Long lng = new Long (Long.parseLong((String) iter.next()));
+			sequenceReport.addCompletedMessage(lng);
+		}
 		
-//		report.setOutGoingSequence(false);
-//		report.setAckedMessageCount(SequenceManager.getIncomingSequenceAckedMessageCount(sequenceID,configurationContext));
-//		report.setSequenceCompleted(SequenceManager.isIncomingSequenceCompleted(sequenceID,configurationContext));
+		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_IN);
+		boolean completed  = SequenceManager.isIncomingSequenceCompleted(sequenceID,configurationContext);
+		if (completed)
+			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_COMPLETED);
+		
+		//TODO complete
 		
 		return sequenceReport;
 	}
