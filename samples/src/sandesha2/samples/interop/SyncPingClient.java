@@ -19,6 +19,7 @@ package sandesha2.samples.interop;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.InOnlyMEPClient;
 import org.apache.axis2.client.MessageSender;
@@ -27,6 +28,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.MessageReceiver;
@@ -71,13 +73,17 @@ public class SyncPingClient {
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
 		}
-		ConfigurationContext configContext = new ConfigurationContextFactory().createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH);
+		
+		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 		
 		Options clientOptions = new Options ();
 	//	clientOptions.setr\
 		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
+	//	clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
+		
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.

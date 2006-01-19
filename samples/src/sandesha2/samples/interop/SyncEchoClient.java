@@ -72,8 +72,8 @@ public class SyncEchoClient {
 			return;
 		}
 		
-		
-		ConfigurationContext configContext = new ConfigurationContextFactory().createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH);
+		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		

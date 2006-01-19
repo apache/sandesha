@@ -42,7 +42,10 @@ public class SimpleSandesha2Server {
 		}
 		
 		System.out.println("Starting sandesha2 server...");
-		SimpleHTTPServer server = new SimpleHTTPServer (AXIS2_SERVER_PATH,8080);
+		
+		String axis2_xml = AXIS2_SERVER_PATH + "axis2.xml";
+		SimpleHTTPServer server = new SimpleHTTPServer (AXIS2_SERVER_PATH,axis2_xml,8080);
+		
 		server.start();
 	}
 }

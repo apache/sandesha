@@ -78,7 +78,9 @@ public class AsyncEchoClient {
 			return;
 		}
 		
-		ConfigurationContext configContext = new ConfigurationContextFactory().createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH);
+		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
+     
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
@@ -96,7 +98,8 @@ public class AsyncEchoClient {
 		
 		serviceClient.setOptions(clientOptions);
 		serviceClient.engageModule(new QName ("Sandesha2-0.9"));
-		
+		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		String offeredSequenceID = SandeshaUtil.getUUID();
 		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,offeredSequenceID);  //Optional
 		
@@ -105,11 +108,16 @@ public class AsyncEchoClient {
 		Callback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2"),callback2);
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3"),callback3);
+		Callback callback4 = new TestCallback ("Callback 4");
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo4"),callback4);
 		
-        while (!callback3.isComplete()) {
+		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		Callback callback5 = new TestCallback ("Callback 5");
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo5"),callback5);
+		
+        while (!callback5.isComplete()) {
             Thread.sleep(1000);
         }
        
