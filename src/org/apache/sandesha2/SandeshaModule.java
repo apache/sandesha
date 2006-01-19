@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.ModuleDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
@@ -39,23 +40,25 @@ public class SandeshaModule implements Module {
 
 
 	// initialize the module
-	public void init(AxisConfiguration axisSystem) throws AxisFault {
-		ConfigurationContext configurationContext = new ConfigurationContext (axisSystem);
-		//StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+	public void init(ConfigurationContext configContext, ModuleDescription module) throws AxisFault {
 		
-		//	cleanStorage (storageManager);
-		
-		ConfigurationContext configCtx = null;
 		//continueUncompletedSequences (storageManager,configCtx);
 		
-		QName sandeshaModule = new QName ("Sandesha2-0.9");
-		ModuleDescription moduleDesc = axisSystem.getModule(sandeshaModule);
-		
 		//loading properties to property manager.
-		PropertyManager.getInstance().loadPropertiesFromModuleDesc(moduleDesc);
+		PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
 
 	}
 	
+	
+	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
+		
+		// TODO add notify logic.
+		
+	}
+
+
+
+
 	private void continueUncompletedSequences (StorageManager storageManager,ConfigurationContext configCtx) {
 		//server side continues
 		//SandeshaUtil.startInvokerIfStopped(configCtx);
