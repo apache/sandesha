@@ -27,4 +27,36 @@
         <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
     </operation>
     
+    
+    <!--  PARAMETERS FOR SANDESHA2                     -->
+    <!--  ========================                     -->
+    
+    <!--  RM Policy values for the server              -->
+        
+    <parameter name="RetransmissionInterval" locked="xsd:false">10000</parameter>
+    <parameter name="AcknowledgementInterval" locked="xsd:false">4000</parameter>
+    <parameter name="ExponentialBackoff" locked="xsd:false">false</parameter>
+    <parameter name="InactivityTimeout" locked="xsd:false">5</parameter>
+    <parameter name="InactivityTimeoutMeasure" locked="xsd:false">days</parameter>
+    
+    
+    <!--  Storage Manager Class                         -->
+
+    <parameter name="StorageManager" locked="xsd:false">org.apache.sandesha2.storage.inmemory.InMemoryStorageManager</parameter>
+    <!-- <parameter name="StorageManager" locked="xsd:false">org.apache.sandesha2.storage.persistent.hibernate.PersistentStorageManager</parameter> -->
+    
+    
+    <!-- Delivery Assurance                             -->
+    
+    <parameter name="InvokeInOrder" locked="xsd:false">true</parameter>
+    
+    
+    <!-- System Configurations (only for advance users)  -->
+    <!-- ==============================================  -->
+    
+    <!-- SenderConfiguration                             -->
+    
+    <parameter name="MessageTypesToDrop" locked="xsd:false">none</parameter>
+    
+    
 </module>
