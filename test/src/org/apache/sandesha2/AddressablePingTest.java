@@ -45,7 +45,7 @@ public class AddressablePingTest extends TestCase {
 	SimpleHTTPServer httpServer = null;
 	
 	public void setUp () throws AxisFault {
-		httpServer = new SimpleHTTPServer ("target\\repos\\server",8060);
+		httpServer = new SimpleHTTPServer ("target\\repos\\server","target\\repos\\server\\axis2.xml",8060);
 		httpServer.start();
 		try {
 			Thread.sleep(300);
@@ -65,7 +65,7 @@ public class AddressablePingTest extends TestCase {
 		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
 		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
-		ConfigurationContext configContext = new ConfigurationContextFactory().createConfigurationContextFromFileSystem("target\\repos\\client");
+		ConfigurationContext configContext = new ConfigurationContextFactory().createConfigurationContextFromFileSystem("target\\repos\\client","target\\repos\\server\\axis2.xml");
 
 		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		Options clientOptions = new Options ();

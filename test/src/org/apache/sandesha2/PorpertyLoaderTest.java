@@ -44,7 +44,7 @@ public class PorpertyLoaderTest extends TestCase {
 		
 		try {
 			InputStream in = new FileInputStream (file);
-			manager.reload(in);
+			manager.loadPropertiesFromPropertyFile(in);
 			in.close();
 		} catch (Exception e) {
 			fail (e.getMessage());
