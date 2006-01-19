@@ -17,11 +17,16 @@
 
 package org.apache.sandesha2;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.ModuleDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.util.PropertyManager;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
@@ -36,12 +41,19 @@ public class SandeshaModule implements Module {
 	// initialize the module
 	public void init(AxisConfiguration axisSystem) throws AxisFault {
 		ConfigurationContext configurationContext = new ConfigurationContext (axisSystem);
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		//StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
 		
-	//	cleanStorage (storageManager);
+		//	cleanStorage (storageManager);
 		
 		ConfigurationContext configCtx = null;
 		//continueUncompletedSequences (storageManager,configCtx);
+		
+		QName sandeshaModule = new QName ("Sandesha2-0.9");
+		ModuleDescription moduleDesc = axisSystem.getModule(sandeshaModule);
+		
+		//loading properties to property manager.
+		PropertyManager.getInstance().loadPropertiesFromModuleDesc(moduleDesc);
+
 	}
 	
 	private void continueUncompletedSequences (StorageManager storageManager,ConfigurationContext configCtx) {

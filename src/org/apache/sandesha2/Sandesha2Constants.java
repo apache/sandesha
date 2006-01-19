@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2;
 
+import java.util.ArrayList;
+
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
  * Please see sub-interfaces to see grouped data.
