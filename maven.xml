@@ -19,7 +19,9 @@
 	<ant:property name="apache.license.file" value="LICENSE.txt" />
 	<ant:property name="readme.file" value="README.txt" />
 	<ant:property name="release.notes.file" value="release-notes.html" />
-	
+	<ant:property name="addressing.mar.name" value="axis2-addressing-0.95-SNAPSHOT.jar" />
+	<ant:property name="addressing.mar.path" value="${maven.repo.local}/axis2/jars" />
+	<ant:property name="addressing.mar" value="${addressing.mar.path}/${addressing.mar.name}" />
     <goal name="all" prereqs="jar,mar:create,samples:create,javadoc" />
     
     <goal name="default">
@@ -47,7 +49,10 @@
 		<ant:mkdir dir="${client.dist.path}" />
 		<ant:mkdir dir="${client.dist.path}/modules" />
 		<ant:copy file="${dir.config}/axis2.xml" todir="${client.dist.path}" />
-		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${client.dist.path}/modules" />     
+		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${client.dist.path}/modules" />
+		
+		<!-- Copying addressing mar file--> 
+		<ant:copy file="${addressing.mar}" todir="${client.dist.path}/modules" />    
 	</goal>
 
 	<goal name="server:create" prereqs="mar:create,sample:create">
@@ -62,6 +67,9 @@
                 <ant:include name="**/*.aar" />
             </ant:fileset>
         </ant:copy>
+        
+        <!-- Copying addressing mar file-->
+        <ant:copy file="${addressing.mar}" todir="${server.dist.path}/modules" /> 
 	</goal>
 	
     <goal name="sample:compile">
@@ -126,8 +134,10 @@
     	<attainGoal name="client:create"/>   
     	
     	<!-- check for the availability of addretting module and fail if not available-->
+        <!--	
     	<ant:copy file="${dir.test.resources}/modules/${addressing.module.name}" todir="${build.repo.dir}/server/modules"/>
     	<ant:copy file="${dir.test.resources}/modules/${addressing.module.name}" todir="${build.repo.dir}/client/modules"/>
+        -->
     </preGoal>
     
     <goal name="server.copy.tomcat" prereqs="server:create">
