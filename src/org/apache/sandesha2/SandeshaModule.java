@@ -17,6 +17,9 @@
 
 package org.apache.sandesha2;
 
+import java.beans.beancontext.BeanContext;
+import java.util.ArrayList;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
@@ -25,10 +28,15 @@ import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.ModuleDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
+import org.apache.sandesha2.policy.PolicyEngineData;
+import org.apache.sandesha2.policy.RMPolicyProcessor;
+import org.apache.sandesha2.policy.RMProcessorContext;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.ws.policy.Policy;
+
 
 /**
  * The Module class of Sandesha2.
@@ -38,67 +46,62 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class SandeshaModule implements Module {
 
-
 	// initialize the module
-	public void init(ConfigurationContext configContext, ModuleDescription module) throws AxisFault {
-		
-		//continueUncompletedSequences (storageManager,configCtx);
-		
-		//loading properties to property manager.
-		PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
+	public void init(ConfigurationContext configContext,
+			ModuleDescription module) throws AxisFault {
 
+		// continueUncompletedSequences (storageManager,configCtx);
+
+		// loading properties to property manager.
+		 PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
 	}
-	
-	
+
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
-		
+
 		// TODO add notify logic.
-		
+
 	}
 
+	private void continueUncompletedSequences(StorageManager storageManager,
+			ConfigurationContext configCtx) {
+		// server side continues
+		// SandeshaUtil.startInvokerIfStopped(configCtx);
 
+		// server side re-injections
 
+		// reinject everything that has been acked within the in-handler but
+		// have not been invoked.
 
-	private void continueUncompletedSequences (StorageManager storageManager,ConfigurationContext configCtx) {
-		//server side continues
-		//SandeshaUtil.startInvokerIfStopped(configCtx);
-		
-		//server side re-injections
-		
-		//reinject everything that has been acked within the in-handler but have not been invoked.
-		
-		
-		//client side continues
-		//SandeshaUtil.startSenderIfStopped(configCtx);
-		
-		//client side re-injections
-		
-		
+		// client side continues
+		// SandeshaUtil.startSenderIfStopped(configCtx);
+
+		// client side re-injections
+
 	}
 
 	// shutdown the module
 	public void shutdown(AxisConfiguration axisSystem) throws AxisFault {
 
 	}
-	
-	//Removing data of uncontinuuable sequences so that the sandesha2 system will not be confused
-	private void cleanStorage (StorageManager storageManager) throws AxisFault {
-		
+
+	// Removing data of uncontinuuable sequences so that the sandesha2 system
+	// will not be confused
+	private void cleanStorage(StorageManager storageManager) throws AxisFault {
+
 		storageManager.initStorage();
-		
-		//server side cleaning
-		
-		//cleaning NextMsgData
-		//Cleaning InvokerData
-		
-		
-		//client side cleaning
-		
-		//cleaning RetransmitterData
-		//cleaning CreateSequenceData
-		
-		//cleaning sequence properties
-		
+
+		// server side cleaning
+
+		// cleaning NextMsgData
+		// Cleaning InvokerData
+
+		// client side cleaning
+
+		// cleaning RetransmitterData
+		// cleaning CreateSequenceData
+
+		// cleaning sequence properties
+
 	}
-	
+
 }
