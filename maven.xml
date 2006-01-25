@@ -55,6 +55,11 @@
 		<ant:copy file="${addressing.mar}" todir="${client.dist.path}/modules" />    
 	</goal>
 
+    <goal name="repo:create">
+        <attainGoal name="server:create"/>
+        <attainGoal name="client:create"/>
+    </goal>	
+    
 	<goal name="server:create" prereqs="mar:create,sample:create">
 		<ant:property name="server.dist.path" value="${build.repo.dir}/server"/>
 		<ant:mkdir dir="${server.dist.path}" />
