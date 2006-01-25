@@ -17,25 +17,15 @@
 
 package org.apache.sandesha2;
 
-import java.beans.beancontext.BeanContext;
-import java.util.ArrayList;
-
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisDescription;
-import org.apache.axis2.description.ModuleDescription;
+import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
-import org.apache.sandesha2.policy.PolicyEngineData;
-import org.apache.sandesha2.policy.RMPolicyProcessor;
-import org.apache.sandesha2.policy.RMProcessorContext;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.ws.policy.Policy;
 
 
 /**
@@ -48,12 +38,15 @@ public class SandeshaModule implements Module {
 
 	// initialize the module
 	public void init(ConfigurationContext configContext,
-			ModuleDescription module) throws AxisFault {
+			AxisModule module) throws AxisFault {
 
 		// continueUncompletedSequences (storageManager,configCtx);
 
 		// loading properties to property manager.
-		 PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
+		// PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
+		PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		storageManager.initStorage(module);
 	}
 
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
@@ -88,7 +81,7 @@ public class SandeshaModule implements Module {
 	// will not be confused
 	private void cleanStorage(StorageManager storageManager) throws AxisFault {
 
-		storageManager.initStorage();
+		
 
 		// server side cleaning
 

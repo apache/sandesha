@@ -6,13 +6,11 @@
  */
 package org.apache.sandesha2.util;
 
-import java.net.BindException;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;

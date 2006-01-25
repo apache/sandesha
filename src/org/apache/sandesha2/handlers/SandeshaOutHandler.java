@@ -29,10 +29,12 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.transport.TransportSender;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -48,6 +50,7 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.RMPolicyManager;
@@ -102,8 +105,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		StorageManager storageManager = SandeshaUtil
 		.getSandeshaStorageManager(context);
 		
-		Transaction transaction = storageManager.getTransaction();
-		
 		ServiceContext serviceContext = msgCtx.getServiceContext();
 		OperationContext operationContext = msgCtx.getOperationContext();
 
@@ -120,6 +121,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
+		Transaction transaction = storageManager.getTransaction();
+		
 		boolean serverSide = msgCtx.isServerSide();
 
 		//setting message Id if null
@@ -289,12 +292,16 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 					}
 				}
+				
+				transaction.commit();
+				
 				addCreateSequenceMessage(rmMsgCtx, internalSequenceId, acksTo);
 			}
 		}
 
 		//do response processing
-
+		Transaction responseProcessTransaction = storageManager.getTransaction();
+		
 		SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 		if (env == null) {
 			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(
@@ -357,10 +364,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		}
 
+		//cannot pause since the message have to be saved at the sender
 		//pausing the message
-		msgCtx.pause();
+		//msgCtx.pause();
 		
-		transaction.commit();
+		responseProcessTransaction.commit();
 	}
 
 	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg,
@@ -383,6 +391,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(message);
 		}
 
+		StorageManager storageManager = SandeshaUtil
+		.getSandeshaStorageManager(applicationMsg
+				.getConfigurationContext());
+
+		Transaction  createSeqTransaction = storageManager.getTransaction();
+		SequencePropertyBeanMgr seqPropMgr = storageManager
+			.getSequencePropretyBeanMgr();
+
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {
 			//Offer processing
@@ -398,13 +414,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			offeredSequenceBean.setSequenceID(internalSequenceId);
 			offeredSequenceBean.setValue(offeredSequenceId);
 
-			StorageManager storageManager = SandeshaUtil
-					.getSandeshaStorageManager(applicationMsg
-							.getConfigurationContext());
-
-			SequencePropertyBeanMgr seqPropMgr = storageManager
-					.getSequencePropretyBeanMgr();
-
 			seqPropMgr.insert(msgsBean);
 			seqPropMgr.insert(offeredSequenceBean);
 		}
@@ -419,8 +428,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new SandeshaException(message);
 		}
 
-		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(applicationMsg.getConfigurationContext());
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
 		CreateSeqBean createSeqBean = new CreateSeqBean(internalSequenceId,
@@ -434,15 +441,43 @@ public class SandeshaOutHandler extends AbstractHandler {
 		SenderBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 
-		String key = SandeshaUtil.storeMessageContext(createSeqRMMessage
-				.getMessageContext());
+		String key = SandeshaUtil.getUUID();
+
 		SenderBean createSeqEntry = new SenderBean();
 		createSeqEntry.setMessageContextRefKey(key);
 		createSeqEntry.setTimeToSend(System.currentTimeMillis());
 		createSeqEntry.setMessageID(createSeqRMMessage.getMessageId());
-		createSeqEntry.setSend(true);
+		
+		//this will be set to true in the sender
+		createSeqEntry.setSend(false);
 		createSeqEntry.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ); 
 		retransmitterMgr.insert(createSeqEntry);
+		createSeqTransaction.commit();
+		
+		
+		//sending the message once through our sender.
+		AxisEngine engine = new AxisEngine (createSeqMsg.getConfigurationContext());
+		Sandesha2TransportSender sender = new Sandesha2TransportSender ();
+		
+		//message will be stored in the Sandesha2TransportSender
+		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
+		//sender.setMessageStoreKey(key);
+		
+		TransportSender oldSender = createSeqMsg.getTransportOut().getSender();
+		createSeqMsg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,oldSender);
+		createSeqMsg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
+		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
+		
+		//setting the sandesha2 sender as the sender.
+		createSeqMsg.getTransportOut().setSender(sender);
+		
+		try {
+			log.info ("Sending create seq msg...");
+			engine.send(createSeqMsg);
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
+		
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg,
@@ -628,9 +663,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//Retransmitter bean entry for the application message
 		SenderBean appMsgEntry = new SenderBean();
-		String key = SandeshaUtil
-				.storeMessageContext(rmMsg.getMessageContext());
-		appMsgEntry.setMessageContextRefKey(key);
+//		String key = storageManager
+//				.storeMessageContext(rmMsg.getMessageContext());
+		String storageKey = SandeshaUtil.getUUID();
+		
+		appMsgEntry.setMessageContextRefKey(storageKey);
+		
 		appMsgEntry.setTimeToSend(System.currentTimeMillis());
 		appMsgEntry.setMessageID(rmMsg.getMessageId());
 		appMsgEntry.setMessageNumber(messageNumber);
@@ -638,11 +676,32 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
 			appMsgEntry.setSend(false);
 		} else {
-			appMsgEntry.setSend(true);
-
+			appMsgEntry.setSend(false);
+			//Send will be set to true at the sender.
+			msg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
 		}
+		
 		appMsgEntry.setInternalSequenceID(internalSequenceId);
 		retransmitterMgr.insert(appMsgEntry);
+		
+		msg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,Sandesha2Constants.VALUE_FALSE);
+		
+		//changing the sender. This will set send to true.
+		TransportSender sender = msg.getTransportOut().getSender();
+		
+
+		
+		
+		if (sender!=null) {
+			Sandesha2TransportSender sandesha2Sender = new Sandesha2TransportSender ();
+			
+			msg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,storageKey);
+			//sandesha2Sender.setMessageStoreKey(storageKey);
+			
+			msg.getTransportOut().setSender(sandesha2Sender);
+			msg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,sender);
+		}
+		
 	}
 
 	private long getNextMsgNo(ConfigurationContext context,

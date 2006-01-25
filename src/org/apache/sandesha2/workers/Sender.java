@@ -18,15 +18,9 @@ package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
-import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -127,9 +121,17 @@ public class Sender extends Thread {
 
 					SenderBean bean = (SenderBean) iter.next();
 					String key = (String) bean.getMessageContextRefKey();
-					MessageContext msgCtx = SandeshaUtil
-							.getStoredMessageContext(key);
+					MessageContext msgCtx = storageManager.retrieveMessageContext(key,context);
 
+					//sender will not send the message if following property is set and not true.
+					//But it will set if it is not set (null)
+					
+					//This is used to make sure that the mesage get passed the Sandesha2TransportSender.
+					String qualifiedForSending = (String) msgCtx.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
+					if (qualifiedForSending!=null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
+						continue;
+					}
+					
 					try {
 
 						if (msgCtx == null) {
@@ -166,7 +168,9 @@ public class Sender extends Thread {
 								//sequence has been timed out.
 								//do time out processing.
 								
-								TerminateManager.terminateSendingSide(context,sequenceID);
+								//TODO uncomment below line
+								//TerminateManager.terminateSendingSide(context,sequenceID);
+								
 								String message = "Sequence timed out";
 								log.debug(message);
 								throw new SandeshaException (message);
@@ -181,6 +185,10 @@ public class Sender extends Thread {
 
 						
 						preSendTransaction.commit();
+						
+						if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
+							int i =1;
+						}
 						
 						try {
 							//every message should be resumed (pause==false) when sending
@@ -201,8 +209,8 @@ public class Sender extends Thread {
 							log.debug(message);
 							log.debug(e.getMessage());
 
-						}
-						
+						} 
+												
 						Transaction postSendTransaction = storageManager.getTransaction();
 
 						MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
@@ -214,8 +222,9 @@ public class Sender extends Thread {
 									.getMessageNumber();
 						}
 
-						retransmitterAdjuster.adjustRetransmittion(bean);
+						retransmitterAdjuster.adjustRetransmittion(bean,context);
 
+							
 						//update or delete only if the object is still present.
 						SenderBean bean1 = mgr.retrieve(bean.getMessageID());
 						if (bean1 != null) {
@@ -303,7 +312,7 @@ public class Sender extends Thread {
 
 	public synchronized void runSenderForTheSequence(ConfigurationContext context, String sequenceID) {
 		
-		if (!workingSequences.contains(sequenceID))
+		if (sequenceID!=null && !workingSequences.contains(sequenceID))
 			workingSequences.add(sequenceID);
 		
 

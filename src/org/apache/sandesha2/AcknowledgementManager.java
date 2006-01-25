@@ -106,9 +106,9 @@ public class AcknowledgementManager {
 				retransmitterBeanMgr.delete(ackBean.getMessageID());
 
 				//Adding the ack to the application message
-				MessageContext ackMsgContext = SandeshaUtil
-						.getStoredMessageContext(ackBean
-								.getMessageContextRefKey());
+				MessageContext ackMsgContext = storageManager
+						.retrieveMessageContext(ackBean
+								.getMessageContextRefKey(),configurationContext);
 				RMMsgContext ackRMMsgContext = MsgInitializer
 						.initializeMessage(ackMsgContext);
 				if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {

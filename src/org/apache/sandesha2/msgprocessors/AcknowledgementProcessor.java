@@ -25,6 +25,9 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.transport.TransportSender;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -36,6 +39,7 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
@@ -294,11 +298,15 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			throw new SandeshaException(e.getMessage());
 		}
 
-		String key = SandeshaUtil.storeMessageContext(terminateRMMessage
-				.getMessageContext());
+		String key = SandeshaUtil.getUUID();
+		
 		SenderBean terminateBean = new SenderBean();
 		terminateBean.setMessageContextRefKey(key);
 
+		
+		
+
+		
 		//Set a retransmitter lastSentTime so that terminate will be send with
 		// some delay.
 		//Otherwise this get send before return of the current request (ack).
@@ -307,7 +315,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				+ Sandesha2Constants.TERMINATE_DELAY);
 
 		terminateBean.setMessageID(terminateRMMessage.getMessageId());
-		terminateBean.setSend(true);
+		
+		//this will be set to true at the sender.
+		terminateBean.setSend(false);
 		terminateBean.setReSend(false);
 
 		SenderBeanMgr retramsmitterMgr = storageManager
@@ -321,6 +331,27 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);
+		
+		//This should be dumped to the storage by the sender
+		TransportOutDescription transportOut = terminateRMMessage.getMessageContext().getTransportOut();
+		Sandesha2TransportSender sandesha2Sender = new Sandesha2TransportSender ();
+		TransportSender originalSender = transportOut.getSender();
+		terminateRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,originalSender);
+		
+		terminateRMMessage.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
+		//sandesha2Sender.setMessageStoreKey(key);
+		
+		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
+		
+		transportOut.setSender(sandesha2Sender);
+		
+	    AxisEngine engine = new AxisEngine (incomingAckRMMsg.getMessageContext().getConfigurationContext());
+	    try {
+			engine.send(terminateRMMessage.getMessageContext());
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
+	    
 	}
 	
 	private static long getNoOfMessagesAcked (Iterator ackRangeIterator) {

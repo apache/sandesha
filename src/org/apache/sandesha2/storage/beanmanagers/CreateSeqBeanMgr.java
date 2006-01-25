@@ -22,7 +22,6 @@ import java.util.Collection;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
  * This is used to manage CreateSequence beans.

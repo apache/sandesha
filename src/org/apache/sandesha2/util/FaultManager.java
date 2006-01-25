@@ -26,6 +26,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.om.OMElement;
@@ -395,6 +397,22 @@ public class FaultManager {
 
 			MessageContext referenceMessage = referenceRMMsgContext
 					.getMessageContext();
+			
+			//This is to hack to remove NPE. TODO remove this.
+			if (referenceMessage.getServiceGroupContext()==null) {
+				ServiceGroupContext serviceGroupContext = new ServiceGroupContext (referenceMessage.getConfigurationContext(),referenceMessage.getAxisServiceGroup()); 
+				referenceMessage.setServiceGroupContext(serviceGroupContext);
+			}
+			if (referenceMessage.getServiceContext()==null) {
+				ServiceContext serviceContext = new ServiceContext (
+						referenceMessage.getAxisService(),
+								referenceMessage.getServiceGroupContext());
+				referenceMessage.setServiceContext(serviceContext);
+			}
+			
+			//end hack
+			
+			
 			MessageContext faultMsgContext = Utils
 					.createOutMessageContext(referenceMessage);
 

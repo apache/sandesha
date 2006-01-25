@@ -21,7 +21,6 @@ import java.util.Collection;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
-import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
@@ -47,4 +46,5 @@ public interface SequencePropertyBeanMgr extends RMBeanManager {
 
 	public boolean update(SequencePropertyBean bean) throws SandeshaStorageException;
 
+	public Collection retrieveAll ();
 }

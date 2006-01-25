@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -31,6 +29,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
@@ -50,6 +49,7 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -219,7 +219,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			//saving the message.
 			try {
-				String key = SandeshaUtil.storeMessageContext(rmMsgCtx
+				String key = SandeshaUtil.getUUID();
+				storageManager.storeMessageContext(key,rmMsgCtx
 						.getMessageContext());
 				storageMapMgr.insert(new InvokerBean(key, msgNo, sequenceId));
 
@@ -384,14 +385,20 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			SenderBeanMgr retransmitterBeanMgr = storageManager
 					.getRetransmitterBeanMgr();
 
-			String key = SandeshaUtil.storeMessageContext(ackMsgCtx);
+			String key = SandeshaUtil.getUUID();
+			
+			//dumping to the storage will be done be Sandesha2 Transport Sender
+			//storageManager.storeMessageContext(key,ackMsgCtx);
+			
 			SenderBean ackBean = new SenderBean();
 			ackBean.setMessageContextRefKey(key);
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
-			ackBean.setSend(true);
+			
+			//this will be set to true in the sender.
+			ackBean.setSend(false);
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-
+			
 			//the internalSequenceId value of the retransmitter Table for the
 			// messages related to an incoming
 			//sequence is the actual sequence ID
@@ -431,6 +438,24 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			asyncAckTransaction.commit();
 
+			//passing the message through sandesha2sender
+			Sandesha2TransportSender sandesha2Sender = new Sandesha2TransportSender ();
+			TransportOutDescription transportOut = ackMsgCtx.getTransportOut();
+			ackMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,transportOut.getSender());
+			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
+			
+			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
+			//sandesha2Sender.setMessageStoreKey(key);
+			
+			transportOut.setSender(sandesha2Sender);
+			
+			AxisEngine engine = new AxisEngine (configCtx);
+			try {
+				engine.send(ackMsgCtx);
+			} catch (AxisFault e) {
+				throw new SandeshaException (e.getMessage());
+			}
+			
 			SandeshaUtil.startSenderForTheSequence(configCtx,sequenceId);
 		}
 

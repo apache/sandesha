@@ -17,9 +17,12 @@
 
 package org.apache.sandesha2.util;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.RMPolicyBean;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
@@ -31,14 +34,15 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 public class MessageRetransmissionAdjuster {
 
 	public SenderBean adjustRetransmittion(
-			SenderBean retransmitterBean) {
+			SenderBean retransmitterBean,ConfigurationContext configContext) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		
 		String storedKey = (String) retransmitterBean.getMessageContextRefKey();
 
 		if (storedKey == null)
 			return retransmitterBean;
 
-		MessageContext messageContext = SandeshaUtil
-				.getStoredMessageContext(storedKey);
+		MessageContext messageContext = storageManager.retrieveMessageContext(storedKey,configContext);
 
 		if (messageContext.getConfigurationContext() == null)
 			return retransmitterBean;

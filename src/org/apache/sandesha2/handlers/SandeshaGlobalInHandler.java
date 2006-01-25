@@ -25,7 +25,6 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
@@ -62,6 +61,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		if (!isRMGlobalMessage) {
 			return;
 		}
+		
 
 		FaultManager faultManager = new FaultManager();
 		RMMsgContext faultMessageContext = faultManager
@@ -77,12 +77,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		RMMsgContext rmMessageContext = MsgInitializer
 				.initializeMessage(msgContext);
 
-		ConfigurationContext context = rmMessageContext.getMessageContext()
-				.getConfigurationContext();
-
-		ServiceContext serviceContext = msgContext.getServiceContext();
-		Object debug = null;
-
 		//Dropping duplicates
 		boolean dropped = dropIfDuplicate(rmMessageContext);
 		if (dropped) {
@@ -90,6 +84,11 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			return;
 		}
 
+        //Persisting the application messages	
+//		if (rmMessageContext.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
+//			SandeshaUtil.PersistMessageContext ()
+//		}
+		
 		//Process if global processing possible. - Currently none
 		if (SandeshaUtil.isGloballyProcessableMessageType(rmMessageContext
 				.getMessageType())) {

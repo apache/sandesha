@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;

@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
@@ -136,4 +135,17 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 			return null;
 	}
 
+	public Collection retrieveAll() {
+		Collection coll = new ArrayList();
+		
+		Iterator keys = table.keySet().iterator();
+		while (keys.hasNext()) {
+			Object key = keys.next();
+			coll.add(table.get(key));
+		}
+		
+		return coll;
+	}
+
+	
 }

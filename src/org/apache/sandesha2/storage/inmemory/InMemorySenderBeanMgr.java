@@ -28,7 +28,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
@@ -188,5 +187,21 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		else 
 			return null;
 	}
+
+	public SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {
+		
+		Iterator iter = table.keySet().iterator();
+		while (iter.hasNext()) {
+			Object key = iter.next();
+			SenderBean bean = (SenderBean) table.get(key);
+			if (bean.getMessageContextRefKey().equals(messageContextRefKey)) {
+				return bean;
+			}
+		}
+		
+		return null;
+	}
+	
+	
 
 }

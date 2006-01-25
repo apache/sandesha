@@ -21,8 +21,6 @@ import java.util.Collection;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
-import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
@@ -52,4 +50,5 @@ public interface SenderBeanMgr extends RMBeanManager {
 
 	public boolean update(SenderBean bean) throws SandeshaStorageException;
 
+	public SenderBean retrieveFromMessageRefKey (String messageContextRefKey);
 }

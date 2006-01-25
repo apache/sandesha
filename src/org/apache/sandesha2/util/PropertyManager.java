@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.axis2.description.ModuleDescription;
+import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -129,7 +129,40 @@ public class PropertyManager {
 		}
 	}
 
-	public void loadPropertiesFromModuleDesc(ModuleDescription desc)
+	public void loadPropertiesFromModuleDesc (AxisModule desc) {
+		
+		Parameter expoBackoffParam = desc.getParameter (Sandesha2Constants.Properties.ExponentialBackoff);
+		String expoBackoffStr = (String) expoBackoffParam.getValue();
+		loadExponentialBackoff(expoBackoffStr);
+		
+		Parameter retransmissionIntParam = desc.getParameter (Sandesha2Constants.Properties.RetransmissionInterval);
+		String retransmissionIntStr = (String) retransmissionIntParam.getValue();
+		loadRetransmissionInterval(retransmissionIntStr);
+		
+		Parameter acknowledgementIntParam = desc.getParameter(Sandesha2Constants.Properties.AcknowledgementInterval);
+		String acknowledgementIntStr = (String) acknowledgementIntParam.getValue();
+		loadAcknowledgementInterval(acknowledgementIntStr);		
+		
+		Parameter inactivityTimeoutParam = desc.getParameter(Sandesha2Constants.Properties.InactivityTimeout);
+		String inactivityTimeoutStr = (String) inactivityTimeoutParam.getValue();
+		Parameter inactivityTimeoutMeasureParam = desc.getParameter(Sandesha2Constants.Properties.InactivityTimeoutMeasure);
+		String inactivityTimeoutMeasure = (String) inactivityTimeoutMeasureParam.getValue();
+		loadInactivityTimeout(inactivityTimeoutStr,inactivityTimeoutMeasure);
+		
+		Parameter storageMgrClassParam = desc.getParameter(Sandesha2Constants.Properties.StorageManager);
+		String storageMgrClassStr = (String) storageMgrClassParam.getValue();
+		loadStoragemanagerClass(storageMgrClassStr);
+		
+		Parameter inOrderInvocationParam = desc.getParameter(Sandesha2Constants.Properties.InOrderInvocation);
+		String inOrderInvocation = (String) inOrderInvocationParam.getValue();
+		loadInOrderInvocation (inOrderInvocation);
+		
+		Parameter messageTypesToDropParam = desc.getParameter(Sandesha2Constants.Properties.MessageTypesToDrop); 
+		String messageTypesToDrop = (String) messageTypesToDropParam.getValue();
+		loadMessageTypesToDrop (messageTypesToDrop);
+	}
+	
+	public void loadPropertiesFromModuleDescPolicy(AxisModule desc)
 			throws SandeshaException {
 		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 

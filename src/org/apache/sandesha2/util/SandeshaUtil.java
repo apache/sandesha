@@ -19,7 +19,6 @@ package org.apache.sandesha2.util;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
@@ -37,6 +36,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.Handler;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.soap.SOAP12Constants;
@@ -65,7 +65,7 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 public class SandeshaUtil {
 
-	private static Hashtable storedMsgContexts = new Hashtable();
+	//private static Hashtable storedMsgContexts = new Hashtable();
 
 	private static StorageManager storageManager = null;
 
@@ -189,36 +189,36 @@ public class SandeshaUtil {
 		return sortedList;
 	}
 
-	/**
-	 * Used to store message context objects. Currently they are stored in a in-memory HashMap.
-	 * Returned key can be used to retrieve the message context.
-	 * 
-	 * @param ctx
-	 * @return
-	 * @throws SandeshaException
-	 */
-	public static String storeMessageContext(MessageContext ctx)
-			throws SandeshaException {
-		if (ctx == null) {
-			String message = "Stored Msg Ctx is null";
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		String key = getUUID();
-		storedMsgContexts.put(key, ctx);
-		return key;
-	}
-
-	/**
-	 * Retrieve the MessageContexts saved by the above method.
-	 * 
-	 * @param key
-	 * @return
-	 */
-	public static MessageContext getStoredMessageContext(String key) {
-		return (MessageContext) storedMsgContexts.get(key);
-	}
+//	/**
+//	 * Used to store message context objects. Currently they are stored in a in-memory HashMap.
+//	 * Returned key can be used to retrieve the message context.
+//	 * 
+//	 * @param ctx
+//	 * @return
+//	 * @throws SandeshaException
+//	 */
+//	public static String storeMessageContext(MessageContext ctx)
+//			throws SandeshaException {
+//		if (ctx == null) {
+//			String message = "Stored Msg Ctx is null";
+//			log.debug(message);
+//			throw new SandeshaException(message);
+//		}
+//
+//		String key = getUUID();
+//		storedMsgContexts.put(key, ctx);
+//		return key;
+//	}
+	
+//	/**
+//	 * Retrieve the MessageContexts saved by the above method.
+//	 * 
+//	 * @param key
+//	 * @return
+//	 */
+//	public static MessageContext getStoredMessageContext(String key) {
+//		return (MessageContext) storedMsgContexts.get(key);
+//	}
 
 	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) {
 		sender.runSenderForTheSequence (context,sequenceID);
@@ -612,7 +612,7 @@ public class SandeshaUtil {
 		else if (sequenceKey==null)
 			return to;
 		else 
-			return to + ":" +sequenceKey;
+			return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + to + ":" +sequenceKey;
 	}
 	
 //	public static String getServerSideInternalSeqID (String incomingSeqId) {
@@ -631,6 +631,98 @@ public class SandeshaUtil {
 			sequeunceID = outSequenceBean.getValue();
 		
 		return sequeunceID;
+	}
+		
+	public static QName getQNameFromString (String qnameStr) throws SandeshaException {
+		String[] parts = qnameStr.split(Sandesha2Constants.QNAME_SEPERATOR);
+		if (!(parts.length==3))
+			throw new SandeshaException ("Invalid QName String");
+		
+		if (parts[0].equals(Sandesha2Constants.VALUE_NONE))
+			parts[0]=null;
+		
+		if (parts[1].equals(Sandesha2Constants.VALUE_NONE))
+			parts[1]=null;
+		
+		if (parts[2].equals(Sandesha2Constants.VALUE_NONE))
+			parts[2]=null;
+		
+		if (parts[0].equals(Sandesha2Constants.VALUE_EMPTY))
+			parts[0]="";
+		
+		if (parts[1].equals(Sandesha2Constants.VALUE_EMPTY))
+			parts[1]="";
+		
+		if (parts[2].equals(Sandesha2Constants.VALUE_EMPTY))
+			parts[2]="";
+		
+		String namespace = parts[0];
+		String localPart = parts[1];
+		String prefix = parts[2];
+		
+		QName name = new QName (namespace, localPart,prefix);
+		return name;
+	}
+	
+	public static String getStringFromQName (QName name) {
+		String localPart = name.getLocalPart();
+		String namespace = name.getNamespaceURI();
+		String prefix = name.getPrefix();
+		
+		if (localPart==null)
+			localPart = Sandesha2Constants.VALUE_NONE;
+
+		if (namespace==null)
+			namespace = Sandesha2Constants.VALUE_NONE;
+		
+		if (prefix==null)
+			prefix = Sandesha2Constants.VALUE_NONE;
+		
+		if ("".equals(localPart))
+			localPart = Sandesha2Constants.VALUE_EMPTY;
+
+		if ("".equals(namespace))
+			namespace = Sandesha2Constants.VALUE_EMPTY;
+		
+		if ("".equals(prefix))
+			prefix = Sandesha2Constants.VALUE_EMPTY;
+		
+		String QNameStr = namespace + Sandesha2Constants.QNAME_SEPERATOR + localPart + Sandesha2Constants.QNAME_SEPERATOR 
+								+ prefix;
+		
+		return QNameStr;
+	}
+	
+	public static String getExecutionChainString (ArrayList executionChain) {
+		Iterator iter = executionChain.iterator();
+		
+		String executionChainStr = "";
+		while (iter.hasNext()) {
+			Handler handler = (Handler) iter.next();
+			QName name = handler.getName();
+			String handlerStr = SandeshaUtil.getStringFromQName(name);
+			executionChainStr = executionChainStr + Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR + handlerStr;
+		}
+		
+		return executionChainStr;
+	}
+	
+	
+	//TODO complete below.
+	public static ArrayList getExecutionChainFromString (String executionChainStr, ConfigurationContext configContext) throws SandeshaException {
+		String[] QNameStrs = executionChainStr.split(Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR);
+		
+		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
+		
+		int length = QNameStrs.length;
+		for (int i=0;i<length;i++) {
+			String QNameStr = QNameStrs[i];
+			QName name = getQNameFromString(QNameStr);
+			//axisConfiguration.get
+			
+		}
+		
+		return null;  //not complete yet.
 	}
 
 }

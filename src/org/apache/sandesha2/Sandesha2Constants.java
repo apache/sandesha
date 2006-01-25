@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2;
 
-import java.util.ArrayList;
 
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
@@ -305,6 +304,10 @@ public interface Sandesha2Constants {
 		}
 	}
 	
+	public interface DatabaseParams {
+		
+	}
+	
 	String IN_HANDLER_NAME = "SandeshaInHandler";
 
 	String OUT_HANDLER_NAME = "SandeshaOutHandler";
@@ -335,6 +338,27 @@ public interface Sandesha2Constants {
 	
 	String VALUE_NONE = "none";
 	
+	String VALUE_EMPTY = "empty";
+	
+	String VALUE_TRUE = "true";
+	
+	String VALUE_FALSE = "false";
+	
 	String SANDESHA2_INTERNAL_SEQUENCE_ID = "Sandesha2IntSeq";
+	
+	String MESSAGE_STORE_KEY = "Sandesha2MessageStoreKey";
 
+	String ORIGINAL_TRANSPORT_SENDER = "Sandesha2OriginalTransportSender";
+	
+	String SET_SEND_TO_TRUE = "Sandesha2SetSendToTrue";
+	
+	String MESSAGE_TYPE = "Sandesha2MessageType";
+	
+	String QUALIFIED_FOR_SENDING = "Sandesha2QualifiedForSending";  //Sender will send messages only if this property is null (not set) or true.
+
+	String QNAME_SEPERATOR = ",";
+	
+	String EXECUTIN_CHAIN_SEPERATOR = ".";
+	
+	String INTERNAL_SEQUENCE_PREFIX = "Sandesha2InternalSequence";
 }

@@ -198,9 +198,12 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			//updating the application message
 			String key = tempBean.getMessageContextRefKey();
-			MessageContext applicationMsg = SandeshaUtil
-					.getStoredMessageContext(key);
+			MessageContext applicationMsg = storageManager.retrieveMessageContext(key,configCtx); 
 
+			//TODO make following exception message more understandable to the user (probably some others exceptions messages as well)
+			if (applicationMsg==null)
+				throw new SandeshaException ("Unavailable application message");
+			
 			RMMsgContext applicaionRMMsg = MsgInitializer
 					.initializeMessage(applicationMsg);
 
@@ -233,6 +236,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			//asking to send the application msssage
 			tempBean.setSend(true);
 			retransmitterMgr.update(tempBean);
+			
+			//updating the message. this will correct the SOAP envelope string.
+			storageManager.updateMessageContext(key,applicationMsg);
 		}
 
 		SequenceManager.updateLastActivatedTime(newOutSequenceId,configCtx);
