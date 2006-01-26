@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -39,6 +41,8 @@ import org.apache.sandesha2.util.SequenceManager;
 
 public class Sandesha2ClientAPI {
 
+	private static Log log = LogFactory.getLog(Sandesha2ClientAPI.class);
+	
 	public static String AcksTo = "Sandesha2ClientAPIPropertyAcksTo";
 	public static String LAST_MESSAGE = "Sandesha2ClientAPIPropertyWSRMLastMessage";
 	public static String OFFERED_SEQUENCE_ID = "Sandesha2ClientAPIPropertyOfferedSequenceId";
@@ -58,6 +62,12 @@ public class Sandesha2ClientAPI {
 		findBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		findBean.setValue(internalSequenceID);
 		SequencePropertyBean internalSequenceBean = seqpPropMgr.findUnique(findBean);
+		
+		if (internalSequenceBean==null) {
+			log.debug("internal sequence bean is null.");
+			throw new SandeshaException ("Data not available to give the sequence report");
+		}
+		
 		String sequenceID = internalSequenceBean.getSequenceID();
 		
 		//finding the actual seq

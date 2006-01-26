@@ -29,6 +29,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.soap.SOAPEnvelope;
@@ -418,7 +419,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 //			long ackInterval = PropertyManager.getInstance()
 //					.getAcknowledgementInterval();
 			
-			SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) msgCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN).getValue();
+			Parameter param = msgCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+			
+			SandeshaPropertyBean propertyBean = null;
+			if (param!=null) {
+				propertyBean = (SandeshaPropertyBean)  param.getValue();
+			}else {
+				propertyBean = PropertyManager.getInstance().getPropertyBean();
+			}
+			
+			
 			long ackInterval = propertyBean.getAcknowledgementInaterval();
 			
 			//			if (policyBean != null) {
