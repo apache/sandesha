@@ -82,7 +82,7 @@ public class AnonymousPingTest extends TestCase{
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
 		
-		serviceClient.engageModule(new QName ("Sandesha2-0.9"));
+		serviceClient.engageModule(new QName ("sandesha2"));
 		serviceClient.setOptions(clientOptions);
 		
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));

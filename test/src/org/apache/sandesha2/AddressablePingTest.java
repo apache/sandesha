@@ -84,7 +84,7 @@ public class AddressablePingTest extends TestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
 		
-		serviceClient.engageModule(new QName ("Sandesha2-0.9"));
+		serviceClient.engageModule(new QName ("sandesha2"));
 		serviceClient.setOptions(clientOptions);
 		
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
@@ -107,7 +107,6 @@ public class AddressablePingTest extends TestCase {
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_COMPLETED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 		
-
 	}
 	
 	private OMElement getPingOMBlock(String text) {
