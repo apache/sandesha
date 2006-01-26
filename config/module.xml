@@ -33,14 +33,12 @@
     <parameter name="db.conn.id" locked="xsd:false">jdbc:derby:SANDESHA2DB;create=true</parameter>
     <parameter name="db.driver" locked="xsd:false">org.apache.derby.jdbc.EmbeddedDriver</parameter>
     <parameter name="db.sql.dialect" locked="xsd:false">org.hibernate.dialect.DerbyDialect</parameter>
+    <parameter name="db.create.mode" locked="xsd:false">update</parameter> 
     <parameter name="db.username" locked="xsd:false"></parameter> 
     <parameter name="db.password" locked="xsd:false"></parameter>      
     
-    <!--  PARAMETERS FOR SANDESHA2                     -->
-    <!--  ========================                     -->
-    
-    <!--  RM Policy values for the server              -->
-        
+<!--
+
     <parameter name="RetransmissionInterval" locked="xsd:false">10000</parameter>
     <parameter name="AcknowledgementInterval" locked="xsd:false">4000</parameter>
     <parameter name="ExponentialBackoff" locked="xsd:false">false</parameter>
@@ -48,31 +46,21 @@
     <parameter name="InactivityTimeoutMeasure" locked="xsd:false">days</parameter>
     
     
-    <!--  Storage Manager Class                         -->
+    <parameter name="StorageManager" locked="xsd:false">org.apache.sandesha2.storage.inmemory.InMemoryStorageManager</parameter>
 
-     <parameter name="StorageManager" locked="xsd:false">org.apache.sandesha2.storage.inmemory.InMemoryStorageManager</parameter> 
-      
-    <!-- Delivery Assurance                             -->
-    
+
     <parameter name="InvokeInOrder" locked="xsd:false">true</parameter>
     
     
-    <!-- System Configurations (only for advance users)  -->
-    <!-- ==============================================  -->
-    
-    <!-- SenderConfiguration                             -->
-    
     <parameter name="MessageTypesToDrop" locked="xsd:false">none</parameter>
-    
-   
-   <!--
+      -->
+
    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
 	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
     xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
          
       <wsrm:AcknowledgementInterval>4000</wsrm:AcknowledgementInterval>
-      
-      
+       
       <wsrm:RetransmissionInterval>10000</wsrm:RetransmissionInterval>
       
       <wsrm:ExponentialBackoff>true</wsrm:ExponentialBackoff>
@@ -83,20 +71,18 @@
       
       <wsrm:InvokeInOrder>true</wsrm:InvokeInOrder>
       
-      <wsrm:MessageTypesToDrop>none</wsrm:MessageTypesToDrop>            
-      
+      <!-- This will not be overriden by service level policies -->
+      <wsrm:MessageTypesToDrop>none</wsrm:MessageTypesToDrop>  
+                
+                
+      <!-- This will not be overriden by service level policies -->
       <wsrm:StorageManagers>
-
-        <wsrm:PermanentStorageManager>
-        </wsrm:PermanentStorageManager>
-        
-        <wsrm:InmemoryStorageManager>
+        <wsrm:StorageManager>
           org.apache.sandesha2.storage.inmemory.InMemoryStorageManager
-        </wsrm:InmemoryStorageManager>
-        
+        </wsrm:StorageManager> 
       </wsrm:StorageManagers>
 
-
+<!--
 	<wsrm:DBConnectionID>jdbc:derby:SANDESHA2DB;create=true</wsrm:DBConnectionID> 
 
 	<wsrm:DBDriver>org.apache.derby.jdbc.EmbeddedDriver</wsrm:DBDriver> 
@@ -106,9 +92,8 @@
 	<wsrm:DBUsername></wsrm:DBUsername> 
 
 	<wsrm:DBPassword></wsrm:DBPassword>  
-
-      <wsrm:>   
+-->
    
-</wsp:Policy>    -->
+</wsp:Policy>
 
 </module>
