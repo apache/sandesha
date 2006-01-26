@@ -29,6 +29,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -58,10 +59,28 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class RMMsgCreator {
 
-	private static void setUpMessage(MessageContext rmMsgCtx) {
+	private static void setUpMessage(MessageContext relatedMessage, MessageContext newMessage) throws SandeshaException {
 		//Seting RMPolicyBean
-		if (rmMsgCtx.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN)==null)
-			rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, PropertyManager.getInstance().getRMPolicyBean());
+//		if (rmMsgCtx.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN)==null)
+//			rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, PropertyManager.getInstance().getRMPolicyBean());
+	
+		Parameter policyParam = relatedMessage.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+//		if (propertyParam!=null)
+//			newMessage.setProperty(propertyParam.getName(),propertyParam.getValue());
+		
+		if (policyParam!=null) {
+			
+			try {
+				//TODO this should be added to the AxisMessage
+				if (newMessage.getAxisOperation()!=null)
+					newMessage.getAxisOperation().addParameter(policyParam);
+				else if (newMessage.getAxisService()!=null) {
+					newMessage.getAxisService().addParameter(policyParam);
+				}
+			} catch (AxisFault e) {
+				throw new SandeshaException (e.getMessage());
+			}
+		}
 	}
 
 	/**
@@ -111,7 +130,7 @@ public class RMMsgCreator {
 			throw new SandeshaException(e.getMessage());
 		}
 
-		setUpMessage(createSeqmsgContext);
+		setUpMessage(applicationMsgContext, createSeqmsgContext);
 
 		AxisOperation appMsgOperationDesc = applicationMsgContext
 				.getAxisOperation();
@@ -236,7 +255,7 @@ public class RMMsgCreator {
 		if (terminateMessage == null)
 			throw new SandeshaException("MessageContext is null");
 
-		setUpMessage(terminateMessage);
+		setUpMessage(referenceMessage, terminateMessage);
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
 				.getSOAPVersion(referenceMessage.getEnvelope()));
@@ -327,7 +346,7 @@ public class RMMsgCreator {
 
 		outMessage.setEnvelope(envelope);
 
-		setUpMessage(outMessage);
+		setUpMessage(createSeqMessage.getMessageContext(), outMessage);
 
 		RMMsgContext createSeqResponse = null;
 		try {
@@ -414,7 +433,7 @@ public class RMMsgCreator {
 			RMMsgContext ackRMMsgCtx = MsgInitializer
 					.initializeMessage(ackMsgCtx);
 
-			setUpMessage(ackMsgCtx);
+			setUpMessage(applicationMsgCtx, ackMsgCtx);
 
 			Sequence reqSequence = (Sequence) applicationRMMsgCtx
 					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);

@@ -29,6 +29,8 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.soap.SOAPBody;
@@ -52,9 +54,11 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.RMPolicyManager;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -65,6 +69,8 @@ import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.wsdl.WSDLConstants;
+
+import sun.security.action.GetPropertyAction;
 
 /**
  * This is invoked in the outFlow of an RM endpoint
@@ -114,8 +120,21 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		//Adding the policy bean
-		RMPolicyBean policyBean = RMPolicyManager.getPolicyBean(rmMsgCtx);
-		rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, policyBean);
+//		RMPolicyBean policyBean = RMPolicyManager.getPolicyBean(rmMsgCtx);
+//		rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, policyBean);
+		Parameter policyParam = msgCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+		if (policyParam==null) {
+			SandeshaPropertyBean propertyBean = PropertyManager.getInstance().getPropertyBean();
+			Parameter parameter = new ParameterImpl ();
+			parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+			parameter.setValue(propertyBean);
+			
+			//TODO this should be addede to the AxisMessage
+			if (msgCtx.getAxisOperation()!=null)
+				msgCtx.getAxisOperation().addParameter(parameter);
+			else if (msgCtx.getAxisService()!=null) 
+				msgCtx.getAxisService().addParameter(parameter);
+		}
 
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager

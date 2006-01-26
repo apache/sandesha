@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -36,6 +38,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.PropertyManager;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
@@ -47,6 +50,8 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class TerminateManager {
 
+	private static Log log = LogFactory.getLog(TerminateManager.class);
+	
 	private static String CLEANED_ON_TERMINATE_MSG = "CleanedOnTerminateMsg";
 	private static String CLEANED_AFTER_INVOCATION = "CleanedAfterInvocation";
 	
@@ -66,6 +71,9 @@ public class TerminateManager {
 		//clean senderMap
 		
 		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
+		//SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) msgContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+		
+		
 		if(!inOrderInvocation) { 
 			//there is no invoking by Sandesha2. So clean invocations storages.
 			cleanReceivingSideAfterInvocation(configContext,sequenceID);
@@ -136,12 +144,17 @@ public class TerminateManager {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-		ArrayList allSequenceList = SandeshaUtil.getArrayListFromString(allSequenceBean.getValue());
-		allSequenceList.remove(sequenceID);
 		
-		//updating 
-		allSequenceBean.setValue(allSequenceList.toString());
-		sequencePropertyBeanMgr.update(allSequenceBean);
+		if (allSequenceBean!=null) {
+			log.debug("AllSequence bean is null");
+			
+			ArrayList allSequenceList = SandeshaUtil.getArrayListFromString(allSequenceBean.getValue());
+			allSequenceList.remove(sequenceID);
+		
+			//updating 
+			allSequenceBean.setValue(allSequenceList.toString());
+			sequencePropertyBeanMgr.update(allSequenceBean);
+		}
 	}
 	
 	private static boolean isRequiredForResponseSide (String name) {

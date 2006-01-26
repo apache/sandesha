@@ -33,8 +33,8 @@ public class RMPolicy {
 	public static final RMPolicyToken permenentStorageManager = new RMPolicyToken(
 			"PermanentStorageManager", RMPolicyToken.SIMPLE_TOKEN, new String[]{});
 	
-	public static final RMPolicyToken inmemoryStorageManager = new RMPolicyToken(
-			"InmemoryStorageManager", RMPolicyToken.SIMPLE_TOKEN, new String[]{});
+	public static final RMPolicyToken storageManager = new RMPolicyToken(
+			"StorageManager", RMPolicyToken.SIMPLE_TOKEN, new String[]{});
 	
 	public static final String includeNever = "http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never";
 

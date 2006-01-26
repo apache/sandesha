@@ -201,7 +201,7 @@ public class PropertyManager {
 				.setRetransmissionInterval(data.getRetransmissionInterval());
 
 		// CHECKME
-		propertyBean.setStorageManagerClass(data.getInmemoryStorageManager());
+		propertyBean.setStorageManagerClass(data.getStorageManager());
 	}
 
 	public static PropertyManager getInstance() {

@@ -14,6 +14,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -256,7 +257,10 @@ public class SequenceManager {
 			.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
 		if (policyBean == null) {
 			//loading default policies.
-			policyBean = PropertyManager.getInstance().getRMPolicyBean();
+			//policyBean = PropertyManager.getInstance().getRMPolicyBean();
+			Parameter parameter =  rmMsgCtx.getMessageContext().getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+			SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
+			policyBean = propertyBean.getPolicyBean();
 		}
 		
 		if (policyBean.getInactiveTimeoutInterval()<=0)

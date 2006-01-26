@@ -361,4 +361,6 @@ public interface Sandesha2Constants {
 	String EXECUTIN_CHAIN_SEPERATOR = ".";
 	
 	String INTERNAL_SEQUENCE_PREFIX = "Sandesha2InternalSequence";
+	
+	String SANDESHA2_POLICY_BEAN = "Sandesha2PolicyBean";
 }

@@ -16,7 +16,7 @@ public class StorageManagersProcessor {
 			throws NoSuchMethodException {
 		logger.debug("StorageManagersProcessor:initializeStorageManager");
 
-		RMPolicyToken tmpRpt = RMPolicy.inmemoryStorageManager.copy();
+		RMPolicyToken tmpRpt = RMPolicy.storageManager.copy();
 		tmpRpt.setProcessTokenMethod(this);
 		rmpt.setChildToken(tmpRpt);
 
@@ -55,7 +55,7 @@ public class StorageManagersProcessor {
 		return new Boolean(true);
 	}
 
-	public Object doInmemoryStorageManager(RMProcessorContext rmpc) {
+	public Object doStorageManager(RMProcessorContext rmpc) {
 		logger.debug("Processing "
 				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
 				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
@@ -64,7 +64,7 @@ public class StorageManagersProcessor {
 		String cls = rmpc.getAssertion().getStrValue();
 
 		if (cls != null && !cls.trim().equals("")) {
-			ped.setInmemoryStorageManager(cls.trim());
+			ped.setStorageManager(cls.trim());
 		}
 
 		return new Boolean(true);
@@ -79,7 +79,7 @@ public class StorageManagersProcessor {
 		String cls = spc.getAssertion().getStrValue();
 
 		if (cls != null && !cls.trim().equals("")) {
-			ped.setPermanentStorageManager(cls.trim());
+			ped.setStorageManager(cls.trim());
 		}
 
 		return new Boolean(true);

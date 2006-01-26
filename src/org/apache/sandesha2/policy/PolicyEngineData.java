@@ -9,8 +9,8 @@ public class PolicyEngineData {
 	private boolean invokeInOrder;
 	private String messageTypesToDrop;
 	private long retransmissionInterval;
-	private String permanentStorageMgr;
-	private String inmemoryStorageManager;
+	//private String permanentStorageMgr;
+	private String storageManager;
 	
 
 	public boolean isExponentialBackoff() {
@@ -61,13 +61,13 @@ public class PolicyEngineData {
 		this.retransmissionInterval = retransmissionInterval;
 	}
 
-	public String getPermanentStorageManager() {
-		return permanentStorageMgr;
-	}
-
-	public void setPermanentStorageManager(String storageManager) {
-		this.permanentStorageMgr = storageManager;
-	}
+//	public String getPermanentStorageManager() {
+//		return permanentStorageMgr;
+//	}
+//
+//	public void setPermanentStorageManager(String storageManager) {
+//		this.permanentStorageMgr = storageManager;
+//	}
 
 	public void initializeWithDefaults() {
 		
@@ -83,7 +83,8 @@ public class PolicyEngineData {
 		ped.setInvokeInOrder(this.isInvokeInOrder());
 		ped.setMessageTypesToDrop(this.getMessageTypesToDrop());
 		ped.setRetransmissionInterval(this.getRetransmissionInterval());
-		ped.setPermanentStorageManager(this.getPermanentStorageManager());
+		//ped.setPermanentStorageManager(this.getPermanentStorageManager());
+		ped.setStorageManager(this.getStorageManager());
 		
 		return ped;
 	}
@@ -96,11 +97,11 @@ public class PolicyEngineData {
 		return acknowledgementInterval;
 	}
 	
-	public void setInmemoryStorageManager(String inmemoryStorageManager) {
-		this.inmemoryStorageManager = inmemoryStorageManager;
+	public void setStorageManager(String storageManager) {
+		this.storageManager = storageManager;
 	}
 	
-	public String getInmemoryStorageManager() {
-		return inmemoryStorageManager;
+	public String getStorageManager() {
+		return storageManager;
 	}
 }

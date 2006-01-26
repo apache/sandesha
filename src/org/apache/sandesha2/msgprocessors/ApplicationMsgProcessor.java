@@ -54,6 +54,7 @@ import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -177,8 +178,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	//	long nextMsgno = bean.getNextMsgNoToProcess();
 
-		boolean inOrderInvocation = PropertyManager.getInstance()
-				.isInOrderInvocation();
+//		boolean inOrderInvocation = PropertyManager.getInstance()
+//				.isInOrderInvocation();
+//		
+		//TODO currently this is an module-level property. Make this service specific.
+//		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) msgCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN).getValue();
+//		boolean inOrderInvocation = propertyBean.isInOrder();
+		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
+		
+		
 		if (inOrderInvocation) {
 			
 			//pause the message
@@ -404,13 +412,18 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//sequence is the actual sequence ID
 			ackBean.setInternalSequenceID(sequenceId);
 
-			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
-					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
-			long ackInterval = PropertyManager.getInstance()
-					.getAcknowledgementInterval();
-			if (policyBean != null) {
-				ackInterval = policyBean.getAcknowledgementInaterval();
-			}
+//			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
+//					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
+		
+//			long ackInterval = PropertyManager.getInstance()
+//					.getAcknowledgementInterval();
+			
+			SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) msgCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN).getValue();
+			long ackInterval = propertyBean.getAcknowledgementInaterval();
+			
+			//			if (policyBean != null) {
+//				ackInterval = policyBean.getAcknowledgementInaterval();
+//			}
 			
 			//Ack will be sent as stand alone, only after the retransmitter
 			// interval.

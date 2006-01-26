@@ -17,8 +17,16 @@
 
 package org.apache.sandesha2.util;
 
+import java.util.ArrayList;
+
+import org.apache.axis2.description.AxisDescription;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.policy.PolicyEngineData;
 import org.apache.sandesha2.policy.RMPolicyBean;
+import org.apache.sandesha2.policy.RMPolicyProcessor;
+import org.apache.sandesha2.policy.RMProcessorContext;
+import org.apache.ws.policy.Policy;
 
 /**
  * This is used to manage RM Policies.
@@ -34,5 +42,50 @@ public class RMPolicyManager {
 		
 		RMPolicyBean policyBean = PropertyManager.getInstance().getRMPolicyBean();
 		return policyBean;
+	}
+	
+	public static SandeshaPropertyBean loadPoliciesFromAxisDescription (AxisDescription desc) throws SandeshaException{
+		
+		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();
+		
+		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
+
+		if (policy == null) {
+			//no policy found
+			return null;
+		}
+
+		RMPolicyProcessor processor = new RMPolicyProcessor();
+
+		try {
+			processor.setup();
+		} catch (NoSuchMethodException e) {
+			throw new SandeshaException(e.getMessage());
+		}
+		
+		processor.processPolicy(policy);
+
+		RMProcessorContext ctx = processor.getContext();
+		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
+
+		propertyBean.setAcknowledgementInterval(data
+				.getAcknowledgementInterval());
+		propertyBean.setExponentialBackoff(data.isExponentialBackoff());
+		propertyBean.setInactiveTimeoutInterval((int) data
+				.getInactivityTimeout(), data.getInactivityTimeoutMeassure());
+		propertyBean.setInOrder(data.isInvokeInOrder());
+
+		// CHECKME
+		ArrayList msgTypesToDrop = new ArrayList();
+		msgTypesToDrop.add(data.getMessageTypesToDrop());
+		propertyBean.setMsgTypesToDrop(msgTypesToDrop);
+
+		propertyBean
+				.setRetransmissionInterval(data.getRetransmissionInterval());
+
+		// CHECKME
+		propertyBean.setStorageManagerClass(data.getStorageManager());
+		
+		return propertyBean;
 	}
 }

@@ -21,10 +21,14 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
+import org.apache.sandesha2.util.RMPolicyManager;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 
@@ -44,7 +48,7 @@ public class SandeshaModule implements Module {
 
 		// loading properties to property manager.
 		// PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
-		PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
+		PropertyManager.getInstance().loadPropertiesFromModuleDescPolicy(module);
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		storageManager.initStorage(module);
 	}
@@ -52,6 +56,19 @@ public class SandeshaModule implements Module {
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
 
 		// TODO add notify logic.
+		
+		SandeshaPropertyBean defaultPropertyBean = PropertyManager.getInstance().getPropertyBean();
+		SandeshaPropertyBean axisDescPropertyBean = RMPolicyManager.loadPoliciesFromAxisDescription(axisDescription);
+		
+		Parameter parameter = new ParameterImpl ();
+		parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+		if (axisDescPropertyBean==null) {
+			parameter.setValue(defaultPropertyBean);
+		}else {
+			parameter.setValue(axisDescPropertyBean);
+		}
+		
+		axisDescription.addParameter(parameter);
 
 	}
 

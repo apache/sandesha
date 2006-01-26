@@ -421,7 +421,9 @@ public class SandeshaUtil {
 			return storageManager;
 
 		} catch (Exception e) {
-			throw new SandeshaException(e.getMessage());
+			String message = "Cannot load the given storage manager";
+			log.error(message);
+			throw new SandeshaException(message);
 		}
 	}
 
