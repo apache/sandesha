@@ -385,7 +385,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		//cannot pause since the message have to be saved at the sender
 		//pausing the message
-		//msgCtx.pause();
+		msgCtx.pause();
 		
 		responseProcessTransaction.commit();
 	}
@@ -461,14 +461,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 				.getRetransmitterBeanMgr();
 
 		String key = SandeshaUtil.getUUID();
-
+		storageManager.storeMessageContext(key,createSeqMsg);
+		
 		SenderBean createSeqEntry = new SenderBean();
 		createSeqEntry.setMessageContextRefKey(key);
 		createSeqEntry.setTimeToSend(System.currentTimeMillis());
 		createSeqEntry.setMessageID(createSeqRMMessage.getMessageId());
 		
 		//this will be set to true in the sender
-		createSeqEntry.setSend(false);
+		createSeqEntry.setSend(true);
 		createSeqEntry.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ); 
 		retransmitterMgr.insert(createSeqEntry);
 		createSeqTransaction.commit();
@@ -488,14 +489,16 @@ public class SandeshaOutHandler extends AbstractHandler {
 		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
 		
 		//setting the sandesha2 sender as the sender.
-		createSeqMsg.getTransportOut().setSender(sender);
+		//createSeqMsg.getTransportOut().setSender(sender);
 		
-		try {
-			log.info ("Sending create seq msg...");
-			engine.send(createSeqMsg);
-		} catch (AxisFault e) {
-			throw new SandeshaException (e.getMessage());
-		}
+//		try {
+//			log.info ("Sending create seq msg...");
+//			engine.send(createSeqMsg);
+//		} catch (AxisFault e) {
+//			throw new SandeshaException (e.getMessage());
+//		}
+		
+		
 		
 	}
 
@@ -685,6 +688,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 //		String key = storageManager
 //				.storeMessageContext(rmMsg.getMessageContext());
 		String storageKey = SandeshaUtil.getUUID();
+		storageManager.storeMessageContext(storageKey,msg); 
 		
 		appMsgEntry.setMessageContextRefKey(storageKey);
 		
@@ -717,7 +721,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			msg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,storageKey);
 			//sandesha2Sender.setMessageStoreKey(storageKey);
 			
-			msg.getTransportOut().setSender(sandesha2Sender);
+			//msg.getTransportOut().setSender(sandesha2Sender);
 			msg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,sender);
 		}
 		

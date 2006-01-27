@@ -397,7 +397,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			String key = SandeshaUtil.getUUID();
 			
 			//dumping to the storage will be done be Sandesha2 Transport Sender
-			//storageManager.storeMessageContext(key,ackMsgCtx);
+			storageManager.storeMessageContext(key,ackMsgCtx);
 			
 			SenderBean ackBean = new SenderBean();
 			ackBean.setMessageContextRefKey(key);
@@ -405,7 +405,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			ackBean.setReSend(false);
 			
 			//this will be set to true in the sender.
-			ackBean.setSend(false);
+			ackBean.setSend(true);
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 			
 			//the internalSequenceId value of the retransmitter Table for the
@@ -470,14 +470,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
 			//sandesha2Sender.setMessageStoreKey(key);
 			
-			transportOut.setSender(sandesha2Sender);
+			//transportOut.setSender(sandesha2Sender);
 			
 			AxisEngine engine = new AxisEngine (configCtx);
-			try {
-				engine.send(ackMsgCtx);
-			} catch (AxisFault e) {
-				throw new SandeshaException (e.getMessage());
-			}
+//			try {
+//				engine.send(ackMsgCtx);
+//			} catch (AxisFault e) {
+//				throw new SandeshaException (e.getMessage());
+//			}
 			
 			SandeshaUtil.startSenderForTheSequence(configCtx,sequenceId);
 		}

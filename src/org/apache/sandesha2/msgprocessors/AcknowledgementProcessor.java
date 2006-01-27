@@ -304,7 +304,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateBean.setMessageContextRefKey(key);
 
 		
-		
+		storageManager.storeMessageContext(key,terminateRMMessage.getMessageContext());
 
 		
 		//Set a retransmitter lastSentTime so that terminate will be send with
@@ -317,7 +317,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateBean.setMessageID(terminateRMMessage.getMessageId());
 		
 		//this will be set to true at the sender.
-		terminateBean.setSend(false);
+		terminateBean.setSend(true);
 		terminateBean.setReSend(false);
 
 		SenderBeanMgr retramsmitterMgr = storageManager
@@ -343,14 +343,14 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
 		
-		transportOut.setSender(sandesha2Sender);
+		//transportOut.setSender(sandesha2Sender);
 		
 	    AxisEngine engine = new AxisEngine (incomingAckRMMsg.getMessageContext().getConfigurationContext());
-	    try {
-			engine.send(terminateRMMessage.getMessageContext());
-		} catch (AxisFault e) {
-			throw new SandeshaException (e.getMessage());
-		}
+//	    try {
+//			engine.send(terminateRMMessage.getMessageContext());
+//		} catch (AxisFault e) {
+//			throw new SandeshaException (e.getMessage());
+//		}
 	    
 	}
 	

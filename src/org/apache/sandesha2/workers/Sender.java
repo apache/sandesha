@@ -128,10 +128,10 @@ public class Sender extends Thread {
 					//But it will set if it is not set (null)
 					
 					//This is used to make sure that the mesage get passed the Sandesha2TransportSender.
-					String qualifiedForSending = (String) msgCtx.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
-					if (qualifiedForSending!=null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
-						continue;
-					}
+//					String qualifiedForSending = (String) msgCtx.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
+//					if (qualifiedForSending!=null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
+//						continue;
+//					}
 					
 					try {
 
