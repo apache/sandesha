@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.soap.SOAPFactory;
@@ -104,8 +105,14 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
-		String createSeqMsgId = createSeqResponseRMMsgCtx.getMessageContext()
-				.getRelatesTo().getValue();
+		RelatesTo relatesTo = createSeqResponseRMMsgCtx.getMessageContext()
+										.getRelatesTo();
+		if (relatesTo==null) {
+			String message = "Invalid create sequence message. RelatesTo part is not available";
+			log.error("Invalid create sequence message. RelatesTo part is not available");
+			throw new SandeshaException ("Invalid create sequence message. RelatesTo part is not available");
+		}
+		String createSeqMsgId = relatesTo.getValue();
 
 
 		SenderBeanMgr retransmitterMgr = storageManager
