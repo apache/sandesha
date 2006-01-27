@@ -48,8 +48,10 @@ public class RMPolicyManager {
 		
 		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();
 		
-		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
+		Policy policy = null;
+		policy = desc.getPolicyInclude().getEffectivePolicy();
 
+		
 		if (policy == null) {
 			//no policy found
 			return null;

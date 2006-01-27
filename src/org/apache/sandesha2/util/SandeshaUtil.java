@@ -447,6 +447,10 @@ public class SandeshaUtil {
 		SOAPHeader header = null;
 		if (env != null)
 			header = env.getHeader();
+		else {
+			log.error("SOAP envelope is null");
+			return false;
+		}
 
 		OMElement sequenceElem = null;
 		if (header != null)

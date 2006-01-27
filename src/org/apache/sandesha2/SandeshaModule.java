@@ -21,6 +21,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -56,7 +58,7 @@ public class SandeshaModule implements Module {
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
 
 		// TODO add notify logic.
-		
+				
 		SandeshaPropertyBean defaultPropertyBean = PropertyManager.getInstance().getPropertyBean();
 		SandeshaPropertyBean axisDescPropertyBean = RMPolicyManager.loadPoliciesFromAxisDescription(axisDescription);
 		
@@ -69,7 +71,6 @@ public class SandeshaModule implements Module {
 		}
 		
 		axisDescription.addParameter(parameter);
-
 	}
 
 	private void continueUncompletedSequences(StorageManager storageManager,

@@ -93,7 +93,7 @@ public class SandeshaInHandler extends AbstractHandler {
 				.getMessageProcessor(rmMsgCtx.getMessageType());
 
 		if (msgProcessor == null) {
-			String message = "Cant find a suitable message processor";
+			String message = "An Invalid RM message was received. Sandesha2 cant forward this request";
 			log.debug(message);
 			throw new AxisFault(message);
 		}
