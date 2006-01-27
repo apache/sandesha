@@ -4,7 +4,7 @@
     <id>sandesha2</id>
     <name>Apache Sandesha2</name>
 	<groupId>sandesha2</groupId>
-    <currentVersion>0.91-SNAPSHOT</currentVersion>
+    <currentVersion>${current.version}</currentVersion>
     <organization>
         <name>Apache Web Services</name>
         <url>http://ws.apache.org/</url>
@@ -108,7 +108,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-addressing</artifactId>
-            <version>${axis2.version}</version>
+            <version>${addressing.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>

@@ -14,14 +14,14 @@
 	<ant:property name="jar.name" value="${dist.name}.jar"/>
 	<ant:property name="dir.samples" value="samples"/>
 	<ant:property name="dir.test.resources" value="test-resources"/>
-	<ant:property name="addressing.module.name" value="addressing.mar"/>
+	<ant:property name="build.addressing.mar" value="addressing.mar"/>
 	<ant:property name="dir.config" value="config"/>
 	<ant:property name="apache.license.file" value="LICENSE.txt" />
 	<ant:property name="readme.file" value="README.txt" />
 	<ant:property name="release.notes.file" value="release-notes.html" />
-	<ant:property name="addressing.mar.name" value="axis2-addressing-0.95-SNAPSHOT.jar" />
-	<ant:property name="addressing.mar.path" value="${maven.repo.local}/axis2/jars" />
-	<ant:property name="addressing.mar" value="${addressing.mar.path}/${addressing.mar.name}" />
+	<ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.jar" />
+	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/jars" />
+	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
     <goal name="all" prereqs="jar,mar:create,samples:create,javadoc" />
     
     <goal name="default">
@@ -52,7 +52,7 @@
 		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${client.dist.path}/modules" />
 		
 		<!-- Copying addressing mar file--> 
-		<ant:copy file="${addressing.mar}" todir="${client.dist.path}/modules" />    
+		<ant:copy file="${repo.addressing.mar}" toFile="${client.dist.path}/modules/${build.addressing.mar}" />    
 	</goal>
 
     <goal name="repo:create">
@@ -74,7 +74,7 @@
         </ant:copy>
         
         <!-- Copying addressing mar file-->
-        <ant:copy file="${addressing.mar}" todir="${server.dist.path}/modules" /> 
+        <ant:copy file="${repo.addressing.mar}" toFile="${server.dist.path}/modules/${build.addressing.mar}" /> 
 	</goal>
 	
     <goal name="sample:compile">
@@ -137,12 +137,6 @@
     <preGoal name="test:test" > 
     	<attainGoal name="server:create"/>
     	<attainGoal name="client:create"/>   
-    	
-    	<!-- check for the availability of addretting module and fail if not available-->
-        <!--	
-    	<ant:copy file="${dir.test.resources}/modules/${addressing.module.name}" todir="${build.repo.dir}/server/modules"/>
-    	<ant:copy file="${dir.test.resources}/modules/${addressing.module.name}" todir="${build.repo.dir}/client/modules"/>
-        -->
     </preGoal>
     
     <goal name="server.copy.tomcat" prereqs="server:create">
