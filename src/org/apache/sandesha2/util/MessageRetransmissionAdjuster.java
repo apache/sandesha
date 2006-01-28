@@ -61,7 +61,7 @@ public class MessageRetransmissionAdjuster {
 
 		Parameter parameter =  messageContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
 		if (parameter==null) {
-			log.error ("Cant adjust retransmission since, Parameter bean is not set");
+			//log.error ("Cant adjust retransmission since, Parameter bean is not set");
 			return retransmitterBean;
 		}
 		
