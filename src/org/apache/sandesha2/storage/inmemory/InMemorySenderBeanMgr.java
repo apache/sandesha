@@ -84,7 +84,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 
 	public Collection find(SenderBean bean) {
 		ArrayList beans = new ArrayList();
-		Iterator iterator = table.values().iterator();
+		Iterator iterator = ((Hashtable) table).values().iterator();
 
 		SenderBean temp;
 		while (iterator.hasNext()) {

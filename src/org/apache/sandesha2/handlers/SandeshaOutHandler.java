@@ -290,15 +290,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 							.getProperty(MessageContext.TRANSPORT_IN);
 					if (transportIn == null)
 						transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
-
-					// For receiving async Ack messages.
-					// try {
-					ListenerManager.makeSureStarted(transportIn, context);
-					// } catch (AxisFault e) {
-					// log.debug("Could not start listener...");
-					// log.debug(e.getStackTrace());
-					// }
-
 				} else if (acksTo == null && serverSide) {
 					String incomingSequencId = SandeshaUtil
 							.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);

@@ -10,10 +10,13 @@ import java.util.Collection;
 import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -188,6 +191,50 @@ public class SequenceManager {
 
 		SandeshaUtil.startSenderForTheSequence(configurationContext,internalSequenceId);
 		
+		updateClientSideListnerIfNeeded (firstAplicationMsgCtx);
+		
+	}
+	
+	private static void updateClientSideListnerIfNeeded (MessageContext messageContext) throws SandeshaException {
+		if (messageContext.isServerSide())
+			return;   //listners are updated only for the client side.
+		
+		String transportInProtocol = messageContext.getOptions().getTransportInProtocol();
+		
+		String acksTo = (String) messageContext.getProperty(Sandesha2ClientAPI.AcksTo);
+		String mep = messageContext.getAxisOperation().getMessageExchangePattern();
+		
+		boolean startListnerForAsyncAcks = false;
+		boolean startListnerForAsyncControlMsgs = false;   //For async createSerRes & terminateSeq.
+		
+		if (acksTo!=null && !Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+			//starting listner for async acks.
+			startListnerForAsyncAcks = true;
+		}
+		
+		if (mep!=null && !AxisOperation.MEP_URI_OUT_ONLY.equals(mep)) {
+			//starting listner for the async createSeqResponse & terminateSer messages.
+			startListnerForAsyncControlMsgs = true;
+		}
+		
+		try {
+			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) && transportInProtocol==null)
+				throw new SandeshaException ("Cant start the listner since the TransportInProtocol is null");
+
+			if (startListnerForAsyncAcks)
+				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
+		
+			if (startListnerForAsyncControlMsgs)
+				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
+							
+			
+		} catch (AxisFault e) {
+			String message = "Cant start the listner for incoming messages";
+			log.error(e.getStackTrace());
+			System.out.println(e.getStackTrace());
+			throw new SandeshaException (message);
+		}
+	
 	}
 	
 	/**

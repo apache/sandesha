@@ -197,8 +197,8 @@ public class InOrderInvoker extends Thread {
 									.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 							if (sequence.getLastMessage() != null) {
 								
-								TerminateManager.cleanReceivingSideAfterInvocation(
-										context, sequenceId);
+								TerminateManager.cleanReceivingSideAfterInvocation(context, sequenceId);
+								
 								//this sequence has no more invocations
 								stopInvokerForTheSequence(sequenceId);
 								

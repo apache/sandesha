@@ -172,7 +172,7 @@ public class Sender extends Thread {
 								//do time out processing.
 								
 								//TODO uncomment below line
-								//TerminateManager.terminateSendingSide(context,sequenceID);
+								TerminateManager.terminateSendingSide(context,sequenceID,msgCtx.isServerSide());
 								
 								String message = "Sequence timed out";
 								log.debug(message);
@@ -185,13 +185,7 @@ public class Sender extends Thread {
 									.piggybackAckIfPresent(rmMsgCtx);
 						}
 						
-
-						
 						preSendTransaction.commit();
-						
-						if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-							int i =1;
-						}
 						
 						try {
 							//every message should be resumed (pause==false) when sending
@@ -258,8 +252,7 @@ public class Sender extends Thread {
 							ConfigurationContext configContext = msgCtx
 									.getConfigurationContext();
 
-							TerminateManager.terminateSendingSide(
-									configContext, sequenceID);
+							TerminateManager.terminateSendingSide(configContext, sequenceID,msgCtx.isServerSide());
 							
 							//removing a entry from the Listener
 							String transport = msgCtx.getTransportOut().getName().getLocalPart();

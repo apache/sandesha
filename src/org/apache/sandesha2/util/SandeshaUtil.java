@@ -621,9 +621,9 @@ public class SandeshaUtil {
 			return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + to + ":" +sequenceKey;
 	}
 	
-//	public static String getServerSideInternalSeqID (String incomingSeqId) {
-//		return (Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":" + incomingSeqId);
-//	}
+	public static String getInternalSequenceID (String sequenceID) {
+			return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + sequenceID;
+	}
 	
 	public static String getSequenceIDFromInternalSequenceID (String internalSequenceID, ConfigurationContext configurationContext)  throws SandeshaException {
 		

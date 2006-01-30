@@ -192,6 +192,8 @@ public interface Sandesha2Constants {
 		String NO_OF_OUTGOING_MSGS_ACKED = "NoOfOutGoingMessagesAcked";
 		
 		String TRANSPORT_TO = "TransportTo";
+		
+		String OUT_SEQ_ACKSTO = "OutSequenceAcksTo";
 	}
 
 	public interface SOAPVersion {

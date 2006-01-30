@@ -411,7 +411,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//the internalSequenceId value of the retransmitter Table for the
 			// messages related to an incoming
 			//sequence is the actual sequence ID
-			ackBean.setInternalSequenceID(sequenceId);
 
 //			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
 //					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
@@ -442,7 +441,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//removing old acks.
 			SenderBean findBean = new SenderBean();
 			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			findBean.setInternalSequenceID(sequenceId);
 			findBean.setSend(true);
 			findBean.setReSend(false);
 			Collection coll = retransmitterBeanMgr.find(findBean);

@@ -22,6 +22,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -176,7 +179,8 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void terminateSendingSide (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
+	public static void terminateSendingSide (ConfigurationContext configContext, String sequenceID,boolean serverSide) throws SandeshaException {
+		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		
 		//TODO - remove folowing redundant transaction
@@ -185,6 +189,38 @@ public class TerminateManager {
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
+		
+		
+		if (!serverSide) {
+			//stpoing the listner for the client side.	
+			
+			//SequencePropertyBean outGoingAcksToBean  = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.OUT_SEQ_ACKSTO);
+			
+			boolean stopListnerForAsyncAcks = false;
+			SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+			if (internalSequenceBean!=null) {
+				String internalSequenceID = internalSequenceBean.getValue();
+				SequencePropertyBean acksToBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
+				
+				if (acksToBean!=null) {
+					String acksTo = acksToBean.getValue();
+					if (acksTo!=null && !Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+						stopListnerForAsyncAcks = true;
+					}
+				}
+			}
+			
+			try {
+				//this removes the listner entry for receiving async acks.
+				if (stopListnerForAsyncAcks)
+					ListenerManager.stop(configContext,Constants.TRANSPORT_HTTP);
+				
+				//TODO stop listner for asyncControlMessages
+				
+			} catch (AxisFault e) {
+				throw new SandeshaException (e.getMessage());
+			}
+		}
 		
 		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		if (internalSequenceBean==null)
@@ -228,14 +264,6 @@ public class TerminateManager {
 		}
 		
 		terminateSendingTransaction.commit();
-		
-		//asking the listner to stop.
-		//if (clientSide)
-//			try {
-//				ListenerManager.stop(configContext,Constants.TRANSPORT_HTTP);
-//			} catch (AxisFault e) {
-//				throw new SandeshaException (e.getMessage());
-//			}
 		
 		SandeshaUtil.stopSenderForTheSequence(internalSequenceId);
 		

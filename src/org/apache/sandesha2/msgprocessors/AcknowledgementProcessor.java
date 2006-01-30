@@ -123,7 +123,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			rmMsgCtx.setRelatesTo(null);
 
 		SenderBean input = new SenderBean();
-		input.setInternalSequenceID(internalSequenceId);
 		input.setSend(true);
 		input.setReSend(true);
 		Collection retransmitterEntriesOfSequence = retransmitterMgr

@@ -87,15 +87,14 @@ public class AcknowledgementManager {
 		}
 
 		String internalSequenceId = (String) internalSequenceBean.getValue();
-		findBean.setInternalSequenceID(internalSequenceId);
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
 		findBean.setReSend(false);
 		Collection collection = retransmitterBeanMgr.find(findBean);
+		
 		Iterator it = collection.iterator();
 
 		if (it.hasNext()) {
-
 			SenderBean ackBean = (SenderBean) it.next();
 
 			long timeNow = System.currentTimeMillis();
