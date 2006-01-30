@@ -19,6 +19,7 @@ package org.apache.sandesha2;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -80,6 +81,7 @@ public class AddressablePingTest extends TestCase {
 		String sequenceKey = "sequence2";
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
