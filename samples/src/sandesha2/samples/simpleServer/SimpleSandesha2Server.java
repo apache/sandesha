@@ -16,6 +16,8 @@
 
 package sandesha2.samples.simpleServer;
 
+import java.io.File;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 
@@ -23,7 +25,7 @@ public class SimpleSandesha2Server {
 
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
-	private static String AXIS2_SERVER_PATH = SANDESHA2_HOME + "\\target\\repos\\server\\";   //this will be available after a maven build
+	private static String AXIS2_SERVER_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "server" + File.separator;   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
 

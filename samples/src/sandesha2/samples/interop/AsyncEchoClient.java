@@ -16,6 +16,8 @@
 
 package sandesha2.samples.interop;
 
+import java.io.File;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
@@ -54,7 +56,7 @@ public class AsyncEchoClient {
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
-	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";   //this will be available after a maven build
+	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -97,7 +99,7 @@ public class AsyncEchoClient {
 		clientOptions.setUseSeparateListener(true);
 		
 		serviceClient.setOptions(clientOptions);
-		serviceClient.engageModule(new QName ("Sandesha2-0.9"));
+		serviceClient.engageModule(new QName ("sandesha2"));
 		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
 		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		String offeredSequenceID = SandeshaUtil.getUUID();

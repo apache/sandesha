@@ -16,15 +16,19 @@
 
 package sandesha2.samples.interop;
 
+import java.io.File;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
@@ -49,7 +53,7 @@ public class AsyncPingClient {
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
-	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + "\\target\\repos\\client\\";   //this will be available after a maven build
+	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
 	public static void main(String[] args) throws AxisFault {
 		
@@ -81,10 +85,11 @@ public class AsyncPingClient {
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
 		
 		serviceClient.setOptions(clientOptions);
-		serviceClient.engageModule(new QName ("Sandesha2-0.9"));
+		serviceClient.engageModule(new QName ("sandesha2"));
 		
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
