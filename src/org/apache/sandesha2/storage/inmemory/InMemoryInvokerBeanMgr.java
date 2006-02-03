@@ -50,24 +50,24 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 		}
 	}
 
-	public boolean insert(InvokerBean bean) {
+	public synchronized boolean insert(InvokerBean bean) {
 		table.put(bean.getMessageContextRefKey(), bean);
 		return true;
 	}
 
-	public boolean delete(String key) {
+	public synchronized boolean delete(String key) {
 		return table.remove(key) != null;
 	}
 
-	public InvokerBean retrieve(String key) {
+	public synchronized InvokerBean retrieve(String key) {
 		return (InvokerBean) table.get(key);
 	}
 
-	public ResultSet find(String query) {
+	public synchronized ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not implemented");
 	}
 
-	public Collection find(InvokerBean bean) {
+	public synchronized Collection find(InvokerBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 
@@ -95,14 +95,14 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 		return beans;
 	}
 
-	public boolean update(InvokerBean bean) {
+	public synchronized boolean update(InvokerBean bean) {
 		if (!table.contains(bean))
 			return false;
 
 		return table.put(bean.getMessageContextRefKey(), bean) != null;
 	}
 	
-	public InvokerBean findUnique (InvokerBean bean) throws SandeshaException {
+	public synchronized InvokerBean findUnique (InvokerBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
 			String message = "Non-Unique result";

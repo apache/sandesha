@@ -17,8 +17,8 @@
 
 package org.apache.sandesha2.util;
 
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.soap.SOAPFactory;
+import org.apache.ws.commons.om.OMAbstractFactory;
+import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 
 /**

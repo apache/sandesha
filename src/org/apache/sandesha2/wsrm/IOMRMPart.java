@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2.wsrm;
 
-import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPEnvelope;
 
 /**
  * This is the base interface for RM infoset objects that are added directly so 

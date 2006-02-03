@@ -16,6 +16,7 @@
  */
 package org.apache.sandesha2.util;
 
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,10 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -37,12 +42,12 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Handler;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.soap.SOAP11Constants;
-import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPFactory;
-import org.apache.axis2.soap.SOAPHeader;
+import org.apache.ws.commons.om.OMElement;
+import org.apache.ws.commons.soap.SOAP11Constants;
+import org.apache.ws.commons.soap.SOAP12Constants;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
+import org.apache.ws.commons.soap.SOAPHeader;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
@@ -729,6 +734,18 @@ public class SandeshaUtil {
 		}
 		
 		return null;  //not complete yet.
+	}
+	
+	public static void printSOAPEnvelope (SOAPEnvelope envelope, OutputStream out) throws SandeshaException {
+		try {
+			XMLStreamWriter writer =  XMLOutputFactory.newInstance().createXMLStreamWriter(out);
+			System.out.println("\n");
+			envelope.serialize(writer);
+		} catch (XMLStreamException e) {
+			throw new SandeshaException (e.getMessage());
+		} catch (FactoryConfigurationError e) {
+			throw new SandeshaException (e.getMessage());
+		}
 	}
 
 }

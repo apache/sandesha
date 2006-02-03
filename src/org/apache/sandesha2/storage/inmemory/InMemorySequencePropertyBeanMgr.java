@@ -50,27 +50,27 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 		}
 	}
 
-	public boolean delete(String sequenceId, String name) {
+	public synchronized boolean delete(String sequenceId, String name) {
 		
 		SequencePropertyBean bean = retrieve( sequenceId,name);
 				
 		return table.remove(sequenceId + ":" + name) != null;
 	}
 
-	public SequencePropertyBean retrieve(String sequenceId, String name) {
+	public synchronized SequencePropertyBean retrieve(String sequenceId, String name) {
 		return (SequencePropertyBean) table.get(sequenceId + ":" + name);
 	}
 
-	public boolean insert(SequencePropertyBean bean) {
+	public synchronized boolean insert(SequencePropertyBean bean) {
 		table.put(bean.getSequenceID() + ":" + bean.getName(), bean);
 		return true;
 	}
 
-	public ResultSet find(String query) {
+	public synchronized ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not supported");
 	}
 
-	public Collection find(SequencePropertyBean bean) {
+	public synchronized Collection find(SequencePropertyBean bean) {
 		ArrayList beans = new ArrayList();
 
 		if (bean == null)
@@ -103,7 +103,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 		return beans;
 	}
 
-	public boolean update(SequencePropertyBean bean) {
+	public synchronized boolean update(SequencePropertyBean bean) {
 		
 		if (bean.getName().equals(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES)) {
 			int i = 1;
@@ -120,7 +120,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 		return bean.getSequenceID() + ":" + bean.getName();
 	}
 	
-	public SequencePropertyBean findUnique(SequencePropertyBean bean) throws SandeshaException {
+	public synchronized SequencePropertyBean findUnique(SequencePropertyBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
 			String message = "Non-Unique result";
@@ -135,7 +135,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 			return null;
 	}
 
-	public Collection retrieveAll() {
+	public synchronized Collection retrieveAll() {
 		Collection coll = new ArrayList();
 		
 		Iterator keys = table.keySet().iterator();

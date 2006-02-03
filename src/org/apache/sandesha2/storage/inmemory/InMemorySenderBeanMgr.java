@@ -50,22 +50,22 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		}
 	}
 
-	public boolean delete(String MessageId) {
+	public synchronized boolean delete(String MessageId) {
 		return table.remove(MessageId) != null;
 	}
 
-	public SenderBean retrieve(String MessageId) {
+	public synchronized SenderBean retrieve(String MessageId) {
 		return (SenderBean) table.get(MessageId);
 	}
 
-	public boolean insert(SenderBean bean) throws SandeshaStorageException {
+	public synchronized boolean insert(SenderBean bean) throws SandeshaStorageException {
 		if (bean.getMessageID() == null)
 			throw new SandeshaStorageException("Key (MessageId) is null. Cant insert.");
 		table.put(bean.getMessageID(), bean);
 		return true;
 	}
 
-	public Collection find(String internalSequenceID) {
+	public synchronized Collection find(String internalSequenceID) {
 		
 		ArrayList arrayList = new ArrayList ();
 		if (internalSequenceID==null || "".equals(internalSequenceID))
@@ -82,7 +82,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return arrayList;
 	}
 
-	public Collection find(SenderBean bean) {
+	public synchronized Collection find(SenderBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = ((Hashtable) table).values().iterator();
 
@@ -130,7 +130,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return beans;
 	}
 
-	public Collection findMsgsToSend() {
+	public synchronized Collection findMsgsToSend() {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.keySet().iterator();
 
@@ -153,7 +153,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return beans;
 	}
 
-	private ArrayList findBeansWithMsgNo(ArrayList list, long msgNo) {
+	private synchronized ArrayList findBeansWithMsgNo(ArrayList list, long msgNo) {
 		ArrayList beans = new ArrayList();
 
 		Iterator it = list.iterator();
@@ -166,14 +166,14 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return beans;
 	}
 
-	public boolean update(SenderBean bean) {
+	public synchronized boolean update(SenderBean bean) {
 		if (!table.contains(bean))
 			return false;
 
 		return true; //No need to update. Being a reference does the job.
 	}
 	
-	public SenderBean findUnique(SenderBean bean) throws SandeshaException {
+	public synchronized SenderBean findUnique(SenderBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
 			String message = "Non-Unique result";
@@ -188,7 +188,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 			return null;
 	}
 
-	public SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {
+	public synchronized SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {
 		
 		Iterator iter = table.keySet().iterator();
 		while (iter.hasNext()) {

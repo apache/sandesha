@@ -16,6 +16,8 @@ import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
@@ -165,17 +167,51 @@ public class SequenceManager {
 
 		SequencePropertyBean toBean = new SequencePropertyBean(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.TO_EPR, toEPR.getAddress());
-
-		//Default value for acksTo is anonymous
-		if (acksTo == null)
+		SequencePropertyBean replyToBean = null;
+		SequencePropertyBean acksToBean = null;
+		
+		if (firstAplicationMsgCtx.isServerSide()) {
+			//setting replyTo value, if this is the server side.
+			OperationContext opContext = firstAplicationMsgCtx.getOperationContext();
+			try {
+				MessageContext requestMessage = opContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+				if (requestMessage==null) {
+					String message = "Cannot find the request message from the operation context";
+					log.error(message);
+					throw new SandeshaException (message);
+				}
+				
+				EndpointReference replyToEPR = requestMessage.getTo();    //'replyTo' of the response msg is the 'to' value of the req msg.
+				if (replyToEPR!=null) {
+					replyToBean = new SequencePropertyBean (internalSequenceId,Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,replyToEPR.getAddress());
+					acksToBean = new SequencePropertyBean (internalSequenceId,Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,replyToEPR.getAddress());		
+				} else {
+					String message = "To EPR is not present in the request message. Need this information to set acksTo & replyTo value of reply messages";
+					log.error(message);
+					throw new SandeshaException (message);
+				}
+			} catch (AxisFault e) {
+				String message = "Cannot get request message from the operation context";
+				log.error(message);
+				log.error(e.getStackTrace());
+				throw new SandeshaException (message);
+			}
+		}
+		//Default value for acksTo is anonymous  (this happens only for the client side)
+		if (acksToBean==null) {
 			acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
 
-		EndpointReference acksToEPR = new EndpointReference(acksTo);
-		SequencePropertyBean acksToBean = new SequencePropertyBean(
+			EndpointReference acksToEPR = new EndpointReference(acksTo);
+		    acksToBean = new SequencePropertyBean(
 				internalSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
 				acksToEPR.getAddress());
+		}
+		
 		seqPropMgr.insert(toBean);
-		seqPropMgr.insert(acksToBean);
+		if (acksToBean!=null)
+			seqPropMgr.insert(acksToBean);
+		if (replyToBean!=null)
+			seqPropMgr.insert(replyToBean);
 		
 		//saving transportTo value;
 		String transportTo = (String) firstAplicationMsgCtx.getProperty(MessageContextConstants.TRANSPORT_URL);

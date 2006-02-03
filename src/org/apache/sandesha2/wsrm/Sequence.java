@@ -18,13 +18,13 @@ package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMException;
-import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPFactory;
-import org.apache.axis2.soap.SOAPHeader;
-import org.apache.axis2.soap.SOAPHeaderBlock;
+import org.apache.ws.commons.om.OMElement;
+import org.apache.ws.commons.om.OMException;
+import org.apache.ws.commons.om.OMNamespace;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
+import org.apache.ws.commons.soap.SOAPHeader;
+import org.apache.ws.commons.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 
 /**
@@ -116,6 +116,11 @@ public class Sequence implements IOMRMPart {
 
 		SOAPHeaderBlock sequenceHeaderBlock = soapHeader.addHeaderBlock(
 				Sandesha2Constants.WSRM.SEQUENCE, seqNoNamespace);
+		//soapHeader.addChild(sequenceHeaderBlock);
+		//OMElement elem1 = factory.createOMElement("test","http://test1","test2");
+		//soapHeader.addChild(elem1)
+		
+		
 		sequenceHeaderBlock.setMustUnderstand(true);
 		identifier.toOMElement(sequenceHeaderBlock);
 		messageNumber.toOMElement(sequenceHeaderBlock);

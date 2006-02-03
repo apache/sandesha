@@ -26,8 +26,10 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -128,10 +130,10 @@ public class Sender extends Thread {
 					//But it will set if it is not set (null)
 					
 					//This is used to make sure that the mesage get passed the Sandesha2TransportSender.
-//					String qualifiedForSending = (String) msgCtx.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
-//					if (qualifiedForSending!=null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
-//						continue;
-//					}
+					String qualifiedForSending = (String) msgCtx.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
+					if (qualifiedForSending!=null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
+						continue;
+					}
 					
 					try {
 
@@ -142,7 +144,8 @@ public class Sender extends Thread {
 												
 						RMMsgContext rmMsgCtx = MsgInitializer
 								.initializeMessage(msgCtx);
-
+						//rmMsgCtx.addSOAPEnvelope();
+						
 						//skip sending if this message has been mentioned as a message not to send (within sandesha2.properties)
 						ArrayList msgsNotToSend = PropertyManager.getInstance().getMessagesNotToSend();
 						//SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) messageContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
@@ -189,15 +192,21 @@ public class Sender extends Thread {
 						
 						try {
 							//every message should be resumed (pause==false) when sending
-							boolean paused = msgCtx.isPaused();
+//							boolean paused = msgCtx.isPaused();
 							
 							
-							AxisEngine engine = new AxisEngine(msgCtx
-									.getConfigurationContext());
-							if (paused) {
-								engine.resume(msgCtx);
-							}else  {
-								engine.send(msgCtx);
+//							AxisEngine engine = new AxisEngine(msgCtx
+//									.getConfigurationContext());
+//							if (paused) {
+//								engine.resume(msgCtx);
+//							}else  {
+//								engine.send(msgCtx);
+//							}
+							
+							TransportOutDescription transportOutDescription = msgCtx.getTransportOut();
+							TransportSender transportSender = transportOutDescription.getSender();
+							if (transportSender!=null) {
+								transportSender.invoke(msgCtx);
 							}
 							
 						} catch (Exception e) {

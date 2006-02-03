@@ -51,24 +51,24 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		}
 	}
 
-	public boolean delete(String sequenceId) {
+	public synchronized boolean delete(String sequenceId) {
 		return table.remove(sequenceId) != null;
 	}
 
-	public NextMsgBean retrieve(String sequenceId) {
+	public synchronized NextMsgBean retrieve(String sequenceId) {
 		return (NextMsgBean) table.get(sequenceId);
 	}
 
-	public boolean insert(NextMsgBean bean) {
+	public synchronized boolean insert(NextMsgBean bean) {
 		table.put(bean.getSequenceID(), bean);
 		return true;
 	}
 
-	public ResultSet find(String query) {
+	public synchronized ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not supported");
 	}
 
-	public Collection find(NextMsgBean bean) {
+	public synchronized Collection find(NextMsgBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 
@@ -97,18 +97,18 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		return beans;
 	}
 
-	public boolean update(NextMsgBean bean) {
+	public synchronized boolean update(NextMsgBean bean) {
 		if (!table.contains(bean))
 			return false;
 
 		return table.put(bean.getSequenceID(), bean) != null;
 	}
 
-	public Collection retrieveAll() {
+	public synchronized Collection retrieveAll() {
 		return table.values();
 	}
 	
-	public NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
+	public synchronized NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
 			String message = "Non-Unique result";

@@ -32,8 +32,8 @@ import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPFactory;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -50,6 +50,7 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
@@ -406,6 +407,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			
 			//this will be set to true in the sender.
 			ackBean.setSend(true);
+			
+			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,
+					Sandesha2Constants.VALUE_FALSE);
+			
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 			
 			//the internalSequenceId value of the retransmitter Table for the
@@ -441,6 +446,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			//removing old acks.
 			SenderBean findBean = new SenderBean();
 			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+			
+			//this will be set to true in the sandesha2TransportSender.
 			findBean.setSend(true);
 			findBean.setReSend(false);
 			Collection coll = retransmitterBeanMgr.find(findBean);
@@ -460,22 +467,20 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			asyncAckTransaction.commit();
 
 			//passing the message through sandesha2sender
-			Sandesha2TransportSender sandesha2Sender = new Sandesha2TransportSender ();
-			TransportOutDescription transportOut = ackMsgCtx.getTransportOut();
-			ackMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,transportOut.getSender());
+
+			ackMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,ackMsgCtx.getTransportOut());
 			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
 			
 			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
-			//sandesha2Sender.setMessageStoreKey(key);
 			
-			//transportOut.setSender(sandesha2Sender);
+			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc ());
 			
 			AxisEngine engine = new AxisEngine (configCtx);
-//			try {
-//				engine.send(ackMsgCtx);
-//			} catch (AxisFault e) {
-//				throw new SandeshaException (e.getMessage());
-//			}
+			try {
+				engine.send(ackMsgCtx);
+			} catch (AxisFault e) {
+				throw new SandeshaException (e.getMessage());
+			}
 			
 			SandeshaUtil.startSenderForTheSequence(configCtx,sequenceId);
 		}

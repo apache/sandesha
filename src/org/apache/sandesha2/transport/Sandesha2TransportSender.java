@@ -26,12 +26,14 @@ public class Sandesha2TransportSender implements TransportSender  {
 	public void invoke(MessageContext msgContext) throws AxisFault {
 		
 		//setting the correct transport sender.
-		TransportSender sender = (TransportSender) msgContext.getProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER);
+		//TransportSender sender = (TransportSender) msgContext.getProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER);
+		TransportOutDescription transportOut = (TransportOutDescription) msgContext.getProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC);
 		
-		if (sender==null)
+		if (transportOut==null)
 			throw new SandeshaException ("Original transport sender is not present");
 		
-		msgContext.getTransportOut().setSender(sender);
+		//msgContext.getTransportOut().setSender(sender);
+		msgContext.setTransportOut(transportOut);
 		
 		String key =  (String) msgContext.getProperty(Sandesha2Constants.MESSAGE_STORE_KEY);
 		
@@ -51,14 +53,14 @@ public class Sandesha2TransportSender implements TransportSender  {
 
 		RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgContext);
 		
+		String messageType = SandeshaUtil.getMessageTypeString(rmMsg.getMessageType());
 		SenderBean senderBean = senderBeanMgr.retrieveFromMessageRefKey(key);
 
-	 	String setSendToTrue = (String) msgContext.getProperty(Sandesha2Constants.SET_SEND_TO_TRUE);
-		if (Sandesha2Constants.VALUE_TRUE.equals(setSendToTrue)) {
-
-			senderBean.setSend(true);
-			senderBeanMgr.update(senderBean);
-		}
+//	 	String setSendToTrue = (String) msgContext.getProperty(Sandesha2Constants.SET_SEND_TO_TRUE);
+//		if (Sandesha2Constants.VALUE_TRUE.equals(setSendToTrue)) {
+//			senderBean.setSend(true);
+//			senderBeanMgr.update(senderBean);
+//		}
 		
 		transaction.commit();
 		

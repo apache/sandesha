@@ -39,6 +39,7 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -151,7 +152,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 			//TODO - Process Nack
 		}
-
 		
 		//setting acked message date.
 		//TODO add details specific to each message.
@@ -221,7 +221,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				terminateTransaction.commit();
 			}
 		}
-		
 	
 		//stopping the progress of the message further.
 		rmMsgCtx.pause();	
@@ -317,6 +316,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		
 		//this will be set to true at the sender.
 		terminateBean.setSend(true);
+		
+		terminateRMMessage.getMessageContext().setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,
+				Sandesha2Constants.VALUE_FALSE);
+		
 		terminateBean.setReSend(false);
 
 		SenderBeanMgr retramsmitterMgr = storageManager
@@ -333,23 +336,21 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		
 		//This should be dumped to the storage by the sender
 		TransportOutDescription transportOut = terminateRMMessage.getMessageContext().getTransportOut();
-		Sandesha2TransportSender sandesha2Sender = new Sandesha2TransportSender ();
-		TransportSender originalSender = transportOut.getSender();
-		terminateRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,originalSender);
+		
+		terminateRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,transportOut);
 		
 		terminateRMMessage.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
-		//sandesha2Sender.setMessageStoreKey(key);
 		
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
 		
-		//transportOut.setSender(sandesha2Sender);
+		terminateRMMessage.getMessageContext().setTransportOut(new Sandesha2TransportOutDesc ());
 		
 	    AxisEngine engine = new AxisEngine (incomingAckRMMsg.getMessageContext().getConfigurationContext());
-//	    try {
-//			engine.send(terminateRMMessage.getMessageContext());
-//		} catch (AxisFault e) {
-//			throw new SandeshaException (e.getMessage());
-//		}
+	    try {
+			engine.send(terminateRMMessage.getMessageContext());
+		} catch (AxisFault e) {
+			throw new SandeshaException (e.getMessage());
+		}
 	    
 	}
 	

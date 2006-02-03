@@ -22,7 +22,7 @@ import java.util.HashMap;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
-import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPEnvelope;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -42,9 +42,20 @@ public class InMemoryStorageManager extends StorageManager {
 
 	private static InMemoryStorageManager instance = null;
     private final String MESSAGE_MAP_KEY = "Sandesha2MessageMap";
+    private CreateSeqBeanMgr  createSeqBeanMgr = null;
+    private NextMsgBeanMgr nextMsgBeanMgr = null;
+    private SequencePropertyBeanMgr sequencePropertyBeanMgr = null;
+    private SenderBeanMgr senderBeanMgr = null;
+    private InvokerBeanMgr invokerBeanMgr = null;
     
 	public InMemoryStorageManager(ConfigurationContext context) {
 		super(context);
+		
+		this.createSeqBeanMgr = new InMemoryCreateSeqBeanMgr (context);
+		this.nextMsgBeanMgr = new InMemoryNextMsgBeanMgr (context);
+		this.senderBeanMgr = new InMemorySenderBeanMgr (context);
+		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (context);
+		this.sequencePropertyBeanMgr = new InMemorySequencePropertyBeanMgr (context);
 	}
 
 	public Transaction getTransaction() {
@@ -52,23 +63,23 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 	public CreateSeqBeanMgr getCreateSeqBeanMgr() {
-		return new InMemoryCreateSeqBeanMgr(getContext());
+		return createSeqBeanMgr;
 	}
 
 	public NextMsgBeanMgr getNextMsgBeanMgr() {
-		return new InMemoryNextMsgBeanMgr(getContext());
+		return nextMsgBeanMgr;
 	}
 
 	public SenderBeanMgr getRetransmitterBeanMgr() {
-		return new InMemorySenderBeanMgr(getContext());
+		return senderBeanMgr;
 	}
 
 	public SequencePropertyBeanMgr getSequencePropretyBeanMgr() {
-		return new InMemorySequencePropertyBeanMgr(getContext());
+		return sequencePropertyBeanMgr;
 	}
 
 	public InvokerBeanMgr getStorageMapBeanMgr() {
-		return new InMemoryInvokerBeanMgr(getContext());
+		return invokerBeanMgr;
 	}
 
 	public void init(ConfigurationContext context) {

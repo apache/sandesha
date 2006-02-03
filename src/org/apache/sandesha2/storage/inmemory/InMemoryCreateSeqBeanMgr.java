@@ -51,27 +51,27 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		}
 	}
 
-	public boolean insert(CreateSeqBean bean) {
+	public synchronized boolean insert(CreateSeqBean bean) {
 		table.put(bean.getCreateSeqMsgID(), bean);
 		return true;
 	}
 
-	public boolean delete(String msgId) {
+	public synchronized boolean delete(String msgId) {
 		return table.remove(msgId) != null;
 	}
 
-	public CreateSeqBean retrieve(String msgId) {
+	public synchronized CreateSeqBean retrieve(String msgId) {
 		return (CreateSeqBean) table.get(msgId);
 	}
 
-	public boolean update(CreateSeqBean bean) {
+	public synchronized boolean update(CreateSeqBean bean) {
 		if (!table.contains(bean))
 			return false;
 
 		return table.put(bean.getCreateSeqMsgID(), bean) != null;
 	}
 
-	public Collection find(CreateSeqBean bean) {
+	public synchronized Collection find(CreateSeqBean bean) {
 		ArrayList beans = new ArrayList();
 		if (bean == null)
 			return beans;
@@ -105,11 +105,11 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		return beans;
 	}
 
-	public ResultSet find(String query) {
+	public synchronized ResultSet find(String query) {
 		throw new UnsupportedOperationException("selectRS() is not supported");
 	}
 	
-	public CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException {
+	public synchronized CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
 			String message = "Non-Unique result";

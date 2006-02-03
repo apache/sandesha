@@ -22,12 +22,12 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMException;
-import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPFactory;
-import org.apache.axis2.soap.SOAPHeader;
+import org.apache.ws.commons.om.OMElement;
+import org.apache.ws.commons.om.OMException;
+import org.apache.ws.commons.om.OMNamespace;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
+import org.apache.ws.commons.soap.SOAPHeader;
 import org.apache.sandesha2.Sandesha2Constants;
 
 /**

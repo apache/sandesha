@@ -25,7 +25,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPEnvelope;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;

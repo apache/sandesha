@@ -350,7 +350,7 @@ public interface Sandesha2Constants {
 	
 	String MESSAGE_STORE_KEY = "Sandesha2MessageStoreKey";
 
-	String ORIGINAL_TRANSPORT_SENDER = "Sandesha2OriginalTransportSender";
+	String ORIGINAL_TRANSPORT_OUT_DESC = "Sandesha2OriginalTransportSender";
 	
 	String SET_SEND_TO_TRUE = "Sandesha2SetSendToTrue";
 	

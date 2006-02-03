@@ -31,11 +31,12 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.soap.SOAPBody;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPFactory;
+import org.apache.ws.commons.soap.SOAPBody;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,6 +53,7 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
@@ -383,11 +385,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber);
 
 		}
-
-		// cannot pause since the message have to be saved at the sender
-		// pausing the message
-		msgCtx.pause();
-
 		responseProcessTransaction.commit();
 	}
 
@@ -472,6 +469,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		// this will be set to true in the sender
 		createSeqEntry.setSend(true);
+		
+		createSeqMsg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,
+				Sandesha2Constants.VALUE_FALSE);
+		
 		createSeqEntry
 				.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
 		retransmitterMgr.insert(createSeqEntry);
@@ -480,28 +481,27 @@ public class SandeshaOutHandler extends AbstractHandler {
 		// sending the message once through our sender.
 		AxisEngine engine = new AxisEngine(createSeqMsg
 				.getConfigurationContext());
-		Sandesha2TransportSender sender = new Sandesha2TransportSender();
 
-		// message will be stored in the Sandesha2TransportSender
+		// message will be stored in the Sandesha2TransportSender		
 		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
-		// sender.setMessageStoreKey(key);
-
-		TransportSender oldSender = createSeqMsg.getTransportOut().getSender();
-		createSeqMsg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,
-				oldSender);
+		
+		TransportOutDescription transportOut = createSeqMsg.getTransportOut();
+		
+		createSeqMsg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,
+				transportOut);
 		createSeqMsg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,
 				Sandesha2Constants.VALUE_TRUE);
 		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
+		
+		Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc ();
+		createSeqMsg.setTransportOut(sandesha2TransportOutDesc);
 
-		// setting the sandesha2 sender as the sender.
-		// createSeqMsg.getTransportOut().setSender(sender);
-
-		// try {
-		// log.info ("Sending create seq msg...");
-		// engine.send(createSeqMsg);
-		// } catch (AxisFault e) {
-		// throw new SandeshaException (e.getMessage());
-		// }
+		 try {
+			 log.info ("Sending create seq msg...");
+			 engine.send(createSeqMsg);
+		 } catch (AxisFault e) {
+			 throw new SandeshaException (e.getMessage());
+		 }
 
 	}
 
@@ -706,7 +706,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
 			appMsgEntry.setSend(false);
 		} else {
-			appMsgEntry.setSend(false);
+			appMsgEntry.setSend(true);
 			// Send will be set to true at the sender.
 			msg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,
 					Sandesha2Constants.VALUE_TRUE);
@@ -722,14 +722,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 		TransportSender sender = msg.getTransportOut().getSender();
 
 		if (sender != null) {
-			Sandesha2TransportSender sandesha2Sender = new Sandesha2TransportSender();
-
+			Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc ();
 			msg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
-			// sandesha2Sender.setMessageStoreKey(storageKey);
-
-			// msg.getTransportOut().setSender(sandesha2Sender);
-			msg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER,
-					sender);
+			msg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,
+					msg.getTransportOut());
+			msg.setTransportOut(sandesha2TransportOutDesc);
+			
 		}
 
 	}
