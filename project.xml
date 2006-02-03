@@ -147,13 +147,18 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         </dependency>
         <dependency>
             <groupId>ws-commons</groupId>
-            <artifactId>ws-policy</artifactId>
-            <version>SNAPSHOT</version>
+            <artifactId>policy</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ws-commons</groupId>
             <artifactId>XmlSchema</artifactId>
-            <version>SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>annogen</groupId>
