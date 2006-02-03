@@ -29,7 +29,6 @@ public class SimpleSandesha2Server {
 	
 	public static void main(String[] args) throws AxisFault {
 
-		
 		String axisServerRepo = null;
 		if (args!=null && args.length>0)
 			axisServerRepo = args[0];

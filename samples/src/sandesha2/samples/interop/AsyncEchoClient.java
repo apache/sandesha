@@ -31,11 +31,11 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAP12Constants;
+import org.apache.ws.commons.om.OMAbstractFactory;
+import org.apache.ws.commons.om.OMElement;
+import org.apache.ws.commons.om.OMFactory;
+import org.apache.ws.commons.om.OMNamespace;
+import org.apache.ws.commons.soap.SOAP12Constants;
 import org.apache.sandesha2.client.RMReport;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -44,14 +44,16 @@ public class AsyncEchoClient {
 	
 	private String toIP = "127.0.0.1";
 	
-	private String toPort = "8070";
-	
 	private String ackIP = "127.0.0.1";
 	
 	private String ackPort = "9070";
 	
+	private String toPort = "8070";
+	private String transportToPort = "8070";
+	
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
-
+	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMInteropService";
+	
 	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
@@ -93,7 +95,8 @@ public class AsyncEchoClient {
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
-
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
@@ -103,7 +106,7 @@ public class AsyncEchoClient {
 		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
 		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		String offeredSequenceID = SandeshaUtil.getUUID();
-		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,offeredSequenceID);  //Optional
+		//clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,offeredSequenceID);  //Optional
 		
 		Callback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1"),callback1);

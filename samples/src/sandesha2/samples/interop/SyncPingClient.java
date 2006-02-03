@@ -34,11 +34,11 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.MessageReceiver;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.soap.SOAP11Constants;
+import org.apache.ws.commons.om.OMAbstractFactory;
+import org.apache.ws.commons.om.OMElement;
+import org.apache.ws.commons.om.OMFactory;
+import org.apache.ws.commons.om.OMNamespace;
+import org.apache.ws.commons.soap.SOAP11Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 
 
@@ -46,9 +46,12 @@ public class SyncPingClient {
 
 	private String toIP = "127.0.0.1";
 	
-	private String toPort = "8070";
+	private String toPort = "8080";
+	private String transportToPort = "8070";
 	
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
+	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMInteropService";
+	
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
@@ -80,6 +83,7 @@ public class SyncPingClient {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 		
 		Options clientOptions = new Options ();
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 	//	clientOptions.setr\
 		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
