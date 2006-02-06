@@ -85,8 +85,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.getSequencePropretyBeanMgr();
 
 
-		//Starting transaction
-		Transaction ackTransaction = storageManager.getTransaction();
 
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges()
 				.iterator();
@@ -100,8 +98,13 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		}
 
 		//updating the last activated time of the sequence.
-		SequenceManager.updateLastActivatedTime(outSequenceId,rmMsgCtx.getMessageContext().getConfigurationContext());
+//		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
+//		SequenceManager.updateLastActivatedTime(outSequenceId,rmMsgCtx.getMessageContext().getConfigurationContext());
+//		lastUpdatedTimeTransaction.commit();
 		
+		//Starting transaction
+		Transaction ackTransaction = storageManager.getTransaction();
+
 		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(
 				outSequenceId, Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 
@@ -215,10 +218,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 					lastOutMessageNo);
 			
 			if (complete) {
-				Transaction terminateTransaction = storageManager.getTransaction();
+				//Transaction terminateTransaction = storageManager.getTransaction();
 				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,
 						internalSequenceId);
-				terminateTransaction.commit();
+				//terminateTransaction.commit();
 			}
 		}
 	
@@ -248,6 +251,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
 						.getConfigurationContext());
 
+		Transaction addTerminateSeqTransaction = storageManager.getTransaction();
+		
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
@@ -302,7 +307,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateBean.setMessageContextRefKey(key);
 
 		
-		storageManager.storeMessageContext(key,terminateRMMessage.getMessageContext());
+		//storageManager.storeMessageContext(key,terminateRMMessage.getMessageContext());
 
 		
 		//Set a retransmitter lastSentTime so that terminate will be send with
@@ -344,6 +349,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
 		
 		terminateRMMessage.getMessageContext().setTransportOut(new Sandesha2TransportOutDesc ());
+		
+		addTerminateSeqTransaction.commit();
 		
 	    AxisEngine engine = new AxisEngine (incomingAckRMMsg.getMessageContext().getConfigurationContext());
 	    try {

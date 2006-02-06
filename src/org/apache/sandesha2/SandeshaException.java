@@ -32,4 +32,8 @@ public class SandeshaException extends AxisFault  {
 		super (message);
 	}
 	
+	public SandeshaException (Exception e) {
+		super (e);
+	}
+	
 }

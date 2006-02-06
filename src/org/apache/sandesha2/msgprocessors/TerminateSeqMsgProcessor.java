@@ -87,8 +87,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		terminateReceivedTransaction.commit();
 		
 		Transaction terminateTransaction = storageManager.getTransaction();
-		
 		TerminateManager.cleanReceivingSideOnTerminateMessage(context,sequenceId);
+		terminateTransaction.commit(); 
+		
 		SandeshaUtil.stopSenderForTheSequence(sequenceId);
 		
 		//removing an entry from the listener
@@ -104,10 +105,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 //			log.debug(message);
 //		}
 		
-		terminateTransaction.commit(); 
 		
+		
+		
+		Transaction lastUpdatedTransaction = storageManager.getTransaction();
 		SequenceManager.updateLastActivatedTime(sequenceId,context);
-
+		lastUpdatedTransaction.commit();
+		
 		terminateSeqRMMsg.pause();
 	}
 }

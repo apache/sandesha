@@ -169,7 +169,7 @@ public class Sender extends Thread {
 							Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 							String sequenceID = sequence.getIdentifier().getIdentifier();
 							//checking weather the sequence has been timed out.
-							boolean sequenceTimedOut = SequenceManager.hasSequenceTimedOut (sequenceID, rmMsgCtx);;
+							boolean sequenceTimedOut = SequenceManager.hasSequenceTimedOut (sequenceID, rmMsgCtx);
 							if (sequenceTimedOut) {
 								//sequence has been timed out.
 								//do time out processing.
@@ -234,21 +234,21 @@ public class Sender extends Thread {
 						//update or delete only if the object is still present.
 						SenderBean bean1 = mgr.retrieve(bean.getMessageID());
 						if (bean1 != null) {
-							if (bean.isReSend())
-								mgr.update(bean);
-							else
-								mgr.delete(bean.getMessageID());
+							if (bean.isReSend()) {
+								bean1.setSentCount(bean.getSentCount());
+								bean1.setTimeToSend(bean.getTimeToSend());
+							
+								mgr.update(bean1);
+							}else 
+								mgr.delete(bean1.getMessageID());
 						}
 
 						postSendTransaction.commit(); //commiting the current
 												  // transaction
 
-						Transaction processResponseTransaction =
-						storageManager.getTransaction();
 						if (!msgCtx.isServerSide())
 							checkForSyncResponses(msgCtx);
 												
-						processResponseTransaction.commit();
 
 						Transaction terminateCleaningTransaction = storageManager
 								.getTransaction();

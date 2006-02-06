@@ -28,4 +28,9 @@ public class SandeshaStorageException extends SandeshaException {
 	public SandeshaStorageException (String message) {
 		super (message);
 	}
+	
+	public SandeshaStorageException (Exception e) {
+		super (e);
+	}
+	
 }

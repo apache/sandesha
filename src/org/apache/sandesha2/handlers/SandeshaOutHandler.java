@@ -142,11 +142,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 				msgCtx.getAxisService().addParameter(parameter);
 		}
 
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
-		Transaction transaction = storageManager.getTransaction();
+		//Transaction transaction = storageManager.getTransaction();
 
 		boolean serverSide = msgCtx.isServerSide();
 
@@ -213,6 +212,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		// check if the first message
 
+		Transaction ouHandlerSetupTransaction = storageManager.getTransaction();
+		
 		long messageNumber = getNextMsgNo(context, internalSequenceId);
 
 		boolean sendCreateSequence = false;
@@ -244,10 +245,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 			// if (!serverSide && sendCreateSequence) {
 			SequenceManager.setupNewClientSequence(msgCtx, internalSequenceId);
 		}
+		
+		ouHandlerSetupTransaction.commit();
 
 		// if first message - add create sequence
 		if (sendCreateSequence) {
 
+			Transaction beginCreateSeqTransaction = storageManager.getTransaction();
+			
 			SequencePropertyBean responseCreateSeqAdded = seqPropMgr
 					.retrieve(
 							internalSequenceId,
@@ -314,15 +319,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 					}
 				}
 
-				transaction.commit();
+				beginCreateSeqTransaction.commit();
 
 				addCreateSequenceMessage(rmMsgCtx, internalSequenceId, acksTo);
 			}
 		}
 
 		// do response processing
-		Transaction responseProcessTransaction = storageManager
-				.getTransaction();
+
 
 		SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 		if (env == null) {
@@ -385,7 +389,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber);
 
 		}
-		responseProcessTransaction.commit();
+		
 	}
 
 	public void addCreateSequenceMessage(RMMsgContext applicationRMMsg,
@@ -460,7 +464,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				.getRetransmitterBeanMgr();
 
 		String key = SandeshaUtil.getUUID();
-		storageManager.storeMessageContext(key, createSeqMsg);
+		//storageManager.storeMessageContext(key, createSeqMsg);
 
 		SenderBean createSeqEntry = new SenderBean();
 		createSeqEntry.setMessageContextRefKey(key);
@@ -529,6 +533,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(msg.getConfigurationContext());
+		
+		Transaction processResponseTransaction = storageManager.getTransaction();
+		
 		SequencePropertyBeanMgr sequencePropertyMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
@@ -695,7 +702,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		// String key = storageManager
 		// .storeMessageContext(rmMsg.getMessageContext());
 		String storageKey = SandeshaUtil.getUUID();
-		storageManager.storeMessageContext(storageKey, msg);
+		//storageManager.storeMessageContext(storageKey, msg);
 
 		appMsgEntry.setMessageContextRefKey(storageKey);
 
@@ -730,6 +737,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			
 		}
 
+		processResponseTransaction.commit();
 	}
 
 	private long getNextMsgNo(ConfigurationContext context,

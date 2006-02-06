@@ -31,6 +31,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -111,6 +112,8 @@ public class InOrderInvoker extends Thread {
 				SequencePropertyBeanMgr sequencePropMgr = storageManager
 						.getSequencePropretyBeanMgr();
 
+				Transaction preInvocationTransaction = storageManager.getTransaction();
+				
 				//Getting the incomingSequenceIdList
 				SequencePropertyBean allSequencesBean = (SequencePropertyBean) sequencePropMgr
 						.retrieve(
@@ -121,12 +124,17 @@ public class InOrderInvoker extends Thread {
 
 				ArrayList allSequencesList = SandeshaUtil.getArrayListFromString( allSequencesBean
 						.getValue());
+				
+				preInvocationTransaction.commit();
+				
 				Iterator allSequencesItr = allSequencesList.iterator();
 
 				currentIteration: while (allSequencesItr.hasNext()) {
 
 					String sequenceId = (String) allSequencesItr.next();
 
+					Transaction sequenceInvocationTransaction = storageManager.getTransaction();
+					
 					NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
 					if (nextMsgBean == null) {
 
@@ -152,14 +160,18 @@ public class InOrderInvoker extends Thread {
 							new InvokerBean(null, nextMsgno, sequenceId))
 							.iterator();
 
+					sequenceInvocationTransaction.commit();
+					
 					while (stMapIt.hasNext()) {
 
 						InvokerBean stMapBean = (InvokerBean) stMapIt
 								.next();
 						String key = stMapBean.getMessageContextRefKey();
 
+						Transaction invocationTransaction = storageManager.getTransaction();
 						MessageContext msgToInvoke = storageManager.retrieveMessageContext(key,context);
-
+						invocationTransaction.commit();
+						
 						RMMsgContext rmMsg = MsgInitializer
 								.initializeMessage(msgToInvoke);
 						Sequence seq = (Sequence) rmMsg
@@ -177,13 +189,16 @@ public class InOrderInvoker extends Thread {
 							log.info("Invoker invoking a '" + SandeshaUtil.getMessageTypeString(rmMsg
 												.getMessageType()) + "' message.");
 							
+							Transaction deleteEntryTransaction = storageManager.getTransaction();
 							//deleting the message entry.
 							storageMapMgr.delete(key);
+							deleteEntryTransaction.commit();
 
 						} catch (AxisFault e) {
-							throw new SandeshaException(e.getMessage());
+							throw new SandeshaException(e);
 						}
 
+						Transaction postInvocationTransaction = storageManager.getTransaction();
 						//undating the next msg to invoke
 						nextMsgno++;
 						stMapIt = storageMapMgr
@@ -206,11 +221,14 @@ public class InOrderInvoker extends Thread {
 								break currentIteration;
 							}
 						}
+						postInvocationTransaction.commit();
 					}
 
+					Transaction updateNextMsgTransaction = storageManager.getTransaction();
 					nextMsgBean.setNextMsgNoToProcess(nextMsgno);
 					nextMsgMgr.update(nextMsgBean);
-
+					updateNextMsgTransaction.commit();
+				
 				}
 			} catch (SandeshaException e1) {
 				// TODO Auto-generated catch block

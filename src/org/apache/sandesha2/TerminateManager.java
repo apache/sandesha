@@ -183,9 +183,6 @@ public class TerminateManager {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		
-		//TODO - remove folowing redundant transaction
-		Transaction terminateSendingTransaction = storageManager.getTransaction();
-		
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
@@ -262,8 +259,6 @@ public class TerminateManager {
 				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 			}
 		}
-		
-		terminateSendingTransaction.commit();
 		
 		SandeshaUtil.stopSenderForTheSequence(internalSequenceId);
 		

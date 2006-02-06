@@ -113,8 +113,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()
 						.getConfigurationContext());
 
-		Transaction updataMsgStringTransaction = storageManager
-				.getTransaction();
+
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
@@ -131,8 +130,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
+
+		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
 		//updating the last activated time of the sequence.
 		SequenceManager.updateLastActivatedTime(sequenceId,configCtx);
+		lastUpdatedTimeTransaction.commit();
+		
+		Transaction updataMsgStringTransaction = storageManager
+				.getTransaction();
 		
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
 				Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
@@ -398,7 +403,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			String key = SandeshaUtil.getUUID();
 			
 			//dumping to the storage will be done be Sandesha2 Transport Sender
-			storageManager.storeMessageContext(key,ackMsgCtx);
+			//storageManager.storeMessageContext(key,ackMsgCtx);
 			
 			SenderBean ackBean = new SenderBean();
 			ackBean.setMessageContextRefKey(key);

@@ -133,7 +133,7 @@ public class SequenceManager {
 //			log.info("Counght exception when starting listner. Possible server side start.");
 //		}
 		
-		updateLastActivatedTime(sequenceId,createSequenceMsg.getMessageContext().getConfigurationContext());
+		
 		
 		return sequenceId;
 	}
@@ -281,7 +281,7 @@ public class SequenceManager {
 	 */
 	public static void updateLastActivatedTime (String sequenceID, ConfigurationContext configContext) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
-		Transaction lastActivatedTransaction = storageManager.getTransaction();
+		//Transaction lastActivatedTransaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		
 //		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID,null);
@@ -312,7 +312,7 @@ public class SequenceManager {
 		else
 			sequencePropertyBeanMgr.update(lastActivatedBean);
 		
-		lastActivatedTransaction.commit();
+	//	lastActivatedTransaction.commit();
 	}
 	
 	
@@ -351,13 +351,13 @@ public class SequenceManager {
 
 		boolean sequenceTimedOut = false;
 		
-		SequencePropertyBean lastActivatedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
-		if (lastActivatedBean!=null) {
-			long lastActivatedTime = Long.parseLong(lastActivatedBean.getValue());
-			long timeNow = System.currentTimeMillis();
-			if (lastActivatedTime+policyBean.getInactiveTimeoutInterval()<timeNow)
-				sequenceTimedOut = true;
-		}
+		//SequencePropertyBean lastActivatedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
+		//if (lastActivatedBean!=null) {
+		long lastActivatedTime = getLastActivatedTime(sequenceID,rmMsgCtx.getMessageContext().getConfigurationContext());
+		long timeNow = System.currentTimeMillis();
+		if (lastActivatedTime>0 && (lastActivatedTime+policyBean.getInactiveTimeoutInterval()<timeNow))
+			sequenceTimedOut = true;
+		//}
 		
 		return sequenceTimedOut;
 	}

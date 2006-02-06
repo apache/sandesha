@@ -167,6 +167,13 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			Object obj1 = createSeqMsg.getOperationContext().getProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN);
 
+			//commiting tr. before sending the response msg.
+			createSequenceTransaction.commit();
+			
+			Transaction updateLastActivatedTransaction = storageManager.getTransaction();
+			SequenceManager.updateLastActivatedTime(newSequenceId,createSeqRMMsg.getMessageContext().getConfigurationContext());
+			updateLastActivatedTransaction.commit();
+			
 			AxisEngine engine = new AxisEngine(context);
 			engine.send(outMessage);
 
@@ -197,6 +204,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 		createSeqRMMsg.pause();
 		
-		createSequenceTransaction.commit();
+		//createSequenceTransaction.commit();
 	}
 }
