@@ -466,6 +466,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			
 			ackBean.setTimeToSend(timeToSend);
 
+			storageManager.storeMessageContext(key,ackMsgCtx);
+			
 			//inserting the new ack.
 			retransmitterBeanMgr.insert(ackBean);
 

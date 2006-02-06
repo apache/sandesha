@@ -305,7 +305,7 @@ public class InMemoryStorageManager extends StorageManager {
 		
 		Object oldEntry = storageMap.get(key);
 		if (oldEntry==null)
-			throw new SandeshaStorageException ("En try is not present for updating");
+			throw new SandeshaStorageException ("Entry is not present for updating");
 		
 		storeMessageContext(key,msgContext);
 	}

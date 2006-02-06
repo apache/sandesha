@@ -44,7 +44,7 @@ public class Sandesha2TransportSender implements TransportSender  {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
 		
 		Transaction messageStoreTransaction = storageManager.getTransaction();
-		storageManager.storeMessageContext(key,msgContext);
+		storageManager.updateMessageContext(key,msgContext);
 		messageStoreTransaction.commit();
 		
 		Transaction transaction = storageManager.getTransaction();

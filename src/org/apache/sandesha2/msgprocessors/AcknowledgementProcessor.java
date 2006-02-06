@@ -307,7 +307,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		terminateBean.setMessageContextRefKey(key);
 
 		
-		//storageManager.storeMessageContext(key,terminateRMMessage.getMessageContext());
+		storageManager.storeMessageContext(key,terminateRMMessage.getMessageContext());
 
 		
 		//Set a retransmitter lastSentTime so that terminate will be send with

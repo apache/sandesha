@@ -137,7 +137,7 @@ public class TerminateManager {
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			NextMsgBean nextMsgBean = (NextMsgBean) iterator.next();
-			nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
+			//nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
 		}
 		
 		removeReceivingSideProperties(configContext,sequenceID);

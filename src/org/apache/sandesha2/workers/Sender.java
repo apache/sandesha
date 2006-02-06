@@ -126,10 +126,14 @@ public class Sender extends Thread {
 					String key = (String) bean.getMessageContextRefKey();
 					MessageContext msgCtx = storageManager.retrieveMessageContext(key,context);
 
+					if (msgCtx==null) {
+						String message = "Message context is not present in the storage";
+					}
 					//sender will not send the message if following property is set and not true.
 					//But it will set if it is not set (null)
 					
 					//This is used to make sure that the mesage get passed the Sandesha2TransportSender.
+										
 					String qualifiedForSending = (String) msgCtx.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
 					if (qualifiedForSending!=null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
 						continue;
@@ -275,7 +279,7 @@ public class Sender extends Thread {
 
 					} catch (AxisFault e1) {
 						e1.printStackTrace();
-					} catch (Exception e3) {
+					} catch (Throwable e3) {
 						e3.printStackTrace();
 					}
 				}

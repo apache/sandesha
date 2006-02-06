@@ -464,7 +464,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 				.getRetransmitterBeanMgr();
 
 		String key = SandeshaUtil.getUUID();
-		//storageManager.storeMessageContext(key, createSeqMsg);
 
 		SenderBean createSeqEntry = new SenderBean();
 		createSeqEntry.setMessageContextRefKey(key);
@@ -480,6 +479,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 		createSeqEntry
 				.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
 		retransmitterMgr.insert(createSeqEntry);
+		
+		storageManager.storeMessageContext(key,createSeqMsg);
+		
 		createSeqTransaction.commit();
 
 		// sending the message once through our sender.
@@ -720,6 +722,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		appMsgEntry.setInternalSequenceID(internalSequenceId);
+		
+		storageManager.storeMessageContext(storageKey,msg);
+		
 		retransmitterMgr.insert(appMsgEntry);
 
 		msg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,
