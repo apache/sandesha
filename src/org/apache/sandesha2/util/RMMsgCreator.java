@@ -31,6 +31,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
 import org.apache.commons.logging.Log;
@@ -107,7 +108,6 @@ public class RMMsgCreator {
 				throw new SandeshaException(e.getMessage());
 			}
 		}
-
 	}
 
 	private static void finalizeCreation(MessageContext relatedMessage,
@@ -269,6 +269,7 @@ public class RMMsgCreator {
 
 		AxisOperation createSeqOperation = createSeqmsgContext
 				.getAxisOperation();
+		
 		createSeqOperation.setName(new QName("CreateSequenceOperation"));
 		if (appMsgOperationDesc != null) {
 			createSeqOperation.setPhasesOutFlow(appMsgOperationDesc
@@ -415,7 +416,7 @@ public class RMMsgCreator {
 				terminateOperation.setPhasesOutFaultFlow(outPhases);
 			}
 		}
-
+		
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		terminateRMMessage.setSOAPEnvelop(envelope);
 
@@ -428,7 +429,10 @@ public class RMMsgCreator {
 				terminateSequencePart);
 
 		finalizeCreation(referenceMessage, terminateMessage);
-
+		
+		terminateMessage.setProperty(MessageContext.TRANSPORT_IN,null);   //no need for an incoming transport for an terminate
+																		  //message. If this is put, sender will look for an response.
+		
 		return terminateRMMessage;
 	}
 

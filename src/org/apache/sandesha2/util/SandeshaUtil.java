@@ -539,6 +539,14 @@ public class SandeshaUtil {
 
 			newMessageContext.setAxisOperation(operation);
 
+			
+			//setting parent child relationships 
+			AxisService service = newMessageContext.getAxisService();
+			if (service!=null && operation!=null) {
+				service.addChild(operation);
+				operation.setParent(service);
+			}
+			
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);
 			operationContext.addMessageContext(newMessageContext);
