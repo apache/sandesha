@@ -131,6 +131,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 
+		
+		//setting mustUnderstand to false.
+		sequence.setMustUnderstand(false);
+		rmMsgCtx.addSOAPEnvelope();
+		
 		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
 		//updating the last activated time of the sequence.
 		SequenceManager.updateLastActivatedTime(sequenceId,configCtx);

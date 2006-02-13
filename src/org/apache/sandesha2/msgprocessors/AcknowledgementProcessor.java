@@ -75,6 +75,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		
+		//setting mustUnderstand to false.
+		sequenceAck.setMustUnderstand(false);
+		rmMsgCtx.addSOAPEnvelope();
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(rmMsgCtx.getMessageContext()

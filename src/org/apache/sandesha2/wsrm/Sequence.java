@@ -46,6 +46,8 @@ public class Sequence implements IOMRMPart {
 	private SOAPFactory factory;
 	
 	OMNamespace seqNoNamespace = null;
+	
+	private boolean mustUnderstand = true;
 
 	public Sequence(SOAPFactory factory) {
 		this.factory = factory;
@@ -121,7 +123,7 @@ public class Sequence implements IOMRMPart {
 		//soapHeader.addChild(elem1)
 		
 		
-		sequenceHeaderBlock.setMustUnderstand(true);
+		sequenceHeaderBlock.setMustUnderstand(isMustUnderstand());
 		identifier.toOMElement(sequenceHeaderBlock);
 		messageNumber.toOMElement(sequenceHeaderBlock);
 		if (lastMessage != null)
@@ -171,5 +173,15 @@ public class Sequence implements IOMRMPart {
 		
 		toOMElement(header);
 	}
+
+	public boolean isMustUnderstand() {
+		return mustUnderstand;
+	}
+
+	public void setMustUnderstand(boolean mustUnderstand) {
+		this.mustUnderstand = mustUnderstand;
+	}
+	
+	
 
 }

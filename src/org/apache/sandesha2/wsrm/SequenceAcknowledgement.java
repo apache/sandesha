@@ -28,6 +28,7 @@ import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAPEnvelope;
 import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.ws.commons.soap.SOAPHeader;
+import org.apache.ws.commons.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 
 /**
@@ -51,6 +52,8 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	OMNamespace rmNamespace = null;
 
 	SOAPFactory factory;
+	
+	private boolean mustUnderstand = true;
 	
 	public SequenceAcknowledgement(SOAPFactory factory) {
 		this.factory = factory;
@@ -117,7 +120,10 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		SOAPHeader SOAPHeader = (SOAPHeader) header;
 
-		if (sequenceAcknowledgementElement == null)
+		SOAPHeaderBlock sequenceAcknowledgementHeaderBlock = SOAPHeader.addHeaderBlock(
+				Sandesha2Constants.WSRM.SEQUENCE_ACK,rmNamespace);
+		
+		if (sequenceAcknowledgementHeaderBlock == null)
 			throw new OMException(
 					"Cant set sequence acknowledgement since the element is null");
 
@@ -125,22 +131,23 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			throw new OMException(
 					"Cant set the sequence since Identifier is null");
 
-		identifier.toOMElement(sequenceAcknowledgementElement);
+		sequenceAcknowledgementHeaderBlock.setMustUnderstand(isMustUnderstand());
+		identifier.toOMElement(sequenceAcknowledgementHeaderBlock);
 
 		Iterator ackRangeIt = acknowledgementRangeList.iterator();
 		while (ackRangeIt.hasNext()) {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIt
 					.next();
-			ackRange.toOMElement(sequenceAcknowledgementElement);
+			ackRange.toOMElement(sequenceAcknowledgementHeaderBlock);
 		}
 
 		Iterator nackIt = nackList.iterator();
 		while (nackIt.hasNext()) {
 			Nack nack = (Nack) nackIt.next();
-			nack.toOMElement(sequenceAcknowledgementElement);
+			nack.toOMElement(sequenceAcknowledgementHeaderBlock);
 		}
 
-		SOAPHeader.addChild(sequenceAcknowledgementElement);
+		SOAPHeader.addChild(sequenceAcknowledgementHeaderBlock);
 
 		sequenceAcknowledgementElement = factory.createOMElement(
 				Sandesha2Constants.WSRM.SEQUENCE_ACK, rmNamespace);
@@ -195,4 +202,13 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		toOMElement(header);
 	}
 
+	public boolean isMustUnderstand() {
+		return mustUnderstand;
+	}
+
+	public void setMustUnderstand(boolean mustUnderstand) {
+		this.mustUnderstand = mustUnderstand;
+	}
+
+	
 }

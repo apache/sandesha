@@ -122,7 +122,7 @@ public class InOrderInvoker extends Thread {
 				if (allSequencesBean == null)
 					continue;
 
-				ArrayList allSequencesList = SandeshaUtil.getArrayListFromString( allSequencesBean
+				ArrayList allSequencesList = SandeshaUtil.getArrayListFromString (allSequencesBean
 						.getValue());
 				
 				preInvocationTransaction.commit();
@@ -192,8 +192,9 @@ public class InOrderInvoker extends Thread {
 							Transaction deleteEntryTransaction = storageManager.getTransaction();
 							//deleting the message entry.
 							storageMapMgr.delete(key);
+							
 							deleteEntryTransaction.commit();
-
+							
 						} catch (AxisFault e) {
 							throw new SandeshaException(e);
 						}

@@ -116,6 +116,7 @@ public class SequenceManager {
 
 		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 		nextMsgMgr.insert(new NextMsgBean(sequenceId, 1)); // 1 will be the next
+		
 		// message to invoke. This will apply for only in-order invocations.
 
 		
