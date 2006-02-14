@@ -25,6 +25,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
+import org.apache.axis2.description.PolicyInclude;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 import org.apache.sandesha2.storage.StorageManager;
@@ -41,7 +42,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
  */
 
 public class SandeshaModule implements Module {
-
+    
 	// initialize the module
 	public void init(ConfigurationContext configContext,
 			AxisModule module) throws AxisFault {

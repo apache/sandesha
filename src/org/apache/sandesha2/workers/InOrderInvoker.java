@@ -162,15 +162,19 @@ public class InOrderInvoker extends Thread {
 
 					sequenceInvocationTransaction.commit();
 					
+					
+					Transaction invocationTransaction = storageManager.getTransaction();   //Transaction based invocation
+					
+					
 					while (stMapIt.hasNext()) {
 
 						InvokerBean stMapBean = (InvokerBean) stMapIt
 								.next();
 						String key = stMapBean.getMessageContextRefKey();
 
-						Transaction invocationTransaction = storageManager.getTransaction();
+
 						MessageContext msgToInvoke = storageManager.retrieveMessageContext(key,context);
-						invocationTransaction.commit();
+						//invocationTransaction.commit();
 						
 						RMMsgContext rmMsg = MsgInitializer
 								.initializeMessage(msgToInvoke);
@@ -199,7 +203,7 @@ public class InOrderInvoker extends Thread {
 							throw new SandeshaException(e);
 						}
 
-						Transaction postInvocationTransaction = storageManager.getTransaction();
+						//Transaction postInvocationTransaction = storageManager.getTransaction();
 						//undating the next msg to invoke
 						nextMsgno++;
 						stMapIt = storageMapMgr
@@ -222,13 +226,16 @@ public class InOrderInvoker extends Thread {
 								break currentIteration;
 							}
 						}
-						postInvocationTransaction.commit();
+						
+						
 					}
 
-					Transaction updateNextMsgTransaction = storageManager.getTransaction();
+					//Transaction updateNextMsgTransaction = storageManager.getTransaction();
 					nextMsgBean.setNextMsgNoToProcess(nextMsgno);
 					nextMsgMgr.update(nextMsgBean);
-					updateNextMsgTransaction.commit();
+					//updateNextMsgTransaction.commit();
+					
+					invocationTransaction.commit();
 				
 				}
 			} catch (SandeshaException e1) {
