@@ -21,13 +21,14 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.description.PolicyInclude;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
+import org.apache.axis2.wsdl.codegen.extension.CodeGenPolicyExtension;
+import org.apache.axis2.wsdl.codegen.extension.PolicyExtension;
+import org.apache.sandesha2.policy.RMPolicyExtension;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMPolicyManager;
@@ -41,7 +42,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
-public class SandeshaModule implements Module {
+public class SandeshaModule implements Module, CodeGenPolicyExtension {
     
 	// initialize the module
 	public void init(ConfigurationContext configContext,
@@ -51,7 +52,9 @@ public class SandeshaModule implements Module {
 
 		// loading properties to property manager.
 		// PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
+
 		PropertyManager.getInstance().loadPropertiesFromModuleDescPolicy(module);
+		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		storageManager.initStorage(module);
 	}
@@ -89,6 +92,10 @@ public class SandeshaModule implements Module {
 
 		// client side re-injections
 
+	}
+	
+	public PolicyExtension getPolicyExtension() {
+		return new RMPolicyExtension();
 	}
 
 	// shutdown the module

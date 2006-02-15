@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 
+import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
+
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +36,6 @@ import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.policy.RMPolicyProcessor;
 import org.apache.sandesha2.policy.RMProcessorContext;
 import org.apache.ws.policy.Policy;
-
 
 /**
  * Loads properties from sandesha2.properties file (from Sandesha2Constants if
@@ -179,7 +180,7 @@ public class PropertyManager {
 		} catch (NoSuchMethodException e) {
 			throw new SandeshaException(e.getMessage());
 		}
-		
+
 		processor.processPolicy(policy);
 
 		RMProcessorContext ctx = processor.getContext();
@@ -202,6 +203,63 @@ public class PropertyManager {
 
 		// CHECKME
 		propertyBean.setStorageManagerClass(data.getStorageManager());
+	}
+
+	public void loadPropertiesFromAxisDescription(AxisDescription desc)
+			throws SandeshaException {
+		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
+
+		if (policy == null) {
+			return;
+		}
+
+		RMPolicyProcessor processor = new RMPolicyProcessor();
+
+		try {
+			processor.setup();
+		} catch (NoSuchMethodException e) {
+			throw new SandeshaException(e.getMessage());
+		}
+
+		processor.processPolicy(policy);
+
+		RMProcessorContext ctx = processor.getContext();
+		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
+
+		if (data.getAcknowledgementInterval() != -1) {
+
+			propertyBean.setAcknowledgementInterval(data
+					.getAcknowledgementInterval());
+		}
+		if (data.isExponentialBackoff()) {
+			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
+		}
+		if (data.getInactivityTimeout() != -1) {
+			propertyBean.setInactiveTimeoutInterval((int) data
+					.getInactivityTimeout(), data
+					.getInactivityTimeoutMeassure());
+		}
+
+		if (!data.isInvokeInOrder()) {
+			propertyBean.setInOrder(data.isInvokeInOrder());
+		}
+
+		// CHECKME
+		if (data.getMessageTypesToDrop() != null) {
+			ArrayList msgTypesToDrop = new ArrayList();
+			msgTypesToDrop.add(data.getMessageTypesToDrop());
+			propertyBean.setMsgTypesToDrop(msgTypesToDrop);
+
+		}
+		if (data.getRetransmissionInterval() != -1) {
+			propertyBean.setRetransmissionInterval(data
+					.getRetransmissionInterval());
+		}
+		if (data.getStorageManager() != null) {
+			// CHECKME
+			propertyBean.setStorageManagerClass(data
+					.getStorageManager());
+		}
 	}
 
 	public static PropertyManager getInstance() {

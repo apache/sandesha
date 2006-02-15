@@ -1,17 +1,17 @@
 package org.apache.sandesha2.policy;
 
 public class PolicyEngineData {
-
-	private long acknowledgementInterval;
-	private boolean exponentialBackoff;
-	private long inactivityTimeout;
-	private String inactivityTimeoutMeassure;
-	private boolean invokeInOrder;
-	private String messageTypesToDrop;
-	private long retransmissionInterval;
-	//private String permanentStorageMgr;
-	private String storageManager;
 	
+	private long acknowledgementInterval = -1;
+	private boolean exponentialBackoff = false;
+	private long inactivityTimeout = -1;
+	private String inactivityTimeoutMeassure = null;
+	private boolean invokeInOrder = true;
+	private String messageTypesToDrop = null;
+	private long retransmissionInterval =  -1;
+	private String permanentStorageMgr = null;
+	private String inmemoryStorageManager = null;	
+	private String storageManager = null;
 
 	public boolean isExponentialBackoff() {
 		return exponentialBackoff;
