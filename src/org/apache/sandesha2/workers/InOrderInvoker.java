@@ -23,6 +23,7 @@ import java.util.Iterator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,6 +60,8 @@ public class InOrderInvoker extends Thread {
 	private ConfigurationContext context = null;
 	
 	Log log = LogFactory.getLog(getClass());
+	
+	int i = 1;
 
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
 		workingSequences.remove(sequenceID);
@@ -133,7 +136,9 @@ public class InOrderInvoker extends Thread {
 
 					String sequenceId = (String) allSequencesItr.next();
 
-					Transaction sequenceInvocationTransaction = storageManager.getTransaction();
+					//Transaction sequenceInvocationTransaction = storageManager.getTransaction();
+					
+					Transaction invocationTransaction = storageManager.getTransaction();   //Transaction based invocation
 					
 					NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
 					if (nextMsgBean == null) {
@@ -160,14 +165,14 @@ public class InOrderInvoker extends Thread {
 							new InvokerBean(null, nextMsgno, sequenceId))
 							.iterator();
 
-					sequenceInvocationTransaction.commit();
+					//sequenceInvocationTransaction.commit();
 					
 					
-					Transaction invocationTransaction = storageManager.getTransaction();   //Transaction based invocation
-					
-					
+
 					while (stMapIt.hasNext()) {
 
+
+						
 						InvokerBean stMapBean = (InvokerBean) stMapIt
 								.next();
 						String key = stMapBean.getMessageContextRefKey();
@@ -187,17 +192,28 @@ public class InOrderInvoker extends Thread {
 							//Invoking the message.
 //							new AxisEngine(msgToInvoke.getConfigurationContext())
 //									.receive(msgToInvoke);
+							
+							//currently Transaction based invocation can be supplied only for the in-only case.
+							
+							if (!AxisOperationFactory.MEP_URI_IN_ONLY.equals(msgToInvoke.getAxisOperation().getMessageExchangePattern())) {
+								invocationTransaction.commit();
+							}
+							
 							new AxisEngine (msgToInvoke.getConfigurationContext())
 									.resume(msgToInvoke);
+							
+							if (!AxisOperationFactory.MEP_URI_IN_ONLY.equals(msgToInvoke.getAxisOperation().getMessageExchangePattern())) {
+								invocationTransaction = storageManager.getTransaction();
+							}
 							
 							log.info("Invoker invoking a '" + SandeshaUtil.getMessageTypeString(rmMsg
 												.getMessageType()) + "' message.");
 							
-							Transaction deleteEntryTransaction = storageManager.getTransaction();
+							//Transaction deleteEntryTransaction = storageManager.getTransaction();
 							//deleting the message entry.
 							storageMapMgr.delete(key);
 							
-							deleteEntryTransaction.commit();
+							//deleteEntryTransaction.commit();
 							
 						} catch (AxisFault e) {
 							throw new SandeshaException(e);
@@ -205,11 +221,11 @@ public class InOrderInvoker extends Thread {
 
 						//Transaction postInvocationTransaction = storageManager.getTransaction();
 						//undating the next msg to invoke
-						nextMsgno++;
-						stMapIt = storageMapMgr
-								.find(
-										new InvokerBean(null, nextMsgno,
-												sequenceId)).iterator();
+//						nextMsgno++;
+//						stMapIt = storageMapMgr
+//								.find(
+//										new InvokerBean(null, nextMsgno,
+//												sequenceId)).iterator();
 
 						//terminate (AfterInvocation)
 						if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
@@ -223,6 +239,7 @@ public class InOrderInvoker extends Thread {
 								stopInvokerForTheSequence(sequenceId);
 								
 								//exit from current iteration. (since an entry was removed)
+								invocationTransaction.commit();
 								break currentIteration;
 							}
 						}
@@ -231,13 +248,22 @@ public class InOrderInvoker extends Thread {
 					}
 
 					//Transaction updateNextMsgTransaction = storageManager.getTransaction();
+					nextMsgno++;
 					nextMsgBean.setNextMsgNoToProcess(nextMsgno);
 					nextMsgMgr.update(nextMsgBean);
 					//updateNextMsgTransaction.commit();
 					
+//					i++;
+//					if (i==3) {
+//						throw new SandeshaException ("test");
+//					}
+					
 					invocationTransaction.commit();
+					
+
 				
 				}
+				
 			} catch (SandeshaException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
