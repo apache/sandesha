@@ -1,6 +1,6 @@
 package org.apache.sandesha2.policy;
 
-import org.apache.axis2.wsdl.codegen.extension.PolicyExtension;
+import org.apache.axis2.modules.PolicyExtension;
 import org.apache.ws.policy.Policy;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

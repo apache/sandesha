@@ -24,7 +24,6 @@ import java.util.Iterator;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -207,16 +206,17 @@ public class TerminateManager {
 				}
 			}
 			
-			try {
+//			try {
 				//this removes the listner entry for receiving async acks.
-				if (stopListnerForAsyncAcks)
-					ListenerManager.stop(configContext,Constants.TRANSPORT_HTTP);
+				//FIXME
+//				if (stopListnerForAsyncAcks)
+//					ListenerManager.stop(configContext,Constants.TRANSPORT_HTTP);
 				
 				//TODO stop listner for asyncControlMessages
 				
-			} catch (AxisFault e) {
-				throw new SandeshaException (e.getMessage());
-			}
+//			} catch (AxisFault e) {
+//				throw new SandeshaException (e.getMessage());
+//			}
 		}
 		
 		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);

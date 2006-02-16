@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.ListenerManager;
+//import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
@@ -258,11 +258,11 @@ public class SequenceManager {
 			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) && transportInProtocol==null)
 				throw new SandeshaException ("Cant start the listner since the TransportInProtocol is null");
 
-			if (startListnerForAsyncAcks)
-				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
-		
-			if (startListnerForAsyncControlMsgs)
-				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
+//			if (startListnerForAsyncAcks)
+//				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
+//		
+//			if (startListnerForAsyncControlMsgs)
+//				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
 							
 			
 		} catch (AxisFault e) {
