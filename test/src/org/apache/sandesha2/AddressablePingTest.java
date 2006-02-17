@@ -16,6 +16,8 @@
 
 package org.apache.sandesha2;
 
+import java.io.File;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
@@ -46,7 +48,15 @@ public class AddressablePingTest extends TestCase {
 	SimpleHTTPServer httpServer = null;
 	
 	public void setUp () throws AxisFault {
-		httpServer = new SimpleHTTPServer ("target\\repos\\server","target\\repos\\server\\axis2.xml",8060);
+		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "axis2.xml";
+		
+//		String repoPath = "target\\repos\\server";
+//		String axis2_xml = "target\\repos\\server\\axis2.xml";
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+		
+		httpServer = new SimpleHTTPServer (configContext,8060);
+		
 		httpServer.start();
 		try {
 			Thread.sleep(300);

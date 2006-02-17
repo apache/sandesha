@@ -72,7 +72,6 @@ public class PorpertyLoaderTest extends TestCase {
 		assertEquals(value,(60*60*3*1000));
 	}
 	
-	
 	public void testStorageManager () {
 		String storageMgr = manager.getStorageManagerClass();
 		assertEquals(storageMgr,"org.apache.sandesha2.storage.inmemory.InMemoryStorageManager1");
