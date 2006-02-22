@@ -19,6 +19,8 @@ package sandesha2.samples.simpleServer;
 import java.io.File;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 
 public class SimpleSandesha2Server {
@@ -45,7 +47,9 @@ public class SimpleSandesha2Server {
 		System.out.println("Starting sandesha2 server...");
 		
 		String axis2_xml = AXIS2_SERVER_PATH + "axis2.xml";
-		SimpleHTTPServer server = new SimpleHTTPServer (AXIS2_SERVER_PATH,axis2_xml,8080);
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_SERVER_PATH,axis2_xml);
+		
+		SimpleHTTPServer server = new SimpleHTTPServer  (configContext,8080);
 		
 		server.start();
 	}

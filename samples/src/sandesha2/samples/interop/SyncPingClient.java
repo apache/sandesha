@@ -32,6 +32,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.ws.commons.om.OMAbstractFactory;
@@ -39,6 +41,7 @@ import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAP11Constants;
+import org.apache.ws.commons.soap.SOAP12Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 
 
@@ -84,15 +87,18 @@ public class SyncPingClient {
 		
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
-	//	clientOptions.setr\
+
 		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
-	//	clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
-		
+	    //clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
+		
+		clientOptions.setProperty("prop1","test1234");
+		serviceClient.getAxisService().addParameter (new ParameterImpl  ("prop2","test12345"));
 		
 		serviceClient.engageModule(new QName ("sandesha2"));
 		serviceClient.setOptions(clientOptions);
@@ -101,7 +107,7 @@ public class SyncPingClient {
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
-		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		serviceClient.fireAndForget(getPingOMBlock("ping31"));
 		
 	}
 	

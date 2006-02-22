@@ -34,6 +34,7 @@ import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
+import org.apache.ws.commons.soap.SOAP12Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 
 

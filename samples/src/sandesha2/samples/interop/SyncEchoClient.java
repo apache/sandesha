@@ -40,7 +40,6 @@ import org.apache.ws.commons.soap.SOAP12Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
 
-import sandesha2.samples.interop.AsyncEchoClient.TestCallback;
 
 public class SyncEchoClient {
 
