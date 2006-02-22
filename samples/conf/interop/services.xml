@@ -7,20 +7,21 @@
         This is a testing service , to test the system is working or not
    </description>
 
-    <operation name="ping">  
+    <operation name="ping" mep="http://www.w3.org/2004/08/wsdl/in-only">  
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
     </operation>
 
-    <operation name="Ping">  
+    <operation name="Ping" mep="http://www.w3.org/2004/08/wsdl/in-only">  
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
     </operation>
     
     <operation name="echoString">
-            <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+    	
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
     </operation>
 
     <operation name="EchoString">
-            <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
     </operation>
     
 </service>
