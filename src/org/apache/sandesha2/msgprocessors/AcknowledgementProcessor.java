@@ -182,17 +182,18 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		
 		
 		//setting the completed_messages list. This gives all the messages of the sequence that were acked.
-		SequencePropertyBean allCompletedMsgsBean = seqPropMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+		SequencePropertyBean allCompletedMsgsBean = seqPropMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 		if (allCompletedMsgsBean==null) {
 			allCompletedMsgsBean = new SequencePropertyBean ();
 			allCompletedMsgsBean.setSequenceID(internalSequenceId);
-			allCompletedMsgsBean.setName(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+			allCompletedMsgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 			
 			seqPropMgr.insert(allCompletedMsgsBean);
 		}
 				
 		String str = ackedMessagesList.toString();
 		allCompletedMsgsBean.setValue(str);
+		
 		seqPropMgr.update(allCompletedMsgsBean);
 		
 		//If all messages up to last message have been acknowledged. Add terminate Sequence message.

@@ -596,7 +596,7 @@ public class SandeshaUtil {
 			return new ArrayList ();
 		
 		if (str.length()<2) {
-			String message = "Invalid String array";
+			String message = "Invalid String array : " + str;
 			log.debug(message);
 			throw new SandeshaException (message);
 		}
@@ -604,7 +604,7 @@ public class SandeshaUtil {
 		int length = str.length();
 		
 		if (str.charAt(0)!='[' || str.charAt(length-1)!=']') {
-			String message = "Invalid String array";
+			String message = "Invalid String array" + str;
 			log.debug(message);
 			throw new SandeshaException (message);
 		}

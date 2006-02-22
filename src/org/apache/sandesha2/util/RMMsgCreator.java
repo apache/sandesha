@@ -541,7 +541,7 @@ public class RMMsgCreator {
 				.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
-				Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
 
 		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(

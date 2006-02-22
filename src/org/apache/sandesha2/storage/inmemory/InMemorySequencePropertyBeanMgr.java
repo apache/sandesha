@@ -103,12 +103,8 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 		return beans;
 	}
 
-	public synchronized boolean update(SequencePropertyBean bean) {
+	public synchronized boolean update(SequencePropertyBean bean) {	
 		
-		if (bean.getName().equals(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES)) {
-			int i = 1;
-		}
-	
 		if (!table.contains(bean))
 			return false;
 

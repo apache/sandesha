@@ -206,17 +206,6 @@ public class TerminateManager {
 				}
 			}
 			
-//			try {
-				//this removes the listner entry for receiving async acks.
-				//FIXME
-//				if (stopListnerForAsyncAcks)
-//					ListenerManager.stop(configContext,Constants.TRANSPORT_HTTP);
-				
-				//TODO stop listner for asyncControlMessages
-				
-//			} catch (AxisFault e) {
-//				throw new SandeshaException (e.getMessage());
-//			}
 		}
 		
 		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
@@ -265,7 +254,7 @@ public class TerminateManager {
 	}
 	
 	private static void doUpdatesIfNeeded (String sequenceID, SequencePropertyBean propertyBean, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
-		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES)) {
+		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES)) {
 			
 			//this value cannot be completely deleted since this data will be needed by SequenceReports
 			//so saving it with the sequenceID value being the out sequenceID.
@@ -274,7 +263,7 @@ public class TerminateManager {
 			newBean.setSequenceID(sequenceID);
 			newBean.setName(propertyBean.getName());
 			newBean.setValue(propertyBean.getValue());
-			
+
 			seqPropMgr.insert(newBean);
 			
 			//TODO amazingly this property does not seem to get deleted without following - in the hibernate impl 

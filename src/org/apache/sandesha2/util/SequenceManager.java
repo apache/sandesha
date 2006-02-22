@@ -90,7 +90,7 @@ public class SequenceManager {
 				.getSequencePropretyBeanMgr();
 
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
-				sequenceId, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES, "");
+				sequenceId, Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
 		
 		//If no replyTo value. Send responses as sync.
 		SequencePropertyBean toBean = null;
@@ -434,27 +434,27 @@ public class SequenceManager {
 		return false;
 	}
 	
-	public static long getIncomingSequenceAckedMessageCount (String sequenceID, ConfigurationContext configurationContext) throws SandeshaException {
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-		Transaction transaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
-		
-		SequencePropertyBean receivedMsgsBean = seqPropBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
-		
-		//we should be able to assume that all the received messages has been acked.
-		String receivedMsgsStr = receivedMsgsBean.getValue();
-
-		StringTokenizer tokenizer = new StringTokenizer (receivedMsgsStr,",");
-		
-		long count = 0;
-		while (tokenizer.hasMoreTokens()) {
-			String temp = tokenizer.nextToken();
-			count++;
-		}
-
-		transaction.commit();
-		return count;
-	}
+//	public static long getIncomingSequenceAckedMessageCount (String sequenceID, ConfigurationContext configurationContext) throws SandeshaException {
+//		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+//		Transaction transaction = storageManager.getTransaction();
+//		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+//		
+//		SequencePropertyBean receivedMsgsBean = seqPropBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+//		
+//		//we should be able to assume that all the received messages has been acked.
+//		String receivedMsgsStr = receivedMsgsBean.getValue();
+//
+//		StringTokenizer tokenizer = new StringTokenizer (receivedMsgsStr,",");
+//		
+//		long count = 0;
+//		while (tokenizer.hasMoreTokens()) {
+//			String temp = tokenizer.nextToken();
+//			count++;
+//		}
+//
+//		transaction.commit();
+//		return count;
+//	}
 	
 	public static boolean isIncomingSequenceCompleted (String sequenceID, ConfigurationContext configurationContext) throws SandeshaException {
 		

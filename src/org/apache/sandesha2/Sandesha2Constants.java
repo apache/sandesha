@@ -157,8 +157,9 @@ public interface Sandesha2Constants {
 		//received (may be an ack was sent - depending on the policy)
 		//For out going sequences this gives the messages that were sent and that were successfully
 		//acked by the other end point.
-		String COMPLETED_MESSAGES = "CompletedMessages";
-
+		String CLIENT_COMPLETED_MESSAGES = "ClientCompletedMessages";
+		String SERVER_COMPLETED_MESSAGES = "ServerCompletedMessages";
+		
 		String TO_EPR = "ToEPR";
 
 		String ACKS_TO_EPR = "acksToEPR";

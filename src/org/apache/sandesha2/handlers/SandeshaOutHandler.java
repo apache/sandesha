@@ -426,7 +426,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			SequencePropertyBean msgsBean = new SequencePropertyBean();
 			msgsBean.setSequenceID(offeredSequenceId);
 			msgsBean
-					.setName(Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+					.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 			msgsBean.setValue("");
 
 			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean();

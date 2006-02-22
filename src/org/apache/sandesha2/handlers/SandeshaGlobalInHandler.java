@@ -121,7 +121,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 						.getSequencePropretyBeanMgr();
 				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
 						sequenceId,
-						Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+						Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 				if (receivedMsgsBean != null) {
 					String receivedMsgStr = (String) receivedMsgsBean
 							.getValue();
@@ -154,7 +154,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							if (receivedMsgsBean == null) {
 								receivedMsgsBean = new SequencePropertyBean(
 										sequenceId,
-										Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES,
+										Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES,
 										"");
 								seqPropMgr.insert(receivedMsgsBean);
 							}
@@ -168,6 +168,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 								receivedMsgStr = Long.toString(msgNo);
 
 							receivedMsgsBean.setValue(receivedMsgStr);
+							
+							//TODO correct the syntac into '[received msgs]'
+							
 							seqPropMgr.update(receivedMsgsBean);
 
 							ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
@@ -205,7 +208,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			SequencePropertyBeanMgr seqPropMgr = storageManager
 					.getSequencePropretyBeanMgr();
 			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(
-					sequenceId, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+					sequenceId, Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 			String receivedMsgStr = (String) receivedMsgsBean.getValue();
 
 			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();

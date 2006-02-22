@@ -145,7 +145,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getTransaction();
 		
 		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
-				Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo == 0) {

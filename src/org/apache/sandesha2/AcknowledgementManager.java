@@ -86,28 +86,40 @@ public class AcknowledgementManager {
 			throw new SandeshaException(message);
 		}
 
-		String internalSequenceId = (String) internalSequenceBean.getValue();
+		//String internalSequenceId = (String) internalSequenceBean.getValue();
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
 		findBean.setReSend(false);
+		
+		String carrietTo = applicationRMMsgContext.getTo().getAddress();
+		
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		
 		Iterator it = collection.iterator();
 
-		if (it.hasNext()) {
+		
+		piggybackLoop:
+		while (it.hasNext()) {
 			SenderBean ackBean = (SenderBean) it.next();
 
 			long timeNow = System.currentTimeMillis();
 			if (ackBean.getTimeToSend() > timeNow) { 
 				//Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
 
+				MessageContext ackMsgContext = storageManager
+				.retrieveMessageContext(ackBean
+						.getMessageContextRefKey(),configurationContext);
+				
+				String to = ackMsgContext.getTo().getAddress();
+				if (!carrietTo.equals(to)) {
+					continue piggybackLoop;
+				}
+				
 				//deleting the ack entry.
 				retransmitterBeanMgr.delete(ackBean.getMessageID());
 
 				//Adding the ack to the application message
-				MessageContext ackMsgContext = storageManager
-						.retrieveMessageContext(ackBean
-								.getMessageContextRefKey(),configurationContext);
+
 				RMMsgContext ackRMMsgContext = MsgInitializer
 						.initializeMessage(ackMsgContext);
 				if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
@@ -123,6 +135,7 @@ public class AcknowledgementManager {
 						sequenceAcknowledgement);
 
 				applicationRMMsgContext.addSOAPEnvelope();
+				break piggybackLoop;
 			}
 		}
 	}
@@ -134,11 +147,23 @@ public class AcknowledgementManager {
 	 * @param outGoingMessage
 	 * @return
 	 */
-	public static ArrayList getCompletedMessagesList (String sequenceIdentifier,ConfigurationContext configurationContext) throws SandeshaException {
+	public static ArrayList getClientCompletedMessagesList (String sequenceIdentifier,ConfigurationContext configurationContext) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
 		
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
-		SequencePropertyBean completedMessagesBean = sequencePropertyBeanMgr.retrieve(sequenceIdentifier,Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
+		
+		//first trying to get it from the internal sequence id.
+		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceIdentifier,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		String internalSequenceID = null;
+		if (internalSequenceBean!=null)
+			internalSequenceID = internalSequenceBean.getValue();
+		
+		SequencePropertyBean completedMessagesBean = null;
+		if (internalSequenceID!=null)
+			completedMessagesBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
+		
+		if (completedMessagesBean==null)
+			completedMessagesBean = sequencePropertyBeanMgr.retrieve(sequenceIdentifier,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 		
 		ArrayList completedMsgList = null;
 		if (completedMessagesBean!=null) {

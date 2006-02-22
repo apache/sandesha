@@ -71,7 +71,7 @@ public class Sandesha2ClientAPI {
 		String sequenceID = internalSequenceBean.getSequenceID();
 		
 		//finding the actual seq
-		ArrayList completedMessageList =  AcknowledgementManager.getCompletedMessagesList (sequenceID,configurationContext);
+		ArrayList completedMessageList =  AcknowledgementManager.getClientCompletedMessagesList (sequenceID,configurationContext);
 		
 		Iterator iter = completedMessageList.iterator();
 		while (iter.hasNext()) {
@@ -96,7 +96,7 @@ public class Sandesha2ClientAPI {
 		
 		SequenceReport sequenceReport = new SequenceReport ();
 
-		ArrayList completedMessageList =  AcknowledgementManager.getCompletedMessagesList (sequenceID,configurationContext);
+		ArrayList completedMessageList =  AcknowledgementManager.getClientCompletedMessagesList (sequenceID,configurationContext);
 
 		Iterator iter = completedMessageList.iterator();
 		while (iter.hasNext()) {

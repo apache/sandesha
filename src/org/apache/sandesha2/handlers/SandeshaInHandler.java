@@ -103,7 +103,7 @@ public class SandeshaInHandler extends AbstractHandler {
 		} catch (SandeshaException se) {
 			String message = "Error in processing the message";
 			log.debug(message);
-			throw new AxisFault(message);
+			throw new AxisFault(message,se);
 		}
 
 	}
