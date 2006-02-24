@@ -59,16 +59,20 @@
           <parameter name="transport.mail.replyToAddress" locked="false">axis2@127.0.0.1</parameter>
       </transportReceiver> -->
 
+<!--
     <transportReceiver name="tcp" class="org.apache.axis2.transport.tcp.TCPServer">
-        <parameter name="port" locked="false">6060</parameter>
+        <parameter name="port" locked="false">6061</parameter>
     </transportReceiver>
+-->
 
+<!--
     <transportReceiver name="jms" class="org.apache.axis2.transport.jms.SimpleJMSListener">
         <parameter name="transport.jms.Destination" locked="false">dynamicQueues/FOO</parameter>
         <parameter name="java.naming.factory.initial" locked="false">
             org.activemq.jndi.ActiveMQInitialContextFactory</parameter>
         <parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>
     </transportReceiver>
+-->
 
     <!-- ================================================= -->
     <!-- Transport Outs -->
@@ -100,7 +104,7 @@
     <!-- Global Modules  -->
     <!-- ================================================= -->
     <!-- Comment this to disable Addressing -->
-    <module ref="addressing"/>
+    <module ref="addressing" />
 
 
     <!--Configuring module , providing parameters for modules whether they refer or not-->
@@ -116,25 +120,26 @@
         <phase name="TransportIn"/>
         <phase name="PreDispatch"/>
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
-            <handler name="AddressingBasedDispatcher"
-                     class="org.apache.axis2.engine.AddressingBasedDispatcher">
-                <order phase="Dispatch"/>
-            </handler>
-
             <handler name="RequestURIBasedDispatcher"
                      class="org.apache.axis2.engine.RequestURIBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
-
+            
             <handler name="SOAPActionBasedDispatcher"
                      class="org.apache.axis2.engine.SOAPActionBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
-
+            
+            <handler name="AddressingBasedDispatcher"
+                     class="org.apache.axis2.engine.AddressingBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+            
             <handler name="SOAPMessageBodyBasedDispatcher"
                      class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
+            
             <handler name="InstanceDispatcher"
                      class="org.apache.axis2.engine.InstanceDispatcher">
                 <order phase="PostDispatch"/>
@@ -145,28 +150,25 @@
         <phase name="userphase1"/>
 	  <phase name="RMPhase" />
     </phaseOrder>
-
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
         <phase name="RMPhase" />
-	  <phase name="userphase1"/>
+        <phase name="userphase1"/>
         <!--system predefined phase-->
         <!--these phase will run irrespective of the service-->
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>
     </phaseOrder>
-
     <phaseOrder type="INfaultflow">
         <!--      user can add his own phases to this area  -->
         <phase name="userphase1"/>
-	  <phase name="RMPhase" />
+        <phase name="RMPhase" />
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
         <phase name="RMPhase" />
-	  <phase name="userphase1"/>
+        <phase name="userphase1"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>
     </phaseOrder>
 </axisconfig>
-

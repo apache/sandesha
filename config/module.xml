@@ -78,13 +78,16 @@
                               
       <!-- This will not be overriden by service level policies -->
       <wsrm:StorageManagers>
-        <wsrm:StorageManager>
+      
+       <wsrm:StorageManager>
             org.apache.sandesha2.storage.inmemory.InMemoryStorageManager 
         </wsrm:StorageManager> 
-         <!-- 
+       
+       <!-- 
         <wsrm:StorageManager>
             org.apache.sandesha2.storage.persistent.hibernate.PersistentStorageManager
-        </wsrm:StorageManager> -->
+        </wsrm:StorageManager> 
+       -->
        
       </wsrm:StorageManagers>
 
