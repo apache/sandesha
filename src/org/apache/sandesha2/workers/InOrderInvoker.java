@@ -54,19 +54,13 @@ import org.apache.sandesha2.wsrm.Sequence;
 public class InOrderInvoker extends Thread {
 	
 	private boolean runInvoker = false;
-	//private boolean stopInvokerAfterWork = false;
 	private ArrayList workingSequences = new ArrayList();
-	
 	private ConfigurationContext context = null;
+	private Log log = LogFactory.getLog(getClass());
 	
-	Log log = LogFactory.getLog(getClass());
-	
-	int i = 1;
-
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
 		workingSequences.remove(sequenceID);
 		if (workingSequences.size()==0) {
-			
 			//runInvoker = false;
 		}
 	}
@@ -83,7 +77,6 @@ public class InOrderInvoker extends Thread {
 		
 		if (!workingSequences.contains(sequenceID))
 			workingSequences.add(sequenceID);
-		
 
 		if (!isInvokerStarted()) {
 			runInvoker = true;     //so that isSenderStarted()=true.
@@ -104,7 +97,6 @@ public class InOrderInvoker extends Thread {
 			}
 
 			try {
-
 				StorageManager storageManager = SandeshaUtil
 						.getSandeshaStorageManager(context);
 				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
@@ -135,8 +127,6 @@ public class InOrderInvoker extends Thread {
 				currentIteration: while (allSequencesItr.hasNext()) {
 
 					String sequenceId = (String) allSequencesItr.next();
-
-					//Transaction sequenceInvocationTransaction = storageManager.getTransaction();
 					
 					Transaction invocationTransaction = storageManager.getTransaction();   //Transaction based invocation
 					
@@ -164,11 +154,7 @@ public class InOrderInvoker extends Thread {
 					Iterator stMapIt = storageMapMgr.find(
 							new InvokerBean(null, nextMsgno, sequenceId))
 							.iterator();
-
-					//sequenceInvocationTransaction.commit();
 					
-					
-
 					while (stMapIt.hasNext()) {
 
 
@@ -179,8 +165,7 @@ public class InOrderInvoker extends Thread {
 
 
 						MessageContext msgToInvoke = storageManager.retrieveMessageContext(key,context);
-						//invocationTransaction.commit();
-						
+
 						RMMsgContext rmMsg = MsgInitializer
 								.initializeMessage(msgToInvoke);
 						Sequence seq = (Sequence) rmMsg
@@ -190,9 +175,7 @@ public class InOrderInvoker extends Thread {
 
 						try {
 							//Invoking the message.
-//							new AxisEngine(msgToInvoke.getConfigurationContext())
-//									.receive(msgToInvoke);
-							
+
 							//currently Transaction based invocation can be supplied only for the in-only case.
 							
 							if (!AxisOperationFactory.MEP_URI_IN_ONLY.equals(msgToInvoke.getAxisOperation().getMessageExchangePattern())) {
@@ -209,23 +192,15 @@ public class InOrderInvoker extends Thread {
 							log.info("Invoker invoking a '" + SandeshaUtil.getMessageTypeString(rmMsg
 												.getMessageType()) + "' message.");
 							
-							//Transaction deleteEntryTransaction = storageManager.getTransaction();
-							//deleting the message entry.
+
 							storageMapMgr.delete(key);
-							
-							//deleteEntryTransaction.commit();
-							
 						} catch (AxisFault e) {
 							throw new SandeshaException(e);
 						}
 
 						//Transaction postInvocationTransaction = storageManager.getTransaction();
 						//undating the next msg to invoke
-//						nextMsgno++;
-//						stMapIt = storageMapMgr
-//								.find(
-//										new InvokerBean(null, nextMsgno,
-//												sequenceId)).iterator();
+
 
 						//terminate (AfterInvocation)
 						if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
@@ -247,25 +222,13 @@ public class InOrderInvoker extends Thread {
 						
 					}
 
-					//Transaction updateNextMsgTransaction = storageManager.getTransaction();
 					nextMsgno++;
 					nextMsgBean.setNextMsgNoToProcess(nextMsgno);
 					nextMsgMgr.update(nextMsgBean);
-					//updateNextMsgTransaction.commit();
-					
-//					i++;
-//					if (i==3) {
-//						throw new SandeshaException ("test");
-//					}
-					
 					invocationTransaction.commit();
-					
-
-				
 				}
 				
 			} catch (SandeshaException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}

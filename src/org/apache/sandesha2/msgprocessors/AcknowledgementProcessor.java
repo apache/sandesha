@@ -223,10 +223,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 					lastOutMessageNo);
 			
 			if (complete) {
-				//Transaction terminateTransaction = storageManager.getTransaction();
-				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,
-						internalSequenceId);
-				//terminateTransaction.commit();
+				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,internalSequenceId);
 			}
 		}
 	
@@ -346,15 +343,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		
 		//This should be dumped to the storage by the sender
 		TransportOutDescription transportOut = terminateRMMessage.getMessageContext().getTransportOut();
-		
 		terminateRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,transportOut);
-		
 		terminateRMMessage.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
-		
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
-		
 		terminateRMMessage.getMessageContext().setTransportOut(new Sandesha2TransportOutDesc ());
-		
 		addTerminateSeqTransaction.commit();
 		
 	    AxisEngine engine = new AxisEngine (incomingAckRMMsg.getMessageContext().getConfigurationContext());

@@ -9,30 +9,21 @@ import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.TransportSender;
-import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class Sandesha2TransportSender implements TransportSender  {
 
-	private String messageStoreKey = null;
-	
 	public void invoke(MessageContext msgContext) throws AxisFault {
 		
 		//setting the correct transport sender.
-		//TransportSender sender = (TransportSender) msgContext.getProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_SENDER);
 		TransportOutDescription transportOut = (TransportOutDescription) msgContext.getProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC);
 		
 		if (transportOut==null)
 			throw new SandeshaException ("Original transport sender is not present");
-		
-		//msgContext.getTransportOut().setSender(sender);
+
 		msgContext.setTransportOut(transportOut);
 		
 		String key =  (String) msgContext.getProperty(Sandesha2Constants.MESSAGE_STORE_KEY);
@@ -42,27 +33,7 @@ public class Sandesha2TransportSender implements TransportSender  {
 		
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-		
-		Transaction messageStoreTransaction = storageManager.getTransaction();
 		storageManager.updateMessageContext(key,msgContext);
-		messageStoreTransaction.commit();
-		
-		Transaction transaction = storageManager.getTransaction();
-		//setting send=true (if requestd) for the message.
-		SenderBeanMgr senderBeanMgr = storageManager.getRetransmitterBeanMgr();
-
-		RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgContext);
-		
-		String messageType = SandeshaUtil.getMessageTypeString(rmMsg.getMessageType());
-		SenderBean senderBean = senderBeanMgr.retrieveFromMessageRefKey(key);
-
-//	 	String setSendToTrue = (String) msgContext.getProperty(Sandesha2Constants.SET_SEND_TO_TRUE);
-//		if (Sandesha2Constants.VALUE_TRUE.equals(setSendToTrue)) {
-//			senderBean.setSend(true);
-//			senderBeanMgr.update(senderBean);
-//		}
-		
-		transaction.commit();
 		
 		msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,Sandesha2Constants.VALUE_TRUE);
 	}

@@ -31,13 +31,10 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.soap.SOAPEnvelope;
-import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -57,6 +54,8 @@ import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
 
 /**
  * Used to create new RM messages.
@@ -68,31 +67,11 @@ public class RMMsgCreator {
 
 	private static Log log = LogFactory.getLog(RMMsgCreator.class);
 
-	
-	private static void initializeCreation1(MessageContext relatedMessage,
-			MessageContext newMessage) {
-	}
-
-	private static void finalizeCreation1(MessageContext relatedMessage,
-			MessageContext newMessage) throws SandeshaException {
-
-	}
-	
-	
-	
-	
 	private static void initializeCreation(MessageContext relatedMessage,
 			MessageContext newMessage) throws SandeshaException {
-		// Seting RMPolicyBean
-		// if
-		// (rmMsgCtx.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN)==null)
-		// rmMsgCtx.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN,
-		// PropertyManager.getInstance().getRMPolicyBean());
 
 		Parameter policyParam = relatedMessage
 				.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-		// if (propertyParam!=null)
-		// newMessage.setProperty(propertyParam.getName(),propertyParam.getValue());
 
 		if (policyParam != null) {
 
@@ -157,8 +136,6 @@ public class RMMsgCreator {
 					String key = (String) keyIter.next();
 					newOpContext.setProperty(key, oldOpContextProperties
 							.get(key));
-					// newAxisOperation.addParameter(new ParameterImpl
-					// (nextParam.getName(),(String) nextParam.getValue()));
 				}
 			}
 		}
@@ -172,8 +149,6 @@ public class RMMsgCreator {
 					String key = (String) keyIter.next();
 					newMessage.setProperty(key, oldMsgContextProperties
 							.get(key));
-					// newAxisOperation.addParameter(new ParameterImpl
-					// (nextParam.getName(),(String) nextParam.getValue()));
 				}
 			}
 		}
@@ -261,8 +236,6 @@ public class RMMsgCreator {
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
 		}
-
-		// setUpMessage(applicationMsgContext, createSeqmsgContext);
 
 		AxisOperation appMsgOperationDesc = applicationMsgContext
 				.getAxisOperation();

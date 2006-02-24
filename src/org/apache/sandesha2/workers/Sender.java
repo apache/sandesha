@@ -28,7 +28,6 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.ws.commons.soap.SOAPEnvelope;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
@@ -45,11 +44,11 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.TerminateSequence;
+import org.apache.ws.commons.soap.SOAPEnvelope;
 
 /**
  * This is responsible for sending and re-sending messages of Sandesha2. This
@@ -62,14 +61,10 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 public class Sender extends Thread {
 
 	private boolean runSender = false;
-
 	private boolean stopSenderAfterWork = false;
-
 	private ArrayList workingSequences = new ArrayList();
-
 	private ConfigurationContext context = null;
-
-	Log log = LogFactory.getLog(getClass());
+	private Log log = LogFactory.getLog(getClass());
 
 	public synchronized void stopSenderForTheSequence(String sequenceID) {
 		workingSequences.remove(sequenceID);
@@ -104,11 +99,7 @@ public class Sender extends Thread {
 					throw new SandeshaException(message);
 				}
 
-				Transaction pickMessagesToSendTransaction = storageManager
-						.getTransaction(); // starting
-				// a
-				// new
-				// transaction
+				Transaction pickMessagesToSendTransaction = storageManager.getTransaction();
 
 				SenderBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
 				Collection coll = mgr.findMsgsToSend();
@@ -136,40 +127,29 @@ public class Sender extends Thread {
 					// set and not true.
 					// But it will set if it is not set (null)
 
-					// This is used to make sure that the mesage get passed the
-					// Sandesha2TransportSender.
+					// This is used to make sure that the mesage get passed the Sandesha2TransportSender.
 
 					String qualifiedForSending = (String) msgCtx
 							.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
 					if (qualifiedForSending != null
-							&& !qualifiedForSending
-									.equals(Sandesha2Constants.VALUE_TRUE)) {
+							&& !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
 						continue;
 					}
 
-					// try {
-
 					if (msgCtx == null) {
-						log
-								.debug("ERROR: Sender has an Unavailable Message entry");
+						log.debug("ERROR: Sender has an Unavailable Message entry");
 						break;
 					}
 
 					RMMsgContext rmMsgCtx = MsgInitializer
 							.initializeMessage(msgCtx);
-					// rmMsgCtx.addSOAPEnvelope();
 
 					// skip sending if this message has been mentioned as a
 					// message not to send (within sandesha2.properties)
-					ArrayList msgsNotToSend = PropertyManager.getInstance()
-							.getMessagesNotToSend();
-					// SandeshaPropertyBean propertyBean =
-					// (SandeshaPropertyBean)
-					// messageContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+					ArrayList msgsNotToSend = PropertyManager.getInstance().getMessagesNotToSend();
 
 					if (msgsNotToSend != null
-							&& msgsNotToSend.contains(new Integer(rmMsgCtx
-									.getMessageType()))) {
+							&& msgsNotToSend.contains(new Integer(rmMsgCtx.getMessageType()))) {
 						continue;
 					}
 
@@ -185,47 +165,28 @@ public class Sender extends Thread {
 					int messageType = rmMsgCtx.getMessageType();
 
 					if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
-
-						Sequence sequence = (Sequence) rmMsgCtx
-								.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-						String sequenceID = sequence.getIdentifier()
-								.getIdentifier();
+						Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+						String sequenceID = sequence.getIdentifier().getIdentifier();
 						// checking weather the sequence has been timed out.
-						boolean sequenceTimedOut = SequenceManager
-								.hasSequenceTimedOut(sequenceID, rmMsgCtx);
+						boolean sequenceTimedOut = SequenceManager.hasSequenceTimedOut(sequenceID, rmMsgCtx);
 						if (sequenceTimedOut) {
 							// sequence has been timed out.
 							// do time out processing.
 
 							// TODO uncomment below line
-							TerminateManager.terminateSendingSide(context,
-									sequenceID, msgCtx.isServerSide());
+							TerminateManager.terminateSendingSide(context,sequenceID, msgCtx.isServerSide());
 
 							String message = "Sequence timed out";
 							log.debug(message);
 							throw new SandeshaException(message);
 						}
 
-						// piggybacking if an ack if available for the same
-						// sequence.
+						// piggybacking if an ack if available for the same sequence.
 						//TODO do piggybacking based on wsa:To
-						
 						AcknowledgementManager.piggybackAckIfPresent(rmMsgCtx);
 					}
 
 					preSendTransaction.commit();
-
-					// every message should be resumed (pause==false) when
-					// sending
-					// boolean paused = msgCtx.isPaused();
-
-					// AxisEngine engine = new AxisEngine(msgCtx
-					// .getConfigurationContext());
-					// if (paused) {
-					// engine.resume(msgCtx);
-					// }else {
-					// engine.send(msgCtx);
-					// }
 
 					TransportOutDescription transportOutDescription = msgCtx
 							.getTransportOut();
@@ -235,8 +196,7 @@ public class Sender extends Thread {
 						transportSender.invoke(msgCtx);
 					}
 
-					Transaction postSendTransaction = storageManager
-							.getTransaction();
+					Transaction postSendTransaction = storageManager.getTransaction();
 
 					MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
 
@@ -261,8 +221,7 @@ public class Sender extends Thread {
 							mgr.delete(bean1.getMessageID());
 					}
 
-					postSendTransaction.commit(); // commiting the current
-					// transaction
+					postSendTransaction.commit(); // commiting the current transaction
 
 					if (!msgCtx.isServerSide())
 						checkForSyncResponses(msgCtx);
@@ -278,8 +237,7 @@ public class Sender extends Thread {
 						ConfigurationContext configContext = msgCtx
 								.getConfigurationContext();
 
-						TerminateManager.terminateSendingSide(configContext,
-								sequenceID, msgCtx.isServerSide());
+						TerminateManager.terminateSendingSide(configContext,sequenceID, msgCtx.isServerSide());
 
 						// removing a entry from the Listener
 						String transport = msgCtx.getTransportOut().getName()
@@ -348,16 +306,7 @@ public class Sender extends Thread {
 	}
 
 	private void updateMessage(MessageContext msgCtx1) throws SandeshaException {
-		// try {
-		// RMMsgContext rmMsgCtx1 = MsgInitializer.initializeMessage(msgCtx1);
-		// rmMsgCtx1.addSOAPEnvelope();
-		//
-		// } catch (AxisFault e) {
-		// String message = "Exception in updating contexts";
-		// log.debug(message);
-		// throw new SandeshaException(message);
-		// }
-
+		//do updates if required.
 	}
 
 	private void checkForSyncResponses(MessageContext msgCtx)
@@ -383,9 +332,6 @@ public class Sender extends Thread {
 
 			responseMessageContext.setProperty(MessageContext.TRANSPORT_IN,
 					msgCtx.getProperty(MessageContext.TRANSPORT_IN));
-			// msgCtx.getAxisOperation().registerOperationContext(responseMessageContext,
-			// msgCtx.getOperationContext());
-			// responseMessageContext.setServerSide(false);
 			responseMessageContext
 					.setServiceContext(msgCtx.getServiceContext());
 			responseMessageContext.setServiceGroupContext(msgCtx

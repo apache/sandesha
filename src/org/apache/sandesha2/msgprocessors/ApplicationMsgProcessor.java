@@ -30,16 +30,12 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.ws.commons.soap.SOAPEnvelope;
-import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -51,7 +47,6 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
-import org.apache.sandesha2.transport.Sandesha2TransportSender;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -63,6 +58,8 @@ import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
 
 /**
  * Responsible for processing an incoming Application message.
@@ -130,13 +127,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
-
-		
 		//setting mustUnderstand to false.
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
 		
 		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
+		
 		//updating the last activated time of the sequence.
 		SequenceManager.updateLastActivatedTime(sequenceId,configCtx);
 		lastUpdatedTimeTransaction.commit();
@@ -160,7 +156,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			//this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
-
 			rmMsgCtx.pause();
 
 		}
@@ -174,8 +169,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		seqPropMgr.update(msgsBean);
 
 		updataMsgStringTransaction.commit();
-
-
 
 		Transaction invokeTransaction = storageManager.getTransaction();
 

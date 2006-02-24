@@ -94,20 +94,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		//removing an entry from the listener
 		String transport = terminateSeqMsg.getTransportIn().getName().getLocalPart();
-//		try {
-			//This will throw an exception in the server side. //TODO find a better method.
-			//TODO : following causes the SAS to stop withot returning 202. find a better method or correct this
-			//ListenerManager.stop(context, transport);
-//		} catch (AxisFault e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			String message = "Cant stop listener...";
-//			log.debug(message);
-//		}
-		
-		
-		
-		
+	
 		Transaction lastUpdatedTransaction = storageManager.getTransaction();
 		SequenceManager.updateLastActivatedTime(sequenceId,context);
 		lastUpdatedTransaction.commit();
