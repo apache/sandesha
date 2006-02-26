@@ -19,13 +19,14 @@ import javax.xml.namespace.QName;
 public class TerminateSequenceTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	String rmNamespace = Sandesha2Constants.SPEC_2005_02.NS_URI;
 	
     public TerminateSequenceTest() {
         super("TerminateSequenceTest");
     }
 
     public void testFromOMElement() {
-        TerminateSequence terminateSequence =  new TerminateSequence(factory);
+        TerminateSequence terminateSequence =  new TerminateSequence(factory,rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "TerminateSequence.xml");
         terminateSequence.fromOMElement(env.getBody());
 
@@ -34,8 +35,8 @@ public class TerminateSequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() {
-        TerminateSequence terminateSequence = new TerminateSequence(factory);
-        Identifier identifier = new Identifier(factory);
+        TerminateSequence terminateSequence = new TerminateSequence(factory,rmNamespace);
+        Identifier identifier = new Identifier(factory,rmNamespace);
         identifier.setIndentifer("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06");
         terminateSequence.setIdentifier(identifier);
 
@@ -43,9 +44,9 @@ public class TerminateSequenceTest extends SandeshaTestCase {
         terminateSequence.toSOAPEnvelope(env);
 
         OMElement terminateSeqPart = env.getBody().getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.TERMINATE_SEQUENCE));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
         OMElement identifierPart = terminateSeqPart.getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.IDENTIFIER));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
         assertEquals("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06", identifierPart.getText());
     }
 }

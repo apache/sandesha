@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
 public class SequenceTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	String rmNamespace = Sandesha2Constants.SPEC_2005_02.NS_URI;
 	
     public SequenceTest() {
         super("SequenceTest");
@@ -27,7 +28,7 @@ public class SequenceTest extends SandeshaTestCase {
 
     public void testFromOMElement() {
         SOAPEnvelope env = getSOAPEnvelope("", "Sequence.xml");
-        Sequence sequence = new Sequence(factory);
+        Sequence sequence = new Sequence(factory,rmNamespace);
         sequence.fromOMElement(env.getHeader());
 
         Identifier identifier = sequence.getIdentifier();
@@ -38,13 +39,13 @@ public class SequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() {
-        Sequence sequence = new Sequence(factory);
+        Sequence sequence = new Sequence(factory,rmNamespace);
 
-        Identifier identifier = new Identifier(factory);
+        Identifier identifier = new Identifier(factory,rmNamespace);
         identifier.setIndentifer("uuid:879da420-1624-11da-bed9-84d13db13902");
         sequence.setIdentifier(identifier);
 
-        MessageNumber msgNo = new MessageNumber(factory);
+        MessageNumber msgNo = new MessageNumber(factory,rmNamespace);
         msgNo.setMessageNumber(1);
         sequence.setMessageNumber(msgNo);
 
@@ -52,13 +53,13 @@ public class SequenceTest extends SandeshaTestCase {
         sequence.toSOAPEnvelope(envelope);
 
         OMElement sequencePart = envelope.getHeader().getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
         OMElement identifierPart = sequencePart.getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.IDENTIFIER));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
         assertEquals("uuid:879da420-1624-11da-bed9-84d13db13902", identifierPart.getText());
 
         OMElement msgNumberPart = sequencePart.getFirstChildWithName(
-				new QName (Sandesha2Constants.WSRM.NS_URI_RM,Sandesha2Constants.WSRM.MSG_NUMBER));
+				new QName (rmNamespace,Sandesha2Constants.WSRM_COMMON.MSG_NUMBER));
         assertEquals(1, Long.parseLong(msgNumberPart.getText()));
     }
 }

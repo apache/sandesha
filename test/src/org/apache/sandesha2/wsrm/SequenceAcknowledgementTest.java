@@ -20,13 +20,14 @@ import java.util.Iterator;
 public class SequenceAcknowledgementTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	String rmNamespace = Sandesha2Constants.SPEC_2005_02.NS_URI;
 	
     public SequenceAcknowledgementTest() {
         super("SequenceAcknowledgementTest");
     }
 
     public void testFromOMElement() {
-        SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(factory);
+        SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(factory,rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "SequenceAcknowledgement.xml");
         sequenceAck.fromOMElement(env.getHeader());
 
@@ -63,8 +64,8 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
     }
 
     public void testToOMElement() {
-        SequenceAcknowledgement seqAck = new SequenceAcknowledgement(factory);
-        Identifier identifier = new Identifier(factory);
+        SequenceAcknowledgement seqAck = new SequenceAcknowledgement(factory,rmNamespace);
+        Identifier identifier = new Identifier(factory,rmNamespace);
         identifier.setIndentifer("uuid:897ee740-1624-11da-a28e-b3b9c4e71445");
         seqAck.setIdentifier(identifier);
 
@@ -72,9 +73,9 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
         seqAck.toSOAPEnvelope(env);
 
         OMElement sequenceAckPart = env.getHeader().getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE_ACK));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
         OMElement identifierPart = sequenceAckPart.getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.IDENTIFIER));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
         assertEquals("uuid:897ee740-1624-11da-a28e-b3b9c4e71445", identifierPart.getText());
 
 

@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 public class CreateSequenceResponseTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+	String rmNamespace = Sandesha2Constants.SPEC_2005_02.NS_URI;
 	
     public CreateSequenceResponseTest() {
         super("CreateSequenceResponseTest");
@@ -27,7 +28,7 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     }
 
     public void testFromOMElement() {
-        CreateSequenceResponse res = new CreateSequenceResponse(factory);
+        CreateSequenceResponse res = new CreateSequenceResponse(factory,rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "CreateSequenceResponse.xml");
         res.fromOMElement(env.getBody());
 
@@ -42,14 +43,14 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() {
-        CreateSequenceResponse res = new CreateSequenceResponse(factory);
+        CreateSequenceResponse res = new CreateSequenceResponse(factory,rmNamespace);
 
-        Identifier identifier = new Identifier(factory);
+        Identifier identifier = new Identifier(factory,rmNamespace);
         identifier.setIndentifer("uuid:88754b00-161a-11da-b6d6-8198de3c47c5");
         res.setIdentifier(identifier);
 
-        Accept accept = new Accept(factory);
-        AcksTo acksTo = new AcksTo(factory);
+        Accept accept = new Accept(factory,rmNamespace);
+        AcksTo acksTo = new AcksTo(factory,rmNamespace);
         Address address = new Address(factory);
         address.setEpr(new EndpointReference("http://localhost:8070/axis/services/TestService"));
         acksTo.setAddress(address);
@@ -60,15 +61,15 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
         res.toSOAPEnvelope(env);
 
         OMElement createSeqResponsePart = env.getBody().getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.CREATE_SEQUENCE_RESPONSE));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
         OMElement identifierPart = createSeqResponsePart.getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.IDENTIFIER));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
         assertEquals("uuid:88754b00-161a-11da-b6d6-8198de3c47c5", identifierPart.getText());
 
         OMElement acceptPart = createSeqResponsePart.getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.ACCEPT));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.ACCEPT));
         OMElement acksToPart = acceptPart.getFirstChildWithName(
-                new QName(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.ACKS_TO));
+                new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.ACKS_TO));
         OMElement addressPart = acksToPart.getFirstChildWithName(new QName(
 				Sandesha2Constants.WSA.NS_URI_ADDRESSING, Sandesha2Constants.WSA.ADDRESS));
         assertEquals("http://localhost:8070/axis/services/TestService", addressPart.getText());
