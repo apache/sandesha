@@ -85,6 +85,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			RMMsgContext createSeqResponse = RMMsgCreator
 					.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
 							newSequenceId);
+			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
 			
 			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
 			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
@@ -199,7 +200,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 			}
 		} catch (AxisFault e1) {
-			throw new SandeshaException(e1.getMessage());
+			throw new SandeshaException(e1);
 		}
 
 		createSeqRMMsg.pause();

@@ -101,7 +101,7 @@ public class SandeshaUtil {
 	 * @throws SandeshaException
 	 */
 	public static ArrayList getAckRangeArrayList(String msgNoStr,
-			SOAPFactory factory) throws SandeshaException {
+			SOAPFactory factory, String rmNamespaceValue) throws SandeshaException {
 
 		ArrayList ackRanges = new ArrayList();
 
@@ -126,7 +126,7 @@ public class SandeshaUtil {
 			} else {
 				//add ackRange (lower,upper)
 				AcknowledgementRange ackRange = new AcknowledgementRange(
-						factory);
+						factory,rmNamespaceValue);
 				ackRange.setLowerValue(lower);
 				ackRange.setUpperValue(upper);
 				ackRanges.add(ackRange);
@@ -138,7 +138,7 @@ public class SandeshaUtil {
 		}
 
 		if (!completed) {
-			AcknowledgementRange ackRange = new AcknowledgementRange(factory);
+			AcknowledgementRange ackRange = new AcknowledgementRange(factory,rmNamespaceValue);
 			ackRange.setLowerValue(lower);
 			ackRange.setUpperValue(upper);
 			ackRanges.add(ackRange);
@@ -460,39 +460,50 @@ public class SandeshaUtil {
 		OMElement sequenceElem = null;
 		if (header != null)
 			sequenceElem = header.getFirstChildWithName(new QName(
-					Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE));
+					Sandesha2Constants.SPEC_2005_02.NS_URI, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 
+		if (sequenceElem==null)
+			sequenceElem = header.getFirstChildWithName(new QName(
+					Sandesha2Constants.SPEC_2005_10.NS_URI, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+			
 		if (sequenceElem != null)
 			rmGlobalMsg = true;
 
-		if (Sandesha2Constants.WSRM.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
+		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
 				.equals(action))
 			rmGlobalMsg = true;
 
-		if (Sandesha2Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
+		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
+			rmGlobalMsg = true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
+				.equals(action))
+			rmGlobalMsg = true;
+
+		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
 
 		return rmGlobalMsg;
 	}
 
-	public static RMMsgContext createResponseRMMessage(
-			RMMsgContext referenceRMMessage) throws SandeshaException {
-		try {
-			MessageContext referenceMessage = referenceRMMessage
-					.getMessageContext();
-			MessageContext faultMsgContext = Utils
-					.createOutMessageContext(referenceMessage);
-
-			RMMsgContext faultRMMsgCtx = MsgInitializer
-					.initializeMessage(faultMsgContext);
-
-			return faultRMMsgCtx;
-
-		} catch (AxisFault e) {
-			log.debug(e.getMessage());
-			throw new SandeshaException(e.getMessage());
-		}
-	}
+//	public static RMMsgContext createResponseRMMessage(
+//			RMMsgContext referenceRMMessage) throws SandeshaException {
+//		try {
+//			MessageContext referenceMessage = referenceRMMessage
+//					.getMessageContext();
+//			MessageContext faultMsgContext = Utils
+//					.createOutMessageContext(referenceMessage);
+//
+//			RMMsgContext faultRMMsgCtx = MsgInitializer
+//					.initializeMessage(faultMsgContext);
+//
+//			return faultRMMsgCtx;
+//
+//		} catch (AxisFault e) {
+//			log.debug(e.getMessage());
+//			throw new SandeshaException(e.getMessage());
+//		}
+//	}
 
 	public static MessageContext createNewRelatedMessageContext(
 			RMMsgContext referenceRMMessage, AxisOperation operation)
@@ -575,7 +586,6 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(MessageContext.TRANSPORT_IN,referenceMessage.getProperty(MessageContext.TRANSPORT_IN));
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
 			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
-			
 			
 			return newMessageContext;
 
@@ -754,6 +764,26 @@ public class SandeshaUtil {
 		} catch (FactoryConfigurationError e) {
 			throw new SandeshaException (e.getMessage());
 		}
+	}
+	
+	/**
+	 * 
+	 * @param propertyKey
+	 * for the client side - internalSequenceID, for the server side - sequenceID
+	 * @param configurationContext
+	 * @return
+	 * @throws SandeshaException
+	 */
+	public static String getRMVersion (String propertyKey, ConfigurationContext configurationContext) throws SandeshaException {
+			StorageManager storageManager = getSandeshaStorageManager(configurationContext);
+			
+			SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+			SequencePropertyBean specVersionBean = sequencePropertyBeanMgr.retrieve(propertyKey,Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
+			
+			if (specVersionBean==null)
+				return null;
+	
+			return specVersionBean.getValue();
 	}
 
 }

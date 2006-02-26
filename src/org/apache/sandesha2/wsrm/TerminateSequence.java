@@ -37,19 +37,18 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class TerminateSequence implements IOMRMPart {
 
 	private OMElement terminateSequenceElement;
-
 	private Identifier identifier;
-
 	OMNamespace rmNameSpace = null;
-	
 	SOAPFactory factory;
-
-	public TerminateSequence(SOAPFactory factory) {
+	String namespaceValue = null;
+	
+	public TerminateSequence(SOAPFactory factory, String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNameSpace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		terminateSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
+				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNameSpace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -63,17 +62,17 @@ public class TerminateSequence implements IOMRMPart {
 					"Cant add terminate sequence to a non body element");
 
 		OMElement terminateSeqPart = body.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.TERMINATE_SEQUENCE));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 
 		if (terminateSeqPart == null)
 			throw new OMException(
 					"passed element does not contain a terminate sequence part");
 
-		identifier = new Identifier(factory);
+		identifier = new Identifier(factory,namespaceValue);
 		identifier.fromOMElement(terminateSeqPart);
 
 		terminateSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
+				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return this;
 	}
@@ -96,7 +95,7 @@ public class TerminateSequence implements IOMRMPart {
 		body.addChild(terminateSequenceElement);
 
 		terminateSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE, rmNameSpace);
+				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return body;
 	}
@@ -113,8 +112,8 @@ public class TerminateSequence implements IOMRMPart {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.
-		OMElement elem = body.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-				Sandesha2Constants.WSRM.TERMINATE_SEQUENCE));
+		OMElement elem = body.getFirstChildWithName(new QName(namespaceValue,
+				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 		if (elem!=null)
 			elem.detach();
 		

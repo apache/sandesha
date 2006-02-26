@@ -29,19 +29,19 @@ import org.apache.sandesha2.Sandesha2Constants;
  */
 
 public class Nack implements IOMRMElement {
+	
 	private OMElement nackElement;
 	private long nackNumber;
-	
 	SOAPFactory factory;
-	
 	OMNamespace rmNamespace = null;
-	
+	String namespaceValue = null;
 		
-	public Nack(SOAPFactory factory){
+	public Nack(SOAPFactory factory,String namespaceValue){
 		this.factory = factory;
-		rmNamespace = factory.createOMNamespace(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+		this.namespaceValue = namespaceValue;
+		rmNamespace = factory.createOMNamespace(namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		nackElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.NACK,rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
 	}
 	
 	public OMElement getOMElement() throws OMException {
@@ -63,7 +63,7 @@ public class Nack implements IOMRMElement {
 		}
 		
 		nackElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.NACK,rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
 		
 		return this;
 	} 
@@ -82,7 +82,7 @@ public class Nack implements IOMRMElement {
 		sequenceAckElement.addChild(nackElement);
 
 		nackElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.NACK,rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
 		
 		return sequenceAckElement;
 	}

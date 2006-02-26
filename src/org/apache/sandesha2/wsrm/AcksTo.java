@@ -33,25 +33,22 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class AcksTo implements IOMRMElement {
 
 	private Address address;
-
 	private OMElement acksToElement;
-
-	//private OMElement addressElement;
-
 	private SOAPFactory factory;
-	
 	OMNamespace rmNamespace = null;
+	String namespaceValue = null;
 
-	public AcksTo(SOAPFactory factory) {
+	public AcksTo(SOAPFactory factory,String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		acksToElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACKS_TO, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
 	}
 	
-	public AcksTo (Address address,SOAPFactory factory) {
-		this (factory);
+	public AcksTo (Address address,SOAPFactory factory,String namespaceValue) {
+		this (factory,namespaceValue);
 		this.address = address;
 	}
 
@@ -61,7 +58,7 @@ public class AcksTo implements IOMRMElement {
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		OMElement acksToPart = element.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.ACKS_TO));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACKS_TO));
 
 		if (acksToPart == null)
 			throw new OMException(
@@ -71,7 +68,7 @@ public class AcksTo implements IOMRMElement {
 		address.fromOMElement(acksToPart);
 
 		acksToElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACKS_TO, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
 
 		return this;
 	}
@@ -84,13 +81,13 @@ public class AcksTo implements IOMRMElement {
 			throw new OMException("Cant set AcksTo. Address is null");
 
 		OMElement acksToPart = element.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSA.NS_URI_ADDRESSING, Sandesha2Constants.WSRM.ACKS_TO));
+				Sandesha2Constants.WSA.NS_URI_ADDRESSING, Sandesha2Constants.WSRM_COMMON.ACKS_TO));
 
 		address.toOMElement(acksToElement);
 		element.addChild(acksToElement);
 
 		acksToElement =factory.createOMElement(
-				Sandesha2Constants.WSRM.ACKS_TO, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
 
 		return element;
 	}

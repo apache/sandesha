@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -211,6 +212,12 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			if (applicationMsg==null)
 				throw new SandeshaException ("Unavailable application message");
 			
+			String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId,configCtx);
+			if (rmVersion==null)
+				throw new SandeshaException ("Cant find the rmVersion of the given message");
+			
+			String assumedRMNamespace = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+			
 			RMMsgContext applicaionRMMsg = MsgInitializer
 					.initializeMessage(applicationMsg);
 
@@ -221,7 +228,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				log.debug(message);
 				throw new SandeshaException(message);
 			}
-			Identifier identifier = new Identifier(factory);
+			
+			
+			Identifier identifier = new Identifier(factory,assumedRMNamespace);
 			identifier.setIndentifer(newOutSequenceId);
 
 			sequencePart.setIdentifier(identifier);
@@ -229,7 +238,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			AckRequested ackRequestedPart = (AckRequested) applicaionRMMsg
 					.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
 			if (ackRequestedPart != null) {
-				Identifier id1 = new Identifier(factory);
+				Identifier id1 = new Identifier(factory,assumedRMNamespace);
 				id1.setIndentifer(newOutSequenceId);
 				ackRequestedPart.setIdentifier(id1);
 			}

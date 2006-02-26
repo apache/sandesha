@@ -24,11 +24,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class Address implements IOMRMElement {
 
 	EndpointReference epr = null;
-
 	OMElement addressElement;
-	
 	SOAPFactory factory;
-
 	OMNamespace rmNamespace = null;
 
 	public Address(SOAPFactory factory) {

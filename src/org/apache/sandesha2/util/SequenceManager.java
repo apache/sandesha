@@ -7,12 +7,9 @@
 package org.apache.sandesha2.util;
 
 import java.util.Collection;
-import java.util.StringTokenizer;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-//import org.apache.axis2.client.ListenerManager;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
@@ -46,8 +43,8 @@ public class SequenceManager {
 	private static Log log = LogFactory.getLog(SequenceManager.class);
 	
 	public static String setupNewSequence(RMMsgContext createSequenceMsg)
-			throws AxisFault {
-
+			throws AxisFault {		
+		
 		String sequenceId = SandeshaUtil.getUUID();
 
 		EndpointReference to = createSequenceMsg.getTo();
@@ -107,6 +104,7 @@ public class SequenceManager {
 		SequencePropertyBean acksToBean = new SequencePropertyBean(sequenceId,
 				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, acksTo.getAddress());
 
+		
 		seqPropMgr.insert(receivedMsgBean);
 		seqPropMgr.insert(replyToBean);
 		seqPropMgr.insert(acksToBean);
@@ -122,17 +120,32 @@ public class SequenceManager {
 		
 		SandeshaUtil.startSenderForTheSequence(configurationContext,sequenceId);
 		
-		//Adding another entry to the ListnerManager to wait till the terminate sequence message.
-		String transport = createSequenceMsg.getMessageContext().getTransportIn().getName().getLocalPart();
+
 		
+		//getting SPEC version for this sequence.
+		String createSequenceMsgAction = createSequenceMsg.getWSAAction();
+		if (createSequenceMsgAction==null)
+		    throw new SandeshaException ("Create sequence message does not have the WSA:Action value");
 		
-		//Only the client side should call below.
-//		try {
-//			//An bind method is thrown when this is done in the server side. TODO find a better method to do this.
-//			ListenerManager.makeSureStarted(transport,configurationContext);
-//		} catch (AxisFault ex) {
-//			log.info("Counght exception when starting listner. Possible server side start.");
-//		}
+		String messageRMNamespace = createSequence.getOMElement().getNamespace().getName();
+		
+		String specVersion = null;
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(messageRMNamespace)) {
+			specVersion = Sandesha2Constants.SPEC_VERSIONS.WSRM;
+		}else if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(messageRMNamespace)) {
+			specVersion = Sandesha2Constants.SPEC_VERSIONS.WSRX;
+		} else {
+			throw new SandeshaException ("Create sequence message does not has a valid RM namespace value. Cant decide the RM version");
+		}
+		
+		SequencePropertyBean specVerionBean = new SequencePropertyBean ();
+		specVerionBean.setSequenceID(sequenceId);
+		specVerionBean.setName(Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
+		specVerionBean.setValue(specVersion);
+		
+		seqPropMgr.insert(specVerionBean);
+		
+		//TODO get the SOAP version from the create seq message.
 		
 		
 		
@@ -144,7 +157,7 @@ public class SequenceManager {
 	}
 
 	public static void setupNewClientSequence(
-			MessageContext firstAplicationMsgCtx, String internalSequenceId)
+			MessageContext firstAplicationMsgCtx, String internalSequenceId, String specVersion)
 			throws SandeshaException {
 		
 		ConfigurationContext configurationContext = firstAplicationMsgCtx
@@ -226,6 +239,13 @@ public class SequenceManager {
 		}
 
 
+		//setting the spec version for the client side.
+		SequencePropertyBean specVerionBean = new SequencePropertyBean ();
+		specVerionBean.setSequenceID(internalSequenceId);
+		specVerionBean.setName(Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
+		specVerionBean.setValue(specVersion);
+		seqPropMgr.insert(specVerionBean);
+		
 		SandeshaUtil.startSenderForTheSequence(configurationContext,internalSequenceId);
 		
 		updateClientSideListnerIfNeeded (firstAplicationMsgCtx);

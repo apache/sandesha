@@ -33,17 +33,17 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class LastMessage implements IOMRMElement {
 
 	private OMElement lastMessageElement;
-
 	OMNamespace rmNamespace = null;
-	
 	SOAPFactory factory;
-
-	public LastMessage(SOAPFactory factory) {
+	String namespaceValue = null;
+	
+	public LastMessage(SOAPFactory factory,String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		lastMessageElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.LAST_MSG, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.LAST_MSG, rmNamespace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -52,13 +52,13 @@ public class LastMessage implements IOMRMElement {
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		OMElement lastMessagePart = element.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.LAST_MSG));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.LAST_MSG));
 		if (lastMessagePart == null)
 			throw new OMException(
 					"The passed element does not contain a Last Message part");
 
 		lastMessageElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.LAST_MSG, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.LAST_MSG, rmNamespace);
 
 		return this;
 	}
@@ -71,7 +71,7 @@ public class LastMessage implements IOMRMElement {
 		sequenceElement.addChild(lastMessageElement);
 
 		lastMessageElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.LAST_MSG, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.LAST_MSG, rmNamespace);
 
 		return sequenceElement;
 	}

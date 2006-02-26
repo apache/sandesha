@@ -36,25 +36,21 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class Sequence implements IOMRMPart {
 
 	private OMElement sequenceElement;
-
 	private Identifier identifier;
-
 	private MessageNumber messageNumber;
-
 	private LastMessage lastMessage = null;
-
 	private SOAPFactory factory;
-	
 	OMNamespace seqNoNamespace = null;
-	
 	private boolean mustUnderstand = true;
-
-	public Sequence(SOAPFactory factory) {
+	String namespaceValue = null;
+	
+	public Sequence(SOAPFactory factory,String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		seqNoNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		sequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE, seqNoNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -69,26 +65,26 @@ public class Sequence implements IOMRMPart {
 					"Sequence element cannot be added to non-header element");
 
 		OMElement sequencePart = sequenceElement = headerElement
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-						Sandesha2Constants.WSRM.SEQUENCE));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequencePart == null)
 			throw new OMException(
 					"Cannot find Sequence element in the given element");
 
 		sequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE, seqNoNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
 
-		identifier = new Identifier(factory);
-		messageNumber = new MessageNumber(factory);
+		identifier = new Identifier(factory,namespaceValue);
+		messageNumber = new MessageNumber(factory,namespaceValue);
 		identifier.fromOMElement(sequencePart);
 		messageNumber.fromOMElement(sequencePart);
 
 		OMElement lastMessageElement = sequencePart
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-						Sandesha2Constants.WSRM.LAST_MSG));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.LAST_MSG));
 
 		if (lastMessageElement != null) {
-			lastMessage = new LastMessage(factory);
+			lastMessage = new LastMessage(factory,namespaceValue);
 			lastMessage.fromOMElement(sequencePart);
 		}
 
@@ -117,7 +113,7 @@ public class Sequence implements IOMRMPart {
 
 
 		SOAPHeaderBlock sequenceHeaderBlock = soapHeader.addHeaderBlock(
-				Sandesha2Constants.WSRM.SEQUENCE, seqNoNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
 		//soapHeader.addChild(sequenceHeaderBlock);
 		//OMElement elem1 = factory.createOMElement("test","http://test1","test2");
 		//soapHeader.addChild(elem1)
@@ -133,7 +129,7 @@ public class Sequence implements IOMRMPart {
 		//resetting the element. So that subsequest toOMElement calls will
 		// attach a different object.
 		this.sequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE, seqNoNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
 
 		return headerElement;
 	}
@@ -166,8 +162,8 @@ public class Sequence implements IOMRMPart {
 		SOAPHeader header = envelope.getHeader();
 		
 		//detach if already exist.
-		OMElement elem = header.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-				Sandesha2Constants.WSRM.SEQUENCE));
+		OMElement elem = header.getFirstChildWithName(new QName(namespaceValue,
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (elem!=null)
 			elem.detach();
 		

@@ -34,15 +34,15 @@ public class MessageNumber implements IOMRMElement {
 	
 	private long messageNumber;
 	private OMElement messageNoElement;
-	
 	OMNamespace rmNamespace = null;
-	
 	SOAPFactory factory;
+	String namespaceValue = null;
 	
-	public MessageNumber(SOAPFactory factory){
+	public MessageNumber(SOAPFactory factory,String namespaceValue){
 		this.factory = factory;
-	    rmNamespace = factory.createOMNamespace(Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
-		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM.MSG_NUMBER,rmNamespace);
+		this.namespaceValue = namespaceValue;
+	    rmNamespace = factory.createOMNamespace(namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MSG_NUMBER,rmNamespace);
 	}
 	
 	public long getMessageNumber(){
@@ -54,11 +54,11 @@ public class MessageNumber implements IOMRMElement {
 	
 	public Object fromOMElement(OMElement seqenceElement) throws OMException {
 		OMElement msgNumberPart = seqenceElement.getFirstChildWithName( 
-				new QName (Sandesha2Constants.WSRM.NS_URI_RM,Sandesha2Constants.WSRM.MSG_NUMBER));
+				new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.MSG_NUMBER));
 		if (msgNumberPart==null)
 			throw new OMException ("The passed sequnce element does not contain a message number part");
 		
-		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM.MSG_NUMBER,rmNamespace);
+		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MSG_NUMBER,rmNamespace);
 
 		String msgNoStr = msgNumberPart.getText();
 		messageNumber = Long.parseLong(msgNoStr);
@@ -73,7 +73,7 @@ public class MessageNumber implements IOMRMElement {
 		messageNoElement.setText(Long.toString(messageNumber));
 		element.addChild(messageNoElement);
 		
-		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM.MSG_NUMBER,rmNamespace);
+		messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MSG_NUMBER,rmNamespace);
 		
 		return element;
 	}

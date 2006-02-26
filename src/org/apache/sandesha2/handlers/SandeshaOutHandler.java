@@ -27,6 +27,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
@@ -39,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -253,13 +255,43 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		
+		String specVersion = null;
+		
+		if (msgCtx.isServerSide()) {
+			//in the server side, get the RM version from the request sequence.
+			MessageContext requestMessageContext = msgCtx.getOperationContext().getMessageContext(AxisOperationFactory.MESSAGE_LABEL_IN_VALUE);
+			if (requestMessageContext==null) 
+				throw new SandeshaException ("Request message context is null, cant find out the request side sequenceID");
+			
+			RMMsgContext requestRMMsgCtx = MsgInitializer.initializeMessage(requestMessageContext);
+			Sequence sequence = (Sequence) requestRMMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			
+			String requestSequenceID = sequence.getIdentifier().getIdentifier();
+			SequencePropertyBean specVersionBean = seqPropMgr.retrieve(requestSequenceID,Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
+			if (specVersionBean==null) 
+				throw new SandeshaException ("SpecVersion sequence property bean is not available for the incoming sequence. Cant find the RM version for outgoing side");
+			
+			specVersion = specVersionBean.getValue();
+			
+			
+		} else {
+			//in the client side, user will set the RM version.
+			specVersion = (String) msgCtx.getProperty(Sandesha2ClientAPI.RM_SPEC_VERSION);
+		}
+		
+		
+		if (specVersion==null) {
+			specVersion = Sandesha2Constants.SPEC_VERSIONS.WSRM;   //TODO change the default to WSRX.
+		}
+		
+		
 		if (messageNumber == 1) {
 			if (outSeqBean == null) {
 				sendCreateSequence = true;   // message number being one and not having an out sequence, implies that a create sequence has to be send.
 			}
 
 			// if fist message - setup the sending side sequence - both for the server and the client sides
-			SequenceManager.setupNewClientSequence(msgCtx, internalSequenceId);
+			SequenceManager.setupNewClientSequence(msgCtx, internalSequenceId,specVersion);
 		}
 
 		if (sendCreateSequence) {
@@ -405,6 +437,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(
 				applicationRMMsg, internalSequenceId, acksTo);
+		createSeqRMMessage.setFlow(MessageContext.OUT_FLOW);
 		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		if (createSequencePart == null) {
@@ -524,6 +557,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		ConfigurationContext configurationContext = rmMsg.getMessageContext().getConfigurationContext();
 
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(msg.getConfigurationContext());
@@ -589,9 +623,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (replyToEPR != null)
 			rmMsg.setReplyTo(replyToEPR);
 
-		Sequence sequence = new Sequence(factory);
+		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId,configurationContext);
+		if (rmVersion==null)
+			throw new SandeshaException ("Cant find the rmVersion of the given message");
+		
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+		
+		Sequence sequence = new Sequence(factory,rmNamespaceValue);
 
-		MessageNumber msgNumber = new MessageNumber(factory);
+		MessageNumber msgNumber = new MessageNumber(factory,rmNamespaceValue);
 		msgNumber.setMessageNumber(messageNumber);
 		sequence.setMessageNumber(msgNumber);
 
@@ -621,7 +661,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 			if (requestSequence.getLastMessage() != null) {
 				lastMessage = true;
-				sequence.setLastMessage(new LastMessage(factory));
+				sequence.setLastMessage(new LastMessage(factory,rmNamespaceValue));
 
 				// saving the last message no.
 				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
@@ -639,7 +679,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				Object obj = msg.getProperty(Sandesha2ClientAPI.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 					lastMessage = true;
-					sequence.setLastMessage(new LastMessage(factory));
+					sequence.setLastMessage(new LastMessage(factory,rmNamespaceValue));
 					// saving the last message no.
 					SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
 							internalSequenceId,
@@ -667,14 +707,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 			identifierStr = (String) outSequenceBean.getValue();
 		}
 
-		Identifier id1 = new Identifier(factory);
+		Identifier id1 = new Identifier(factory,rmNamespaceValue);
 		id1.setIndentifer(identifierStr);
 		sequence.setIdentifier(id1);
 		rmMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE,sequence);
 
 		if (addAckRequested) {
-			ackRequested = new AckRequested(factory);
-			Identifier id2 = new Identifier(factory);
+			ackRequested = new AckRequested(factory,rmNamespaceValue);
+			Identifier id2 = new Identifier(factory,rmNamespaceValue);
 			id2.setIndentifer(identifierStr);
 			ackRequested.setIdentifier(id2);
 			rmMsg.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST,

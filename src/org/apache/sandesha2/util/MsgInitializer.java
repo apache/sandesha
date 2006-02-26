@@ -17,11 +17,21 @@
 
 package org.apache.sandesha2.util;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.wsrm.CreateSequence;
+import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.RMElements;
+import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * This class is used to create an RMMessageContext out of an MessageContext.
@@ -31,9 +41,23 @@ import org.apache.sandesha2.wsrm.RMElements;
 
 public class MsgInitializer {
 
+	/**
+	 * Called to create a rmMessageContext out of an message context. Finds out things like rm version and message type
+	 * as well.
+	 * 
+	 * @param ctx
+	 * @param assumedRMNamespace
+	 * this is used for validation (to find out weather the rmNamespace of the current message
+	 * is equal to the regietered rmNamespace of the sequence). 
+	 * If null validation will not happen.
+	 * 
+	 * @return
+	 * @throws SandeshaException
+	 */
 	public static RMMsgContext initializeMessage(MessageContext ctx)
 			throws SandeshaException {
 		RMMsgContext rmMsgCtx = new RMMsgContext(ctx);
+		
 		populateRMMsgContext(ctx, rmMsgCtx);
 		validateMessage(rmMsgCtx);
 		return rmMsgCtx;
@@ -49,33 +73,49 @@ public class MsgInitializer {
 			RMMsgContext rmMsgContext) {
 
 		RMElements elements = new RMElements();
-		elements.fromSOAPEnvelope(msgCtx.getEnvelope());
+		elements.fromSOAPEnvelope(msgCtx.getEnvelope(), msgCtx.getWSAAction());
 
-		if (elements.getCreateSequence() != null)
+		String rmNamespace = null;
+		
+		if (elements.getCreateSequence() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ,
 					elements.getCreateSequence());
+			rmNamespace = elements.getCreateSequence().getOMElement().getNamespace().getName();
+		}
 
-		if (elements.getCreateSequenceResponse() != null)
+		if (elements.getCreateSequenceResponse() != null) {
 			rmMsgContext.setMessagePart(
 					Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE, elements
 							.getCreateSequenceResponse());
+			rmNamespace = elements.getCreateSequenceResponse().getOMElement().getNamespace().getName();
+		}
 
-		if (elements.getSequence() != null)
+		if (elements.getSequence() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE,
 					elements.getSequence());
+			rmNamespace = elements.getSequence().getOMElement().getNamespace().getName();	
+		}
 
-		if (elements.getSequenceAcknowledgement() != null)
+		if (elements.getSequenceAcknowledgement() != null) {
 			rmMsgContext.setMessagePart(
 					Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, elements
 							.getSequenceAcknowledgement());
+			rmNamespace = elements.getSequenceAcknowledgement().getOMElement().getNamespace().getName();
+		}
 
-		if (elements.getTerminateSequence() != null)
+		if (elements.getTerminateSequence() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ,
 					elements.getTerminateSequence());
+			rmNamespace = elements.getTerminateSequence().getOMElement().getNamespace().getName();
+		}
 
-		if (elements.getAckRequested() != null)
+		if (elements.getAckRequested() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST,
 					elements.getAckRequested());
+			rmNamespace = elements.getAckRequested().getOMElement().getNamespace().getName();
+		}
+		
+		rmMsgContext.setRMNamespaceValue(rmNamespace);
 
 	}
 
@@ -90,22 +130,61 @@ public class MsgInitializer {
 	private static boolean validateMessage(RMMsgContext rmMsgCtx)
 			throws SandeshaException {
 
+		ConfigurationContext configContext = rmMsgCtx.getMessageContext().getConfigurationContext();
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		String sequenceID = null;
+		
+		CreateSequence createSequence = (CreateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
+		CreateSequenceResponse createSequenceResponse = (CreateSequenceResponse) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
+		TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		//Setting message type.
-		if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ) != null)
+		if (createSequence != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
-		else if (rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE) != null)
+		}else if (createSequenceResponse != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE);
-		else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ) != null)
+			sequenceID = createSequenceResponse.getIdentifier().getIdentifier();
+		}else if (terminateSequence != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
-		else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null)
+			sequenceID = terminateSequence.getIdentifier().getIdentifier();
+		} else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
-		else if (rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT) != null)
+			sequenceID = sequence.getIdentifier().getIdentifier();
+		} else if (sequenceAcknowledgement != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-		else
+			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
+		} else
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 
+		String propertyKey = null;
+		if (rmMsgCtx.getMessageContext().getFLOW()==MessageContext.IN_FLOW) {
+			propertyKey = sequenceID;
+		} else {
+			SequencePropertyBean internalSequenceIDBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+			if (internalSequenceIDBean!=null) {
+				propertyKey = internalSequenceIDBean.getValue();
+			}
+		}
+		
+        String rmNamespace = rmMsgCtx.getRMNamespaceValue();
+        if (sequenceID!=null) {
+        	String specVersion = SandeshaUtil.getRMVersion(propertyKey,rmMsgCtx.getMessageContext().getConfigurationContext());
+    		
+        	String sequenceRMNamespace = null;
+        	if (specVersion!=null)
+    			sequenceRMNamespace = SpecSpecificConstants.getRMNamespaceValue(specVersion);
+    		if (sequenceRMNamespace!=null && rmNamespace!=null) {
+    			if (!sequenceRMNamespace.equals(rmNamespace)) {
+    				throw new SandeshaException ("Given message has rmNamespace value, which is different from the " +
+    						"reqistered namespace for the sequence");
+    			}
+    		}
+        }
+		
 		return true;
 	}
 

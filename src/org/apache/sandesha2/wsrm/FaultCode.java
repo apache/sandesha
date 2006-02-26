@@ -33,19 +33,18 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class FaultCode implements IOMRMElement {
 
 	private OMElement faultCodeElement;
-
 	String faultCode = null;
-	
 	SOAPFactory factory;
-
 	OMNamespace rmNameSpace = null;
-
-	public FaultCode(SOAPFactory factory) {
+	String namespaceValue = null;
+	
+	public FaultCode(SOAPFactory factory, String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNameSpace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		faultCodeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.FAULT_CODE, rmNameSpace);
+				Sandesha2Constants.WSRM_COMMON.FAULT_CODE, rmNameSpace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -59,8 +58,8 @@ public class FaultCode implements IOMRMElement {
 					"Can't add Fault Code part since the passed element is null");
 
 		OMElement faultCodePart = sequenceFault
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_PREFIX_RM,
-						Sandesha2Constants.WSRM.FAULT_CODE));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.FAULT_CODE));
 
 		if (faultCodePart == null)
 			throw new OMException(
@@ -69,7 +68,7 @@ public class FaultCode implements IOMRMElement {
 		this.faultCode = faultCodePart.getText();
 
 		faultCodeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.FAULT_CODE, rmNameSpace);
+				Sandesha2Constants.WSRM_COMMON.FAULT_CODE, rmNameSpace);
 
 		return sequenceFault;
 

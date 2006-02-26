@@ -24,6 +24,8 @@ import java.util.Iterator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
@@ -33,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -249,9 +252,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			String outSequenceId, String internalSequenceId)
 			throws SandeshaException {
 
+		
+		ConfigurationContext configurationContext = incomingAckRMMsg.getMessageContext().getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(incomingAckRMMsg.getMessageContext()
-						.getConfigurationContext());
+				.getSandeshaStorageManager(configurationContext);
 
 		Transaction addTerminateSeqTransaction = storageManager.getTransaction();
 		
@@ -269,8 +273,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		}
 
 		RMMsgContext terminateRMMessage = RMMsgCreator
-				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId);
-
+				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId,internalSequenceId);
+		terminateRMMessage.setFlow(MessageContext.OUT_FLOW);
 		terminateRMMessage.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
 		
 		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
@@ -287,10 +291,12 @@ public class AcknowledgementProcessor implements MsgProcessor {
 				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
 		terminateRMMessage.setFaultTo(new EndpointReference(
 				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
-		terminateRMMessage
-				.setWSAAction(Sandesha2Constants.WSRM.Actions.ACTION_TERMINATE_SEQUENCE);
-		terminateRMMessage
-				.setSOAPAction(Sandesha2Constants.WSRM.Actions.SOAP_ACTION_TERMINATE_SEQUENCE);
+		
+		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId,configurationContext);
+		if (rmVersion==null)
+			throw new SandeshaException ("Cant find the rmVersion of the given message");
+		terminateRMMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
+		terminateRMMessage.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
 
 		SequencePropertyBean transportToBean = seqPropMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
 		if (transportToBean!=null) {

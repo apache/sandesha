@@ -38,13 +38,16 @@ public class Accept implements IOMRMElement {
 	private SOAPFactory factory;
 
 	OMNamespace rmNamespace = null; 
+	
+	String namespaceValue = null;
 
-	public Accept(SOAPFactory factory) {
+	public Accept(SOAPFactory factory, String namespaceValue) {
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		acceptElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACCEPT, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
+		this.namespaceValue = namespaceValue;
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -54,16 +57,16 @@ public class Accept implements IOMRMElement {
 	public Object fromOMElement(OMElement element) throws OMException {
 
 		OMElement acceptPart = element.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.ACCEPT));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACCEPT));
 		if (acceptPart == null)
 			throw new OMException(
 					"Passed element does not contain an Accept part");
 
-		acksTo = new AcksTo(factory);
+		acksTo = new AcksTo(factory,namespaceValue);
 		acksTo.fromOMElement(acceptPart);
 
 		acceptElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACCEPT, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
 
 		return this;
 	}
@@ -82,7 +85,7 @@ public class Accept implements IOMRMElement {
 		element.addChild(acceptElement);
 
 		acceptElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACCEPT, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
 
 		return element;
 	}

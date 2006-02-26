@@ -284,6 +284,9 @@ public class TerminateManager {
 		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))
 			deleatable = false;
 		
+		if (Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION.equals(name))
+			deleatable = false;
+		
 		return deleatable;
 	}
 }

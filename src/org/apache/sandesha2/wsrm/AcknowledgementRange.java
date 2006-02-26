@@ -32,22 +32,21 @@ import org.apache.sandesha2.Sandesha2Constants;
  */
 
 public class AcknowledgementRange implements IOMRMElement {
-	private OMElement acknowledgementRangeElement;
-
-	private long upperValue;
-
-	private long lowerValue;
 	
+	private OMElement acknowledgementRangeElement;
+	private long upperValue;
+	private long lowerValue;
 	private SOAPFactory factory;
-
 	OMNamespace rmNamespace = null;
-
-	public AcknowledgementRange(SOAPFactory factory) {
+	String namespaceValue = null;
+	
+	public AcknowledgementRange(SOAPFactory factory, String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		acknowledgementRangeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACK_RANGE, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACK_RANGE, rmNamespace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -60,9 +59,9 @@ public class AcknowledgementRange implements IOMRMElement {
 			throw new OMException("The passed element is null");
 
 		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName(
-				Sandesha2Constants.WSRM.LOWER));
+				Sandesha2Constants.WSRM_COMMON.LOWER));
 		OMAttribute upperAttrib = ackRangePart.getAttribute(new QName(
-				Sandesha2Constants.WSRM.UPPER));
+				Sandesha2Constants.WSRM_COMMON.UPPER));
 
 		if (lowerAttrib == null || upperAttrib == null)
 			throw new OMException(
@@ -79,7 +78,7 @@ public class AcknowledgementRange implements IOMRMElement {
 		}
 
 		acknowledgementRangeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACK_RANGE, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACK_RANGE, rmNamespace);
 
 		return this;
 	}
@@ -96,9 +95,9 @@ public class AcknowledgementRange implements IOMRMElement {
 					"Cant set Ack Range part since Upper or Lower is not set to the correct value");
 
 		OMAttribute lowerAttrib = factory.createOMAttribute(
-				Sandesha2Constants.WSRM.LOWER, null, Long.toString(lowerValue));
+				Sandesha2Constants.WSRM_COMMON.LOWER, null, Long.toString(lowerValue));
 		OMAttribute upperAttrib = factory.createOMAttribute(
-				Sandesha2Constants.WSRM.UPPER, null, Long.toString(upperValue));
+				Sandesha2Constants.WSRM_COMMON.UPPER, null, Long.toString(upperValue));
 
 		acknowledgementRangeElement.addAttribute(lowerAttrib);
 		acknowledgementRangeElement.addAttribute(upperAttrib);
@@ -106,7 +105,7 @@ public class AcknowledgementRange implements IOMRMElement {
 		sequenceAckElement.addChild(acknowledgementRangeElement);
 
 		acknowledgementRangeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.ACK_RANGE, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.ACK_RANGE, rmNamespace);
 
 		return sequenceAckElement;
 	}

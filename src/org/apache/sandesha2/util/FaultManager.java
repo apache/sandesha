@@ -83,8 +83,18 @@ public class FaultManager {
 		SOAPHeader header = envelope.getHeader();
 		if (header != null) {
 			OMElement sequenceHeaderBlock = header
-					.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-							Sandesha2Constants.WSRM.SEQUENCE));
+					.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI,
+							Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+			if (sequenceHeaderBlock != null) {
+				faultMessageContext = checkForMessageNumberRoleover(msgCtx);
+				if (faultMessageContext != null)
+					return faultMessageContext;
+			}
+			
+			//For the 200510 spec
+			sequenceHeaderBlock = header
+			.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_10.NS_URI,
+					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 			if (sequenceHeaderBlock != null) {
 				faultMessageContext = checkForMessageNumberRoleover(msgCtx);
 				if (faultMessageContext != null)
@@ -303,6 +313,8 @@ public class FaultManager {
 				break;
 			}
 		}
+		
+		String rmNamespaceValue = rmMsgCtx.getRMNamespaceValue();
 
 		if (!validSequence) {
 			//Return an UnknownSequence error
@@ -318,7 +330,7 @@ public class FaultManager {
 
 			SOAPFactory factory = SOAPAbstractFactory
 					.getSOAPFactory(SOAPVersion);
-			Identifier identifier = new Identifier(factory);
+			Identifier identifier = new Identifier(factory,rmNamespaceValue);
 			identifier.setIndentifer(sequenceId);
 			OMElement identifierOMElem = identifier.getOMElement();
 			data.setDetail(identifierOMElem);
@@ -472,7 +484,7 @@ public class FaultManager {
 					.getEnvelope());
 
 			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMsgContext,
-					SOAPVersion, data);
+					SOAPVersion, data,referenceRMMsgContext.getRMNamespaceValue());
 
 			RMMsgContext faultRMMsgCtx = MsgInitializer
 					.initializeMessage(faultMsgContext);

@@ -49,6 +49,7 @@ public class Sandesha2ClientAPI {
 	public static String SANDESHA_DEBUG_MODE = "Sandesha2ClientAPIPropertyDebugMode";
 	public static String SEQUENCE_KEY = "Sandesha2ClientAPIPropertySequenceKey";
 	public static String MESSAGE_NUMBER = "Sandesha2ClientAPIPropertyMessageNumber";
+	public static String RM_SPEC_VERSION = "Sandesha2ClientAPIPropertyRMSpecVersion";
 	
 	public static SequenceReport getOutgoingSequenceReport (String to, String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
 		

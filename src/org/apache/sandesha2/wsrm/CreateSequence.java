@@ -35,30 +35,26 @@ import org.apache.sandesha2.Sandesha2Constants;
  */
 
 public class CreateSequence implements IOMRMPart {
-	private OMElement createSequenceElement;
-
-	private AcksTo acksTo = null;
-
-	private Expires expires = null;
-
-	private SequenceOffer sequenceOffer = null;
 	
+	private OMElement createSequenceElement;
+	private AcksTo acksTo = null;
+	private Expires expires = null;
+	private SequenceOffer sequenceOffer = null;
 	private SOAPFactory factory;
-
-	//private SequritytokenReference;
-
 	OMNamespace rmNamespace = null;
+	String namespaceValue = null;
 
-	public CreateSequence(SOAPFactory factory) {
+	public CreateSequence(SOAPFactory factory,String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		createSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
 	}
 	
-	public CreateSequence (AcksTo acksTo,SOAPFactory factory) {
-		this (factory);
+	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String namespaceValue) {
+		this (factory,namespaceValue);
 		this.acksTo = acksTo;
 	}
 
@@ -69,31 +65,31 @@ public class CreateSequence implements IOMRMPart {
 	public Object fromOMElement(OMElement bodyElement) throws OMException {
 
 		OMElement createSequencePart = bodyElement
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-						Sandesha2Constants.WSRM.CREATE_SEQUENCE));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		if (createSequencePart == null)
 			throw new OMException(
 					"Create sequence is not present in the passed element");
 
 		createSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
 
-		acksTo = new AcksTo(factory);
+		acksTo = new AcksTo(factory,namespaceValue);
 		acksTo.fromOMElement(createSequencePart);
 
 		OMElement offerPart = createSequencePart
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-						Sandesha2Constants.WSRM.SEQUENCE_OFFER));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
 		if (offerPart != null) {
-			sequenceOffer = new SequenceOffer(factory);
+			sequenceOffer = new SequenceOffer(factory,namespaceValue);
 			sequenceOffer.fromOMElement(createSequencePart);
 		}
 
 		OMElement expiresPart = createSequenceElement
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-						Sandesha2Constants.WSRM.EXPIRES));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires(factory);
+			expires = new Expires(factory,namespaceValue);
 			expires.fromOMElement(createSequencePart);
 		}
 
@@ -124,7 +120,7 @@ public class CreateSequence implements IOMRMPart {
 		soapBody.addChild(createSequenceElement);
 
 		createSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.CREATE_SEQUENCE, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
 		return soapBody;
 	}
 
@@ -148,8 +144,8 @@ public class CreateSequence implements IOMRMPart {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.
-		OMElement elem = body.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-				Sandesha2Constants.WSRM.CREATE_SEQUENCE));
+		OMElement elem = body.getFirstChildWithName(new QName(namespaceValue,
+				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		if (elem!=null)
 			elem.detach();
 		

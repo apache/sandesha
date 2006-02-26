@@ -42,25 +42,21 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class SequenceAcknowledgement implements IOMRMPart {
 	
 	private OMElement sequenceAcknowledgementElement;
-
 	private Identifier identifier;
-
 	private ArrayList acknowledgementRangeList;
-
 	private ArrayList nackList;
-
 	OMNamespace rmNamespace = null;
-
 	SOAPFactory factory;
-	
+	String namespaceValue = null;
 	private boolean mustUnderstand = true;
 	
-	public SequenceAcknowledgement(SOAPFactory factory) {
+	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) {
+		this.namespaceValue = namespaceValue;
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		sequenceAcknowledgementElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE_ACK, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK, rmNamespace);
 		acknowledgementRangeList = new ArrayList();
 		nackList = new ArrayList();
 	}
@@ -77,38 +73,38 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		SOAPHeader header = (SOAPHeader) element;
 		OMElement sequenceAckPart = header.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE_ACK));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
 
 		if (sequenceAckPart == null)
 			throw new OMException(
 					"The passed element does not contain a seqence ackknowledgement Part");
 
-		identifier = new Identifier(factory);
+		identifier = new Identifier(factory,namespaceValue);
 		identifier.fromOMElement(sequenceAckPart);
 
 		Iterator ackRangeParts = sequenceAckPart.getChildrenWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.ACK_RANGE));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_RANGE));
 
 		while (ackRangeParts.hasNext()) {
 			OMElement ackRangePart = (OMElement) ackRangeParts.next();
 
-			AcknowledgementRange ackRange = new AcknowledgementRange(factory);
+			AcknowledgementRange ackRange = new AcknowledgementRange(factory,namespaceValue);
 			ackRange.fromOMElement(ackRangePart);
 			acknowledgementRangeList.add(ackRange);
 		}
 
 		Iterator nackParts = sequenceAckPart.getChildrenWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NACK));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NACK));
 
 		while (nackParts.hasNext()) {
 			OMElement nackPart = (OMElement) nackParts.next();
-			Nack nack = new Nack(factory);
+			Nack nack = new Nack(factory,namespaceValue);
 			nack.fromOMElement(nackPart);
 			nackList.add(nack);
 		}
 
 		sequenceAcknowledgementElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE_ACK, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK, rmNamespace);
 
 		return this;
 	}
@@ -121,7 +117,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		SOAPHeader SOAPHeader = (SOAPHeader) header;
 
 		SOAPHeaderBlock sequenceAcknowledgementHeaderBlock = SOAPHeader.addHeaderBlock(
-				Sandesha2Constants.WSRM.SEQUENCE_ACK,rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK,rmNamespace);
 		
 		if (sequenceAcknowledgementHeaderBlock == null)
 			throw new OMException(
@@ -150,7 +146,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		SOAPHeader.addChild(sequenceAcknowledgementHeaderBlock);
 
 		sequenceAcknowledgementElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE_ACK, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK, rmNamespace);
 
 		return header;
 	}
@@ -195,7 +191,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		//detach if already exist.
 		OMElement elem = header.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.SEQUENCE_ACK));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
 		if (elem != null)
 			elem.detach();
 

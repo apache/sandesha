@@ -48,6 +48,8 @@ public class RMMsgContext {
 
 	private int messageType;
 
+	private String rmNamespaceValue = null;
+	
 	public RMMsgContext() {
 		rmMessageParts = new HashMap();
 		messageType = Sandesha2Constants.MessageTypes.UNKNOWN;
@@ -236,5 +238,21 @@ public class RMMsgContext {
 	public void setPaused (boolean pause) {
 		if (msgContext!=null)
 			msgContext.setPaused(pause);
+	}
+
+	public String getRMNamespaceValue() {
+		return rmNamespaceValue;
+	}
+
+	public void setRMNamespaceValue(String rmNamespaceValue) {
+		this.rmNamespaceValue = rmNamespaceValue;
+	}
+	
+	public void setFlow (int flow) {
+		msgContext.setFLOW(flow);
+	}
+	
+	public int getFlow () {
+		return msgContext.getFLOW();
 	}
 }

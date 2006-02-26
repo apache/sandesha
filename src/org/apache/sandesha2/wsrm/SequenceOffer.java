@@ -31,22 +31,21 @@ import org.apache.sandesha2.Sandesha2Constants;
  */
 
 public class SequenceOffer implements IOMRMElement {
-	private OMElement sequenceOfferElement;
-
-	private Identifier identifier = null;
-
-	private Expires expires = null;
 	
+	private OMElement sequenceOfferElement;
+	private Identifier identifier = null;
+	private Expires expires = null;
 	SOAPFactory factory;
-
 	OMNamespace rmNamespace = null; 
+	String namespaceValue = null;
 
-	public SequenceOffer(SOAPFactory factory) {
+	public SequenceOffer(SOAPFactory factory,String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		sequenceOfferElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -56,23 +55,23 @@ public class SequenceOffer implements IOMRMElement {
 	public Object fromOMElement(OMElement createSequenceElement)
 			throws OMException {
 		OMElement sequenceOfferPart = createSequenceElement
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-						Sandesha2Constants.WSRM.SEQUENCE_OFFER));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
 		if (sequenceOfferPart == null)
 			throw new OMException(
 					"The passed element does not contain a SequenceOffer part");
 
 		sequenceOfferElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
 
-		identifier = new Identifier(factory);
+		identifier = new Identifier(factory,namespaceValue);
 		identifier.fromOMElement(sequenceOfferPart);
 
 		OMElement expiresPart = sequenceOfferPart
-				.getFirstChildWithName(new QName(Sandesha2Constants.WSRM.NS_URI_RM,
-						Sandesha2Constants.WSRM.EXPIRES));
+				.getFirstChildWithName(new QName(namespaceValue,
+						Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires(factory);
+			expires = new Expires(factory,namespaceValue);
 			expires.fromOMElement(sequenceOfferElement);
 		}
 
@@ -97,7 +96,7 @@ public class SequenceOffer implements IOMRMElement {
 		createSequenceElement.addChild(sequenceOfferElement);
 
 		sequenceOfferElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.SEQUENCE_OFFER, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
 
 		return createSequenceElement;
 	}

@@ -29,11 +29,69 @@ package org.apache.sandesha2;
 
 public interface Sandesha2Constants {
 
-	public interface WSRM {
+	
+	public interface SPEC_VERSIONS {
+		String WSRM = "Spec_2005_10";
+		String WSRX = "Spec_2005_02";
+	}
+	
+	public interface SPEC_2005_02 {
+		
+		String NS_URI = "http://schemas.xmlsoap.org/ws/2005/02/rm";
+		
+		public interface Actions {
+
+			String ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
+
+			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
+
+			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
+
+			String ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence";
+
+			String SOAP_ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
+
+			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
+
+			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
+
+			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence";
+		}
+	}
+	
+	public interface SPEC_2005_10 {
+		
+		String NS_URI = "http://docs.oasis-open.org/ws-rx/wsrm/200510";
+		
+		public interface Actions {
+			
+			String ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence";
+
+			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequenceResponse";
+
+			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement";
+
+			String ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence";
+			
+			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence";
+			
+			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence";
+
+			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequenceResponse";
+
+			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement";
+
+			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence";
+			
+			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence";
+		}
+	}
+	
+	public interface WSRM_COMMON {
 		
 		String NS_PREFIX_RM = "wsrm";
 
-		String NS_URI_RM = "http://schemas.xmlsoap.org/ws/2005/02/rm";
+		
 
 		String MSG_NUMBER = "MessageNumber";
 
@@ -72,26 +130,6 @@ public interface Sandesha2Constants {
 		String IDENTIFIER = "Identifier";
 
 		String ACCEPT = "Accept";
-
-		public interface Actions {
-
-			String ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
-
-			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
-
-			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
-
-			String ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence";
-
-			String SOAP_ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
-
-			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
-
-			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
-
-			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence";
-
-		}
 	}
 
 	public interface WSA {
@@ -120,10 +158,12 @@ public interface Sandesha2Constants {
 		int APPLICATION = 3;
 
 		int ACK = 4;
+		
+		int CLOSE_SEQUENCE = 5;
 
-		int TERMINATE_SEQ = 5;
+		int TERMINATE_SEQ = 6;
 
-		int MAX_MESSAGE_TYPE = 5;
+		int MAX_MESSAGE_TYPE = 6;
 	}
 
 	public interface MessageParts {
@@ -147,6 +187,8 @@ public interface Sandesha2Constants {
 	}
 
 	public interface SequenceProperties {
+		
+		String RM_SPEC_VERSION = "WSRMSpecVersion";
 
 		String ALL_SEQUENCES = "AllSequences"; //this is not a sequence
 											   // property. This is used as the

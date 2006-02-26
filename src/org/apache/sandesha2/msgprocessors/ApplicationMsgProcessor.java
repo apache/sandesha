@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -340,12 +341,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(
 				rmMsgCtx, ackOperation);
-
-		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,
-				"true");
-
+		
+		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
+		
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
-
+		ackRMMsgCtx.setRMNamespaceValue(rmMsgCtx.getRMNamespaceValue());
+		
 		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
 
 		//Setting new envelope

@@ -42,6 +42,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
 		System.out.println("MsgReceiver got type:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));
+		
 	}
 	
 }

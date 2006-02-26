@@ -34,24 +34,23 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class Expires implements IOMRMElement {
 
 	SOAPFactory factory;
-	
 	OMNamespace rmNamespace = null;
-
 	OMElement expiresElement = null;
-
 	String duration = null;
+	String namespaceValue = null;
 
-	public Expires(SOAPFactory factory) {
+	public Expires(SOAPFactory factory,String namespaceValue) {
 		this.factory = factory;
+		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.NS_PREFIX_RM);
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		expiresElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.EXPIRES, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.EXPIRES, rmNamespace);
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		OMElement expiresPart = element.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSRM.NS_URI_RM, Sandesha2Constants.WSRM.EXPIRES));
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart == null)
 			throw new OMException(
 					"Passed elemenet does not have a Expires part");
@@ -60,7 +59,7 @@ public class Expires implements IOMRMElement {
 			throw new OMException("The duration value is not valid");
 
 		expiresElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.EXPIRES, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.EXPIRES, rmNamespace);
 
 		duration = expiresText;
 		return element;
@@ -82,7 +81,7 @@ public class Expires implements IOMRMElement {
 		element.addChild(expiresElement);
 
 		expiresElement = factory.createOMElement(
-				Sandesha2Constants.WSRM.EXPIRES, rmNamespace);
+				Sandesha2Constants.WSRM_COMMON.EXPIRES, rmNamespace);
 
 		return element;
 	}

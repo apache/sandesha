@@ -55,7 +55,7 @@ public class SOAPFaultEnvelopeCreator {
 	 * @throws SandeshaException
 	 */
 	public static void addSOAPFaultEnvelope(MessageContext faultMsgContext,
-			int SOAPVersion, FaultData faultData) throws SandeshaException {
+			int SOAPVersion, FaultData faultData, String rmNamespaceValue) throws SandeshaException {
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 		SOAPEnvelope env = factory.getDefaultFaultEnvelope();
@@ -67,9 +67,9 @@ public class SOAPFaultEnvelopeCreator {
 		}
 
 		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-			doSOAP11Encoding(faultMsgContext, faultData);
+			doSOAP11Encoding(faultMsgContext, faultData, rmNamespaceValue);
 		else
-			doSOAP12Encoding(faultMsgContext, faultData);
+			doSOAP12Encoding(faultMsgContext, faultData, rmNamespaceValue);
 
 	}
 
@@ -108,11 +108,11 @@ public class SOAPFaultEnvelopeCreator {
 	 */
 	private static void addSequenceFaultHeader(
 			MessageContext faultMessageContext, FaultData faultData,
-			SOAPFactory factory) {
+			SOAPFactory factory, String rmNamespaceValue) {
 
-		SequenceFault sequenceFault = new SequenceFault(factory);
+		SequenceFault sequenceFault = new SequenceFault(factory, rmNamespaceValue);
 
-		FaultCode faultCode = new FaultCode(factory);
+		FaultCode faultCode = new FaultCode(factory, rmNamespaceValue);
 		faultCode.setFaultCode(faultData.getSubcode());
 		sequenceFault.setFaultCode(faultCode);
 	}
@@ -125,7 +125,7 @@ public class SOAPFaultEnvelopeCreator {
 	 * @throws SandeshaException
 	 */
 	private static void doSOAP11Encoding(MessageContext faultMsgContext,
-			FaultData data) throws SandeshaException {
+			FaultData data, String rmNamespaceValue) throws SandeshaException {
 
 		SOAPEnvelope faultMsgEnvelope = faultMsgContext.getEnvelope();
 		if (faultMsgEnvelope == null)
@@ -155,7 +155,7 @@ public class SOAPFaultEnvelopeCreator {
 
 		//SequenceFault header is added only for SOAP 1.1
 		if (isSequenceFault(data))
-			addSequenceFaultHeader(faultMsgContext, data, factory);
+			addSequenceFaultHeader(faultMsgContext, data, factory, rmNamespaceValue);
 
 	}
 
@@ -168,7 +168,7 @@ public class SOAPFaultEnvelopeCreator {
 	 * @throws SandeshaException
 	 */
 	private static void doSOAP12Encoding(MessageContext faultMsgContext,
-			FaultData data) throws SandeshaException {
+			FaultData data, String rmNamespaceValue) throws SandeshaException {
 
 		SOAPEnvelope faultEnvelope = faultMsgContext.getEnvelope();
 		if (faultEnvelope == null)
