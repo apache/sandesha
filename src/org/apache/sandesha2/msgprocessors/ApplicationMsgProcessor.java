@@ -297,6 +297,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		AckRequested ackRequested = (AckRequested) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
+		
+		if (ackRequested!=null) {
+			//setting mustundestand=false for the ackRequested header block.
+			ackRequested.setMustUnderstand(false);
+			rmMsgCtx.addSOAPEnvelope();
+		}
+		
 		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
 
 		//Setting the ack depending on AcksTo.

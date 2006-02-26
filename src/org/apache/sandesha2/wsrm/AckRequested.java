@@ -43,6 +43,7 @@ public class AckRequested implements IOMRMPart {
 	private SOAPFactory factory;
 	OMNamespace rmNamespace = null;
 	String namespaceValue = null;
+	private boolean mustUnderstand = true;
 
 	public AckRequested(SOAPFactory factory,String namespaceValue) {
 		this.factory = factory;
@@ -100,7 +101,7 @@ public class AckRequested implements IOMRMPart {
 		SOAPHeader SOAPHdr = (SOAPHeader) header;
 		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(
 				Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
-		ackReqHdrBlock.setMustUnderstand(true);
+		ackReqHdrBlock.setMustUnderstand(isMustUnderstand());
 
 		identifier.toOMElement(ackReqHdrBlock);
 
@@ -140,6 +141,14 @@ public class AckRequested implements IOMRMPart {
 			elem.detach();
 		
 		toOMElement(header);
+	}
+	
+	public boolean isMustUnderstand() {
+		return mustUnderstand;
+	}
+
+	public void setMustUnderstand(boolean mustUnderstand) {
+		this.mustUnderstand = mustUnderstand;
 	}
 
 }

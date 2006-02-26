@@ -155,10 +155,10 @@ public class InOrderInvoker extends Thread {
 							new InvokerBean(null, nextMsgno, sequenceId))
 							.iterator();
 					
+					boolean invoked = false;
+					
 					while (stMapIt.hasNext()) {
 
-
-						
 						InvokerBean stMapBean = (InvokerBean) stMapIt
 								.next();
 						String key = stMapBean.getMessageContextRefKey();
@@ -184,6 +184,7 @@ public class InOrderInvoker extends Thread {
 							
 							new AxisEngine (msgToInvoke.getConfigurationContext())
 									.resume(msgToInvoke);
+							invoked = true;
 							
 							if (!AxisOperationFactory.MEP_URI_IN_ONLY.equals(msgToInvoke.getAxisOperation().getMessageExchangePattern())) {
 								invocationTransaction = storageManager.getTransaction();
@@ -222,10 +223,12 @@ public class InOrderInvoker extends Thread {
 						
 					}
 
-					nextMsgno++;
-					nextMsgBean.setNextMsgNoToProcess(nextMsgno);
-					nextMsgMgr.update(nextMsgBean);
-					invocationTransaction.commit();
+					if (invoked) {
+						nextMsgno++;
+						nextMsgBean.setNextMsgNoToProcess(nextMsgno);
+						nextMsgMgr.update(nextMsgBean);
+						invocationTransaction.commit();
+					}
 				}
 				
 			} catch (SandeshaException e1) {
