@@ -35,6 +35,7 @@ import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAP12Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 
 
@@ -82,6 +83,12 @@ public class AsyncPingClient {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
 		Options clientOptions = new Options ();
+		
+		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+		
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		
+		//clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));

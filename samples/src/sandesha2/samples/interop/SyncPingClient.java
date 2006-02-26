@@ -42,6 +42,7 @@ import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAP11Constants;
 import org.apache.ws.commons.soap.SOAP12Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 
 
@@ -84,23 +85,24 @@ public class SyncPingClient {
 		
 		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
-		
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
-
 		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
-	    //clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+	    
+		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
-		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		//serviceClient.
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
+		//clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);		
 		clientOptions.setProperty("prop1","test1234");
 		serviceClient.getAxisService().addParameter (new ParameterImpl  ("prop2","test12345"));
 		
-		serviceClient.engageModule(new QName ("sandesha2"));
+		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
+		
 		serviceClient.setOptions(clientOptions);
 		
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));

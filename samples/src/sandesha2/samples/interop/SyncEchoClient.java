@@ -37,6 +37,7 @@ import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAP12Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -78,7 +79,6 @@ public class SyncEchoClient {
 
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
-		
 		Options clientOptions = new Options ();
 		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
@@ -89,11 +89,16 @@ public class SyncEchoClient {
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
-		serviceClient.setOptions(clientOptions);
-		serviceClient.engageModule(new QName ("sandesha2"));
+		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
-		String offeredSequenceID = SandeshaUtil.getUUID();
-		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,offeredSequenceID);  //Optional
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		
+		//clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		
+		//clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+		
+		serviceClient.setOptions(clientOptions);
+		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module
 		
 		Callback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1"),callback1);
@@ -107,7 +112,6 @@ public class SyncEchoClient {
         while (!callback3.isComplete()) {
             Thread.sleep(1000);
         }
-
 	}
 
 	private static OMElement getEchoOMBlock(String text) {

@@ -36,6 +36,7 @@ import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAP12Constants;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.RMReport;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -52,6 +53,7 @@ public class AsyncEchoClient {
 	private String transportToPort = "8070";
 	
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
+	
 	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMInteropService";
 	
 	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
@@ -96,16 +98,20 @@ public class AsyncEchoClient {
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
+		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+		
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		
+		//clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		
+		//clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+		
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
 		serviceClient.setOptions(clientOptions);
-		serviceClient.engageModule(new QName ("sandesha2"));
-		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		String offeredSequenceID = SandeshaUtil.getUUID();
-		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,offeredSequenceID);  //Optional
+		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
 		
 		Callback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1"),callback1);
