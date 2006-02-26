@@ -21,33 +21,26 @@ import java.io.File;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.InOnlyMEPClient;
-import org.apache.axis2.client.MessageSender;
-import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.ParameterImpl;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.MessageReceiver;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
-import org.apache.ws.commons.soap.SOAP11Constants;
-import org.apache.ws.commons.soap.SOAP12Constants;
-import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
 
 
 public class SyncPingClient {
 
+	private static final String applicationNamespaceName = "http://tempuri.org/"; 
+	private static final String Ping = "Ping";
+	private static final String Text = "Text";
+	
 	private String toIP = "127.0.0.1";
 	
 	private String toPort = "8080";
@@ -91,11 +84,11 @@ public class SyncPingClient {
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
 	    
-		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-		//clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+//		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);		
 		clientOptions.setProperty("prop1","test1234");
@@ -115,14 +108,14 @@ public class SyncPingClient {
 	
 	private static OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace ns = fac.createOMNamespace("http://tempuri.apache.org",
-				"ns1");
-		OMElement pingElement = fac.createOMElement("ping", ns);
-		OMElement paramElement = fac.createOMElement("param1", ns);
-		pingElement.addChild(paramElement);
-		paramElement.setText(text);
+		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement textElem = fac.createOMElement(Text, namespace);
+		
+		textElem.setText(text);
+		pingElem.addChild(textElem);
 
-		return pingElement;
+		return pingElem;
 	}
 	
 }

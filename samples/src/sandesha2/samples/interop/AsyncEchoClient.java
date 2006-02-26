@@ -22,7 +22,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Call;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.async.AsyncResult;
@@ -30,18 +29,21 @@ import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.AxisService;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
-import org.apache.ws.commons.soap.SOAP12Constants;
-import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.client.RMReport;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.ws.commons.soap.SOAPBody;
 
 public class AsyncEchoClient {
+	
+	private final static String applicationNamespaceName = "http://tempuri.org/"; 
+	private final static String echoString = "echoString";
+	private final static String Text = "Text";
+	private final static String Sequence = "Sequence";
+	private final static String echoStringResponse = "echoStringResponse";
+	private final static String EchoStringReturn = "EchoStringReturn";
 	
 	private String toIP = "127.0.0.1";
 	
@@ -95,16 +97,19 @@ public class AsyncEchoClient {
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
+		
+		String sequenceKey = "sequence4";
+		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
+		
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
-		//clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-		//clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+//		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
-		//clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+//		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
 		
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
@@ -114,34 +119,39 @@ public class AsyncEchoClient {
 		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
 		
 		Callback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1"),callback1);
-		Callback callback2 = new TestCallback ("Callback 2");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2"),callback2);
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
+		Callback callback2 = new TestCallback ("Callback 2");
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2",sequenceKey),callback2);
+
 		Callback callback3 = new TestCallback ("Callback 3");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3"),callback3);
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3",sequenceKey),callback3);
+		
 		Callback callback4 = new TestCallback ("Callback 4");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo4"),callback4);
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo4",sequenceKey),callback4);
 		
 		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
-		Callback callback5 = new TestCallback ("Callback 6");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo6"),callback5);
+		Callback callback5 = new TestCallback ("Callback 5");
+		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo5",sequenceKey),callback5);
 		
         while (!callback5.isComplete()) {
             Thread.sleep(1000);
         }
-       
 	}
 
-	private static OMElement getEchoOMBlock(String text) {
+	private static OMElement getEchoOMBlock(String text, String sequenceKey) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace defaultNS = fac.createOMNamespace("http://tempuri.apache.org","ns1");
-		OMElement echoElement = fac.createOMElement("echoString", null);
-		OMElement paramElement = fac.createOMElement("text", null);
-		echoElement.addChild(paramElement);
-		paramElement.setText(text);
-
-		return echoElement;
+		OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement echoStringElement = fac.createOMElement(echoString, applicationNamespace);
+		OMElement textElem = fac.createOMElement(Text,applicationNamespace);
+		OMElement sequenceElem = fac.createOMElement(Sequence,applicationNamespace);
+		
+		textElem.setText(text);
+		sequenceElem.setText(sequenceKey);
+		echoStringElement.addChild(textElem);
+		echoStringElement.addChild(sequenceElem);
+		
+		return echoStringElement;
 	}
 
 	class TestCallback extends Callback {
@@ -154,24 +164,22 @@ public class AsyncEchoClient {
 		
 		public void onComplete(AsyncResult result) {
 			//System.out.println("On Complete Called for " + text);
-			OMElement responseElement = result.getResponseEnvelope().getBody().getFirstElement();
-			if (responseElement==null) {
-				System.out.println("Response element is null");
+			SOAPBody body = result.getResponseEnvelope().getBody();
+			
+			OMElement echoStringResponseElem = body.getFirstChildWithName(new QName (applicationNamespaceName,echoStringResponse));
+			if (echoStringResponseElem==null) { 
+				System.out.println("Error: SOAPBody does not have a 'echoStringResponse' child");
 				return;
 			}
 			
-			String tempText = responseElement.getText();
-			if (tempText==null || "".equals(tempText)){
-				OMElement child = responseElement.getFirstElement();
-				if (child!=null)
-					tempText = child.getText();
+			OMElement echoStringReturnElem = echoStringResponseElem.getFirstChildWithName(new QName (applicationNamespaceName,EchoStringReturn));
+			if (echoStringReturnElem==null) { 
+				System.out.println("Error: 'echoStringResponse' element does not have a 'EchoStringReturn' child");
+				return;
 			}
 			
-			
-			tempText = (tempText==null)?"":tempText;
-			
-			System.out.println("Callback '" + name +  "' got result:" + tempText);
-			
+			String resultStr = echoStringReturnElem.getText();
+			System.out.println("Callback '" + name +  "' got result:" + resultStr);
 		}
 
 		public void onError (Exception e) {

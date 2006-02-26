@@ -20,6 +20,9 @@ package sandesha2.samples.interop;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import org.apache.sandesha2.SandeshaException;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
@@ -27,104 +30,60 @@ import org.apache.ws.commons.om.OMNamespace;
 
 public class RMInteropService {
 
-	private static Map sequences = new HashMap();
-
-	public OMElement echoString(OMElement in) {
-
-		String responseText = null;
-		if (in != null) {
-			String tempText = in.getText();
-			if (tempText == null || "".equals(tempText)) {
-				OMElement firstChild = in.getFirstElement();
-				if (firstChild != null)
-					tempText = firstChild.getText();
-			}
-
-			if (tempText != null)
-				responseText = tempText;
-		}
-
-		System.out.println("echoString got text:"
-				+ ((null == responseText) ? "" : responseText));
+	private static Map sequenceStrings = new HashMap();  //TODO make this non static
+	private final String applicationNamespaceName = "http://tempuri.org/"; 
+	private final String Text = "Text";
+	private final String Sequence = "Sequence";
+	private final String echoStringResponse = "echoStringResponse";
+	private final String EchoStringReturn = "EchoStringReturn";
+  
+	public OMElement echoString(OMElement in) throws Exception {
+		
+		OMElement textElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Text));
+		OMElement sequenceElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Sequence));
+		
+		if (textElem==null)
+			throw new SandeshaException ("'Text' element is not present as a child of the 'echoString' element");
+		if (sequenceElem==null)
+			throw new SandeshaException ("'Sequence' element is not present as a child of the 'echoString' element");
+		
+		String textStr = textElem.getText();
+		String sequenceStr = sequenceElem.getText();
+		
+		System.out.println("'EchoString' service got text '" + textStr + "' for the sequence '" + sequenceStr + "'");
+		
+		String previousText = (String) sequenceStrings.get(sequenceStr);
+		String resultText = (previousText==null)?textStr:previousText+textStr;
+		sequenceStrings.put(sequenceStr,resultText);
+		
+		
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace omNs = fac.createOMNamespace("http://tempuri.org/",
-				"echoString");
-		OMElement method = fac.createOMElement("echoStringResponse", omNs);
-
-		OMElement value = fac.createOMElement("text", omNs);
-
-		if (responseText == null || "".equals(responseText))
-			responseText = "echo response";
-
-		value.setText(responseText);
-		method.addChild(value);
-
-		return method;
+		OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement echoStringResponseElem = fac.createOMElement(echoStringResponse, applicationNamespace);
+		OMElement echoStringReturnElem = fac.createOMElement(EchoStringReturn, applicationNamespace);
+		
+		echoStringReturnElem.setText(resultText);
+		echoStringResponseElem.addChild(echoStringReturnElem);
+		
+		return echoStringResponseElem;
+	}
+  
+	public void ping(OMElement in) throws Exception  {
+		OMElement textElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Text));
+		if (textElem==null)
+			throw new Exception ("'Text' element is not present as a child of the 'Ping' element");
+		
+		String textValue = textElem.getText();
+		
+		System.out.println("ping service got text:" + textValue);
 	}
 
-	public void ping(OMElement in) {
-		//Just accept the message and do some processing
-
-		String text = null;
-		if (in != null) {
-			OMElement firstElement = in.getFirstElement();
-			if (firstElement != null) {
-				text = firstElement.getText();
-			}
-		}
-
-		text = (text == null) ? "" : text;
-
-		System.out.println("Ping got text:" + text);
+	public OMElement EchoString(OMElement in) throws Exception  {
+		return echoString(in);
 	}
 
-	public OMElement EchoString(OMElement in) {
-
-		String responseText = null;
-		if (in != null) {
-			String tempText = in.getText();
-			if (tempText == null || "".equals(tempText)) {
-				OMElement firstChild = in.getFirstElement();
-				if (firstChild != null)
-					tempText = firstChild.getText();
-			}
-
-			if (tempText != null)
-				responseText = tempText;
-		}
-
-		System.out.println("echoString got text:"
-				+ ((null == responseText) ? "" : responseText));
-		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace omNs = fac.createOMNamespace("http://tempuri.org/",
-				"echoString");
-		OMElement method = fac.createOMElement("echoStringResponse", omNs);
-
-		OMElement value = fac.createOMElement("text", omNs);
-
-		if (responseText == null || "".equals(responseText))
-			responseText = "echo response";
-
-		value.setText(responseText);
-		method.addChild(value);
-
-		return method;
-	}
-
-	public void Ping(OMElement in) {
-		//Just accept the message and do some processing
-
-		String text = null;
-		if (in != null) {
-			OMElement firstElement = in.getFirstElement();
-			if (firstElement != null) {
-				text = firstElement.getText();
-			}
-		}
-
-		text = (text == null) ? "" : text;
-
-		System.out.println("Ping got text:" + text);
+	public void Ping(OMElement in) throws Exception  {
+		ping(in);
 	}
 
 }
