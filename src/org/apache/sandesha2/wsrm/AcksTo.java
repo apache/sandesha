@@ -23,6 +23,7 @@ import org.apache.ws.commons.om.OMException;
 import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -38,7 +39,10 @@ public class AcksTo implements IOMRMElement {
 	OMNamespace rmNamespace = null;
 	String namespaceValue = null;
 
-	public AcksTo(SOAPFactory factory,String namespaceValue) {
+	public AcksTo(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(namespaceValue))
+			throw new SandeshaException ("Unsupported namespace");
+		
 		this.factory = factory;
 		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
@@ -47,7 +51,7 @@ public class AcksTo implements IOMRMElement {
 				Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
 	}
 	
-	public AcksTo (Address address,SOAPFactory factory,String namespaceValue) {
+	public AcksTo (Address address,SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		this (factory,namespaceValue);
 		this.address = address;
 	}
@@ -56,7 +60,7 @@ public class AcksTo implements IOMRMElement {
 		return acksToElement;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException {
+	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 		OMElement acksToPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACKS_TO));
 
@@ -98,5 +102,15 @@ public class AcksTo implements IOMRMElement {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+	
+	public boolean isNamespaceSupported (String namespaceName) {
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+			return true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+			return true;
+		
+		return false;
 	}
 }

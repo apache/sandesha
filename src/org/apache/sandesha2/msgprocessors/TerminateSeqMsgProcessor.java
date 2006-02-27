@@ -17,20 +17,26 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
@@ -84,6 +90,12 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		sequencePropertyBeanMgr.insert(terminateReceivedBean);
 		
+		
+		//add the terminate sequence response if required.
+		if (SpecSpecificConstants.isTerminateSequenceResponseRequired (terminateSeqRMMsg.getRMSpecVersion()))
+			addTerminateSequenceResponse (terminateSeqRMMsg);
+		
+		
 		terminateReceivedTransaction.commit();
 		
 		Transaction terminateTransaction = storageManager.getTransaction();
@@ -101,4 +113,30 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		terminateSeqRMMsg.pause();
 	}
+	
+	private void addTerminateSequenceResponse (RMMsgContext terminateSeqRMMsg) throws SandeshaException {
+		
+		MessageContext terminateSeqMsg = terminateSeqRMMsg.getMessageContext();
+		
+		MessageContext outMessage = null;
+		outMessage = Utils.createOutMessageContext(terminateSeqMsg);
+		
+		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator
+				.createTerminateSeqResponseMsg(terminateSeqRMMsg, outMessage);
+		
+		terminateSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
+		terminateSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
+
+		outMessage.setResponseWritten(true);
+		
+		AxisEngine engine = new AxisEngine (terminateSeqMsg.getConfigurationContext());
+		
+		try {
+			engine.send(outMessage);
+		} catch (AxisFault e) {
+			String message = "Could not send the terminate sequence response";
+			throw new SandeshaException (message,e);
+		}
+	}
+	
 }

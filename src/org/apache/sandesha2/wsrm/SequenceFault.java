@@ -24,6 +24,7 @@ import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAPBody;
 import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 
 /**
  * Adds the SequenceFault header block.
@@ -41,7 +42,10 @@ public class SequenceFault implements IOMRMElement {
 	OMNamespace rmNamespace = null;
 	String namespaceValue = null;
 
-	public SequenceFault(SOAPFactory factory,String namespaceValue) {
+	public SequenceFault(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(namespaceValue))
+			throw new SandeshaException ("Unsupported namespace");
+		
 		this.factory = factory;
 		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
@@ -54,7 +58,7 @@ public class SequenceFault implements IOMRMElement {
 		return sequenceFaultElement;
 	}
 
-	public Object fromOMElement(OMElement body) throws OMException {
+	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
 
 		if (body == null || !(body instanceof SOAPBody))
 			throw new OMException(
@@ -118,6 +122,16 @@ public class SequenceFault implements IOMRMElement {
 
 	public OMElement getSequenceFaultElement() {
 		return sequenceFaultElement;
+	}
+	
+	public boolean isNamespaceSupported (String namespaceName) {
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+			return true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+			return true;
+		
+		return false;
 	}
 
 }

@@ -29,6 +29,7 @@ import org.apache.ws.commons.om.OMException;
 import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 
 public class Identifier implements Sandesha2Constants, IOMRMElement {
 
@@ -38,7 +39,10 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 	private SOAPFactory factory;
 	String namespaceValue = null;
 	
-	public Identifier(SOAPFactory factory, String namespaceValue) {
+	public Identifier(SOAPFactory factory, String namespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(namespaceValue))
+			throw new SandeshaException ("Unsupported namespace");
+		
 		this.factory = factory;
 		this.namespaceValue = namespaceValue;
 		wsrmNamespace = factory.createOMNamespace(
@@ -99,5 +103,15 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 
 	public int hashCode() {
 		return identifier.hashCode();
+	}
+	
+	public boolean isNamespaceSupported (String namespaceName) {
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+			return true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+			return true;
+		
+		return false;
 	}
 }

@@ -103,6 +103,8 @@ public interface Sandesha2Constants {
 
 		String TERMINATE_SEQUENCE = "TerminateSequence";
 
+		String TERMINATE_SEQUENCE_RESPONSE = "TerminateSequenceResponse";
+		
 		String FAULT_CODE = "FaultCode";
 
 		String SEQUENCE_FAULT = "SequenceFault";
@@ -162,8 +164,10 @@ public interface Sandesha2Constants {
 		int CLOSE_SEQUENCE = 5;
 
 		int TERMINATE_SEQ = 6;
+		
+		int TERMINATE_SEQ_RESPONSE = 7;
 
-		int MAX_MESSAGE_TYPE = 6;
+		int MAX_MESSAGE_TYPE = 7;
 	}
 
 	public interface MessageParts {
@@ -181,7 +185,9 @@ public interface Sandesha2Constants {
 
 		int TERMINATE_SEQ = 11;
 
-		int ACK_REQUEST = 12;
+		int TERMINATE_SEQ_RESPONSE = 12;
+		
+		int ACK_REQUEST = 13;
 
 		int MAX_MSG_PART_ID = 13;
 	}

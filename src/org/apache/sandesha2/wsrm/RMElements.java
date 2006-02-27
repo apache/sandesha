@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import javax.xml.namespace.QName;
 
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMException;
@@ -42,11 +43,12 @@ public class RMElements {
 	private CreateSequence createSequence = null;
 	private CreateSequenceResponse createSequenceResponse = null;
 	private TerminateSequence terminateSequence = null;
+	private TerminateSequenceResponse terminateSequenceResponse = null;
 	private AckRequested ackRequested = null;
 	private SOAPFactory factory = null;
 	String rmNamespaceValue = null;
 	
-	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) {
+	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws SandeshaException {
 
 		if (envelope == null)
 			throw new OMException("The passed envelope is null");
@@ -107,6 +109,15 @@ public class RMElements {
 			terminateSequence = new TerminateSequence(factory,rmNamespaceValue);
 			terminateSequence.fromOMElement(envelope.getBody());
 		}
+		
+		OMElement terminateSeqResponseElement = envelope.getBody()
+				.getFirstChildWithName(
+						new QName(rmNamespaceValue,
+								Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE_RESPONSE));
+		if (terminateSeqResponseElement != null) {
+				terminateSequenceResponse = new TerminateSequenceResponse (factory,rmNamespaceValue);
+				terminateSequenceResponse.fromOMElement(envelope.getBody());
+		}
 
 		OMElement ackRequestedElement = envelope.getHeader()
 				.getFirstChildWithName(
@@ -159,6 +170,10 @@ public class RMElements {
 	public TerminateSequence getTerminateSequence() {
 		return terminateSequence;
 	}
+	
+	public TerminateSequenceResponse getTerminateSequenceResponse() {
+		return terminateSequenceResponse;
+	}
 
 	public void setCreateSequence(CreateSequence createSequence) {
 		this.createSequence = createSequence;
@@ -180,6 +195,10 @@ public class RMElements {
 
 	public void setTerminateSequence(TerminateSequence terminateSequence) {
 		this.terminateSequence = terminateSequence;
+	}
+	
+	public void setTerminateSequenceResponse(TerminateSequenceResponse terminateSequenceResponse) {
+		this.terminateSequenceResponse = terminateSequenceResponse;
 	}
 
 	public AckRequested getAckRequested() {

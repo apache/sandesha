@@ -30,6 +30,7 @@ import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.ws.commons.soap.SOAPHeader;
 import org.apache.ws.commons.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 
 /**
  * Adds the SequenceAcknowledgement header block.
@@ -50,7 +51,10 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	String namespaceValue = null;
 	private boolean mustUnderstand = true;
 	
-	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) {
+	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(namespaceValue))
+			throw new SandeshaException ("Unsupported namespace");
+		
 		this.namespaceValue = namespaceValue;
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
@@ -65,7 +69,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		return sequenceAcknowledgementElement;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException {
+	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 
 		if (element == null || !(element instanceof SOAPHeader))
 			throw new OMException(
@@ -206,5 +210,13 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		this.mustUnderstand = mustUnderstand;
 	}
 
-	
+	public boolean isNamespaceSupported (String namespaceName) {
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+			return true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+			return true;
+		
+		return false;
+	}
 }

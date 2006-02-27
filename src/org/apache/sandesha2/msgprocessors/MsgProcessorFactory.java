@@ -33,6 +33,8 @@ public class MsgProcessorFactory {
 			return new CreateSeqMsgProcessor();
 		case (Sandesha2Constants.MessageTypes.TERMINATE_SEQ):
 			return new TerminateSeqMsgProcessor();
+		case (Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE):
+			return new TerminateSeqResponseMsgProcessor();
 		case (Sandesha2Constants.MessageTypes.APPLICATION):
 			return new ApplicationMsgProcessor();
 		case (Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE):

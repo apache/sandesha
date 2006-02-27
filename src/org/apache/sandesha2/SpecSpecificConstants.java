@@ -85,4 +85,12 @@ public class SpecSpecificConstants {
 			throw new SandeshaException (unknowsSpecErrorMessage);
 	}
 	
+	public static boolean isTerminateSequenceResponseRequired (String specVersion)  throws SandeshaException {
+		if (Sandesha2Constants.SPEC_VERSIONS.WSRM.equals(specVersion)) 
+			return false;
+		else if (Sandesha2Constants.SPEC_VERSIONS.WSRX.equals(specVersion)) 
+			return true;
+		else 
+			throw new SandeshaException (unknowsSpecErrorMessage);
+	}
 }

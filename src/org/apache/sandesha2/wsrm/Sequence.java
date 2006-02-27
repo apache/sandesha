@@ -26,6 +26,7 @@ import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.ws.commons.soap.SOAPHeader;
 import org.apache.ws.commons.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -44,7 +45,10 @@ public class Sequence implements IOMRMPart {
 	private boolean mustUnderstand = true;
 	String namespaceValue = null;
 	
-	public Sequence(SOAPFactory factory,String namespaceValue) {
+	public Sequence(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(namespaceValue))
+			throw new SandeshaException ("Unsupported namespace");
+		
 		this.factory = factory;
 		this.namespaceValue = namespaceValue;
 		seqNoNamespace = factory.createOMNamespace(
@@ -57,7 +61,7 @@ public class Sequence implements IOMRMPart {
 		return sequenceElement;
 	}
 
-	public Object fromOMElement(OMElement headerElement) throws OMException {
+	public Object fromOMElement(OMElement headerElement) throws OMException,SandeshaException {
 
 		SOAPHeader header = (SOAPHeader) headerElement;
 		if (header == null)
@@ -178,6 +182,14 @@ public class Sequence implements IOMRMPart {
 		this.mustUnderstand = mustUnderstand;
 	}
 	
-	
+	public boolean isNamespaceSupported (String namespaceName) {
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+			return true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+			return true;
+		
+		return false;
+	}
 
 }

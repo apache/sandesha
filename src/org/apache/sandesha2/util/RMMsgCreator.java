@@ -40,6 +40,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.msgprocessors.TerminateSeqResponseMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -55,6 +56,7 @@ import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
+import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 import org.apache.ws.commons.soap.SOAPEnvelope;
 import org.apache.ws.commons.soap.SOAPFactory;
 
@@ -370,6 +372,22 @@ public class RMMsgCreator {
 				.createNewRelatedMessageContext(referenceRMMessage,
 						terminateOperation);
 
+		OperationContext operationContext = terminateMessage.getOperationContext();
+		configCtx.registerOperationContext(terminateMessage.getMessageID(), operationContext);   //to receive terminate sequence response messages correctly.
+		
+		AxisOperation teferenceMsgOperation = referenceMessage.getAxisOperation();
+		AxisOperation terminateMsgOperation = terminateMessage.getAxisOperation();
+		if (teferenceMsgOperation != null) {
+			terminateMsgOperation.setPhasesOutFlow(teferenceMsgOperation
+					.getPhasesOutFlow());
+			terminateMsgOperation.setPhasesOutFaultFlow(teferenceMsgOperation
+					.getPhasesOutFaultFlow());
+			terminateMsgOperation.setPhasesInFaultFlow(teferenceMsgOperation
+					.getPhasesInFaultFlow());
+			terminateMsgOperation.setRemainingPhasesInFlow(teferenceMsgOperation
+					.getRemainingPhasesInFlow());
+		}
+		
 		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceID,configCtx);
 		if (rmVersion==null)
 			throw new SandeshaException ("Cant find the rmVersion of the given message");
@@ -496,6 +514,43 @@ public class RMMsgCreator {
 
 		return createSeqResponse;
 	}
+	
+	
+	public static RMMsgContext createTerminateSeqResponseMsg (RMMsgContext terminateSeqRMMsg, MessageContext outMessage) throws SandeshaException {
+		
+		RMMsgContext terminateSeqResponseRMMsg = new RMMsgContext (outMessage);
+		ConfigurationContext configurationContext = terminateSeqRMMsg.getMessageContext().getConfigurationContext();
+		
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
+				.getSOAPVersion(terminateSeqRMMsg.getSOAPEnvelope()));
+		
+		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+		String sequenceID = terminateSequence.getIdentifier().getIdentifier();
+		
+		String namespace = terminateSeqRMMsg.getRMNamespaceValue();
+		terminateSeqResponseRMMsg.setRMNamespaceValue(namespace);
+		
+		TerminateSequenceResponse terminateSequenceResponse = new TerminateSequenceResponse (factory,namespace);
+		Identifier identifier = new Identifier (factory,namespace);
+		identifier.setIndentifer(sequenceID);
+		terminateSequenceResponse.setIdentifier(identifier);
+		
+		SOAPEnvelope envelope = factory.getDefaultEnvelope();
+		terminateSeqResponseRMMsg.setSOAPEnvelop(envelope);
+		terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE,terminateSequenceResponse);
+		
+		outMessage.setWSAAction(SpecSpecificConstants.getCreateSequenceResponseAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
+		outMessage.setSoapAction(SpecSpecificConstants.getCreateSequenceResponseSOAPAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
+
+		initializeCreation(terminateSeqRMMsg.getMessageContext(),outMessage);
+		
+		terminateSeqResponseRMMsg.addSOAPEnvelope();
+		
+		
+		finalizeCreation(terminateSeqRMMsg.getMessageContext(), outMessage);
+		
+		return terminateSeqResponseRMMsg;
+	}
 
 	/**
 	 * Adds an ack message to the given application message.
@@ -568,14 +623,13 @@ public class RMMsgCreator {
 	 */
 	public static RMMsgContext createAckMessage(RMMsgContext applicationRMMsgCtx, String rmNamespaceValue)
 			throws SandeshaException {
+		
 		try {
 			MessageContext applicationMsgCtx = applicationRMMsgCtx
 					.getMessageContext();
 
 			AxisOperation ackOperation = AxisOperationFactory
 					.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_OUT_ONLY);
-
-			
 			
 			MessageContext ackMsgCtx = SandeshaUtil
 					.createNewRelatedMessageContext(applicationRMMsgCtx,

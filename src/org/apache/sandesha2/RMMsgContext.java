@@ -19,6 +19,7 @@ package org.apache.sandesha2;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.jar.Attributes.Name;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -49,6 +50,8 @@ public class RMMsgContext {
 	private int messageType;
 
 	private String rmNamespaceValue = null;
+	
+	private String rmSpecVersion = null;
 	
 	public RMMsgContext() {
 		rmMessageParts = new HashMap();
@@ -246,6 +249,16 @@ public class RMMsgContext {
 
 	public void setRMNamespaceValue(String rmNamespaceValue) {
 		this.rmNamespaceValue = rmNamespaceValue;
+		
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespaceValue)) { 
+			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.WSRM;
+		} else if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(rmNamespaceValue)) {
+			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.WSRX;
+		}
+	}
+	
+	public String getRMSpecVersion () {
+		return rmSpecVersion;
 	}
 	
 	public void setFlow (int flow) {

@@ -25,6 +25,7 @@ import org.apache.ws.commons.soap.SOAPBody;
 import org.apache.ws.commons.soap.SOAPEnvelope;
 import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 
 /**
  * Adds the Terminate Sequence body part.
@@ -42,7 +43,10 @@ public class TerminateSequence implements IOMRMPart {
 	SOAPFactory factory;
 	String namespaceValue = null;
 	
-	public TerminateSequence(SOAPFactory factory, String namespaceValue) {
+	public TerminateSequence(SOAPFactory factory, String namespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(namespaceValue))
+			throw new SandeshaException ("Unsupported namespace");
+		
 		this.factory = factory;
 		this.namespaceValue = namespaceValue;
 		rmNameSpace = factory.createOMNamespace(
@@ -55,7 +59,7 @@ public class TerminateSequence implements IOMRMPart {
 		return terminateSequenceElement;
 	}
 
-	public Object fromOMElement(OMElement body) throws OMException {
+	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
 
 		if (!(body instanceof SOAPBody))
 			throw new OMException(
@@ -118,5 +122,15 @@ public class TerminateSequence implements IOMRMPart {
 			elem.detach();
 		
 		toOMElement(body);
+	}
+	
+	public boolean isNamespaceSupported (String namespaceName) {
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+			return true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+			return true;
+		
+		return false;
 	}
 }

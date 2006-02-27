@@ -25,6 +25,7 @@ import org.apache.ws.commons.soap.SOAPBody;
 import org.apache.ws.commons.soap.SOAPEnvelope;
 import org.apache.ws.commons.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 
 /**
  * Represent the CreateSequence body element.
@@ -44,7 +45,10 @@ public class CreateSequence implements IOMRMPart {
 	OMNamespace rmNamespace = null;
 	String namespaceValue = null;
 
-	public CreateSequence(SOAPFactory factory,String namespaceValue) {
+	public CreateSequence(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(namespaceValue))
+			throw new SandeshaException ("Unsupported namespace");
+		
 		this.factory = factory;
 		this.namespaceValue = namespaceValue;
 		rmNamespace = factory.createOMNamespace(
@@ -53,7 +57,7 @@ public class CreateSequence implements IOMRMPart {
 				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
 	}
 	
-	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String namespaceValue) {
+	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		this (factory,namespaceValue);
 		this.acksTo = acksTo;
 	}
@@ -62,7 +66,7 @@ public class CreateSequence implements IOMRMPart {
 		return createSequenceElement;
 	}
 
-	public Object fromOMElement(OMElement bodyElement) throws OMException {
+	public Object fromOMElement(OMElement bodyElement) throws OMException,SandeshaException {
 
 		OMElement createSequencePart = bodyElement
 				.getFirstChildWithName(new QName(namespaceValue,
@@ -150,5 +154,15 @@ public class CreateSequence implements IOMRMPart {
 			elem.detach();
 		
 		toOMElement(body);
+	}
+	
+	public boolean isNamespaceSupported (String namespaceName) {
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
+			return true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+			return true;
+		
+		return false;
 	}
 }

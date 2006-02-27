@@ -108,7 +108,7 @@ public class SOAPFaultEnvelopeCreator {
 	 */
 	private static void addSequenceFaultHeader(
 			MessageContext faultMessageContext, FaultData faultData,
-			SOAPFactory factory, String rmNamespaceValue) {
+			SOAPFactory factory, String rmNamespaceValue) throws SandeshaException {
 
 		SequenceFault sequenceFault = new SequenceFault(factory, rmNamespaceValue);
 

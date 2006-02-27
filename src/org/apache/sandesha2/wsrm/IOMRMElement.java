@@ -24,11 +24,13 @@ package org.apache.sandesha2.wsrm;
  * @author Saminda Abeyruwan  <saminda@opensource.lk>
  */
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMException;
 
 public interface IOMRMElement {
 	public OMElement getOMElement() throws OMException;
-	public Object fromOMElement(OMElement element) throws OMException;
-	public OMElement toOMElement(OMElement element) throws OMException;
+	public Object fromOMElement(OMElement element) throws OMException,SandeshaException ;
+	public OMElement toOMElement(OMElement element) throws OMException, SandeshaException ;
+	public boolean isNamespaceSupported (String namespaceName);
 }

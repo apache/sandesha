@@ -32,6 +32,7 @@ import org.apache.sandesha2.wsrm.RMElements;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
+import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 
 /**
  * This class is used to create an RMMessageContext out of an MessageContext.
@@ -70,7 +71,7 @@ public class MsgInitializer {
 	 * @param rmMsgContext
 	 */
 	private static void populateRMMsgContext(MessageContext msgCtx,
-			RMMsgContext rmMsgContext) {
+			RMMsgContext rmMsgContext) throws SandeshaException {
 
 		RMElements elements = new RMElements();
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope(), msgCtx.getWSAAction());
@@ -108,6 +109,12 @@ public class MsgInitializer {
 					elements.getTerminateSequence());
 			rmNamespace = elements.getTerminateSequence().getOMElement().getNamespace().getName();
 		}
+		
+		if (elements.getTerminateSequenceResponse() != null) {
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE,
+					elements.getTerminateSequenceResponse());
+			rmNamespace = elements.getTerminateSequenceResponse().getOMElement().getNamespace().getName();
+		}
 
 		if (elements.getAckRequested() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST,
@@ -140,8 +147,10 @@ public class MsgInitializer {
 		CreateSequence createSequence = (CreateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		CreateSequenceResponse createSequenceResponse = (CreateSequenceResponse) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
 		TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+		TerminateSequenceResponse terminateSequenceResponse = (TerminateSequenceResponse) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
 		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+		
 		//Setting message type.
 		if (createSequence != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
@@ -151,7 +160,10 @@ public class MsgInitializer {
 		}else if (terminateSequence != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
 			sequenceID = terminateSequence.getIdentifier().getIdentifier();
-		} else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null) {
+		}else if (terminateSequenceResponse != null) {
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE);
+			sequenceID = terminateSequenceResponse.getIdentifier().getIdentifier();
+		}else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 			sequenceID = sequence.getIdentifier().getIdentifier();
 		} else if (sequenceAcknowledgement != null) {
