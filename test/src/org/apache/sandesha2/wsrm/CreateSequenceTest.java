@@ -1,5 +1,6 @@
 package org.apache.sandesha2.wsrm;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.wsrm.*;
@@ -27,7 +28,7 @@ public class CreateSequenceTest extends SandeshaTestCase {
         super("CreateSequenceTest");
     }
 
-    public void testfromOMElement() {
+    public void testfromOMElement()  throws SandeshaException {
         CreateSequence createSequence = new CreateSequence(factory,rmNamespace);
         createSequence.fromOMElement(getSOAPEnvelope("", "CreateSequence.xml").getBody());
 
@@ -41,7 +42,7 @@ public class CreateSequenceTest extends SandeshaTestCase {
 
     }
 
-    public void testToSOAPEnvelope() {
+    public void testToSOAPEnvelope()  throws SandeshaException {
         CreateSequence createSequence = new CreateSequence(factory,rmNamespace);
 
         AcksTo acksTo = new AcksTo(factory,rmNamespace);

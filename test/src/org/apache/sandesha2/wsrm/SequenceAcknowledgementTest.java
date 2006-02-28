@@ -1,5 +1,6 @@
 package org.apache.sandesha2.wsrm;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.ws.commons.soap.SOAPEnvelope;
@@ -26,7 +27,7 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
         super("SequenceAcknowledgementTest");
     }
 
-    public void testFromOMElement() {
+    public void testFromOMElement()  throws SandeshaException {
         SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(factory,rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "SequenceAcknowledgement.xml");
         sequenceAck.fromOMElement(env.getHeader());
@@ -63,7 +64,7 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
 
     }
 
-    public void testToOMElement() {
+    public void testToOMElement()  throws SandeshaException {
         SequenceAcknowledgement seqAck = new SequenceAcknowledgement(factory,rmNamespace);
         Identifier identifier = new Identifier(factory,rmNamespace);
         identifier.setIndentifer("uuid:897ee740-1624-11da-a28e-b3b9c4e71445");

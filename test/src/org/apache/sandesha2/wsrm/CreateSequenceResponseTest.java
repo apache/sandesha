@@ -1,5 +1,6 @@
 package org.apache.sandesha2.wsrm;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.ws.commons.soap.SOAPEnvelope;
@@ -27,7 +28,7 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
 
     }
 
-    public void testFromOMElement() {
+    public void testFromOMElement() throws SandeshaException {
         CreateSequenceResponse res = new CreateSequenceResponse(factory,rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "CreateSequenceResponse.xml");
         res.fromOMElement(env.getBody());
@@ -42,7 +43,7 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
 
     }
 
-    public void testToSOAPEnvelope() {
+    public void testToSOAPEnvelope()  throws SandeshaException {
         CreateSequenceResponse res = new CreateSequenceResponse(factory,rmNamespace);
 
         Identifier identifier = new Identifier(factory,rmNamespace);

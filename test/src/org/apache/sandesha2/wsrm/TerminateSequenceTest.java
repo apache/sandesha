@@ -1,5 +1,6 @@
 package org.apache.sandesha2.wsrm;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.ws.commons.soap.SOAPEnvelope;
@@ -25,7 +26,7 @@ public class TerminateSequenceTest extends SandeshaTestCase {
         super("TerminateSequenceTest");
     }
 
-    public void testFromOMElement() {
+    public void testFromOMElement() throws SandeshaException {
         TerminateSequence terminateSequence =  new TerminateSequence(factory,rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "TerminateSequence.xml");
         terminateSequence.fromOMElement(env.getBody());
@@ -34,7 +35,7 @@ public class TerminateSequenceTest extends SandeshaTestCase {
         assertEquals("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06", identifier.getIdentifier());
     }
 
-    public void testToSOAPEnvelope() {
+    public void testToSOAPEnvelope() throws SandeshaException {
         TerminateSequence terminateSequence = new TerminateSequence(factory,rmNamespace);
         Identifier identifier = new Identifier(factory,rmNamespace);
         identifier.setIndentifer("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06");

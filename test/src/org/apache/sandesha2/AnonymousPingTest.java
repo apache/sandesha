@@ -27,6 +27,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.engine.ListenerManager;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
@@ -45,16 +46,15 @@ import junit.framework.TestCase;
 public class AnonymousPingTest extends TestCase{
 
 	SimpleHTTPServer httpServer = null;
+	private final String applicationNamespaceName = "http://tempuri.org/"; 
+	private final String Ping = "Ping";
+	private final String Text = "Text";
 	
 	public void setUp () throws AxisFault {
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "axis2.xml";
-		
-		
-//		String repoPath = "target\\repos\\server";
-//		String axis2_xml = "target\\repos\\server\\axis2.xml";
-		
+			
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
 		
@@ -118,18 +118,19 @@ public class AnonymousPingTest extends TestCase{
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_COMPLETED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 		
+		serviceClient.finalizeInvoke();
 	}
 	
 	private OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace ns = fac.createOMNamespace("http://tempuri.apache.org",
-				"ns1");
-		OMElement pingElement = fac.createOMElement("ping", ns);
-		OMElement paramElement = fac.createOMElement("param1", ns);
-		pingElement.addChild(paramElement);
-		paramElement.setText(text);
+		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement textElem = fac.createOMElement(Text, namespace);
+		
+		textElem.setText(text);
+		pingElem.addChild(textElem);
 
-		return pingElement;
+		return pingElem;
 	}
 
 }
