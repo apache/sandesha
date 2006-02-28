@@ -167,6 +167,9 @@ public class AcknowledgementManager {
 		ArrayList completedMsgList = null;
 		if (completedMessagesBean!=null) {
 			completedMsgList = SandeshaUtil.getArrayListFromString(completedMessagesBean.getValue());
+		} else {
+			String message = "Completed messages bean is null, for the sequence " + sequenceIdentifier;
+			throw new SandeshaException (message);
 		}
 		
 		return completedMsgList;

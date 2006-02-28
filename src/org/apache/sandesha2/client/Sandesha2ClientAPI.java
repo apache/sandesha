@@ -120,4 +120,12 @@ public class Sandesha2ClientAPI {
 		RMReport rmReport = new RMReport ();
 		return rmReport;
 	}
+	
+	public static String generateInternalSequenceIDForTheClientSide (String toEPR,String sequenceKey) {
+		return SandeshaUtil.getInternalSequenceID(toEPR,sequenceKey);
+	}
+	
+	public static void endSequence (String internalSequenceID, ConfigurationContext configurationContext) {
+		
+	}
 }

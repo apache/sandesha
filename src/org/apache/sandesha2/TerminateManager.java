@@ -241,7 +241,6 @@ public class TerminateManager {
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-
 			doUpdatesIfNeeded (sequenceID,sequencePropertyBean,sequencePropertyBeanMgr);
 			
 			if (isProportyDeletable(sequencePropertyBean.getName())) {
@@ -265,7 +264,6 @@ public class TerminateManager {
 			newBean.setValue(propertyBean.getValue());
 
 			seqPropMgr.insert(newBean);
-			
 			//TODO amazingly this property does not seem to get deleted without following - in the hibernate impl 
 			//(even though the lines efter current methodcall do this).
 			seqPropMgr.delete (propertyBean.getSequenceID(),propertyBean.getName());			

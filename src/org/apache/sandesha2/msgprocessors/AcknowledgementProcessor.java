@@ -72,8 +72,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		}
 		
 		AbstractContext context = rmMsgCtx.getContext();
-		if (context == null)
-		{
+		if (context == null) {
 			String message = "Context is null";
 			log.debug(message);
 			throw new SandeshaException(message);
