@@ -5,37 +5,58 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
   <title>Sandesha2 Architecture guide</title>
-  <meta name="generator" content="amaya 9.2.2, see http://www.w3.org/Amaya/"
+  <meta name="generator" content="amaya 9.2.1, see http://www.w3.org/Amaya/"
   />
 </head>
 
-<body>
+<body xml:lang="en" lang="en">
+<h1>Sandesha2 Architecture Guide</h1>
+
+<h2>Content</h2>
+<ul>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#architecture">Basic Architecture of Sandesha2</a>
+    <ul>
+      <li><a href="#handlers">Handlers</a></li>
+      <li><a href="#sender">Sender</a></li>
+      <li><a href="#msgprocessors">Message Processors</a></li>
+      <li><a href="#inorder_invoker">InOrderInvoker</a></li>
+      <li><a href="#storage">Storage Framework</a></li>
+      <li><a href="#delivery">Delivery Assurances</a></li>
+    </ul>
+  </li>
+  <li><a href="#example">Example Scenario</a>
+    <ul>
+      <li><a href="#client_side">Client side</a></li>
+      <li><a href="#server_side">Server side</a></li>
+    </ul>
+  </li>
+</ul>
+<a name="intro"></a>
 <h2>Introduction</h2>
 
-<p>Sandesha2 implements WS-ReliableMessaging for Axis2. From the point of
-view of the Axis2 engine, Sandesha2 is a module. When this module is engaged
-to a service, that service get reliable messaging capability. According to
-the WS-ReliableMessaging specification reliable communication happens between
-two endpoints. These two are called the RM Source and the RM Destination.
-Before communication, RM Source and RM Destination do a message exchange to
-create something called a sequence. A sequence is always identified by a
-unique sequenceID. The messages of a sequence are numbered starting from
-one.</p>
+<p>Sandesha2 implements Web services (WS)-ReliableMessaging (RM) for Axis2.
+From the point of view of Axis2 engine, Sandesha2 is a module. When this
+module is engaged to a service, that service gets reliable messaging
+capability. According to the WS-ReliableMessaging specification reliable
+communication happens between two endpoints. These endpoints are called the
+RM Source and the RM Destination. Before communication, RM Source and RM
+Destination perform a message exchange to create something called a sequence.
+A sequence is always identified by a unique sequenceID. The messages of a
+sequence are numbered starting from one.</p>
 
-<p>The reliability is obtained basically using acknowledgements. the RM
-Source is required to send each messages one or more times. RM Destination
-send back acknowledgements to notify the successful reception of messages.
-After receiving the acknowledgement for a certain message RM Source can stop
-the retransmission of that message.</p>
+<p>The reliability is obtained basically using acknowledgements. RM Source is
+required to send each message one or more times. RM Destination sends back
+acknowledgements to notify the successful reception of messages. After
+receiving the acknowledgement for a certain message RM Source can stop the
+retransmission of that message.</p>
 
 <p>When all messages of a certain sequence have been successfully transmitted
-to the RM Destination, RM Source sends a TerminateSequence message to the RM
-Destination. If RM Destination receive this it can free any resources
-allocated for this sequence.</p>
+to RM Destination, RM Source sends a TerminateSequence message to the RM
+Destination. If and when RM Destination receives this message it can free any
+resources allocated for this sequence.</p>
 
-<p></p>
-
-<p>Folliwing popular diagram explains the most basic operations of the RM
+<p>Following popular diagram explains the most basic operations of the RM
 Source and the RM Destination.</p>
 
 <p><img alt="WS-RM Model" src="images/RMModel.jpg" /></p>
@@ -47,20 +68,12 @@ messages one or more times. RM Destination send back Acknowledgements. After
 receiving acknowledgements for all the messages RM Source will send a
 TerminateSequence message to the RM Destination.</p>
 
-<p></p>
-
 <p>RM Destination will obtain the messages and invoke them by passing to the
 Application Destination. If RM Destination is configured to invoke the
 messages in order, it will have to pause the invocation of some messages
 until all previous once have been received and invoked.</p>
-
-<p></p>
-
-<p></p>
-
+<a name="architecture"></a>
 <h2>Basic Architecture of Sandesha2</h2>
-
-<p></p>
 
 <p><img alt="Basic Architecture" src="images/basicArchitecture.png" /></p>
 
@@ -68,82 +81,69 @@ until all previous once have been received and invoked.</p>
 
 <p>Above diagram gives the basic architecture of Sandesha2. Let's try to
 understand each part of this in detail.</p>
-
-<p></p>
-
+<a name="handlers"></a>
 <h3>Handlers</h3>
 
 <p>Sandesha module deploy three handlers into Axis2 phases.</p>
+<ol>
+  <li><a href="#outhandler">SandeshaOutHandler</a></li>
+  <li><a href="#inhandler">SandeshaInHandler</a></li>
+  <li><a href="#globalinhandler">SandeshaGlobalInHandler</a></li>
+</ol>
+<a name="outhandler"></a>
+<p><b>SandeshaOutHandler</b> is the only handler added to the outFlow by
+Sandesha2 module. This handler stops the out going application messages till
+a sequence is established. The handler is deployed to the RMPhase of the
+outFlow.</p>
 
-<p>1. SandeshaOutHandler</p>
+<a name="inhandler"></a>
+<p><b>SandeshaInHandler</b> is the second handler of the inFlow. Since this
+is situated in the RMPhase which comes after the dispatch phase, this handler
+gets called only for messages that come to RM enabled services.</p>
 
-<p>2. SandeshaInHandler</p>
+<a name="globalinhandler"></a>
+<p><b>SandeshaGlobalInHandler</b> is deployed to the predispatch phase (of
+inFlow) when the RM module is engaged. So this gets called for all the
+messages that come to Axis2. This performs global functions such as duplicate
+detection.</p>
 
-<p>3.SandeshaGlobalInHandler</p>
-
-<p></p>
-
-<p>SandesOutHandler is the only handler added to the outFlow by the Sandesha2
-module. This handler stops the out going application messages till a sequence
-is established. The handler is deployed to the RMPhase of the outFlow.</p>
-
-<p></p>
-
-<p>SandeshaGlobalInHandler is deployed to the predispatch phase (of inFlow)
-when the RMModule is engaged. So this get called for all the messages that
-come to Axis2. This does functions that should be performed globally such as
-duplicate detection.</p>
-
-<p></p>
-
-<p>SandeshaInHandler is the second handler of the inFlow. Since this is
-situated in the RMPhase which comes after the dispatch phase, this handler
-get called only for messages that come to RM enabled services.</p>
-
-<p></p>
-
+<a name="sender"></a>
 <h3>Sender</h3>
 
-<p>Sender is responsible for transmition and retransmition of messages. The
-Sender is a seperate thread that keeps running all the time. At each
-iteration Sender check the Sandesha2 Storage to see weather there are any
-messages to be sent. If there are any, they are sent. If a message does not
-have to be retransmitted the Sender delete this entry from the Storage.
-Otherwise the entry is only modified, and will be sent at some other time.
-How exactly this happens will be explained later.</p>
-
-<p></p>
-
+<p>Sender is responsible for transmission and retransmission of messages. The
+Sender is a separate thread that keeps running all the time. At each
+iteration Sender checks the Sandesha2 storage to see weather there are any
+messages to be sent. If there are any, then they are sent. If a message sent
+does not have to be retransmitted the Sender deletes this entry from the
+storage. Or else the entry is only modified, and will be sent at some other
+time. How exactly this happens will be explained later in this document.</p>
+<a name="msgprocessors"></a>
 <h3>Message Processors</h3>
 
-<p>Sandesha2 have a set of message processors each extending the
+<p>Sandesha2 have a set of message processors each implementing the
 MessageProcessor interface. Each message processor is responsible for
 processing a certain type of message. For example CreateSequenceProcessor
-will process incoming Create Sequence messages and Acknowledgement processor
-will process incoming Acknowledgement messages. Please check the class
-diagram to see all the MessageProcessors.</p>
-
-<p></p>
-
+will process incoming CreateSequence messages and Acknowledgement processor
+will process incoming Acknowledgement messages. Please check the <a
+href="">class diagram</a> to see all the MessageProcessors.</p>
+<a name="inorder_invoker"></a>
 <h3>InOrderInvoker</h3>
 
-<p>InOrderInvoker is another seperate thread that get started by the
+<p>InOrderInvoker is another separate thread that get started by the
 Sandesha2 system. This is started only if Sadesha2 has been configured to
 support InOrder Invocation delivery assurance. InOrderInvoker is responsible
 for invoking messages of a sequence in the order of message numbers.</p>
-
-<p></p>
-
+<a name="storage"></a>
 <h3>Sandesha2 Storage Framework</h3>
 
-<p>Sandesha2 Storage Framework cab be given as the cornerstone of Sandesha2
-system. This was designed to support the RM Message exchage while being
-independent of the storage implementation used. Two main storage
+<p>Sandesha2 storage framework can be considered as the cornerstone of
+Sandesha2 system. This was designed to support the RM Message exchange while
+being independent of the storage implementation used. Two main storage
 implementations are InMemory storage implementation and Database based
 storage implementation.</p>
 
-<p>Storage framework define several beans that extend the RMBean storage (so
-these are called RM Beans). Currently there are five RM Beans. They are.</p>
+<p>Storage framework define several beans that extend the RMBean abstract
+class. Currently there are five RMBeans. They are as follows:</p>
 <ol>
   <li>CreateSequenceBean (fields - InternalSequenceID, CreateSequenceMsgID,
     SequenceID)</li>
@@ -156,136 +156,128 @@ these are called RM Beans). Currently there are five RM Beans. They are.</p>
 </ol>
 
 <p>Each storage implementation should have five BeanManagers that define how
-to manage each of these beans. There are five BeanManager interaces that
+to manage each of these beans. There are five BeanManager interfaces that
 define how the managers should be defined. Also there is a StorageManager
 interface that define methods to create each of these BeanManagers. Another
-interface called Transaction has general transaction methods like commit and
-roleback.</p>
+interface called Transaction has general transaction methods such as commit
+and roleback.</p>
 
 <p>Collectively each Sandesha2 storage implementation should have following
-classes.</p>
+classes:</p>
 <ol>
   <li>An implementation of the StorageManager interface.</li>
   <li>Implementations of five Bean Manager interfaces.</li>
-  <li>An implementation of a transaction interface.</li>
+  <li>An implementation of a Transaction interface.</li>
 </ol>
 
-<p>After implementing these the user has to add these to the classpath (may
-be as a jar) and include the name of the StorageManager implementation class
-in the sandesha2.properties file. This will tell Sandesha2 to use this
-storage implementation as the default (this will need a restart of the Axis2
-engine).</p>
-
-<p></p>
-
+<p>After implementing these, the user has to add them to the classpath (may
+be as a .jar) and include the name of the StorageManager implementation class
+in the sandesha2.properties file (This will tell Sandesha2 to use this
+storage implementation as the default). Once this is done Axis2 engine needs
+to be restarted before Sandesha2 can use the storage implementaion as the
+default.</p>
+<a name="delivery"></a>
 <h3>Delivery Assurances</h3>
 
 <p>You can instruct Sandesha2 to give the delivery assurance you want. The
-bacis configurable delivery assurance we provide is the odering of messages.
+basic configurable delivery assurance we provide is the ordering of messages.
 By setting the InOrderInvocation property of Sandesha2.properties file to
 true (the default), you can tell Sandesha2 to invoke messages of a sequence
-in the order. Order will be decided based on the wsrm:messageNumber. If you
-set this property to false, Sandesha2 will invoke messages as they come.
-Please note that if you set an invalid value to this property, Sandesha2 will
-use the defult.</p>
+in a particular order. This order will be decided based on the
+wsrm:messageNumber. If you set this property to false, Sandesha2 will invoke
+messages as and when they come.</p>
 
-<p>Which delivery assurance to use depend on your requirements. If you want
-want the invocation to be as fast as possible and if you do not care about
-ordering, set the property to false. If you want ordering, set it to true.
-There could be a considerable performance improvement if you set this to
-false.</p>
+<p>Note: If you set an invalid value to this property, Sandesha2 will use the
+default.</p>
 
-<p>Internally sandesha2 start a special thread if in-order invocation is
+<p>The delivery assurance to be used depends on your requirements. If you
+want the invocation to be as fast as possible, and you do not care about
+ordering, set the property to false. If you want message ordering, then set
+property to true. There could be a considerable performance improvement if
+you set property to false.</p>
+
+<p>Internally Sandesha2 starts a special thread if in-order invocation is
 required (InOrderInvoker). This thread which is continuously running will
 only invoke the messages in order.</p>
 
 <p>In the current implementation each message (identified by sequenceID and
-message number) will be invoked only once. So exactly once delivey assurance
+message number) will be invoked only once. So exactly once delivery assurance
 is guaranteed. You cannot ask Sandesha2 to invoke the same message more than
 once.</p>
-
-<p></p>
-
+<a name="example"></a>
 <h2>Example Scenario</h2>
 
 <p>This part explains how Sandesha2 framework work internally for the most
-common RM scenario. Which is the sending of a couple of Ping messages from a
-client to the server. We will mailnly look at how Sandesha2 use its storage
-to do the RM message exchange correctly. While reading this please keep in
-mind the RM Beans and their fields which were mentioned before.</p>
-
-<p><b>Client side</b></p>
+common RM scenario, which is the sending of a couple of Ping messages from a
+client to the server. We will mainly look at how Sandesha2 use its storage to
+do the RM message exchange correctly. While going through the following, keep
+in mind the RM Beans and their fields which were mentioned before.</p>
+<a name="client_side"></a>
+<h3>Client side</h3>
 <ul>
   <li>Client invoke the call.</li>
-  <li>SandeshaOutHandler pauses the message and create a new Create Sequence
-    Request message.</li>
+  <li>SandeshaOutHandler pauses the message and create a new
+    CreateSequenceRequest message.</li>
   <li>SandeshaOutHandler adds an entry to the CreateSequenceBeanManager. The
     internalSequenceId is an identifier unique to the whole sequence. For the
-    client side this is the concantination of wsa:To and a constants set by
-    the client (SEQUENCE_KEY). The seqenceID property is initially null. The
-    createSeqMsgID is the message ID of the crerated Create Sequence
+    client side this is the concatenation of wsa:To and a constant set by the
+    client (SEQUENCE_KEY). The sequenceID property is initially null. The
+    createSeqMsgID is the message ID of the created CreateSequence
   message.</li>
-  <li>SandeshaOutHandler adds two entries to the SenderBeanManager. One which
-    has the send property to false represents the application message. Other
-    which has the send property to true represents the Create Sequence
-    message. The Sender threads sends (and retransmits) only the Create
-    Sequence message.</li>
-  <li><p>Sometime later the client side receives an Create Sequence Response
+  <li>SandeshaOutHandler adds two entries to the SenderBeanManager, one which
+    has the send property to 'false' which represents the application
+    message, other which has the send property to 'true' which represents the
+    CreateSequence message. The Sender thread sends (and retransmits) only
+    the CreateSequence message.</li>
+  <li>Sometime later the client side receives an CreateSequenceResponse
     message from the server. The SandeshaInHandler which is the Sandesha2
-    handler in the InFlow finds this and delegates the processing to the
-    CreateSequenceResponse message processor. It finds the correct
+    handler in the InFlow finds this message and delegates the processing to
+    the CreateSequenceResponse message processor. It finds the correct
     CreateSequence manager entry using the createSequenceMessageID property
     (the value of the create sequence message ID comes in the relatesTo part
-    of the Create Sequence Response message).</p>
-  </li>
-  <li>Client update the sequenceID property of the CreateSequence BeanManager
+    of the Create Sequence Response message).</li>
+  <li>Client updates the sequenceID property of the CreateSequenceBeanManager
     entry. Also the send value of the application message entries are set to
-    true, so that the sender start sending (and retransmitting) them.</li>
-  <li>When the client receive acknowlegements for the messages it sent, the
-    task is deligate to the Acknwoledgement processor, It removes the
-    corresponsing entry of that application message ifrom the
-    SenderBeanManager.</li>
-  <li>If an acknowledgement says that all the sent messages (upto last
+    true, so that the Sender starts sending (and retransmitting) them.</li>
+  <li>When the client receives acknowledgements for the messages it sent, the Acknowledgement to the Acknowledgement
+    processor, it removes the corresponding entry of that application message
+    from the SenderBeanManager.</li>
+  <li>If an acknowledgement says that all the sent messages (up to last
     message) were successfully received, the Acknowledgement processor
-    creates an TerminateSequence message and adds an corresponding entry to
+    creates an TerminateSequence message and adds a corresponding entry to
     the Sender table.</li>
 </ul>
-
-<p><b>Server side</b></p>
+<a name="server_side"></a>
+<h3>Server side</h3>
 <ul>
-  <li>Server receives an CreateSequence message. It generates a new sequence
-    ID and creates a new CreateSequenceResponse message containing this.</li>
-  <li>Server adds an entry to the NextMessage Bean manager. The initial velue
-    for nextMessageToInvoke is 1.</li>
-  <li>Server adds an entry to the Sender bean manager (of server side)
-    representing the application message. The send value is true. The Create
-    Sequence Responese message is sent by the Sender.</li>
+  <li>Server receives a CreateSequence message. It generates a new sequence
+    ID and creates a new CreateSequenceResponse message containing this ID.</li>
+  <li>Server adds an entry to the NextMessageBeanManager. The initial value for
+    nextMessageToInvoke is 1.</li>
+  <li>Server adds an entry to the SenderBeanManager (of server side) representing the application message. The
+    send value is true. The CreateSequenceResponse message is sent by the
+    Sender.</li>
   <li>After some time the server receives an application message. The server
     side SandeshaInHandler delegates this to the ApplicationMessageProcessor
-    which creates an Acknowledgement and send it. If InOrder invocation is
-    enabled, an entry is added to the InvokerBeanManager representing this.
-    (suppose the message number of this message is 2)</li>
+    which creates an Acknowledgement and sends it. If InOrder invocation is
+    enabled, an entry is added to the InvokerBeanManager representing this new appication maessage. 
+    <p>Lets consider the message number of this message as 2.</p></li>
   <li>The InOrderInvoker which keeps looking at the InvokerBeanManager
     entries sees that there are entries to be invoked.</li>
-  <li>the InOrderInvoker checks the entry of the NextMessageBeanManager of
-    the relevent sequence and sees that it is 1. But since only message
-    number 2 is present in the invokerBeanManager entries the invocation is
+  <li>The InOrderInvoker checks the entry of the NextMessageBeanManager of
+    the relevant sequence and sees that it is 1. But since only message
+    number 2 is present in the invokerBeanManager entries, the invocation is
     not done.</li>
-  <li>After some time application message 1 also comes. Now the Invoker sees
-    this entry and invoke the message. It also update the
-    NextMessageBeanManager nextMessageToInvoke property to 2. The invoker
-    again check weather the new entry for the NextMessageToInvoke (2) is
-    present in the InvokerBeanManager entries. Since this is present it is
-    also invoked. The value is again updated (to 3) but no invocation is done
-    since an entry is not found.</li>
+  <li>After some time, application message 1 also comes. Now the Invoker sees
+    this entry and invokes the message. It also updates the nextMessageToInvoke property of 
+    NextMessageBeanManagerto 2. The invoker again checks whether the new entry for the NextMessageToInvoke
+    (2) is present in the InvokerBeanManager entries. Since this is present
+    it is also invoked. The value is again updated (to 3) but no invocation
+    is done since an entry is not found.</li>
   <li>Some time later the server may receive an TerminateSequence message. It
-    can partly remove the resources allocated for the sequence. Other part
-    (which is required by the InOrderInvoker) is removed after the invocation
-    of the last message.</li>
+    can partly remove the resources allocated for the sequence. The other
+    part of resources (which is required by the InOrderInvoker) is removed
+    after the invocation of the last message.</li>
 </ul>
-
-<p></p>
-
-<p></p>
 </body>
 </html>
