@@ -27,6 +27,7 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
@@ -107,7 +108,9 @@ public class SyncEchoClient {
 		Callback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		Options newOptions = new Options (clientOptions);
+		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		serviceClient.setOptions(newOptions);
 		Callback callback3 = new TestCallback ("Callback 3");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		

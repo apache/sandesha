@@ -27,6 +27,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
@@ -70,7 +71,7 @@ public class AsyncPingClient {
 		new AsyncPingClient().run();
 	}
 	
-	public void run () throws AxisFault {
+	private void run () throws AxisFault {
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
@@ -101,9 +102,10 @@ public class AsyncPingClient {
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		Options newOptions = new Options (clientOptions);
+		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		serviceClient.setOptions(newOptions);
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
-		
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

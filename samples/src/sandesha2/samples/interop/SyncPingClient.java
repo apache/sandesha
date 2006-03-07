@@ -27,8 +27,9 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.ParameterImpl;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.SequenceReport;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
@@ -69,7 +70,7 @@ public class SyncPingClient {
 		new SyncPingClient ().run();
 	}
 	
-	public void run () throws AxisFault {
+	private void run () throws AxisFault {
 		
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
@@ -82,7 +83,9 @@ public class SyncPingClient {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence1");
+		
+		String sequenceKey = "sequence1";
+		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
@@ -91,9 +94,6 @@ public class SyncPingClient {
 //		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);		
-		clientOptions.setProperty("prop1","test1234");
-		serviceClient.getAxisService().addParameter (new ParameterImpl  ("prop2","test12345"));
-		
 		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
 		
 		serviceClient.setOptions(clientOptions);
@@ -101,9 +101,33 @@ public class SyncPingClient {
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		Options newOptions = new Options (clientOptions);
+		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		serviceClient.setOptions(newOptions);
+		
 		serviceClient.fireAndForget(getPingOMBlock("ping31"));
 		
+		SequenceReport sequenceReport = null;
+		
+		try {
+			sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
+		} catch (SandeshaException e1) {
+			//no data available.
+		}
+		
+//		while (sequenceReport==null || sequenceReport.getSequenceStatus()!=SequenceReport.SEQUENCE_STATUS_COMPLETED) {
+//			try {
+//				sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
+//			} catch (SandeshaException e) {
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e1) {
+//					e1.printStackTrace();
+//				}
+//			} 
+//		}
+		
+		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

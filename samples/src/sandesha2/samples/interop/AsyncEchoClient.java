@@ -52,13 +52,14 @@ public class AsyncEchoClient {
 	private String ackPort = "9070";
 	
 	private String toPort = "8070";
+	
 	private String transportToPort = "8070";
 	
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
 	
 	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMInteropService";
 	
-	private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
+	//private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
@@ -96,7 +97,9 @@ public class AsyncEchoClient {
 		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
-		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
+		
+		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksTo);
 		
 		String sequenceKey = "sequence4";
 		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
@@ -130,7 +133,9 @@ public class AsyncEchoClient {
 		Callback callback4 = new TestCallback ("Callback 4");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo4",sequenceKey),callback4);
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		Options newOptions = new Options (clientOptions);
+		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		serviceClient.setOptions(newOptions);
 		Callback callback5 = new TestCallback ("Callback 5");
 		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo5",sequenceKey),callback5);
 		
