@@ -44,6 +44,8 @@ public class RMElements {
 	private CreateSequenceResponse createSequenceResponse = null;
 	private TerminateSequence terminateSequence = null;
 	private TerminateSequenceResponse terminateSequenceResponse = null;
+	private CloseSequence closeSequence = null;
+	private CloseSequenceResponse closeSequenceResponse = null;
 	private AckRequested ackRequested = null;
 	private SOAPFactory factory = null;
 	String rmNamespaceValue = null;
@@ -127,9 +129,27 @@ public class RMElements {
 			ackRequested = new AckRequested(factory,rmNamespaceValue);
 			ackRequested.fromOMElement(envelope.getHeader());
 		}
+		
+		OMElement closeSequenceElement = envelope.getBody()
+			.getFirstChildWithName(
+				new QName(rmNamespaceValue,
+						Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE));
+		if (closeSequenceElement != null) {
+			closeSequence = new CloseSequence (factory,rmNamespaceValue);
+			closeSequence.fromOMElement(envelope.getBody());
+		}
+
+		OMElement closeSequenceResponseElement = envelope.getBody()
+			.getFirstChildWithName(
+					new QName(rmNamespaceValue,
+							Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE));
+		if (closeSequenceResponseElement != null) {
+			closeSequenceResponse = new CloseSequenceResponse  (factory,rmNamespaceValue);
+			closeSequenceResponse.fromOMElement(envelope.getBody());
+		}
 	}
 
-	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) {
+	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException  {
 		if (sequence != null) {
 			sequence.toOMElement(envelope.getHeader());
 		}
@@ -148,6 +168,19 @@ public class RMElements {
 		if (ackRequested != null) {
 			ackRequested.toOMElement(envelope.getBody());
 		}
+		
+		if (terminateSequenceResponse != null) {
+			terminateSequenceResponse.toOMElement(envelope.getBody());
+		}
+		
+		if (closeSequence != null) {
+			closeSequence.toOMElement(envelope.getBody());
+		}
+		
+		if (closeSequenceResponse != null) {
+			closeSequenceResponse.toOMElement(envelope.getBody());
+		}
+		
 		return envelope;
 	}
 
@@ -242,7 +275,29 @@ public class RMElements {
 			return Sandesha2Constants.SPEC_2005_10.NS_URI;
 		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE))
 			return Sandesha2Constants.SPEC_2005_10.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE))
+			return Sandesha2Constants.SPEC_2005_10.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE))
+			return Sandesha2Constants.SPEC_2005_10.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE))
+			return Sandesha2Constants.SPEC_2005_10.NS_URI;
 		
 		return null;   //a version could not be found
+	}
+
+	public CloseSequence getCloseSequence() {
+		return closeSequence;
+	}
+
+	public void setCloseSequence(CloseSequence closeSequence) {
+		this.closeSequence = closeSequence;
+	}
+
+	public CloseSequenceResponse getCloseSequenceResponse() {
+		return closeSequenceResponse;
+	}
+
+	public void setCloseSequenceResponse(CloseSequenceResponse closeSequenceResponse) {
+		this.closeSequenceResponse = closeSequenceResponse;
 	}
 }

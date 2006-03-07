@@ -43,8 +43,10 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SOAPFaultEnvelopeCreator;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -67,73 +69,6 @@ public class FaultManager {
 	public FaultManager() {
 	}
 
-	public RMMsgContext checkForPossibleFaults(MessageContext msgCtx)
-			throws SandeshaException {
-
-		//Cannot initialize message before checking for MsgNoRoleover - since
-		// initialization will give an exception
-		//for rolled over messages.
-
-		SOAPEnvelope envelope = msgCtx.getEnvelope();
-		if (envelope == null)
-			throw new SandeshaException("SOAP Envelope is null");
-
-		RMMsgContext faultMessageContext = null;
-
-		SOAPHeader header = envelope.getHeader();
-		if (header != null) {
-			OMElement sequenceHeaderBlock = header
-					.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI,
-							Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-			if (sequenceHeaderBlock != null) {
-				faultMessageContext = checkForMessageNumberRoleover(msgCtx);
-				if (faultMessageContext != null)
-					return faultMessageContext;
-			}
-			
-			//For the 200510 spec
-			sequenceHeaderBlock = header
-			.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_10.NS_URI,
-					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-			if (sequenceHeaderBlock != null) {
-				faultMessageContext = checkForMessageNumberRoleover(msgCtx);
-				if (faultMessageContext != null)
-					return faultMessageContext;
-			}
-		}
-
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-		int msgType = rmMsgCtx.getMessageType();
-
-		if (msgType == Sandesha2Constants.MessageTypes.APPLICATION
-				|| msgType == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-			faultMessageContext = checkForUnknownSequence(msgCtx);
-			if (faultMessageContext != null)
-				return faultMessageContext;
-
-		}
-
-		if (msgType == Sandesha2Constants.MessageTypes.CREATE_SEQ) {
-			faultMessageContext = checkForCreateSequenceRefused(msgCtx);
-			if (faultMessageContext != null)
-				return faultMessageContext;
-		}
-
-		if (msgType == Sandesha2Constants.MessageTypes.ACK) {
-			faultMessageContext = checkForInvalidAcknowledgement(msgCtx);
-			if (faultMessageContext != null)
-				return faultMessageContext;
-		}
-
-		if (msgType == Sandesha2Constants.MessageTypes.APPLICATION) {
-			faultMessageContext = checkForLastMsgNumberExceeded(msgCtx);
-			if (faultMessageContext != null)
-				return faultMessageContext;
-		}
-
-		return faultMessageContext;
-
-	}
 
 	/**
 	 * Check weather the CreateSequence should be refused and generate the fault if it should.
@@ -142,19 +77,19 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	private RMMsgContext checkForCreateSequenceRefused(
-			MessageContext messageContext) throws SandeshaException {
+	public RMMsgContext checkForCreateSequenceRefused(
+			MessageContext createSequenceMessage) throws SandeshaException {
 
-		RMMsgContext rmMsgCtx = MsgInitializer
-				.initializeMessage(messageContext);
+		RMMsgContext createSequenceRMMsg = MsgInitializer
+				.initializeMessage(createSequenceMessage);
 
-		CreateSequence createSequence = (CreateSequence) rmMsgCtx
+		CreateSequence createSequence = (CreateSequence) createSequenceRMMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		if (createSequence == null)
 			throw new SandeshaException(
-					"CreateSequence message does not have a CreateSequence part");
+					"Passed message does not have a CreateSequence part");
 
-		ConfigurationContext context = messageContext.getConfigurationContext();
+		ConfigurationContext context = createSequenceMessage.getConfigurationContext();
 		StorageManager storageManager = (StorageManager) SandeshaUtil
 				.getSandeshaStorageManager(context);
 		if (storageManager == null)
@@ -171,10 +106,6 @@ public class FaultManager {
 				refuseSequence = true;
 				reason = "Offered sequenceId is invalid";
 			}
-			
-			if (!refuseSequence) {
-				//TODO throw a fault if offered id contains an invalid char e.g.: [ ] ,
-			}
 
 			if (!refuseSequence) {
 				NextMsgBeanMgr nextMsgBeanMgr = storageManager
@@ -183,30 +114,16 @@ public class FaultManager {
 				Iterator it = collection.iterator();
 				while (it.hasNext()) {
 
-				//checking weather a incoming sequence with the given id
-				// exists.
-				NextMsgBean nextMsgBean = (NextMsgBean) it.next();
-				String sequenceId = nextMsgBean.getSequenceID();
-				if (sequenceId.equals(offeredSequenceId)) {
-					refuseSequence = true;
-					reason = "A sequence with offered sequenceId, already axists";
-				}
-
-				//checking weather an outgoing sequence with the given id
-				// exists.
-				SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
-						.getSequencePropretyBeanMgr();
-				SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr
-						.retrieve(
-								sequenceId,
-								Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-				if (sequencePropertyBean != null) {
-					String outSequenceId = (String) sequencePropertyBean
-							.getValue();
-					if (outSequenceId != null
-							&& outSequenceId.equals(offeredSequenceId)) {
+					//checking weather an outgoing sequence with the given id exists.
+					SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
+							.getSequencePropretyBeanMgr();
+					SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr
+							.retrieve(offeredSequenceId,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+					if (sequencePropertyBean != null) {
+						String outSequenceId = (String) sequencePropertyBean.getValue();
+					if (outSequenceId != null && outSequenceId.equals(offeredSequenceId)) {
 						refuseSequence = true;
-						reason = "A sequence with offered sequenceId, already axists";
+						reason = "An sequence with offered sequenceId has been already established";
 					}
 
 				}
@@ -215,25 +132,18 @@ public class FaultManager {
 			
 		}
 
-		//TODO - if (securityTokenReference is present RefuseCreateSequence)
-
 		if (refuseSequence) {
-
 			FaultData data = new FaultData();
-			data
-					.setType(Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED);
-
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMsgCtx
-					.getSOAPEnvelope());
+			data.setType(Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED);
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(createSequenceRMMsg.getSOAPEnvelope());
 			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
 				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
 			else
 				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
-			data
-					.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
+			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
 			data.setReason(reason);
-			return getFault(rmMsgCtx, data);
+			return getFault(createSequenceRMMsg, data);
 		}
 
 		return null;
@@ -246,11 +156,44 @@ public class FaultManager {
 	 * @param msgCtx
 	 * @return
 	 */
-	private RMMsgContext checkForLastMsgNumberExceeded(MessageContext msgCtx) {
-		return null;
+	public RMMsgContext checkForLastMsgNumberExceeded(RMMsgContext  applicationRMMessage) throws SandeshaException {
+		Sequence sequence = (Sequence) applicationRMMessage.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+		long messageNumber = sequence.getMessageNumber().getMessageNumber();
+		String sequenceID = sequence.getIdentifier().getIdentifier();
+		
+		ConfigurationContext configCtx = applicationRMMessage.getMessageContext().getConfigurationContext();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		boolean lastMessageNumberExceeded = false;
+		String reason = null;
+		SequencePropertyBean lastMessageBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_MESSAGE);
+		if (lastMessageBean!=null) {
+			long lastMessageNo = Long.parseLong(lastMessageBean.getValue());
+			if (messageNumber>lastMessageNo) {
+				lastMessageNumberExceeded = true;
+				reason = "The message number of the message '" + messageNumber + "' exceeded the last message number '" + lastMessageNo + "'"+
+				         "which was mentioned as last message in a previosly received application message";
+			}
+		}
+		
+		if (lastMessageNumberExceeded) {
+			FaultData faultData = new FaultData ();
+			faultData.setType(Sandesha2Constants.SOAPFaults.FaultType.LAST_MESSAGE_NO_EXCEEDED);
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(applicationRMMessage.getSOAPEnvelope());
+			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+				faultData.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+			else
+				faultData.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+
+			faultData.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.LAST_MESSAGE_NO_EXCEEDED);
+			faultData.setReason(reason);
+			return getFault(applicationRMMessage, faultData);
+		} else
+			return null;
 	}
 
-	private RMMsgContext checkForMessageNumberRoleover(
+	public RMMsgContext checkForMessageNumberRoleover(
 			MessageContext messageContext) {
 		return null;
 	}
@@ -264,61 +207,55 @@ public class FaultManager {
 	 * @return @throws
 	 *         SandeshaException
 	 */
-	public RMMsgContext checkForUnknownSequence(MessageContext messageContext)
+	public RMMsgContext checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID)
 			throws SandeshaException {
 
-		RMMsgContext rmMsgCtx = MsgInitializer
-				.initializeMessage(messageContext);
-		String sequenceId = null;
 
-		if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-			Sequence sequence = (Sequence) rmMsgCtx
-					.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			if (sequence == null)
-				throw new SandeshaException(
-						"Sequence part not found in the application message");
-
-			sequenceId = sequence.getIdentifier().getIdentifier();
-
-		} else if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.ACK) {
-			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMsgCtx
-					.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-			sequenceId = sequenceAcknowledgement.getIdentifier()
-					.getIdentifier();
-		} else if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-			TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx
-					.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
-			sequenceId = terminateSequence.getIdentifier().getIdentifier();
-		} else {
-			//sequenceId not found.
-			return null;
-		}
-
-		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(messageContext.getConfigurationContext());
-
-		NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
-		SOAPEnvelope envelope = messageContext.getEnvelope();
-
-		Collection coll = mgr.retrieveAll();
-		Iterator it = coll.iterator();
-
+		MessageContext messageContext = rmMessageContext.getMessageContext();
+		ConfigurationContext configCtx = messageContext.getConfigurationContext();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+		
+		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		int type = rmMessageContext.getMessageType();
+		
 		boolean validSequence = false;
-
-		while (it.hasNext()) {
-			NextMsgBean nextMsgBean = (NextMsgBean) it.next();
-			String tempId = nextMsgBean.getSequenceID();
-			if (tempId.equals(sequenceId)) {
+		String reason = null;
+		
+		if (type==Sandesha2Constants.MessageTypes.ACK || 
+			type==Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE ||
+			type==Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE ||
+			type==Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE) {
+			
+			CreateSeqBean createSeqFindBean = new CreateSeqBean ();
+			createSeqFindBean.setSequenceID(sequenceID);
+			
+			Collection coll = createSeqMgr.find(createSeqFindBean);
+			if (coll.size()==0) {
 				validSequence = true;
-				break;
+			}
+			
+		} else {
+			NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
+			SOAPEnvelope envelope = messageContext.getEnvelope();
+
+			Collection coll = mgr.retrieveAll();
+			Iterator it = coll.iterator();
+
+			while (it.hasNext()) {
+				NextMsgBean nextMsgBean = (NextMsgBean) it.next();
+				String tempId = nextMsgBean.getSequenceID();
+				if (tempId.equals(sequenceID)) {
+					validSequence = true;
+					break;
+				}
 			}
 		}
 		
-		String rmNamespaceValue = rmMsgCtx.getRMNamespaceValue();
+		String rmNamespaceValue = rmMessageContext.getRMNamespaceValue();
 
 		if (!validSequence) {
 			//Return an UnknownSequence error
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(envelope);
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
 
 			FaultData data = new FaultData();
 			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
@@ -328,17 +265,14 @@ public class FaultManager {
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE);
 
-			SOAPFactory factory = SOAPAbstractFactory
-					.getSOAPFactory(SOAPVersion);
+			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 			Identifier identifier = new Identifier(factory,rmNamespaceValue);
-			identifier.setIndentifer(sequenceId);
+			identifier.setIndentifer(sequenceID);
 			OMElement identifierOMElem = identifier.getOMElement();
 			data.setDetail(identifierOMElem);
-			data
-					.setReason("The value of wsrm:Identifier is not a known Sequence identifier");
+			data.setReason("A sequence with the given sequenceID has NOT been established");
 
-			return getFault(rmMsgCtx, data);
-
+			return getFault(rmMessageContext, data);
 		}
 
 		return null;
@@ -351,16 +285,19 @@ public class FaultManager {
 	 * @return @throws
 	 *         SandeshaException
 	 */
-	public RMMsgContext checkForInvalidAcknowledgement(MessageContext msgCtx)
+	public RMMsgContext checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext)
 			throws SandeshaException {
 
 		//check lower<=upper
 		//TODO acked for not-send message
-		RMMsgContext rmMsgContext = new RMMsgContext();
-		if (rmMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK)
+		
+		MessageContext ackMessageContext = ackRMMessageContext.getMessageContext();
+		if (ackRMMessageContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK)
 			return null;
 
-		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMsgContext
+		boolean invalidAck = false;
+		String reason = null;
+		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMessageContext
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		List sequenceAckList = sequenceAcknowledgement
 				.getAcknowledgementRanges();
@@ -373,26 +310,61 @@ public class FaultManager {
 			long lower = acknowledgementRange.getLowerValue();
 
 			if (lower > upper) {
-				//Invalid ack
-				FaultData data = new FaultData();
-				int SOAPVersion = SandeshaUtil.getSOAPVersion(msgCtx
-						.getEnvelope());
-				if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-					data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-				else
-					data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+				invalidAck = true;
+				reason = "The SequenceAcknowledgement is invalid. Lower value is larger than upper value";
 
-				data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
-				data.setSubcode("The SequenceAcknowledgement is invalid. Lower value is larger than upper value");
-				data.setDetail(sequenceAcknowledgement.getOMElement());
-
-				return getFault(rmMsgContext, data);
 			}
+		}
+		
+		if (invalidAck) {
+			FaultData data = new FaultData();
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(ackMessageContext.getEnvelope());
+			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+			else
+				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+
+			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
+			data.setReason(reason);
+			data.setDetail(sequenceAcknowledgement.getOMElement());
+
+			return getFault(ackRMMessageContext, data);
 		}
 
 		return null;
 	}
 
+	public RMMsgContext checkForSequenceClosed ( RMMsgContext referenceRMMessage, String sequenceID) throws SandeshaException {
+		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
+		ConfigurationContext configCtx = referenceMessage.getConfigurationContext();
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		boolean sequenceClosed = false;
+		String reason = null;
+		SequencePropertyBean sequenceClosedBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
+		if (sequenceClosedBean!=null && Sandesha2Constants.VALUE_TRUE.equals(sequenceClosedBean.getValue()))  {
+			sequenceClosed = true;
+			reason = "The sequence with the id " + sequenceID + " was closed previously. Cannot accept this message";
+		}
+		
+		if (sequenceClosed) {
+			FaultData data = new FaultData();
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
+			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+			else
+				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+
+			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_CLOSED);
+			data.setReason(reason);
+
+			return getFault(referenceRMMessage, data);
+		}
+		return null;
+		
+	}
 
 	/**
 	 * Returns a RMMessageContext for the fault message. Data for generating the fault is given in the data parameter.
@@ -486,8 +458,7 @@ public class FaultManager {
 			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMsgContext,
 					SOAPVersion, data,referenceRMMsgContext.getRMNamespaceValue());
 
-			RMMsgContext faultRMMsgCtx = MsgInitializer
-					.initializeMessage(faultMsgContext);
+			RMMsgContext faultRMMsgCtx = MsgInitializer.initializeMessage(faultMsgContext);
 
 			return faultRMMsgCtx;
 
@@ -496,4 +467,7 @@ public class FaultManager {
 		}
 
 	}
+	
+
+	
 }

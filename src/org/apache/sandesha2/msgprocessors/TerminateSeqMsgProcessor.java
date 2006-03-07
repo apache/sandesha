@@ -33,6 +33,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
@@ -76,6 +77,21 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			String message = "Invalid sequence id";
 			log.debug(message);
 			throw new SandeshaException (message);
+		}
+		
+		FaultManager faultManager = new FaultManager();
+		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(terminateSeqRMMsg,sequenceId);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = terminateSeqMsg.getConfigurationContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			
+			try {
+				engine.sendFault(faultMessageContext.getMessageContext());
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not send the fault message",e);
+			}
+			
+			return;
 		}
 		
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();

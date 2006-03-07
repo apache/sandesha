@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2;
 
+import org.apache.axis2.addressing.AddressingConstants;
+
 
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
@@ -31,8 +33,8 @@ public interface Sandesha2Constants {
 
 	
 	public interface SPEC_VERSIONS {
-		String WSRM = "Spec_2005_10";
-		String WSRX = "Spec_2005_02";
+		String WSRM = "Spec_2005_02";
+		String WSRX = "Spec_2005_10";
 	}
 	
 	public interface SPEC_2005_02 {
@@ -73,7 +75,13 @@ public interface Sandesha2Constants {
 
 			String ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence";
 			
+			String ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequenceResponse";
+			
+			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200602/AckRequested";
+			
 			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence";
+			
+			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequenceResponse";
 			
 			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence";
 
@@ -82,6 +90,8 @@ public interface Sandesha2Constants {
 			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement";
 
 			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence";
+			
+			String SOAP_ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200510/AckRequested";
 			
 			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence";
 		}
@@ -103,6 +113,10 @@ public interface Sandesha2Constants {
 
 		String TERMINATE_SEQUENCE = "TerminateSequence";
 
+		String CLOSE_SEQUENCE = "CloseSequence";
+		
+		String CLOSE_SEQUENCE_RESPONSE = "CloseSequenceResponse";
+		
 		String TERMINATE_SEQUENCE_RESPONSE = "TerminateSequenceResponse";
 		
 		String FAULT_CODE = "FaultCode";
@@ -132,12 +146,16 @@ public interface Sandesha2Constants {
 		String IDENTIFIER = "Identifier";
 
 		String ACCEPT = "Accept";
+		
+		String NONE = "None";
+		
+		String FINAL = "Final";
 	}
 
 	public interface WSA {
-		String NS_URI_ANONYMOUS = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
+		String NS_URI_ANONYMOUS = AddressingConstants.Final.WSA_ANONYMOUS_URL;  // "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
 
-		String NS_URI_ADDRESSING = "http://schemas.xmlsoap.org/ws/2004/08/addressing";
+		String NS_URI_ADDRESSING = AddressingConstants.Final.WSA_NAMESPACE; //"http://schemas.xmlsoap.org/ws/2004/08/addressing";
 
 		String NS_PREFIX_ADDRESSING = "wsa";
 
@@ -163,11 +181,15 @@ public interface Sandesha2Constants {
 		
 		int CLOSE_SEQUENCE = 5;
 
-		int TERMINATE_SEQ = 6;
+		int CLOSE_SEQUENCE_RESPONSE = 6;
 		
-		int TERMINATE_SEQ_RESPONSE = 7;
+		int TERMINATE_SEQ = 7;
+		
+		int ACK_REQUEST = 8;
+		
+		int TERMINATE_SEQ_RESPONSE = 9;
 
-		int MAX_MESSAGE_TYPE = 7;
+		int MAX_MESSAGE_TYPE = 9;
 	}
 
 	public interface MessageParts {
@@ -184,12 +206,16 @@ public interface Sandesha2Constants {
 		int CREATE_SEQ_RESPONSE = 10;
 
 		int TERMINATE_SEQ = 11;
-
-		int TERMINATE_SEQ_RESPONSE = 12;
 		
-		int ACK_REQUEST = 13;
+		int CLOSE_SEQUENCE = 12;
+		
+		int CLOSE_SEQUENCE_RESPONSE = 13;
 
-		int MAX_MSG_PART_ID = 13;
+		int TERMINATE_SEQ_RESPONSE = 14;
+		
+		int ACK_REQUEST = 15;
+
+		int MAX_MSG_PART_ID = 15;
 	}
 
 	public interface SequenceProperties {
@@ -243,6 +269,15 @@ public interface Sandesha2Constants {
 		String TRANSPORT_TO = "TransportTo";
 		
 		String OUT_SEQ_ACKSTO = "OutSequenceAcksTo";
+		
+		String SEQUENCE_CLOSED = "SequenceClosed";
+		
+		String LAST_MESSAGE = "LastMessage";
+		
+
+		String REQUEST_SIDE_SEQUENCE_ID = "RequestSideSequenceID"; 		//used only at the server side
+		
+		String HIGHEST_MSG_NO = "HighestMessageNumber";
 	}
 
 	public interface SOAPVersion {
@@ -291,6 +326,8 @@ public interface Sandesha2Constants {
 		public interface Subcodes {
 
 			String SEQUENCE_TERMINATED = "wsrm:SequenceTerminated";
+			
+			String SEQUENCE_CLOSED = "wsrm:SequenceClosed";
 
 			String UNKNOWN_SEQUENCE = "wsrm:UnknownSequence";
 
@@ -301,6 +338,7 @@ public interface Sandesha2Constants {
 			String LAST_MESSAGE_NO_EXCEEDED = "wsrm:LastMessageNumberExceeded";
 
 			String CREATE_SEQUENCE_REFUSED = "wsrm:CreateSequenceRefused";
+			
 
 		}
 
@@ -313,7 +351,8 @@ public interface Sandesha2Constants {
 			public static final int INVALID_ACKNOWLEDGEMENT = 3;
 
 			public static final int CREATE_SEQUENCE_REFUSED = 4;
-
+			
+			public static final int LAST_MESSAGE_NO_EXCEEDED = 5;
 		}
 	}
 
@@ -335,6 +374,8 @@ public interface Sandesha2Constants {
 		
 		String MessageTypesToDrop = "MessageTypesToDrop";
 		
+		String RetransmissionCount = "RetransmissionCount";
+		
 		public interface DefaultValues {
 			
 			int RetransmissionInterval = 20000;
@@ -352,6 +393,8 @@ public interface Sandesha2Constants {
 			boolean InvokeInOrder = true;
 			
 			String MessageTypesToDrop=VALUE_NONE;
+			
+			int RetransmissionCount = 8;
 		}
 	}
 	

@@ -221,6 +221,13 @@ public class SequenceManager {
 				acksToEPR.getAddress());
 		}
 		
+		SequencePropertyBean msgsBean = new SequencePropertyBean();
+		msgsBean.setSequenceID(internalSequenceId);
+		msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
+		msgsBean.setValue("");
+		
+		seqPropMgr.insert(msgsBean);
+		
 		seqPropMgr.insert(toBean);
 		if (acksToBean!=null)
 			seqPropMgr.insert(acksToBean);
@@ -276,7 +283,7 @@ public class SequenceManager {
 		
 		try {
 			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) && transportInProtocol==null)
-				throw new SandeshaException ("Cant start the listner since the TransportInProtocol is null");
+				throw new SandeshaException ("Cant start the listner since the TransportInProtocol is not set.");
 
 //			if (startListnerForAsyncAcks)
 //				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());

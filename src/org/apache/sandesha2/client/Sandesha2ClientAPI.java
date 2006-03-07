@@ -19,18 +19,35 @@ package org.apache.sandesha2.client;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.AcknowledgementManager;
+import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.TerminateManager;
+import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
+import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+
+import com.sun.corba.se.internal.core.ServiceContext;
 
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
@@ -50,11 +67,12 @@ public class Sandesha2ClientAPI {
 	public static String SEQUENCE_KEY = "Sandesha2ClientAPIPropertySequenceKey";
 	public static String MESSAGE_NUMBER = "Sandesha2ClientAPIPropertyMessageNumber";
 	public static String RM_SPEC_VERSION = "Sandesha2ClientAPIPropertyRMSpecVersion";
+	public static String DUMMY_MESSAGE = "Sandesha2ClientAPIDummyMessage"; //If this property is set, even though this message will invoke the RM handlers, this will not be sent as an actual application message
+	public static String VALUE_TRUE = "true";
+	public static String VALUE_FALSE = "false";
 	
-	public static SequenceReport getOutgoingSequenceReport (String to, String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
-		
-		String internalSequenceID = SandeshaUtil.getInternalSequenceID (to,sequenceKey);
-		SequenceReport sequenceReport = new SequenceReport ();
+	public static SequenceReport getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
+	SequenceReport sequenceReport = new SequenceReport ();
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
 		SequencePropertyBeanMgr seqpPropMgr = storageManager.getSequencePropretyBeanMgr();
@@ -91,7 +109,14 @@ public class Sandesha2ClientAPI {
 		
 		reportTransaction.commit();
 		
-		return sequenceReport;
+		return sequenceReport;	
+	}
+	
+	public static SequenceReport getOutgoingSequenceReport (String to, String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
+		
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID (to,sequenceKey);
+		return getOutgoingSequenceReport(internalSequenceID,configurationContext);
+	
 	}
 	
 	public static SequenceReport getIncomingSequenceReport (String sequenceID,ConfigurationContext configurationContext) throws SandeshaException {
@@ -121,11 +146,5 @@ public class Sandesha2ClientAPI {
 		return rmReport;
 	}
 	
-	public static String generateInternalSequenceIDForTheClientSide (String toEPR,String sequenceKey) {
-		return SandeshaUtil.getInternalSequenceID(toEPR,sequenceKey);
-	}
-	
-	public static void endSequence (String internalSequenceID, ConfigurationContext configurationContext) {
-		
-	}
+
 }

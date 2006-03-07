@@ -26,6 +26,9 @@ import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.wsrm.AckRequested;
+import org.apache.sandesha2.wsrm.CloseSequence;
+import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.RMElements;
@@ -122,6 +125,18 @@ public class MsgInitializer {
 			rmNamespace = elements.getAckRequested().getOMElement().getNamespace().getName();
 		}
 		
+		if (elements.getCloseSequence() != null) {
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE,
+					elements.getCloseSequence());
+			rmNamespace = elements.getCloseSequence().getOMElement().getNamespace().getName();
+		}
+		
+		if (elements.getCloseSequenceResponse() != null) {
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE,
+					elements.getCloseSequenceResponse());
+			rmNamespace = elements.getCloseSequenceResponse().getOMElement().getNamespace().getName();
+		}
+		
 		rmMsgContext.setRMNamespaceValue(rmNamespace);
 
 	}
@@ -150,6 +165,9 @@ public class MsgInitializer {
 		TerminateSequenceResponse terminateSequenceResponse = (TerminateSequenceResponse) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
 		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+		AckRequested ackRequest = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
+		CloseSequence closeSequence = (CloseSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+		CloseSequenceResponse closeSequenceResponse = (CloseSequenceResponse) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE);
 		
 		//Setting message type.
 		if (createSequence != null) {
@@ -169,6 +187,15 @@ public class MsgInitializer {
 		} else if (sequenceAcknowledgement != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
+		} else if (ackRequest != null) {
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
+			sequenceID = ackRequest.getIdentifier().getIdentifier(); 
+		} else if (closeSequence != null) {
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE);
+			sequenceID = closeSequence.getIdentifier().getIdentifier(); 
+		} else if (closeSequenceResponse != null) {
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE);
+			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier(); 
 		} else
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 

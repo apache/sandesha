@@ -34,6 +34,7 @@ import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * This is invoked in the inFlow of an RM endpoint. This is responsible for selecting an suitable
@@ -64,15 +65,6 @@ public class SandeshaInHandler extends AbstractHandler {
 		if (null != DONE && "true".equals(DONE))
 			return;
 
-		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager
-				.checkForPossibleFaults(msgCtx);
-		if (faultMessageContext != null) {
-			AxisEngine engine = new AxisEngine(context);
-			engine.send(faultMessageContext.getMessageContext());
-			return;
-		}
-
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null) {
 			String message = "AxisService is null";
@@ -89,6 +81,9 @@ public class SandeshaInHandler extends AbstractHandler {
 			throw new AxisFault(message);
 		}
 
+		if (rmMsgCtx.getMessageContext().getAxisOperation().getParent()==null) {
+			System.out.println("Operation parent was null for message:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));
+		}
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());
 

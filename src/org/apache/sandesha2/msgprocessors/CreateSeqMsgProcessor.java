@@ -34,6 +34,7 @@ import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
@@ -64,6 +65,21 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
+		FaultManager faultManager = new FaultManager();
+		RMMsgContext faultMessageContext = faultManager.checkForCreateSequenceRefused(createSeqMsg);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = createSeqMsg.getConfigurationContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			
+			try {
+				engine.sendFault(faultMessageContext.getMessageContext());
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not send the fault message",e);
+			}
+			
+			return;
+		}
+		
 		MessageContext outMessage = null;
 		outMessage = Utils.createOutMessageContext(createSeqMsg);
 		

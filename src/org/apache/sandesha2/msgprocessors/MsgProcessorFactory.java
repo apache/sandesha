@@ -41,6 +41,10 @@ public class MsgProcessorFactory {
 			return new CreateSeqResponseMsgProcessor();
 		case (Sandesha2Constants.MessageTypes.ACK):
 			return new AcknowledgementProcessor();
+		case (Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE):
+			return new CloseSequenceProcessor ();
+		case (Sandesha2Constants.MessageTypes.ACK_REQUEST):
+			return new AckRequestedProcessor ();
 		default:
 			return null;
 		}

@@ -31,6 +31,7 @@ import org.apache.ws.commons.soap.SOAPHeader;
 import org.apache.ws.commons.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 
 /**
  * Adds the SequenceAcknowledgement header block.
@@ -50,6 +51,8 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	SOAPFactory factory;
 	String namespaceValue = null;
 	private boolean mustUnderstand = true;
+	private AckNone ackNone = null;
+	private AckFinal ackFinal = null;
 	
 	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -107,13 +110,32 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			nackList.add(nack);
 		}
 
+		String rmSpecVersion = SpecSpecificConstants.getSpecVersionString (namespaceValue);
+		
+		if (SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
+			OMElement ackFinalPart = sequenceAckPart.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.FINAL));
+			if (ackFinalPart!=null) {
+				ackFinal = new AckFinal (factory,namespaceValue);
+				ackFinal.fromOMElement(sequenceAckPart);
+			}
+		}
+		
+		if (SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
+			OMElement ackNonePart = sequenceAckPart.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.NONE));
+			if (ackNonePart!=null) {
+				ackNone = new AckNone (factory,namespaceValue);
+				ackNone.fromOMElement(sequenceAckPart);
+			}
+		}
+		
 		sequenceAcknowledgementElement = factory.createOMElement(
 				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK, rmNamespace);
+
 
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement header) throws OMException {
+	public OMElement toOMElement(OMElement header) throws OMException,SandeshaException {
 
 		if (header == null || !(header instanceof SOAPHeader))
 			throw new OMException();
@@ -146,8 +168,44 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			Nack nack = (Nack) nackIt.next();
 			nack.toOMElement(sequenceAcknowledgementHeaderBlock);
 		}
+		
+		String rmSpecVersion = SpecSpecificConstants.getSpecVersionString(namespaceValue);
 
+		//setting a 'None' when nothing is there (for the correct RM version)
+		if (ackNone==null && acknowledgementRangeList.size()==0 && nackList.size()==0 && SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
+			ackNone = new AckNone (factory,namespaceValue);
+		}
+		
+		if (ackNone!=null) {
+			if (!SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
+				throw new SandeshaException ("The given namespace does not allow the 'None' part to be added to the sequenceAcknowledgement element");
+			}
+			
+			if (acknowledgementRangeList.size()>0) {
+				throw new SandeshaException ("The 'None' element cannot be present when there are acknowledgement range elements under the sequenceAcknowledgement");
+			}
+			
+			if (nackList.size()>0) {
+				throw new SandeshaException ("The 'None' element cannot be present when there are Nack elements under the sequenceAcknowledgement");
+			}
+			
+			ackNone.toOMElement(sequenceAcknowledgementHeaderBlock);
+		}
+		
+		if (ackFinal!=null) {
+			if (!SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
+				throw new SandeshaException ("The given namespace does not allow the 'Final' part to be added to the sequenceAcknowledgement element");
+			}
+			
+			if (nackList.size()>0) {
+				throw new SandeshaException ("The 'Final' element cannot be present when there are Nack elements under the sequenceAcknowledgement");
+			}
+			
+			ackFinal.toOMElement(sequenceAcknowledgementHeaderBlock);
+		}
+		
 		SOAPHeader.addChild(sequenceAcknowledgementHeaderBlock);
+		
 
 		sequenceAcknowledgementElement = factory.createOMElement(
 				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK, rmNamespace);
@@ -190,7 +248,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		acknowledgementRangeList.add(element);
 	}
 
-	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
 		SOAPHeader header = envelope.getHeader();
 
 		//detach if already exist.
@@ -218,5 +276,21 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+
+	public AckFinal getAckFinal() {
+		return ackFinal;
+	}
+
+	public void setAckFinal(AckFinal ackFinal) {
+		this.ackFinal = ackFinal;
+	}
+
+	public AckNone getAckNone() {
+		return ackNone;
+	}
+
+	public void setAckNone(AckNone ackNone) {
+		this.ackNone = ackNone;
 	}
 }

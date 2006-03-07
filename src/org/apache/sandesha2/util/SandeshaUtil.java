@@ -86,7 +86,9 @@ public class SandeshaUtil {
 	 * @return
 	 */
 	public static String getUUID() {
-		String uuid = "uuid:" + UUIDGenerator.getUUID();
+		//String uuid = "uuid:" + UUIDGenerator.getUUID();
+		String uuid = UUIDGenerator.getUUID();
+
 		return uuid;
 	}
 
@@ -335,6 +337,14 @@ public class SandeshaUtil {
 			return "Application";
 		case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
 			return "TerminateSequence";
+		case Sandesha2Constants.MessageTypes.ACK_REQUEST:
+			return "AckRequest";
+		case Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE:
+			return "CloseSequence";
+		case Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE:
+			return "CloseSequenceResponse";
+		case Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE:
+			return "TerminateSequenceResponse";
 		case Sandesha2Constants.MessageTypes.UNKNOWN:
 			return "Unknown";
 		default:
@@ -457,6 +467,8 @@ public class SandeshaUtil {
 			return false;
 		}
 
+		//TODO make this spec indipendent 
+		
 		OMElement sequenceElem = null;
 		if (header != null)
 			sequenceElem = header.getFirstChildWithName(new QName(
@@ -472,9 +484,14 @@ public class SandeshaUtil {
 		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
 				.equals(action))
 			rmGlobalMsg = true;
+		
+		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
+			rmGlobalMsg = true;
 
 		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
+		
+		
 		
 		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
 				.equals(action))
@@ -482,7 +499,11 @@ public class SandeshaUtil {
 
 		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
+		
+		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
+			rmGlobalMsg = true;
 
+		
 		return rmGlobalMsg;
 	}
 
@@ -602,7 +623,7 @@ public class SandeshaUtil {
 	
 	public static ArrayList getArrayListFromString (String str) throws SandeshaException {
 		
-		if (str==null)
+		if (str==null || "".equals(str))
 			return new ArrayList ();
 		
 		if (str.length()<2) {

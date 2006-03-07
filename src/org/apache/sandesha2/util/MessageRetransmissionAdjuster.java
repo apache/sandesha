@@ -67,6 +67,16 @@ public class MessageRetransmissionAdjuster {
 		
 		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
 		
+		
+		//TODO make MaxRetransmissionCount a policy
+		int maxRetransmissionCount = Sandesha2Constants.Properties.DefaultValues.RetransmissionCount;
+		if (retransmitterBean.getSentCount()>maxRetransmissionCount) {
+			log.debug("Stopping retransmission since maximum retransmission was exceeded");
+			retransmitterBean.setSend(false);
+			
+			//TODO do reporting and cleaning since this sequence will not work correctly after this.
+		}
+		
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);
 

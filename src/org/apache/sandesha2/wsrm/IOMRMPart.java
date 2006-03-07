@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.wsrm;
 
+import org.apache.sandesha2.SandeshaException;
 import org.apache.ws.commons.soap.SOAPEnvelope;
 
 /**
@@ -29,5 +30,5 @@ import org.apache.ws.commons.soap.SOAPEnvelope;
  */
 
 public interface IOMRMPart extends IOMRMElement {
-	public void toSOAPEnvelope (SOAPEnvelope envelope);
+	public void toSOAPEnvelope (SOAPEnvelope envelope) throws SandeshaException;
 }

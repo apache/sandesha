@@ -188,6 +188,7 @@ public class Sender extends Thread {
 
 					preSendTransaction.commit();
 
+					//sending the message
 					TransportOutDescription transportOutDescription = msgCtx
 							.getTransportOut();
 					TransportSender transportSender = transportOutDescription
@@ -196,6 +197,9 @@ public class Sender extends Thread {
 						transportSender.invoke(msgCtx);
 					}
 
+					
+					
+					
 					Transaction postSendTransaction = storageManager.getTransaction();
 
 					MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
@@ -254,9 +258,7 @@ public class Sender extends Thread {
 
 			} catch (AxisFault e) {
 				String message = "An Exception was throws in sending";
-				System.out.println(message);
 				log.error(e.getMessage());
-				e.printStackTrace();
 
 				// TODO : when this is the client side throw the exception to
 				// the client when necessary.

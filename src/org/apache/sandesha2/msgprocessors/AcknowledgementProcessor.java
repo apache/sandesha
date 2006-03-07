@@ -44,6 +44,7 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.transport.Sandesha2TransportSender;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
@@ -70,6 +71,8 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		
+		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		
 		AbstractContext context = rmMsgCtx.getContext();
 		if (context == null) {
@@ -103,6 +106,35 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
+		FaultManager faultManager = new FaultManager();
+		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(rmMsgCtx,outSequenceId);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			
+			try {
+				engine.sendFault(faultMessageContext.getMessageContext());
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not send the fault message",e);
+			}
+			
+			return;
+		}
+		
+		faultMessageContext = faultManager.checkForInvalidAcknowledgement(rmMsgCtx);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			
+			try {
+				engine.sendFault(faultMessageContext.getMessageContext());
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not send the fault message",e);
+			}
+			
+			return;
+		}
+		
 		//updating the last activated time of the sequence.
 //		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
 //		SequenceManager.updateLastActivatedTime(outSequenceId,rmMsgCtx.getMessageContext().getConfigurationContext());

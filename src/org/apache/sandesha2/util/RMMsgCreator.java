@@ -32,7 +32,6 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.ParameterImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -45,9 +44,12 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.Accept;
+import org.apache.sandesha2.wsrm.AckFinal;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.Address;
+import org.apache.sandesha2.wsrm.CloseSequence;
+import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.IOMRMElement;
@@ -109,7 +111,7 @@ public class RMMsgCreator {
 					Iterator iter = axisOpParams.iterator();
 					while (iter.hasNext()) {
 						Parameter nextParam = (Parameter) iter.next();
-						Parameter newParam = new ParameterImpl();
+						Parameter newParam = new Parameter();
 
 						newParam.setName(nextParam.getName());
 						newParam.setValue(nextParam.getValue());
@@ -539,8 +541,8 @@ public class RMMsgCreator {
 		terminateSeqResponseRMMsg.setSOAPEnvelop(envelope);
 		terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE,terminateSequenceResponse);
 		
-		outMessage.setWSAAction(SpecSpecificConstants.getCreateSequenceResponseAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
-		outMessage.setSoapAction(SpecSpecificConstants.getCreateSequenceResponseSOAPAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
+		outMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
+		outMessage.setSoapAction(SpecSpecificConstants.getTerminateSequenceAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
 
 		initializeCreation(terminateSeqRMMsg.getMessageContext(),outMessage);
 		
@@ -551,6 +553,44 @@ public class RMMsgCreator {
 		
 		return terminateSeqResponseRMMsg;
 	}
+	
+	
+	public static RMMsgContext createCloseSeqResponseMsg (RMMsgContext closeSeqRMMsg, MessageContext outMessage) throws SandeshaException {
+		
+		RMMsgContext closeSeqResponseRMMsg = new RMMsgContext (outMessage);
+		ConfigurationContext configurationContext = closeSeqRMMsg.getMessageContext().getConfigurationContext();
+		
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
+				.getSOAPVersion(closeSeqRMMsg.getSOAPEnvelope()));
+		
+		CloseSequence closeSequence = (CloseSequence) closeSeqRMMsg.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+		String sequenceID = closeSequence.getIdentifier().getIdentifier();
+		
+		String namespace = closeSeqRMMsg.getRMNamespaceValue();
+		closeSeqResponseRMMsg.setRMNamespaceValue(namespace);
+		
+		CloseSequenceResponse closeSequenceResponse = new CloseSequenceResponse (factory,namespace);
+		Identifier identifier = new Identifier (factory,namespace);
+		identifier.setIndentifer(sequenceID);
+		closeSequenceResponse.setIdentifier(identifier);
+		
+		SOAPEnvelope envelope = factory.getDefaultEnvelope();
+		closeSeqResponseRMMsg.setSOAPEnvelop(envelope);
+		closeSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE,closeSequenceResponse);
+		
+		outMessage.setWSAAction(SpecSpecificConstants.getCloseSequenceAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
+		outMessage.setSoapAction(SpecSpecificConstants.getCloseSequenceAction(SandeshaUtil.getRMVersion(sequenceID,configurationContext)));
+
+		initializeCreation(closeSeqRMMsg.getMessageContext(),outMessage);
+		
+		closeSeqResponseRMMsg.addSOAPEnvelope();
+		
+		
+		finalizeCreation(closeSeqRMMsg.getMessageContext(), outMessage);
+		
+		return closeSeqResponseRMMsg;
+	}
+	
 
 	/**
 	 * Adds an ack message to the given application message.
@@ -605,7 +645,20 @@ public class RMMsgCreator {
 					.next();
 			sequenceAck.addAcknowledgementRanges(ackRange);
 		}
+		
+		
+		SequencePropertyBean sequenceClosedBean = seqPropMgr.retrieve(sequenceId,Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED );
+		
+		if (sequenceClosedBean!=null && Sandesha2Constants.VALUE_TRUE.equals(sequenceClosedBean.getValue())) {
+			//sequence is closed. so add the 'Final' part.
+			if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
+				AckFinal ackFinal = new AckFinal (factory,rmNamespaceValue);
+				sequenceAck.setAckFinal(ackFinal);
+			}
+		}
 
+		applicationMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,sequenceAck);
+		
 		sequenceAck.toOMElement(envelope.getHeader());
 		applicationMsg
 				.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(SandeshaUtil.getRMVersion(sequenceId,ctx)));

@@ -33,6 +33,7 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -48,6 +49,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -83,6 +85,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
 			ackProcessor.processMessage(rmMsgCtx);
 		}
+		
+		//TODO process embedded ack requests
+		
 
 		//Processing the application message.
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
@@ -100,7 +105,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-		//RM will not rend sync responses. If sync acks are there this will be
+		//RM will not send sync responses. If sync acks are there this will be
 		// made true again later.
 		if (rmMsgCtx.getMessageContext().getOperationContext() != null) {
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
@@ -113,9 +118,24 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 
 
+		FaultManager faultManager = new FaultManager();
+		RMMsgContext faultMessageContext = faultManager.checkForLastMsgNumberExceeded(rmMsgCtx);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			
+			try {
+				engine.sendFault(faultMessageContext.getMessageContext());
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not send the fault message",e);
+			}
+			
+			return;
+		}
+		
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
-
+		
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -128,9 +148,42 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
+		faultMessageContext = faultManager.checkForUnknownSequence(rmMsgCtx,sequenceId);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			
+			try {
+				engine.send(faultMessageContext.getMessageContext());
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not send the fault message",e);
+			}
+			
+			return;
+		}
+		
+		
 		//setting mustUnderstand to false.
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
+		
+		
+		//throwing a fault if the sequence is closed.
+		faultMessageContext = faultManager. checkForSequenceClosed(rmMsgCtx,sequenceId);
+		if (faultMessageContext != null) {
+			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
+			AxisEngine engine = new AxisEngine(configurationContext);
+			
+			try {
+				engine.sendFault(faultMessageContext.getMessageContext());
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not send the fault message",e);
+			}
+			
+			return;
+		}
+
+			
 		
 		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
 		
@@ -306,197 +359,25 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
 
-		//Setting the ack depending on AcksTo.
-		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
-				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
-
-		EndpointReference acksTo = new EndpointReference(acksToBean.getValue());
-		String acksToStr = acksTo.getAddress();
-
-		if (acksToStr == null || messagesStr == null)
-			throw new SandeshaException(
-					"Seqeunce properties are not set correctly");
-
-		if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
-			// send ack in the sync case, only if the last message or the
-			// ackRequested tag is present.
-			boolean ackRequired = false;
-			if (ackRequested != null || lastMessage != null)
-				ackRequired = true;
-
-			if (!ackRequired) {
-				return;
-			}
+		if (lastMessage!=null) {
+			long messageNumber = sequence.getMessageNumber().getMessageNumber();
+			SequencePropertyBean lastMessageBean = new SequencePropertyBean ();
+			lastMessageBean.setSequenceID(sequenceId);
+			lastMessageBean.setName(Sandesha2Constants.SequenceProperties.LAST_MESSAGE);
+			lastMessageBean.setValue(new Long(messageNumber).toString());
+			
+			seqPropMgr.insert(lastMessageBean);
 		}
-		AxisOperation ackOperation = null;
-
-		try {
-			ackOperation = AxisOperationFactory.getOperationDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
+		
+	 	RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(rmMsgCtx,sequenceId);
+		
+	 	AxisEngine engine = new AxisEngine (configCtx);
+	 	
+	 	try {
+			engine.send(ackRMMessage.getMessageContext());
 		} catch (AxisFault e) {
-			throw new SandeshaException("Could not create the Operation");
+			String message = "Exception thrown while trying to send the ack message";
+			throw new SandeshaException (message,e);
 		}
-
-		AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext()
-				.getAxisOperation();
-		if (rmMsgOperation != null) {
-			ArrayList outFlow = rmMsgOperation.getPhasesOutFlow();
-			if (outFlow != null) {
-				ackOperation.setPhasesOutFlow(outFlow);
-				ackOperation.setPhasesOutFaultFlow(outFlow);
-			}
-		}
-
-		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(
-				rmMsgCtx, ackOperation);
-		
-		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
-		
-		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
-		ackRMMsgCtx.setRMNamespaceValue(rmMsgCtx.getRMNamespaceValue());
-		
-		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
-
-		//Setting new envelope
-		SOAPEnvelope envelope = factory.getDefaultEnvelope();
-		try {
-			ackMsgCtx.setEnvelope(envelope);
-		} catch (AxisFault e3) {
-			throw new SandeshaException(e3.getMessage());
-		}
-
-		ackMsgCtx.setTo(acksTo);
-		ackMsgCtx.setReplyTo(msgCtx.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId);
-
-		if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
-
-			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
-					.getConfigurationContext());
-
-			//setting CONTEXT_WRITTEN since acksto is anonymous
-			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
-				//operation context will be null when doing in a GLOBAL
-				// handler.
-				try {
-					AxisOperation op = AxisOperationFactory
-							.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_IN_OUT);
-					OperationContext opCtx = new OperationContext(op);
-					rmMsgCtx.getMessageContext().setAxisOperation(op);
-					rmMsgCtx.getMessageContext().setOperationContext(opCtx);
-				} catch (AxisFault e2) {
-					throw new SandeshaException(e2.getMessage());
-				}
-			}
-
-			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-					org.apache.axis2.Constants.RESPONSE_WRITTEN,
-					Constants.VALUE_TRUE);
-
-			rmMsgCtx.getMessageContext().setProperty(
-					Sandesha2Constants.ACK_WRITTEN, "true");
-			try {
-				engine.send(ackRMMsgCtx.getMessageContext());
-			} catch (AxisFault e1) {
-				throw new SandeshaException(e1.getMessage());
-			}
-		} else {
-
-			Transaction asyncAckTransaction = storageManager.getTransaction();
-
-			SenderBeanMgr retransmitterBeanMgr = storageManager
-					.getRetransmitterBeanMgr();
-
-			String key = SandeshaUtil.getUUID();
-			
-			//dumping to the storage will be done be Sandesha2 Transport Sender
-			//storageManager.storeMessageContext(key,ackMsgCtx);
-			
-			SenderBean ackBean = new SenderBean();
-			ackBean.setMessageContextRefKey(key);
-			ackBean.setMessageID(ackMsgCtx.getMessageID());
-			ackBean.setReSend(false);
-			
-			//this will be set to true in the sender.
-			ackBean.setSend(true);
-			
-			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,
-					Sandesha2Constants.VALUE_FALSE);
-			
-			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			
-			//the internalSequenceId value of the retransmitter Table for the
-			// messages related to an incoming
-			//sequence is the actual sequence ID
-
-//			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
-//					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
-		
-//			long ackInterval = PropertyManager.getInstance()
-//					.getAcknowledgementInterval();
-			
-			Parameter param = msgCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-			
-			SandeshaPropertyBean propertyBean = null;
-			if (param!=null) {
-				propertyBean = (SandeshaPropertyBean)  param.getValue();
-			}else {
-				propertyBean = PropertyManager.getInstance().getPropertyBean();
-			}
-			
-			
-			long ackInterval = propertyBean.getAcknowledgementInaterval();
-			
-			//			if (policyBean != null) {
-//				ackInterval = policyBean.getAcknowledgementInaterval();
-//			}
-			
-			//Ack will be sent as stand alone, only after the retransmitter
-			// interval.
-			long timeToSend = System.currentTimeMillis() + ackInterval;
-
-			//removing old acks.
-			SenderBean findBean = new SenderBean();
-			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			
-			//this will be set to true in the sandesha2TransportSender.
-			findBean.setSend(true);
-			findBean.setReSend(false);
-			Collection coll = retransmitterBeanMgr.find(findBean);
-			Iterator it = coll.iterator();
-
-			if (it.hasNext()) {
-				SenderBean oldAckBean = (SenderBean) it.next();
-				timeToSend = oldAckBean.getTimeToSend();		//If there is an old ack. This ack will be sent in the old timeToSend.
-				retransmitterBeanMgr.delete(oldAckBean.getMessageID());
-			}
-			
-			ackBean.setTimeToSend(timeToSend);
-
-			storageManager.storeMessageContext(key,ackMsgCtx);
-			
-			//inserting the new ack.
-			retransmitterBeanMgr.insert(ackBean);
-
-			asyncAckTransaction.commit();
-
-			//passing the message through sandesha2sender
-
-			ackMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,ackMsgCtx.getTransportOut());
-			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
-			
-			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
-			
-			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc ());
-			
-			AxisEngine engine = new AxisEngine (configCtx);
-			try {
-				engine.send(ackMsgCtx);
-			} catch (AxisFault e) {
-				throw new SandeshaException (e.getMessage());
-			}
-			
-			SandeshaUtil.startSenderForTheSequence(configCtx,sequenceId);
-		}
-
 	}
 }

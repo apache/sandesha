@@ -22,7 +22,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.description.PolicyInclude;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
@@ -66,7 +65,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		SandeshaPropertyBean defaultPropertyBean = PropertyManager.getInstance().getPropertyBean();
 		SandeshaPropertyBean axisDescPropertyBean = RMPolicyManager.loadPoliciesFromAxisDescription(axisDescription);
 		
-		Parameter parameter = new ParameterImpl ();
+		Parameter parameter = new Parameter ();
 		parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
 		if (axisDescPropertyBean==null) {
 			parameter.setValue(defaultPropertyBean);

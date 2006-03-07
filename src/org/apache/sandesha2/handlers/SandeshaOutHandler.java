@@ -30,7 +30,6 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
@@ -106,7 +105,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,
 				"true");
-
+		
+		String dummyMessageString = (String) msgCtx.getOptions().getProperty(Sandesha2ClientAPI.DUMMY_MESSAGE);
+		boolean dummyMessage = false;
+		if (dummyMessageString!=null && Sandesha2ClientAPI.VALUE_TRUE.equals(dummyMessageString))
+			dummyMessage = true;
+		
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(context);
 
@@ -123,7 +127,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (policyParam == null) {
 			SandeshaPropertyBean propertyBean = PropertyManager.getInstance()
 					.getPropertyBean();
-			Parameter parameter = new ParameterImpl();
+			Parameter parameter = new Parameter();
 			parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
 			parameter.setValue(propertyBean);
 
@@ -233,7 +237,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 		
 		//saving the used message number
-		setNextMsgNo(context,internalSequenceId,messageNumber);
+		if (!dummyMessage)
+			setNextMsgNo(context,internalSequenceId,messageNumber);
 		
 		boolean sendCreateSequence = false;
 
@@ -419,7 +424,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 		
 		// processing the response
-		processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber);
+		if (!dummyMessage)
+			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber);
 		
 		msgCtx.pause();  // the execution will be stopped.
 		outHandlerTransaction.commit();		
@@ -659,6 +665,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 				throw new SandeshaException(message);
 			}
 
+			
+			//TODO check for highest msg no.
+			long requestMsgNo = requestSequence.getMessageNumber().getMessageNumber();
+			
+			
 			if (requestSequence.getLastMessage() != null) {
 				lastMessage = true;
 				sequence.setLastMessage(new LastMessage(factory,rmNamespaceValue));
@@ -679,7 +690,15 @@ public class SandeshaOutHandler extends AbstractHandler {
 				Object obj = msg.getProperty(Sandesha2ClientAPI.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 					lastMessage = true;
-					sequence.setLastMessage(new LastMessage(factory,rmNamespaceValue));
+					
+					SequencePropertyBean specVersionBean = sequencePropertyMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
+					if (specVersionBean==null)
+						throw new SandeshaException ("Spec version bean is not set");
+					String specVersion = specVersionBean.getValue();
+					
+					if (SpecSpecificConstants.isLastMessageIndicatorRequired(specVersion))
+						sequence.setLastMessage(new LastMessage(factory,rmNamespaceValue));
+					
 					// saving the last message no.
 					SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
 							internalSequenceId,
@@ -693,8 +712,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		AckRequested ackRequested = null;
 
 		boolean addAckRequested = false;
-		if (!lastMessage)
-			addAckRequested = true;
+		//if (!lastMessage)
+		addAckRequested = true;   //TODO decide the policy to add the ackRequested tag
 
 		// setting the Sequnece id.
 		// Set send = true/false depending on the availability of the out
@@ -730,6 +749,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		//Retransmitter bean entry for the application message
 		SenderBean appMsgEntry = new SenderBean();
 		String storageKey = SandeshaUtil.getUUID();
+		
 		appMsgEntry.setMessageContextRefKey(storageKey);
 
 		appMsgEntry.setTimeToSend(System.currentTimeMillis());

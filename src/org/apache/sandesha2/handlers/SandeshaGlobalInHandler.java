@@ -23,8 +23,10 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.ws.commons.soap.SOAPBody;
@@ -59,18 +61,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		//Quitting the message with minimum processing if not intended for RM.
 		boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
 		if (!isRMGlobalMessage) {
-			return;
-		}
-		
-
-		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager
-				.checkForPossibleFaults(msgContext);
-		if (faultMessageContext != null) {
-			ConfigurationContext configurationContext = msgContext
-					.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-			engine.send(faultMessageContext.getMessageContext());
 			return;
 		}
 
@@ -179,6 +169,23 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 						}
 					}
+				}
+			}
+		} else if (rmMsgContext.getMessageType()!=Sandesha2Constants.MessageTypes.UNKNOWN) {
+			//droping other known message types if, an suitable operation context is not available,
+			//and if a relates to value is present.
+			RelatesTo relatesTo = rmMsgContext.getRelatesTo();
+			if (relatesTo!=null) {
+				String value = relatesTo.getValue();
+				
+				//TODO do not drop, relationshipTypes other than reply
+				
+				ConfigurationContext configurationContext = rmMsgContext.getMessageContext().getConfigurationContext();
+				OperationContext opCtx = configurationContext.getOperationContext(value);
+				if (opCtx==null) {
+					String message = "Dropping duplicate RM message";
+					log.debug(message);
+					drop=true;
 				}
 			}
 		}
