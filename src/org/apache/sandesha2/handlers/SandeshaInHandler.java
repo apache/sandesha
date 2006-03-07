@@ -81,9 +81,6 @@ public class SandeshaInHandler extends AbstractHandler {
 			throw new AxisFault(message);
 		}
 
-		if (rmMsgCtx.getMessageContext().getAxisOperation().getParent()==null) {
-			System.out.println("Operation parent was null for message:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));
-		}
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());
 

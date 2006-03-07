@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:wsa="http://www.w3.org/2005/08/addressing">
       <soapenv:Header>
          <wsa:MessageID soapenv:mustUnderstand="0">uuid:c3671020-15e0-11da-9b3a-f0439d4867bd</wsa:MessageID>
          <wsa:To soapenv:mustUnderstand="0">http://localhost:8070/axis/services/TestService</wsa:To>

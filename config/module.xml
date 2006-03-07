@@ -2,7 +2,8 @@
 
     <inflow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
-            <order after="AddressingInHandler" phase="PreDispatch"/>
+            <order phase="PreDispatch" after="AddressingFinalInHandler" />
+            <!-- <order after="addressingSubmissionInHandler" phase="PreDispatch"/>  cant do this-->
         </handler> 
         <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">
             <order phase="RMPhase"/>
@@ -19,25 +20,30 @@
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         
         <!-- namespaces for the 2005-02 spec -->
-        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</parameter>
-        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</parameter>
-        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse</parameter>
         
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</actionMapping>
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</actionMapping>
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse</actionMapping>
+
         <!-- namespaces for the 2005-10 spec -->
-        <parameter name="wsamapping" locked="xsd:false">http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence</parameter>
-        <parameter name="wsamapping" locked="xsd:false">http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement</parameter>
-        <parameter name="wsamapping" locked="xsd:false">http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequenceResponse</parameter>
-    </operation>
+        
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequenceResponse</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/AckRequested</actionMapping>
+     </operation>
  
      <operation name="RMInOutOperation" mep="http://www.w3.org/2004/08/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         
         <!-- namespaces for the 2005-02 spec -->
-        <parameter name="wsamapping" locked="xsd:false">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</parameter>
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</actionMapping>
 
         <!-- namespaces for the 2005-10 spec -->
-        <parameter name="wsamapping" locked="xsd:false">http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence</parameter>
-
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequenceResponse</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequenceResponse</actionMapping>
 
     </operation>
     
