@@ -52,5 +52,6 @@ public class SimpleSandesha2Server {
 		SimpleHTTPServer server = new SimpleHTTPServer  (configContext,8080);
 		
 		server.start();
+		
 	}
 }

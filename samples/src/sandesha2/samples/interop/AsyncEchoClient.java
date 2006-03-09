@@ -29,6 +29,7 @@ import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.description.ClientUtils;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
@@ -86,7 +87,7 @@ public class AsyncEchoClient {
 			System.out.println("ERROR: Please set the directory you unzipped Sandesha2 as the first option.");
 			return;
 		}
-		
+
 		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
      
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);

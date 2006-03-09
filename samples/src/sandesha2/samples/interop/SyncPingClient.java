@@ -29,7 +29,7 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.client.reports.SequenceReport;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
