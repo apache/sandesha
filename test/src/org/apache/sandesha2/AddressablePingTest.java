@@ -35,7 +35,7 @@ import org.apache.ws.commons.om.OMNamespace;
 import org.apache.ws.commons.soap.SOAP11Constants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.client.reports.SequenceReport;
 
 import junit.framework.TestCase;
 
@@ -121,7 +121,7 @@ public class AddressablePingTest extends TestCase {
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(3)));
-		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_COMPLETED);
+		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 		
 		serviceClient.finalizeInvoke();
