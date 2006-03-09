@@ -174,7 +174,7 @@ public class Sender extends Thread {
 							// do time out processing.
 
 							// TODO uncomment below line
-							TerminateManager.terminateSendingSide(context,sequenceID, msgCtx.isServerSide());
+							TerminateManager.timeOutSendingSideSequence(context,sequenceID, msgCtx.isServerSide());
 
 							String message = "Sequence timed out";
 							log.debug(message);

@@ -80,7 +80,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			log.debug(message);
 			throw new AxisFault(message);
 		}
-
+		
 		MsgProcessor msgProcessor = MsgProcessorFactory
 				.getMessageProcessor(rmMsgCtx.getMessageType());
 

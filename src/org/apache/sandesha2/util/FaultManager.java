@@ -218,7 +218,7 @@ public class FaultManager {
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		int type = rmMessageContext.getMessageType();
 		
-		boolean validSequence = false;
+		boolean validSequence = true;
 		String reason = null;
 		
 		if (type==Sandesha2Constants.MessageTypes.ACK || 
@@ -231,7 +231,7 @@ public class FaultManager {
 			
 			Collection coll = createSeqMgr.find(createSeqFindBean);
 			if (coll.size()==0) {
-				validSequence = true;
+				validSequence = false;
 			}
 			
 		} else {
@@ -241,14 +241,18 @@ public class FaultManager {
 			Collection coll = mgr.retrieveAll();
 			Iterator it = coll.iterator();
 
+			boolean contains = false;
 			while (it.hasNext()) {
 				NextMsgBean nextMsgBean = (NextMsgBean) it.next();
 				String tempId = nextMsgBean.getSequenceID();
 				if (tempId.equals(sequenceID)) {
-					validSequence = true;
+					contains = true;
 					break;
 				}
 			}
+			
+			if (contains)
+				validSequence = true;
 		}
 		
 		String rmNamespaceValue = rmMessageContext.getRMNamespaceValue();

@@ -116,6 +116,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		Transaction terminateTransaction = storageManager.getTransaction();
 		TerminateManager.cleanReceivingSideOnTerminateMessage(context,sequenceId);
+		
+		
+		SequencePropertyBean terminatedBean = new SequencePropertyBean (
+				     sequenceId,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED,Sandesha2Constants.VALUE_TRUE);
+		
+		sequencePropertyBeanMgr.insert(terminatedBean);
+		
 		terminateTransaction.commit(); 
 		
 		SandeshaUtil.stopSenderForTheSequence(sequenceId);
@@ -125,7 +132,12 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 	
 		Transaction lastUpdatedTransaction = storageManager.getTransaction();
 		SequenceManager.updateLastActivatedTime(sequenceId,context);
+		
+		
+		
 		lastUpdatedTransaction.commit();
+		
+		
 		
 		terminateSeqRMMsg.pause();
 	}

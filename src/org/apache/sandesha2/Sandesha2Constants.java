@@ -272,12 +272,17 @@ public interface Sandesha2Constants {
 		
 		String SEQUENCE_CLOSED = "SequenceClosed";
 		
-		String LAST_MESSAGE = "LastMessage";
+		String SEQUENCE_TERMINATED = "SequenceTerminated";
 		
+		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";
+		
+		String LAST_MESSAGE = "LastMessage";
 
 		String REQUEST_SIDE_SEQUENCE_ID = "RequestSideSequenceID"; 		//used only at the server side
 		
 		String HIGHEST_MSG_NO = "HighestMessageNumber";
+		
+		
 	}
 
 	public interface SOAPVersion {

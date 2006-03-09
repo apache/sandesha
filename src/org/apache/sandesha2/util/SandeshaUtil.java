@@ -806,5 +806,25 @@ public class SandeshaUtil {
 	
 			return specVersionBean.getValue();
 	}
-
+	
+	
+//	public static boolean inNumberPresentInList (String list, long no) throws SandeshaException {
+//		
+//	}
+//
+//	public static String putNumberToList (String list, long no) throws SandeshaException {
+//		StringTokenizer tokenizer = new StringTokenizer (list,Sandesha2Constants.LIST_SEPERATOR);
+//		
+//		while (tokenizer.hasMoreElements()){
+//			String element = tokenizer.nextToken();
+//			String[] items = element.split(Sandesha2Constants.LIST_ITEM_SEPERATOR);
+//			if (items.length!=1 && items.length!=2)
+//				throw new SandeshaException ("Invalid string array");
+//			
+//			
+//		}
+//		
+//	}
+	
+	
 }

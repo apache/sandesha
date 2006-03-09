@@ -8,6 +8,8 @@ package org.apache.sandesha2.util;
 
 import java.util.Collection;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -17,6 +19,8 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -212,13 +216,35 @@ public class SequenceManager {
 			}
 		}
 		//Default value for acksTo is anonymous  (this happens only for the client side)
-		if (acksToBean==null) {
+		if (acksTo==null) {
 			acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
-
-			EndpointReference acksToEPR = new EndpointReference(acksTo);
-		    acksToBean = new SequencePropertyBean(
+		}
+		
+	    acksToBean = new SequencePropertyBean(
 				internalSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
-				acksToEPR.getAddress());
+				acksTo);
+	    
+		//start the in listner for the client side, if acksTo is not anonymous.
+		if (!firstAplicationMsgCtx.isServerSide()  && !Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+		    
+			String transportInProtocol = firstAplicationMsgCtx.getOptions().getTransportInProtocol();
+		    if (transportInProtocol==null) {
+		    	throw new SandeshaException ("You must mention the transport in protocol for getting async acknowledgement messages");
+		    }
+		   
+            try {
+				ListenerManager listenerManager =
+				    firstAplicationMsgCtx.getConfigurationContext().getListenerManager();
+				TransportInDescription transportIn = firstAplicationMsgCtx.getConfigurationContext().getAxisConfiguration().getTransportIn(new QName(transportInProtocol));
+				//if acksTo is not anonymous start the in-transport
+				if (!listenerManager.isListenerRunning(transportIn.getName().getLocalPart())) {
+					listenerManager.addListener(transportIn, false);
+				}
+			} catch (AxisFault e) {
+				throw new SandeshaException ("Could not stast the transport listner",e);
+			}
+			
+			
 		}
 		
 		SequencePropertyBean msgsBean = new SequencePropertyBean();

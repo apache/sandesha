@@ -162,29 +162,43 @@ public class AcknowledgementManager {
 	 * @param outGoingMessage
 	 * @return
 	 */
-	public static ArrayList getClientCompletedMessagesList (String sequenceIdentifier,ConfigurationContext configurationContext) throws SandeshaException {
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-		
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
-		
+	public static ArrayList getClientCompletedMessagesList (String sequenceID,SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
+	
 		//first trying to get it from the internal sequence id.
-		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceIdentifier,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 		String internalSequenceID = null;
 		if (internalSequenceBean!=null)
 			internalSequenceID = internalSequenceBean.getValue();
 		
 		SequencePropertyBean completedMessagesBean = null;
 		if (internalSequenceID!=null)
-			completedMessagesBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
+			completedMessagesBean = seqPropMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 		
 		if (completedMessagesBean==null)
-			completedMessagesBean = sequencePropertyBeanMgr.retrieve(sequenceIdentifier,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
+			completedMessagesBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 		
 		ArrayList completedMsgList = null;
 		if (completedMessagesBean!=null) {
 			completedMsgList = SandeshaUtil.getArrayListFromString(completedMessagesBean.getValue());
 		} else {
-			String message = "Completed messages bean is null, for the sequence " + sequenceIdentifier;
+			String message = "Completed messages bean is null, for the sequence " + sequenceID;
+			throw new SandeshaException (message);
+		}
+		
+		return completedMsgList;
+	}
+	
+	public static ArrayList getServerCompletedMessagesList (String sequenceID,SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
+				
+		SequencePropertyBean completedMessagesBean = null;
+
+		completedMessagesBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
+		
+		ArrayList completedMsgList = null;
+		if (completedMessagesBean!=null) {
+			completedMsgList = SandeshaUtil.getArrayListFromString(completedMessagesBean.getValue());
+		} else {
+			String message = "Completed messages bean is null, for the sequence " + sequenceID;
 			throw new SandeshaException (message);
 		}
 		

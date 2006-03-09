@@ -133,6 +133,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		
+		createSeqBean.setSequenceID(newOutSequenceId);
+		createSeqMgr.update(createSeqBean);
 
 		//deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);

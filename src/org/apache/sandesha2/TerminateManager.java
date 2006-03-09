@@ -33,7 +33,7 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.client.reports.SequenceReport;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -191,10 +191,82 @@ public class TerminateManager {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED,Sandesha2Constants.VALUE_TRUE);
+		seqPropMgr.insert(seqTerminatedBean);
+		
+		cleanSendingSideData(configContext,sequenceID,serverSide);
+		
+		
+	}
+	
+	
+	
+	private static void doUpdatesIfNeeded (String sequenceID, SequencePropertyBean propertyBean, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
+		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES)) {
+			
+			//this value cannot be completely deleted since this data will be needed by SequenceReports
+			//so saving it with the sequenceID value being the out sequenceID.
+			
+			SequencePropertyBean newBean = new SequencePropertyBean ();
+			newBean.setSequenceID(sequenceID);
+			newBean.setName(propertyBean.getName());
+			newBean.setValue(propertyBean.getValue());
+
+			seqPropMgr.insert(newBean);
+			//TODO amazingly this property does not seem to get deleted without following - in the hibernate impl 
+			//(even though the lines efter current methodcall do this).
+			seqPropMgr.delete (propertyBean.getSequenceID(),propertyBean.getName());			
+		}
+	}
+	
+	private static boolean isProportyDeletable (String name) {
+		boolean deleatable = true;
+				
+		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED.equals(name))
+			deleatable = false;
+		
+		if (Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT.equals(name))
+			deleatable = false;
+		
+		return deleatable;
+	}
+	
+	public static void timeOutSendingSideSequence (ConfigurationContext context,String sequenceID, boolean serverside) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+		
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT,Sandesha2Constants.VALUE_TRUE);
+		seqPropMgr.insert(seqTerminatedBean);
+		
+		
+		cleanSendingSideData(context,sequenceID,serverside);
+	}
+	
+	private static void cleanSendingSideData (ConfigurationContext configContext,String sequenceID, boolean serverSide) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
+		
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 		
+		SequencePropertyBean sequenceTerminatedBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED,Sandesha2Constants.VALUE_TRUE);
+		sequencePropertyBeanMgr.insert(sequenceTerminatedBean);
 		
 		if (!serverSide) {
 			//stpoing the listner for the client side.	
@@ -214,7 +286,6 @@ public class TerminateManager {
 					}
 				}
 			}
-			
 		}
 		
 		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
@@ -258,43 +329,6 @@ public class TerminateManager {
 		}
 		
 		SandeshaUtil.stopSenderForTheSequence(internalSequenceId);
-		
-	}
-	
-	private static void doUpdatesIfNeeded (String sequenceID, SequencePropertyBean propertyBean, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
-		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES)) {
-			
-			//this value cannot be completely deleted since this data will be needed by SequenceReports
-			//so saving it with the sequenceID value being the out sequenceID.
-			
-			SequencePropertyBean newBean = new SequencePropertyBean ();
-			newBean.setSequenceID(sequenceID);
-			newBean.setName(propertyBean.getName());
-			newBean.setValue(propertyBean.getValue());
-
-			seqPropMgr.insert(newBean);
-			//TODO amazingly this property does not seem to get deleted without following - in the hibernate impl 
-			//(even though the lines efter current methodcall do this).
-			seqPropMgr.delete (propertyBean.getSequenceID(),propertyBean.getName());			
-		}
-	}
-	
-	private static boolean isProportyDeletable (String name) {
-		boolean deleatable = true;
-				
-		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
-			deleatable = false;
-		
-		if (Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED.equals(name))
-			deleatable = false;
-		
-		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))
-			deleatable = false;
-		
-		if (Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION.equals(name))
-			deleatable = false;
-		
-		return deleatable;
 	}
 	
 

@@ -17,37 +17,27 @@
 package org.apache.sandesha2.client;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.AcknowledgementManager;
-import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
-import org.apache.sandesha2.TerminateManager;
-import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
+import org.apache.sandesha2.client.reports.RMReport;
+import org.apache.sandesha2.client.reports.SequenceReport;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
-import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
-
-import com.sun.corba.se.internal.core.ServiceContext;
 
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
@@ -72,45 +62,152 @@ public class Sandesha2ClientAPI {
 	public static String VALUE_FALSE = "false";
 	
 	public static SequenceReport getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
-	SequenceReport sequenceReport = new SequenceReport ();
+		
+		SequenceReport sequenceReport = new SequenceReport ();
+		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-		SequencePropertyBeanMgr seqpPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		
 		Transaction reportTransaction = storageManager.getTransaction();
-		SequencePropertyBean findBean =  new SequencePropertyBean ();
-		findBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-		findBean.setValue(internalSequenceID);
-		SequencePropertyBean internalSequenceBean = seqpPropMgr.findUnique(findBean);
 		
-		if (internalSequenceBean==null) {
-			log.debug("internal sequence bean is null.");
-			throw new SandeshaException ("Data not available to give the sequence report");
+		CreateSeqBean createSeqFindBean = new CreateSeqBean ();
+		createSeqFindBean.setInternalSequenceID(internalSequenceID);
+		
+		CreateSeqBean createSeqBean = createSeqMgr.findUnique(createSeqFindBean);
+		
+		if (createSeqBean==null) {
+			//check weather this is an terminated sequence.
+			if (isTerminatedSequence(internalSequenceID,seqPropMgr)) {
+				fillTerminatedOutgoingSequenceInfo (sequenceReport,internalSequenceID,seqPropMgr);
+				
+				return sequenceReport;
+			}
+			
+			if (isTimedOutSequence(internalSequenceID,seqPropMgr)) {
+				fillTimedoutOutgoingSequenceInfo (sequenceReport,internalSequenceID,seqPropMgr);
+				
+				return sequenceReport;
+			}
+			
+			String message = "Unrecorder internalSequenceID";
+			log.debug(message);
+			return null;
 		}
 		
-		String sequenceID = internalSequenceBean.getSequenceID();
-		
-		//finding the actual seq
-		ArrayList completedMessageList =  AcknowledgementManager.getClientCompletedMessagesList (sequenceID,configurationContext);
-		
-		Iterator iter = completedMessageList.iterator();
-		while (iter.hasNext()) {
-			Long lng = new Long (Long.parseLong((String) iter.next()));
-			sequenceReport.addCompletedMessage(lng);
+		String outSequenceID = createSeqBean.getSequenceID();
+		if (outSequenceID==null) {
+			 sequenceReport.setInternalSequenceID(internalSequenceID);
+			 sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
+			 sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
+			 
+			 return sequenceReport;
 		}
 		
-		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
-		boolean completed  = SequenceManager.isOutGoingSequenceCompleted(internalSequenceID,configurationContext);
-		if (completed)
-			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_COMPLETED);
+		sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
 		
-		//TODO complete
-		
+		fillOutgoingSequenceInfo(sequenceReport,outSequenceID,seqPropMgr);
 		
 		reportTransaction.commit();
 		
 		return sequenceReport;	
 	}
+	
+	private static boolean isTerminatedSequence (String internalSequenceID, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException { 
+		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean ();
+		internalSequenceFindBean.setValue(internalSequenceID);
+		internalSequenceFindBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		
+		SequencePropertyBean internalSequenceBean = seqPropMgr.findUnique(internalSequenceFindBean);
+		if (internalSequenceBean==null) {
+			String message = "Internal sequence Bean is not available for the given sequence";
+			log.debug (message);
+			
+			return false;
+		}
+		
+		String outSequenceID = internalSequenceBean.getSequenceID();
+	
+		SequencePropertyBean sequenceTerminatedBean = seqPropMgr.retrieve(outSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED);
+		if (sequenceTerminatedBean!=null && Sandesha2Constants.VALUE_TRUE.equals(sequenceTerminatedBean.getValue())) {
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
+	private static boolean isTimedOutSequence (String internalSequenceID, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException { 
+		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean ();
+		internalSequenceFindBean.setValue(internalSequenceID);
+		internalSequenceFindBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		
+		SequencePropertyBean internalSequenceBean = seqPropMgr.findUnique(internalSequenceFindBean);
+		if (internalSequenceBean==null) {
+			String message = "Internal sequence Bean is not available for the given sequence";
+			log.debug (message);
+			
+			return false;
+		}
+		
+		String outSequenceID = internalSequenceBean.getSequenceID();
+	
+		SequencePropertyBean sequenceTerminatedBean = seqPropMgr.retrieve(outSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT);
+		if (sequenceTerminatedBean!=null && Sandesha2Constants.VALUE_TRUE.equals(sequenceTerminatedBean.getValue())) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private static void fillTerminatedOutgoingSequenceInfo (SequenceReport report,String internalSequenceID,SequencePropertyBeanMgr seqPropMgr) throws SandeshaException  { 
+		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean ();
+		internalSequenceFindBean.setValue(internalSequenceID);
+		internalSequenceFindBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		
+		SequencePropertyBean internalSequenceBean = seqPropMgr.findUnique(internalSequenceFindBean);
+		if (internalSequenceBean==null) {
+			String message = "Not a valid terminated sequence. Internal sequence Bean is not available for the given sequence";
+			log.debug (message);
+			
+			throw new SandeshaException (message);
+		}
+		
+		report.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		
+		String outSequenceID = internalSequenceBean.getSequenceID();
+		fillOutgoingSequenceInfo(report,outSequenceID,seqPropMgr);
+	}
+	
+	private static void fillTimedoutOutgoingSequenceInfo (SequenceReport report,String internalSequenceID, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException  { 
+		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean ();
+		internalSequenceFindBean.setValue(internalSequenceID);
+		internalSequenceFindBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		
+		SequencePropertyBean internalSequenceBean = seqPropMgr.findUnique(internalSequenceFindBean);
+		if (internalSequenceBean==null) {
+			String message = "Not a valid timedOut sequence. Internal sequence Bean is not available for the given sequence";
+			log.debug (message);
+			
+			throw new SandeshaException (message);
+		}
+		
+		report.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_TIMED_OUT);
+		String outSequenceID = internalSequenceBean.getSequenceID();
+		fillOutgoingSequenceInfo(report,outSequenceID,seqPropMgr);
+	}
+	
+	private static void fillOutgoingSequenceInfo (SequenceReport report,String outSequenceID, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException  { 
+		ArrayList completedMessageList =  AcknowledgementManager.getClientCompletedMessagesList (outSequenceID,seqPropMgr);
+		
+		Iterator iter = completedMessageList.iterator();
+		while (iter.hasNext()) {
+			Long lng = new Long (Long.parseLong((String) iter.next()));
+			report.addCompletedMessage(lng);
+		}
+	}
+	
 	
 	public static SequenceReport getOutgoingSequenceReport (String to, String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
 		
@@ -119,11 +216,14 @@ public class Sandesha2ClientAPI {
 	
 	}
 	
-	public static SequenceReport getIncomingSequenceReport (String sequenceID,ConfigurationContext configurationContext) throws SandeshaException {
+	public static SequenceReport getIncomingSequenceReport (String sequenceID,ConfigurationContext configCtx) throws SandeshaException {
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		
 		SequenceReport sequenceReport = new SequenceReport ();
 
-		ArrayList completedMessageList =  AcknowledgementManager.getClientCompletedMessagesList (sequenceID,configurationContext);
+		ArrayList completedMessageList =  AcknowledgementManager.getServerCompletedMessagesList (sequenceID,seqPropMgr);
 
 		Iterator iter = completedMessageList.iterator();
 		while (iter.hasNext()) {
@@ -132,18 +232,91 @@ public class Sandesha2ClientAPI {
 		}
 		
 		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_IN);
-		boolean completed  = SequenceManager.isIncomingSequenceCompleted(sequenceID,configurationContext);
-		if (completed)
-			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_COMPLETED);
-		
-		//TODO complete
-		
+
+		sequenceReport.setSequenceStatus(getServerSequenceStatus (sequenceID,storageManager));
+	
 		return sequenceReport;
 	}
 	
-	public static RMReport getRMReport1 () {
+	private static byte getServerSequenceStatus (String sequenceID,StorageManager storageManager) throws SandeshaException {
+		
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean terminatedBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED);
+		if (terminatedBean!=null) {
+			return SequenceReport.SEQUENCE_STATUS_TERMINATED;
+		}
+		
+		SequencePropertyBean timedOutBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT);
+		if (timedOutBean!=null) {
+			return SequenceReport.SEQUENCE_STATUS_TIMED_OUT;
+		}
+		
+		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+		NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceID);
+		
+		if (nextMsgBean!=null) {
+			return SequenceReport.SEQUENCE_STATUS_ESTABLISHED;
+		}
+		
+		throw new SandeshaException ("Unrecorded sequenceID");
+	}
+	
+	/**
+	 * RM Report gives the details of incoming and outgoing sequences.
+	 * The outgoing sequence have to pass the initial state (CS/CSR exchange) to be included in a RMReport
+	 * 
+	 * @param configurationContext
+	 * @return
+	 * @throws SandeshaException
+	 */
+	public static RMReport getRMReport (ConfigurationContext configurationContext) throws SandeshaException {
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		
 		RMReport rmReport = new RMReport ();
+
+		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean ();
+		internalSequenceFindBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+		
+		Collection collection = seqPropMgr.find(internalSequenceFindBean);
+		Iterator iterator = collection.iterator();
+		while (iterator.hasNext()) {
+			SequencePropertyBean bean = (SequencePropertyBean) iterator.next();
+			String sequenceID = bean.getSequenceID();
+			rmReport.addToOutgoingSequenceList (sequenceID);
+			rmReport.addToOutgoingInternalSequenceMap(sequenceID,bean.getValue());
+			
+			SequenceReport report = getOutgoingSequenceReport(bean.getValue(),configurationContext);
+			
+			rmReport.addToNoOfCompletedMessagesMap(sequenceID ,report.getCompletedMessages().size());
+			rmReport.addToSequenceStatusMap(sequenceID ,report.getSequenceStatus());
+		}
+		
+		
+		//incoming sequences
+		SequencePropertyBean serverCompletedMsgsFindBean = new SequencePropertyBean ();
+		serverCompletedMsgsFindBean.setName(Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
+		
+		Collection serverCompletedMsgsBeans = seqPropMgr.find(serverCompletedMsgsFindBean);
+		Iterator iter = serverCompletedMsgsBeans.iterator();
+		while (iter.hasNext()) {
+			SequencePropertyBean serverCompletedMsgsBean = (SequencePropertyBean) iter.next();
+			String sequenceID = serverCompletedMsgsBean.getSequenceID();
+			rmReport.addToIncomingSequenceList(sequenceID);
+			
+			SequenceReport sequenceReport = getIncomingSequenceReport(sequenceID,configurationContext);
+			
+			rmReport.addToNoOfCompletedMessagesMap(sequenceID,sequenceReport.getCompletedMessages().size());
+			rmReport.addToSequenceStatusMap(sequenceID,sequenceReport.getSequenceStatus());
+		}
+		
 		return rmReport;
+	}
+	
+	public String InternalSequenceID (String to, String sequenceKey) {
+		return SandeshaUtil.getInternalSequenceID(to,sequenceKey);
 	}
 	
 
