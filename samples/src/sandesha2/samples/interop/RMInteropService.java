@@ -22,7 +22,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.sandesha2.SandeshaException;
 import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
@@ -43,9 +42,9 @@ public class RMInteropService {
 		OMElement sequenceElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Sequence));
 		
 		if (textElem==null)
-			throw new SandeshaException ("'Text' element is not present as a child of the 'echoString' element");
+			throw new Exception ("'Text' element is not present as a child of the 'echoString' element");
 		if (sequenceElem==null)
-			throw new SandeshaException ("'Sequence' element is not present as a child of the 'echoString' element");
+			throw new Exception ("'Sequence' element is not present as a child of the 'echoString' element");
 		
 		String textStr = textElem.getText();
 		String sequenceStr = sequenceElem.getText();
