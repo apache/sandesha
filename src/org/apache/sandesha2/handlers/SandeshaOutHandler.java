@@ -121,6 +121,16 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (!(rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.UNKNOWN)) {
 			return;
 		}
+		
+		MessageContext requestMessageCtx = msgCtx.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+		if (requestMessageCtx!=null) {
+			RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMessageCtx);
+			Sequence reqSeqPart = (Sequence) reqRMMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			if (reqSeqPart==null) {
+				//this is not a rm intended message
+				return;
+			}
+		}
 
 		Parameter policyParam = msgCtx
 				.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
