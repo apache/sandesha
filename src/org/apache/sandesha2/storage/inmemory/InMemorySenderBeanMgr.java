@@ -167,7 +167,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 	}
 
 	public synchronized boolean update(SenderBean bean) {
-		if (!table.contains(bean))
+		if (table.get(bean.getMessageID())==null)
 			return false;
 
 		return true; //No need to update. Being a reference does the job.

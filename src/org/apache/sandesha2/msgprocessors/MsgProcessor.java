@@ -28,5 +28,6 @@ import org.apache.sandesha2.SandeshaException;
  */
 
 public interface MsgProcessor {
-	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException;
+	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException;
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException;
 }

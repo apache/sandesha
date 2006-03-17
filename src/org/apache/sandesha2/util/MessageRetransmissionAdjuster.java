@@ -45,43 +45,28 @@ public class MessageRetransmissionAdjuster {
 		String storedKey = (String) retransmitterBean.getMessageContextRefKey();
 
 		if (storedKey == null)
-			return retransmitterBean;
+			throw new SandeshaException ("Stored Key not present in the retransmittable message");
 
 		MessageContext messageContext = storageManager.retrieveMessageContext(storedKey,configContext);
 
-		if (messageContext.getConfigurationContext() == null)
-			return retransmitterBean;
 
-//		RMPolicyBean policyBean = (RMPolicyBean) messageContext
-//				.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
-//		if (policyBean == null) {
-//			//loading default policies.
-//			policyBean = PropertyManager.getInstance().getRMPolicyBean();
-//		}
-
-		Parameter parameter =  messageContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-		if (parameter==null) {
-			//log.error ("Cant adjust retransmission since, Parameter bean is not set");
-			return retransmitterBean;
-		}
-		
-		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
+		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropretyBean(messageContext);
 		
 		
 		//TODO make MaxRetransmissionCount a policy
-		int maxRetransmissionCount = Sandesha2Constants.Properties.DefaultValues.RetransmissionCount;
-		if (retransmitterBean.getSentCount()>maxRetransmissionCount) {
-			log.debug("Stopping retransmission since maximum retransmission was exceeded");
-			retransmitterBean.setSend(false);
-			
-			//TODO do reporting and cleaning since this sequence will not work correctly after this.
-		}
+//		int maxRetransmissionCount = Sandesha2Constants.Properties.DefaultValues.RetransmissionCount;
+//		if (retransmitterBean.getSentCount()>maxRetransmissionCount) {
+//			log.debug("Stopping retransmission since maximum retransmission was exceeded");
+//			retransmitterBean.setSend(false);
+//			
+//			//TODO do reporting and cleaning since this sequence will not work correctly after this.
+//		}
 		
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);
 
-		if (retransmitterBean.getSentCount() >= Sandesha2Constants.MAXIMUM_RETRANSMISSION_ATTEMPTS)
-			stopRetransmission(retransmitterBean);
+//		if (retransmitterBean.getSentCount() >= Sandesha2Constants.MAXIMUM_RETRANSMISSION_ATTEMPTS)
+//			stopRetransmission(retransmitterBean);
 
 		return retransmitterBean;
 	}
@@ -97,7 +82,7 @@ public class MessageRetransmissionAdjuster {
 	private SenderBean adjustNextRetransmissionTime(
 			SenderBean retransmitterBean, SandeshaPropertyBean propertyBean) {
 
-		long lastSentTime = retransmitterBean.getTimeToSend();
+//		long lastSentTime = retransmitterBean.getTimeToSend();
 
 		int count = retransmitterBean.getSentCount();
 

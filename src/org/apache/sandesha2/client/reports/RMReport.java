@@ -84,7 +84,7 @@ public class RMReport {
 	}
 	
 	public void addToOutgoingInternalSequenceMap (String outSequenceID, String internalSequenceID) {
-		outgoingInternalSequenceIDMap.put(outSequenceID,outSequenceID);
+		outgoingInternalSequenceIDMap.put(outSequenceID,internalSequenceID);
 	}
 	
 }

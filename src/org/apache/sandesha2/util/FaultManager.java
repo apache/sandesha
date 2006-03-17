@@ -98,39 +98,43 @@ public class FaultManager {
 		boolean refuseSequence = false;
 		String reason = "";
 
-		SequenceOffer offer = createSequence.getSequenceOffer();
-		if (offer != null) {
-	
-			String offeredSequenceId = offer.getIdentifer().getIdentifier();
-			if (offeredSequenceId == null || "".equals(offeredSequenceId)) {
-				refuseSequence = true;
-				reason = "Offered sequenceId is invalid";
-			}
-
-			if (!refuseSequence) {
-				NextMsgBeanMgr nextMsgBeanMgr = storageManager
-						.getNextMsgBeanMgr();
-				Collection collection = nextMsgBeanMgr.retrieveAll();
-				Iterator it = collection.iterator();
-				while (it.hasNext()) {
-
-					//checking weather an outgoing sequence with the given id exists.
-					SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
-							.getSequencePropretyBeanMgr();
-					SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr
-							.retrieve(offeredSequenceId,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-					if (sequencePropertyBean != null) {
-						String outSequenceId = (String) sequencePropertyBean.getValue();
-					if (outSequenceId != null && outSequenceId.equals(offeredSequenceId)) {
-						refuseSequence = true;
-						reason = "An sequence with offered sequenceId has been already established";
-					}
-
-				}
-			}
-			}
-			
-		}
+//		SequenceOffer offer = createSequence.getSequenceOffer();
+//		if (offer != null) {
+//	
+//			String offeredSequenceId = offer.getIdentifer().getIdentifier();
+//			if (offeredSequenceId == null || "".equals(offeredSequenceId)) {
+//				refuseSequence = true;
+//				reason = "Offered sequenceId is invalid";
+//			}
+//
+//			if (!refuseSequence) {
+//				NextMsgBeanMgr nextMsgBeanMgr = storageManager
+//						.getNextMsgBeanMgr();
+//				Collection collection = nextMsgBeanMgr.retrieveAll();
+//				Iterator it = collection.iterator();
+//				while (it.hasNext()) {
+//
+//					NextMsgBean nextMsgBean = (NextMsgBean) it.next();
+//					String tempSequenceID = nextMsgBean.getSequenceID();
+//					
+//					if (tempSequenceID.equals(offeredSequenceId)) {
+//						refuseSequence = true;
+//						reason = "An incoming sequence with offered sequenceId has been already established";
+//					}
+//
+//				}
+//				
+//				SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
+//						.getSequencePropretyBeanMgr();
+//				SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr
+//						.retrieve(offeredSequenceId,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+//				if (sequencePropertyBean != null) {
+//					refuseSequence = true;
+//					reason = "A outgoing sequence with offered sequenceId has been already established";
+//				}
+//			}
+//			
+//		}
 
 		if (refuseSequence) {
 			FaultData data = new FaultData();

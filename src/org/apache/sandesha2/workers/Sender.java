@@ -193,24 +193,22 @@ public class Sender extends Thread {
 							.getTransportOut();
 					TransportSender transportSender = transportOutDescription
 							.getSender();
+					
+					boolean successfullySent = false;
 					if (transportSender != null) {
-						transportSender.invoke(msgCtx);
+						try {
+							transportSender.invoke(msgCtx);
+							successfullySent = true;
+						} catch (AxisFault e) {
+							// TODO Auto-generated catch block
+						    log.debug("Could not send message");
+							log.debug(e.getStackTrace().toString());
+						}
 					}
 
-					
-					
-					
 					Transaction postSendTransaction = storageManager.getTransaction();
 
 					MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
-
-					if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-						Sequence sequence = (Sequence) rmMsgCtx
-								.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-						long messageNo = sequence.getMessageNumber()
-								.getMessageNumber();
-					}
-
 					retransmitterAdjuster.adjustRetransmittion(bean, context);
 
 					// update or delete only if the object is still present.
@@ -227,8 +225,10 @@ public class Sender extends Thread {
 
 					postSendTransaction.commit(); // commiting the current transaction
 
-					if (!msgCtx.isServerSide())
-						checkForSyncResponses(msgCtx);
+					if (successfullySent) {
+						if (!msgCtx.isServerSide())
+							checkForSyncResponses(msgCtx);
+					}
 
 					Transaction terminateCleaningTransaction = storageManager
 							.getTransaction();
@@ -240,16 +240,7 @@ public class Sender extends Thread {
 								.getIdentifier();
 						ConfigurationContext configContext = msgCtx
 								.getConfigurationContext();
-
 						TerminateManager.terminateSendingSide(configContext,sequenceID, msgCtx.isServerSide());
-
-						// removing a entry from the Listener
-						String transport = msgCtx.getTransportOut().getName()
-								.getLocalPart();
-
-						// TODO complete below. Need a more eligent method which
-						// finishes the current message before ending.
-						// ListenerManager.stop(configContext,transport);
 					}
 
 					terminateCleaningTransaction.commit();
@@ -258,7 +249,8 @@ public class Sender extends Thread {
 
 			} catch (AxisFault e) {
 				String message = "An Exception was throws in sending";
-				log.error(e.getMessage());
+				log.debug(message);
+				log.debug(e.getMessage());
 
 				// TODO : when this is the client side throw the exception to
 				// the client when necessary.

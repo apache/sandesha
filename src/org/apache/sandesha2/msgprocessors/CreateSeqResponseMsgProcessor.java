@@ -62,12 +62,13 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	
 	private Log log = LogFactory.getLog(getClass());
 	
-	public void processMessage(RMMsgContext createSeqResponseRMMsgCtx)
+	public void processInMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {
 		
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
 				.getSOAPVersion(createSeqResponseRMMsgCtx.getSOAPEnvelope()));
 
+		MessageContext createSeqResponseMsg = createSeqResponseRMMsgCtx.getMessageContext();
 		ConfigurationContext configCtx = createSeqResponseRMMsgCtx
 			.getMessageContext().getConfigurationContext();		
 		StorageManager storageManager = SandeshaUtil
@@ -80,7 +81,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck != null) {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
-			ackProcessor.processMessage(createSeqResponseRMMsgCtx);
+			ackProcessor.processInMessage(createSeqResponseRMMsgCtx);
 		}
 
 		ackProcessTransaction.commit();
@@ -169,7 +170,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			//TODO this should be detected in the Fault manager.
 			if (offeredSequenceBean == null) {
-				String message = "No offered sequence. But an accept was received"; 
+				String message = "No offered sequence entry. But an accept was received"; 
 				log.debug(message);
 				throw new SandeshaException(message);
 			}
@@ -191,6 +192,22 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 			nextMsgMgr.insert(nextMsgBean);
+			
+			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
+			
+			SequencePropertyBean specVersionBean = new SequencePropertyBean (
+					offeredSequenceId,Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION,rmSpecVersion);
+			sequencePropMgr.insert(specVersionBean);
+			
+			SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
+					offeredSequenceId, Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
+			sequencePropMgr.insert(receivedMsgBean);
+			
+			SequencePropertyBean msgsBean = new SequencePropertyBean();
+			msgsBean.setSequenceID(offeredSequenceId);
+			msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
+			msgsBean.setValue("");
+			sequencePropMgr.insert(msgsBean);
 		}
 
 		offerProcessTransaction.commit();
@@ -272,5 +289,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 						"false");
 
 		createSeqResponseRMMsgCtx.pause();
+	}
+	
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+		
 	}
 }

@@ -96,7 +96,7 @@ public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 	}
 
 	public synchronized boolean update(InvokerBean bean) {
-		if (!table.contains(bean))
+		if (table.get(bean.getMessageContextRefKey())==null)
 			return false;
 
 		return table.put(bean.getMessageContextRefKey(), bean) != null;

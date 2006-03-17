@@ -65,7 +65,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 	}
 
 	public synchronized boolean update(CreateSeqBean bean) {
-		if (!table.contains(bean))
+		if (table.get(bean.getCreateSeqMsgID())==null)
 			return false;
 
 		return table.put(bean.getCreateSeqMsgID(), bean) != null;

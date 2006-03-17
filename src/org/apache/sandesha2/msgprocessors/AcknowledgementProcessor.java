@@ -32,10 +32,12 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -62,7 +64,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 
 	Log log = LogFactory.getLog(getClass());
 	
-	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
 		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
@@ -73,6 +75,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		}
 		
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
+		ConfigurationContext configCtx = msgCtx.getConfigurationContext();
 		
 		AbstractContext context = rmMsgCtx.getContext();
 		if (context == null) {
@@ -231,41 +234,48 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		seqPropMgr.update(allCompletedMsgsBean);
 		
 		//If all messages up to last message have been acknowledged. Add terminate Sequence message.
-		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
-				internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE);
-		if (lastOutMsgBean != null) {
-			Long lastOutMsgNoLng = new Long (lastOutMsgBean.getValue());
-			if (lastOutMsgNoLng == null) {
-				String message = "Invalid object set for the Last Out Message";
-				log.debug(message);
-				throw new SandeshaException(message);
+//		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
+//				internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE);
+//		if (lastOutMsgBean != null) {
+//			Long lastOutMsgNoLng = new Long (lastOutMsgBean.getValue());
+//			if (lastOutMsgNoLng == null) {
+//				String message = "Invalid object set for the Last Out Message";
+//				log.debug(message);
+//				throw new SandeshaException(message);
+//			}
+//			
+//			long lastOutMessageNo = lastOutMsgNoLng.longValue();
+//			if (lastOutMessageNo <= 0) {
+//				String message = "Invalid value set for the last out message";
+//				log.debug(message);
+//				throw new SandeshaException(message);
+//			}
+
+		
+		
+		//commiting transaction
+		ackTransaction.commit();
+		
+		String lastOutMsgNoStr = SandeshaUtil.getSequenceProperty(internalSequenceId,Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO,configCtx);
+		if (lastOutMsgNoStr!=null ) {
+			long highestOutMsgNo = 0;
+			if (lastOutMsgNoStr!=null) {
+				highestOutMsgNo = Long.parseLong(lastOutMsgNoStr);
 			}
 			
-			long lastOutMessageNo = lastOutMsgNoLng.longValue();
-			if (lastOutMessageNo <= 0) {
-				String message = "Invalid value set for the last out message";
-				log.debug(message);
-				throw new SandeshaException(message);
-			}
-
-
-			//commiting transaction
-			ackTransaction.commit();
-
-			boolean complete = SandeshaUtil.verifySequenceCompletion(
-					sequenceAck.getAcknowledgementRanges().iterator(),
-					lastOutMessageNo);
+			if (highestOutMsgNo>0) {
+				boolean complete = AcknowledgementManager.verifySequenceCompletion (
+				sequenceAck.getAcknowledgementRanges().iterator(),highestOutMsgNo);
 			
-			if (complete) {
-				addTerminateSequenceMessage(rmMsgCtx, outSequenceId,internalSequenceId);
+				if (complete) 
+					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, outSequenceId,internalSequenceId);
 			}
 		}
-	
+		
 		//stopping the progress of the message further.
 		rmMsgCtx.pause();	
-		
-
 	}
+	
 
 	private SenderBean getRetransmitterEntry(Collection collection,
 			long msgNo) {
@@ -279,121 +289,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		return null;
 	}
 
-	public void addTerminateSequenceMessage(RMMsgContext incomingAckRMMsg,
-			String outSequenceId, String internalSequenceId)
-			throws SandeshaException {
 
-		
-		ConfigurationContext configurationContext = incomingAckRMMsg.getMessageContext().getConfigurationContext();
-		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(configurationContext);
-
-		Transaction addTerminateSeqTransaction = storageManager.getTransaction();
-		
-		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
-
-		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceId,
-				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-
-		if (terminated != null && terminated.getValue() != null
-				&& "true".equals(terminated.getValue())) {
-			String message = "Terminate was added previously.";
-			log.info(message);
-			return;
-		}
-
-		RMMsgContext terminateRMMessage = RMMsgCreator
-				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId,internalSequenceId);
-		terminateRMMessage.setFlow(MessageContext.OUT_FLOW);
-		terminateRMMessage.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
-		
-		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
-				Sandesha2Constants.SequenceProperties.TO_EPR);
-
-		EndpointReference toEPR = new EndpointReference ( toBean.getValue());
-		if (toEPR == null) {
-			String message = "To EPR has an invalid value";
-			throw new SandeshaException(message);
-		}
-
-		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
-		terminateRMMessage.setFrom(new EndpointReference(
-				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
-		terminateRMMessage.setFaultTo(new EndpointReference(
-				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
-		
-		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId,configurationContext);
-		if (rmVersion==null)
-			throw new SandeshaException ("Cant find the rmVersion of the given message");
-		terminateRMMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
-		terminateRMMessage.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
-
-		SequencePropertyBean transportToBean = seqPropMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
-		if (transportToBean!=null) {
-			terminateRMMessage.setProperty(MessageContextConstants.TRANSPORT_URL,transportToBean.getValue());
-		}
-		
-		try {
-			terminateRMMessage.addSOAPEnvelope();
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
-
-		String key = SandeshaUtil.getUUID();
-		
-		SenderBean terminateBean = new SenderBean();
-		terminateBean.setMessageContextRefKey(key);
-
-		
-		storageManager.storeMessageContext(key,terminateRMMessage.getMessageContext());
-
-		
-		//Set a retransmitter lastSentTime so that terminate will be send with
-		// some delay.
-		//Otherwise this get send before return of the current request (ack).
-		//TODO: refine the terminate delay.
-		terminateBean.setTimeToSend(System.currentTimeMillis()
-				+ Sandesha2Constants.TERMINATE_DELAY);
-
-		terminateBean.setMessageID(terminateRMMessage.getMessageId());
-		
-		//this will be set to true at the sender.
-		terminateBean.setSend(true);
-		
-		terminateRMMessage.getMessageContext().setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,
-				Sandesha2Constants.VALUE_FALSE);
-		
-		terminateBean.setReSend(false);
-
-		SenderBeanMgr retramsmitterMgr = storageManager
-				.getRetransmitterBeanMgr();
-
-		retramsmitterMgr.insert(terminateBean);
-		
-		SequencePropertyBean terminateAdded = new SequencePropertyBean();
-		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		terminateAdded.setSequenceID(outSequenceId);
-		terminateAdded.setValue("true");
-
-		seqPropMgr.insert(terminateAdded);
-		
-		//This should be dumped to the storage by the sender
-		TransportOutDescription transportOut = terminateRMMessage.getMessageContext().getTransportOut();
-		terminateRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,transportOut);
-		terminateRMMessage.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
-		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
-		terminateRMMessage.getMessageContext().setTransportOut(new Sandesha2TransportOutDesc ());
-		addTerminateSeqTransaction.commit();
-		
-	    AxisEngine engine = new AxisEngine (incomingAckRMMsg.getMessageContext().getConfigurationContext());
-	    try {
-			engine.send(terminateRMMessage.getMessageContext());
-		} catch (AxisFault e) {
-			throw new SandeshaException (e.getMessage());
-		}
-	    
-	}
 	
 	private static long getNoOfMessagesAcked (Iterator ackRangeIterator) {
 		long noOfMsgs = 0;
@@ -408,5 +304,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		}
 		
 		return noOfMsgs;
+	}
+	
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+		
 	}
 }

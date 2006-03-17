@@ -105,8 +105,17 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 
 	public synchronized boolean update(SequencePropertyBean bean) {	
 		
-		if (!table.contains(bean))
+		if (table.get(getId(bean))==null)
 			return false;
+
+		return table.put(getId(bean), bean) != null;
+
+	}
+	
+	public synchronized boolean updateOrInsert(SequencePropertyBean bean) {	
+		
+		if (table.get(getId(bean))==null)
+			table.put(getId(bean), bean);
 
 		return table.put(getId(bean), bean) != null;
 

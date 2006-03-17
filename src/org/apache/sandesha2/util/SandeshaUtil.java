@@ -40,6 +40,7 @@ import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Handler;
 import org.apache.ws.commons.om.OMElement;
@@ -245,34 +246,7 @@ public class SandeshaUtil {
 		invoker.stopInvokerForTheSequence (sequenceID);
 	}
 
-	public static boolean verifySequenceCompletion(Iterator ackRangesIterator,
-			long lastMessageNo) {
-		HashMap startMap = new HashMap();
 
-		while (ackRangesIterator.hasNext()) {
-			AcknowledgementRange temp = (AcknowledgementRange) ackRangesIterator
-					.next();
-			startMap.put(new Long(temp.getLowerValue()), temp);
-		}
-
-		long start = 1;
-		boolean loop = true;
-		while (loop) {
-			AcknowledgementRange temp = (AcknowledgementRange) startMap
-					.get(new Long(start));
-			if (temp == null) {
-				loop = false;
-				continue;
-			}
-
-			if (temp.getUpperValue() >= lastMessageNo)
-				return true;
-
-			start = temp.getUpperValue() + 1;
-		}
-
-		return false;
-	}
 
 	/*public static SOAPEnvelope createSOAPMessage(MessageContext msgContext,
 			String soapNamespaceURI) throws AxisFault {
@@ -387,7 +361,7 @@ public class SandeshaUtil {
 	public static String getServerSideIncomingSeqIdFromInternalSeqId (
 			String internalSequenceId) throws SandeshaException  {
 		
-		String startStr = Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":";
+		String startStr = Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":";
 		if (!internalSequenceId.startsWith(startStr)){
 			throw new SandeshaException ("Invalid internal sequence ID");
 		}
@@ -396,11 +370,11 @@ public class SandeshaUtil {
 		return incomingSequenceId;
 	}
 
-	public static String getServerSideInternalSeqIdFromIncomingSeqId(
-			String incomingSequenceId) {
-		String internalSequenceId =  Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":" + incomingSequenceId;
-		return internalSequenceId;
-	}
+//	public static String getServerSideInternalSeqIdFromIncomingSeqId(
+//			String incomingSequenceId) {
+//		String internalSequenceId =  Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":" + incomingSequenceId;
+//		return internalSequenceId;
+//	}
 
 	/**
 	 * Used to obtain the storage Manager Implementation. 
@@ -654,6 +628,26 @@ public class SandeshaUtil {
 		return retArr;
 	}
 	
+	public static ArrayList getArrayListFromMsgsString (String str) throws SandeshaException {
+		
+		if (str==null || "".equals(str))
+			return new ArrayList ();
+		
+		ArrayList retArr = new ArrayList ();
+		
+		StringTokenizer tokenizer = new StringTokenizer (str,",");
+		
+		while (tokenizer.hasMoreElements()) {
+			String nextToken = tokenizer.nextToken();
+			if (nextToken!=null && !"".equals(nextToken)) {
+				Long lng = new Long (nextToken);
+				retArr.add(lng);
+			}
+		}
+		
+		return retArr;
+	}
+	
 	public static String getInternalSequenceID (String to, String sequenceKey) {
 		if (to==null && sequenceKey==null)
 			return null;
@@ -808,23 +802,112 @@ public class SandeshaUtil {
 	}
 	
 	
-//	public static boolean inNumberPresentInList (String list, long no) throws SandeshaException {
+//	public static boolean isNumberPresentInList (String list, long no) throws SandeshaException {
+//		StringTokenizer tokenizer = new StringTokenizer (list,Sandesha2Constants.LIST_SEPERATOR);
+//		while (tokenizer.hasMoreElements()){
+//			String listPart = tokenizer.nextToken();
+//			if (!"".equals(listPart) && isNumberPresentInListPart(listPart,no))
+//				return true;
+//		}
 //		
+//		return false;
 //	}
 //
 //	public static String putNumberToList (String list, long no) throws SandeshaException {
+//		
 //		StringTokenizer tokenizer = new StringTokenizer (list,Sandesha2Constants.LIST_SEPERATOR);
 //		
+//		boolean present = false;
 //		while (tokenizer.hasMoreElements()){
-//			String element = tokenizer.nextToken();
-//			String[] items = element.split(Sandesha2Constants.LIST_ITEM_SEPERATOR);
-//			if (items.length!=1 && items.length!=2)
-//				throw new SandeshaException ("Invalid string array");
-//			
-//			
+//			String listPart = tokenizer.nextToken();
+//			if (!"".equals(listPart) && isNumberPresentInListPart(listPart,no))
+//				present = true;
 //		}
 //		
+//		list = list + Sandesha2Constants.LIST_SEPERATOR + new Long (no).toString();
+//		sortListParts (list);
+//		mergeListParts (list);
 //	}
+//	
+//	private static boolean isNumberPresentInListPart (String listPart, long no) throws SandeshaException {
+//		if (listPart==null || "".equals(listPart))
+//			throw new SandeshaException ("Invalid list part");
+//		
+//		int seperatorPosition = listPart.indexOf(Sandesha2Constants.LIST_PART_SEPERATOR);
+//
+//		try {
+//			if (seperatorPosition<0) {
+//				//this must be a single number
+//				long tempNo = new Long (listPart).longValue();
+//				if (no==tempNo)
+//					return true;
+//				
+//				return false;
+//			} else {
+//				String number1Str = listPart.substring(0,seperatorPosition);
+//				String number2Str = listPart.substring((seperatorPosition+1),listPart.length());
+//				
+//				long number1 = new Long (number1Str).longValue();
+//				long number2 = new Long (number2Str).longValue();
+//				
+//				if (number1>number2)
+//					throw new SandeshaException ("list part have numbers in the wrong order");
+//				
+//				if (no>=number1 && no<=number2)
+//					return true;
+//				
+//				return false;
+//			}
+//		} catch (NumberFormatException e) {
+//			throw new SandeshaException ("Invalid list part",e);
+//		}
+//	}
+//	
+//	private String sortListParts (String list) {
+//		
+//	}
+//	
+//	private String mergeListParts (String list) {
+//		
+//	}
+//	
+//	private void updatePartOfTheList () {
+//		
+//	}
+	
+	public static String getSequenceProperty (String id, String name, ConfigurationContext context) throws SandeshaException {
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		
+		SequencePropertyBean sequencePropertyBean =  sequencePropertyBeanMgr.retrieve(id,name);
+		if (sequencePropertyBean==null)
+			return null;
+		else
+			return sequencePropertyBean.getValue();
+	}
+	
+	public static boolean isAllMsgsAckedUpto (long highestInMsgNo, String internalSequenceID, ConfigurationContext configCtx) throws SandeshaException {
+		
+		String clientCompletedMessages = getSequenceProperty(internalSequenceID,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES,configCtx);
+		ArrayList ackedMsgsList = getArrayListFromString(clientCompletedMessages);
+		
+		long smallestMsgNo = 1;
+		for (long tempMsgNo=smallestMsgNo;tempMsgNo<=highestInMsgNo;tempMsgNo++) {
+			if (!ackedMsgsList.contains(new Long(tempMsgNo).toString()))
+				return false;
+		}
+		
+		return true;   //all message upto the highest have been acked.
+	}
+	
+	public static SandeshaPropertyBean getPropretyBean (MessageContext messageCtx) throws SandeshaException {
+		Parameter parameter =  messageCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+		if (parameter==null)
+			throw new SandeshaException ("Property bean not set for the message");
+		
+		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue ();
+		return propertyBean;
+	}
 	
 	
 }

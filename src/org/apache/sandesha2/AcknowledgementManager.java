@@ -19,6 +19,7 @@ package org.apache.sandesha2;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.axis2.AxisFault;
@@ -46,6 +47,7 @@ import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.ws.commons.soap.SOAPEnvelope;
@@ -196,7 +198,7 @@ public class AcknowledgementManager {
 		
 		ArrayList completedMsgList = null;
 		if (completedMessagesBean!=null) {
-			completedMsgList = SandeshaUtil.getArrayListFromString(completedMessagesBean.getValue());
+			completedMsgList = SandeshaUtil.getArrayListFromMsgsString (completedMessagesBean.getValue());
 		} else {
 			String message = "Completed messages bean is null, for the sequence " + sequenceID;
 			throw new SandeshaException (message);
@@ -295,11 +297,7 @@ public class AcknowledgementManager {
 
 			referenceRMMessage.getMessageContext().setProperty(
 					Sandesha2Constants.ACK_WRITTEN, "true");
-//			try {
-//				engine.send(ackRMMsgCtx.getMessageContext());
-//			} catch (AxisFault e1) {
-//				throw new SandeshaException(e1.getMessage());
-//			}
+			
 			return ackRMMsgCtx;
 			
 		} else {
@@ -310,9 +308,6 @@ public class AcknowledgementManager {
 					.getRetransmitterBeanMgr();
 
 			String key = SandeshaUtil.getUUID();
-			
-			//dumping to the storage will be done be Sandesha2 Transport Sender
-			//storageManager.storeMessageContext(key,ackMsgCtx);
 			
 			SenderBean ackBean = new SenderBean();
 			ackBean.setMessageContextRefKey(key);
@@ -326,32 +321,7 @@ public class AcknowledgementManager {
 					Sandesha2Constants.VALUE_FALSE);
 			
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			
-			//the internalSequenceId value of the retransmitter Table for the
-			// messages related to an incoming
-			//sequence is the actual sequence ID
-
-//			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
-//					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
-		
-//			long ackInterval = PropertyManager.getInstance()
-//					.getAcknowledgementInterval();
-			
-			Parameter param = referenceMsg.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-			
-			SandeshaPropertyBean propertyBean = null;
-			if (param!=null) {
-				propertyBean = (SandeshaPropertyBean)  param.getValue();
-			}else {
-				propertyBean = PropertyManager.getInstance().getPropertyBean();
-			}
-			
-			
-			long ackInterval = propertyBean.getAcknowledgementInaterval();
-			
-			//			if (policyBean != null) {
-//				ackInterval = policyBean.getAcknowledgementInaterval();
-//			}
+			long ackInterval = SandeshaUtil.getPropretyBean(referenceMsg).getAcknowledgementInaterval();
 			
 			//Ack will be sent as stand alone, only after the retransmitter
 			// interval.
@@ -374,40 +344,50 @@ public class AcknowledgementManager {
 			}
 			
 			ackBean.setTimeToSend(timeToSend);
-
 			storageManager.storeMessageContext(key,ackMsgCtx);
 			
 			//inserting the new ack.
 			retransmitterBeanMgr.insert(ackBean);
-
 			asyncAckTransaction.commit();
 
 			//passing the message through sandesha2sender
-
 			ackMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,ackMsgCtx.getTransportOut());
 			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
-			
 			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
-			
 			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc ());
-			
-//			AxisEngine engine = new AxisEngine (configurationContext);
-//			try {
-//				engine.send(ackMsgCtx);
-//			} catch (AxisFault e) {
-//				throw new SandeshaException (e.getMessage());
-//			}
-			
 			RMMsgContext ackRMMessageCtx = MsgInitializer.initializeMessage(ackMsgCtx);
-			
-			SandeshaUtil.startSenderForTheSequence(configurationContext,sequenceID);
-			
+			SandeshaUtil.startSenderForTheSequence(configurationContext,sequenceID);	
 			referenceMsg.pause(); 
-			
 			return ackRMMessageCtx;
+		}	
+	}
+	
+	public static boolean verifySequenceCompletion(Iterator ackRangesIterator,
+			long lastMessageNo) {
+		HashMap startMap = new HashMap();
+
+		while (ackRangesIterator.hasNext()) {
+			AcknowledgementRange temp = (AcknowledgementRange) ackRangesIterator
+					.next();
+			startMap.put(new Long(temp.getLowerValue()), temp);
 		}
-		
-		
-		
+
+		long start = 1;
+		boolean loop = true;
+		while (loop) {
+			AcknowledgementRange temp = (AcknowledgementRange) startMap
+					.get(new Long(start));
+			if (temp == null) {
+				loop = false;
+				continue;
+			}
+
+			if (temp.getUpperValue() >= lastMessageNo)
+				return true;
+
+			start = temp.getUpperValue() + 1;
+		}
+
+		return false;
 	}
 }

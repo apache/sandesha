@@ -98,7 +98,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 	}
 
 	public synchronized boolean update(NextMsgBean bean) {
-		if (!table.contains(bean))
+		if (table.get(bean.getSequenceID())==null)
 			return false;
 
 		return table.put(bean.getSequenceID(), bean) != null;

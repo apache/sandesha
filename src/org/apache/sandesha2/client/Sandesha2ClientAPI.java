@@ -20,12 +20,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.client.reports.RMReport;
 import org.apache.sandesha2.client.reports.SequenceReport;
 import org.apache.sandesha2.storage.StorageManager;
@@ -38,6 +44,14 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.TerminateSequence;
+import org.apache.ws.commons.om.OMException;
+import org.apache.ws.commons.soap.SOAP12Constants;
+import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.ws.commons.soap.SOAPFactory;
+import org.apache.ws.commons.soap.impl.llom.soap11.SOAP11Factory;
+import org.apache.ws.commons.soap.impl.llom.soap12.SOAP12Factory;
 
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
@@ -199,6 +213,8 @@ public class Sandesha2ClientAPI {
 	}
 	
 	private static void fillOutgoingSequenceInfo (SequenceReport report,String outSequenceID, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException  { 
+		report.setSequenceID(outSequenceID);
+		
 		ArrayList completedMessageList =  AcknowledgementManager.getClientCompletedMessagesList (outSequenceID,seqPropMgr);
 		
 		Iterator iter = completedMessageList.iterator();
@@ -226,9 +242,8 @@ public class Sandesha2ClientAPI {
 		ArrayList completedMessageList =  AcknowledgementManager.getServerCompletedMessagesList (sequenceID,seqPropMgr);
 
 		Iterator iter = completedMessageList.iterator();
-		while (iter.hasNext()) {
-			Long lng = new Long (Long.parseLong((String) iter.next()));
-			sequenceReport.addCompletedMessage(lng);
+		while (iter.hasNext()) {;
+			sequenceReport.addCompletedMessage((Long) iter.next());
 		}
 		
 		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_IN);
@@ -315,9 +330,75 @@ public class Sandesha2ClientAPI {
 		return rmReport;
 	}
 	
-	public String InternalSequenceID (String to, String sequenceKey) {
+	public static String getInternalSequenceID (String to, String sequenceKey) {
 		return SandeshaUtil.getInternalSequenceID(to,sequenceKey);
 	}
 	
 
+	public static void terminateSequence (String toEPR, String sequenceKey, ServiceClient serviceClient,ConfigurationContext configurationContext) throws SandeshaException { 
+
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID(toEPR,sequenceKey);
+				
+		SequenceReport sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(internalSequenceID,configurationContext);
+		if (sequenceReport==null)
+			throw new SandeshaException ("Cannot generate the sequence report for the given internalSequenceID");
+		if (sequenceReport.getSequenceStatus()!=SequenceReport.SEQUENCE_STATUS_ESTABLISHED)
+			throw new SandeshaException ("Canot terminate the sequence since it is not active");
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		if (sequenceIDBean==null)
+			throw new SandeshaException ("SequenceIdBean is not set");
+		
+		String sequenceID = sequenceIDBean.getValue();
+
+		if (sequenceID==null)
+			throw new SandeshaException ("Cannot find the sequenceID");
+		
+		Options options = serviceClient.getOptions();
+		
+		String rmSpecVersion = (String) options.getProperty(Sandesha2ClientAPI.RM_SPEC_VERSION);
+
+		if (rmSpecVersion==null) 
+			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion ();
+		
+		String oldAction = options.getAction();
+		
+		options.setAction(SpecSpecificConstants.getTerminateSequenceAction(rmSpecVersion));		
+		
+		SOAPEnvelope dummyEnvelope = null;
+		SOAPFactory factory = null;
+		String soapNamespaceURI = options.getSoapVersionURI();
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
+			factory = new SOAP12Factory ();
+			dummyEnvelope = factory.getDefaultEnvelope();
+		}else  {
+			factory = new SOAP11Factory ();
+			dummyEnvelope = factory.getDefaultEnvelope();
+		}
+		
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
+		
+		TerminateSequence terminateSequence = new TerminateSequence (factory,rmNamespaceValue);
+		Identifier identifier = new Identifier (factory,rmNamespaceValue);
+		identifier.setIndentifer(sequenceID);
+		terminateSequence.setIdentifier(identifier);
+		
+		terminateSequence.toSOAPEnvelope(dummyEnvelope);
+		
+	    String oldSequenceKey = (String) options.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
+	    options.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
+		try {
+			serviceClient.fireAndForget(dummyEnvelope.getBody().getFirstChildWithName(new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE)));
+		} catch (AxisFault e) {
+			throw new SandeshaException ("Could not invoke the service client", e);
+		}
+
+		if (oldSequenceKey!=null)
+			options.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,oldSequenceKey);
+		
+		options.setAction(oldAction);
+	}
+	
 }

@@ -77,7 +77,7 @@ public interface Sandesha2Constants {
 			
 			String ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequenceResponse";
 			
-			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200602/AckRequested";
+			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200510/AckRequested";
 			
 			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence";
 			
@@ -250,8 +250,6 @@ public interface Sandesha2Constants {
 
 		String NEXT_MESSAGE_NUMBER = "NextMsgNo";
 
-		String LAST_OUT_MESSAGE = "LastOutMessage";
-
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
 
 		String CHECK_RESPONSE = "CheckResponse";
@@ -280,9 +278,17 @@ public interface Sandesha2Constants {
 
 		String REQUEST_SIDE_SEQUENCE_ID = "RequestSideSequenceID"; 		//used only at the server side
 		
-		String HIGHEST_MSG_NO = "HighestMessageNumber";
+		String HIGHEST_IN_MSG_NUMBER = "HighestInMsgNumber";
 		
+		String HIGHEST_IN_MSG_KEY = "HighestInMsgKey";
 		
+		String HIGHEST_OUT_MSG_NUMBER = "HighestOutMsgNumber";
+		
+		String HIGHEST_OUT_MSG_KEY = "HighestOutMsgKey";
+		
+		String LAST_OUT_MESSAGE_NO = "LastOutMessage";
+		
+		String LAST_IN_MESSAGE_NO = "LastInMessage";
 	}
 
 	public interface SOAPVersion {
@@ -443,8 +449,6 @@ public interface Sandesha2Constants {
 	
 	String VALUE_FALSE = "false";
 	
-	String SANDESHA2_INTERNAL_SEQUENCE_ID = "Sandesha2IntSeq";
-	
 	String MESSAGE_STORE_KEY = "Sandesha2MessageStoreKey";
 
 	String ORIGINAL_TRANSPORT_OUT_DESC = "Sandesha2OriginalTransportSender";
@@ -462,4 +466,9 @@ public interface Sandesha2Constants {
 	String INTERNAL_SEQUENCE_PREFIX = "Sandesha2InternalSequence";
 	
 	String SANDESHA2_POLICY_BEAN = "Sandesha2PolicyBean";
+	
+	String LIST_SEPERATOR = ",";
+	
+	String LIST_PART_SEPERATOR = "-";
+	
 }

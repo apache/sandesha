@@ -62,7 +62,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 
 	private Log log = LogFactory.getLog(getClass());
 	
-	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		
 		
 		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
@@ -263,6 +263,10 @@ public class AckRequestedProcessor implements MsgProcessor {
 			
 			msgContext.pause(); 
 		}
+	}
+	
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+		
 	}
 	
 }

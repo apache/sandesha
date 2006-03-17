@@ -26,7 +26,7 @@ import org.apache.ws.commons.soap.SOAPFactory;
 
 public class CloseSequenceProcessor implements MsgProcessor {
 
-	public void processMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
 		CloseSequence closeSequence = (CloseSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
@@ -114,7 +114,9 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		closeSequenceTransaction.commit();
 	}
 	
-
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+		
+	}
 
 	
 	

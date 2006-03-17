@@ -45,6 +45,8 @@ public interface SequencePropertyBeanMgr extends RMBeanManager {
 	public SequencePropertyBean findUnique (SequencePropertyBean bean) throws SandeshaException;
 
 	public boolean update(SequencePropertyBean bean) throws SandeshaStorageException;
+	
+	public boolean updateOrInsert(SequencePropertyBean bean) throws SandeshaStorageException;
 
 	public Collection retrieveAll ();
 }
