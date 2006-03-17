@@ -30,6 +30,7 @@ public class RMPolicyBean {
     private long acknowledgementInterval;
     private long retransmissionInterval;
     private boolean exponentialBackoff;
+    private int maximumRetransmissionCount;
     
     public RMPolicyBean () {
     	loadValuesFromPropertyFile ();
@@ -70,6 +71,14 @@ public class RMPolicyBean {
     public void setAcknowledgementInterval(long acknowledgementInterval) {
         this.acknowledgementInterval = acknowledgementInterval;
     }
+
+	public int getMaximumRetransmissionCount() {
+		return maximumRetransmissionCount;
+	}
+
+	public void setMaximumRetransmissionCount(int maximumRetransmissionCount) {
+		this.maximumRetransmissionCount = maximumRetransmissionCount;
+	}
     
     
 }

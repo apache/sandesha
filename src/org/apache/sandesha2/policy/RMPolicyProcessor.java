@@ -11,6 +11,7 @@ import org.apache.sandesha2.policy.processors.ExponentialBackoffProcessor;
 import org.apache.sandesha2.policy.processors.InactivityTimeoutMeasureProcessor;
 import org.apache.sandesha2.policy.processors.InactivityTimeoutProcessor;
 import org.apache.sandesha2.policy.processors.InvokeInOrderProcessor;
+import org.apache.sandesha2.policy.processors.MaximumRetransmissionCountProcessor;
 import org.apache.sandesha2.policy.processors.MessageTypesToDropProcessor;
 import org.apache.sandesha2.policy.processors.RetransmissionItervalProcessor;
 import org.apache.sandesha2.policy.processors.StorageManagersProcessor;
@@ -52,6 +53,11 @@ public class RMPolicyProcessor {
 		rpt.setProcessTokenMethod(aip);
 		topLevel.setChildToken(rpt);
 
+		MaximumRetransmissionCountProcessor mrip = new MaximumRetransmissionCountProcessor();
+		rpt = RMPolicy.maximumRetransmissionCount.copy();
+		rpt.setProcessTokenMethod(mrip);
+		topLevel.setChildToken(rpt);
+		
 		ExponentialBackoffProcessor ebp = new ExponentialBackoffProcessor();
 		rpt = RMPolicy.exponentialBackoff.copy();
 		rpt.setProcessTokenMethod(ebp);

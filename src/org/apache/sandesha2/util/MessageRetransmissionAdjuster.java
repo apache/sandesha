@@ -52,21 +52,12 @@ public class MessageRetransmissionAdjuster {
 
 		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropretyBean(messageContext);
 		
-		
-		//TODO make MaxRetransmissionCount a policy
-//		int maxRetransmissionCount = Sandesha2Constants.Properties.DefaultValues.RetransmissionCount;
-//		if (retransmitterBean.getSentCount()>maxRetransmissionCount) {
-//			log.debug("Stopping retransmission since maximum retransmission was exceeded");
-//			retransmitterBean.setSend(false);
-//			
-//			//TODO do reporting and cleaning since this sequence will not work correctly after this.
-//		}
-		
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);
 
-//		if (retransmitterBean.getSentCount() >= Sandesha2Constants.MAXIMUM_RETRANSMISSION_ATTEMPTS)
-//			stopRetransmission(retransmitterBean);
+		int maxRetransmissionAttempts = propertyBean.getMaximumRetransmissionCount();
+		if (maxRetransmissionAttempts>=0 && retransmitterBean.getSentCount() > maxRetransmissionAttempts)
+			stopRetransmission(retransmitterBean);
 
 		return retransmitterBean;
 	}
@@ -106,7 +97,7 @@ public class MessageRetransmissionAdjuster {
 	}
 
 	private void stopRetransmission(SenderBean bean) {
-		bean.setReSend(false);
+		bean.setSend(false);
 	}
 
 	private long generateNextExponentialBackedoffDifference(int count,

@@ -203,6 +203,7 @@ public class PropertyManager {
 
 		// CHECKME
 		propertyBean.setStorageManagerClass(data.getStorageManager());
+		propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
 	}
 
 	public void loadPropertiesFromAxisDescription(AxisDescription desc)

@@ -121,5 +121,13 @@ public class SandeshaPropertyBean {
 		}
 	}
 	
+	public int getMaximumRetransmissionCount() {
+		return policyBean.getMaximumRetransmissionCount();
+	}
+
+	public void setMaximumRetransmissionCount(int maximumRetransmissionCount) {
+		policyBean.setMaximumRetransmissionCount(maximumRetransmissionCount);
+	}
+	
 	
 }

@@ -12,6 +12,7 @@ public class PolicyEngineData {
 	private String permanentStorageMgr = null;
 	private String inmemoryStorageManager = null;	
 	private String storageManager = null;
+	private int maximumRetransmissionCount; 
 
 	public boolean isExponentialBackoff() {
 		return exponentialBackoff;
@@ -85,6 +86,7 @@ public class PolicyEngineData {
 		ped.setRetransmissionInterval(this.getRetransmissionInterval());
 		//ped.setPermanentStorageManager(this.getPermanentStorageManager());
 		ped.setStorageManager(this.getStorageManager());
+		ped.setMaximumRetransmissionCount(this.getMaximumRetransmissionCount());
 		
 		return ped;
 	}
@@ -103,5 +105,13 @@ public class PolicyEngineData {
 	
 	public String getStorageManager() {
 		return storageManager;
+	}
+
+	public int getMaximumRetransmissionCount() {
+		return maximumRetransmissionCount;
+	}
+
+	public void setMaximumRetransmissionCount(int maximumRetransmissionCount) {
+		this.maximumRetransmissionCount = maximumRetransmissionCount;
 	}
 }

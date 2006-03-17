@@ -10,6 +10,10 @@ public class RMPolicy {
 	public static final RMPolicyToken acknowledgementInterval = new RMPolicyToken(
 			"AcknowledgementInterval", RMPolicyToken.SIMPLE_TOKEN,
 			new String[] {});
+	
+	public static final RMPolicyToken maximumRetransmissionCount = new RMPolicyToken(
+			"MaximumRetransmissionCount", RMPolicyToken.SIMPLE_TOKEN,
+			new String[] {});
 
 	public static final RMPolicyToken exponentialBackoff = new RMPolicyToken(
 			"ExponentialBackoff", RMPolicyToken.SIMPLE_TOKEN, new String[] {});
