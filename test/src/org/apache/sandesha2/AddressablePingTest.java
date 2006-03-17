@@ -110,21 +110,36 @@ public class AddressablePingTest extends TestCase {
 		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
+		SequenceReport sequenceReport = null;
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3)
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		Sandesha2ClientAPI.terminateSequence(to,sequenceKey,serviceClient,configContext);
+		serviceClient.finalizeInvoke();
+		
 		try {
-			//waiting till the messages exchange finishes.
-			Thread.sleep(10000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			throw new SandeshaException ("sleep interupted");
+			e.printStackTrace();
 		}
 		
-		SequenceReport sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
+		sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(3)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
-		
-		serviceClient.finalizeInvoke();
 		
 	}
 	
