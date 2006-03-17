@@ -1,9 +1,5 @@
 <module name="Sandesha2-0.9" class="org.apache.sandesha2.SandeshaModule">
 
-    <Description>
-    A WSRM implementation for Axis2. This implements WSRM 2005/02 specification.  
-    </Description>
-    
     <inflow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
             <order phase="PreDispatch" after="AddressingFinalInHandler" />
@@ -87,9 +83,12 @@
          
       <wsrm:AcknowledgementInterval>4000</wsrm:AcknowledgementInterval>
        
-      <wsrm:RetransmissionInterval>10000</wsrm:RetransmissionInterval>
+      <wsrm:RetransmissionInterval>6000</wsrm:RetransmissionInterval>
       
-      <wsrm:ExponentialBackoff>true</wsrm:ExponentialBackoff>
+      <!-- '-1' conveys that there is no limit to the max. number of retransmissions.-->
+      <wsrm:MaximumRetransmissionCount>10</wsrm:MaximumRetransmissionCount>
+      
+      <wsrm:ExponentialBackoff>false</wsrm:ExponentialBackoff>
       
       <wsrm:InactivityTimeout>5</wsrm:InactivityTimeout>
            
@@ -97,7 +96,13 @@
       
       <wsrm:InvokeInOrder>true</wsrm:InvokeInOrder>
       
-      <!-- This will not be overriden by service level policies -->
+      <!--
+      <wsrm:TerminateOnTimeout>true</wsrm:TerminateOnTimeout>
+      
+      <wsrm:TerminateInterval>3000</wsrm:TerminateInterval>
+      -->
+      
+      <!-- These will not be overriden by service level policies -->
       <wsrm:MessageTypesToDrop>none</wsrm:MessageTypesToDrop>  
                               
       <!-- This will not be overriden by service level policies -->
