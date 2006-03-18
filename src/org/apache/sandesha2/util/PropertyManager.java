@@ -64,21 +64,17 @@ public class PropertyManager {
 	}
 
 	public void loadlPropertiesFromDefaultValues() {
-		propertyBean
-				.setAcknowledgementInterval(Sandesha2Constants.Properties.DefaultValues.AcknowledgementInterval);
-		propertyBean
-				.setExponentialBackoff(Sandesha2Constants.Properties.DefaultValues.ExponentialBackoff);
-		propertyBean
-				.setInactiveTimeoutInterval(
-						Sandesha2Constants.Properties.DefaultValues.InactivityTimeout,
+		propertyBean.setAcknowledgementInterval(Sandesha2Constants.Properties.DefaultValues.AcknowledgementInterval);
+		propertyBean.setExponentialBackoff(Sandesha2Constants.Properties.DefaultValues.ExponentialBackoff);
+		propertyBean.setInactiveTimeoutInterval(
+				        Sandesha2Constants.Properties.DefaultValues.InactivityTimeout,
 						Sandesha2Constants.Properties.DefaultValues.InactivityTimeoutMeasure);
-		propertyBean
-				.setInOrder(Sandesha2Constants.Properties.DefaultValues.InvokeInOrder);
+		
+		propertyBean.setInOrder(Sandesha2Constants.Properties.DefaultValues.InvokeInOrder);
 		propertyBean.setMsgTypesToDrop(null);
-		propertyBean
-				.setRetransmissionInterval(Sandesha2Constants.Properties.DefaultValues.RetransmissionInterval);
-		propertyBean
-				.setStorageManagerClass(Sandesha2Constants.Properties.DefaultValues.StorageManager);
+		propertyBean.setRetransmissionInterval(Sandesha2Constants.Properties.DefaultValues.RetransmissionInterval);
+		propertyBean.setStorageManagerClass(Sandesha2Constants.Properties.DefaultValues.StorageManager);
+		propertyBean.setMaximumRetransmissionCount(Sandesha2Constants.Properties.DefaultValues.MaximumRetransmissionCount);
 	}
 
 	public void loadPropertiesFromPropertyFile(InputStream in) {

@@ -406,6 +406,8 @@ public interface Sandesha2Constants {
 			String MessageTypesToDrop=VALUE_NONE;
 			
 			int RetransmissionCount = 8;
+			
+			int MaximumRetransmissionCount = 10;
 		}
 	}
 	

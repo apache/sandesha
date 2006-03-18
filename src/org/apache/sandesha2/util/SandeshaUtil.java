@@ -902,8 +902,13 @@ public class SandeshaUtil {
 	
 	public static SandeshaPropertyBean getPropretyBean (MessageContext messageCtx) throws SandeshaException {
 		Parameter parameter =  messageCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-		if (parameter==null)
-			throw new SandeshaException ("Property bean not set for the message");
+		parameter = null;
+		if (parameter==null) {
+			//TODO - get actual values from the module.
+			log.debug("Property bean not set. Using the default one");
+			SandeshaPropertyBean defaultPropertyBean = PropertyManager.getInstance().getPropertyBean();
+			return defaultPropertyBean;
+		}
 		
 		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue ();
 		return propertyBean;
