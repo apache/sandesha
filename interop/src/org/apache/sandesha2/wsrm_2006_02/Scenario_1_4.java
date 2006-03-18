@@ -35,6 +35,7 @@ import org.apache.ws.commons.om.OMAbstractFactory;
 import org.apache.ws.commons.om.OMElement;
 import org.apache.ws.commons.om.OMFactory;
 import org.apache.ws.commons.om.OMNamespace;
+import org.apache.ws.commons.soap.SOAP12Constants;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -48,20 +49,13 @@ public class Scenario_1_4 {
 	private static final String Text = "Text";
 
 	private String toIP = "127.0.0.1";
-
 	private String toPort = "8080";
-
+	private String transportToIP = "127.0.0.1";
 	private String transportToPort = "8070";
+	private String servicePart = "/axis2/services/RMInteropService";
+	private String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
+	private String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
-	private String ackIP = "127.0.0.1";
-	
-	private String ackPort = "9070";
-
-	private String toEPR = "http://" + toIP + ":" + toPort + "/axis2/services/RMInteropService";
-
-	private String transportToEPR = "http://" + toIP + ":" + transportToPort
-			+ "/axis2/services/RMInteropService";
-
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; // Change
 																											// this
 																											// to
@@ -119,7 +113,7 @@ public class Scenario_1_4 {
 		// clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
 		// //uncomment this to send messages without chunking.
 
-		// clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		 clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		// //uncomment this to send messages in SOAP 1.2
 
 		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,

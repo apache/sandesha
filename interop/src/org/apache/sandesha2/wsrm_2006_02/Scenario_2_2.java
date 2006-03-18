@@ -51,20 +51,12 @@ public class Scenario_2_2 {
 	private final static String EchoStringReturn = "EchoStringReturn";
 	
 	private String toIP = "127.0.0.1";
-	
-	private String ackIP = "127.0.0.1";
-	
-	private String ackPort = "9070";
-	
-	private String toPort = "8070";
-	
+	private String toPort = "8080";
+	private String transportToIP = "127.0.0.1";
 	private String transportToPort = "8070";
-	
-	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
-	
-	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMInteropService";
-	
-	//private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
+	private String servicePart = "/axis2/services/RMInteropService";
+	private String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
+	private String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
