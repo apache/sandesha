@@ -214,6 +214,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		if (arr.size()>0)
 			return false;
 		
+		if (sequenceID.length()<=1)
+			return false;   //Single character offers are NOT accepted.
+		
 		return true;
 	}
 	
