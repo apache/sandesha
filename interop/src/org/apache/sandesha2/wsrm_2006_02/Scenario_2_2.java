@@ -17,6 +17,9 @@
 package org.apache.sandesha2.wsrm_2006_02;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -50,19 +53,19 @@ public class Scenario_2_2 {
 	private final static String echoStringResponse = "echoStringResponse";
 	private final static String EchoStringReturn = "EchoStringReturn";
 	
-	private String toIP = "127.0.0.1";
-	private String toPort = "8080";
-	private String transportToIP = "127.0.0.1";
-	private String transportToPort = "8070";
-	private String servicePart = "/axis2/services/RMInteropService";
-	private String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
-	private String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
+	private static String toIP = "127.0.0.1";
+	private static String toPort = "9762";
+	private static String transportToIP = "127.0.0.1";
+	private static String transportToPort = "8070";
+	private static String servicePart = "/axis2/services/RMInteropService";
+	private static String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
+	private static String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception,IOException {
 		
 		
 		String axisClientRepo = null;
@@ -73,6 +76,16 @@ public class Scenario_2_2 {
 			AXIS2_CLIENT_PATH = axisClientRepo;
 			SANDESHA2_HOME = "";
 		}
+		
+		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("sandesha2_interop.properties");
+
+		Properties properties = new Properties();
+		if (in != null) {
+			properties.load(in);
+		}
+		
+		toEPR = properties.getProperty("to");
+		transportToEPR = properties.getProperty("transportTo");
 		
 		new Scenario_2_2 ().run();
 	}
