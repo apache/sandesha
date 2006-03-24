@@ -104,15 +104,15 @@ public class SyncEchoClient {
 		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module
 		
 		Callback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		Callback callback2 = new TestCallback ("Callback 2");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2",sequenceKey),callback2);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 		
 		Options newOptions = new Options (clientOptions);
 		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		serviceClient.setOptions(newOptions);
 		Callback callback3 = new TestCallback ("Callback 3");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3",sequenceKey),callback3);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		
         while (!callback3.isComplete()) {
             Thread.sleep(1000);

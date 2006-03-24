@@ -123,22 +123,22 @@ public class AsyncEchoClient {
 		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
 		
 		Callback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
 		Callback callback2 = new TestCallback ("Callback 2");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2",sequenceKey),callback2);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 
 		Callback callback3 = new TestCallback ("Callback 3");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3",sequenceKey),callback3);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		
 		Callback callback4 = new TestCallback ("Callback 4");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo4",sequenceKey),callback4);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo4",sequenceKey),callback4);
 		
 		Options newOptions = new Options (clientOptions);
 		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		serviceClient.setOptions(newOptions);
 		Callback callback5 = new TestCallback ("Callback 5");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo5",sequenceKey),callback5);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo5",sequenceKey),callback5);
 		
         while (!callback5.isComplete()) {
             Thread.sleep(1000);
