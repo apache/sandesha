@@ -3,20 +3,14 @@ package org.apache.sandesha2.wsrm;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.ws.commons.soap.SOAPEnvelope;
-import org.apache.ws.commons.soap.SOAPFactory;
-import org.apache.ws.commons.om.OMAbstractFactory;
-import org.apache.ws.commons.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
-/**
- * Created by IntelliJ IDEA.
- * User: sanka
- * Date: Oct 7, 2005
- * Time: 4:31:54 AM
- * To change this template use File | Settings | File Templates.
- */
+
 public class SequenceTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();

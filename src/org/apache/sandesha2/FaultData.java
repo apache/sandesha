@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2;
 
-import org.apache.ws.commons.om.OMElement;
+import org.apache.axiom.om.OMElement;
 
 /**
  * Used to hold data related to a RM Fault.

@@ -31,11 +31,11 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.ClientUtils;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.ws.commons.om.OMAbstractFactory;
-import org.apache.ws.commons.om.OMElement;
-import org.apache.ws.commons.om.OMFactory;
-import org.apache.ws.commons.om.OMNamespace;
-import org.apache.ws.commons.soap.SOAPBody;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAPBody;
 
 public class AsyncEchoClient {
 	
@@ -67,7 +67,6 @@ public class AsyncEchoClient {
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
 	public static void main(String[] args) throws Exception {
-		
 		
 		String axisClientRepo = null;
 		if (args!=null && args.length>0)

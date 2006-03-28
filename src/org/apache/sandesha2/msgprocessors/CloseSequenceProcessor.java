@@ -21,8 +21,8 @@ import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
-import org.apache.ws.commons.soap.SOAPEnvelope;
-import org.apache.ws.commons.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 
 public class CloseSequenceProcessor implements MsgProcessor {
 

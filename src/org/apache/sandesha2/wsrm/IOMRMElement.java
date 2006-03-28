@@ -25,8 +25,8 @@ package org.apache.sandesha2.wsrm;
  */
 
 import org.apache.sandesha2.SandeshaException;
-import org.apache.ws.commons.om.OMElement;
-import org.apache.ws.commons.om.OMException;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 
 public interface IOMRMElement {
 	public OMElement getOMElement() throws OMException;

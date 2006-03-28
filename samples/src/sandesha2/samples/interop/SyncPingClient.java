@@ -30,10 +30,10 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.client.reports.SequenceReport;
-import org.apache.ws.commons.om.OMAbstractFactory;
-import org.apache.ws.commons.om.OMElement;
-import org.apache.ws.commons.om.OMFactory;
-import org.apache.ws.commons.om.OMNamespace;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 
 
 public class SyncPingClient {
@@ -115,18 +115,21 @@ public class SyncPingClient {
 			//no data available.
 		}
 		
-//		while (sequenceReport==null || sequenceReport.getSequenceStatus()!=SequenceReport.SEQUENCE_STATUS_COMPLETED) {
-//			try {
-//				sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
-//			} catch (SandeshaException e) {
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e1) {
-//					e1.printStackTrace();
-//				}
-//			} 
-//		}
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3)
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
+		Sandesha2ClientAPI.terminateSequence(toEPR,sequenceKey,serviceClient,configContext);
 		serviceClient.finalizeInvoke();
 	}
 	

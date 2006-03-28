@@ -18,7 +18,7 @@
 package org.apache.sandesha2.wsrm;
 
 import org.apache.sandesha2.SandeshaException;
-import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPEnvelope;
 
 /**
  * This is the base interface for RM infoset objects that are added directly so 

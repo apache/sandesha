@@ -9,10 +9,10 @@ package org.apache.sandesha2.wsrm;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.ws.commons.om.OMElement;
-import org.apache.ws.commons.om.OMException;
-import org.apache.ws.commons.om.OMNamespace;
-import org.apache.ws.commons.soap.SOAPFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 

@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -29,7 +30,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.ws.commons.soap.SOAPBody;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;

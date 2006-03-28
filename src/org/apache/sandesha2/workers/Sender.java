@@ -48,7 +48,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.TerminateSequence;
-import org.apache.ws.commons.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPEnvelope;
 
 /**
  * This is responsible for sending and re-sending messages of Sandesha2. This

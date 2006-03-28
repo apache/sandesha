@@ -22,6 +22,11 @@ import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -46,12 +51,6 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.TerminateSequence;
-import org.apache.ws.commons.om.OMException;
-import org.apache.ws.commons.soap.SOAP12Constants;
-import org.apache.ws.commons.soap.SOAPEnvelope;
-import org.apache.ws.commons.soap.SOAPFactory;
-import org.apache.ws.commons.soap.impl.llom.soap11.SOAP11Factory;
-import org.apache.ws.commons.soap.impl.llom.soap12.SOAP12Factory;
 
 /**
  * Contains all the Sandesha2Constants of Sandesha2.

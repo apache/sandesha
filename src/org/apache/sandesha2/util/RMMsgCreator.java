@@ -59,8 +59,8 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
-import org.apache.ws.commons.soap.SOAPEnvelope;
-import org.apache.ws.commons.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 
 /**
  * Used to create new RM messages.
