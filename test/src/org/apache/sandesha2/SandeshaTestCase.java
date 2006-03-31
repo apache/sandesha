@@ -80,7 +80,6 @@ public class SandeshaTestCase extends TestCase {
         MessageContext msgCtx = new MessageContext();
         msgCtx.setConfigurationContext(configCtx);
         return msgCtx;
-
     }
 
 

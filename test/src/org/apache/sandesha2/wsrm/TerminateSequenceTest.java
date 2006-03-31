@@ -10,6 +10,13 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Created by IntelliJ IDEA.
+ * User: sanka
+ * Date: Oct 7, 2005
+ * Time: 3:36:59 AM
+ * To change this template use File | Settings | File Templates.
+ */
 public class TerminateSequenceTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
