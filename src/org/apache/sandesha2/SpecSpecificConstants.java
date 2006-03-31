@@ -1,5 +1,7 @@
 package org.apache.sandesha2;
 
+import org.apache.axis2.addressing.AddressingConstants;
+
 public class SpecSpecificConstants {
 
 	private static String unknownSpecErrorMessage = "Unknown specification version";
@@ -49,11 +51,27 @@ public class SpecSpecificConstants {
 			throw new SandeshaException (unknownSpecErrorMessage);
 	}
 	
+	public static String getTerminateSequenceResponseAction (String specVersion) throws SandeshaException {
+		if (Sandesha2Constants.SPEC_VERSIONS.WSRX.equals(specVersion)) 
+			return Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE;
+		else 
+			throw new SandeshaException (unknownSpecErrorMessage);
+	}
+	
 	public static String getCloseSequenceAction (String specVersion) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_VERSIONS.WSRM.equals(specVersion)) 
 			throw new SandeshaException ("This rm spec version does not define a sequenceClose action");
 		else if (Sandesha2Constants.SPEC_VERSIONS.WSRX.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE;
+		else 
+			throw new SandeshaException (unknownSpecErrorMessage);
+	}
+
+	public static String getCloseSequenceResponseAction (String specVersion) throws SandeshaException {
+		if (Sandesha2Constants.SPEC_VERSIONS.WSRM.equals(specVersion)) 
+			throw new SandeshaException ("This rm spec version does not define a sequenceClose action");
+		else if (Sandesha2Constants.SPEC_VERSIONS.WSRX.equals(specVersion)) 
+			return Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE;
 		else 
 			throw new SandeshaException (unknownSpecErrorMessage);
 	}
@@ -99,6 +117,13 @@ public class SpecSpecificConstants {
 			return Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_TERMINATE_SEQUENCE;
 		else if (Sandesha2Constants.SPEC_VERSIONS.WSRX.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_10.Actions.SOAP_ACTION_TERMINATE_SEQUENCE;
+		else 
+			throw new SandeshaException (unknownSpecErrorMessage);
+	}
+	
+	public static String getTerminateSequenceResponseSOAPAction (String specVersion) throws SandeshaException {
+		if (Sandesha2Constants.SPEC_VERSIONS.WSRX.equals(specVersion)) 
+			return Sandesha2Constants.SPEC_2005_10.Actions.SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE;
 		else 
 			throw new SandeshaException (unknownSpecErrorMessage);
 	}
@@ -169,4 +194,23 @@ public class SpecSpecificConstants {
 	public static String getDefaultSpecVersion () {
 		return Sandesha2Constants.SPEC_VERSIONS.WSRM;
 	}
+	
+	public static String getAddressingAnonymousURI (String addressingNSURI) throws SandeshaException {
+		if (AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNSURI))
+			return AddressingConstants.Submission.WSA_ANONYMOUS_URL;
+		else if (AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNSURI))
+			return AddressingConstants.Final.WSA_ANONYMOUS_URL;
+		else
+			throw new SandeshaException ("Unknown addressing version");
+	}
+	
+	public static String getAddressingFaultAction (String addressingNSURI) throws SandeshaException {
+		if (AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNSURI))
+			return "http://schemas.xmlsoap.org/ws/2004/08/addressing/fault";  //this is not available in addressing constants )-:
+		else if (AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNSURI))
+			return AddressingConstants.Final.WSA_FAULT_ACTION;
+		else
+			throw new SandeshaException ("Unknown addressing version");
+	}
+	
 }

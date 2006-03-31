@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -25,6 +27,8 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
@@ -54,6 +58,8 @@ import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
+
+import com.sun.rsasign.ax;
 
 /**
  * Responsible for processing an incoming Terminate Sequence message.
@@ -123,7 +129,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		//add the terminate sequence response if required.
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired (terminateSeqRMMsg.getRMSpecVersion()))
-			addTerminateSequenceResponse (terminateSeqRMMsg);
+			addTerminateSequenceResponse (terminateSeqRMMsg,sequenceId);
 		
 		
 		
@@ -160,7 +166,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		terminateSeqRMMsg.pause();
 	}
-	
 
 	private void setUpHighestMsgNumbers (ConfigurationContext configCtx, StorageManager storageManager, String sequenceID, RMMsgContext terminateRMMsg) throws SandeshaException {
 		
@@ -229,9 +234,10 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 	}
 	
-	private void addTerminateSequenceResponse (RMMsgContext terminateSeqRMMsg) throws SandeshaException {
+	private void addTerminateSequenceResponse (RMMsgContext terminateSeqRMMsg, String sequenceID) throws SandeshaException {
 		
 		MessageContext terminateSeqMsg = terminateSeqRMMsg.getMessageContext();
+		ConfigurationContext configCtx = terminateSeqMsg.getConfigurationContext();
 		
 		MessageContext outMessage = null;
 		outMessage = Utils.createOutMessageContext(terminateSeqMsg);
@@ -239,6 +245,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator
 				.createTerminateSeqResponseMsg(terminateSeqRMMsg, outMessage);
 		
+	 	RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg,sequenceID);
+	 	SequenceAcknowledgement seqAck = (SequenceAcknowledgement) ackRMMessage.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+	 	terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,seqAck);
+	 	
+	 	terminateSeqResponseRMMsg.addSOAPEnvelope();
+	 	
+	 	
 		terminateSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		terminateSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
 
@@ -246,11 +259,23 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		AxisEngine engine = new AxisEngine (terminateSeqMsg.getConfigurationContext());
 		
+		EndpointReference toEPR = terminateSeqMsg.getTo();
+		
 		try {
 			engine.send(outMessage);
 		} catch (AxisFault e) {
 			String message = "Could not send the terminate sequence response";
 			throw new SandeshaException (message,e);
+		}
+		
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequenceID,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configCtx);
+		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+		
+		if (anonymousURI.equals(
+				toEPR.getAddress())) {
+			terminateSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+		} else {
+			terminateSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 		}
 	}
 	
@@ -276,6 +301,30 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		String terminated = SandeshaUtil.getSequenceProperty(outSequenceID,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED,configurationContext);
+		
+		
+		
+		//registring an InOutOperationContext for this.
+		//since the serviceContext.fireAndForget only sets a inOnly One
+		//this does not work when there is a terminateSequnceResponse
+		//TODO do processing of terminateMessagesCorrectly., create a new message instead of sendign the one given by the serviceClient
+		//TODO important
+		try {
+			AxisOperation oldOPeration = msgContext.getAxisOperation();
+			AxisOperation outInAxisOp = new OutInAxisOperation (new QName ("temp"));
+			//setting flows
+			outInAxisOp.setRemainingPhasesInFlow(oldOPeration.getRemainingPhasesInFlow());
+			
+			OperationContext opcontext = OperationContextFactory.createOperationContext(OperationContextFactory.MEP_CONSTANT_OUT_IN,outInAxisOp);
+		    opcontext.setParent(msgContext.getServiceContext());
+			configurationContext.registerOperationContext(rmMsgCtx.getMessageId(),opcontext);
+		} catch (AxisFault e1) {
+			throw new SandeshaException ("Could not register an outInAxisOperation");
+		}
+		
+		
+		
+		
 
 		if (terminated != null
 				&& "true".equals(terminated)) {
@@ -284,30 +333,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-//		RMMsgContext terminateRMMessage = RMMsgCreator
-//				.createTerminateSequenceMessage(incomingAckRMMsg, outSequenceId,internalSequenceId);
-		
 		TerminateSequence terminateSequencePart = (TerminateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 		terminateSequencePart.getIdentifier().setIndentifer(outSequenceID);
 		
 		rmMsgCtx.setFlow(MessageContext.OUT_FLOW);
 		msgContext.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
 		
-//		String toAddress =  SandeshaUtil.getSequenceProperty(internalSeqenceID,Sandesha2Constants.SequenceProperties.TO_EPR,configurationContext);
-
-//		EndpointReference toEPR = new EndpointReference ( toBean.getValue());
-//		if (toEPR == null) {
-//			String message = "To EPR has an invalid value";
-//			throw new SandeshaException(message);
-//		}
-
 		rmMsgCtx.setTo(new EndpointReference(toAddress));
-		
-		
-//		terminateRMMessage.setFrom(new EndpointReference(
-//				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
-//		terminateRMMessage.setFaultTo(new EndpointReference(
-//				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
 		
 		String rmVersion = SandeshaUtil.getRMVersion(internalSeqenceID,configurationContext);
 		if (rmVersion==null)
@@ -316,7 +348,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		rmMsgCtx.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
 		rmMsgCtx.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
 
-		//SequencePropertyBean transportToBean = seqPropMgr.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
 		String transportTo = SandeshaUtil.getSequenceProperty(internalSeqenceID,Sandesha2Constants.SequenceProperties.TRANSPORT_TO,configurationContext);
 		if (transportTo!=null) {
 			rmMsgCtx.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);

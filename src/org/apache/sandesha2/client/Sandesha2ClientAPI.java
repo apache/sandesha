@@ -22,14 +22,11 @@ import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
-import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.client.async.AsyncResult;
+import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,6 +48,12 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.TerminateSequence;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
@@ -389,7 +392,8 @@ public class Sandesha2ClientAPI {
 	    String oldSequenceKey = (String) options.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
 	    options.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
 		try {
-			serviceClient.fireAndForget(dummyEnvelope.getBody().getFirstChildWithName(new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE)));
+			DummyCallback callback = new Sandesha2ClientAPI().new DummyCallback();
+			serviceClient.fireAndForget(dummyEnvelope.getBody().getFirstChildWithName(new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE))); 
 		} catch (AxisFault e) {
 			throw new SandeshaException ("Could not invoke the service client", e);
 		}
@@ -397,7 +401,22 @@ public class Sandesha2ClientAPI {
 		if (oldSequenceKey!=null)
 			options.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,oldSequenceKey);
 		
-		options.setAction(oldAction);
+//		options.setAction(oldAction);
+	}
+	
+	private class DummyCallback extends Callback {
+
+		public void onComplete(AsyncResult result) {
+			// TODO Auto-generated method stub
+			System.out.println("Error: dummy callback was called");
+		}
+
+		public void onError(Exception e) {
+			// TODO Auto-generated method stub
+			System.out.println("Error: dummy callback received an error");
+			
+		}
+		
 	}
 	
 }

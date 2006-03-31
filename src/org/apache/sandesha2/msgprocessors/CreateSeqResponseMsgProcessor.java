@@ -19,12 +19,12 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
 
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -208,6 +208,14 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 			msgsBean.setValue("");
 			sequencePropMgr.insert(msgsBean);
+			
+			
+			//setting the addressing version.
+			String addressingNamespace = createSeqResponseRMMsgCtx.getAddressingNamespaceValue();
+			SequencePropertyBean addressingVersionBean = new SequencePropertyBean (
+					offeredSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,addressingNamespace);
+			sequencePropMgr.insert(addressingVersionBean);
+			
 		}
 
 		offerProcessTransaction.commit();

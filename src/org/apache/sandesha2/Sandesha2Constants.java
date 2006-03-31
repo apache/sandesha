@@ -63,37 +63,39 @@ public interface Sandesha2Constants {
 	
 	public interface SPEC_2005_10 {
 		
-		String NS_URI = "http://docs.oasis-open.org/ws-rx/wsrm/200510";
+		String NS_URI = "http://docs.oasis-open.org/ws-rx/wsrm/200602";
 		
 		public interface Actions {
 			
-			String ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence";
+			String ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequence";
 
-			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequenceResponse";
+			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequenceResponse";
 
-			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement";
+			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200602/SequenceAcknowledgement";
 
-			String ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence";
+			String ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequence";
 			
-			String ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequenceResponse";
+			String ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequenceResponse";
 			
-			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200510/AckRequested";
+			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200602/AckRequested";
 			
-			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence";
+			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequence";
 			
-			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequenceResponse";
+			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequenceResponse";
 			
-			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence";
+			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequence";
 
-			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequenceResponse";
+			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequenceResponse";
 
-			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement";
+			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200602/SequenceAcknowledgement";
 
-			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence";
+			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequence";
 			
-			String SOAP_ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200510/AckRequested";
+			String SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequenceResponse";
 			
-			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence";
+			String SOAP_ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200602/AckRequested";
+			
+			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequence";
 		}
 	}
 	
@@ -153,15 +155,13 @@ public interface Sandesha2Constants {
 	}
 
 	public interface WSA {
-		String NS_URI_ANONYMOUS = AddressingConstants.Final.WSA_ANONYMOUS_URL;  // "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
-
-		String NS_URI_ADDRESSING = AddressingConstants.Final.WSA_NAMESPACE; //"http://schemas.xmlsoap.org/ws/2004/08/addressing";
-
+		
 		String NS_PREFIX_ADDRESSING = "wsa";
 
 		String ADDRESS = "Address";
 
-		String SOAP_FAULT_ACTION = "http://schemas.xmlsoap.org/ws/2004/08/addressing/fault";
+//		String SOAP_FAULT_ACTION = "http://schemas.xmlsoap.org/ws/2004/08/addressing/fault";
+		
 	}
 
 	public interface WSP {
@@ -226,6 +226,9 @@ public interface Sandesha2Constants {
 											   // property. This is used as the
 											   // sequenceId to share data b/w
 											   // sequences
+		
+		//Addressing version of a sequence. All messages of a sequence should have this addressing versio
+		String ADDRESSING_NAMESPACE_VALUE = "AddressingNamespaceValue";
 
 		//For incoming sequences this gives the msg no's of the messages that were
 		//received (may be an ack was sent - depending on the policy)

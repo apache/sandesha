@@ -29,6 +29,9 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axis2.addressing.AddressingConstants;
+
+import sun.util.logging.resources.logging;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -49,6 +52,7 @@ public class RMElements {
 	private AckRequested ackRequested = null;
 	private SOAPFactory factory = null;
 	String rmNamespaceValue = null;
+	String addressingNamespaceValue = null;
 	
 	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws SandeshaException {
 
@@ -57,7 +61,7 @@ public class RMElements {
 
 		SOAPFactory factory;
 
-		//Ya I know. Could hv done it directly :D (just to make it consistent)
+		//Yep, I know. Could hv done it directly :D (just to make it consistent)
 		if (envelope.getNamespace().getName().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_1);
 		else
@@ -66,9 +70,16 @@ public class RMElements {
 		
 		//finding out the rm version.
 		rmNamespaceValue = getRMNamespaceValue (envelope,action);
-		if (rmNamespaceValue==null)
+		if (rmNamespaceValue==null) {
 			return;
+		}
 		
+		//finding out the addressing version.
+		addressingNamespaceValue = getAddressingNamespaceValue (envelope,action);
+		if (addressingNamespaceValue==null) {
+			return;
+		}
+	
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequenceElement != null) {
@@ -90,7 +101,7 @@ public class RMElements {
 						Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		
 		if (createSeqElement != null) {
-			createSequence = new CreateSequence(factory,rmNamespaceValue);
+			createSequence = new CreateSequence(factory,rmNamespaceValue,addressingNamespaceValue);
 			createSequence.fromOMElement(envelope.getBody());
 		}
 
@@ -99,7 +110,7 @@ public class RMElements {
 						new QName(rmNamespaceValue,
 								Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
 		if (createSeqResElement != null) {
-			createSequenceResponse = new CreateSequenceResponse(factory,rmNamespaceValue);
+			createSequenceResponse = new CreateSequenceResponse(factory,rmNamespaceValue,addressingNamespaceValue);
 			createSequenceResponse.fromOMElement(envelope.getBody());
 		}
 
@@ -284,6 +295,21 @@ public class RMElements {
 		
 		return null;   //a version could not be found
 	}
+	
+	private String getAddressingNamespaceValue (SOAPEnvelope envelope, String action) {
+		SOAPHeader header = envelope.getHeader();
+		if (header!=null) {
+			ArrayList headers = header.getHeaderBlocksWithNSURI(AddressingConstants.Submission.WSA_NAMESPACE);
+			if (headers!=null && headers.size()>0)
+				return AddressingConstants.Submission.WSA_NAMESPACE;
+			
+			headers = header.getHeaderBlocksWithNSURI(AddressingConstants.Final.WSA_NAMESPACE);
+			if (headers!=null && headers.size()>0)
+				return AddressingConstants.Final.WSA_NAMESPACE;
+		}
+		
+		return null;   //a version could not be found
+	}
 
 	public CloseSequence getCloseSequence() {
 		return closeSequence;
@@ -299,5 +325,9 @@ public class RMElements {
 
 	public void setCloseSequenceResponse(CloseSequenceResponse closeSequenceResponse) {
 		this.closeSequenceResponse = closeSequenceResponse;
+	}
+
+	public String getAddressingNamespaceValue() {
+		return addressingNamespaceValue;
 	}
 }

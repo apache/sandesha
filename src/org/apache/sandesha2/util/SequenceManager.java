@@ -11,6 +11,7 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -26,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.Sandesha2Constants.WSA;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
@@ -93,6 +96,15 @@ public class SequenceManager {
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
 				sequenceId, Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
 		
+		
+		//setting the addressing version
+		String addressingNamespaceValue = createSequenceMsg.getAddressingNamespaceValue();
+		SequencePropertyBean addressingNamespaceBean = new SequencePropertyBean (
+				sequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,addressingNamespaceValue);
+		seqPropMgr.insert(addressingNamespaceBean);
+		
+		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
+		
 		//If no replyTo value. Send responses as sync.
 		SequencePropertyBean toBean = null;
 		if (replyTo!=null) {
@@ -100,7 +112,7 @@ public class SequenceManager {
 				Sandesha2Constants.SequenceProperties.TO_EPR, replyTo.getAddress());
 		}else {
 			toBean = new SequencePropertyBean(sequenceId,
-					Sandesha2Constants.SequenceProperties.TO_EPR, Sandesha2Constants.WSA.NS_URI_ANONYMOUS);
+					Sandesha2Constants.SequenceProperties.TO_EPR, anonymousURI);
 		}
 		
 		SequencePropertyBean replyToBean = new SequencePropertyBean(sequenceId,
@@ -121,12 +133,9 @@ public class SequenceManager {
 		
 		// message to invoke. This will apply for only in-order invocations.
 
-		
 		SandeshaUtil.startSenderForTheSequence(configurationContext,sequenceId);
 		
-
-		
-		//getting SPEC version for this sequence.
+		//stting the RM SPEC version for this sequence.
 		String createSequenceMsgAction = createSequenceMsg.getWSAAction();
 		if (createSequenceMsgAction==null)
 		    throw new SandeshaException ("Create sequence message does not have the WSA:Action value");
@@ -151,8 +160,6 @@ public class SequenceManager {
 		
 		//TODO get the SOAP version from the create seq message.
 		
-		
-		
 		return sequenceId;
 	}
 
@@ -173,6 +180,31 @@ public class SequenceManager {
 		SequencePropertyBeanMgr seqPropMgr = storageManager
 				.getSequencePropretyBeanMgr();
 
+		//setting the addressing version
+		String addressingNamespace = (String) firstAplicationMsgCtx.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+		
+		if (addressingNamespace==null) {
+			OperationContext opCtx = firstAplicationMsgCtx.getOperationContext();
+			if (opCtx!=null) {
+				try {
+					MessageContext requestMsg = opCtx.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					if (requestMsg!=null)
+						addressingNamespace = (String) requestMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+				} catch (AxisFault e) {
+					throw new SandeshaException (e);
+				}
+			}
+		}
+		
+		if (addressingNamespace==null)
+			addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;   //defaults to Final. Make sure this is synchronized with addressing.
+		
+		SequencePropertyBean addressingNamespaceBean = new SequencePropertyBean (
+				internalSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,addressingNamespace);
+		seqPropMgr.insert(addressingNamespaceBean);
+		
+		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
+		
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		String acksTo = (String) firstAplicationMsgCtx
 				.getProperty(Sandesha2ClientAPI.AcksTo);
@@ -217,7 +249,7 @@ public class SequenceManager {
 		}
 		//Default value for acksTo is anonymous  (this happens only for the client side)
 		if (acksTo==null) {
-			acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
+			acksTo = anonymousURI;
 		}
 		
 	    acksToBean = new SequencePropertyBean(
@@ -225,7 +257,7 @@ public class SequenceManager {
 				acksTo);
 	    
 		//start the in listner for the client side, if acksTo is not anonymous.
-		if (!firstAplicationMsgCtx.isServerSide()  && !Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+		if (!firstAplicationMsgCtx.isServerSide()  && !anonymousURI.equals(acksTo)) {
 		    
 			String transportInProtocol = firstAplicationMsgCtx.getOptions().getTransportInProtocol();
 		    if (transportInProtocol==null) {
@@ -281,11 +313,11 @@ public class SequenceManager {
 		
 		SandeshaUtil.startSenderForTheSequence(configurationContext,internalSequenceId);
 		
-		updateClientSideListnerIfNeeded (firstAplicationMsgCtx);
+		updateClientSideListnerIfNeeded (firstAplicationMsgCtx,anonymousURI);
 		
 	}
 	
-	private static void updateClientSideListnerIfNeeded (MessageContext messageContext) throws SandeshaException {
+	private static void updateClientSideListnerIfNeeded (MessageContext messageContext, String addressingAnonymousURI) throws SandeshaException {
 		if (messageContext.isServerSide())
 			return;   //listners are updated only for the client side.
 		
@@ -297,7 +329,7 @@ public class SequenceManager {
 		boolean startListnerForAsyncAcks = false;
 		boolean startListnerForAsyncControlMsgs = false;   //For async createSerRes & terminateSeq.
 		
-		if (acksTo!=null && !Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+		if (acksTo!=null && !addressingAnonymousURI.equals(acksTo)) {
 			//starting listner for async acks.
 			startListnerForAsyncAcks = true;
 		}
@@ -309,14 +341,7 @@ public class SequenceManager {
 		
 		try {
 			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) && transportInProtocol==null)
-				throw new SandeshaException ("Cant start the listner since the TransportInProtocol is not set.");
-
-//			if (startListnerForAsyncAcks)
-//				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
-//		
-//			if (startListnerForAsyncControlMsgs)
-//				ListenerManager.makeSureStarted(messageContext.getOptions().getTransportInProtocol(),messageContext.getConfigurationContext());
-							
+				throw new SandeshaException ("Cant start the listner since the TransportInProtocol is not set.");		
 			
 		} catch (AxisFault e) {
 			String message = "Cant start the listner for incoming messages";
@@ -338,15 +363,6 @@ public class SequenceManager {
 		//Transaction lastActivatedTransaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		
-//		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID,null);
-//		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.findUnique(internalSequenceFindBean);
-//		if (internalSequenceBean==null) {
-//			String message = "InternalSequenceBean is not set";
-//			log.error(message);
-//			throw new SandeshaException (message);
-//		}
-//		
-//		String internalSequenceID = internalSequenceBean.getValue();
 		SequencePropertyBean lastActivatedBean = sequencePropertyBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
 		
 		boolean added = false;
@@ -486,28 +502,6 @@ public class SequenceManager {
 		transaction.commit();
 		return false;
 	}
-	
-//	public static long getIncomingSequenceAckedMessageCount (String sequenceID, ConfigurationContext configurationContext) throws SandeshaException {
-//		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-//		Transaction transaction = storageManager.getTransaction();
-//		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
-//		
-//		SequencePropertyBean receivedMsgsBean = seqPropBeanMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.COMPLETED_MESSAGES);
-//		
-//		//we should be able to assume that all the received messages has been acked.
-//		String receivedMsgsStr = receivedMsgsBean.getValue();
-//
-//		StringTokenizer tokenizer = new StringTokenizer (receivedMsgsStr,",");
-//		
-//		long count = 0;
-//		while (tokenizer.hasMoreTokens()) {
-//			String temp = tokenizer.nextToken();
-//			count++;
-//		}
-//
-//		transaction.commit();
-//		return count;
-//	}
 	
 	public static boolean isIncomingSequenceCompleted (String sequenceID, ConfigurationContext configurationContext) throws SandeshaException {
 		

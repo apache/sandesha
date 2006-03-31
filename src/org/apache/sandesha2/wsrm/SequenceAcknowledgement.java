@@ -50,7 +50,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	OMNamespace rmNamespace = null;
 	SOAPFactory factory;
 	String namespaceValue = null;
-	private boolean mustUnderstand = true;
+	private boolean mustUnderstand = false;
 	private AckNone ackNone = null;
 	private AckFinal ackFinal = null;
 	

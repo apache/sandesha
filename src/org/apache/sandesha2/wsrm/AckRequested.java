@@ -44,7 +44,7 @@ public class AckRequested implements IOMRMPart {
 	private SOAPFactory factory;
 	OMNamespace rmNamespace = null;
 	String namespaceValue = null;
-	private boolean mustUnderstand = true;
+	private boolean mustUnderstand = false;
 
 	public AckRequested(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))

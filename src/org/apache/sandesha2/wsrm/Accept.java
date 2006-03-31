@@ -40,18 +40,19 @@ public class Accept implements IOMRMElement {
 
 	OMNamespace rmNamespace = null; 
 	
-	String namespaceValue = null;
+	OMNamespace addressingNamespace = null;
 
-	public Accept(SOAPFactory factory, String namespaceValue) throws SandeshaException {
-		if (!isNamespaceSupported(namespaceValue))
+	public Accept(SOAPFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
 		this.factory = factory;
 		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+				rmNamespaceValue , Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		addressingNamespace = factory.createOMNamespace(
+				addressingNamespaceValue , Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
 		acceptElement = factory.createOMElement(
 				Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
-		this.namespaceValue = namespaceValue;
 	}
 
 	public OMElement getOMElement() throws OMException {
@@ -61,12 +62,12 @@ public class Accept implements IOMRMElement {
 	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 
 		OMElement acceptPart = element.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACCEPT));
+				rmNamespace.getName(), Sandesha2Constants.WSRM_COMMON.ACCEPT));
 		if (acceptPart == null)
 			throw new OMException(
 					"Passed element does not contain an Accept part");
 
-		acksTo = new AcksTo(factory,namespaceValue);
+		acksTo = new AcksTo(factory,rmNamespace.getName(),addressingNamespace.getName());
 		acksTo.fromOMElement(acceptPart);
 
 		acceptElement = factory.createOMElement(

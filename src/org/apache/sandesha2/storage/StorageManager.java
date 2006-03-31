@@ -69,9 +69,4 @@ public abstract class StorageManager {
 	public abstract void updateMessageContext (String storageKey,MessageContext msgContext) throws SandeshaStorageException;
 
 	public abstract MessageContext retrieveMessageContext (String storageKey, ConfigurationContext configContext) throws SandeshaStorageException;
-	
-//	public abstract void storeSOAPEnvelope (SOAPEnvelope envelope,String key) throws SandeshaStorageException;
-//	
-//	public abstract SOAPEnvelope retrieveSOAPEnvelope (String key) throws SandeshaStorageException;
-
 }

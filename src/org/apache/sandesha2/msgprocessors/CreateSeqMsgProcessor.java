@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.axis2.AxisFault;
@@ -31,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -59,6 +59,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	public void processInMessage(RMMsgContext createSeqRMMsg)
 			throws SandeshaException {
 
+		
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
 		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		if (createSeqPart == null) {
@@ -116,7 +117,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 				String offeredSequenceID = offer.getIdentifer().getIdentifier(); //offered seq. id.
 				
-				boolean offerEcepted = offerAccepted (offeredSequenceID,context);
+				boolean offerEcepted = offerAccepted (offeredSequenceID,context,createSeqRMMsg);
 				
 				if (offerEcepted)  {
 					//Setting the CreateSequence table entry for the outgoing side.
@@ -186,8 +187,10 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			
 			EndpointReference toEPR = new EndpointReference (toBean.getValue());
 			
-			if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(
-					toEPR.getAddress())) {
+			String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(newSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,context);
+			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+			
+			if (anonymousURI.equals(toEPR.getAddress())) {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 			} else {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
@@ -200,7 +203,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		createSeqRMMsg.pause();
 	}
 	
-	private boolean offerAccepted (String sequenceID, ConfigurationContext configCtx) throws SandeshaException {
+	private boolean offerAccepted (String sequenceID, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg) throws SandeshaException {
 		if ("".equals(sequenceID)) 
 			return false;
 		
@@ -216,7 +219,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		
 		if (sequenceID.length()<=1)
 			return false;   //Single character offers are NOT accepted.
-		
+				
 		return true;
 	}
 	

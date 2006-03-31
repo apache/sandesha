@@ -22,9 +22,11 @@ import java.util.Iterator;
 import java.util.jar.Attributes.Name;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.AbstractContext;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -50,6 +52,8 @@ public class RMMsgContext {
 	private int messageType;
 
 	private String rmNamespaceValue = null;
+	
+	private String addressingNamespaceValue = null;
 	
 	private String rmSpecVersion = null;
 	
@@ -222,13 +226,14 @@ public class RMMsgContext {
 		return true;
 	}
 
-	public AbstractContext getContext() {
+	public ConfigurationContext getConfigurationContext() {
 		if (msgContext == null)
 			return null;
 
 		return msgContext.getConfigurationContext();
 	}
 
+	
 	public void setSOAPAction(String SOAPAction) {
 		msgContext.setSoapAction(SOAPAction);
 	}
@@ -267,5 +272,17 @@ public class RMMsgContext {
 	
 	public int getFlow () {
 		return msgContext.getFLOW();
+	}
+
+	public String getAddressingNamespaceValue() {
+		return addressingNamespaceValue;
+	}
+
+	public void setAddressingNamespaceValue(String addressingNamespaceValue) throws SandeshaException {
+		if (addressingNamespaceValue!=AddressingConstants.Submission.WSA_NAMESPACE &&
+			addressingNamespaceValue!=AddressingConstants.Final.WSA_NAMESPACE)
+			throw new SandeshaException ("Unknown addressing version");
+		
+		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 }

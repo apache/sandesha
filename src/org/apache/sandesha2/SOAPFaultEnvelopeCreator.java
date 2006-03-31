@@ -17,7 +17,9 @@
 
 package org.apache.sandesha2;
 
-
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axiom.om.OMConstants;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -30,8 +32,6 @@ import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.FaultCode;
@@ -203,7 +203,8 @@ public class SOAPFaultEnvelopeCreator {
 		if (detailElement != null)
 			faultDetail.addChild(detailElement);
 
-		faultMsgContext.setWSAAction(Sandesha2Constants.WSA.SOAP_FAULT_ACTION);
+		
+		faultMsgContext.setWSAAction(AddressingConstants.Final.WSA_FAULT_ACTION);
 	}
 
 }

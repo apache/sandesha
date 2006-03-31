@@ -46,7 +46,7 @@ public interface SenderBeanMgr extends RMBeanManager {
 	
 	public SenderBean findUnique (SenderBean bean) throws SandeshaException;
 	
-	public Collection findMsgsToSend() throws SandeshaStorageException;
+	public SenderBean getNextMsgToSend() throws SandeshaStorageException;
 
 	public boolean update(SenderBean bean) throws SandeshaStorageException;
 

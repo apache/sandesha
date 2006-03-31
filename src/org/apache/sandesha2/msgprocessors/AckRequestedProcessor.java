@@ -21,10 +21,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -38,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -52,6 +52,8 @@ import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AckRequested;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 
 /**
  * Responsible for processing an incoming Application message.
@@ -69,6 +71,10 @@ public class AckRequestedProcessor implements MsgProcessor {
 		if (ackRequested==null) {
 			throw new SandeshaException ("Message identified as of type ackRequested does not have an AckRequeted element");
 		}
+		
+	    //settting must understand to false.
+		ackRequested.setMustUnderstand(false);
+		rmMsgCtx.addSOAPEnvelope();
 		
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		
@@ -131,8 +137,16 @@ public class AckRequestedProcessor implements MsgProcessor {
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceID);
+		ackRMMsgCtx.getMessageContext().setServerSide(true);
+		ackMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,
+				msgContext.getProperty(AddressingConstants.WS_ADDRESSING_VERSION));  //TODO do this in the RMMsgCreator
+		
+//		RMMsgContext ackRMMsgCtx = rmm
 
-		if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequenceID,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configurationContext);
+		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+		
+		if (anonymousURI.equals(acksTo.getAddress())) {
 
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 					.getConfigurationContext());
@@ -179,6 +193,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 			ackBean.setMessageContextRefKey(key);
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
+			ackBean.setSequenceID(sequenceID);
 			
 			//this will be set to true in the sender.
 			ackBean.setSend(true);

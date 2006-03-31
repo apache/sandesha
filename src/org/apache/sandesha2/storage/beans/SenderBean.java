@@ -83,6 +83,13 @@ public class SenderBean extends RMBean {
 	 */
 	private int messageType =0;
 	
+	/**
+	 * The sequenceID of the sequence this message belong to.
+	 * this may be null for some messages (e.g. create sequence);
+	 */
+	//TODO fill this property correctly
+	private String sequenceID;
+	
 	public SenderBean() {
 
 	}
@@ -169,5 +176,13 @@ public class SenderBean extends RMBean {
 	
 	public void setMessageType(int messagetype) {
 		this.messageType = messagetype;
+	}
+
+	public String getSequenceID() {
+		return sequenceID;
+	}
+
+	public void setSequenceID(String sequenceID) {
+		this.sequenceID = sequenceID;
 	}
 }

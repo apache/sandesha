@@ -19,10 +19,10 @@ package org.apache.sandesha2.storage.inmemory;
 
 import java.util.HashMap;
 
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;

@@ -21,12 +21,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -36,12 +30,19 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.Utils;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SOAPFaultEnvelopeCreator;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
@@ -147,7 +148,7 @@ public class FaultManager {
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
 			data.setReason(reason);
-			return getFault(createSequenceRMMsg, data);
+			return getFault(createSequenceRMMsg, data,createSequenceRMMsg.getAddressingNamespaceValue());
 		}
 
 		return null;
@@ -192,7 +193,7 @@ public class FaultManager {
 
 			faultData.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.LAST_MESSAGE_NO_EXCEEDED);
 			faultData.setReason(reason);
-			return getFault(applicationRMMessage, faultData);
+			return getFault(applicationRMMessage, faultData, applicationRMMessage.getAddressingNamespaceValue());
 		} else
 			return null;
 	}
@@ -280,7 +281,7 @@ public class FaultManager {
 			data.setDetail(identifierOMElem);
 			data.setReason("A sequence with the given sequenceID has NOT been established");
 
-			return getFault(rmMessageContext, data);
+			return getFault(rmMessageContext, data,rmMessageContext.getAddressingNamespaceValue());
 		}
 
 		return null;
@@ -336,7 +337,7 @@ public class FaultManager {
 			data.setReason(reason);
 			data.setDetail(sequenceAcknowledgement.getOMElement());
 
-			return getFault(ackRMMessageContext, data);
+			return getFault(ackRMMessageContext, data,ackRMMessageContext.getAddressingNamespaceValue());
 		}
 
 		return null;
@@ -368,7 +369,7 @@ public class FaultManager {
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_CLOSED);
 			data.setReason(reason);
 
-			return getFault(referenceRMMessage, data);
+			return getFault(referenceRMMessage, data, referenceRMMessage.getAddressingNamespaceValue());
 		}
 		return null;
 		
@@ -383,12 +384,11 @@ public class FaultManager {
 	 * @throws SandeshaException
 	 */
 	public RMMsgContext getFault(RMMsgContext referenceRMMsgContext,
-			FaultData data) throws SandeshaException {
+			FaultData data, String addressingNamespaceURI) throws SandeshaException {
 
 		try {
-
-			MessageContext referenceMessage = referenceRMMsgContext
-					.getMessageContext();
+			MessageContext referenceMessage = referenceRMMsgContext.getMessageContext();
+			ConfigurationContext configCtx = referenceRMMsgContext.getConfigurationContext();
 			
 			//This is to hack to remove NPE. TODO remove this.
 			if (referenceMessage.getServiceGroupContext()==null) {
@@ -455,16 +455,15 @@ public class FaultManager {
 				}
 			}
 
+			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+
 			if (acksToStr != null
-					&& !acksToStr.equals(Sandesha2Constants.WSA.NS_URI_ANONYMOUS)) {
+					&& !acksToStr.equals(anonymousURI)) {
 				faultMsgContext.setTo(new EndpointReference(acksToStr));
 			}
 
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage
-					.getEnvelope());
-
-			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMsgContext,
-					SOAPVersion, data,referenceRMMsgContext.getRMNamespaceValue());
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
+			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMsgContext,SOAPVersion, data,referenceRMMsgContext.getRMNamespaceValue());
 
 			RMMsgContext faultRMMsgCtx = MsgInitializer.initializeMessage(faultMsgContext);
 

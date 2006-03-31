@@ -279,9 +279,12 @@ public class TerminateManager {
 				String internalSequenceID = internalSequenceBean.getValue();
 				SequencePropertyBean acksToBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 				
+				String addressingNamespace = SandeshaUtil.getSequenceProperty(internalSequenceID,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configContext);
+				String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
+				
 				if (acksToBean!=null) {
 					String acksTo = acksToBean.getValue();
-					if (acksTo!=null && !Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo)) {
+					if (acksTo!=null && !anonymousURI.equals(acksTo)) {
 						stopListnerForAsyncAcks = true;
 					}
 				}
@@ -331,120 +334,6 @@ public class TerminateManager {
 		SandeshaUtil.stopSenderForTheSequence(internalSequenceId);
 	}
 	
-//	public void terminateSequence (String outSequenceID,String internalSequenceID,ConfigurationContext configCtx) {
-//
-//		
-//		StorageManager storageManager = SandeshaUtil
-//				.getSandeshaStorageManager(configCtx);
-//
-//		Transaction addTerminateSeqTransaction = storageManager.getTransaction();
-//		
-//		SequencePropertyBeanMgr seqPropMgr = storageManager
-//				.getSequencePropretyBeanMgr();
-//
-//		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceID,
-//				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-//
-//		if (terminated != null && terminated.getValue() != null
-//				&& "true".equals(terminated.getValue())) {
-//			String message = "Terminate was added previously.";
-//			log.info(message);
-//			return;
-//		}
-//
-//		RMMsgContext terminateRMMessage = RMMsgCreator
-//				.createTerminateSequenceMessage(outSequenceID);
-//		terminateRMMessage.setFlow(MessageContext.OUT_FLOW);
-//		terminateRMMessage.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
-//		
-//		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceID,
-//				Sandesha2Constants.SequenceProperties.TO_EPR);
-//
-//		EndpointReference toEPR = new EndpointReference ( toBean.getValue());
-//		if (toEPR == null) {
-//			String message = "To EPR has an invalid value";
-//			throw new SandeshaException(message);
-//		}
-//
-//		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
-//		terminateRMMessage.setFrom(new EndpointReference(
-//				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
-//		terminateRMMessage.setFaultTo(new EndpointReference(
-//				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
-//		
-//		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceID,configCtx);
-//		if (rmVersion==null)
-//			throw new SandeshaException ("Cant find the rmVersion of the given message");
-//		terminateRMMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
-//		terminateRMMessage.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
-//
-//		SequencePropertyBean transportToBean = seqPropMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
-//		if (transportToBean!=null) {
-//			terminateRMMessage.setProperty(MessageContextConstants.TRANSPORT_URL,transportToBean.getValue());
-//		}
-//		
-//		try {
-//			terminateRMMessage.addSOAPEnvelope();
-//		} catch (AxisFault e) {
-//			throw new SandeshaException(e.getMessage());
-//		}
-//
-//		String key = SandeshaUtil.getUUID();
-//		
-//		SenderBean terminateBean = new SenderBean();
-//		terminateBean.setMessageContextRefKey(key);
-//
-//		
-//		storageManager.storeMessageContext(key,terminateRMMessage.getMessageContext());
-//
-//		
-//		//Set a retransmitter lastSentTime so that terminate will be send with
-//		// some delay.
-//		//Otherwise this get send before return of the current request (ack).
-//		//TODO: refine the terminate delay.
-//		terminateBean.setTimeToSend(System.currentTimeMillis()
-//				+ Sandesha2Constants.TERMINATE_DELAY);
-//
-//		terminateBean.setMessageID(terminateRMMessage.getMessageId());
-//		
-//		//this will be set to true at the sender.
-//		terminateBean.setSend(true);
-//		
-//		terminateRMMessage.getMessageContext().setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,
-//				Sandesha2Constants.VALUE_FALSE);
-//		
-//		terminateBean.setReSend(false);
-//
-//		SenderBeanMgr retramsmitterMgr = storageManager
-//				.getRetransmitterBeanMgr();
-//
-//		retramsmitterMgr.insert(terminateBean);
-//		
-//		SequencePropertyBean terminateAdded = new SequencePropertyBean();
-//		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-//		terminateAdded.setSequenceID(outSequenceID);
-//		terminateAdded.setValue("true");
-//
-//		seqPropMgr.insert(terminateAdded);
-//		
-//		//This should be dumped to the storage by the sender
-//		TransportOutDescription transportOut = terminateRMMessage.getMessageContext().getTransportOut();
-//		terminateRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC,transportOut);
-//		terminateRMMessage.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
-//		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE,Sandesha2Constants.VALUE_TRUE);
-//		terminateRMMessage.getMessageContext().setTransportOut(new Sandesha2TransportOutDesc ());
-//		addTerminateSeqTransaction.commit();
-//		
-//	    AxisEngine engine = new AxisEngine (incomingAckRMMsg.getMessageContext().getConfigurationContext());
-//	    try {
-//			engine.send(terminateRMMessage.getMessageContext());
-//		} catch (AxisFault e) {
-//			throw new SandeshaException (e.getMessage());
-//		}
-//	    
-//	}
-
-	
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage,
 			String outSequenceId, String internalSequenceId)
 			throws SandeshaException {
@@ -484,10 +373,12 @@ public class TerminateManager {
 		}
 
 		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
-		terminateRMMessage.setFrom(new EndpointReference(
-				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
-		terminateRMMessage.setFaultTo(new EndpointReference(
-				Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
+		
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(internalSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configurationContext);
+		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+		
+		terminateRMMessage.setFrom(new EndpointReference(anonymousURI));
+		terminateRMMessage.setFaultTo(new EndpointReference(anonymousURI));
 		
 		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId,configurationContext);
 		if (rmVersion==null)

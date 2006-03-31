@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.util;
 
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -138,7 +139,10 @@ public class MsgInitializer {
 		}
 		
 		rmMsgContext.setRMNamespaceValue(rmNamespace);
-
+		
+		String addressingNamespaceValue = elements.getAddressingNamespaceValue();
+		if (addressingNamespaceValue!=null)
+			rmMsgContext.setAddressingNamespaceValue(addressingNamespaceValue);
 	}
 
 	/**

@@ -31,11 +31,14 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private Log log = LogFactory.getLog(getClass());
 	
-	public void processInMessage(RMMsgContext createSeqRMMsg)
+	public void processInMessage(RMMsgContext terminateResRMMsg)
 			throws SandeshaException { 
 		
 		
 		//TODO add processing logic
+		System.out.println("");
+		
+		terminateResRMMsg.pause();
 	}
 	
 	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {

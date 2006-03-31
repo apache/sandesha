@@ -130,29 +130,87 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return beans;
 	}
 
-	public synchronized Collection findMsgsToSend() {
-		ArrayList beans = new ArrayList();
+	public synchronized SenderBean getNextMsgToSend() {
+//		ArrayList beans = new ArrayList();
 		Iterator iterator = table.keySet().iterator();
 
-		SenderBean temp;
-
+//		long lowestAppMsgNo = 0;
+//		while (iterator.hasNext()) {
+//			Object key = iterator.next();
+//			temp = (SenderBean) table.get(key);
+//
+//			if (temp.isSend()) {
+//				long timeToSend = temp.getTimeToSend();
+//				long timeNow = System.currentTimeMillis();
+//				if ((timeNow >= timeToSend)) {
+//					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
+//						long msgNo = temp.getMessageNumber();
+//						if (lowestAppMsgNo==0) {
+//							lowestAppMsgNo=msgNo;
+//						}else {
+//							if (msgNo<lowestAppMsgNo)
+//								lowestAppMsgNo = msgNo;
+//						}
+//					}
+//				}
+//			}
+//		}
+		
+		iterator = table.keySet().iterator();	
 		while (iterator.hasNext()) {
 			Object key = iterator.next();
-			temp = (SenderBean) table.get(key);
+			SenderBean temp = (SenderBean) table.get(key);
 
 			if (temp.isSend()) {
 
 				long timeToSend = temp.getTimeToSend();
 				long timeNow = System.currentTimeMillis();
 				if ((timeNow >= timeToSend)) {
-					beans.add(temp);
+//					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
+//						if (temp.getMessageNumber()==lowestAppMsgNo)
+//							beans.add(temp);
+//					}else {
+//						beans.add(temp);
+//					}
+					updateNextSendingTime (temp);
+					return temp;
 				}
 			}
 		}
-
-		return beans;
+		
+		return null;
+		
+//
+//		return beans;
 	}
 
+	private void updateNextSendingTime (SenderBean bean) {
+		
+	}
+	
+//	public synchronized Collection findMsgsToSend() {
+//		ArrayList beans = new ArrayList();
+//		Iterator iterator = table.keySet().iterator();
+//
+//		SenderBean temp;
+//
+//		while (iterator.hasNext()) {
+//			Object key = iterator.next();
+//			temp = (SenderBean) table.get(key);
+//
+//			if (temp.isSend()) {
+//
+//				long timeToSend = temp.getTimeToSend();
+//				long timeNow = System.currentTimeMillis();
+//				if ((timeNow >= timeToSend)) {
+//					beans.add(temp);
+//				}
+//			}
+//		}
+//
+//		return beans;
+//	}
+	
 	private synchronized ArrayList findBeansWithMsgNo(ArrayList list, long msgNo) {
 		ArrayList beans = new ArrayList();
 

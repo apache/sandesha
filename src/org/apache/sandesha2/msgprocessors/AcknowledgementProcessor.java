@@ -77,13 +77,6 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		ConfigurationContext configCtx = msgCtx.getConfigurationContext();
 		
-		AbstractContext context = rmMsgCtx.getContext();
-		if (context == null) {
-			String message = "Context is null";
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-		
 		//setting mustUnderstand to false.
 		sequenceAck.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
@@ -231,27 +224,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		String str = ackedMessagesList.toString();
 		allCompletedMsgsBean.setValue(str);
 		
-		seqPropMgr.update(allCompletedMsgsBean);
-		
-		//If all messages up to last message have been acknowledged. Add terminate Sequence message.
-//		SequencePropertyBean lastOutMsgBean = seqPropMgr.retrieve(
-//				internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE);
-//		if (lastOutMsgBean != null) {
-//			Long lastOutMsgNoLng = new Long (lastOutMsgBean.getValue());
-//			if (lastOutMsgNoLng == null) {
-//				String message = "Invalid object set for the Last Out Message";
-//				log.debug(message);
-//				throw new SandeshaException(message);
-//			}
-//			
-//			long lastOutMessageNo = lastOutMsgNoLng.longValue();
-//			if (lastOutMessageNo <= 0) {
-//				String message = "Invalid value set for the last out message";
-//				log.debug(message);
-//				throw new SandeshaException(message);
-//			}
-
-		
+		seqPropMgr.update(allCompletedMsgsBean);		
 		
 		//commiting transaction
 		ackTransaction.commit();

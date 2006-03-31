@@ -27,26 +27,26 @@ public class Address implements IOMRMElement {
 	EndpointReference epr = null;
 	OMElement addressElement;
 	SOAPFactory factory;
-	OMNamespace rmNamespace = null;
+	OMNamespace addressingNamespace = null;
 
-	public Address(SOAPFactory factory) {
+	public Address(SOAPFactory factory, String addressingNamespaceValue) {
 		
 		this.factory = factory;
-		rmNamespace = factory.createOMNamespace(Sandesha2Constants.WSA.NS_URI_ADDRESSING,
+		addressingNamespace = factory.createOMNamespace(addressingNamespaceValue,
 				Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
 		addressElement = factory.createOMElement(
-				Sandesha2Constants.WSA.ADDRESS, rmNamespace);
+				Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
 	}
 	
-	public Address (EndpointReference epr,SOAPFactory factory) {
-		this(factory);
+	public Address (EndpointReference epr,SOAPFactory factory,String addressingNamespaceValue) {
+		this(factory,addressingNamespaceValue);
 		this.epr = epr;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
 
 		OMElement addressPart = element.getFirstChildWithName(new QName(
-				Sandesha2Constants.WSA.NS_URI_ADDRESSING, Sandesha2Constants.WSA.ADDRESS));
+				addressingNamespace.getName(), Sandesha2Constants.WSA.ADDRESS));
 		if (addressPart == null)
 			throw new OMException(
 					"Cant find an Address element in the given part");
@@ -58,7 +58,7 @@ public class Address implements IOMRMElement {
 		addressElement = addressPart;
 		epr = new EndpointReference(addressText);
 		addressElement = factory.createOMElement(
-				Sandesha2Constants.WSA.ADDRESS, rmNamespace);
+				Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
 		return this;
 
 	}
@@ -80,7 +80,7 @@ public class Address implements IOMRMElement {
 		element.addChild(addressElement);
 
 		addressElement = factory.createOMElement(
-				Sandesha2Constants.WSA.ADDRESS, rmNamespace);
+				Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
 
 		return element;
 	}

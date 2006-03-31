@@ -101,7 +101,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 		
 		//TODO process embedded ack requests
-		
+		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
+		if (ackRequested!=null) {
+			ackRequested.setMustUnderstand(false);
+			rmMsgCtx.addSOAPEnvelope();
+		}
 
 		//Processing the application message.
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
@@ -147,8 +151,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
@@ -381,8 +384,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
-				.getSOAPVersion(msgCtx.getEnvelope()));
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(msgCtx.getConfigurationContext());
 		SequencePropertyBeanMgr seqPropMgr = storageManager
@@ -430,6 +431,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	}
 	
 	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+				
 		
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configContext = msgContext .getConfigurationContext();
@@ -664,6 +666,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			SequencePropertyBean responseCreateSeqAdded = seqPropMgr
 					.retrieve(internalSequenceId,Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT);
 
+			String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(internalSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configContext);
+			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+			
 			if (responseCreateSeqAdded == null) {
 				responseCreateSeqAdded = new SequencePropertyBean(
 						internalSequenceId,Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT,"true");
@@ -692,10 +697,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 				} else {
 					if (acksTo == null)
-						acksTo = Sandesha2Constants.WSA.NS_URI_ANONYMOUS;
+						acksTo = anonymousURI;
 				}
 
-				if (!Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo) && !serverSide) {
+				if (!anonymousURI.equals(acksTo) && !serverSide) {
 					String transportIn = (String) configContext   //TODO verify
 							.getProperty(MessageContext.TRANSPORT_IN);
 					if (transportIn == null)
@@ -709,8 +714,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						if (acksToEPR != null)
 							acksTo = (String) acksToEPR.getAddress();
 					}
-				} else if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS
-						.equals(acksTo)) {
+				} else if (anonymousURI.equals(acksTo)) {
 					// set transport in.
 					Object trIn = msgContext.getProperty(MessageContext.TRANSPORT_IN);
 					if (trIn == null) {
@@ -819,8 +823,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		CreateSeqBean createSeqBean = new CreateSeqBean(internalSequenceId,createSeqMsg.getMessageID(), null);
 		createSeqMgr.insert(createSeqBean);
 
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(internalSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configCtx);
+		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+		
 		if (createSeqMsg.getReplyTo() == null)
-			createSeqMsg.setReplyTo(new EndpointReference(Sandesha2Constants.WSA.NS_URI_ANONYMOUS));
+			createSeqMsg.setReplyTo(new EndpointReference(anonymousURI));
 
 		String key = SandeshaUtil.getUUID();   //the key used to store the create sequence message.
 
@@ -929,7 +936,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 		
 		Sequence sequence = new Sequence(factory,rmNamespaceValue);
-
 		MessageNumber msgNumber = new MessageNumber(factory,rmNamespaceValue);
 		msgNumber.setMessageNumber(messageNumber);
 		sequence.setMessageNumber(msgNumber);
@@ -981,13 +987,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					String specVersion = specVersionBean.getValue();
 					if (SpecSpecificConstants.isLastMessageIndicatorRequired(specVersion))
 						sequence.setLastMessage(new LastMessage(factory,rmNamespaceValue));
-					
-//					// saving the last message no.
-//					SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
-//							internalSequenceId,
-//							Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE,
-//							new Long(messageNumber).toString());
-//					sequencePropertyMgr.insert(lastOutMsgBean);
 				}
 			}
 		}
@@ -996,7 +995,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		boolean addAckRequested = false;
 		//if (!lastMessage)
-		addAckRequested = true;   //TODO decide the policy to add the ackRequested tag
+//		addAckRequested = true;   //TODO decide the policy to add the ackRequested tag
 
 		// setting the Sequnece id.
 		// Set send = true/false depending on the availability of the out

@@ -16,6 +16,7 @@
  */
 package org.apache.sandesha2.util;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -25,16 +26,20 @@ import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
@@ -43,12 +48,19 @@ import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Handler;
+import org.apache.axis2.i18n.Messages;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXBuilder;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
@@ -61,7 +73,12 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.workers.InOrderInvoker;
 import org.apache.sandesha2.workers.Sender;
+import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
+import org.apache.sandesha2.wsrm.CloseSequence;
+import org.apache.sandesha2.wsrm.CloseSequenceResponse;
+import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * Contains utility methods that are used in many plases of Sandesha2.
@@ -71,14 +88,14 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 public class SandeshaUtil {
 
-	//private static Hashtable storedMsgContexts = new Hashtable();
+	// private static Hashtable storedMsgContexts = new Hashtable();
 
 	private static StorageManager storageManager = null;
 
 	private static Sender sender = new Sender();
 
 	private static InOrderInvoker invoker = new InOrderInvoker();
-	
+
 	private static Log log = LogFactory.getLog(SandeshaUtil.class);
 
 	/**
@@ -87,24 +104,24 @@ public class SandeshaUtil {
 	 * @return
 	 */
 	public static String getUUID() {
-		//String uuid = "uuid:" + UUIDGenerator.getUUID();
+		// String uuid = "uuid:" + UUIDGenerator.getUUID();
 		String uuid = UUIDGenerator.getUUID();
 
 		return uuid;
 	}
 
 	/**
-	 * Used to convert a message number list (a comma seperated list of message numbers) into
-	 * a set of AcknowledgementRanges. This breaks the list, sort the items and group them to create
-	 * the AcknowledgementRange objects.
+	 * Used to convert a message number list (a comma seperated list of message
+	 * numbers) into a set of AcknowledgementRanges. This breaks the list, sort
+	 * the items and group them to create the AcknowledgementRange objects.
 	 * 
 	 * @param msgNoStr
 	 * @param factory
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static ArrayList getAckRangeArrayList(String msgNoStr,
-			SOAPFactory factory, String rmNamespaceValue) throws SandeshaException {
+	public static ArrayList getAckRangeArrayList(String msgNoStr, SOAPFactory factory, String rmNamespaceValue)
+			throws SandeshaException {
 
 		ArrayList ackRanges = new ArrayList();
 
@@ -127,9 +144,8 @@ public class SandeshaUtil {
 				upper = temp;
 				completed = false;
 			} else {
-				//add ackRange (lower,upper)
-				AcknowledgementRange ackRange = new AcknowledgementRange(
-						factory,rmNamespaceValue);
+				// add ackRange (lower,upper)
+				AcknowledgementRange ackRange = new AcknowledgementRange(factory, rmNamespaceValue);
 				ackRange.setLowerValue(lower);
 				ackRange.setUpperValue(upper);
 				ackRanges.add(ackRange);
@@ -141,7 +157,7 @@ public class SandeshaUtil {
 		}
 
 		if (!completed) {
-			AcknowledgementRange ackRange = new AcknowledgementRange(factory,rmNamespaceValue);
+			AcknowledgementRange ackRange = new AcknowledgementRange(factory, rmNamespaceValue);
 			ackRange.setLowerValue(lower);
 			ackRange.setUpperValue(upper);
 			ackRanges.add(ackRange);
@@ -151,8 +167,7 @@ public class SandeshaUtil {
 		return ackRanges;
 	}
 
-	private static ArrayList getSortedMsgNoArrayList(StringTokenizer tokenizer)
-			throws SandeshaException {
+	private static ArrayList getSortedMsgNoArrayList(StringTokenizer tokenizer) throws SandeshaException {
 		ArrayList msgNubers = new ArrayList();
 
 		while (tokenizer.hasMoreElements()) {
@@ -197,107 +212,23 @@ public class SandeshaUtil {
 		return sortedList;
 	}
 
-//	/**
-//	 * Used to store message context objects. Currently they are stored in a in-memory HashMap.
-//	 * Returned key can be used to retrieve the message context.
-//	 * 
-//	 * @param ctx
-//	 * @return
-//	 * @throws SandeshaException
-//	 */
-//	public static String storeMessageContext(MessageContext ctx)
-//			throws SandeshaException {
-//		if (ctx == null) {
-//			String message = "Stored Msg Ctx is null";
-//			log.debug(message);
-//			throw new SandeshaException(message);
-//		}
-//
-//		String key = getUUID();
-//		storedMsgContexts.put(key, ctx);
-//		return key;
-//	}
-	
-//	/**
-//	 * Retrieve the MessageContexts saved by the above method.
-//	 * 
-//	 * @param key
-//	 * @return
-//	 */
-//	public static MessageContext getStoredMessageContext(String key) {
-//		return (MessageContext) storedMsgContexts.get(key);
-//	}
-
 	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) {
-		sender.runSenderForTheSequence (context,sequenceID);
+		sender.runSenderForTheSequence(context, sequenceID);
 	}
 
 	public static void stopSenderForTheSequence(String sequenceID) {
-		sender.stopSenderForTheSequence (sequenceID);
+		sender.stopSenderForTheSequence(sequenceID);
 	}
-	
+
 	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
 		if (!invoker.isInvokerStarted()) {
-			invoker.runInvokerForTheSequence(context,sequenceID);
+			invoker.runInvokerForTheSequence(context, sequenceID);
 		}
 	}
-	
+
 	public static void stopInvokerForTheSequence(String sequenceID) {
-		invoker.stopInvokerForTheSequence (sequenceID);
+		invoker.stopInvokerForTheSequence(sequenceID);
 	}
-
-
-
-	/*public static SOAPEnvelope createSOAPMessage(MessageContext msgContext,
-			String soapNamespaceURI) throws AxisFault {
-		try {
-
-			InputStream inStream = (InputStream) msgContext
-					.getProperty(MessageContext.TRANSPORT_IN);
-			msgContext.setProperty(MessageContext.TRANSPORT_IN, null);
-			//this inputstram is set by the TransportSender represents a two
-			// way transport or
-			//by a Transport Recevier
-			if (inStream == null) {
-				throw new AxisFault(Messages.getMessage("inputstreamNull"));
-			}
-
-			String contentType = null;
-
-			StAXBuilder builder = null;
-			SOAPEnvelope envelope = null;
-
-			String charSetEnc = (String) msgContext
-					.getProperty(MessageContext.CHARACTER_SET_ENCODING);
-			if (charSetEnc == null) {
-				charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
-			}
-
-			if (contentType != null) {
-				msgContext.setDoingMTOM(true);
-				builder = HTTPTransportUtils.selectBuilderForMIME(msgContext,
-						inStream, (String) contentType);
-				envelope = (SOAPEnvelope) builder.getDocumentElement();
-			} else if (msgContext.isDoingREST()) {
-				XMLStreamReader xmlreader = XMLInputFactory.newInstance()
-						.createXMLStreamReader(inStream, charSetEnc);
-				SOAPFactory soapFactory = new SOAP11Factory();
-				builder = new StAXOMBuilder(xmlreader);
-				builder.setOmbuilderFactory(soapFactory);
-				envelope = soapFactory.getDefaultEnvelope();
-				envelope.getBody().addChild(builder.getDocumentElement());
-			} else {
-				XMLStreamReader xmlreader = XMLInputFactory.newInstance()
-						.createXMLStreamReader(inStream, charSetEnc);
-				builder = new StAXSOAPModelBuilder(xmlreader, soapNamespaceURI);
-				envelope = (SOAPEnvelope) builder.getDocumentElement();
-			}
-			return envelope;
-		} catch (Exception e) {
-			throw new AxisFault(e);
-		}
-
-	}*/
 
 	public static String getMessageTypeString(int messageType) {
 		switch (messageType) {
@@ -327,8 +258,7 @@ public class SandeshaUtil {
 	}
 
 	public static boolean isGloballyProcessableMessageType(int type) {
-		if (type == Sandesha2Constants.MessageTypes.ACK
-				|| type == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
+		if (type == Sandesha2Constants.MessageTypes.ACK || type == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
 			return true;
 		}
 
@@ -358,36 +288,30 @@ public class SandeshaUtil {
 		return results;
 	}
 
-	public static String getServerSideIncomingSeqIdFromInternalSeqId (
-			String internalSequenceId) throws SandeshaException  {
-		
+	public static String getServerSideIncomingSeqIdFromInternalSeqId(String internalSequenceId)
+			throws SandeshaException {
+
 		String startStr = Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":";
-		if (!internalSequenceId.startsWith(startStr)){
-			throw new SandeshaException ("Invalid internal sequence ID");
+		if (!internalSequenceId.startsWith(startStr)) {
+			throw new SandeshaException("Invalid internal sequence ID");
 		}
-		
+
 		String incomingSequenceId = internalSequenceId.substring(startStr.length());
 		return incomingSequenceId;
 	}
 
-//	public static String getServerSideInternalSeqIdFromIncomingSeqId(
-//			String incomingSequenceId) {
-//		String internalSequenceId =  Sandesha2Constants.SANDESHA2_INTERNAL_SEQUENCE_ID + ":" + incomingSequenceId;
-//		return internalSequenceId;
-//	}
-
 	/**
-	 * Used to obtain the storage Manager Implementation. 
+	 * Used to obtain the storage Manager Implementation.
+	 * 
 	 * @param context
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static StorageManager getSandeshaStorageManager(
-			ConfigurationContext context) throws SandeshaException {
-		
-		if (storageManager!=null)
+	public static StorageManager getSandeshaStorageManager(ConfigurationContext context) throws SandeshaException {
+
+		if (storageManager != null)
 			return storageManager;
-		
+
 		String srotageManagerClassStr = PropertyManager.getInstance().getStorageManagerClass();
 
 		if (storageManager != null)
@@ -395,15 +319,12 @@ public class SandeshaUtil {
 
 		try {
 			Class c = Class.forName(srotageManagerClassStr);
-			Class configContextClass = Class.forName(context.getClass()
-					.getName());
-			Constructor constructor = c
-					.getConstructor(new Class[] { configContextClass });
+			Class configContextClass = Class.forName(context.getClass().getName());
+			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
 			Object obj = constructor.newInstance(new Object[] { context });
 
 			if (obj == null || !(obj instanceof StorageManager))
-				throw new SandeshaException(
-						"StorageManager must implement org.apache.sandeshat.storage.StorageManager");
+				throw new SandeshaException("StorageManager must implement org.apache.sandeshat.storage.StorageManager");
 
 			StorageManager mgr = (StorageManager) obj;
 			storageManager = mgr;
@@ -416,13 +337,11 @@ public class SandeshaUtil {
 		}
 	}
 
-	public static int getSOAPVersion(SOAPEnvelope envelope)
-			throws SandeshaException {
+	public static int getSOAPVersion(SOAPEnvelope envelope) throws SandeshaException {
 		String namespaceName = envelope.getNamespace().getName();
 		if (namespaceName.equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			return Sandesha2Constants.SOAPVersion.v1_1;
-		else if (namespaceName
-				.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
+		else if (namespaceName.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			return Sandesha2Constants.SOAPVersion.v1_2;
 		else
 			throw new SandeshaException("Unknown SOAP version");
@@ -441,147 +360,118 @@ public class SandeshaUtil {
 			return false;
 		}
 
-		//TODO make this spec indipendent 
-		
+		// TODO make this spec indipendent
+
 		OMElement sequenceElem = null;
 		if (header != null)
-			sequenceElem = header.getFirstChildWithName(new QName(
-					Sandesha2Constants.SPEC_2005_02.NS_URI, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI,
+					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 
-		if (sequenceElem==null)
-			sequenceElem = header.getFirstChildWithName(new QName(
-					Sandesha2Constants.SPEC_2005_10.NS_URI, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-			
+		if (sequenceElem == null)
+			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_10.NS_URI,
+					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+
 		if (sequenceElem != null)
 			rmGlobalMsg = true;
 
-		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
-				.equals(action))
+		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
 			rmGlobalMsg = true;
-		
+
 		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
 			rmGlobalMsg = true;
 
 		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
-		
-		
-		
-		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT
-				.equals(action))
+
+		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
 			rmGlobalMsg = true;
 
 		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
-		
+
 		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
 			rmGlobalMsg = true;
 
-		
 		return rmGlobalMsg;
 	}
 
-//	public static RMMsgContext createResponseRMMessage(
-//			RMMsgContext referenceRMMessage) throws SandeshaException {
-//		try {
-//			MessageContext referenceMessage = referenceRMMessage
-//					.getMessageContext();
-//			MessageContext faultMsgContext = Utils
-//					.createOutMessageContext(referenceMessage);
-//
-//			RMMsgContext faultRMMsgCtx = MsgInitializer
-//					.initializeMessage(faultMsgContext);
-//
-//			return faultRMMsgCtx;
-//
-//		} catch (AxisFault e) {
-//			log.debug(e.getMessage());
-//			throw new SandeshaException(e.getMessage());
-//		}
-//	}
-
-	public static MessageContext createNewRelatedMessageContext(
-			RMMsgContext referenceRMMessage, AxisOperation operation)
+	public static MessageContext createNewRelatedMessageContext(RMMsgContext referenceRMMessage, AxisOperation operation)
 			throws SandeshaException {
 		try {
-			MessageContext referenceMessage = referenceRMMessage
-					.getMessageContext();
-			ConfigurationContext configContext = referenceMessage
-					.getConfigurationContext();
+			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
+			ConfigurationContext configContext = referenceMessage.getConfigurationContext();
 			AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
-			
+
 			MessageContext newMessageContext = new MessageContext();
 			newMessageContext.setConfigurationContext(configContext);
 
 			if (referenceMessage.getAxisServiceGroup() != null) {
-				newMessageContext.setAxisServiceGroup(referenceMessage
-						.getAxisServiceGroup());
-				newMessageContext.setServiceGroupContext(referenceMessage
-						.getServiceGroupContext());
-				newMessageContext.setServiceGroupContextId(referenceMessage
-						.getServiceGroupContextId());
+				newMessageContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
+				newMessageContext.setServiceGroupContext(referenceMessage.getServiceGroupContext());
+				newMessageContext.setServiceGroupContextId(referenceMessage.getServiceGroupContextId());
 			} else {
-				AxisServiceGroup axisServiceGroup = new AxisServiceGroup (axisConfiguration);
-				ServiceGroupContext serviceGroupContext = new ServiceGroupContext (configContext,axisServiceGroup);
-				
+				AxisServiceGroup axisServiceGroup = new AxisServiceGroup(axisConfiguration);
+				ServiceGroupContext serviceGroupContext = new ServiceGroupContext(configContext, axisServiceGroup);
+
 				newMessageContext.setAxisServiceGroup(axisServiceGroup);
-				newMessageContext.setServiceGroupContext (serviceGroupContext);
+				newMessageContext.setServiceGroupContext(serviceGroupContext);
 			}
 
 			if (referenceMessage.getAxisService() != null) {
-				newMessageContext.setAxisService(referenceMessage
-						.getAxisService());
-				newMessageContext.setServiceContext(referenceMessage
-						.getServiceContext());
-				newMessageContext.setServiceContextID(referenceMessage
-						.getServiceContextID());
+				newMessageContext.setAxisService(referenceMessage.getAxisService());
+				newMessageContext.setServiceContext(referenceMessage.getServiceContext());
+				newMessageContext.setServiceContextID(referenceMessage.getServiceContextID());
 			} else {
-				AxisService axisService = new AxisService ("AnonymousRMService"); //just a dummy name.
-				ServiceContext serviceContext = new ServiceContext (axisService,newMessageContext.getServiceGroupContext());
-				
+				AxisService axisService = new AxisService("AnonymousRMService"); // just
+																					// a
+																					// dummy
+																					// name.
+				ServiceContext serviceContext = new ServiceContext(axisService, newMessageContext
+						.getServiceGroupContext());
+
 				newMessageContext.setAxisService(axisService);
 				newMessageContext.setServiceContext(serviceContext);
 			}
 
 			newMessageContext.setAxisOperation(operation);
 
-			
-			//setting parent child relationships 
+			// setting parent child relationships
 			AxisService service = newMessageContext.getAxisService();
-			if (service!=null && operation!=null) {
+			if (service != null && operation != null) {
 				service.addChild(operation);
 				operation.setParent(service);
 			}
-			
+
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);
 			operationContext.addMessageContext(newMessageContext);
 
-			//adding a blank envelope
-			SOAPFactory factory = SOAPAbstractFactory
-					.getSOAPFactory(SandeshaUtil
-							.getSOAPVersion(referenceMessage.getEnvelope()));
+			// adding a blank envelope
+			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(referenceMessage
+					.getEnvelope()));
 			newMessageContext.setEnvelope(factory.getDefaultEnvelope());
 
 			newMessageContext.setTransportIn(referenceMessage.getTransportIn());
-			newMessageContext.setTransportOut(referenceMessage
-					.getTransportOut());
+			newMessageContext.setTransportOut(referenceMessage.getTransportOut());
 
-			copyNecessaryPropertiesFromRelatedContext (referenceMessage,newMessageContext);
-			
-			//copying transport info.
-			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,
-					referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
-			newMessageContext.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN,
-					referenceMessage
+			copyNecessaryPropertiesFromRelatedContext(referenceMessage, newMessageContext);
+
+			// copying transport info.
+			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
+					.getProperty(MessageContext.TRANSPORT_OUT));
+			newMessageContext.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, referenceMessage
 					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN));
 
-			newMessageContext.setProperty(Constants.OUT_TRANSPORT_INFO,referenceMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
-			newMessageContext.setProperty(MessageContext.TRANSPORT_HEADERS,referenceMessage.getProperty(MessageContext.TRANSPORT_HEADERS));
-			newMessageContext.setProperty(MessageContext.TRANSPORT_IN,referenceMessage.getProperty(MessageContext.TRANSPORT_IN));
-			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT,referenceMessage.getProperty(MessageContext.TRANSPORT_OUT));
+			newMessageContext.setProperty(Constants.OUT_TRANSPORT_INFO, referenceMessage
+					.getProperty(Constants.OUT_TRANSPORT_INFO));
+			newMessageContext.setProperty(MessageContext.TRANSPORT_HEADERS, referenceMessage
+					.getProperty(MessageContext.TRANSPORT_HEADERS));
+			newMessageContext.setProperty(MessageContext.TRANSPORT_IN, referenceMessage
+					.getProperty(MessageContext.TRANSPORT_IN));
+			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
+					.getProperty(MessageContext.TRANSPORT_OUT));
 			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
-			
+
 			return newMessageContext;
 
 		} catch (AxisFault e) {
@@ -590,156 +480,175 @@ public class SandeshaUtil {
 		}
 
 	}
-	
-	private static void copyNecessaryPropertiesFromRelatedContext (MessageContext fromMessage, MessageContext toMessage) {
-		toMessage.setProperty(MessageContextConstants.TRANSPORT_URL,fromMessage.getProperty(MessageContextConstants.TRANSPORT_URL));
-	}
-	
-	public static ArrayList getArrayListFromString (String str) throws SandeshaException {
+
+	private static void copyNecessaryPropertiesFromRelatedContext(MessageContext fromMessage, MessageContext toMessage) throws SandeshaException {
+		toMessage.setProperty(MessageContextConstants.TRANSPORT_URL, fromMessage
+				.getProperty(MessageContextConstants.TRANSPORT_URL));
 		
-		if (str==null || "".equals(str))
-			return new ArrayList ();
-		
-		if (str.length()<2) {
-			String message = "Invalid String array : " + str;
-			log.debug(message);
-			throw new SandeshaException (message);
-		}
-		
-		int length = str.length();
-		
-		if (str.charAt(0)!='[' || str.charAt(length-1)!=']') {
-			String message = "Invalid String array" + str;
-			log.debug(message);
-			throw new SandeshaException (message);
-		}
-		
-		ArrayList retArr = new ArrayList ();
-		
-		String subStr = str.substring(1,length-1);
-		
-		String[] parts = subStr.split(",");
-		
-		for (int i=0;i<parts.length;i++) {
-			if (!"".equals(parts[i]))
-				retArr.add(parts[i].trim());
-		}
-		
-		return retArr;
-	}
-	
-	public static ArrayList getArrayListFromMsgsString (String str) throws SandeshaException {
-		
-		if (str==null || "".equals(str))
-			return new ArrayList ();
-		
-		ArrayList retArr = new ArrayList ();
-		
-		StringTokenizer tokenizer = new StringTokenizer (str,",");
-		
-		while (tokenizer.hasMoreElements()) {
-			String nextToken = tokenizer.nextToken();
-			if (nextToken!=null && !"".equals(nextToken)) {
-				Long lng = new Long (nextToken);
-				retArr.add(lng);
+		String addressingVersion = (String) fromMessage.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+		if (addressingVersion==null) {
+			OperationContext opCtx = fromMessage.getOperationContext();
+			if (opCtx!=null) {
+				try {
+					MessageContext requestMsg = opCtx.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					if (requestMsg!=null)
+						addressingVersion = (String) requestMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+				} catch (AxisFault e) {
+					throw new SandeshaException (e);
+				}
 			}
 		}
 		
+		toMessage.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,addressingVersion);
+	}
+
+	public static ArrayList getArrayListFromString(String str) throws SandeshaException {
+
+		if (str == null || "".equals(str))
+			return new ArrayList();
+
+		if (str.length() < 2) {
+			String message = "Invalid String array : " + str;
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
+
+		int length = str.length();
+
+		if (str.charAt(0) != '[' || str.charAt(length - 1) != ']') {
+			String message = "Invalid String array" + str;
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
+
+		ArrayList retArr = new ArrayList();
+
+		String subStr = str.substring(1, length - 1);
+
+		String[] parts = subStr.split(",");
+
+		for (int i = 0; i < parts.length; i++) {
+			if (!"".equals(parts[i]))
+				retArr.add(parts[i].trim());
+		}
+
 		return retArr;
 	}
-	
-	public static String getInternalSequenceID (String to, String sequenceKey) {
-		if (to==null && sequenceKey==null)
+
+	public static ArrayList getArrayListFromMsgsString(String str) throws SandeshaException {
+
+		if (str == null || "".equals(str))
+			return new ArrayList();
+
+		ArrayList retArr = new ArrayList();
+
+		StringTokenizer tokenizer = new StringTokenizer(str, ",");
+
+		while (tokenizer.hasMoreElements()) {
+			String nextToken = tokenizer.nextToken();
+			if (nextToken != null && !"".equals(nextToken)) {
+				Long lng = new Long(nextToken);
+				retArr.add(lng);
+			}
+		}
+
+		return retArr;
+	}
+
+	public static String getInternalSequenceID(String to, String sequenceKey) {
+		if (to == null && sequenceKey == null)
 			return null;
-		else if (to==null) 
+		else if (to == null)
 			return sequenceKey;
-		else if (sequenceKey==null)
+		else if (sequenceKey == null)
 			return to;
-		else 
-			return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + to + ":" +sequenceKey;
+		else
+			return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + to + ":" + sequenceKey;
 	}
-	
-	public static String getInternalSequenceID (String sequenceID) {
-			return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + sequenceID;
+
+	public static String getInternalSequenceID(String sequenceID) {
+		return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + sequenceID;
 	}
-	
-	public static String getSequenceIDFromInternalSequenceID (String internalSequenceID, ConfigurationContext configurationContext)  throws SandeshaException {
-		
+
+	public static String getSequenceIDFromInternalSequenceID(String internalSequenceID,
+			ConfigurationContext configurationContext) throws SandeshaException {
+
 		StorageManager storageManager = getSandeshaStorageManager(configurationContext);
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
-		
-		SequencePropertyBean outSequenceBean = sequencePropertyBeanMgr.retrieve(internalSequenceID, Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-		
+
+		SequencePropertyBean outSequenceBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,
+				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+
 		String sequeunceID = null;
-		if (outSequenceBean!=null)
+		if (outSequenceBean != null)
 			sequeunceID = outSequenceBean.getValue();
-		
+
 		return sequeunceID;
 	}
-		
-	public static QName getQNameFromString (String qnameStr) throws SandeshaException {
+
+	public static QName getQNameFromString(String qnameStr) throws SandeshaException {
 		String[] parts = qnameStr.split(Sandesha2Constants.QNAME_SEPERATOR);
-		if (!(parts.length==3))
-			throw new SandeshaException ("Invalid QName String");
-		
+		if (!(parts.length == 3))
+			throw new SandeshaException("Invalid QName String");
+
 		if (parts[0].equals(Sandesha2Constants.VALUE_NONE))
-			parts[0]=null;
-		
+			parts[0] = null;
+
 		if (parts[1].equals(Sandesha2Constants.VALUE_NONE))
-			parts[1]=null;
-		
+			parts[1] = null;
+
 		if (parts[2].equals(Sandesha2Constants.VALUE_NONE))
-			parts[2]=null;
-		
+			parts[2] = null;
+
 		if (parts[0].equals(Sandesha2Constants.VALUE_EMPTY))
-			parts[0]="";
-		
+			parts[0] = "";
+
 		if (parts[1].equals(Sandesha2Constants.VALUE_EMPTY))
-			parts[1]="";
-		
+			parts[1] = "";
+
 		if (parts[2].equals(Sandesha2Constants.VALUE_EMPTY))
-			parts[2]="";
-		
+			parts[2] = "";
+
 		String namespace = parts[0];
 		String localPart = parts[1];
 		String prefix = parts[2];
-		
-		QName name = new QName (namespace, localPart,prefix);
+
+		QName name = new QName(namespace, localPart, prefix);
 		return name;
 	}
-	
-	public static String getStringFromQName (QName name) {
+
+	public static String getStringFromQName(QName name) {
 		String localPart = name.getLocalPart();
 		String namespace = name.getNamespaceURI();
 		String prefix = name.getPrefix();
-		
-		if (localPart==null)
+
+		if (localPart == null)
 			localPart = Sandesha2Constants.VALUE_NONE;
 
-		if (namespace==null)
+		if (namespace == null)
 			namespace = Sandesha2Constants.VALUE_NONE;
-		
-		if (prefix==null)
+
+		if (prefix == null)
 			prefix = Sandesha2Constants.VALUE_NONE;
-		
+
 		if ("".equals(localPart))
 			localPart = Sandesha2Constants.VALUE_EMPTY;
 
 		if ("".equals(namespace))
 			namespace = Sandesha2Constants.VALUE_EMPTY;
-		
+
 		if ("".equals(prefix))
 			prefix = Sandesha2Constants.VALUE_EMPTY;
-		
-		String QNameStr = namespace + Sandesha2Constants.QNAME_SEPERATOR + localPart + Sandesha2Constants.QNAME_SEPERATOR 
-								+ prefix;
-		
+
+		String QNameStr = namespace + Sandesha2Constants.QNAME_SEPERATOR + localPart
+				+ Sandesha2Constants.QNAME_SEPERATOR + prefix;
+
 		return QNameStr;
 	}
-	
-	public static String getExecutionChainString (ArrayList executionChain) {
+
+	public static String getExecutionChainString(ArrayList executionChain) {
 		Iterator iter = executionChain.iterator();
-		
+
 		String executionChainStr = "";
 		while (iter.hasNext()) {
 			Handler handler = (Handler) iter.next();
@@ -747,172 +656,196 @@ public class SandeshaUtil {
 			String handlerStr = SandeshaUtil.getStringFromQName(name);
 			executionChainStr = executionChainStr + Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR + handlerStr;
 		}
-		
+
 		return executionChainStr;
 	}
-	
-	
-	//TODO complete below.
-	public static ArrayList getExecutionChainFromString (String executionChainStr, ConfigurationContext configContext) throws SandeshaException {
+
+	// TODO complete below.
+	public static ArrayList getExecutionChainFromString(String executionChainStr, ConfigurationContext configContext)
+			throws SandeshaException {
 		String[] QNameStrs = executionChainStr.split(Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR);
-		
+
 		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
-		
+
 		int length = QNameStrs.length;
-		for (int i=0;i<length;i++) {
+		for (int i = 0; i < length; i++) {
 			String QNameStr = QNameStrs[i];
 			QName name = getQNameFromString(QNameStr);
-			//axisConfiguration.get
-			
+			// axisConfiguration.get
+
 		}
-		
-		return null;  //not complete yet.
+
+		return null; // not complete yet.
 	}
-	
-	public static void printSOAPEnvelope (SOAPEnvelope envelope, OutputStream out) throws SandeshaException {
+
+	public static void printSOAPEnvelope(SOAPEnvelope envelope, OutputStream out) throws SandeshaException {
 		try {
-			XMLStreamWriter writer =  XMLOutputFactory.newInstance().createXMLStreamWriter(out);
+			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
 			System.out.println("\n");
 			envelope.serialize(writer);
 		} catch (XMLStreamException e) {
-			throw new SandeshaException (e.getMessage());
+			throw new SandeshaException(e.getMessage());
 		} catch (FactoryConfigurationError e) {
-			throw new SandeshaException (e.getMessage());
+			throw new SandeshaException(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param propertyKey
-	 * for the client side - internalSequenceID, for the server side - sequenceID
+	 *            for the client side - internalSequenceID, for the server side -
+	 *            sequenceID
 	 * @param configurationContext
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static String getRMVersion (String propertyKey, ConfigurationContext configurationContext) throws SandeshaException {
-			StorageManager storageManager = getSandeshaStorageManager(configurationContext);
-			
-			SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
-			SequencePropertyBean specVersionBean = sequencePropertyBeanMgr.retrieve(propertyKey,Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
-			
-			if (specVersionBean==null)
-				return null;
-	
-			return specVersionBean.getValue();
+	public static String getRMVersion(String propertyKey, ConfigurationContext configurationContext)
+			throws SandeshaException {
+		StorageManager storageManager = getSandeshaStorageManager(configurationContext);
+
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBean specVersionBean = sequencePropertyBeanMgr.retrieve(propertyKey,
+				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
+
+		if (specVersionBean == null)
+			return null;
+
+		return specVersionBean.getValue();
 	}
-	
-	
-//	public static boolean isNumberPresentInList (String list, long no) throws SandeshaException {
-//		StringTokenizer tokenizer = new StringTokenizer (list,Sandesha2Constants.LIST_SEPERATOR);
-//		while (tokenizer.hasMoreElements()){
-//			String listPart = tokenizer.nextToken();
-//			if (!"".equals(listPart) && isNumberPresentInListPart(listPart,no))
-//				return true;
-//		}
-//		
-//		return false;
-//	}
-//
-//	public static String putNumberToList (String list, long no) throws SandeshaException {
-//		
-//		StringTokenizer tokenizer = new StringTokenizer (list,Sandesha2Constants.LIST_SEPERATOR);
-//		
-//		boolean present = false;
-//		while (tokenizer.hasMoreElements()){
-//			String listPart = tokenizer.nextToken();
-//			if (!"".equals(listPart) && isNumberPresentInListPart(listPart,no))
-//				present = true;
-//		}
-//		
-//		list = list + Sandesha2Constants.LIST_SEPERATOR + new Long (no).toString();
-//		sortListParts (list);
-//		mergeListParts (list);
-//	}
-//	
-//	private static boolean isNumberPresentInListPart (String listPart, long no) throws SandeshaException {
-//		if (listPart==null || "".equals(listPart))
-//			throw new SandeshaException ("Invalid list part");
-//		
-//		int seperatorPosition = listPart.indexOf(Sandesha2Constants.LIST_PART_SEPERATOR);
-//
-//		try {
-//			if (seperatorPosition<0) {
-//				//this must be a single number
-//				long tempNo = new Long (listPart).longValue();
-//				if (no==tempNo)
-//					return true;
-//				
-//				return false;
-//			} else {
-//				String number1Str = listPart.substring(0,seperatorPosition);
-//				String number2Str = listPart.substring((seperatorPosition+1),listPart.length());
-//				
-//				long number1 = new Long (number1Str).longValue();
-//				long number2 = new Long (number2Str).longValue();
-//				
-//				if (number1>number2)
-//					throw new SandeshaException ("list part have numbers in the wrong order");
-//				
-//				if (no>=number1 && no<=number2)
-//					return true;
-//				
-//				return false;
-//			}
-//		} catch (NumberFormatException e) {
-//			throw new SandeshaException ("Invalid list part",e);
-//		}
-//	}
-//	
-//	private String sortListParts (String list) {
-//		
-//	}
-//	
-//	private String mergeListParts (String list) {
-//		
-//	}
-//	
-//	private void updatePartOfTheList () {
-//		
-//	}
-	
-	public static String getSequenceProperty (String id, String name, ConfigurationContext context) throws SandeshaException {
+
+	public static String getSequenceProperty(String id, String name, ConfigurationContext context)
+			throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
-		
-		SequencePropertyBean sequencePropertyBean =  sequencePropertyBeanMgr.retrieve(id,name);
-		if (sequencePropertyBean==null)
+
+		SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr.retrieve(id, name);
+		if (sequencePropertyBean == null)
 			return null;
 		else
 			return sequencePropertyBean.getValue();
 	}
-	
-	public static boolean isAllMsgsAckedUpto (long highestInMsgNo, String internalSequenceID, ConfigurationContext configCtx) throws SandeshaException {
-		
-		String clientCompletedMessages = getSequenceProperty(internalSequenceID,Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES,configCtx);
+
+	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String internalSequenceID,
+			ConfigurationContext configCtx) throws SandeshaException {
+
+		String clientCompletedMessages = getSequenceProperty(internalSequenceID,
+				Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES, configCtx);
 		ArrayList ackedMsgsList = getArrayListFromString(clientCompletedMessages);
-		
+
 		long smallestMsgNo = 1;
-		for (long tempMsgNo=smallestMsgNo;tempMsgNo<=highestInMsgNo;tempMsgNo++) {
+		for (long tempMsgNo = smallestMsgNo; tempMsgNo <= highestInMsgNo; tempMsgNo++) {
 			if (!ackedMsgsList.contains(new Long(tempMsgNo).toString()))
 				return false;
 		}
-		
-		return true;   //all message upto the highest have been acked.
+
+		return true; // all message upto the highest have been acked.
 	}
-	
-	public static SandeshaPropertyBean getPropretyBean (MessageContext messageCtx) throws SandeshaException {
-		Parameter parameter =  messageCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+
+	public static SandeshaPropertyBean getPropretyBean(MessageContext messageCtx) throws SandeshaException {
+		Parameter parameter = messageCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
 		parameter = null;
-		if (parameter==null) {
-			//TODO - get actual values from the module.
+		if (parameter == null) {
+			// TODO - get actual values from the module.
 			log.debug("Property bean not set. Using the default one");
 			SandeshaPropertyBean defaultPropertyBean = PropertyManager.getInstance().getPropertyBean();
 			return defaultPropertyBean;
 		}
-		
-		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue ();
+
+		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
 		return propertyBean;
 	}
-	
-	
+
+	public static String getSequenceIDFromRMMessage(RMMsgContext rmMessageContext) {
+		int messageType = rmMessageContext.getMessageType();
+
+		String sequenceID = null;
+		if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
+			Sequence sequence = (Sequence) rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			sequenceID = sequence.getIdentifier().getIdentifier();
+		} else if (messageType == Sandesha2Constants.MessageTypes.ACK) {
+			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMessageContext
+					.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
+		} else if (messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
+			AckRequested ackRequested = (AckRequested) rmMessageContext
+					.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
+			sequenceID = ackRequested.getIdentifier().getIdentifier();
+		} else if (messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
+			CloseSequence closeSequence = (CloseSequence) rmMessageContext
+					.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+			sequenceID = closeSequence.getIdentifier().getIdentifier();
+		} else if (messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE) {
+			CloseSequenceResponse closeSequenceResponse = (CloseSequenceResponse) rmMessageContext
+					.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE);
+			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier();
+		}
+
+		// TODO complete for other message types
+
+		return sequenceID;
+	}
+
+	public static SOAPEnvelope createSOAPEnvelopeFromTransportStream(MessageContext msgContext, String soapNamespaceURI)
+			throws AxisFault {
+		InputStream inStream = (InputStream) msgContext.getProperty(MessageContext.TRANSPORT_IN);
+
+		msgContext.setProperty(MessageContext.TRANSPORT_IN, null);
+
+		// this inputstram is set by the TransportSender represents a two way
+		// transport or
+		// by a Transport Recevier
+		if (inStream == null) {
+			throw new AxisFault(Messages.getMessage("inputstreamNull"));
+		}
+
+		return createSOAPMessage(msgContext, inStream, soapNamespaceURI);
+	}
+
+	public static SOAPEnvelope createSOAPMessage(MessageContext msgContext, InputStream inStream,
+			String soapNamespaceURI) throws AxisFault {
+		try {
+			Object contentType;
+
+			StAXBuilder builder;
+			SOAPEnvelope envelope;
+			String charSetEnc = (String) msgContext.getProperty(MessageContext.CHARACTER_SET_ENCODING);
+
+			if (charSetEnc == null) {
+				charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
+			}
+			
+			contentType = msgContext.getProperty(MessageContext.CHARACTER_SET_ENCODING);
+			
+
+			if (contentType != null) {
+				msgContext.setDoingMTOM(true);
+				builder = TransportUtils.selectBuilderForMIME(msgContext, inStream, (String) contentType);
+				envelope = (SOAPEnvelope) builder.getDocumentElement();
+			} else if (msgContext.isDoingREST()) {
+				XMLStreamReader xmlreader = XMLInputFactory.newInstance().createXMLStreamReader(inStream, charSetEnc);
+				SOAPFactory soapFactory = new SOAP11Factory();
+
+				builder = new StAXOMBuilder(xmlreader);
+				builder.setOmbuilderFactory(soapFactory);
+				envelope = soapFactory.getDefaultEnvelope();
+				envelope.getBody().addChild(builder.getDocumentElement());
+
+				// We now have the message inside an envolope. However, this is
+				// only an OM; We need to build a SOAP model from it.
+
+				builder = new StAXSOAPModelBuilder(envelope.getXMLStreamReader(), soapNamespaceURI);
+				envelope = (SOAPEnvelope) builder.getDocumentElement();
+			} else {
+				XMLStreamReader xmlreader = XMLInputFactory.newInstance().createXMLStreamReader(inStream, charSetEnc);
+
+				builder = new StAXSOAPModelBuilder(xmlreader, soapNamespaceURI);
+				envelope = (SOAPEnvelope) builder.getDocumentElement();
+			}
+
+			return envelope;
+		} catch (Exception e) {
+			throw new AxisFault(e);
+		}
+	}
+
 }

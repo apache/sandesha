@@ -26,14 +26,13 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.storage.StorageManager;
@@ -44,13 +43,10 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.util.MsgInitializer;
-import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
-import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
@@ -70,46 +66,24 @@ public class AcknowledgementManager {
 	 * @param applicationRMMsgContext
 	 * @throws SandeshaException
 	 */
-	public static void piggybackAckIfPresent(
-			RMMsgContext applicationRMMsgContext) throws SandeshaException {
-		ConfigurationContext configurationContext = applicationRMMsgContext
-				.getMessageContext().getConfigurationContext();
-		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(configurationContext);
+	public static void piggybackAcksIfPresent(
+			RMMsgContext rmMessageContext) throws SandeshaException {
+		
+		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
 
-		SenderBeanMgr retransmitterBeanMgr = storageManager
-				.getRetransmitterBeanMgr();
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
-				.getSequencePropretyBeanMgr();
+		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 
 		SenderBean findBean = new SenderBean();
 
-		Sequence sequence = (Sequence) applicationRMMsgContext
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-		if (sequence == null) {
-			String message = "Application message does not contain a sequence part";
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		String sequenceId = sequence.getIdentifier().getIdentifier();
-
-		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr
-				.retrieve(
-						sequenceId,
-						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-		if (internalSequenceBean == null) {
-			String message = "Temp Sequence is not set";
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		//String internalSequenceId = (String) internalSequenceBean.getValue();
+		String sequnceID = SandeshaUtil.getSequenceIDFromRMMessage (rmMessageContext);
+		
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
 		findBean.setReSend(false);
 		
-		String carrietTo = applicationRMMsgContext.getTo().getAddress();
+		String carrietTo = rmMessageContext.getTo().getAddress();
 		
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		
@@ -125,11 +99,18 @@ public class AcknowledgementManager {
 				//Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
 
 				MessageContext ackMsgContext = storageManager
-				.retrieveMessageContext(ackBean
-						.getMessageContextRefKey(),configurationContext);
+				.retrieveMessageContext(ackBean.getMessageContextRefKey(),configurationContext);
 				
+				//wsa:To has to match for piggybacking.
 				String to = ackMsgContext.getTo().getAddress();
 				if (!carrietTo.equals(to)) {
+					continue piggybackLoop;
+				}
+				
+				String ackSequenceID = ackBean.getSequenceID();
+				
+				//sequenceID has to match for piggybacking
+				if (!ackSequenceID.equals(sequnceID)) {
 					continue piggybackLoop;
 				}
 				
@@ -137,8 +118,7 @@ public class AcknowledgementManager {
 				retransmitterBeanMgr.delete(ackBean.getMessageID());
 
 				//Adding the ack to the application message
-				RMMsgContext ackRMMsgContext = MsgInitializer
-						.initializeMessage(ackMsgContext);
+				RMMsgContext ackRMMsgContext = MsgInitializer.initializeMessage(ackMsgContext);
 				if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
 					String message = "Invalid ack message entry";
 					log.debug(message);
@@ -147,11 +127,11 @@ public class AcknowledgementManager {
 
 				SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-				applicationRMMsgContext.setMessagePart(
+				rmMessageContext.setMessagePart(
 						Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
 						sequenceAcknowledgement);
 
-				applicationRMMsgContext.addSOAPEnvelope();
+				rmMessageContext.addSOAPEnvelope();
 				break piggybackLoop;
 			}
 		}
@@ -246,6 +226,9 @@ public class AcknowledgementManager {
 
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(
 				referenceRMMessage, ackOperation);
+		ackMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,
+				referenceMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION));  //TODO do this in the RMMsgCreator
+		
 		
 		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");
 		
@@ -270,8 +253,13 @@ public class AcknowledgementManager {
 		
 		//adding the SequenceAcknowledgement part.
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceID);
+		
+		ackMsgCtx.setProperty(MessageContext.TRANSPORT_IN,null);
 
-		if (Sandesha2Constants.WSA.NS_URI_ANONYMOUS.equals(acksTo.getAddress())) {
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequenceID,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configurationContext);
+		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
+		
+		if (anonymousURI.equals(acksTo.getAddress())) {
 
 //			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()
 //					.getConfigurationContext());
@@ -298,6 +286,7 @@ public class AcknowledgementManager {
 			referenceRMMessage.getMessageContext().setProperty(
 					Sandesha2Constants.ACK_WRITTEN, "true");
 			
+			ackRMMsgCtx.getMessageContext().setServerSide(true);
 			return ackRMMsgCtx;
 			
 		} else {
@@ -313,6 +302,7 @@ public class AcknowledgementManager {
 			ackBean.setMessageContextRefKey(key);
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
+			ackBean.setSequenceID(sequenceID);
 			
 			//this will be set to true in the sender.
 			ackBean.setSend(true);

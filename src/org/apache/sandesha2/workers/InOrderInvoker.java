@@ -219,8 +219,6 @@ public class InOrderInvoker extends Thread {
 								break currentIteration;
 							}
 						}
-						
-						
 					}
 
 					if (invoked) {
