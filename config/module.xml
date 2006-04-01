@@ -27,9 +27,9 @@
 
         <!-- namespaces for the 2005-10 spec -->
         
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/SequenceAcknowledgement</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequenceResponse</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/AckRequested</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/SequenceAcknowledgement</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequenceResponse</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/AckRequested</actionMapping>
      </operation>
  
      <operation name="RMInOutOperation" mep="http://www.w3.org/2004/08/wsdl/in-out">
@@ -39,11 +39,11 @@
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</actionMapping>
 
         <!-- namespaces for the 2005-10 spec -->
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CreateSequence</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequence</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequence</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/TerminateSequenceResponse</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200510/CloseSequenceResponse</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequenceResponse</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequenceResponse</actionMapping>
 
     </operation>
     
