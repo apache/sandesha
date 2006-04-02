@@ -277,7 +277,7 @@ public interface Sandesha2Constants {
 		
 		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";
 		
-		String LAST_MESSAGE = "LastMessage";
+//		String LAST_MESSAGE = "LastMessage";
 
 		String REQUEST_SIDE_SEQUENCE_ID = "RequestSideSequenceID"; 		//used only at the server side
 		

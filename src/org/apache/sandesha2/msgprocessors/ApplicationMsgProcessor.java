@@ -408,15 +408,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
 
-		if (lastMessage!=null) {
-			long messageNumber = sequence.getMessageNumber().getMessageNumber();
-			SequencePropertyBean lastMessageBean = new SequencePropertyBean ();
-			lastMessageBean.setSequenceID(sequenceId);
-			lastMessageBean.setName(Sandesha2Constants.SequenceProperties.LAST_MESSAGE);
-			lastMessageBean.setValue(new Long(messageNumber).toString());
-			
-			seqPropMgr.insert(lastMessageBean);
-		}
+//		if (lastMessage!=null) {
+//			long messageNumber = sequence.getMessageNumber().getMessageNumber();
+//			SequencePropertyBean lastMessageBean = new SequencePropertyBean ();
+//			lastMessageBean.setSequenceID(sequenceId);
+//			lastMessageBean.setName(Sandesha2Constants.SequenceProperties.LAST_MESSAGE);
+//			lastMessageBean.setValue(new Long(messageNumber).toString());
+//			
+//			seqPropMgr.insert(lastMessageBean);
+//		}
 		
 	 	RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(rmMsgCtx,sequenceId);
 		
@@ -525,6 +525,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			String to = toEPR.getAddress();
 			String sequenceKey = (String) msgContext.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
 			internalSequenceId = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
+			
+			String lastAppMessage = (String) msgContext.getProperty(Sandesha2ClientAPI.LAST_MESSAGE);
+			if (lastAppMessage!=null && "true".equals(lastAppMessage))
+				lastMessage = true;
 		}
 
 		/* checking weather the user has given the messageNumber (most of the cases this will not be the case where

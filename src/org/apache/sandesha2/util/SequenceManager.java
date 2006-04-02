@@ -346,8 +346,7 @@ public class SequenceManager {
 		} catch (AxisFault e) {
 			String message = "Cant start the listner for incoming messages";
 			log.error(e.getStackTrace());
-			System.out.println(e.getStackTrace());
-			throw new SandeshaException (message);
+			throw new SandeshaException (message,e);
 		}
 	
 	}

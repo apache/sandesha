@@ -172,7 +172,7 @@ public class FaultManager {
 		
 		boolean lastMessageNumberExceeded = false;
 		String reason = null;
-		SequencePropertyBean lastMessageBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_MESSAGE);
+		SequencePropertyBean lastMessageBean = seqPropMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO);
 		if (lastMessageBean!=null) {
 			long lastMessageNo = Long.parseLong(lastMessageBean.getValue());
 			if (messageNumber>lastMessageNo) {

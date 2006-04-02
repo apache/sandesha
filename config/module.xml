@@ -1,5 +1,9 @@
 <module name="Sandesha2-0.9" class="org.apache.sandesha2.SandeshaModule">
 
+    <Description>
+        This module implements WS-ReliableMessaging for Axis2. This implements both the WSRM submitted spec and the new spec being developed under the OASIS WSRX group.
+    </Description>
+    
     <inflow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
             <order phase="PreDispatch" after="AddressingFinalInHandler" />
