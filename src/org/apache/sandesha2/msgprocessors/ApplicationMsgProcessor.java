@@ -43,6 +43,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.client.RMFaultCallback;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -435,6 +436,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configContext = msgContext .getConfigurationContext();
+		
+		//setting the Fault callback		
+		RMFaultCallback faultCallback = (RMFaultCallback) msgContext.getOptions().getProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK);
+		if (faultCallback!=null) {
+			OperationContext operationContext = msgContext.getOperationContext();
+			if (operationContext!=null) {
+				operationContext.setProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK,faultCallback);
+			}
+		}
 		
 		//retrieving the the storage manager
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);

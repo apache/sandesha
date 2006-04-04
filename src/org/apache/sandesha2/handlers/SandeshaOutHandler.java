@@ -131,7 +131,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			} else if (!msgCtx.isServerSide()) //if client side.
 			    msgProcessor = new ApplicationMsgProcessor ();
 		}else  {
-			msgProcessor = MsgProcessorFactory.getMessageProcessor(messageType);
+			msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 		}
 		
 		if (msgProcessor!=null)

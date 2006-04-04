@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
@@ -395,6 +396,50 @@ public class SandeshaUtil {
 		return rmGlobalMsg;
 	}
 
+	// RM will retry sending the message even if a fault arrive for following message types.
+	public static boolean isRetriableOnFaults(MessageContext msgCtx) {
+		boolean rmGlobalMsg = false;
+
+		String action = msgCtx.getWSAAction();
+//		SOAPEnvelope env = msgCtx.getEnvelope();
+//		SOAPHeader header = null;
+//		if (env != null)
+//			header = env.getHeader();
+//		else {
+//			log.error("SOAP envelope is null");
+//			return false;
+//		}
+
+		// TODO make this spec indipendent
+
+//		OMElement sequenceElem = null;
+//		if (header != null)
+//			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI,
+//					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+//
+//		if (sequenceElem == null)
+//			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_10.NS_URI,
+//					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+//
+//		if (sequenceElem != null)
+//			rmGlobalMsg = true;
+
+
+		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE.equals(action))
+			rmGlobalMsg = true;
+
+		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE.equals(action))
+			rmGlobalMsg = true;
+
+//		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
+//			rmGlobalMsg = true;
+//
+//		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE.equals(action))
+//			rmGlobalMsg = true;
+
+		return rmGlobalMsg;
+	}
+	
 	public static MessageContext createNewRelatedMessageContext(RMMsgContext referenceRMMessage, AxisOperation operation)
 			throws SandeshaException {
 		try {
@@ -405,6 +450,16 @@ public class SandeshaUtil {
 			MessageContext newMessageContext = new MessageContext();
 			newMessageContext.setConfigurationContext(configContext);
 
+//			Options referenceMsgOptions = referenceMessage.getOptions();
+//			Options newOptions = null;
+//			if (referenceMsgOptions!=null)
+//				newOptions = new Options (referenceMsgOptions);
+//			else
+			
+			Options newOptions = new Options ();
+			
+			newMessageContext.setOptions(newOptions);
+			
 			if (referenceMessage.getAxisServiceGroup() != null) {
 				newMessageContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
 				newMessageContext.setServiceGroupContext(referenceMessage.getServiceGroupContext());
@@ -826,7 +881,7 @@ public class SandeshaUtil {
 				SOAPFactory soapFactory = new SOAP11Factory();
 
 				builder = new StAXOMBuilder(xmlreader);
-				builder.setOmbuilderFactory(soapFactory);
+				builder.setOMBuilderFactory(soapFactory);
 				envelope = soapFactory.getDefaultEnvelope();
 				envelope.getBody().addChild(builder.getDocumentElement());
 

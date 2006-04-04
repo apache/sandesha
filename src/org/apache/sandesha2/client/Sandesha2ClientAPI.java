@@ -74,6 +74,7 @@ public class Sandesha2ClientAPI {
 	public static String MESSAGE_NUMBER = "Sandesha2ClientAPIPropertyMessageNumber";
 	public static String RM_SPEC_VERSION = "Sandesha2ClientAPIPropertyRMSpecVersion";
 	public static String DUMMY_MESSAGE = "Sandesha2ClientAPIDummyMessage"; //If this property is set, even though this message will invoke the RM handlers, this will not be sent as an actual application message
+	public static String RM_FAULT_CALLBACK = "Sandesha2ClientAPIRMFaultCallback";
 	public static String VALUE_TRUE = "true";
 	public static String VALUE_FALSE = "false";
 	

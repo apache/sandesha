@@ -27,14 +27,20 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axiom.soap.SOAPBody;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFault;
+import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.RMFaultCallback;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -58,6 +64,56 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgContext) throws AxisFault {
 
+		ConfigurationContext configContext = msgContext.getConfigurationContext();
+		if ( configContext==null)
+			throw new AxisFault ("Configuration context is not set");
+		
+		SOAPEnvelope envelope = msgContext.getEnvelope();
+		if (envelope==null)
+			throw new SandeshaException ("SOAP envelope is not set");
+		
+		//processing faults.
+		//Had to do this before dispatching. A fault message comes with the relatesTo part. So this will
+		//fill the opContext of te req/res message. But RM keeps retransmitting. So RM has to report the 
+		//error and stop this fault being dispatched as the response message.
+		
+		SOAPFault faultPart = envelope.getBody().getFault();
+		
+		if (faultPart!=null) {
+			RelatesTo relatesTo = msgContext.getRelatesTo();
+			if (relatesTo!=null) {
+				String relatesToValue = relatesTo.getValue();
+				OperationContext operationContext = configContext.getOperationContext(relatesToValue);
+				if (operationContext!=null) {
+					MessageContext requestMessage = operationContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
+					if (requestMessage!=null) {
+						if(SandeshaUtil.isRetriableOnFaults(requestMessage)){
+							
+							RMFaultCallback faultCallback = (RMFaultCallback) operationContext.getProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK);
+							if (faultCallback!=null) {
+								
+								
+								//constructing the fault
+								AxisFault axisFault = getAxisFaultFromFromSOAPFault (faultPart);
+								
+								
+								//reporting the fault
+								log.error(axisFault);
+								if (faultCallback!=null) {
+									faultCallback.onError(axisFault);
+								} 
+								
+							}
+							
+							//stopping the fault from going further and getting dispatched
+							msgContext.pause(); //TODO let this go in the last try
+							return;
+						}
+					}
+				}
+			}
+		}
+		
 		//Quitting the message with minimum processing if not intended for RM.
 		boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
 		if (!isRMGlobalMessage) {
@@ -237,4 +293,17 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	public QName getName() {
 		return new QName(Sandesha2Constants.GLOBAL_IN_HANDLER_NAME);
 	}
+	
+	private AxisFault getAxisFaultFromFromSOAPFault (SOAPFault faultPart) {
+		SOAPFaultReason reason = faultPart.getReason();
+		
+		AxisFault axisFault = null;
+		if (reason!=null)
+			axisFault = new AxisFault (reason.getText());
+		else
+			axisFault = new AxisFault ("");
+		
+		return axisFault;
+	}
+	
 }

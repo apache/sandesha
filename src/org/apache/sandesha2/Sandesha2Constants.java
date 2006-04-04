@@ -189,7 +189,9 @@ public interface Sandesha2Constants {
 		
 		int TERMINATE_SEQ_RESPONSE = 9;
 
-		int MAX_MESSAGE_TYPE = 9;
+		int FAULT_MSG = 10;
+		
+		int MAX_MESSAGE_TYPE = 10;
 	}
 
 	public interface MessageParts {

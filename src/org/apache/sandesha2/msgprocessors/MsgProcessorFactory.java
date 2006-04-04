@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 
 /**
@@ -27,8 +28,11 @@ import org.apache.sandesha2.Sandesha2Constants;
 
 public class MsgProcessorFactory {
 
-	public static MsgProcessor getMessageProcessor(int msgType) {
-		switch (msgType) {
+	public static MsgProcessor getMessageProcessor(RMMsgContext rmMessageContext) {
+		
+		int messageType = rmMessageContext.getMessageType();
+		
+		switch (messageType) {
 		case (Sandesha2Constants.MessageTypes.CREATE_SEQ):
 			return new CreateSeqMsgProcessor();
 		case (Sandesha2Constants.MessageTypes.TERMINATE_SEQ):

@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
@@ -31,6 +32,8 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.client.RMFaultCallback;
+import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -58,7 +61,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	
 	public void processInMessage(RMMsgContext createSeqRMMsg)
 			throws SandeshaException {
-
 		
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
 		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
@@ -225,5 +227,15 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	
 	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		
+		MessageContext msgCtx = rmMsgCtx.getMessageContext();
+		
+		//adding the RM_FAULT_CALLBACK
+		RMFaultCallback faultCallback = (RMFaultCallback) msgCtx.getOptions().getProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK);
+		if (faultCallback!=null) {
+			OperationContext operationContext = msgCtx.getOperationContext();
+			if (operationContext!=null) {
+				operationContext.setProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK,faultCallback);
+			}
+		}
 	}
 }

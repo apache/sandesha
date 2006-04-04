@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFault;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
@@ -328,7 +329,6 @@ public class Sender extends Thread {
 				
 				if (isFaultEnvelope(resenvelope)) {
 					engine.receiveFault(responseMessageContext);
-					System.out.println("Sender Got a fault");
 				}else {
 					engine.receive(responseMessageContext);
 				}
@@ -358,23 +358,12 @@ public class Sender extends Thread {
 		return false;
 	}
 	
-	private boolean isFaultEnvelope (SOAPEnvelope envelope) throws SandeshaException {
-		SOAPHeader header = envelope.getHeader();
-		
-		OMElement actionElement = header.getFirstChildWithName(new QName (AddressingConstants.Final.WSA_NAMESPACE,AddressingConstants.WSA_ACTION));
-		if (actionElement==null)
-			actionElement = header.getFirstChildWithName(new QName (AddressingConstants.Submission.WSA_NAMESPACE,AddressingConstants.WSA_ACTION));
-		
-		String action = actionElement.getText().trim();
-		
-		if (action==null)
-			throw new SandeshaException ("Given envelope does not contain a wsa:action");
-		
-		if (action.equals(AddressingConstants.Final.WSA_FAULT_ACTION)
-				|| action.equals("http://schemas.xmlsoap.org/ws/2004/08/addressing/fault"))
+	private boolean isFaultEnvelope (SOAPEnvelope envelope) throws SandeshaException {		
+		SOAPFault fault = envelope.getBody().getFault();
+		if (fault!=null)
 			return true;
-		
-		return false;
+		else
+			return false;
 	}
 	
 }

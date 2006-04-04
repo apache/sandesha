@@ -36,7 +36,6 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		
 		//TODO add processing logic
-		System.out.println("");
 		
 		terminateResRMMsg.pause();
 	}
