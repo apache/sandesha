@@ -28,12 +28,14 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.RMFaultCallback;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
 import org.apache.sandesha2.client.reports.SequenceReport;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 
 
 public class SyncPingClient {
@@ -79,9 +81,11 @@ public class SyncPingClient {
 		
 		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
+		
 		Options clientOptions = new Options ();
+		
+		
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
-		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = "sequence1";
@@ -89,31 +93,25 @@ public class SyncPingClient {
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
-//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
 //		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
-		ServiceClient serviceClient = new ServiceClient (configContext,null);		
-		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
-		
+		clientOptions.setProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK, new FaultCallback ());
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		clientOptions.setAction("urn:wsrm:Ping");
 		serviceClient.setOptions(clientOptions);
-		
+
+		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
+				
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
-		Options newOptions = new Options (clientOptions);
-		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
-		serviceClient.setOptions(newOptions);
-		
-		serviceClient.fireAndForget(getPingOMBlock("ping31"));
+		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+
+		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
 		SequenceReport sequenceReport = null;
-		
-		try {
-			sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
-		} catch (SandeshaException e1) {
-			//no data available.
-		}
 		
 		boolean complete = false;
 		while (!complete) {
@@ -129,7 +127,6 @@ public class SyncPingClient {
 			}
 		}
 		
-		Sandesha2ClientAPI.terminateSequence(toEPR,sequenceKey,serviceClient,configContext);
 		serviceClient.finalizeInvoke();
 	}
 	
@@ -143,6 +140,14 @@ public class SyncPingClient {
 		pingElem.addChild(textElem);
 
 		return pingElem;
+	}
+	
+	private class FaultCallback extends RMFaultCallback {
+
+		public void onError(AxisFault fault) {
+			System.out.println("*********** RM fault callbak called");
+		}
+	    	
 	}
 	
 }

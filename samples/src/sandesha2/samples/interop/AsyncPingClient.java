@@ -28,6 +28,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.reports.SequenceReport;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -89,11 +90,13 @@ public class AsyncPingClient {
 		
 //		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
-		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksToEPR);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,"sequence2");
+		clientOptions.setAction("urn:wsrm:Ping");
+		
+		String sequenceKey = "sequence2";
+		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
 		
 		serviceClient.setOptions(clientOptions);
 		serviceClient.engageModule(new QName ("sandesha2"));
@@ -101,10 +104,24 @@ public class AsyncPingClient {
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
-		Options newOptions = new Options (clientOptions);
-		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
-		serviceClient.setOptions(newOptions);
+		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		
+		boolean complete = false;
+		while (!complete) {
+			SequenceReport sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
+			if (sequenceReport!=null && sequenceReport .getCompletedMessages().size()==3)
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

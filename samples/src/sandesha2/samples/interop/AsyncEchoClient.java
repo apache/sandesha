@@ -21,6 +21,7 @@ import java.io.File;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -31,10 +32,12 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.ClientUtils;
 import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 
 public class AsyncEchoClient {
@@ -68,6 +71,7 @@ public class AsyncEchoClient {
 	
 	public static void main(String[] args) throws Exception {
 		
+		
 		String axisClientRepo = null;
 		if (args!=null && args.length>0)
 			axisClientRepo = args[0];
@@ -95,10 +99,9 @@ public class AsyncEchoClient {
 		
 		Options clientOptions = new Options ();
 		
-		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
-		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress() + "/" + ServiceClient.ANON_OUT_IN_OP;
 		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksTo);
 		
 		String sequenceKey = "sequence4";
@@ -108,11 +111,13 @@ public class AsyncEchoClient {
 		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
-//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
 //		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
-//		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+		clientOptions.setAction("urn:wsrm:EchoString");
 		
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
@@ -122,7 +127,7 @@ public class AsyncEchoClient {
 		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
 		
 		Callback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
 		
 		Callback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
@@ -132,16 +137,17 @@ public class AsyncEchoClient {
 		
 		Callback callback4 = new TestCallback ("Callback 4");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo4",sequenceKey),callback4);
-		
-		Options newOptions = new Options (clientOptions);
-		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
-		serviceClient.setOptions(newOptions);
+
+		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		Callback callback5 = new TestCallback ("Callback 5");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo5",sequenceKey),callback5);
 		
         while (!callback5.isComplete()) {
             Thread.sleep(1000);
         }
+        
+        Thread.sleep(4000);
+        
 	}
 
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

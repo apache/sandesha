@@ -82,7 +82,6 @@ public class SyncEchoClient {
 		
 		Options clientOptions = new Options ();
 		
-		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = "sequence3";
@@ -91,6 +90,7 @@ public class SyncEchoClient {
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
+		clientOptions.setAction("urn:wsrm:EchoString");
 		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
@@ -108,9 +108,7 @@ public class SyncEchoClient {
 		Callback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 		
-		Options newOptions = new Options (clientOptions);
-		newOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
-		serviceClient.setOptions(newOptions);
+		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		
