@@ -19,8 +19,8 @@
 	<ant:property name="apache.license.file" value="LICENSE.txt" />
 	<ant:property name="readme.file" value="README.txt" />
 	<ant:property name="release.notes.file" value="release-notes.html" />
-	<ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.jar" />
-	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/jars" />
+	<ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
+	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
 	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
     <goal name="all" prereqs="jar,mar:create,samples:create,javadoc" />
     
@@ -52,7 +52,7 @@
 		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${client.dist.path}/modules" />
 		
 		<!-- Copying addressing mar file--> 
-		<ant:copy file="${repo.addressing.mar}" toFile="${client.dist.path}/modules/${build.addressing.mar}" />    
+		<ant:copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
 	</goal>
 
     <goal name="repo:create">
@@ -74,7 +74,7 @@
         </ant:copy>
         
         <!-- Copying addressing mar file-->
-        <ant:copy file="${repo.addressing.mar}" toFile="${server.dist.path}/modules/${build.addressing.mar}" /> 
+        <ant:copy file="${repo.addressing.mar}" toDir="${server.dist.path}/modules/" /> 
 	</goal>
 	
     <goal name="sample:compile">

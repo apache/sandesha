@@ -107,8 +107,9 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         </dependency>
         <dependency>
             <groupId>axis2</groupId>
-            <artifactId>axis2-addressing</artifactId>
+            <artifactId>addressing</artifactId>
             <version>${addressing.version}</version>
+            <type>mar</type>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
