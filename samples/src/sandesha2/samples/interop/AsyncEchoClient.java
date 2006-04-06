@@ -31,7 +31,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.description.ClientUtils;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.RMClientAPI;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -102,10 +103,10 @@ public class AsyncEchoClient {
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress() + "/" + ServiceClient.ANON_OUT_IN_OP;
-		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksTo);
+		clientOptions.setProperty(RMClientConstants.AcksTo,acksTo);
 		
 		String sequenceKey = "sequence4";
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(RMClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
@@ -113,10 +114,10 @@ public class AsyncEchoClient {
 		
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-//		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+//		clientOptions.setProperty(RMClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
 		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
-		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+		clientOptions.setProperty(RMClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
 		clientOptions.setAction("urn:wsrm:EchoString");
 		
 		//You must set the following two properties in the request-reply case.
@@ -138,7 +139,7 @@ public class AsyncEchoClient {
 		Callback callback4 = new TestCallback ("Callback 4");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo4",sequenceKey),callback4);
 
-		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		clientOptions.setProperty(RMClientConstants.LAST_MESSAGE, "true");
 		Callback callback5 = new TestCallback ("Callback 5");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo5",sequenceKey),callback5);
 		

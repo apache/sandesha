@@ -28,9 +28,10 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.client.RMFaultCallback;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.client.reports.SequenceReport;
+import org.apache.sandesha2.client.RMClientAPI;
+import org.apache.sandesha2.client.SequenceReport;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -89,15 +90,15 @@ public class SyncPingClient {
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = "sequence1";
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(RMClientConstants.SEQUENCE_KEY,sequenceKey);
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-//		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+//		clientOptions.setProperty(RMClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK, new FaultCallback ());
+		clientOptions.setProperty(RMClientConstants.RM_FAULT_CALLBACK, new FaultCallback ());
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		clientOptions.setAction("urn:wsrm:Ping");
 		serviceClient.setOptions(clientOptions);
@@ -107,7 +108,7 @@ public class SyncPingClient {
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.LAST_MESSAGE, "true");
+		clientOptions.setProperty(RMClientConstants.LAST_MESSAGE, "true");
 
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
@@ -115,7 +116,7 @@ public class SyncPingClient {
 		
 		boolean complete = false;
 		while (!complete) {
-			sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
+			sequenceReport = RMClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
 			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3)
 				complete = true;
 			else {
