@@ -15,7 +15,7 @@
  *  
  */
 
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -32,8 +31,10 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.client.reports.SequenceReport;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Sandesha2Constants.SequenceProperties;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -47,10 +48,6 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
-import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.RMMsgCreator;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
-import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * Contains logic to remove all the storad data of a sequence.
@@ -376,9 +373,6 @@ public class TerminateManager {
 		
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(internalSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configurationContext);
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-		
-		terminateRMMessage.setFrom(new EndpointReference(anonymousURI));
-		terminateRMMessage.setFaultTo(new EndpointReference(anonymousURI));
 		
 		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId,configurationContext);
 		if (rmVersion==null)

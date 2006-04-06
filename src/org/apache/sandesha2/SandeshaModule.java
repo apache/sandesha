@@ -22,7 +22,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.PolicyInclude;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 import org.apache.axis2.modules.ModulePolicyExtension;
@@ -54,6 +53,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 		PropertyManager.getInstance().loadPropertiesFromModuleDescPolicy(module);
 		
+		configContext.setProperty(Sandesha2Constants.STORAGE_MANAGER,null);   // this must be resetted by the module settings.
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		storageManager.initStorage(module);
 	}

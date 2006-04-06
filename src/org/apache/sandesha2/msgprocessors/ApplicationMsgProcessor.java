@@ -38,13 +38,12 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.client.RMFaultCallback;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.RMClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -58,6 +57,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
+import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
@@ -66,6 +66,7 @@ import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.Identifier;
@@ -438,11 +439,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ConfigurationContext configContext = msgContext .getConfigurationContext();
 		
 		//setting the Fault callback		
-		RMFaultCallback faultCallback = (RMFaultCallback) msgContext.getOptions().getProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK);
+		RMFaultCallback faultCallback = (RMFaultCallback) msgContext.getOptions().getProperty(RMClientConstants.RM_FAULT_CALLBACK);
 		if (faultCallback!=null) {
 			OperationContext operationContext = msgContext.getOperationContext();
 			if (operationContext!=null) {
-				operationContext.setProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK,faultCallback);
+				operationContext.setProperty(RMClientConstants.RM_FAULT_CALLBACK,faultCallback);
 			}
 		}
 		
@@ -513,7 +514,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			long requestMsgNo = reqSequence.getMessageNumber().getMessageNumber();
 			
-			internalSequenceId = SandeshaUtil.getInternalSequenceID(incomingSeqId);
+			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(incomingSeqId);
 			
 			//deciding weather the last message.
 			String requestLastMsgNoStr = SandeshaUtil.getSequenceProperty(incomingSeqId,Sandesha2Constants.SequenceProperties.LAST_IN_MESSAGE_NO,configContext);
@@ -533,10 +534,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			String to = toEPR.getAddress();
-			String sequenceKey = (String) msgContext.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
+			String sequenceKey = (String) msgContext.getProperty(RMClientConstants.SEQUENCE_KEY);
 			internalSequenceId = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
 			
-			String lastAppMessage = (String) msgContext.getProperty(Sandesha2ClientAPI.LAST_MESSAGE);
+			String lastAppMessage = (String) msgContext.getProperty(RMClientConstants.LAST_MESSAGE);
 			if (lastAppMessage!=null && "true".equals(lastAppMessage))
 				lastMessage = true;
 		}
@@ -545,7 +546,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		   the system will generate the message numbers */
 
 		//User should set it as a long object.
-		Long messageNumberLng = (Long) msgContext.getProperty(Sandesha2ClientAPI.MESSAGE_NUMBER);
+		Long messageNumberLng = (Long) msgContext.getProperty(RMClientConstants.MESSAGE_NUMBER);
 		
 		long givenMessageNumber = -1;
 		if (messageNumberLng!=null) {
@@ -576,9 +577,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		//A dummy message is a one which will not be processed as a actual application message.
 		//The RM handlers will simply let these go.
-		String dummyMessageString = (String) msgContext.getOptions().getProperty(Sandesha2ClientAPI.DUMMY_MESSAGE);
+		String dummyMessageString = (String) msgContext.getOptions().getProperty(RMClientConstants.DUMMY_MESSAGE);
 		boolean dummyMessage = false;
-		if (dummyMessageString!=null && Sandesha2ClientAPI.VALUE_TRUE.equals(dummyMessageString))
+		if (dummyMessageString!=null && RMClientAPI.VALUE_TRUE.equals(dummyMessageString))
 			dummyMessage = true;
 		
 		//saving the used message number
@@ -627,7 +628,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					Sandesha2Constants.SequenceProperties.TO_EPR);
 			if (incomingToBean != null) {
 				String incomingTo = incomingToBean.getValue();
-				msgContext.setProperty(Sandesha2ClientAPI.AcksTo, incomingTo);
+				msgContext.setProperty(RMClientConstants.AcksTo, incomingTo);
 			}
 		}
 
@@ -657,7 +658,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			specVersion = specVersionBean.getValue();
 		} else {
 			//in the client side, user will set the RM version.
-			specVersion = (String) msgContext.getProperty(Sandesha2ClientAPI.RM_SPEC_VERSION);
+			specVersion = (String) msgContext.getProperty(RMClientConstants.RM_SPEC_VERSION);
 		}
 		
 		if (specVersion==null) 
@@ -690,7 +691,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 				String acksTo = null;
 				if (serviceContext != null)
-					acksTo = (String) msgContext.getProperty(Sandesha2ClientAPI.AcksTo);
+					acksTo = (String) msgContext.getProperty(RMClientConstants.AcksTo);
 
 				if (msgContext.isServerSide()) {
 					// we do not set acksTo value to anonymous when the create
@@ -875,7 +876,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		// sending the message once through Sandesha2TransportSender.
 		AxisEngine engine = new AxisEngine(createSeqMsg.getConfigurationContext());
 		 try {
-			 log.info ("Sending create seq msg...");
 			 engine.send(createSeqMsg);
 		 } catch (AxisFault e) {
 			 throw new SandeshaException (e.getMessage());
@@ -990,7 +990,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			OperationContext operationContext = msg.getOperationContext();
 			if (operationContext != null) {
-				Object obj = msg.getProperty(Sandesha2ClientAPI.LAST_MESSAGE);
+				Object obj = msg.getProperty(RMClientConstants.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 					lastMessage = true;
 					

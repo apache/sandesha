@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.client.reports;
+package org.apache.sandesha2.client;
 
 import java.util.ArrayList;
 

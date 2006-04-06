@@ -17,6 +17,8 @@
 package org.apache.sandesha2.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
 
 
 /**
@@ -26,25 +28,64 @@ public class RMReport {
 	
 	private ArrayList incomingSequenceList = null;
 	private ArrayList outgoingSequenceList = null;
+	private HashMap sequenceStatusMap = null;
+	private HashMap noOfCompletedMessagesMap = null;
+	private HashMap outgoingInternalSequenceIDMap = null;
 	
 	public RMReport () {
 		incomingSequenceList = new ArrayList ();
 		outgoingSequenceList = new ArrayList ();
+		sequenceStatusMap = new HashMap ();
+		noOfCompletedMessagesMap = new HashMap ();
+		outgoingInternalSequenceIDMap = new HashMap ();
 	}
-	
-	public void addIncomingSequenceID (String sequenceID) {
-		incomingSequenceList.add(sequenceID);
+
+	public long getCompletedMessagesCount(String sequenceID) {
+		Long lng = (Long) noOfCompletedMessagesMap.get(sequenceID);
+		if (lng==null)
+			return -1;
+		
+		return lng.longValue();
 	}
-	
-	public void addOutgoingSequenceID (String sequenceID) {
-		outgoingSequenceList.add(sequenceID);
-	}
-	
-	public ArrayList getIncomingSequenceList () {
+
+	public ArrayList getIncomingSequenceList() {
 		return incomingSequenceList;
 	}
-	
-	public ArrayList getOutgoingSequenceList () {
+
+	public ArrayList getOutgoingSequenceList() {
 		return outgoingSequenceList;
 	}
+
+	public byte getSequenceStatusMap(String sequenceID) {
+		Byte status = (Byte) sequenceStatusMap.get(sequenceID);
+		if (status==null)
+			return SequenceReport.SEQUENCE_STATUS_UNKNOWN;
+		
+		return status.byteValue();
+	}
+
+	public void addToIncomingSequenceList (String incomingSequenceID) {
+		incomingSequenceList.add(incomingSequenceID);
+	}
+	
+	public void addToOutgoingSequenceList (String outSequenceID) {
+		outgoingSequenceList.add(outSequenceID);
+	}
+	
+	public void addToNoOfCompletedMessagesMap (String id, long noOfMsgs) {
+		noOfCompletedMessagesMap.put(id, new Long (noOfMsgs));
+	}
+	
+	public void addToSequenceStatusMap (String id, byte status) {
+		sequenceStatusMap.put(id, new Byte (status));
+	}
+	
+	public String getInternalSequenceIdOfOutSequence (String outSequenceID) {
+		return (String) outgoingInternalSequenceIDMap.get(outSequenceID);
+	}
+	
+	public void addToOutgoingInternalSequenceMap (String outSequenceID, String internalSequenceID) {
+		outgoingInternalSequenceIDMap.put(outSequenceID,internalSequenceID);
+	}
+	
 }

@@ -39,8 +39,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.client.RMFaultCallback;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.RMClientAPI;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -89,7 +90,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					if (requestMessage!=null) {
 						if(SandeshaUtil.isRetriableOnFaults(requestMessage)){
 							
-							RMFaultCallback faultCallback = (RMFaultCallback) operationContext.getProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK);
+							RMFaultCallback faultCallback = (RMFaultCallback) operationContext.getProperty(RMClientConstants.RM_FAULT_CALLBACK);
 							if (faultCallback!=null) {
 								
 								

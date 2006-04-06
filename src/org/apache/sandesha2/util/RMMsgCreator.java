@@ -23,8 +23,9 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
@@ -38,9 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.msgprocessors.TerminateSeqResponseMsgProcessor;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -55,13 +54,10 @@ import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.Identifier;
-import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 
 /**
  * Used to create new RM messages.
@@ -282,7 +278,7 @@ public class RMMsgCreator {
 				.getOperationContext();
 		if (operationcontext != null) {
 			String offeredSequence = (String) applicationMsgContext
-					.getProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID);
+					.getProperty(RMClientConstants.OFFERED_SEQUENCE_ID);
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(factory,rmNamespaceValue);
 				Identifier identifier = new Identifier(factory,rmNamespaceValue);

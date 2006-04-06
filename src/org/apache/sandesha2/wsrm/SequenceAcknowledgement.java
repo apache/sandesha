@@ -31,7 +31,7 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 
 /**
  * Adds the SequenceAcknowledgement header block.

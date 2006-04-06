@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -32,8 +32,12 @@ import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
-import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.FaultData;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Sandesha2Constants.SOAPFaults;
+import org.apache.sandesha2.Sandesha2Constants.SOAPVersion;
+import org.apache.sandesha2.Sandesha2Constants.SOAPFaults.FaultType;
 import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceFault;
 
@@ -148,11 +152,11 @@ public class SOAPFaultEnvelopeCreator {
 
 		OMNamespace namespace = factory.createOMNamespace(
 				OMConstants.XMLNS_URI, OMConstants.XMLNS_PREFIX);
-		faultReason.getSOAPText().addAttribute("lang", "en", namespace);
+		faultReason.getSOAPFaultText("en").addAttribute("lang", "en", namespace);
 
 		faultReason.setText(data.getReason());
 		faultCode.getValue().setText(data.getSubcode());
-		faultReason.getSOAPText().setText(data.getReason());
+		faultReason.getSOAPFaultText("en").setText(data.getReason());
 
 		//SequenceFault header is added only for SOAP 1.1
 		if (isSequenceFault(data))
@@ -193,7 +197,7 @@ public class SOAPFaultEnvelopeCreator {
 		subCodeValue.setText(data.getSubcode());
 
 		SOAPFaultReason faultReason = fault.getReason();
-		SOAPFaultText faultText = faultReason.getSOAPText();
+		SOAPFaultText faultText = faultReason.getSOAPFaultText("en");
 		faultText.setText(data.getReason());
 
 		SOAPFaultDetail faultDetail = fault.getDetail();

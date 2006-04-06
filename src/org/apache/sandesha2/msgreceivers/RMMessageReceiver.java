@@ -36,13 +36,11 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class RMMessageReceiver extends AbstractMessageReceiver {
 
-
 	public final void receive(MessageContext messgeCtx) throws AxisFault {
 		System.out.println("RM MESSSAGE RECEIVER WAS CALLED");
 		
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
-		System.out.println("MsgReceiver got type:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));
-		
+		System.out.println("MsgReceiver got type:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));	
 	}
 	
 }

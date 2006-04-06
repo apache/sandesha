@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.sandesha2;
+package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +35,12 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Sandesha2Constants.MessageParts;
+import org.apache.sandesha2.Sandesha2Constants.MessageTypes;
+import org.apache.sandesha2.Sandesha2Constants.SequenceProperties;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -42,10 +48,6 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
-import org.apache.sandesha2.util.MsgInitializer;
-import org.apache.sandesha2.util.RMMsgCreator;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
-import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
@@ -249,7 +251,6 @@ public class AcknowledgementManager {
 		}
 
 		ackMsgCtx.setTo(acksTo);
-		ackMsgCtx.setReplyTo(referenceMsg.getTo());
 		
 		//adding the SequenceAcknowledgement part.
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceID);
@@ -346,6 +347,7 @@ public class AcknowledgementManager {
 			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY,key);
 			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc ());
 			RMMsgContext ackRMMessageCtx = MsgInitializer.initializeMessage(ackMsgCtx);
+			
 			SandeshaUtil.startSenderForTheSequence(configurationContext,sequenceID);	
 			referenceMsg.pause(); 
 			return ackRMMessageCtx;

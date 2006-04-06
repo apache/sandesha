@@ -91,12 +91,6 @@ public class SandeshaUtil {
 
 	// private static Hashtable storedMsgContexts = new Hashtable();
 
-	private static StorageManager storageManager = null;
-
-	private static Sender sender = new Sender();
-
-	private static InOrderInvoker invoker = new InOrderInvoker();
-
 	private static Log log = LogFactory.getLog(SandeshaUtil.class);
 
 	/**
@@ -214,21 +208,41 @@ public class SandeshaUtil {
 	}
 
 	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) {
-		sender.runSenderForTheSequence(context, sequenceID);
-	}
-
-	public static void stopSenderForTheSequence(String sequenceID) {
-		sender.stopSenderForTheSequence(sequenceID);
-	}
-
-	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
-		if (!invoker.isInvokerStarted()) {
-			invoker.runInvokerForTheSequence(context, sequenceID);
+		
+		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
+		
+		if (sender!=null)
+			sender.runSenderForTheSequence(context, sequenceID);
+		else {
+			sender = new Sender ();
+			context.setProperty(Sandesha2Constants.SENDER,sender);
+			sender.runSenderForTheSequence(context, sequenceID);
 		}
 	}
 
+	public static void stopSenderForTheSequence(String sequenceID) {
+//		sender.stopSenderForTheSequence(sequenceID);
+	}
+
+	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
+//		if (!invoker.isInvokerStarted()) {
+//			invoker.runInvokerForTheSequence(context, sequenceID);
+//		}
+		
+		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
+		if (invoker!=null)
+			invoker.runInvokerForTheSequence(context,sequenceID);
+		else {
+			invoker = new InOrderInvoker ();
+			context.setProperty(Sandesha2Constants.INVOKER,invoker);
+			invoker.runInvokerForTheSequence(context,sequenceID);
+		}
+ 			
+		
+	}
+
 	public static void stopInvokerForTheSequence(String sequenceID) {
-		invoker.stopInvokerForTheSequence(sequenceID);
+//		invoker.stopInvokerForTheSequence(sequenceID);
 	}
 
 	public static String getMessageTypeString(int messageType) {
@@ -310,13 +324,11 @@ public class SandeshaUtil {
 	 */
 	public static StorageManager getSandeshaStorageManager(ConfigurationContext context) throws SandeshaException {
 
+		StorageManager storageManager = (StorageManager) context.getProperty(Sandesha2Constants.STORAGE_MANAGER);
 		if (storageManager != null)
 			return storageManager;
 
 		String srotageManagerClassStr = PropertyManager.getInstance().getStorageManagerClass();
-
-		if (storageManager != null)
-			return storageManager;
 
 		try {
 			Class c = Class.forName(srotageManagerClassStr);
@@ -329,8 +341,9 @@ public class SandeshaUtil {
 
 			StorageManager mgr = (StorageManager) obj;
 			storageManager = mgr;
+			context.setProperty(Sandesha2Constants.STORAGE_MANAGER,storageManager);
 			return storageManager;
-
+			
 		} catch (Exception e) {
 			String message = "Cannot load the given storage manager";
 			log.error(message);
@@ -621,7 +634,7 @@ public class SandeshaUtil {
 			return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + to + ":" + sequenceKey;
 	}
 
-	public static String getInternalSequenceID(String sequenceID) {
+	public static String getOutgoingSideInternalSequenceID(String sequenceID) {
 		return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + sequenceID;
 	}
 

@@ -19,16 +19,14 @@ package org.apache.sandesha2;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.jar.Attributes.Name;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.axis2.context.AbstractContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;

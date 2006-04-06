@@ -40,9 +40,7 @@ import org.apache.axis2.util.Utils;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.SOAPFaultEnvelopeCreator;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
@@ -69,7 +67,6 @@ public class FaultManager {
 
 	public FaultManager() {
 	}
-
 
 	/**
 	 * Check weather the CreateSequence should be refused and generate the fault if it should.

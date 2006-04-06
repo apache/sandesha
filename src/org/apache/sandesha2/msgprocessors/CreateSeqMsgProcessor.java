@@ -31,9 +31,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.client.RMFaultCallback;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.RMClientAPI;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -44,6 +44,7 @@ import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
@@ -125,7 +126,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					//Setting the CreateSequence table entry for the outgoing side.
 					CreateSeqBean createSeqBean = new CreateSeqBean();
 					createSeqBean.setSequenceID(offeredSequenceID);
-					String outgoingSideInternalSequenceID = SandeshaUtil.getInternalSequenceID(newSequenceId);
+					String outgoingSideInternalSequenceID = SandeshaUtil.getOutgoingSideInternalSequenceID(newSequenceId);
 					createSeqBean.setInternalSequenceID(outgoingSideInternalSequenceID);
 					createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); //this is a dummy value.
 				
@@ -230,11 +231,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		
 		//adding the RM_FAULT_CALLBACK
-		RMFaultCallback faultCallback = (RMFaultCallback) msgCtx.getOptions().getProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK);
+		RMFaultCallback faultCallback = (RMFaultCallback) msgCtx.getOptions().getProperty(RMClientConstants.RM_FAULT_CALLBACK);
 		if (faultCallback!=null) {
 			OperationContext operationContext = msgCtx.getOperationContext();
 			if (operationContext!=null) {
-				operationContext.setProperty(Sandesha2ClientAPI.RM_FAULT_CALLBACK,faultCallback);
+				operationContext.setProperty(RMClientConstants.RM_FAULT_CALLBACK,faultCallback);
 			}
 		}
 	}

@@ -20,9 +20,6 @@ import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
 
-import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -30,8 +27,9 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.addressing.AddressingConstants;
-
-import sun.util.logging.resources.logging;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>

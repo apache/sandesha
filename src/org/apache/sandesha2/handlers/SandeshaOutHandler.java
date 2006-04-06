@@ -39,8 +39,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.RMClientAPI;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
@@ -60,6 +60,7 @@ import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.Identifier;
@@ -109,9 +110,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,
 				"true");
 		
-		String dummyMessageString = (String) msgCtx.getOptions().getProperty(Sandesha2ClientAPI.DUMMY_MESSAGE);
+		String dummyMessageString = (String) msgCtx.getOptions().getProperty(RMClientConstants.DUMMY_MESSAGE);
 		boolean dummyMessage = false;
-		if (dummyMessageString!=null && Sandesha2ClientAPI.VALUE_TRUE.equals(dummyMessageString))
+		if (dummyMessageString!=null && RMClientAPI.VALUE_TRUE.equals(dummyMessageString))
 			dummyMessage = true;
 		
 		StorageManager storageManager = SandeshaUtil

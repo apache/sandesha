@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2;
 
-import org.apache.axis2.addressing.AddressingConstants;
 
 
 /**
@@ -477,5 +476,11 @@ public interface Sandesha2Constants {
 	String LIST_SEPERATOR = ",";
 	
 	String LIST_PART_SEPERATOR = "-";
+	
+	String STORAGE_MANAGER = "StorageManager";
+	
+	String SENDER = "Sender";
+	
+	String INVOKER = "Invoker";
 	
 }

@@ -34,13 +34,11 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.SpecSpecificConstants;
-import org.apache.sandesha2.TerminateManager;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.RMClientAPI;
+import org.apache.sandesha2.client.RMClientConstants;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -49,11 +47,14 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
+import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.SpecSpecificConstants;
+import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -183,7 +184,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		}
 		
 		//following will be valid only for the server side, since the obtained int. seq ID is only valid there.
-		String responseSideInternalSequenceID = SandeshaUtil.getInternalSequenceID(sequenceID);
+		String responseSideInternalSequenceID = SandeshaUtil.getOutgoingSideInternalSequenceID(sequenceID);
 		
 		long highestOutMsgNo = 0;
 		try {
@@ -290,7 +291,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		
 		String toAddress = rmMsgCtx.getTo().getAddress();
-		String sequenceKey = (String) options.getProperty(Sandesha2ClientAPI.SEQUENCE_KEY);
+		String sequenceKey = (String) options.getProperty(RMClientConstants.SEQUENCE_KEY);
         String internalSeqenceID = SandeshaUtil.getInternalSequenceID(toAddress,sequenceKey);
         
         String outSequenceID = SandeshaUtil.getSequenceProperty(internalSeqenceID,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID,configurationContext);

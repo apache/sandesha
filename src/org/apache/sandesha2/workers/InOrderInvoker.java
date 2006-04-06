@@ -30,7 +30,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -41,6 +40,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -79,9 +79,9 @@ public class InOrderInvoker extends Thread {
 			workingSequences.add(sequenceID);
 
 		if (!isInvokerStarted()) {
+			this.context = context;
 			runInvoker = true;     //so that isSenderStarted()=true.
 			super.start();
-			this.context = context;
 		}
 	}
 
@@ -188,11 +188,7 @@ public class InOrderInvoker extends Thread {
 							
 							if (!AxisOperationFactory.MEP_URI_IN_ONLY.equals(msgToInvoke.getAxisOperation().getMessageExchangePattern())) {
 								invocationTransaction = storageManager.getTransaction();
-							}
-							
-							log.info("Invoker invoking a '" + SandeshaUtil.getMessageTypeString(rmMsg
-												.getMessageType()) + "' message.");
-							
+							}						
 
 							storageMapMgr.delete(key);
 						} catch (AxisFault e) {

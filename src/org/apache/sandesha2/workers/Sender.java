@@ -37,20 +37,20 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.threadpool.ThreadPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.AcknowledgementManager;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.TerminateManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
@@ -122,6 +122,7 @@ public class Sender extends Thread {
 					continue;
 			    }
 				
+
 				MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
 				retransmitterAdjuster.adjustRetransmittion(senderBean, context);
 				
@@ -161,8 +162,7 @@ public class Sender extends Thread {
 				}
 				
 				updateMessage(msgCtx);
-				log.info("Sender is sending a '" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()) + "' message.");
-				
+
 				Transaction preSendTransaction = storageManager.getTransaction();
 
 				int messageType = rmMsgCtx.getMessageType();
@@ -258,9 +258,9 @@ public class Sender extends Thread {
 			workingSequences.add(sequenceID);
 
 		if (!isSenderStarted()) {
+			this.context = context;
 			runSender = true; // so that isSenderStarted()=true.
 			super.start();
-			this.context = context;
 		}
 	}
 
