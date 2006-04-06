@@ -18,13 +18,11 @@ package org.apache.sandesha2;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.sandesha2.util.PropertyManager;
-
 import junit.framework.TestCase;
+
+import org.apache.sandesha2.util.PropertyManager;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
