@@ -2,7 +2,7 @@
 
 <project default="default" xmlns:j="jelly:core" xmlns:maven="jelly:maven" xmlns:deploy="deploy" xmlns:ant="jelly:ant">
 
-    <j:set var="dist.name" value="${pom.artifactId}-${pom.currentVersion}"/>
+    <j:set var="dist.name" value="${pom.artifactId}-${sandesha2.version}"/>
     
     <ant:property name="build.dist.dir" value="${maven.build.dir}/dist"/>
     <ant:property name="build.temp.dir" value="${maven.build.dir}/temp"/>
@@ -12,6 +12,7 @@
     <ant:property name="build.samples.clients.dir" value="${build.samples.dir}/clients"/>
 	<ant:property name="mar.name" value="${dist.name}.mar"/>
 	<ant:property name="jar.name" value="${dist.name}.jar"/>
+	<ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
 	<ant:property name="dir.samples" value="samples"/>
 	<ant:property name="dir.test.resources" value="test-resources"/>
 	<ant:property name="build.addressing.mar" value="addressing.mar"/>
@@ -22,13 +23,14 @@
 	<ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
 	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
 	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
-    <goal name="all" prereqs="jar,mar:create,samples:create,javadoc" />
+   
+    <goal name="all" prereqs="clean,mar,repo:create,jar,client:jar,sample:create,javadoc" />
     
     <goal name="default">
-        <attainGoal name="jar:install"/>
+        <attainGoal name="all"/>
     </goal>
     
-    <goal name="mar:create" prereqs="java:compile">
+    <goal name="mar" prereqs="java:compile">
     	<ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
     	<ant:mkdir dir="${metainf.path}" />
     	<ant:copy file="${basedir}/config/module.xml" todir="${metainf.path}" />
@@ -43,8 +45,31 @@
         <ant:jar jarfile="${maven.build.dir}/${mar.name}" basedir="${build.temp.dir}/module" /> 
         <delete dir="${build.temp.dir}" />
     </goal>
+    
+    <goal name="client:jar" prereqs="java:compile">
+    	<ant:property name="client.path" value="${build.temp.dir}/client/" />
+    	<ant:mkdir dir="${client.path}" />
 
-	<goal name="client:create" prereqs="mar:create">
+		<!-- For the client side -->
+        <copy todir="${build.temp.dir}/client">
+            <fileset dir="${basedir}/target/classes" >
+			  <include name="**/sandesha2/*.*" />
+              <include name="**/sandesha2/client/*.*" />
+              <include name="**/sandesha2/storage/*.*" />
+              <include name="**/sandesha2/storage/*.*" />
+              <include name="**/sandesha2/storage/beanmanagers/*.*" />
+              <include name="**/sandesha2/storage/beans/*.*" />
+              <include name="**/sandesha2/storage/inmemory/*.*" />
+              <include name="**/sandesha2/util/*.*" />
+              <include name="**/sandesha2/wsrm/*.*" />
+            </fileset>
+        </copy>
+  
+        <ant:jar jarfile="${maven.build.dir}/${client.jar.name}" basedir="${build.temp.dir}/client" /> 
+        <delete dir="${build.temp.dir}" />
+    </goal>
+
+	<goal name="client:create" prereqs="mar">
 		<ant:property name="client.dist.path" value="${build.repo.dir}/client"/>
 		<ant:mkdir dir="${client.dist.path}" />
 		<ant:mkdir dir="${client.dist.path}/modules" />
@@ -60,7 +85,7 @@
         <attainGoal name="client:create"/>
     </goal>	
     
-	<goal name="server:create" prereqs="mar:create,sample:create">
+	<goal name="server:create" prereqs="mar,sample:create">
 		<ant:property name="server.dist.path" value="${build.repo.dir}/server"/>
 		<ant:mkdir dir="${server.dist.path}" />
 		<ant:mkdir dir="${server.dist.path}/modules" />
@@ -135,8 +160,10 @@
     </goal>
     
     <preGoal name="test:test" > 
+       <!--
     	<attainGoal name="server:create"/>
     	<attainGoal name="client:create"/>   
+    	-->
     </preGoal>
     
     <goal name="server.copy.tomcat" prereqs="server:create">

@@ -4,7 +4,7 @@
     <id>sandesha2</id>
     <name>Apache Sandesha2</name>
 	<groupId>sandesha2</groupId>
-    <currentVersion>${current.version}</currentVersion>
+    <currentVersion>${sandesha2.version}</currentVersion>
     <organization>
         <name>Apache Web Services</name>
         <url>http://ws.apache.org/</url>
