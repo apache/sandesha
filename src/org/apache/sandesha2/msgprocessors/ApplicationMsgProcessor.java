@@ -41,9 +41,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.RMClientConstants;
-import org.apache.sandesha2.client.RMFaultCallback;
-import org.apache.sandesha2.client.RMClientAPI;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaFaultCallback;
+import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -78,7 +78,6 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.wsdl.WSDLConstants;
 
 /**
  * Responsible for processing an incoming Application message.
@@ -439,11 +438,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ConfigurationContext configContext = msgContext .getConfigurationContext();
 		
 		//setting the Fault callback		
-		RMFaultCallback faultCallback = (RMFaultCallback) msgContext.getOptions().getProperty(RMClientConstants.RM_FAULT_CALLBACK);
+		SandeshaFaultCallback faultCallback = (SandeshaFaultCallback) msgContext.getOptions().getProperty(SandeshaClientConstants.RM_FAULT_CALLBACK);
 		if (faultCallback!=null) {
 			OperationContext operationContext = msgContext.getOperationContext();
 			if (operationContext!=null) {
-				operationContext.setProperty(RMClientConstants.RM_FAULT_CALLBACK,faultCallback);
+				operationContext.setProperty(SandeshaClientConstants.RM_FAULT_CALLBACK,faultCallback);
 			}
 		}
 		
@@ -491,7 +490,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// getting the request message and rmMessage.
 			MessageContext reqMsgCtx;
 			try {
-				reqMsgCtx = msgContext.getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+				reqMsgCtx = msgContext.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
 			} catch (AxisFault e) {
 				throw new SandeshaException (e);
 			}
@@ -534,10 +533,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			String to = toEPR.getAddress();
-			String sequenceKey = (String) msgContext.getProperty(RMClientConstants.SEQUENCE_KEY);
+			String sequenceKey = (String) msgContext.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 			internalSequenceId = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
 			
-			String lastAppMessage = (String) msgContext.getProperty(RMClientConstants.LAST_MESSAGE);
+			String lastAppMessage = (String) msgContext.getProperty(SandeshaClientConstants.LAST_MESSAGE);
 			if (lastAppMessage!=null && "true".equals(lastAppMessage))
 				lastMessage = true;
 		}
@@ -546,7 +545,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		   the system will generate the message numbers */
 
 		//User should set it as a long object.
-		Long messageNumberLng = (Long) msgContext.getProperty(RMClientConstants.MESSAGE_NUMBER);
+		Long messageNumberLng = (Long) msgContext.getProperty(SandeshaClientConstants.MESSAGE_NUMBER);
 		
 		long givenMessageNumber = -1;
 		if (messageNumberLng!=null) {
@@ -577,16 +576,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		//A dummy message is a one which will not be processed as a actual application message.
 		//The RM handlers will simply let these go.
-		String dummyMessageString = (String) msgContext.getOptions().getProperty(RMClientConstants.DUMMY_MESSAGE);
+		String dummyMessageString = (String) msgContext.getOptions().getProperty(SandeshaClientConstants.DUMMY_MESSAGE);
 		boolean dummyMessage = false;
-		if (dummyMessageString!=null && RMClientAPI.VALUE_TRUE.equals(dummyMessageString))
+		if (dummyMessageString!=null && Sandesha2Constants.VALUE_TRUE.equals(dummyMessageString))
 			dummyMessage = true;
 		
 		//saving the used message number
 		if (!dummyMessage)
 			setNextMsgNo(configContext,internalSequenceId,messageNumber);
-		
-		
+			
 		//set this as the response highest message.
 		SequencePropertyBean responseHighestMsgBean = new SequencePropertyBean (
 				internalSequenceId,
@@ -628,7 +626,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					Sandesha2Constants.SequenceProperties.TO_EPR);
 			if (incomingToBean != null) {
 				String incomingTo = incomingToBean.getValue();
-				msgContext.setProperty(RMClientConstants.AcksTo, incomingTo);
+				msgContext.setProperty(SandeshaClientConstants.AcksTo, incomingTo);
 			}
 		}
 
@@ -658,7 +656,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			specVersion = specVersionBean.getValue();
 		} else {
 			//in the client side, user will set the RM version.
-			specVersion = (String) msgContext.getProperty(RMClientConstants.RM_SPEC_VERSION);
+			specVersion = (String) msgContext.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 		}
 		
 		if (specVersion==null) 
@@ -691,7 +689,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 				String acksTo = null;
 				if (serviceContext != null)
-					acksTo = (String) msgContext.getProperty(RMClientConstants.AcksTo);
+					acksTo = (String) msgContext.getProperty(SandeshaClientConstants.AcksTo);
 
 				if (msgContext.isServerSide()) {
 					// we do not set acksTo value to anonymous when the create
@@ -766,7 +764,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			
 			MessageContext reqMsgCtx = null;
 			try {
-				reqMsgCtx = msgContext.getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+				reqMsgCtx = msgContext.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
 			} catch (AxisFault e) {
 				throw new SandeshaException (e);
 			}
@@ -990,7 +988,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			OperationContext operationContext = msg.getOperationContext();
 			if (operationContext != null) {
-				Object obj = msg.getProperty(RMClientConstants.LAST_MESSAGE);
+				Object obj = msg.getProperty(SandeshaClientConstants.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 					lastMessage = true;
 					

@@ -39,8 +39,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.RMClientAPI;
-import org.apache.sandesha2.client.RMClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
@@ -71,7 +71,6 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.wsdl.WSDLConstants;
 
 /**
  * This is invoked in the outFlow of an RM endpoint
@@ -110,9 +109,9 @@ public class SandeshaOutHandler extends AbstractHandler {
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,
 				"true");
 		
-		String dummyMessageString = (String) msgCtx.getOptions().getProperty(RMClientConstants.DUMMY_MESSAGE);
+		String dummyMessageString = (String) msgCtx.getOptions().getProperty(SandeshaClientConstants.DUMMY_MESSAGE);
 		boolean dummyMessage = false;
-		if (dummyMessageString!=null && RMClientAPI.VALUE_TRUE.equals(dummyMessageString))
+		if (dummyMessageString!=null && Sandesha2Constants.VALUE_TRUE.equals(dummyMessageString))
 			dummyMessage = true;
 		
 		StorageManager storageManager = SandeshaUtil

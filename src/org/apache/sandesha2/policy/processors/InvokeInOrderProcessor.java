@@ -13,14 +13,9 @@ public class InvokeInOrderProcessor {
 	
 	public void initializeInvokeInOrder(RMPolicyToken spt)
 			throws NoSuchMethodException {
-		logger.debug("InvokeInOrderProcessor:initializeInvokeInOrder");
 	}
 
 	public Object doInvokeInOrder(RMProcessorContext rmpc) {
-		logger.debug("Processing "
-				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
-
 		RMPolicyToken rmpt = rmpc.readCurrentSecurityToken();
 		switch (rmpc.getAction()) {
 

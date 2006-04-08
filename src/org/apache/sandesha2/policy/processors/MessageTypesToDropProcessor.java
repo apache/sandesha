@@ -13,14 +13,10 @@ public class MessageTypesToDropProcessor {
 
 	public void initializeMessageTypesToDrop(RMPolicyToken spt)
 			throws NoSuchMethodException {
-		logger.debug("MessgeTypesToDropProcessor:initializeMessgeTypesToDrop");
+
 	}
 
 	public Object doMessageTypesToDrop(RMProcessorContext rmpc) {
-		logger.debug("Processing "
-				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
-
 		RMPolicyToken rmpt = rmpc.readCurrentSecurityToken();
 		switch (rmpc.getAction()) {
 

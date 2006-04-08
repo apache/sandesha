@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.RMClientConstants;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -278,7 +278,7 @@ public class RMMsgCreator {
 				.getOperationContext();
 		if (operationcontext != null) {
 			String offeredSequence = (String) applicationMsgContext
-					.getProperty(RMClientConstants.OFFERED_SEQUENCE_ID);
+					.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(factory,rmNamespaceValue);
 				Identifier identifier = new Identifier(factory,rmNamespaceValue);

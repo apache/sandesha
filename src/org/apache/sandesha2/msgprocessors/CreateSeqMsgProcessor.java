@@ -31,9 +31,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.RMClientConstants;
-import org.apache.sandesha2.client.RMFaultCallback;
-import org.apache.sandesha2.client.RMClientAPI;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaFaultCallback;
+import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -231,11 +231,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		
 		//adding the RM_FAULT_CALLBACK
-		RMFaultCallback faultCallback = (RMFaultCallback) msgCtx.getOptions().getProperty(RMClientConstants.RM_FAULT_CALLBACK);
+		SandeshaFaultCallback faultCallback = (SandeshaFaultCallback) msgCtx.getOptions().getProperty(SandeshaClientConstants.RM_FAULT_CALLBACK);
 		if (faultCallback!=null) {
 			OperationContext operationContext = msgCtx.getOperationContext();
 			if (operationContext!=null) {
-				operationContext.setProperty(RMClientConstants.RM_FAULT_CALLBACK,faultCallback);
+				operationContext.setProperty(SandeshaClientConstants.RM_FAULT_CALLBACK,faultCallback);
 			}
 		}
 	}

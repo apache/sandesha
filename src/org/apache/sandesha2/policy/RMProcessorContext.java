@@ -49,13 +49,11 @@ public class RMProcessorContext {
 	}
 
 	public void pushRMToken(RMPolicyToken spt) {
-		logger.debug("RMProcessorContext:pushRMToken");
 		tokenStack.add(tokenStackPointer, spt);
 		tokenStackPointer++;
 	}
 
 	public RMPolicyToken popRMToken() {
-		logger.debug("RMProcessorContext:popRMToken");
 		if (tokenStackPointer > 0) {
 			tokenStackPointer--;
 			return (RMPolicyToken) tokenStack.get(tokenStackPointer);
@@ -65,7 +63,6 @@ public class RMProcessorContext {
 	}
 
 	public RMPolicyToken readCurrentSecurityToken() {
-		logger.debug("RMProcessorContext:readCurrentSecurityToken");
 		if (tokenStackPointer > 0) {
 			return (RMPolicyToken) tokenStack.get(tokenStackPointer - 1);
 		} else {
@@ -74,13 +71,11 @@ public class RMProcessorContext {
 	}
 
     public void pushPolicyEngineData(PolicyEngineData ped) {
-    	logger.debug("RMProcessorContext:pushPolicyEngineData");
         pedStack.add(pedStackPointer, ped);
         pedStackPointer++;
     }
 
     public PolicyEngineData popPolicyEngineData() {
-    	logger.debug("RMProcessorContext:popPolicyEngineData");
         if (pedStackPointer > 0) {
             pedStackPointer--;
             return (PolicyEngineData) pedStack.get(pedStackPointer);
@@ -90,7 +85,6 @@ public class RMProcessorContext {
     }
 
     public PolicyEngineData readCurrentPolicyEngineData() {
-    	logger.debug("RMProcessorContext:readCurrentPolicyEngineData");
         if (pedStackPointer > 0) {
             return (PolicyEngineData) pedStack.get(pedStackPointer - 1);
         } else {
@@ -98,9 +92,7 @@ public class RMProcessorContext {
         }
     }
     
-    public PolicyEngineData commitPolicyEngineData() {
-    	logger.debug("RMProcessorContext:commitPolicyEngineData");
-    	
+    public PolicyEngineData commitPolicyEngineData() {	
         if (pedStackPointer > 1) {
             pedStackPointer--;
             PolicyEngineData ped = (PolicyEngineData) pedStack.get(pedStackPointer);

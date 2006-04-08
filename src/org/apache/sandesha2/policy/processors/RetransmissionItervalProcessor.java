@@ -13,17 +13,11 @@ public class RetransmissionItervalProcessor {
 
 	public void initializeRetranmissionIterval(RMPolicyToken spt)
 			throws NoSuchMethodException {
-		logger
-				.debug("RetransmissionIntervalProcessor:initializeRetransmissionInterval");
-		;
+		logger.debug("RetransmissionIntervalProcessor:initializeRetransmissionInterval");;
 
 	}
 
 	public Object doRetransmissionInterval(RMProcessorContext rmpc) {
-		logger.debug("Processing "
-				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
-
 		RMPolicyToken rmpt = rmpc.readCurrentSecurityToken();
 		switch (rmpc.getAction()) {
 

@@ -39,11 +39,4 @@ public class RMPolicy {
 	
 	public static final RMPolicyToken storageManager = new RMPolicyToken(
 			"StorageManager", RMPolicyToken.SIMPLE_TOKEN, new String[]{});
-	
-	public static final String includeNever = "http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never";
-
-	public static final String includeOnce = "http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Once";
-
-	public static final String includeAlways = "http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always";
-
 }

@@ -35,12 +35,8 @@ public class RMPolicyProcessor {
 	RMProcessorContext rmProcessorContext = null;
 
 	public boolean setup() throws NoSuchMethodException {
-		logger.debug("RMPolicyProcessor:setUp");
-
 		prdr = PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
-		/*
-		 * Initialize the top level security policy token.
-		 */
+
 		RMPolicyToken rpt = null;
 
 		RetransmissionItervalProcessor rip = new RetransmissionItervalProcessor();
@@ -124,8 +120,6 @@ public class RMPolicyProcessor {
 	 *         implmentation
 	 */
 	public boolean processPolicy(Policy policy) {
-		logger.debug("RMPolicyProcessor:processPolicy");
-
 		if (!policy.isNormalized()) {
 			policy = (Policy) policy.normalize();
 		}
@@ -185,8 +179,6 @@ public class RMPolicyProcessor {
 	}
 
 	boolean processPrimitiveAssertion(PrimitiveAssertion pa) {
-		logger.debug("RMPolicyManager:processPrimitiveAssertion");
-
 		boolean commit = true;
 
 		commit = startPolicyTransaction(pa);
@@ -211,8 +203,6 @@ public class RMPolicyProcessor {
 	}
 
 	public boolean startPolicyTransaction(PrimitiveAssertion pa) {
-		logger.debug("RMPolicyProcessor:startPolicyTransaction");
-
 		String tokenName = pa.getName().getLocalPart();
 
 		RMPolicyToken rmpt = null;
@@ -263,8 +253,6 @@ public class RMPolicyProcessor {
 	}
 
 	public void abortPolicyTransaction(PrimitiveAssertion pa) {
-		logger.debug("RMPolicyProcessor:abortPolicyTransaction");
-
 		RMPolicyToken currentToken = rmProcessorContext
 				.readCurrentSecurityToken();
 		if (currentToken == null) {
@@ -293,8 +281,6 @@ public class RMPolicyProcessor {
 	}
 
 	public void commitPolicyTransaction(PrimitiveAssertion pa) {
-		logger.debug("RMPolicyProcessor:commitPolicyTransaction");
-		
 		RMPolicyToken currentToken = rmProcessorContext
 				.readCurrentSecurityToken();
 		if (currentToken == null) {

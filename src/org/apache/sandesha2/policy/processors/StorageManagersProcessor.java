@@ -14,8 +14,6 @@ public class StorageManagersProcessor {
 
 	public void initializeStorageManager(RMPolicyToken rmpt)
 			throws NoSuchMethodException {
-		logger.debug("StorageManagersProcessor:initializeStorageManager");
-
 		RMPolicyToken tmpRpt = RMPolicy.storageManager.copy();
 		tmpRpt.setProcessTokenMethod(this);
 		rmpt.setChildToken(tmpRpt);
@@ -27,10 +25,6 @@ public class StorageManagersProcessor {
 	}
 
 	public Object doStorageManagers(RMProcessorContext rmpc) {
-		logger.debug("Processing "
-				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
-
 		RMPolicyToken rmpt = rmpc.readCurrentSecurityToken();
 		switch (rmpc.getAction()) {
 
@@ -56,10 +50,6 @@ public class StorageManagersProcessor {
 	}
 
 	public Object doStorageManager(RMProcessorContext rmpc) {
-		logger.debug("Processing "
-				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
-
 		PolicyEngineData ped = rmpc.readCurrentPolicyEngineData();
 		String cls = rmpc.getAssertion().getStrValue();
 
@@ -71,10 +61,6 @@ public class StorageManagersProcessor {
 	}
 
 	public Object doPermanentStorageManager(RMProcessorContext spc) {
-		logger.debug("Processing "
-				+ spc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[spc.getAction()]);
-
 		PolicyEngineData ped = spc.readCurrentPolicyEngineData();
 		String cls = spc.getAssertion().getStrValue();
 

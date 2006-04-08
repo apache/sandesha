@@ -37,8 +37,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.RMClientAPI;
-import org.apache.sandesha2.client.RMClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -291,7 +291,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		
 		String toAddress = rmMsgCtx.getTo().getAddress();
-		String sequenceKey = (String) options.getProperty(RMClientConstants.SEQUENCE_KEY);
+		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
         String internalSeqenceID = SandeshaUtil.getInternalSequenceID(toAddress,sequenceKey);
         
         String outSequenceID = SandeshaUtil.getSequenceProperty(internalSeqenceID,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID,configurationContext);

@@ -12,15 +12,10 @@ public class InactivityTimeoutMeasureProcessor {
 		
 	public void initializeInactivityTimeoutMeasure(RMPolicyToken rmpt)
 			throws NoSuchMethodException {
-		logger.debug("InactivityTimeoutMeasureProcessor:initializeInactivityTimeoutMeasure");
-		
+
 	}
 
 	public Object doInactivityTimeoutMeasure(RMProcessorContext rmpc) {
-		logger.debug("Processing "
-				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
-
 		RMPolicyToken rmpt = rmpc.readCurrentSecurityToken();
 		switch (rmpc.getAction()) {
 

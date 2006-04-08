@@ -47,7 +47,6 @@ public class RMPolicyToken {
 	}
 
 	public RMPolicyToken(String token, int type, String[] attribs) {
-		logger.debug("RMPolicyToken:RMPolicyTokey(String,int,String[])");
 		tokenName = token;
 		tokenType = type;
 		attributes = attribs;
@@ -65,7 +64,6 @@ public class RMPolicyToken {
 	}
 
 	public void setProcessTokenMethod(Object h) throws NoSuchMethodException {
-		logger.debug("RMPolicyToken:setProcessTokenMethod");
 		
 		if (h == null) {
 			return;
@@ -81,7 +79,6 @@ public class RMPolicyToken {
 	public boolean invokeProcessTokenMethod(RMProcessorContext spc)
 			throws IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
-		logger.debug("RMPolicyToken:invokeProcessTokenMethod");
 
 		if (processTokenMethod == null) {
 			return false;
@@ -97,17 +94,14 @@ public class RMPolicyToken {
 	}
 
 	public String getTokenName() {
-		logger.debug("RMPolicyToken:getTokenName");
 		return tokenName;
 	}
 
 	public void setChildToken(RMPolicyToken spt) {
-		logger.debug("RMPolicyToken:setChildToken");
 		childTokens.add(spt);
 	}
 
 	public RMPolicyToken getChildToken(String sptName) {
-		logger.debug("RMPolicyToken:getChildToken");
 		Iterator it = childTokens.iterator();
 		while (it.hasNext()) {
 			RMPolicyToken tmpSpt = (RMPolicyToken) it.next();
@@ -120,7 +114,6 @@ public class RMPolicyToken {
 
 
 	public void removeChildToken(String sptName) {
-		logger.debug("RMPolicyToken:removeChildToken");
 		Iterator it = childTokens.iterator();
 		while (it.hasNext()) {
 			RMPolicyToken tmpSpt = (RMPolicyToken) it.next();
@@ -132,7 +125,6 @@ public class RMPolicyToken {
 	}
 
 	public RMPolicyToken copy() {
-		logger.debug("RMPolicyToken:copy");
 		RMPolicyToken spt = new RMPolicyToken(tokenName, tokenType,
 				attributes);
 		if (childTokens != null) {

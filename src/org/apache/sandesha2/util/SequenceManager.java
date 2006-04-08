@@ -28,8 +28,8 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.Sandesha2Constants.WSA;
-import org.apache.sandesha2.client.RMClientAPI;
-import org.apache.sandesha2.client.RMClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -207,7 +207,7 @@ public class SequenceManager {
 		
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		String acksTo = (String) firstAplicationMsgCtx
-				.getProperty(RMClientConstants.AcksTo);
+				.getProperty(SandeshaClientConstants.AcksTo);
 
 		if (toEPR == null) {
 			String message = "WS-Addressing To is null";
@@ -323,7 +323,7 @@ public class SequenceManager {
 		
 		String transportInProtocol = messageContext.getOptions().getTransportInProtocol();
 		
-		String acksTo = (String) messageContext.getProperty(RMClientConstants.AcksTo);
+		String acksTo = (String) messageContext.getProperty(SandeshaClientConstants.AcksTo);
 		String mep = messageContext.getAxisOperation().getMessageExchangePattern();
 		
 		boolean startListnerForAsyncAcks = false;

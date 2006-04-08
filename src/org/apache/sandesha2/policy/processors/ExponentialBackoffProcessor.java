@@ -14,14 +14,10 @@ public class ExponentialBackoffProcessor {
 
 	public void initializeExponentialBackoff(RMPolicyToken rmpt)
 			throws NoSuchMethodException {
-		logger.debug("ExponentialBackoffProcessor:initalizeExponentialBackoff");
 
 	}
 
 	public Object doExponentialBackoff(RMProcessorContext rmpc) {
-		logger.debug("Processing "
-				+ rmpc.readCurrentSecurityToken().getTokenName() + ": "
-				+ RMProcessorContext.ACTION_NAMES[rmpc.getAction()]);
 
 		RMPolicyToken rmpt = rmpc.readCurrentSecurityToken();
 		switch (rmpc.getAction()) {
