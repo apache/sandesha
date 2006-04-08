@@ -1,9 +1,19 @@
 /*
- * Created on Nov 13, 2005
+ * Copyright 2004,2005 The Apache Software Foundation.
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.apache.sandesha2;
 
 import java.io.File;
@@ -23,8 +33,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.sandesha2.client.RMClientAPI;
-import org.apache.sandesha2.client.RMClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
 import junit.framework.TestCase;
@@ -32,8 +42,6 @@ import junit.framework.TestCase;
 /**
  * @author chamikara
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class MessageRetransmissionTest extends TestCase {
 
@@ -78,7 +86,7 @@ public class MessageRetransmissionTest extends TestCase {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = "sequence1";
-		clientOptions.setProperty(RMClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
@@ -94,7 +102,7 @@ public class MessageRetransmissionTest extends TestCase {
 		
 		startServer();
 
-		clientOptions.setProperty(RMClientConstants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
 		
@@ -102,7 +110,7 @@ public class MessageRetransmissionTest extends TestCase {
 	
 		serviceClient.finalizeInvoke();
 				
-		SequenceReport sequenceReport = RMClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);

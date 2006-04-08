@@ -36,8 +36,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.RMClientAPI;
-import org.apache.sandesha2.client.RMClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
 import junit.framework.TestCase;
@@ -102,8 +102,8 @@ public class AddressablePingTest extends TestCase {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = "sequence2";
-		clientOptions.setProperty(RMClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(RMClientConstants.AcksTo,acksToEPR);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
@@ -114,7 +114,7 @@ public class AddressablePingTest extends TestCase {
 		
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		
-		clientOptions.setProperty(RMClientConstants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		try {
@@ -125,7 +125,7 @@ public class AddressablePingTest extends TestCase {
 
 		serviceClient.finalizeInvoke();
 		
-		SequenceReport sequenceReport = RMClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);

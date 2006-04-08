@@ -1,3 +1,19 @@
+/*
+ * Copyright 2004,2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.apache.sandesha2;
 
 import java.io.File;
@@ -23,9 +39,9 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.client.RMClientAPI;
-import org.apache.sandesha2.client.RMClientConstants;
-import org.apache.sandesha2.client.RMReport;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaReport;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -75,7 +91,7 @@ public class SquenceOfferTest extends TestCase {
 		
 		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
 		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-		String acksToEPR = "http://127.0.0.1:9070/axis2/services/__ANONYMOUS_SERVICE__";
+		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "axis2.xml";
@@ -88,12 +104,12 @@ public class SquenceOfferTest extends TestCase {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = SandeshaUtil.getUUID();
-		clientOptions.setProperty(RMClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(RMClientConstants.AcksTo,acksToEPR);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
 		String offeredSequenceID = SandeshaUtil.getUUID();
-		clientOptions.setProperty(RMClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		serviceClient.setOptions(clientOptions);
@@ -108,7 +124,7 @@ public class SquenceOfferTest extends TestCase {
 		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
-		clientOptions.setProperty(RMClientConstants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		TestCallback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
 
@@ -117,7 +133,7 @@ public class SquenceOfferTest extends TestCase {
 		serviceClient.finalizeInvoke();
 		
         //assertions for the out sequence.
-		SequenceReport sequenceReport = RMClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
@@ -129,7 +145,7 @@ public class SquenceOfferTest extends TestCase {
 		assertEquals(callback2.getResult(),"echo1echo2");
 		
 		//checking weather the incomingSequenceReport has the offered sequence ID
-		RMReport rmReport = RMClientAPI.getRMReport(configContext);
+		SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);
 		ArrayList incomingSeqList = rmReport.getIncomingSequenceList();
 		assertEquals(incomingSeqList.size(),1);
 		assertEquals(incomingSeqList.get(0),offeredSequenceID);	

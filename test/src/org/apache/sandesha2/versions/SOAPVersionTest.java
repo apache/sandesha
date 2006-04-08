@@ -20,8 +20,8 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.RMClientAPI;
-import org.apache.sandesha2.client.RMClientConstants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
 import junit.framework.TestCase;
@@ -78,7 +78,7 @@ public class SOAPVersionTest extends TestCase {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = "sequence1";
-		clientOptions.setProperty(RMClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		//setting the SOAP version as 1.1
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
@@ -89,13 +89,13 @@ public class SOAPVersionTest extends TestCase {
 		serviceClient.engageModule(new QName ("sandesha2"));
 		serviceClient.setOptions(clientOptions);
 		
-		clientOptions.setProperty(RMClientConstants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
 		Thread.sleep(5000);
 		serviceClient.finalizeInvoke();
 				
-		SequenceReport sequenceReport = RMClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
@@ -119,7 +119,7 @@ public class SOAPVersionTest extends TestCase {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = "sequence1";
-		clientOptions.setProperty(RMClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		//setting the SOAP version as 1.2
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
@@ -130,13 +130,13 @@ public class SOAPVersionTest extends TestCase {
 		serviceClient.engageModule(new QName ("sandesha2"));
 		serviceClient.setOptions(clientOptions);
 		
-		clientOptions.setProperty(RMClientConstants.LAST_MESSAGE, "true");
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
 		Thread.sleep(5000);
 		serviceClient.finalizeInvoke();
 				
-		SequenceReport sequenceReport = RMClientAPI.getOutgoingSequenceReport(to,sequenceKey,configContext);
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
