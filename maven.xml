@@ -53,15 +53,8 @@
 		<!-- For the client side -->
         <copy todir="${build.temp.dir}/client">
             <fileset dir="${basedir}/target/classes" >
-			  <include name="**/sandesha2/*.*" />
-              <include name="**/sandesha2/client/*.*" />
-              <include name="**/sandesha2/storage/*.*" />
-              <include name="**/sandesha2/storage/*.*" />
-              <include name="**/sandesha2/storage/beanmanagers/*.*" />
-              <include name="**/sandesha2/storage/beans/*.*" />
-              <include name="**/sandesha2/storage/inmemory/*.*" />
-              <include name="**/sandesha2/util/*.*" />
-              <include name="**/sandesha2/wsrm/*.*" />
+              <include name="**/sandesha2/client/*SandeshaClientConstants*.*" />
+              <include name="**/sandesha2/client/*SandeshaFaultCallback*.*" />
             </fileset>
         </copy>
   
