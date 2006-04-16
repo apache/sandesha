@@ -140,7 +140,7 @@ public class SequenceManager {
 		if (createSequenceMsgAction==null)
 		    throw new SandeshaException ("Create sequence message does not have the WSA:Action value");
 		
-		String messageRMNamespace = createSequence.getOMElement().getNamespace().getName();
+		String messageRMNamespace = createSequence.getNamespaceValue();
 		
 		String specVersion = null;
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(messageRMNamespace)) {

@@ -84,57 +84,57 @@ public class MsgInitializer {
 		if (elements.getCreateSequence() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ,
 					elements.getCreateSequence());
-			rmNamespace = elements.getCreateSequence().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getCreateSequence().getNamespaceValue();
 		}
 
 		if (elements.getCreateSequenceResponse() != null) {
 			rmMsgContext.setMessagePart(
 					Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE, elements
 							.getCreateSequenceResponse());
-			rmNamespace = elements.getCreateSequenceResponse().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getCreateSequenceResponse().getNamespaceValue();
 		}
 
 		if (elements.getSequence() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE,
 					elements.getSequence());
-			rmNamespace = elements.getSequence().getOMElement().getNamespace().getName();	
+			rmNamespace = elements.getSequence().getNamespaceValue();	
 		}
 
 		if (elements.getSequenceAcknowledgement() != null) {
 			rmMsgContext.setMessagePart(
 					Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, elements
 							.getSequenceAcknowledgement());
-			rmNamespace = elements.getSequenceAcknowledgement().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getSequenceAcknowledgement().getNamespaceValue();
 		}
 
 		if (elements.getTerminateSequence() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ,
 					elements.getTerminateSequence());
-			rmNamespace = elements.getTerminateSequence().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getTerminateSequence().getNamespaceValue();
 		}
 		
 		if (elements.getTerminateSequenceResponse() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE,
 					elements.getTerminateSequenceResponse());
-			rmNamespace = elements.getTerminateSequenceResponse().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getTerminateSequenceResponse().getNamespaceValue();
 		}
 
 		if (elements.getAckRequested() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST,
 					elements.getAckRequested());
-			rmNamespace = elements.getAckRequested().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getAckRequested().getNamespaceValue();
 		}
 		
 		if (elements.getCloseSequence() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE,
 					elements.getCloseSequence());
-			rmNamespace = elements.getCloseSequence().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getCloseSequence().getNamespaceValue();
 		}
 		
 		if (elements.getCloseSequenceResponse() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE,
 					elements.getCloseSequenceResponse());
-			rmNamespace = elements.getCloseSequenceResponse().getOMElement().getNamespace().getName();
+			rmNamespace = elements.getCloseSequenceResponse().getNamespaceValue();
 		}
 		
 		rmMsgContext.setRMNamespaceValue(rmNamespace);

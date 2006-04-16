@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -24,21 +25,18 @@ import org.apache.sandesha2.SandeshaException;
 
 public class Address implements IOMRMElement {
 
-	EndpointReference epr = null;
-	OMElement addressElement;
-	SOAPFactory factory;
-	OMNamespace addressingNamespace = null;
-
-	public Address(SOAPFactory factory, String addressingNamespaceValue) {
-		
-		this.factory = factory;
-		addressingNamespace = factory.createOMNamespace(addressingNamespaceValue,
-				Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
-		addressElement = factory.createOMElement(
-				Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
+	private EndpointReference epr = null;
+	
+	private OMFactory defaultFactory;
+	
+	private String addressingNamespaceValue = null;
+	
+	public Address(OMFactory factory, String addressingNamespaceValue) {
+		this.defaultFactory = factory;
+		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 	
-	public Address (EndpointReference epr,SOAPFactory factory,String addressingNamespaceValue) {
+	public Address (EndpointReference epr,OMFactory factory,String addressingNamespaceValue) {
 		this(factory,addressingNamespaceValue);
 		this.epr = epr;
 	}
@@ -46,41 +44,36 @@ public class Address implements IOMRMElement {
 	public Object fromOMElement(OMElement element) throws OMException {
 
 		OMElement addressPart = element.getFirstChildWithName(new QName(
-				addressingNamespace.getName(), Sandesha2Constants.WSA.ADDRESS));
+				addressingNamespaceValue, Sandesha2Constants.WSA.ADDRESS));
 		if (addressPart == null)
-			throw new OMException(
-					"Cant find an Address element in the given part");
+			throw new OMException("Cant find an Address element in the given part");
 		String addressText = addressPart.getText();
 		if (addressText == null || addressText == "")
 			throw new OMException(
 					"Passed element does not have a valid address text");
 
-		addressElement = addressPart;
 		epr = new EndpointReference(addressText);
-		addressElement = factory.createOMElement(
-				Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
 		return this;
-
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return addressElement;
+	public String getNamespaceValue(){
+		return addressingNamespaceValue;
 	}
 
 	public OMElement toOMElement(OMElement element) throws OMException {
-		if (addressElement == null)
-			throw new OMException(
-					"Cant set Address. The address element is null");
 
 		if (epr == null || epr.getAddress() == null || epr.getAddress() == "")
-			throw new OMException(
-					"cant set the address. The address value is not valid");
+			throw new OMException("cant set the address. The address value is not valid");
 
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace addressingNamespace = factory.createOMNamespace(addressingNamespaceValue,Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
+		OMElement addressElement = factory.createOMElement(Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
+		
 		addressElement.setText(epr.getAddress());
 		element.addChild(addressElement);
-
-		addressElement = factory.createOMElement(
-				Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
 
 		return element;
 	}

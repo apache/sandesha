@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -34,23 +35,20 @@ import org.apache.sandesha2.SandeshaException;
 public class AcksTo implements IOMRMElement {
 
 	private Address address;
-	private OMElement acksToElement;
-	private SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	OMNamespace addressingNamespace = null;
-//	String namespaceValue = null;
+	
+	private OMFactory defaultFactory;
+	
+	private String rmNamespaceValue = null;
+	
+	private String addressingNamespaceValue = null;
 
-	public AcksTo(SOAPFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
+	public AcksTo(OMFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
-		rmNamespace = factory.createOMNamespace(
-				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		addressingNamespace = factory.createOMNamespace(
-				addressingNamespaceValue, Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
-		acksToElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
+		this.defaultFactory = factory;
+		this.rmNamespaceValue = rmNamespaceValue;
+		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 	
 	public AcksTo (Address address,SOAPFactory factory,String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
@@ -58,43 +56,38 @@ public class AcksTo implements IOMRMElement {
 		this.address = address;
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return acksToElement;
+	public String getNamespaceValue(){
+		return rmNamespaceValue;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 		OMElement acksToPart = element.getFirstChildWithName(new QName(
-				rmNamespace.getName(), Sandesha2Constants.WSRM_COMMON.ACKS_TO));
+				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACKS_TO));
 
 		if (acksToPart == null)
-			throw new OMException(
-					"Passed element does not contain an acksTo part");
+			throw new OMException("Passed element does not contain an acksTo part");
 
-		address = new Address(factory,addressingNamespace.getName());
+		address = new Address(defaultFactory,addressingNamespaceValue);
 		address.fromOMElement(acksToPart);
-
-		acksToElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
 
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement element) throws OMException {
 
-		if (acksToElement == null)
-			throw new OMException("Cant set AcksTo. AcksTo element is null");
 		if (address == null)
-			throw new OMException("Cant set AcksTo. Address is null");
+			throw new OMException("Cannot set AcksTo. Address is null");
 
-		OMElement acksToPart = element.getFirstChildWithName(new QName(
-				rmNamespace.getName(), Sandesha2Constants.WSRM_COMMON.ACKS_TO));
-
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement acksToElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
+		
 		address.toOMElement(acksToElement);
+		
 		element.addChild(acksToElement);
-
-		acksToElement =factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
-
 		return element;
 	}
 

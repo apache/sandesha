@@ -49,8 +49,8 @@ public class RMElements {
 	private CloseSequenceResponse closeSequenceResponse = null;
 	private AckRequested ackRequested = null;
 	private SOAPFactory factory = null;
-	String rmNamespaceValue = null;
-	String addressingNamespaceValue = null;
+	private String rmNamespaceValue = null;
+	private String addressingNamespaceValue = null;
 	
 	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws SandeshaException {
 

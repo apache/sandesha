@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -34,27 +35,24 @@ import org.apache.sandesha2.SandeshaException;
 
 public class AcknowledgementRange implements IOMRMElement {
 	
-	private OMElement acknowledgementRangeElement;
 	private long upperValue;
-	private long lowerValue;
-	private SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	String namespaceValue = null;
 	
-	public AcknowledgementRange(SOAPFactory factory, String namespaceValue) throws SandeshaException {
+	private long lowerValue;
+	
+	private OMFactory defaultFactory;
+	
+	private String namespaceValue = null;
+	
+	public AcknowledgementRange(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		acknowledgementRangeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACK_RANGE, rmNamespace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return acknowledgementRangeElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement ackRangePart) throws OMException {
@@ -81,9 +79,6 @@ public class AcknowledgementRange implements IOMRMElement {
 					"The ack range does not have proper long values for Upper and Lower attributes");
 		}
 
-		acknowledgementRangeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACK_RANGE, rmNamespace);
-
 		return this;
 	}
 
@@ -91,25 +86,27 @@ public class AcknowledgementRange implements IOMRMElement {
 			throws OMException {
 
 		if (sequenceAckElement == null)
-			throw new OMException(
-					"Cant set Ack Range part since element is null");
+			throw new OMException("Cant set Ack Range part since element is null");
 
 		if (upperValue <= 0 || lowerValue <= 0 || lowerValue > upperValue)
 			throw new OMException(
 					"Cant set Ack Range part since Upper or Lower is not set to the correct value");
 
+		OMFactory factory = sequenceAckElement.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
 		OMAttribute lowerAttrib = factory.createOMAttribute(
 				Sandesha2Constants.WSRM_COMMON.LOWER, null, Long.toString(lowerValue));
 		OMAttribute upperAttrib = factory.createOMAttribute(
 				Sandesha2Constants.WSRM_COMMON.UPPER, null, Long.toString(upperValue));
 
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement acknowledgementRangeElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ACK_RANGE, rmNamespace);
+		
 		acknowledgementRangeElement.addAttribute(lowerAttrib);
 		acknowledgementRangeElement.addAttribute(upperAttrib);
-
 		sequenceAckElement.addChild(acknowledgementRangeElement);
-
-		acknowledgementRangeElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACK_RANGE, rmNamespace);
 
 		return sequenceAckElement;
 	}

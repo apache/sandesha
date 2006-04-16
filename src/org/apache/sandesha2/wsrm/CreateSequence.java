@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -37,25 +38,25 @@ import org.apache.sandesha2.SandeshaException;
 
 public class CreateSequence implements IOMRMPart {
 	
-	private OMElement createSequenceElement;
 	private AcksTo acksTo = null;
+	
 	private Expires expires = null;
+	
 	private SequenceOffer sequenceOffer = null;
-	private SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	OMNamespace addressingNamespace = null;
-
-	public CreateSequence(SOAPFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
+	
+	private OMFactory defaultFactory;
+	
+	private String rmNamespaceValue = null;
+	
+	private String addressingNamespaceValue = null;
+	
+	public CreateSequence(OMFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
-		rmNamespace = factory.createOMNamespace(
-				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		addressingNamespace = factory.createOMNamespace(
-				addressingNamespaceValue, Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
-		createSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
+		this.defaultFactory = factory;
+		this.rmNamespaceValue = rmNamespaceValue;
+		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 	
 	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
@@ -63,38 +64,33 @@ public class CreateSequence implements IOMRMPart {
 		this.acksTo = acksTo;
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return createSequenceElement;
+	public String getNamespaceValue() {
+		return rmNamespaceValue;
 	}
 
 	public Object fromOMElement(OMElement bodyElement) throws OMException,SandeshaException {
 
 		OMElement createSequencePart = bodyElement
-				.getFirstChildWithName(new QName(rmNamespace.getName(),
-						Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
+				.getFirstChildWithName(new QName(rmNamespaceValue,
+						                         Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		if (createSequencePart == null)
-			throw new OMException(
-					"Create sequence is not present in the passed element");
-
-		createSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
-
-		acksTo = new AcksTo(factory,rmNamespace.getName(),addressingNamespace.getName());
+			throw new OMException("Create sequence is not present in the passed element");
+		
+		acksTo = new AcksTo(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
 		acksTo.fromOMElement(createSequencePart);
 
-		OMElement offerPart = createSequencePart
-				.getFirstChildWithName(new QName(rmNamespace.getName(),
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
+		OMElement offerPart = createSequencePart.getFirstChildWithName(new QName(rmNamespaceValue,
+																	   Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
 		if (offerPart != null) {
-			sequenceOffer = new SequenceOffer(factory,rmNamespace.getName());
+			sequenceOffer = new SequenceOffer(defaultFactory,rmNamespaceValue);
 			sequenceOffer.fromOMElement(createSequencePart);
 		}
 
-		OMElement expiresPart = createSequenceElement
-				.getFirstChildWithName(new QName(rmNamespace.getName(),
+		OMElement expiresPart = createSequencePart.getFirstChildWithName(
+						new QName(rmNamespaceValue,
 						Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires(factory,rmNamespace.getName());
+			expires = new Expires(defaultFactory,rmNamespaceValue);
 			expires.fromOMElement(createSequencePart);
 		}
 
@@ -104,14 +100,20 @@ public class CreateSequence implements IOMRMPart {
 	public OMElement toOMElement(OMElement bodyElement) throws OMException {
 
 		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
-			throw new OMException(
-					"Cant add Create Sequence Part to a non-body element");
+			throw new OMException("Cant add Create Sequence Part to a non-body element");
 
 		if (acksTo == null)
-			throw new OMException(
-					"Cant add create seqeunce part, having acks to as null");
+			throw new OMException("Cant add create seqeunce part, having acks to as null");
 
 		SOAPBody soapBody = (SOAPBody) bodyElement;
+		
+		OMFactory factory = bodyElement.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement createSequenceElement = factory.createOMElement(
+				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
+		
 		acksTo.toOMElement(createSequenceElement);
 
 		if (sequenceOffer != null) {
@@ -123,9 +125,6 @@ public class CreateSequence implements IOMRMPart {
 		}
 
 		soapBody.addChild(createSequenceElement);
-
-		createSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE, rmNamespace);
 		return soapBody;
 	}
 
@@ -149,7 +148,7 @@ public class CreateSequence implements IOMRMPart {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.
-		OMElement elem = body.getFirstChildWithName(new QName(rmNamespace.getName(),
+		OMElement elem = body.getFirstChildWithName(new QName(rmNamespaceValue,
 				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		if (elem!=null)
 			elem.detach();

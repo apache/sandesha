@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPFactory;
@@ -36,26 +37,22 @@ import org.apache.sandesha2.SandeshaException;
 
 public class SequenceFault implements IOMRMElement {
 	
-	private OMElement sequenceFaultElement;
 	private FaultCode faultCode;
-	SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	String namespaceValue = null;
+	
+	private SOAPFactory defaultFactory;
+	
+	private String namespaceValue = null;
 
 	public SequenceFault(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		sequenceFaultElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT, rmNamespace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return sequenceFaultElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
@@ -68,42 +65,35 @@ public class SequenceFault implements IOMRMElement {
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT));
 
 		if (sequenceFaultPart == null)
-			throw new OMException(
-					"The passed element does not contain a Sequence Fault element");
+			throw new OMException("The passed element does not contain a Sequence Fault element");
 
 		OMElement faultCodePart = sequenceFaultPart
-				.getFirstChildWithName(new QName(namespaceValue,
-						Sandesha2Constants.WSRM_COMMON.FAULT_CODE));
+				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.FAULT_CODE));
 
 		if (faultCodePart != null) {
-			faultCode = new FaultCode(factory,namespaceValue);
+			faultCode = new FaultCode(defaultFactory,namespaceValue);
 			faultCode.fromOMElement(sequenceFaultPart);
 		}
 
-		sequenceFaultElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT, rmNamespace);
-
 		return this;
-
 	}
 
 	public OMElement toOMElement(OMElement body) throws OMException {
 
 		if (body == null || !(body instanceof SOAPBody))
-			throw new OMException(
-					"Cant get Sequence Fault part from a non-header element");
+			throw new OMException("Cant get Sequence Fault part from a non-header element");
 
-		if (sequenceFaultElement == null)
-			throw new OMException(
-					"Cant add the sequnce fault since the internal element is null");
-
+		OMFactory factory = body.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement sequenceFaultElement =factory.createOMElement(
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT, rmNamespace);
 		if (faultCode != null)
 			faultCode.toOMElement(sequenceFaultElement);
 
 		body.addChild(sequenceFaultElement);
-
-		sequenceFaultElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT, rmNamespace);
 
 		return body;
 	}
@@ -114,14 +104,6 @@ public class SequenceFault implements IOMRMElement {
 
 	public FaultCode getFaultCode() {
 		return faultCode;
-	}
-
-	public void setSequenceFaultElement(OMElement sequenceFault) {
-		sequenceFaultElement = sequenceFault;
-	}
-
-	public OMElement getSequenceFaultElement() {
-		return sequenceFaultElement;
 	}
 	
 	public boolean isNamespaceSupported (String namespaceName) {

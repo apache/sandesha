@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -38,56 +39,48 @@ import org.apache.sandesha2.SandeshaException;
 
 public class AckRequested implements IOMRMPart {
 	
-	private OMElement ackRequestedElement;
 	private Identifier identifier;
+	
 	private MessageNumber messageNumber;
-	private SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	String namespaceValue = null;
+	
+	private OMFactory defaultFactory;
+	
+	private String namespaceValue = null;
+	
 	private boolean mustUnderstand = false;
 
-	public AckRequested(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public AckRequested(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		ackRequestedElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return ackRequestedElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement header) throws OMException,SandeshaException {
 
 		if (header == null || !(header instanceof SOAPHeader))
-			throw new OMException(
-					"Cant add the Ack Requested part to a non-header element");
+			throw new OMException("Cant add the Ack Requested part to a non-header element");
 
-		OMElement ackReqPart = header.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
+		OMElement ackReqPart = header.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
 
 		if (ackReqPart == null)
-			throw new OMException(
-					"the passed element does not contain an ack requested part");
+			throw new OMException("the passed element does not contain an ack requested part");
 
-		identifier = new Identifier(factory,namespaceValue);
+		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(ackReqPart);
 
 		OMElement msgNoPart = ackReqPart.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.MSG_NUMBER));
 
 		if (msgNoPart != null) {
-			messageNumber = new MessageNumber(factory,namespaceValue);
+			messageNumber = new MessageNumber(defaultFactory,namespaceValue);
 			messageNumber.fromOMElement(ackReqPart);
 		}
-
-		ackRequestedElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
 
 		return this;
 	}
@@ -99,12 +92,13 @@ public class AckRequested implements IOMRMPart {
 					"Cant add the Ack Requested part to a non-header element");
 
 		if (identifier == null)
-			throw new OMException(
-					"Cant add ack Req block since the identifier is null");
+			throw new OMException("Cant add ack Req block since the identifier is null");
+		
+		OMFactory factory = header.getOMFactory();
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 
 		SOAPHeader SOAPHdr = (SOAPHeader) header;
-		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(
-				Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
+		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
 		ackReqHdrBlock.setMustUnderstand(isMustUnderstand());
 
 		identifier.toOMElement(ackReqHdrBlock);
@@ -112,9 +106,6 @@ public class AckRequested implements IOMRMPart {
 		if (messageNumber != null) {
 			messageNumber.toOMElement(ackReqHdrBlock);
 		}
-
-		ackRequestedElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
 
 		return header;
 	}
@@ -164,5 +155,4 @@ public class AckRequested implements IOMRMPart {
 		
 		return false;
 	}
-
 }

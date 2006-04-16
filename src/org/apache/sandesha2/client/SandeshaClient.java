@@ -583,6 +583,11 @@ public class SandeshaClient {
 		return dummyEnvelope;
 	}
 	
+	public static SequenceReport getOutgoingSequenceReport (String to,String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
+		return getOutgoingSequenceReport(internalSequenceID,configurationContext);
+	}
+	
 	private static SequenceReport getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
 		
 		SequenceReport sequenceReport = new SequenceReport ();

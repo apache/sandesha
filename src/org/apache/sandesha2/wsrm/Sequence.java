@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -36,29 +37,23 @@ import org.apache.sandesha2.SandeshaException;
 
 public class Sequence implements IOMRMPart {
 
-	private OMElement sequenceElement;
 	private Identifier identifier;
 	private MessageNumber messageNumber;
 	private LastMessage lastMessage = null;
-	private SOAPFactory factory;
-	OMNamespace seqNoNamespace = null;
+	private SOAPFactory defaultFactory;
 	private boolean mustUnderstand = true;
-	String namespaceValue = null;
+	private String namespaceValue = null;
 	
 	public Sequence(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		seqNoNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		sequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return sequenceElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement headerElement) throws OMException,SandeshaException {
@@ -68,27 +63,21 @@ public class Sequence implements IOMRMPart {
 			throw new OMException(
 					"Sequence element cannot be added to non-header element");
 
-		OMElement sequencePart = sequenceElement = headerElement
-				.getFirstChildWithName(new QName(namespaceValue,
+		OMElement sequencePart = headerElement.getFirstChildWithName(new QName(namespaceValue,
 						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequencePart == null)
-			throw new OMException(
-					"Cannot find Sequence element in the given element");
+			throw new OMException("Cannot find Sequence element in the given element");
 
-		sequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
-
-		identifier = new Identifier(factory,namespaceValue);
-		messageNumber = new MessageNumber(factory,namespaceValue);
+		identifier = new Identifier(defaultFactory,namespaceValue);
+		messageNumber = new MessageNumber(defaultFactory,namespaceValue);
 		identifier.fromOMElement(sequencePart);
 		messageNumber.fromOMElement(sequencePart);
 
 		OMElement lastMessageElement = sequencePart
-				.getFirstChildWithName(new QName(namespaceValue,
-						Sandesha2Constants.WSRM_COMMON.LAST_MSG));
+				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.LAST_MSG));
 
 		if (lastMessageElement != null) {
-			lastMessage = new LastMessage(factory,namespaceValue);
+			lastMessage = new LastMessage(defaultFactory,namespaceValue);
 			lastMessage.fromOMElement(sequencePart);
 		}
 
@@ -98,42 +87,29 @@ public class Sequence implements IOMRMPart {
 	public OMElement toOMElement(OMElement headerElement) throws OMException {
 
 		if (headerElement == null || !(headerElement instanceof SOAPHeader))
-			throw new OMException(
-					"Cant add Sequence Part to a non-header element");
+			throw new OMException("Cant add Sequence Part to a non-header element");
 
 		SOAPHeader soapHeader = (SOAPHeader) headerElement;
-		if (soapHeader == null)
-			throw new OMException(
-					"cant add the sequence part to a non-header element");
-		if (sequenceElement == null)
-			throw new OMException(
-					"cant add Sequence Part since Sequence is null");
+
 		if (identifier == null)
-			throw new OMException(
-					"Cant add Sequence part since identifier is null");
+			throw new OMException("Cant add Sequence part since identifier is null");
 		if (messageNumber == null)
-			throw new OMException(
-					"Cant add Sequence part since MessageNumber is null");
+			throw new OMException("Cant add Sequence part since MessageNumber is null");
 
+		OMFactory factory = headerElement.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
 
+		OMNamespace rmNamespace = factory.createOMNamespace(
+				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		SOAPHeaderBlock sequenceHeaderBlock = soapHeader.addHeaderBlock(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
-		//soapHeader.addChild(sequenceHeaderBlock);
-		//OMElement elem1 = factory.createOMElement("test","http://test1","test2");
-		//soapHeader.addChild(elem1)
-		
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE, rmNamespace);
 		
 		sequenceHeaderBlock.setMustUnderstand(isMustUnderstand());
 		identifier.toOMElement(sequenceHeaderBlock);
 		messageNumber.toOMElement(sequenceHeaderBlock);
 		if (lastMessage != null)
 			lastMessage.toOMElement(sequenceHeaderBlock);
-
-
-		//resetting the element. So that subsequest toOMElement calls will
-		// attach a different object.
-		this.sequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE, seqNoNamespace);
 
 		return headerElement;
 	}

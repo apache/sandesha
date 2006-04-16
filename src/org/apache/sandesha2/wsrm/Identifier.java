@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -33,22 +34,18 @@ import org.apache.sandesha2.SandeshaException;
 
 public class Identifier implements Sandesha2Constants, IOMRMElement {
 
-	private OMElement identifierElement;
 	private String identifier = null;
-	OMNamespace wsrmNamespace = null;
-	private SOAPFactory factory;
-	String namespaceValue = null;
 	
-	public Identifier(SOAPFactory factory, String namespaceValue) throws SandeshaException {
+	private OMFactory defaultFactory;
+	
+	private String namespaceValue = null;
+	
+	public Identifier(OMFactory defaultFactory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = defaultFactory;
 		this.namespaceValue = namespaceValue;
-		wsrmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		identifierElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.IDENTIFIER, wsrmNamespace);
 	}
 
 	public void setIndentifer(String identifier) {
@@ -59,21 +56,21 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		return identifier;
 	}
 
-	public OMElement getOMElement() throws OMException {
-		identifierElement.setText(identifier);
-		return identifierElement;
+	public String getNamespaceValue() throws OMException {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
 		OMElement identifierPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
 		if (identifierPart == null)
-			throw new OMException(
-					"The parsed element does not contain an identifier part");
-		identifierElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.IDENTIFIER, wsrmNamespace);
-
+			throw new OMException("The parsed element does not contain an identifier part");
+		
 		String identifierText = identifierPart.getText();
 		if (identifierText == null || identifierText == "")
 			throw new OMException("The identifier value is not valid");
@@ -87,12 +84,16 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		if (identifier == null || identifier == "") {
 			throw new OMException("identifier is not set .. ");
 		}
+		
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+			
+		OMNamespace wsrmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER, wsrmNamespace);
 
 		identifierElement.setText(identifier);
 		element.addChild(identifierElement);
-
-		identifierElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.IDENTIFIER, wsrmNamespace);
 
 		return element;
 	}

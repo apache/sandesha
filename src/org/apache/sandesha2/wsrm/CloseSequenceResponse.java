@@ -23,6 +23,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -35,26 +36,22 @@ import org.apache.axiom.soap.SOAPFactory;
  */
 public class CloseSequenceResponse implements IOMRMPart {
 
-	private OMElement closeSequenceResponseElement;
 	private Identifier identifier;
-	OMNamespace rmNameSpace = null;
-	SOAPFactory factory;
-	String namespaceValue = null;
 	
-	public CloseSequenceResponse(SOAPFactory factory, String namespaceValue) throws SandeshaException {
+	private OMFactory defaultFactory;
+	
+	private String namespaceValue = null;
+	
+	public CloseSequenceResponse(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNameSpace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		closeSequenceResponseElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE, rmNameSpace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return closeSequenceResponseElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
@@ -67,14 +64,10 @@ public class CloseSequenceResponse implements IOMRMPart {
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE));
 
 		if (closeSeqResponsePart == null)
-			throw new OMException(
-					"passed element does not contain a 'close sequence response' part");
+			throw new OMException("passed element does not contain a 'close sequence response' part");
 
-		identifier = new Identifier(factory,namespaceValue);
+		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(closeSeqResponsePart);
-
-		closeSequenceResponseElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE, rmNameSpace);
 
 		return this;
 	}
@@ -85,19 +78,19 @@ public class CloseSequenceResponse implements IOMRMPart {
 			throw new OMException(
 					"Cant add close sequence response to a nonbody element");
 
-		if (closeSequenceResponseElement == null)
-			throw new OMException(
-					"Cant add close sequnce response since the internal element is null");
-
 		if (identifier == null)
 			throw new OMException(
 					"Cant add close sequence response since identifier is not set");
 
+		OMFactory factory = body.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement closeSequenceResponseElement = factory.createOMElement(
+				Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE, rmNamespace);
 		identifier.toOMElement(closeSequenceResponseElement);
 		body.addChild(closeSequenceResponseElement);
-
-		closeSequenceResponseElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE, rmNameSpace);
 
 		return body;
 	}

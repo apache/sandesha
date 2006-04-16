@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -32,65 +33,60 @@ import org.apache.sandesha2.SandeshaException;
  */
 
 public class Accept implements IOMRMElement {
-	private OMElement acceptElement;
 
 	private AcksTo acksTo;
 	
-	private SOAPFactory factory;
-
-	OMNamespace rmNamespace = null; 
+	private OMFactory defaultFactory;
 	
-	OMNamespace addressingNamespace = null;
+	private String rmNamespaceValue;
+	
+	private String addressingNamespaceValue;
 
-	public Accept(SOAPFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+
+	public Accept(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
-		rmNamespace = factory.createOMNamespace(
-				rmNamespaceValue , Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		addressingNamespace = factory.createOMNamespace(
-				addressingNamespaceValue , Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
-		acceptElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
+		this.defaultFactory = factory;
+		this.addressingNamespaceValue = addressingNamespaceValue;
+		this.rmNamespaceValue = rmNamespaceValue;
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return acceptElement;
+	public String getNamespaceValue(){
+		return rmNamespaceValue;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
 		OMElement acceptPart = element.getFirstChildWithName(new QName(
-				rmNamespace.getName(), Sandesha2Constants.WSRM_COMMON.ACCEPT));
+				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACCEPT));
 		if (acceptPart == null)
-			throw new OMException(
-					"Passed element does not contain an Accept part");
+			throw new OMException("Passed element does not contain an Accept part");
 
-		acksTo = new AcksTo(factory,rmNamespace.getName(),addressingNamespace.getName());
+		acksTo = new AcksTo(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
 		acksTo.fromOMElement(acceptPart);
-
-		acceptElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
 
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement element) throws OMException {
 
-		if (acceptElement == null)
-			throw new OMException(
-					"Cant add Accept part since the internal element is null");
-
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
 		if (acksTo == null)
-			throw new OMException(
-					"Cant add Accept part since AcksTo object is null");
+			throw new OMException("Cant add Accept part since AcksTo object is null");
 
+		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement acceptElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
+		
 		acksTo.toOMElement(acceptElement);
 		element.addChild(acceptElement);
-
-		acceptElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);
 
 		return element;
 	}

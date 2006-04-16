@@ -23,6 +23,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 
@@ -31,66 +32,52 @@ import org.apache.axiom.soap.SOAPFactory;
  * 
  * This represent the wsrm:final element that may be present withing a sequence acknowledgement.
  */
-public class AckFinal {
+public class AckFinal implements IOMRMElement {
 
-	private OMElement finalElement = null;
-	OMNamespace rmNamespace = null;
-	SOAPFactory factory;
-	String namespaceValue = null;
+	private OMFactory defaultfactory;
 	
-	public AckFinal(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	private String namespaceValue = null;
+	
+	public AckFinal(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultfactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		finalElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.FINAL, rmNamespace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return finalElement;
+	public String getNamespaceValue(){
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
-		OMElement nonePart = element.getFirstChildWithName(new QName(
+		
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultfactory;
+		
+		OMElement finalPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.FINAL));
-		if (nonePart == null)
-			throw new OMException(
-					"The passed element does not contain a 'Final' part");
-
-		finalElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.FINAL, rmNamespace);
+		if (finalPart == null)
+			throw new OMException("The passed element does not contain a 'Final' part");
 
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement sequenceAckElement) throws OMException {
 		//soapheaderblock element will be given
-		if (finalElement == null)
-			throw new OMException("Cant set 'Final' element. It is null");
 
+		OMFactory factory = sequenceAckElement.getOMFactory();
+		if (factory==null)
+			factory = defaultfactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement finalElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.FINAL, rmNamespace);
 		sequenceAckElement.addChild(finalElement);
-
-		finalElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.FINAL, rmNamespace);
 
 		return sequenceAckElement;
 	}
 
-	public void setLastMessageElement(OMElement noneElement) {
-		this.finalElement = noneElement;
-	}
-
-	public OMElement getLastMessageElement() {
-		return finalElement;
-	}
-
-	public boolean isPresent() {
-		return (finalElement != null) ? true : false;
-	}
 	
 	//this element is only supported in 2005_05_10 spec.
 	public boolean isNamespaceSupported (String namespaceName) {

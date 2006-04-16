@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -37,46 +38,37 @@ import org.apache.sandesha2.SandeshaException;
 
 public class TerminateSequence implements IOMRMPart {
 
-	private OMElement terminateSequenceElement;
 	private Identifier identifier;
-	OMNamespace rmNameSpace = null;
-	SOAPFactory factory;
-	String namespaceValue = null;
+	
+	private SOAPFactory defaultFactory;
+	
+	private String namespaceValue = null;
 	
 	public TerminateSequence(SOAPFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNameSpace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		terminateSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNameSpace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return terminateSequenceElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
 
 		if (!(body instanceof SOAPBody))
-			throw new OMException(
-					"Cant add terminate sequence to a non body element");
+			throw new OMException("Cant add terminate sequence to a non body element");
 
 		OMElement terminateSeqPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 
 		if (terminateSeqPart == null)
-			throw new OMException(
-					"passed element does not contain a terminate sequence part");
+			throw new OMException("passed element does not contain a terminate sequence part");
 
-		identifier = new Identifier(factory,namespaceValue);
+		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(terminateSeqPart);
-
-		terminateSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return this;
 	}
@@ -84,22 +76,21 @@ public class TerminateSequence implements IOMRMPart {
 	public OMElement toOMElement(OMElement body) throws OMException {
 
 		if (body == null || !(body instanceof SOAPBody))
-			throw new OMException(
-					"Cant add terminate sequence to a nonbody element");
-
-		if (terminateSequenceElement == null)
-			throw new OMException(
-					"Cant add terminate sequnce since the internal element is null");
+			throw new OMException("Cant add terminate sequence to a nonbody element");
 
 		if (identifier == null)
-			throw new OMException(
-					"Cant add terminate sequence since identifier is not set");
+			throw new OMException("Cant add terminate sequence since identifier is not set");
 
+		OMFactory factory= body.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement terminateSequenceElement = factory.createOMElement(
+				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNamespace);
+		
 		identifier.toOMElement(terminateSequenceElement);
 		body.addChild(terminateSequenceElement);
-
-		terminateSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE, rmNameSpace);
 
 		return body;
 	}

@@ -272,10 +272,13 @@ public class FaultManager {
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE);
 
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
-			Identifier identifier = new Identifier(factory,rmNamespaceValue);
-			identifier.setIndentifer(sequenceID);
-			OMElement identifierOMElem = identifier.getOMElement();
-			data.setDetail(identifierOMElem);
+//			Identifier identifier = new Identifier(factory,rmNamespaceValue);
+//			identifier.setIndentifer(sequenceID);
+//			OMElement identifierOMElem = identifier.getOMElement();
+			
+			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+			data.setDetail(identifierElement);
+			
 			data.setReason("A sequence with the given sequenceID has NOT been established");
 
 			return getFault(rmMessageContext, data,rmMessageContext.getAddressingNamespaceValue());
@@ -332,7 +335,14 @@ public class FaultManager {
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
 			data.setReason(reason);
-			data.setDetail(sequenceAcknowledgement.getOMElement());
+			
+			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			OMElement dummyElement = factory.createOMElement("dummyElem",null);
+			sequenceAcknowledgement.toOMElement(dummyElement);
+			
+			OMElement sequenceAckElement = dummyElement.getFirstChildWithName(
+					new QName (Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
+			data.setDetail(sequenceAckElement);
 
 			return getFault(ackRMMessageContext, data,ackRMMessageContext.getAddressingNamespaceValue());
 		}

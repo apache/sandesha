@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -37,68 +38,59 @@ import org.apache.sandesha2.SandeshaException;
 
 public class CreateSequenceResponse implements IOMRMPart {
 	
-	private OMElement createSequenceResponseElement;
 	private Identifier identifier;
+	
 	private Accept accept;
+	
 	private Expires expires;
-	SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	OMNamespace addressingNamespace = null;
+	
+	private OMFactory defaultFactory;
+	
+	private String rmNamespaceValue = null;
+	
+	private String addressingNamespaceValue = null;
 
-	public CreateSequenceResponse(SOAPFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+	public CreateSequenceResponse(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
-		rmNamespace = factory.createOMNamespace(
-				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		addressingNamespace = factory.createOMNamespace(
-				addressingNamespaceValue, Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
-		
-		createSequenceResponseElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE,
-				rmNamespace);
+		this.defaultFactory = factory;
+		this.rmNamespaceValue = rmNamespaceValue;
+		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return createSequenceResponseElement;
+	public String getNamespaceValue() {
+		return rmNamespaceValue;
 	}
 
 	public Object fromOMElement(OMElement bodyElement) throws OMException,SandeshaException {
 
 		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
-			throw new OMException(
-					"Cant get create sequnce response from a non-body element");
+			throw new OMException("Cant get create sequnce response from a non-body element");
 
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
 
 		OMElement createSeqResponsePart = SOAPBody
-				.getFirstChildWithName(new QName(rmNamespace.getName(),
-						Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
+				.getFirstChildWithName(new QName(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
 		if (createSeqResponsePart == null)
-			throw new OMException(
-					"The passed element does not contain a create seqence response part");
+			throw new OMException("The passed element does not contain a create seqence response part");
 
-		createSequenceResponseElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE,
-				rmNamespace);
-
-		identifier = new Identifier(factory,rmNamespace.getName());
+		identifier = new Identifier(defaultFactory,rmNamespaceValue);
 		identifier.fromOMElement(createSeqResponsePart);
 
-		OMElement expiresPart = createSeqResponsePart
-				.getFirstChildWithName(new QName(rmNamespace.getName(),
-						Sandesha2Constants.WSRM_COMMON.EXPIRES));
+		OMElement expiresPart = createSeqResponsePart.getFirstChildWithName(
+					new QName(rmNamespaceValue,
+					Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires(factory,rmNamespace.getName());
+			expires = new Expires(defaultFactory,rmNamespaceValue);
 			expires.fromOMElement(createSeqResponsePart);
 		}
 
-		OMElement acceptPart = createSeqResponsePart
-				.getFirstChildWithName(new QName(rmNamespace.getName(),
+		OMElement acceptPart = createSeqResponsePart.getFirstChildWithName(
+						new QName(rmNamespaceValue,
 						Sandesha2Constants.WSRM_COMMON.ACCEPT));
 		if (acceptPart != null) {
-			accept = new Accept(factory,rmNamespace.getName(),addressingNamespace.getName());
+			accept = new Accept(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
 			accept.fromOMElement(createSeqResponsePart);
 		}
 
@@ -113,13 +105,20 @@ public class CreateSequenceResponse implements IOMRMPart {
 
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
 
-		if (createSequenceResponseElement == null)
-			throw new OMException(
-					"cant set create sequnce response since the internal element is not set");
 		if (identifier == null)
-			throw new OMException(
-					"cant set create sequnce response since the Identifier is not set");
+			throw new OMException("cant set create sequnce response since the Identifier is not set");
 
+		OMFactory factory = bodyElement.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMNamespace addressingNamespace = factory.createOMNamespace(addressingNamespaceValue,Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
+		
+		OMElement createSequenceResponseElement = factory.createOMElement(
+				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE,
+				rmNamespace);
+		
 		identifier.toOMElement(createSequenceResponseElement);
 
 		if (expires != null) {
@@ -132,9 +131,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 
 		SOAPBody.addChild(createSequenceResponseElement);
 
-		createSequenceResponseElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE,
-				rmNamespace);
+		
 
 		return SOAPBody;
 	}
@@ -167,7 +164,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.
-		OMElement elem = body.getFirstChildWithName(new QName(rmNamespace.getName(),
+		OMElement elem = body.getFirstChildWithName(new QName(rmNamespaceValue,
 				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
 		if (elem!=null)
 			elem.detach();

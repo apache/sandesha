@@ -29,7 +29,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 
 public interface IOMRMElement {
-	public OMElement getOMElement() throws OMException;
+	public String getNamespaceValue();
 	public Object fromOMElement(OMElement element) throws OMException,SandeshaException ;
 	public OMElement toOMElement(OMElement element) throws OMException, SandeshaException ;
 	public boolean isNamespaceSupported (String namespaceName);

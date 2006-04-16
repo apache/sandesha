@@ -23,6 +23,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -36,46 +37,37 @@ import org.apache.axiom.soap.SOAPFactory;
 
 public class CloseSequence implements IOMRMPart {
 
-	private OMElement closeSequenceElement;
 	private Identifier identifier;
-	OMNamespace rmNameSpace = null;
-	SOAPFactory factory;
-	String namespaceValue = null;
 	
-	public CloseSequence(SOAPFactory factory, String namespaceValue) throws SandeshaException {
+	private OMFactory defaultFactory;
+	
+	private String namespaceValue = null;
+	
+	public CloseSequence(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNameSpace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		closeSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE, rmNameSpace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return closeSequenceElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
 
 		if (!(body instanceof SOAPBody))
-			throw new OMException(
-					"Cant add 'close sequence' to a non body element");
+			throw new OMException("Cant extract 'close sequence' from a non body element");
 
 		OMElement closeSeqPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE));
 
 		if (closeSeqPart == null)
-			throw new OMException(
-					"passed element does not contain a close sequence part");
+			throw new OMException("passed element does not contain a close sequence part");
 
-		identifier = new Identifier(factory,namespaceValue);
+		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(closeSeqPart);
-
-		closeSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE, rmNameSpace);
 
 		return this;
 	}
@@ -86,19 +78,18 @@ public class CloseSequence implements IOMRMPart {
 			throw new OMException(
 					"Cant add close sequence to a nonbody element");
 
-		if (closeSequenceElement == null)
-			throw new OMException(
-					"Cant add close sequnce since the internal element is null");
-
 		if (identifier == null)
-			throw new OMException(
-					"Cant add close sequence since identifier is not set");
+			throw new OMException("Cant add close sequence since identifier is not set");
 
+		OMFactory factory = body.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement closeSequenceElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE, rmNamespace);
+		
 		identifier.toOMElement(closeSequenceElement);
 		body.addChild(closeSequenceElement);
-
-		closeSequenceElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE, rmNameSpace);
 
 		return body;
 	}

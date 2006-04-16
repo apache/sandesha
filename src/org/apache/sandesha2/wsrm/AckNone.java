@@ -23,6 +23,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 
@@ -32,65 +33,47 @@ import org.apache.axiom.soap.SOAPFactory;
  * 
  * This represent the wsrm:none element that may be present withing a sequence acknowledgement.
  */
-public class AckNone {
+public class AckNone implements IOMRMElement {
 
-	private OMElement noneElement = null;
-	OMNamespace rmNamespace = null;
-	SOAPFactory factory;
-	String namespaceValue = null;
+	private OMNamespace rmNamespace = null;
 	
-	public AckNone(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	private OMFactory defaultFactory;
+	
+	private String namespaceValue = null;
+	
+	public AckNone(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		noneElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.NONE, rmNamespace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return noneElement;
+	public String getNamespaceValue(){
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
+	    
 		OMElement nonePart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.NONE));
 		if (nonePart == null)
-			throw new OMException(
-					"The passed element does not contain a 'None' part");
-
-		noneElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.NONE, rmNamespace);
+			throw new OMException("The passed element does not contain a 'None' part");
 
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement sequenceAckElement) throws OMException {
-		//soapheaderblock element will be given
-		if (noneElement == null)
-			throw new OMException("Cant set 'None' element. It is null");
+		
+		OMFactory factory = sequenceAckElement.getOMFactory();
+	    if (factory==null)
+	    	factory = defaultFactory;
+	    
+	    OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+	    OMElement noneElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.NONE, rmNamespace);
 
 		sequenceAckElement.addChild(noneElement);
-
-		noneElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.NONE, rmNamespace);
-
 		return sequenceAckElement;
-	}
-
-	public void setLastMessageElement(OMElement noneElement) {
-		this.noneElement = noneElement;
-	}
-
-	public OMElement getLastMessageElement() {
-		return noneElement;
-	}
-
-	public boolean isPresent() {
-		return (noneElement != null) ? true : false;
 	}
 	
 	//this element is only supported in 2005_05_10 spec.

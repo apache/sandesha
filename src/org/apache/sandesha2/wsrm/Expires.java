@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -34,58 +35,53 @@ import org.apache.sandesha2.SandeshaException;
 
 public class Expires implements IOMRMElement {
 
-	SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	OMElement expiresElement = null;
-	String duration = null;
-	String namespaceValue = null;
+	private OMFactory defaultFactory;
+	
+	private String duration = null;
+	
+	private String namespaceValue = null;
 
-	public Expires(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public Expires(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		expiresElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.EXPIRES, rmNamespace);
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		OMElement expiresPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart == null)
-			throw new OMException(
-					"Passed elemenet does not have a Expires part");
+			throw new OMException("Passed elemenet does not have a Expires part");
 		String expiresText = expiresPart.getText();
 		if (expiresText == null || expiresText == "")
 			throw new OMException("The duration value is not valid");
-
-		expiresElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.EXPIRES, rmNamespace);
 
 		duration = expiresText;
 		return element;
 	}
 
-	public OMElement getOMElement() throws OMException {
+	public String getNamespaceValue() throws OMException {
 		// TODO Auto-generated method stub
-		return expiresElement;
+		return namespaceValue;
 	}
 
 	public OMElement toOMElement(OMElement element) throws OMException {
-		if (expiresElement == null)
-			throw new OMException("Cant set Expires. It is null");
-		if (duration == null || duration == "")
-			throw new OMException(
-					"Cant set Expires. The duration value is not set");
 
+		if (duration == null || duration == "")
+			throw new OMException("Cant set Expires. The duration value is not set");
+
+		OMFactory factory = element.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement expiresElement = factory.createOMElement(
+				Sandesha2Constants.WSRM_COMMON.EXPIRES, rmNamespace);
+		
 		expiresElement.setText(duration);
 		element.addChild(expiresElement);
-
-		expiresElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.EXPIRES, rmNamespace);
 
 		return element;
 	}
@@ -96,14 +92,6 @@ public class Expires implements IOMRMElement {
 
 	public void setDuration(String duration) {
 		this.duration = duration;
-	}
-
-	public OMElement getExpiresElement() {
-		return expiresElement;
-	}
-
-	public void setExpiresElement(OMElement expiresElement) {
-		this.expiresElement = expiresElement;
 	}
 	
 	public boolean isNamespaceSupported (String namespaceName) {

@@ -18,6 +18,7 @@ package org.apache.sandesha2.wsrm;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -31,31 +32,26 @@ import org.apache.sandesha2.SandeshaException;
 
 public class Nack implements IOMRMElement {
 	
-	private OMElement nackElement;
 	private long nackNumber;
-	SOAPFactory factory;
-	OMNamespace rmNamespace = null;
-	String namespaceValue = null;
+	
+	private SOAPFactory defaultFactory;
+	
+	private String namespaceValue = null;
 		
 	public Nack(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		nackElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
 	}
 	
-	public OMElement getOMElement() throws OMException {
-		return nackElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 	
 
 	public Object fromOMElement(OMElement nackElement) throws OMException{
-		/*OMElement nackPart = sequenceAckElement.getFirstChildWithName(
-				new QName (Sandesha2Constants.WSRM.NS_URI_RM,Sandesha2Constants.WSRM.NACK));*/
 		
 		if (nackElement==null)
 			throw new OMException ("Passed seq ack element does not contain a nack part");
@@ -65,9 +61,6 @@ public class Nack implements IOMRMElement {
 		}catch (Exception ex ) {
 			throw new OMException ("Nack element does not contain a valid long value");
 		}
-		
-		nackElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
 		
 		return this;
 	} 
@@ -79,14 +72,14 @@ public class Nack implements IOMRMElement {
 		if (nackNumber<=0)
 			throw new OMException ("Cant set the nack part since the nack number does not have a valid value");
 		
-		if (nackElement==null) 
-		    throw new OMException ("Cant set the nack part since the element is null");
+		OMFactory factory = sequenceAckElement.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
 		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement nackElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
 		nackElement.setText(Long.toString(nackNumber));
 		sequenceAckElement.addChild(nackElement);
-
-		nackElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
 		
 		return sequenceAckElement;
 	}

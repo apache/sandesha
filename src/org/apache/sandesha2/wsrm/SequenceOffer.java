@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -33,50 +34,42 @@ import org.apache.sandesha2.SandeshaException;
 
 public class SequenceOffer implements IOMRMElement {
 	
-	private OMElement sequenceOfferElement;
 	private Identifier identifier = null;
+	
 	private Expires expires = null;
-	SOAPFactory factory;
-	OMNamespace rmNamespace = null; 
-	String namespaceValue = null;
+	
+	private OMFactory defaultFactory;
+	
+	private String namespaceValue = null;
 
-	public SequenceOffer(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public SequenceOffer(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException ("Unsupported namespace");
 		
-		this.factory = factory;
+		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
-		rmNamespace = factory.createOMNamespace(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		sequenceOfferElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
 	}
 
-	public OMElement getOMElement() throws OMException {
-		return sequenceOfferElement;
+	public String getNamespaceValue() {
+		return namespaceValue;
 	}
 
 	public Object fromOMElement(OMElement createSequenceElement)
 			throws OMException,SandeshaException {
+		
 		OMElement sequenceOfferPart = createSequenceElement
-				.getFirstChildWithName(new QName(namespaceValue,
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
+				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
 		if (sequenceOfferPart == null)
-			throw new OMException(
-					"The passed element does not contain a SequenceOffer part");
+			throw new OMException("The passed element does not contain a SequenceOffer part");
 
-		sequenceOfferElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
-
-		identifier = new Identifier(factory,namespaceValue);
+		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(sequenceOfferPart);
 
 		OMElement expiresPart = sequenceOfferPart
-				.getFirstChildWithName(new QName(namespaceValue,
-						Sandesha2Constants.WSRM_COMMON.EXPIRES));
+				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires(factory,namespaceValue);
-			expires.fromOMElement(sequenceOfferElement);
+			expires = new Expires(defaultFactory,namespaceValue);
+			expires.fromOMElement(sequenceOfferPart);
 		}
 
 		return this;
@@ -84,13 +77,17 @@ public class SequenceOffer implements IOMRMElement {
 
 	public OMElement toOMElement(OMElement createSequenceElement)
 			throws OMException {
-		if (sequenceOfferElement == null)
-			throw new OMException(
-					"Cant set sequnceoffer. Offer element is null");
-		if (identifier == null)
-			throw new OMException(
-					"Cant set sequnceOffer since identifier is null");
 
+		if (identifier == null)
+			throw new OMException("Cant set sequnceOffer since identifier is null");
+
+		OMFactory factory = createSequenceElement.getOMFactory();
+		if (factory==null)
+			factory = defaultFactory;
+		
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement sequenceOfferElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
+		
 		identifier.toOMElement(sequenceOfferElement);
 
 		if (expires != null) {
@@ -98,9 +95,6 @@ public class SequenceOffer implements IOMRMElement {
 		}
 
 		createSequenceElement.addChild(sequenceOfferElement);
-
-		sequenceOfferElement = factory.createOMElement(
-				Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
 
 		return createSequenceElement;
 	}
