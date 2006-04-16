@@ -94,163 +94,137 @@ public class SandeshaReportsTest extends TestCase {
 	
 	public void testSequenceReports () throws AxisFault,InterruptedException  {
 
-//		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-//		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-//		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
-//		
-//		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-//		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "axis2.xml";
-//		
-//		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-//
-//		Options clientOptions = new Options ();
-//
-//		clientOptions.setTo(new EndpointReference (to));
-//		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
-//		
-//		String sequenceKey = SandeshaUtil.getUUID();
-//		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-//		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
-//		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-//		
-//		ServiceClient serviceClient = new ServiceClient (configContext,null);
-//		serviceClient.setOptions(clientOptions);
-//		//serviceClient.
-//		
-//		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-//		clientOptions.setUseSeparateListener(true);
-//		
-//		serviceClient.setOptions(clientOptions);
-//		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
-//		
-//		TestCallback callback1 = new TestCallback ("Callback 1");
-//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
-//		
-//		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-//		TestCallback callback2 = new TestCallback ("Callback 2");
-//		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
-//
-//        
-//        Thread.sleep(12000);
-//		serviceClient.finalizeInvoke();
-//		
-//        //testing outgoing sequence reports
-//		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-//		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-//		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
-//		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-//		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
-//		
-//		//testing incoming sequence reports
-//		ArrayList incomingSequenceReports = SandeshaClient.getIncomingSequenceReports(configContext);
-//		assertEquals(incomingSequenceReports.size(),1);
-//		SequenceReport incomingSequenceReport = (SequenceReport) incomingSequenceReports.get(0);
-//		assertEquals(incomingSequenceReport.getCompletedMessages().size(),2);
-//		assertNotNull(incomingSequenceReport.getSequenceID());
-//		assertEquals(incomingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_IN);
-//		assertEquals(incomingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-//		assertNotNull(incomingSequenceReport.getInternalSequenceID());
-//		
-//		assertEquals(incomingSequenceReport.getSequenceID(),incomingSequenceReport.getInternalSequenceID());  //for the incoming side, internalSequenceID==sequenceID
+		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
+		
+		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "axis2.xml";
+		
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+
+		Options clientOptions = new Options ();
+
+		clientOptions.setTo(new EndpointReference (to));
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+		
+		String sequenceKey = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		serviceClient.setOptions(clientOptions);
+		//serviceClient.
+		
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setUseSeparateListener(true);
+		
+		serviceClient.setOptions(clientOptions);
+		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
+		
+		TestCallback callback1 = new TestCallback ("Callback 1");
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+		
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+		TestCallback callback2 = new TestCallback ("Callback 2");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
+
+        
+        Thread.sleep(10000);
+		serviceClient.finalizeInvoke();
+		
+        //testing outgoing sequence reports
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
+		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
+		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+		
+		//testing incoming sequence reports
+		ArrayList incomingSequenceReports = SandeshaClient.getIncomingSequenceReports(configContext);
+		assertEquals(incomingSequenceReports.size(),1);
+		SequenceReport incomingSequenceReport = (SequenceReport) incomingSequenceReports.get(0);
+		assertEquals(incomingSequenceReport.getCompletedMessages().size(),2);
+		assertNotNull(incomingSequenceReport.getSequenceID());
+		assertEquals(incomingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_IN);
+		assertEquals(incomingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertNotNull(incomingSequenceReport.getInternalSequenceID());
+		
+		assertEquals(incomingSequenceReport.getSequenceID(),incomingSequenceReport.getInternalSequenceID());  //for the incoming side, internalSequenceID==sequenceID
 	}
 	
 	public void testRMReport () throws AxisFault,InterruptedException {
 		
-//		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-//		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-//		
-//		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-//		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "axis2.xml";
-//
-//		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-//
-//		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-//		Options clientOptions = new Options ();
-//		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-//		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-//		
-//		clientOptions.setTo(new EndpointReference (to));
-//		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
-//		
-//		String sequenceKey1 = "sequence3";
-//		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey1);
-//		
-//		ServiceClient serviceClient = new ServiceClient (configContext,null);
-//		
-//		serviceClient.engageModule(new QName ("sandesha2"));
-//		serviceClient.setOptions(clientOptions);
-//		
-//		
-//		serviceClient.fireAndForget(getPingOMBlock("ping1"));		
-//		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-//		serviceClient.fireAndForget(getPingOMBlock("ping2"));
-//		
-//		String sequenceKey2 = "sequence4";
-//		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey2);
-//		
-//		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "false");
-//		serviceClient.fireAndForget(getPingOMBlock("ping1"));		
-//		
-//		try {
-//			//waiting till the messages exchange finishes.
-//			Thread.sleep(5000);
-//		} catch (InterruptedException e) {
-//			throw new SandeshaException ("sleep interupted");
-//		}
-//		
-//		SequenceReport sequenceReport = null;
-//		boolean complete = false;
-//		while (!complete) {
-//			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-//			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==2)
-//				complete = true;
-//			else {
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		
-//		serviceClient.finalizeInvoke();
-//		
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);
-//		
-//	 	assertEquals(rmReport.getOutgoingSequenceList().size(),2);
-//	 	
-//	 	SequenceReport sequence1Report = null;
-//	 	SequenceReport sequence2Report = null;
-//	 	
-//	 	Iterator iterator = rmReport.getOutgoingSequenceList().iterator();
-//	 	while (iterator.hasNext()) {
-//	 		String sequenceID = (String) iterator.next();
-//	 		
-//	 		 String internalSequenceID = rmReport.getInternalSequenceIdOfOutSequence(sequenceID);
-//	 		 
-////	 		 if (internalSequenceID.indexOf(sequenceKey1)>=0) {
-////	 			 sequence1Report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID,configContext);
-////	 		 } else if (internalSequenceID.indexOf(sequenceKey2)>=0){
-////	 			 sequence2Report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID,configContext);
-////	 		 }
-//	 		 
-//	 		 throw new SandeshaException ("complete the test case");
-//	 	}
-//	 	
-//	 	assertNotNull(sequence1Report);
-//	 	assertNotNull(sequence2Report);
-//	 	
-//	 	assertEquals(sequence1Report.getCompletedMessages().size(),2);
-//	 	assertEquals(sequence2Report.getCompletedMessages().size(),1);
-//	 	
-//	 	assertEquals(sequence1Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-//	 	assertEquals(sequence2Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_ESTABLISHED);	
+		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		
+		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "axis2.xml";
+
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		Options clientOptions = new Options ();
+		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		
+		clientOptions.setTo(new EndpointReference (to));
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+		
+		String sequenceKey1 = "sequence3";
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey1);
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		
+		serviceClient.engageModule(new QName ("sandesha2"));
+		serviceClient.setOptions(clientOptions);
+		
+		
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));		
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		
+		String sequenceKey2 = "sequence4";
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey2);
+		
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "false");
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));		
+		
+		try {
+			//waiting till the messages exchange finishes.
+			Thread.sleep(7000);
+		} catch (InterruptedException e) {
+			throw new SandeshaException ("sleep interupted");
+		}
+		
+		
+		SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);
+		
+	 	SequenceReport sequence1Report = null;
+	 	SequenceReport sequence2Report = null;
+	 	
+	 	Iterator iterator = rmReport.getOutgoingSequenceList().iterator();
+	 	while (iterator.hasNext()) {
+	 		String sequenceID = (String) iterator.next();
+	 		
+	 		 String internalSequenceID = rmReport.getInternalSequenceIdOfOutSequence(sequenceID);
+	 		 
+	 		 if (internalSequenceID.indexOf(sequenceKey1)>=0) {
+	 			 sequence1Report = SandeshaClient.getOutgoingSequenceReport(to,sequenceKey1,configContext);
+	 		 } else if (internalSequenceID.indexOf(sequenceKey2)>=0){
+	 			 sequence2Report = SandeshaClient.getOutgoingSequenceReport(to,sequenceKey2,configContext);
+	 		 }
+	 	}
+	 	
+	 	assertNotNull(sequence1Report);
+	 	assertNotNull(sequence2Report);
+	 	
+	 	assertEquals(sequence1Report.getCompletedMessages().size(),2);
+	 	assertEquals(sequence2Report.getCompletedMessages().size(),1);
+	 	
+	 	assertEquals(sequence1Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+	 	assertEquals(sequence2Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_ESTABLISHED);	
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {
