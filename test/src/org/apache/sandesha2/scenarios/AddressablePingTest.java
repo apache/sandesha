@@ -56,7 +56,7 @@ public class AddressablePingTest extends TestCase {
 	
 	public void setUp () throws AxisFault {
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "axis2.xml";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 		
@@ -90,7 +90,7 @@ public class AddressablePingTest extends TestCase {
 		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "axis2.xml";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
@@ -109,7 +109,6 @@ public class AddressablePingTest extends TestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
 		
-		serviceClient.engageModule(new QName ("sandesha2"));
 		serviceClient.setOptions(clientOptions);
 		
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));

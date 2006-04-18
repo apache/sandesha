@@ -41,7 +41,7 @@ public class AnonymousAckEchoTest extends TestCase {
 	
 	public void setUp () throws AxisFault {
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "axis2.xml";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 		
@@ -72,7 +72,7 @@ public class AnonymousAckEchoTest extends TestCase {
 		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "axis2.xml";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
@@ -93,8 +93,7 @@ public class AnonymousAckEchoTest extends TestCase {
 		clientOptions.setUseSeparateListener(true);
 		
 		serviceClient.setOptions(clientOptions);
-		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
-		
+
 		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
