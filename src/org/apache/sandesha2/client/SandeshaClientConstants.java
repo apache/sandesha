@@ -25,5 +25,5 @@ public class SandeshaClientConstants {
 	public static String MESSAGE_NUMBER = "Sandesha2MessageNumber";
 	public static String RM_SPEC_VERSION = "Sandesha2RMSpecVersion";
 	public static String DUMMY_MESSAGE = "Sandesha2DummyMessage"; //If this property is set, even though this message will invoke the RM handlers, this will not be sent as an actual application message
-	public static String RM_FAULT_CALLBACK = "Sandesha2RMFaultCallback";
+	public static String SANDESHA_LISTENER = "Sandesha2Listener";
 }

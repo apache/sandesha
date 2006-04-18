@@ -22,8 +22,13 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaListener;
+import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -38,7 +43,7 @@ public class MessageRetransmissionAdjuster {
 
 	Log log = LogFactory.getLog( getClass());
 	
-	public SenderBean adjustRetransmittion(
+	public boolean adjustRetransmittion(
 			SenderBean retransmitterBean,ConfigurationContext configContext) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		
@@ -48,18 +53,36 @@ public class MessageRetransmissionAdjuster {
 			throw new SandeshaException ("Stored Key not present in the retransmittable message");
 
 		MessageContext messageContext = storageManager.retrieveMessageContext(storedKey,configContext);
-
-
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messageContext);
+		
+		String internalSequenceID = retransmitterBean.getInternalSequenceID();
+		String sequenceID = retransmitterBean.getSequenceID();
+		
 		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropretyBean(messageContext);
 		
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);
 
 		int maxRetransmissionAttempts = propertyBean.getMaximumRetransmissionCount();
+		
+		boolean timeOutSequence = false;
 		if (maxRetransmissionAttempts>=0 && retransmitterBean.getSentCount() > maxRetransmissionAttempts)
+			timeOutSequence = true;		
+		
+		boolean sequenceTimedOut = SequenceManager.hasSequenceTimedOut(internalSequenceID, rmMsgCtx);
+		if (sequenceTimedOut)
+			timeOutSequence = true;
+	
+		boolean continueSending = true;
+		if (timeOutSequence) {
 			stopRetransmission(retransmitterBean);
-
-		return retransmitterBean;
+			
+			//Only messages of outgoing sequences get retransmitted. So named following method according to that.
+			finalizeTimedOutSequence (internalSequenceID,sequenceID, messageContext);
+			continueSending = false;
+		}
+		
+		return continueSending;
 	}
 
 	/**
@@ -108,6 +131,17 @@ public class MessageRetransmissionAdjuster {
 		}
 
 		return interval;
+	}
+	
+	private void finalizeTimedOutSequence (String internalSequenceID, String sequenceID ,MessageContext messageContext) throws SandeshaException {
+		ConfigurationContext configurationContext = messageContext.getConfigurationContext();
+		SequenceReport report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID ,configurationContext);
+		TerminateManager.timeOutSendingSideSequence(configurationContext,internalSequenceID, false);
+		
+		SandeshaListener listener = (SandeshaListener) messageContext.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
+		if (listener!=null) {
+			listener.onTimeOut(report);
+		}
 	}
 
 }

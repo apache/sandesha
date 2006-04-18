@@ -588,7 +588,7 @@ public class SandeshaClient {
 		return getOutgoingSequenceReport(internalSequenceID,configurationContext);
 	}
 	
-	private static SequenceReport getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
+	public static SequenceReport getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
 		
 		SequenceReport sequenceReport = new SequenceReport ();
 		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
@@ -599,12 +599,16 @@ public class SandeshaClient {
 		
 		Transaction reportTransaction = storageManager.getTransaction();
 		
+		sequenceReport.setInternalSequenceID(internalSequenceID);
+		
 		CreateSeqBean createSeqFindBean = new CreateSeqBean ();
 		createSeqFindBean.setInternalSequenceID(internalSequenceID);
 		
 		CreateSeqBean createSeqBean = createSeqMgr.findUnique(createSeqFindBean);
 		
+		//if data not is available sequence has to be terminated or timedOut.
 		if (createSeqBean==null) {
+			
 			//check weather this is an terminated sequence.
 			if (isSequenceTerminated(internalSequenceID,seqPropMgr)) {
 				fillTerminatedOutgoingSequenceInfo (sequenceReport,internalSequenceID,seqPropMgr);
@@ -617,10 +621,16 @@ public class SandeshaClient {
 				
 				return sequenceReport;
 			}
+		
+			//sequence must hv been timed out before establiching. No other posibility I can think of.
+			//this does not get recorded since there is no key (which is normally the sequenceID) to store it.
+			//(properties with key as the internalSequenceID get deleted in timing out)
 			
-			String message = "Unrecorder internalSequenceID";
-			log.debug(message);
-			return null;
+			//so, setting the sequence status to INITIAL
+			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
+			
+			//returning the current sequence report.
+			return sequenceReport;
 		}
 		
 		String outSequenceID = createSeqBean.getSequenceID();
@@ -633,7 +643,6 @@ public class SandeshaClient {
 		}
 		
 		sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
-		
 		fillOutgoingSequenceInfo(sequenceReport,outSequenceID,seqPropMgr);
 		
 		reportTransaction.commit();
@@ -678,7 +687,6 @@ public class SandeshaClient {
 		}
 		
 		String outSequenceID = internalSequenceBean.getSequenceID();
-	
 		SequencePropertyBean sequenceTerminatedBean = seqPropMgr.retrieve(outSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT);
 		if (sequenceTerminatedBean!=null && Sandesha2Constants.VALUE_TRUE.equals(sequenceTerminatedBean.getValue())) {
 			return true;
@@ -798,7 +806,7 @@ public class SandeshaClient {
 		return sequenceReport;
 	}
 	
-	private static String getInternalSequenceID (String to, String sequenceKey) {
+	public static String getInternalSequenceID (String to, String sequenceKey) {
 		return SandeshaUtil.getInternalSequenceID(to,sequenceKey);
 	}
 	

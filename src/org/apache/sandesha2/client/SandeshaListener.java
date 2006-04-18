@@ -19,8 +19,25 @@ package org.apache.sandesha2.client;
 
 import org.apache.axis2.AxisFault;
 
-public abstract class SandeshaFaultCallback {
+/**
+ * By implementing this interface and registering an object with
+ * Sandesha2, users will be invoked in some events.
+ * 
+ * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ */
 
-	public abstract void onError(AxisFault fault);
+public interface SandeshaListener {
 
+	/**
+	 * This sill be invoked when Sandesha2 receive a fault message
+	 * in response to a RM control message that was sent by it.
+	 */
+	public void onError(AxisFault fault);
+	
+	/**
+	 * This will be invoked when a specific sequence time out.
+	 * The timing out method depends on policies.
+	 */
+	public void onTimeOut(SequenceReport report);
+	
 }

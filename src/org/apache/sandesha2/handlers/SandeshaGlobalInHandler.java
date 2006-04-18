@@ -40,7 +40,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SandeshaFaultCallback;
+import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
@@ -90,7 +90,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					if (requestMessage!=null) {
 						if(SandeshaUtil.isRetriableOnFaults(requestMessage)){
 							
-							SandeshaFaultCallback faultCallback = (SandeshaFaultCallback) operationContext.getProperty(SandeshaClientConstants.RM_FAULT_CALLBACK);
+							SandeshaListener faultCallback = (SandeshaListener) operationContext.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
 							if (faultCallback!=null) {
 								
 								

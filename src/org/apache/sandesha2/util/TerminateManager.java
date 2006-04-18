@@ -184,15 +184,16 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void terminateSendingSide (ConfigurationContext configContext, String sequenceID,boolean serverSide) throws SandeshaException {
+	public static void terminateSendingSide (ConfigurationContext configContext, String internalSequenceID,boolean serverSide) throws SandeshaException {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED,Sandesha2Constants.VALUE_TRUE);
+		
+		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (internalSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED,Sandesha2Constants.VALUE_TRUE);
 		seqPropMgr.insert(seqTerminatedBean);
 		
-		cleanSendingSideData(configContext,sequenceID,serverSide);
+		cleanSendingSideData(configContext,internalSequenceID,serverSide);
 		
 		
 	}
@@ -200,8 +201,26 @@ public class TerminateManager {
 	
 	
 	private static void doUpdatesIfNeeded (String sequenceID, SequencePropertyBean propertyBean, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
+		
+		boolean addEntryWithSequenceID = false;
+		
 		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES)) {
-			
+			addEntryWithSequenceID = true;
+		}
+		
+		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED)) {
+			addEntryWithSequenceID = true;
+		}
+		
+		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED)) {
+			addEntryWithSequenceID = true;
+		}
+		
+		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT)) {
+			addEntryWithSequenceID = true;
+		}
+		
+		if (addEntryWithSequenceID && sequenceID!=null) {
 			//this value cannot be completely deleted since this data will be needed by SequenceReports
 			//so saving it with the sequenceID value being the out sequenceID.
 			
@@ -213,8 +232,10 @@ public class TerminateManager {
 			seqPropMgr.insert(newBean);
 			//TODO amazingly this property does not seem to get deleted without following - in the hibernate impl 
 			//(even though the lines efter current methodcall do this).
-			seqPropMgr.delete (propertyBean.getSequenceID(),propertyBean.getName());			
+			seqPropMgr.delete (propertyBean.getSequenceID(),propertyBean.getName());
 		}
+		
+		
 	}
 	
 	private static boolean isProportyDeletable (String name) {
@@ -244,60 +265,45 @@ public class TerminateManager {
 		return deleatable;
 	}
 	
-	public static void timeOutSendingSideSequence (ConfigurationContext context,String sequenceID, boolean serverside) throws SandeshaException {
+	public static void timeOutSendingSideSequence (ConfigurationContext context,String internalSequenceID, boolean serverside) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
 		
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT,Sandesha2Constants.VALUE_TRUE);
+		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (internalSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT,Sandesha2Constants.VALUE_TRUE);
 		seqPropMgr.insert(seqTerminatedBean);
 		
 		
-		cleanSendingSideData(context,sequenceID,serverside);
+		cleanSendingSideData(context,internalSequenceID,serverside);
 	}
 	
-	private static void cleanSendingSideData (ConfigurationContext configContext,String sequenceID, boolean serverSide) throws SandeshaException {
+	private static void cleanSendingSideData (ConfigurationContext configContext,String internalSequenceID, boolean serverSide) throws SandeshaException {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 		
-		SequencePropertyBean sequenceTerminatedBean = new SequencePropertyBean (sequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED,Sandesha2Constants.VALUE_TRUE);
-		sequencePropertyBeanMgr.insert(sequenceTerminatedBean);
+		String outSequenceID = SandeshaUtil.getSequenceProperty(internalSequenceID,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID,configContext);
 		
 		if (!serverSide) {
-			//stpoing the listner for the client side.	
-			
-			//SequencePropertyBean outGoingAcksToBean  = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.OUT_SEQ_ACKSTO);
-			
 			boolean stopListnerForAsyncAcks = false;
-			SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-			if (internalSequenceBean!=null) {
-				String internalSequenceID = internalSequenceBean.getValue();
-				SequencePropertyBean acksToBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
+			SequencePropertyBean acksToBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 				
-				String addressingNamespace = SandeshaUtil.getSequenceProperty(internalSequenceID,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configContext);
-				String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
+			String addressingNamespace = SandeshaUtil.getSequenceProperty(internalSequenceID,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configContext);
+			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
 				
-				if (acksToBean!=null) {
-					String acksTo = acksToBean.getValue();
-					if (acksTo!=null && !anonymousURI.equals(acksTo)) {
-						stopListnerForAsyncAcks = true;
-					}
+			if (acksToBean!=null) {
+				String acksTo = acksToBean.getValue();
+				if (acksTo!=null && !anonymousURI.equals(acksTo)) {
+					stopListnerForAsyncAcks = true;
 				}
 			}
 		}
 		
-		SequencePropertyBean internalSequenceBean = sequencePropertyBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-		if (internalSequenceBean==null)
-			throw new SandeshaException ("TempSequence entry not found");
-		
-		String internalSequenceId = (String) internalSequenceBean.getValue();
-		
 		//removing retransmitterMgr entries
 		//SenderBean findRetransmitterBean = new SenderBean ();
 		//findRetransmitterBean.setInternalSequenceID(internalSequenceId);
-		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
+		Collection collection = retransmitterBeanMgr.find(internalSequenceID);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SenderBean retransmitterBean = (SenderBean) iterator.next();
@@ -306,7 +312,7 @@ public class TerminateManager {
 		
 		//removing the createSeqMgrEntry
 		CreateSeqBean findCreateSequenceBean = new CreateSeqBean ();
-		findCreateSequenceBean.setInternalSequenceID(internalSequenceId);
+		findCreateSequenceBean.setInternalSequenceID(internalSequenceID);
 		collection = createSeqBeanMgr.find(findCreateSequenceBean);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
@@ -316,19 +322,19 @@ public class TerminateManager {
 		
 		//removing sequence properties
 		SequencePropertyBean findSequencePropertyBean1 = new SequencePropertyBean ();
-		findSequencePropertyBean1.setSequenceID(internalSequenceId);
+		findSequencePropertyBean1.setSequenceID(internalSequenceID);
 		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean1);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-			doUpdatesIfNeeded (sequenceID,sequencePropertyBean,sequencePropertyBeanMgr);
+			doUpdatesIfNeeded (outSequenceID,sequencePropertyBean,sequencePropertyBeanMgr);
 			
 			if (isProportyDeletable(sequencePropertyBean.getName())) {
 				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 			}
 		}
 		
-		SandeshaUtil.stopSenderForTheSequence(internalSequenceId);
+		SandeshaUtil.stopSenderForTheSequence(internalSequenceID);
 	}
 	
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage,

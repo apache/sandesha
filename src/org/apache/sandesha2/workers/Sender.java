@@ -124,7 +124,9 @@ public class Sender extends Thread {
 				
 
 				MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
-				retransmitterAdjuster.adjustRetransmittion(senderBean, context);
+				boolean continueSending = retransmitterAdjuster.adjustRetransmittion(senderBean, context);
+				if (!continueSending)
+					continue;
 				
 				pickMessagesToSendTransaction.commit();
 				
@@ -169,17 +171,7 @@ public class Sender extends Thread {
 				if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
 					Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 					String sequenceID = sequence.getIdentifier().getIdentifier();
-					// checking weather the sequence has been timed out.
-					boolean sequenceTimedOut = SequenceManager.hasSequenceTimedOut(sequenceID, rmMsgCtx);
-					if (sequenceTimedOut) {
-						// sequence has been timed out.
-						// do time out processing.
-						// TODO uncomment below line
-						TerminateManager.timeOutSendingSideSequence(context,sequenceID, msgCtx.isServerSide());
-						String message = "Sequence timed out";
-						log.debug(message);
-						throw new SandeshaException(message);
-					}
+	
 				}
 				
 				//checking weather this message can carry piggybacked acks
@@ -235,7 +227,9 @@ public class Sender extends Thread {
 					TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 					String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 					ConfigurationContext configContext = msgCtx.getConfigurationContext();
-					TerminateManager.terminateSendingSide(configContext,sequenceID, msgCtx.isServerSide());
+					
+					String internalSequenceID = SandeshaUtil.getSequenceProperty(sequenceID,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID,configContext);
+					TerminateManager.terminateSendingSide(configContext,internalSequenceID, msgCtx.isServerSide());
 				}
 
 				terminateCleaningTransaction.commit();

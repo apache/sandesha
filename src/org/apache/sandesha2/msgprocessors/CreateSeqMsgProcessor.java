@@ -32,7 +32,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SandeshaFaultCallback;
+import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -230,12 +230,12 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		
-		//adding the RM_FAULT_CALLBACK
-		SandeshaFaultCallback faultCallback = (SandeshaFaultCallback) msgCtx.getOptions().getProperty(SandeshaClientConstants.RM_FAULT_CALLBACK);
+		//adding the SANDESHA_LISTENER
+		SandeshaListener faultCallback = (SandeshaListener) msgCtx.getOptions().getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
 		if (faultCallback!=null) {
 			OperationContext operationContext = msgCtx.getOperationContext();
 			if (operationContext!=null) {
-				operationContext.setProperty(SandeshaClientConstants.RM_FAULT_CALLBACK,faultCallback);
+				operationContext.setProperty(SandeshaClientConstants.SANDESHA_LISTENER,faultCallback);
 			}
 		}
 	}

@@ -114,10 +114,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 		if (dummyMessageString!=null && Sandesha2Constants.VALUE_TRUE.equals(dummyMessageString))
 			dummyMessage = true;
 		
-		StorageManager storageManager = SandeshaUtil
-				.getSandeshaStorageManager(context);
-
-
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context);
 
 		MsgProcessor msgProcessor = null;
 		int messageType = rmMsgCtx.getMessageType();

@@ -288,9 +288,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		updateAppMessagesTransaction.commit();
 		
 		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
-		SequenceManager.updateLastActivatedTime(newOutSequenceId,configCtx);
+		SequenceManager.updateLastActivatedTime(internalSequenceId,configCtx);
 		lastUpdatedTimeTransaction.commit();
-		
 		
 		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext()
 				.setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,

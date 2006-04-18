@@ -80,7 +80,7 @@ public class AcknowledgementManager {
 		SenderBean findBean = new SenderBean();
 
 		String sequnceID = SandeshaUtil.getSequenceIDFromRMMessage (rmMessageContext);
-		
+
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
 		findBean.setReSend(false);

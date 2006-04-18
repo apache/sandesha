@@ -42,7 +42,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SandeshaFaultCallback;
+import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -438,11 +438,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ConfigurationContext configContext = msgContext .getConfigurationContext();
 		
 		//setting the Fault callback		
-		SandeshaFaultCallback faultCallback = (SandeshaFaultCallback) msgContext.getOptions().getProperty(SandeshaClientConstants.RM_FAULT_CALLBACK);
+		SandeshaListener faultCallback = (SandeshaListener) msgContext.getOptions().getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
 		if (faultCallback!=null) {
 			OperationContext operationContext = msgContext.getOperationContext();
 			if (operationContext!=null) {
-				operationContext.setProperty(SandeshaClientConstants.RM_FAULT_CALLBACK,faultCallback);
+				operationContext.setProperty(SandeshaClientConstants.SANDESHA_LISTENER,faultCallback);
 			}
 		}
 		
@@ -848,7 +848,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqEntry.setMessageContextRefKey(key);
 		createSeqEntry.setTimeToSend(System.currentTimeMillis());
 		createSeqEntry.setMessageID(createSeqRMMessage.getMessageId());
-
+		createSeqEntry.setInternalSequenceID(internalSequenceId);
 		// this will be set to true in the sender
 		createSeqEntry.setSend(true);
 

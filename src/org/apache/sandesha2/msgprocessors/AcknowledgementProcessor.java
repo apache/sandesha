@@ -131,10 +131,12 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			return;
 		}
 		
-		//updating the last activated time of the sequence.
-//		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
-//		SequenceManager.updateLastActivatedTime(outSequenceId,rmMsgCtx.getMessageContext().getConfigurationContext());
-//		lastUpdatedTimeTransaction.commit();
+        String internalSequenceID = SandeshaUtil.getSequenceProperty(outSequenceId,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID,configCtx);
+		
+        //updating the last activated time of the sequence.
+		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
+		SequenceManager.updateLastActivatedTime(internalSequenceID,rmMsgCtx.getMessageContext().getConfigurationContext());
+		lastUpdatedTimeTransaction.commit();
 		
 		//Starting transaction
 		Transaction ackTransaction = storageManager.getTransaction();
