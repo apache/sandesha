@@ -25,7 +25,8 @@
 	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
    
     <goal name="build:all" prereqs="clean,mar,repo:create,jar,client:jar,sample:create" />
-    
+    <goal name="all:jar" prereqs="mar,jar,client:jar" />
+        
     <goal name="default">
         <attainGoal name="build:all"/>
     </goal>
