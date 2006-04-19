@@ -831,7 +831,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
-		createSeqMsg.setRelatesTo(null); // create seq msg does not relateTo anything
+		createSeqMsg.setRelationships(null); // create seq msg does not relateTo anything
 
 		CreateSeqBean createSeqBean = new CreateSeqBean(internalSequenceId,createSeqMsg.getMessageID(), null);
 		createSeqMgr.insert(createSeqBean);

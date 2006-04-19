@@ -193,8 +193,8 @@ public class RMMsgContext {
 		msgContext.setWSAAction(action);
 	}
 
-	public void setRelatesTo(RelatesTo relatesTo) {
-		msgContext.setRelatesTo(relatesTo);
+	public void addRelatesTo(RelatesTo relatesTo) {
+		msgContext.addRelatesTo(relatesTo);
 	}
 
 	public void setWSAAction(String URI) {

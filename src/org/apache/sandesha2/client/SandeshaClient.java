@@ -102,50 +102,72 @@ public class SandeshaClient {
 		return getOutgoingSequenceReport(internalSequenceID,configurationContext);
 	}
 	
-	public static void createSequence (ServiceClient serviceClient, boolean offer) throws SandeshaException{
-		Options options = serviceClient.getOptions();
-		if (options==null)
-			throw new SandeshaException ("Options object is not set");
+	public static SequenceReport getOutgoingSequenceReport (String to,String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
 		
-		EndpointReference toEPR = serviceClient.getOptions().getTo();
-		if (toEPR==null)
-			throw new SandeshaException ("ToEPR is not set");
-		
-		String to = toEPR.getAddress();
-		if (to==null)
-			throw new SandeshaException ("To EPR is not set");
-		
-		if (offer) {
-			String offeredSequenceID = SandeshaUtil.getUUID();
-			options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
-		}
-		
-		//setting a new squenceKey if not already set.
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		if (sequenceKey==null) {
-			sequenceKey = SandeshaUtil.getUUID();
-			options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		}
-		
-	    options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_TRUE);
-	    
-	    try {
-			serviceClient.fireAndForget(null);
-		} catch (AxisFault e) {
-			throw new SandeshaException (e);
-		}
-		
-		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_FALSE);
-		
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
+		return getOutgoingSequenceReport(internalSequenceID,configurationContext);
 	}
 	
-	public static void createSequnce (ServiceClient serviceClient, boolean offer, String sequenceKey) throws SandeshaException {
+	public static SequenceReport getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
 		
-		Options options = serviceClient.getOptions();
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		SequenceReport sequenceReport = new SequenceReport ();
+		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
 		
-		createSequence(serviceClient,offer);
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		
+		Transaction reportTransaction = storageManager.getTransaction();
+		
+		sequenceReport.setInternalSequenceID(internalSequenceID);
+		
+		CreateSeqBean createSeqFindBean = new CreateSeqBean ();
+		createSeqFindBean.setInternalSequenceID(internalSequenceID);
+		
+		CreateSeqBean createSeqBean = createSeqMgr.findUnique(createSeqFindBean);
+		
+		//if data not is available sequence has to be terminated or timedOut.
+		if (createSeqBean==null) {
+			
+			//check weather this is an terminated sequence.
+			if (isSequenceTerminated(internalSequenceID,seqPropMgr)) {
+				fillTerminatedOutgoingSequenceInfo (sequenceReport,internalSequenceID,seqPropMgr);
+				
+				return sequenceReport;
+			}
+			
+			if (isSequenceTimedout(internalSequenceID,seqPropMgr)) {
+				fillTimedoutOutgoingSequenceInfo (sequenceReport,internalSequenceID,seqPropMgr);
+				
+				return sequenceReport;
+			}
+		
+			//sequence must hv been timed out before establiching. No other posibility I can think of.
+			//this does not get recorded since there is no key (which is normally the sequenceID) to store it.
+			//(properties with key as the internalSequenceID get deleted in timing out)
+			
+			//so, setting the sequence status to INITIAL
+			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
+			
+			//returning the current sequence report.
+			return sequenceReport;
+		}
+		
+		String outSequenceID = createSeqBean.getSequenceID();
+		if (outSequenceID==null) {
+			 sequenceReport.setInternalSequenceID(internalSequenceID);
+			 sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
+			 sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
+			 
+			 return sequenceReport;
+		}
+		
+		sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
+		fillOutgoingSequenceInfo(sequenceReport,outSequenceID,seqPropMgr);
+		
+		reportTransaction.commit();
+		
+		return sequenceReport;	
 	}
 	
 	/**
@@ -176,7 +198,6 @@ public class SandeshaClient {
 		return incomingSequenceReports;
 	}
 	
-
 	/**
 	 * SandeshaReport gives the details of all incoming and outgoing sequences.
 	 * The outgoing sequence have to pass the initial state (CS/CSR exchange) to be included in a SandeshaReport
@@ -227,6 +248,52 @@ public class SandeshaClient {
 		return sandeshaReport;
 	}
 	
+	public static void createSequence (ServiceClient serviceClient, boolean offer) throws SandeshaException{
+		Options options = serviceClient.getOptions();
+		if (options==null)
+			throw new SandeshaException ("Options object is not set");
+		
+		EndpointReference toEPR = serviceClient.getOptions().getTo();
+		if (toEPR==null)
+			throw new SandeshaException ("ToEPR is not set");
+		
+		String to = toEPR.getAddress();
+		if (to==null)
+			throw new SandeshaException ("To EPR is not set");
+		
+		if (offer) {
+			String offeredSequenceID = SandeshaUtil.getUUID();
+			options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
+		}
+		
+		//setting a new squenceKey if not already set.
+		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		if (sequenceKey==null) {
+			sequenceKey = SandeshaUtil.getUUID();
+			options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		}
+		
+	    options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_TRUE);
+	    
+	    try {
+			serviceClient.fireAndForget(null);
+		} catch (AxisFault e) {
+			throw new SandeshaException (e);
+		}
+		
+		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_FALSE);
+		
+	}
+	
+	public static void createSequnce (ServiceClient serviceClient, boolean offer, String sequenceKey) throws SandeshaException {
+		
+		Options options = serviceClient.getOptions();
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		
+		createSequence(serviceClient,offer);
+		
+	}
+	
 	
 	
 	/**
@@ -256,6 +323,7 @@ public class SandeshaClient {
 		
 		String oldAction = options.getAction();
 		options.setAction(SpecSpecificConstants.getTerminateSequenceAction(rmSpecVersion));
+		
 		try {
 			serviceClient.fireAndForget(terminateBody);
 		} catch (AxisFault e) {
@@ -264,6 +332,18 @@ public class SandeshaClient {
 		} finally {
 			options.setAction(oldAction);
 		}
+	}
+	
+	public static void terminateSequence (ServiceClient serviceClient, String sequenceKey) throws SandeshaException {	
+		Options options = serviceClient.getOptions();
+		if (options==null)
+			throw new SandeshaException ("Options object is not set");
+		
+		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		terminateSequence(serviceClient);
+		
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,oldSequenceKey);
 	}
 	
 	/**
@@ -302,60 +382,19 @@ public class SandeshaClient {
 			options.setAction(oldAction);
 		}
 	}
-
-	private static SOAPEnvelope configureTerminateSequence (Options options,ConfigurationContext configurationContext) throws SandeshaException { 
-
+	
+	public static void closeSequence (ServiceClient serviceClient, String sequenceKey) throws SandeshaException {
+	    //TODO test
+		
+		Options options = serviceClient.getOptions();
 		if (options==null)
-			throw new SandeshaException ("You must set the Options object before calling this method");
+			throw new SandeshaException ("Options object is not set");
 		
-		EndpointReference epr = options.getTo();
-		if (epr==null)
-			throw new SandeshaException ("You must set the toEPR before calling this method");
+		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		closeSequence(serviceClient);
 		
-		String to = epr.getAddress();
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		String internalSequenceID = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
-		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(internalSequenceID,configurationContext);
-		if (sequenceReport==null)
-			throw new SandeshaException ("Cannot generate the sequence report for the given internalSequenceID");
-		if (sequenceReport.getSequenceStatus()!=SequenceReport.SEQUENCE_STATUS_ESTABLISHED)
-			throw new SandeshaException ("Canot terminate the sequence since it is not active");
-		
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-		if (sequenceIDBean==null)
-			throw new SandeshaException ("SequenceIdBean is not set");
-		
-		String sequenceID = sequenceIDBean.getValue();
-
-		if (sequenceID==null)
-			throw new SandeshaException ("Cannot find the sequenceID");
-		
-		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
-		if (rmSpecVersion==null) 
-			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion ();
-		
-		options.setAction(SpecSpecificConstants.getTerminateSequenceAction(rmSpecVersion));		
-		SOAPEnvelope dummyEnvelope = null;
-		SOAPFactory factory = null;
-		String soapNamespaceURI = options.getSoapVersionURI();
-		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
-			factory = new SOAP12Factory ();
-			dummyEnvelope = factory.getDefaultEnvelope();
-		}else  {
-			factory = new SOAP11Factory ();
-			dummyEnvelope = factory.getDefaultEnvelope();
-		}
-		
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
-		TerminateSequence terminateSequence = new TerminateSequence (factory,rmNamespaceValue);
-		Identifier identifier = new Identifier (factory,rmNamespaceValue);
-		identifier.setIndentifer(sequenceID);
-		terminateSequence.setIdentifier(identifier);
-		terminateSequence.toSOAPEnvelope(dummyEnvelope);
-		
-		return dummyEnvelope;
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,oldSequenceKey);
 	}
 	
 	/**
@@ -363,8 +402,20 @@ public class SandeshaClient {
 	 * 
 	 * @param serviceClient
 	 */
-	public void waitUntilSequenceCompleted (ServiceClient serviceClient) throws SandeshaException {
+	public static void waitUntilSequenceCompleted (ServiceClient serviceClient) throws SandeshaException {
 		waitUntilSequenceCompleted(serviceClient,-1);
+	}
+	
+	public static void waitUntilSequenceCompleted (ServiceClient serviceClient, String sequenceKey) throws SandeshaException {
+		Options options = serviceClient.getOptions();
+		if (options==null)
+			throw new SandeshaException ("Options object is not set");
+		
+		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		waitUntilSequenceCompleted(serviceClient);
+		
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,oldSequenceKey);
 	}
 	
 	/**
@@ -374,7 +425,7 @@ public class SandeshaClient {
 	 * @param serviceClient
 	 * @param maxWaitingTime
 	 */
-	public void waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime) throws SandeshaException{
+	public static void waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime) throws SandeshaException{
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -397,9 +448,19 @@ public class SandeshaClient {
 				if (timeNow> (startTime+maxWaitingTime))
 					done = true;
 			}
-		}
+		}	
+	}
+	
+	public static void waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime, String sequenceKey) throws SandeshaException{
+		Options options = serviceClient.getOptions();
+		if (options==null)
+			throw new SandeshaException ("Options object is not set");
 		
+		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		waitUntilSequenceCompleted(serviceClient,maxWaitingTime);
 		
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,oldSequenceKey);
 	}
 	
 	//gives the out sequenceID if CS/CSR exchange is done. Otherwise a SandeshaException
@@ -521,6 +582,22 @@ public class SandeshaClient {
 		options.setAction(oldAction);		
 	}
 		
+	public static void sendAckRequest (ServiceClient serviceClient, String sequenceKey) throws SandeshaException {
+		Options options = serviceClient.getOptions();
+		if (options==null)
+			throw new SandeshaException ("Options object is not set");
+		
+		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		sendAckRequest(serviceClient);
+		
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,oldSequenceKey);
+	}
+	
+	private static String getInternalSequenceID (String to, String sequenceKey) {
+		return SandeshaUtil.getInternalSequenceID(to,sequenceKey);
+	}
+	
 	private static SOAPEnvelope configureCloseSequence (Options options,ConfigurationContext configurationContext) throws SandeshaException {
 
 		if (options==null)
@@ -581,73 +658,6 @@ public class SandeshaClient {
 		closeSequence.toSOAPEnvelope(dummyEnvelope);
 		
 		return dummyEnvelope;
-	}
-	
-	public static SequenceReport getOutgoingSequenceReport (String to,String sequenceKey,ConfigurationContext configurationContext) throws SandeshaException {
-		String internalSequenceID = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
-		return getOutgoingSequenceReport(internalSequenceID,configurationContext);
-	}
-	
-	public static SequenceReport getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext) throws SandeshaException {
-		
-		SequenceReport sequenceReport = new SequenceReport ();
-		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
-		
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
-		
-		Transaction reportTransaction = storageManager.getTransaction();
-		
-		sequenceReport.setInternalSequenceID(internalSequenceID);
-		
-		CreateSeqBean createSeqFindBean = new CreateSeqBean ();
-		createSeqFindBean.setInternalSequenceID(internalSequenceID);
-		
-		CreateSeqBean createSeqBean = createSeqMgr.findUnique(createSeqFindBean);
-		
-		//if data not is available sequence has to be terminated or timedOut.
-		if (createSeqBean==null) {
-			
-			//check weather this is an terminated sequence.
-			if (isSequenceTerminated(internalSequenceID,seqPropMgr)) {
-				fillTerminatedOutgoingSequenceInfo (sequenceReport,internalSequenceID,seqPropMgr);
-				
-				return sequenceReport;
-			}
-			
-			if (isSequenceTimedout(internalSequenceID,seqPropMgr)) {
-				fillTimedoutOutgoingSequenceInfo (sequenceReport,internalSequenceID,seqPropMgr);
-				
-				return sequenceReport;
-			}
-		
-			//sequence must hv been timed out before establiching. No other posibility I can think of.
-			//this does not get recorded since there is no key (which is normally the sequenceID) to store it.
-			//(properties with key as the internalSequenceID get deleted in timing out)
-			
-			//so, setting the sequence status to INITIAL
-			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
-			
-			//returning the current sequence report.
-			return sequenceReport;
-		}
-		
-		String outSequenceID = createSeqBean.getSequenceID();
-		if (outSequenceID==null) {
-			 sequenceReport.setInternalSequenceID(internalSequenceID);
-			 sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
-			 sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
-			 
-			 return sequenceReport;
-		}
-		
-		sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
-		fillOutgoingSequenceInfo(sequenceReport,outSequenceID,seqPropMgr);
-		
-		reportTransaction.commit();
-		
-		return sequenceReport;	
 	}
 	
 	private static boolean isSequenceTerminated (String internalSequenceID, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException { 
@@ -783,6 +793,11 @@ public class SandeshaClient {
 		
 	}
 	
+	
+	private static String generateInternalSequenceIDForTheClientSide (String toEPR,String sequenceKey) {
+		return SandeshaUtil.getInternalSequenceID(toEPR,sequenceKey);
+	}
+	
 	private static SequenceReport getIncomingSequenceReport (String sequenceID,ConfigurationContext configCtx) throws SandeshaException {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
@@ -806,13 +821,59 @@ public class SandeshaClient {
 		return sequenceReport;
 	}
 	
-	public static String getInternalSequenceID (String to, String sequenceKey) {
-		return SandeshaUtil.getInternalSequenceID(to,sequenceKey);
-	}
-	
-	
-	private static String generateInternalSequenceIDForTheClientSide (String toEPR,String sequenceKey) {
-		return SandeshaUtil.getInternalSequenceID(toEPR,sequenceKey);
+	private static SOAPEnvelope configureTerminateSequence (Options options,ConfigurationContext configurationContext) throws SandeshaException { 
+
+		if (options==null)
+			throw new SandeshaException ("You must set the Options object before calling this method");
+		
+		EndpointReference epr = options.getTo();
+		if (epr==null)
+			throw new SandeshaException ("You must set the toEPR before calling this method");
+		
+		String to = epr.getAddress();
+		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID(to,sequenceKey);
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(internalSequenceID,configurationContext);
+		if (sequenceReport==null)
+			throw new SandeshaException ("Cannot generate the sequence report for the given internalSequenceID");
+		if (sequenceReport.getSequenceStatus()!=SequenceReport.SEQUENCE_STATUS_ESTABLISHED)
+			throw new SandeshaException ("Canot terminate the sequence since it is not active");
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext);
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		if (sequenceIDBean==null)
+			throw new SandeshaException ("SequenceIdBean is not set");
+		
+		String sequenceID = sequenceIDBean.getValue();
+
+		if (sequenceID==null)
+			throw new SandeshaException ("Cannot find the sequenceID");
+		
+		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+		if (rmSpecVersion==null) 
+			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion ();
+		
+		options.setAction(SpecSpecificConstants.getTerminateSequenceAction(rmSpecVersion));		
+		SOAPEnvelope dummyEnvelope = null;
+		SOAPFactory factory = null;
+		String soapNamespaceURI = options.getSoapVersionURI();
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
+			factory = new SOAP12Factory ();
+			dummyEnvelope = factory.getDefaultEnvelope();
+		}else  {
+			factory = new SOAP11Factory ();
+			dummyEnvelope = factory.getDefaultEnvelope();
+		}
+		
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
+		TerminateSequence terminateSequence = new TerminateSequence (factory,rmNamespaceValue);
+		Identifier identifier = new Identifier (factory,rmNamespaceValue);
+		identifier.setIndentifer(sequenceID);
+		terminateSequence.setIdentifier(identifier);
+		terminateSequence.toSOAPEnvelope(dummyEnvelope);
+		
+		return dummyEnvelope;
 	}
 	
 }

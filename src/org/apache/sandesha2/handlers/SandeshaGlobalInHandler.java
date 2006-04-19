@@ -286,8 +286,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			throws SandeshaException {
 		switch (rmMsgCtx.getMessageType()) {
 		case Sandesha2Constants.MessageTypes.ACK:
-			rmMsgCtx.setRelatesTo(null); 
-			//Removing the relatesTo part from ackMessageIf present. Some Frameworks tend to send this.
+			
+//			//rmMsgCtx.addRelatesTo(null); 
+//			rmMsgCtx.getMessageContext().getre
+//			//Removing the relatesTo part from ackMessageIf present. Some Frameworks tend to send this.
 		}
 	}
 
