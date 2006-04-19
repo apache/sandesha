@@ -194,7 +194,7 @@
     <!--- Create the Binary Distribution -->
     <!-- ================================================================ -->
 
-    <goal name="dist-bin" prereqs="default,javadoc">
+    <goal name="dist-bin" prereqs="build:all,javadoc">
         <property name="dir.temp.dist.bin.parent" value="${build.temp.dir}/dist-bin" />
         <property name="dir.temp.dist.bin" value="${build.temp.dir}/dist-bin/${dist.name}-bin" />
         
@@ -208,7 +208,7 @@
         <ant:mkdir dir="${dir.temp.dist.bin}/samples/services"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/docs/api"/>
     
-    	<ant:copy file="${dir.config}/axis2.xml" todir="${dir.temp.dist.bin}/samples/clients" />
+    	<ant:copy file="${dir.config}/client_axis2.xml" todir="${dir.temp.dist.bin}/samples/clients" />
     	        
         <ant:copy todir="${dir.temp.dist.bin}/docs/api">
             <ant:fileset dir="target/docs/apidocs/">
@@ -236,7 +236,7 @@
     
         <ant:copy file="target/${jar.name}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="target/${mar.name}" todir="${dir.temp.dist.bin}" />
-        <ant:copy file="${dir.config}/sandesha2.properties" todir="${dir.temp.dist.bin}" />
+       <!-- <ant:copy file="${dir.config}/sandesha2.properties" todir="${dir.temp.dist.bin}" /> -->
         <ant:copy file="${apache.license.file}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="${release.notes.file}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="${readme.file}" todir="${dir.temp.dist.bin}" />
