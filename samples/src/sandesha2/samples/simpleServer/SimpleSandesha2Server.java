@@ -46,7 +46,7 @@ public class SimpleSandesha2Server {
 		
 		System.out.println("Starting sandesha2 server...");
 		
-		String axis2_xml = AXIS2_SERVER_PATH + "axis2.xml";
+		String axis2_xml = AXIS2_SERVER_PATH + "server_axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_SERVER_PATH,axis2_xml);
 		
 		SimpleHTTPServer server = new SimpleHTTPServer  (configContext,8080);
