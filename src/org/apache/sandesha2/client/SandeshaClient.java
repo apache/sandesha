@@ -288,10 +288,15 @@ public class SandeshaClient {
 	public static void createSequnce (ServiceClient serviceClient, boolean offer, String sequenceKey) throws SandeshaException {
 		
 		Options options = serviceClient.getOptions();
+		if (options==null)
+			throw new SandeshaException ("Options object is not set");
+		
+		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		createSequence(serviceClient,offer);
 		
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY,oldSequenceKey);
 	}
 	
 	
