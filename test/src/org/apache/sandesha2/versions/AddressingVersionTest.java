@@ -63,8 +63,8 @@ public class AddressingVersionTest extends TestCase {
 	
 	public void testAddressingFinal () throws AxisFault,InterruptedException  {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
@@ -92,7 +92,7 @@ public class AddressingVersionTest extends TestCase {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
-		Thread.sleep(5000);
+		Thread.sleep(7000);
 		serviceClient.finalizeInvoke();
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -104,8 +104,8 @@ public class AddressingVersionTest extends TestCase {
 	
 	public void testAddressingSubmission () throws AxisFault,InterruptedException  {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
@@ -133,7 +133,7 @@ public class AddressingVersionTest extends TestCase {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
-		Thread.sleep(5000);
+		Thread.sleep(7000);
 		serviceClient.finalizeInvoke();
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);

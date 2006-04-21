@@ -41,7 +41,6 @@ public class RMVersionTest extends TestCase {
 
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
-		
 		httpServer = new SimpleHTTPServer (configContext,8060);
 		httpServer.start();
 		try {
@@ -64,8 +63,8 @@ public class RMVersionTest extends TestCase {
 	
 	public void testRMSubmission () throws AxisFault,InterruptedException  {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
@@ -105,8 +104,8 @@ public class RMVersionTest extends TestCase {
 	
 	public void testRMOASIS () throws AxisFault,InterruptedException  {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";

@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package org.apache.sandesha2.scenarios;
+package org.apache.sandesha2;
 
 import java.io.File;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
-
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -35,31 +29,25 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.util.SandeshaUtil;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
+import junit.framework.TestCase;
 
-public class AnonymousPingTest extends TestCase{
+public class SandeshaClientTest extends TestCase {
 
 	SimpleHTTPServer httpServer = null;
-	private final String applicationNamespaceName = "http://tempuri.org/"; 
-	private final String Ping = "Ping";
-	private final String Text = "Text";
 	
 	public void setUp () throws AxisFault {
-		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-
+		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
 		
 		httpServer = new SimpleHTTPServer (configContext,8060);
+		
 		httpServer.start();
 		try {
 			Thread.sleep(300);
@@ -79,59 +67,73 @@ public class AnonymousPingTest extends TestCase{
 		}
 	}
 	
-	public void testSyncPing () throws AxisFault,InterruptedException  {
+	public void testCreateSequenceWithOffer () throws AxisFault,InterruptedException {
 		
 		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
 		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-
+		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		Options clientOptions = new Options ();
-		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		
+
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
-		String sequenceKey = "sequence1";
+		String sequenceKey = SandeshaUtil.getUUID();
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		
+		String offeredSequenceID = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		serviceClient.setOptions(clientOptions);
 		//serviceClient.
-
+		
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setUseSeparateListener(true);
+		
 		serviceClient.setOptions(clientOptions);
 		
-		serviceClient.fireAndForget(getPingOMBlock("ping1"));
-		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		SandeshaClient.createSequence(serviceClient,true);
 		
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		Thread.sleep(3000);
 		
-		Thread.sleep(5000);
-
-		Thread.sleep(10000);
-		serviceClient.finalizeInvoke();
-				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
-		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+		
+		assertNotNull(sequenceReport.getSequenceID());
 	}
 	
-	private OMElement getPingOMBlock(String text) {
-		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(Ping, namespace);
-		OMElement textElem = fac.createOMElement(Text, namespace);
-		
-		textElem.setText(text);
-		pingElem.addChild(textElem);
-
-		return pingElem;
-	}
-
+//	public void testCreateSequenceWithoutOffer () {
+////		SandeshaClient.createSequence(serviceClient,true);
+//		
+//		
+//	}
+	
+//	public void testCreateSequenceWithSequenceKey () {
+//		
+//	}
+//	
+//	public void testTerminateSequence () {
+//		
+//	}
+//	
+//	public void testCloseSequence () {
+//		
+//	}
+//	
+//	public void testAckRequest () {
+//		
+//	}
+//	
+//	public void getSequenceIDTest () {
+//		
+//	}
+	
+	
 }

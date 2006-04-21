@@ -70,8 +70,8 @@ public class AddressableEchoTest extends TestCase {
 	
 	public void testAsyncEcho () throws AxisFault, InterruptedException {
 	
-		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
 		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
@@ -88,6 +88,63 @@ public class AddressableEchoTest extends TestCase {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		serviceClient.setOptions(clientOptions);
+		//serviceClient.
+		
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setUseSeparateListener(true);
+		
+		serviceClient.setOptions(clientOptions);
+		
+		TestCallback callback1 = new TestCallback ("Callback 1");
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+		
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+		TestCallback callback2 = new TestCallback ("Callback 2");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
+
+        
+        Thread.sleep(12000);
+		serviceClient.finalizeInvoke();
+		
+        //assertions for the out sequence.
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
+		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
+		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+		
+		assertTrue(callback1.isComplete());
+		assertTrue(callback2.isComplete());
+		assertEquals(callback1.getResult(),"echo1");
+		assertEquals(callback2.getResult(),"echo1echo2");
+	}
+	
+	public void testAsyncEchoWithOffer () throws AxisFault, InterruptedException {
+		
+		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
+		
+		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+		
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+
+		Options clientOptions = new Options ();
+
+		clientOptions.setTo(new EndpointReference (to));
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+		
+		String sequenceKey = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		
+		String offeredSequeiceId = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequeiceId);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		serviceClient.setOptions(clientOptions);

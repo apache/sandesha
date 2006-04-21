@@ -42,8 +42,6 @@ public class SandeshaTestCase extends TestCase {
 
     protected InputStreamReader getResource(String relativePath, String resourceName) {
         String resourceFile = resourceDir + relativePath + File.separator + resourceName;
-        String file = new File("/home/sanka/sandesha2-src/trunk/test-resources/CreateSequence.xml").getPath();
-
         try {
             FileReader reader = new FileReader(resourceFile);
             return reader;

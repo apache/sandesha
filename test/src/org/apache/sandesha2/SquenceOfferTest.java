@@ -89,8 +89,8 @@ public class SquenceOfferTest extends TestCase {
 	
 	public void testSequenceOffer () throws AxisFault, InterruptedException {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMInteropService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMInteropService";
+		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
 		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
