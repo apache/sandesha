@@ -10,21 +10,25 @@
     <ant:property name="build.samples.dir" value="${maven.build.dir}/samples"/>
     <ant:property name="build.samples.services.dir" value="${build.samples.dir}/services"/>
     <ant:property name="build.samples.clients.dir" value="${build.samples.dir}/clients"/>
+    
 	<ant:property name="mar.name" value="${dist.name}.mar"/>
 	<ant:property name="jar.name" value="${dist.name}.jar"/>
 	<ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
+	
 	<ant:property name="dir.samples" value="samples"/>
 	<ant:property name="dir.test.resources" value="test-resources"/>
-	<ant:property name="build.addressing.mar" value="addressing.mar"/>
 	<ant:property name="dir.config" value="config"/>
+	
 	<ant:property name="apache.license.file" value="LICENSE.txt" />
 	<ant:property name="readme.file" value="README.txt" />
 	<ant:property name="release.notes.file" value="release-notes.html" />
+	
 	<ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
 	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
 	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
    
     <goal name="build:all" prereqs="clean,mar,repo:create,jar,client:jar,sample:create" />
+    
     <goal name="all:jar" prereqs="mar,jar,client:jar" />
         
     <goal name="default">
@@ -107,7 +111,7 @@
         </ant:javac>
     </goal>
 
-    <goal name="sample:create" prereqs="sample:setup,sample:interop:create">
+    <goal name="sample:create" prereqs="sample:setup,sample:userguide:create">
     </goal>
     
     <goal name="sample:setup" prereqs="sample:compile">
@@ -115,37 +119,36 @@
         <ant:mkdir dir="${build.samples.clients.dir}" />
     </goal>
     
-    <goal name="sample:interop:create" prereqs="sample:compile,sample:setup">
-        <ant:property name="dir.sample.interop.temp" value="${build.temp.dir}/interop" />
-        <ant:property name="dir.sample.interopclients.temp" value="${build.temp.dir}/interopclients" />
-        <ant:property name="interop.service.aar.name" value="RMInteropService.aar" />
-        <ant:property name="interop.client.jar.name" value="InteropSampleClients.jar" />
+    <goal name="sample:userguide:create" prereqs="sample:compile,sample:setup">
+        <ant:property name="dir.sample.userguide.temp" value="${build.temp.dir}/userguide" />
+        <ant:property name="dir.sample.userguideclients.temp" value="${build.temp.dir}/userguideclients" />
+        <ant:property name="userguide.service.aar.name" value="RMSampleService.aar" />
+        <ant:property name="userguide.client.jar.name" value="UserguideSampleClients.jar" />
         
         <ant:mkdir dir="${build.samples.clients.dir}" />
         
-        <ant:mkdir dir="${dir.sample.interop.temp}" />
-        <ant:mkdir dir="${dir.sample.interop.temp}/META-INF" />
-        <ant:copy file="${dir.samples}/conf/interop/services.xml" todir="${dir.sample.interop.temp}/META-INF" /> 
-        <!-- <ant:copy file="${dir.samples}/conf/interop/RMInteropService.wsdl" todir="${dir.sample.interop.temp}" /> --> 
-        <ant:copy todir="${dir.sample.interop.temp}" >
+        <ant:mkdir dir="${dir.sample.userguide.temp}" />
+        <ant:mkdir dir="${dir.sample.userguide.temp}/META-INF" />
+        <ant:copy file="${dir.samples}/conf/userguide/services.xml" todir="${dir.sample.userguide.temp}/META-INF" /> 
+        <!-- <ant:copy file="${dir.samples}/conf/userguide/RMSampleService.wsdl" todir="${dir.sample.userguide.temp}" /> --> 
+        <ant:copy todir="${dir.sample.userguide.temp}" >
             <ant:fileset dir="${maven.build.dir}/samples/classes">
-                <ant:include name="sandesha2/samples/interop/**/*Service*.class" />
+                <ant:include name="sandesha2/samples/userguide/**/*Service*.class" />
             </ant:fileset>
         </ant:copy>
         
-        <ant:mkdir dir="${dir.sample.interopclients.temp}" /> 
-        <ant:copy todir="${dir.sample.interopclients.temp}" >
+        <ant:mkdir dir="${dir.sample.userguideclients.temp}" /> 
+        <ant:copy todir="${dir.sample.userguideclients.temp}" >
             <ant:fileset dir="${maven.build.dir}/samples/classes">
-                <ant:include name="sandesha2/samples/interop/**/*Client*.class" />
+                <ant:include name="sandesha2/samples/userguide/**/*Client*.class" />
             </ant:fileset>
         </ant:copy>
         
-        
-        <ant:jar jarfile="${build.samples.services.dir}/${interop.service.aar.name}" basedir="${dir.sample.interop.temp}" />
-    	<ant:jar jarfile="${build.samples.clients.dir}/${interop.client.jar.name}" basedir="${dir.sample.interopclients.temp}" />
+        <ant:jar jarfile="${build.samples.services.dir}/${userguide.service.aar.name}" basedir="${dir.sample.userguide.temp}" />
+    	<ant:jar jarfile="${build.samples.clients.dir}/${userguide.client.jar.name}" basedir="${dir.sample.userguideclients.temp}" />
     	 
     	<ant:copy todir="${build.samples.clients.dir}" >
-            <ant:fileset dir="${dir.samples}/conf/interop">
+            <ant:fileset dir="${dir.samples}/conf/userguide">
                 <ant:include name="*.bat" />
                 <ant:include name="*.sh" />
             </ant:fileset>
@@ -236,6 +239,7 @@
     
         <ant:copy file="target/${jar.name}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="target/${mar.name}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="target/${client.jar.name}" todir="${dir.temp.dist.bin}" />
        <!-- <ant:copy file="${dir.config}/sandesha2.properties" todir="${dir.temp.dist.bin}" /> -->
         <ant:copy file="${apache.license.file}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="${release.notes.file}" todir="${dir.temp.dist.bin}" />
