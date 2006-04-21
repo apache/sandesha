@@ -10,7 +10,7 @@
 </head>
 
 <body xml:lang="en">
-<h1>Sandesha2 User's Guide</h1>
+<h1>Apache Sandesha2 User's Guide</h1>
 
 <p>This document introduces you to Apache Sandesha2.&lt;ABSTRACT (what this
 doc is about)&gt;</p>
@@ -87,13 +87,13 @@ Apache Axis2. With Sandesha2 you can make your Web services reliable, or you
 can invoke already hosted reliable Web services.</p>
 
 <p>If you want to learn more about Apache Axis2, refer to <a
-href="http://ws.apache.org/axis2/1_0/userguide.html" target="_blank">Apache Axis2 User
+href="http://ws.apache.org/axis2/1_0/userguide.html">Apache Axis2 User
 Guide</a> and <a
-href="http://ws.apache.org/axis2/1_0/Axis2ArchitectureGuide.html" target="_blank">Apache
+href="http://ws.apache.org/axis2/1_0/Axis2ArchitectureGuide.html">Apache
 Axis2 Architecture Guide</a>.</p>
 
 <p>If you want to know about the design of Sandesha2 refer to <a
-href="architectureGuide.html" target="_blank">Sandesha2 Architecture Guide</a>.</p>
+href="architectureGuide.html">Sandesha2 Architecture Guide</a>.</p>
 
 <p>Sandesha2 supports two reliable messaging specifications. It fully
 supports WS-ReliableMessaging Feabruary 2005 specification which was created
@@ -239,7 +239,7 @@ serviceClient.setOptions(clientOptions);
 
 serviceClient.fireAndForget(OM_ELEMENT_1);
 serviceClient.fireAndForget(OM_ELEMENT_2);
-<a name="lastmethos"></a>
+<a></a>
 clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE,"true");
 serviceClient.fireAndForget(OM_ELEMENT_3); </pre>
 
@@ -345,7 +345,8 @@ have to set a property called Sequence Key.</p>
 
 <p>If the sequence key is different, Sandesha2 will send messages in two
 sequences even if they are sent to the same endpoint.</p>
-<a name="offering_seqID"></a>
+<a></a>
+
 <h3>Offering a Sequence ID for the Response Sequence</h3>
 
 <p>This is a concept of reliable messaging which may not be very useful to
@@ -364,9 +365,10 @@ without sending any real application messages. When you ask for this,
 Sandesha2 will do a Create Sequence message exchange and obtain a new
 sequence ID from the server. Later you can send application messages with
 this newly created sequence. A boolean parameter in this can also be used to
-tell whether to send an offer (Read the previous part on <a href="#offering_seqID">offering
-sequence IDs</a> to learn more about this) . The line you have to add to your
-client code for doing these is as follows.</p>
+tell whether to send an offer (Read the previous part on <a
+href="#offering_seqID">offering sequence IDs</a> to learn more about this) .
+The line you have to add to your client code for doing these is as
+follows.</p>
 <pre>SandeshaClient.createSequence (ServiceClient serviceClient, booleanoffer);</pre>
 
 <p>There is another method which takes a third parameter, which is the
@@ -380,15 +382,16 @@ String sequenceKey);</pre>
 
 <p>You can ask the Sandesha2 to get an acknowledgement from a server with
 which it is maintaining a sequence. This may be useful in a case where your
-<a href="#seqreports">SequenceReports</a> indicate that some of the messages you sent
-have not been acknowledged and when you want to verify that. You can do this
-by adding one of the following line to the client code.</p>
+<a href="#seqreports">SequenceReports</a> indicate that some of the messages
+you sent have not been acknowledged and when you want to verify that. You can
+do this by adding one of the following line to the client code.</p>
 <pre>SandeshaClient.sendAckRequest (ServiceClient serviceClient);</pre>
 
 <p>You can use following method to send an acknowledgement request to a
 specific sequence identified by the Sequence Key.</p>
 <pre>SandeshaClient.sendAckRequest (ServiceClient serviceClient, String sequenceKey);</pre>
-<a name="selectversion"></a>
+<a></a>
+
 <h3>Selecting the Specification Version Which you Want to Work in</h3>
 
 <p>As I explained earlier Sandesha2 supports two WSRM specifications. The
@@ -447,7 +450,8 @@ until you exit the program.</p>
 <pre>SandeshaClient.waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime);
 
 SandeshaClient.waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime, String sequenceKey);</pre>
-<a name="seqmgt"></a>
+<a></a>
+
 <h2>Sequence Management of Sandesha2</h2>
 
 <p>This section will explain you about the sequence managing method of
@@ -473,18 +477,18 @@ sequence corresponding to a particular request sequence.</p>
 <h3>Terminating a Sequence</h3>
 
 <p>There are currently two methods to terminate a particular sequence from
-the Client API. The first method is to <a href="#lastmethod">set the Last Message
-property</a> as it was explained earlier. After all the messages up to the
-last message get delivered reliably Sandesha2 will terminate that sequence.
-Remember that if you are working on the Submitted WSRM specification (the
-default), this is the only method you can use.</p>
+the Client API. The first method is to <a href="#lastmethod">set the Last
+Message property</a> as it was explained earlier. After all the messages up
+to the last message get delivered reliably Sandesha2 will terminate that
+sequence. Remember that if you are working on the Submitted WSRM
+specification (the default), this is the only method you can use.</p>
 
 <p>If you are working on the new WSRM specification (see previous section on
-<a href="#selectversion">Selecting the Specification Version</a> if you want to know how
-to set this), these is a alternate method you can use to terminate a
-sequence. You can keep invoking the ServiceClient to send messages, without
-setting a Last Message property. After you finish your work call following
-function to terminate the sequence.</p>
+<a href="#selectversion">Selecting the Specification Version</a> if you want
+to know how to set this), these is a alternate method you can use to
+terminate a sequence. You can keep invoking the ServiceClient to send
+messages, without setting a Last Message property. After you finish your work
+call following function to terminate the sequence.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient);</pre>
 
 <p>You can use the function below to terminate a sequence identified by a
@@ -544,7 +548,8 @@ information:</strong></em></p>
 <p>To get a SandeshaReport at any time, invoke following method from your
 client code.</p>
 <pre>SandeshaClient.getSandeshaReport (ConfigurationContext c);</pre>
-<a name="seqreport"></a>
+<a></a>
+
 <h3>SequenceReport</h3>
 
 <p>A SequnceReport gives information on a specific sequences that a Sandesha
@@ -732,7 +737,7 @@ perticular service by setting a different value there.</p>
 
 <p>This gives the storage manager implementation class used by Sandesha2. You
 have to mention the full qualified class name here. Please read the Sandesha2
-<a href="architectureGuide.html" target="_blank">Architecture Guide</a> &lt;ADD A SEPERATE
+<a href="architectureGuide.html">Architecture Guide</a> &lt;ADD A SEPERATE
 GUIDE&gt; for more details on creating your own storage manager. This is also
 a property that cannot be overridden, i.e., value you set in the module.xml
 is the one that is used for all the services and will not be overridden for a
