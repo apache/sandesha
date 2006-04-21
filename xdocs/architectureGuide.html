@@ -61,17 +61,17 @@ retransmission of that message.</p>
 
 <p>When all messages of a certain sequence have been successfully transmitted
 to RMD, RMS sends a TerminateSequence message. If RMD receives this message
-it can free any resources allocated for this sequence. Otherwise reaource
+it can free any resources allocated for this sequence. Otherwise resource
 deallocation will happen based on a timeout.</p>
 
 <p>Following diagram explains operation of the RMS and the RMD.</p>
 
 <p><img alt="WS-RM Model" src="images/RMModel.jpg" /></p>
 <a>Sandesha2 support two reliable messaging specifications. It fully support
-WS-ReliableMessaging Feabruary 2005 specification which was created by
+WS-ReliableMessaging February 2005 specification which was created by
 collaboration of several companies. Later this specification was submitted to
-OASIS and currently being standerdised under the OASIS WS-RX tecnical
-committee. Sandesha2 support upto the revision &lt;VERSION NO&gt; of the
+OASIS and currently being standardized under the OASIS WS-RX technical
+committee. Sandesha2 support up to the revision &lt;VERSION NO&gt; of the
 specification being developed under this technical committee.</a> <a
 name="architecture"></a>
 
@@ -88,10 +88,10 @@ consider a single side in this discussion.</p>
 
 <h2>Handlers</h2>
 
-<p>Sandesha2 adds three handlers to the excution chain of Axis2. Two of these
-handlers are added to a special user phase called 'RMPhase' of in and out
-flows. Other handler is added to the predispatch phase of the inFlow. These
-handlers and their functions are given below.</p>
+<p>Sandesha2 adds three handlers to the execution chain of Axis2. Two of
+these handlers are added to a special user phase called 'RMPhase' of in and
+out flows. Other handler is added to the predispatch phase of the inFlow.
+These handlers and their functions are given below.</p>
 
 <p></p>
 
@@ -103,7 +103,7 @@ enabled service. This handler will identify the type of this message. The
 type can be an application message (a message that has to be delivered to the
 service) or a RM control messages. Sandesha2 has a special set of classes
 called message processors which are capable of processing each type of
-message. Depending on the type, the message is send throgh the
+message. Depending on the type, the message is send through the
 'processInMessage' method of the message processor which will do the further
 processing of it.</p>
 
@@ -123,7 +123,7 @@ Internal Sequence ID is a derivation of the Sequence ID value of the messages
 of the incoming sequence.</p>
 
 <p>Before sending the message through other handlers the SandeshaOutHandler
-wil send it throgh the 'processOutMessage' method of the respective message
+will send it throgh the 'processOutMessage' method of the respective message
 processor.</p>
 
 <p></p>
@@ -136,7 +136,7 @@ that comes to the Axis2 system. To maximize performance the very first
 function of this handler is to identify weather the current message is
 processable by it. It checks weather the message is intended for a RM enabled
 service and if so check the message type to further verify weather it should
-be processed globally. This handler was plased to perform functions that
+be processed globally. This handler was placed to perform functions that
 should be done before the instance dispatching level of Axis2. Some of those
 are given below.</p>
 
@@ -187,7 +187,7 @@ messages of a sequence only in the order of message numbers.</p>
 Sandesha2 system. This was designed to support the RM message exchange while
 being independent of the storage implementation used. The storage framework
 defines a set of interface and abstract classes that can be implemented by a
-perticular storage implementation. Sandesha2 system comes with an in-memory
+particular storage implementation. Sandesha2 system comes with an in-memory
 storage implementation. There can be other implementations based on different
 databases and persistence mechanisms.</p>
 
@@ -225,7 +225,7 @@ beans.</p>
 <p>Sandesha2 also define a StorageManager interface that define methods to
 create each of these bean managers and to create a Transaction object which
 should implement the Transaction interface. Transaction interface define
-commit and roleback methods.</p>
+commit and rollback methods.</p>
 
 <p>Collectively each Sandesha2 storage implementation should have following
 classes:</p>
@@ -235,7 +235,7 @@ classes:</p>
   <li>An implementation of a Transaction interface.</li>
 </ol>
 
-<p>These classes can be packed as a jar archieve and added to the
+<p>These classes can be packed as a jar archive and added to the
 classpath.The name of the StorageManager implementation class has to be
 mentioned in Sandesha2 policy configurations. This will be picked up after a
 restart of the the Axis2 engine.</p>
@@ -289,8 +289,8 @@ the RM Beans and their fields (which were mentioned before) in mind.</p>
 <ul>
   <li>Client does the first fireAndForget method invocation of a
     serviceClient after setting necessary properties.</li>
-  <li>Message reaches the SandeshaOutHandler which detects ie as an
-    application message. The processing is deligated to the processOutMessage
+  <li>Message reaches the SandeshaOutHandler which detects it as an
+    application message. The processing is delegated to the processOutMessage
     method of the Application Message Processor.</li>
   <li>Application Message Processor generate the Internal Sequence ID as
     explained earlier. It understands that this is a new sequence and
@@ -340,7 +340,7 @@ the RM Beans and their fields (which were mentioned before) in mind.</p>
     side SandeshaInHandler delegates this to the ApplicationMessageProcessor
     which creates an acknowledgement and sends it. If in-order invocation is
     enabled, an entry is added to the InvokerBeanManager representing this
-    new appication maessage.
+    new application message.
     <p>Lets assume that the message number of this message is 2.</p>
   </li>
   <li>The InOrderInvoker which keeps looking at the InvokerBeanManager
