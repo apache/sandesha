@@ -14,7 +14,7 @@
  * the License.
  */
 
-package sandesha2.samples.interop;
+package sandesha2.samples.userguide;
 
 import java.io.File;
 
@@ -60,9 +60,9 @@ public class AsyncEchoClient {
 	
 	private String transportToPort = "8070";
 	
-	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
+	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMSampleService";
 	
-	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMInteropService";
+	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMSampleService";
 	
 	//private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
 	

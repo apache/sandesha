@@ -1,10 +1,10 @@
-<service name="RMInteropService">
-    <parameter name="ServiceClass" locked="xsd:false">sandesha2.samples.interop.RMInteropService</parameter>
+<service name="RMSampleService">
+   <parameter name="ServiceClass" locked="xsd:false">sandesha2.samples.userguide.RMSampleService</parameter>
 
    <module ref="sandesha2" />
 
    <description>
-        This is a testing service , to test the system is working or not
+        The userguide Sample service.
    </description>
 
     <operation name="ping" mep="http://www.w3.org/2004/08/wsdl/in-only">  
@@ -16,7 +16,6 @@
     </operation>
     
     <operation name="echoString">
-    	
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
     </operation>
 

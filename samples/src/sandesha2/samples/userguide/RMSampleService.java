@@ -15,7 +15,7 @@
  *
  */
 
-package sandesha2.samples.interop;
+package sandesha2.samples.userguide;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 
-public class RMInteropService {
+public class RMSampleService {
 
 	private static Map sequenceStrings = new HashMap();  //TODO make this non static
 	private final String applicationNamespaceName = "http://tempuri.org/"; 

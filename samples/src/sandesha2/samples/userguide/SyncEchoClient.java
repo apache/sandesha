@@ -14,7 +14,7 @@
  * the License.
  */
 
-package sandesha2.samples.interop;
+package sandesha2.samples.userguide;
 
 import java.io.File;
 
@@ -50,7 +50,7 @@ public class SyncEchoClient {
 	
 	private String toPort = "8070";
 	
-	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMInteropService";
+	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMSampleService";
 
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
