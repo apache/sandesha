@@ -76,13 +76,4 @@ public class RMSampleService {
 		
 		System.out.println("ping service got text:" + textValue);
 	}
-
-	public OMElement EchoString(OMElement in) throws Exception  {
-		return echoString(in);
-	}
-
-	public void Ping(OMElement in) throws Exception  {
-		ping(in);
-	}
-
 }

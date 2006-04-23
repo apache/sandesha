@@ -20,6 +20,12 @@ import java.io.File;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -30,16 +36,8 @@ import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.ClientUtils;
-import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPBody;
 
 public class AsyncEchoClient {
 	
@@ -52,10 +50,6 @@ public class AsyncEchoClient {
 	
 	private String toIP = "127.0.0.1";
 	
-	private String ackIP = "127.0.0.1";
-	
-	private String ackPort = "9070";
-	
 	private String toPort = "8070";
 	
 	private String transportToPort = "8070";
@@ -63,8 +57,6 @@ public class AsyncEchoClient {
 	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMSampleService";
 	
 	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMSampleService";
-	
-	//private String acksToEPR = "http://" + ackIP +  ":" + ackPort + "/axis2/services/" + "__ANONYMOUS_SERVICE__";
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	

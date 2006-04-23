@@ -18,32 +18,28 @@ package sandesha2.samples.userguide;
 
 import java.io.File;
 
-import javax.xml.namespace.QName;
-
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
-import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
-import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SequenceReport;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAP12Constants;
 
 
 public class SyncPingClient {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/"; 
-	private static final String Ping = "Ping";
+	private static final String ping = "ping";
 	private static final String Text = "Text";
 	
 	private String toIP = "127.0.0.1";
@@ -135,7 +131,7 @@ public class SyncPingClient {
 	private static OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
 		
 		textElem.setText(text);
