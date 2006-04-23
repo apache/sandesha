@@ -5,81 +5,86 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
   <title>Sandesha2 User Guide</title>
-  <meta name="generator" content="amaya 9.2.1, see http://www.w3.org/Amaya/"
+  <meta name="generator" content="amaya 9.2.2, see http://www.w3.org/Amaya/"
   />
 </head>
 
 <body xml:lang="en">
 <h1>Apache Sandesha2 User's Guide</h1>
 
-<p>This document introduces you to Apache Sandesha2.&lt;ABSTRACT (what this
-doc is about)&gt;</p>
+<p>This document introduces you to Apache Sandesha2. This will first take you
+though a step by step guide of developing a Sample application using
+Sandesha2. In the later parts you will be introduced to some advance features
+making you more familier with the application.</p>
 
 <h2>Contents</h2>
 <ul>
-  <li><a href="#">Introduction</a></li>
-  <li><a href="#">Your First Service with Sandesha2</a></li>
-  <li><a href="#">Writing Clients for Reliable Services</a>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#yfs">Your First Service with Sandesha2</a></li>
+  <li><a href="#wcfr">Writing Clients for Reliable Services</a>
     <ul>
-      <li><a href="#">Client Code for a One-Way RM Service Call</a></li>
-      <li><a href="#">Client code for a Request-Reply RM Service Call</a></li>
+      <li><a href="#oneway">Client Code for a One-Way RM Service Call</a></li>
+      <li><a href="#reqres">Client code for a Request-Reply RM Service
+        Call</a></li>
     </ul>
   </li>
-  <li><a href="#">Using Sandesha2 with Axis2 Generated Stubs</a></li>
-  <li><a href="#">Advance Client Scenarios</a>
+  <li><a href="#acs">Advance Client Scenarios</a>
     <ul>
-      <li><a href="#">Getting Acknowledgements and Faults to a given
+      <li><a href="#gaa">Getting Acknowledgements and Faults to a given
         Endpoint</a></li>
-      <li><a href="#">Offering a Sequence ID for the Response
+      <li><a href="#oas">Offering a Sequence ID for the Response
       Sequence</a></li>
-      <li><a href="#">Creating a Sequence Without Sending any
+      <li><a href="#cras">Creating a Sequence Without Sending any
       Messages</a></li>
-      <li><a href="#">Sending Acknowledgement Requests from the Client
+      <li><a href="#sar">Sending Acknowledgement Requests from the Client
         Code</a></li>
-      <li><a href="#">Selecting the Specification Version which you want to
-        Work in</a></li>
-      <li><a href="#">Terminating a Sequence from the Client Code</a></li>
-      <li><a href="#">Closing a Sequence from the Client Code</a></li>
-      <li><a href="#">Blocking the Client Code until a Sequence is
+      <li><a href="#sts">Selecting the Specification Version which you want
+        to Work in</a></li>
+      <li><a href="#tas">Terminating a Sequence from the Client Code</a></li>
+      <li><a href="#clas">Closing a Sequence from the Client Code</a></li>
+      <li><a href="#btc">Blocking the Client Code until a Sequence is
         Complete</a></li>
     </ul>
   </li>
-  <li><a href="#">Sequence Management of Sandesha2</a>
+  <li><a href="#smo">Sequence Management of Sandesha2</a>
     <ul>
-      <li><a href="#">Starting a New Sequence</a></li>
-      <li><a href="#">Terminating a Sequence</a></li>
-      <li><a href="#">Closing a Sequence</a></li>
-      <li><a href="#">Timing Out a Sequence</a></li>
+      <li><a href="#san">Starting a New Sequence</a></li>
+      <li><a href="#tas">Terminating a Sequence</a></li>
+      <li><a href="#cas">Closing a Sequence</a></li>
+      <li><a href="#toa">Timing Out a Sequence</a></li>
     </ul>
   </li>
-  <li><a href="#">Working with Sandesha Reports</a>
+  <li><a href="#wwsr">Working with Sandesha Reports</a>
     <ul>
-      <li><a href="#">SandeshaReport</a></li>
-      <li><a href="#">SequenceReport</a></li>
+      <li><a href="#sandeshareport">SandeshaReport</a></li>
+      <li><a href="#sequencereport">SequenceReport</a></li>
     </ul>
   </li>
-  <li><a href="#">Sandesha Listener Feature</a>
+  <li><a href="#slf">Sandesha Listener Feature</a>
     <ul>
-      <li><a href="#">onError</a></li>
-      <li><a href="#">onTimeOut</a></li>
+      <li><a href="#onerror">onError</a></li>
+      <li><a href="#ontimeout">onTimeOut</a></li>
     </ul>
   </li>
-  <li><a href="#">Delivery Assurances of Sandesha2</a></li>
-  <li><a href="#">Configuring Sandesha2</a>
+  <li><a href="#dao">Delivery Assurances of Sandesha2</a></li>
+  <li><a href="#cs">Configuring Sandesha2</a>
     <ul>
-      <li><a href="#">AcknowledgementInterval</a></li>
-      <li><a href="#">RetransmissionInterval</a></li>
-      <li><a href="#">ExponentialBackoff</a></li>
-      <li><a href="#">MaximumRetransmissionCount</a></li>
-      <li><a href="#">InactivityTimeout</a></li>
-      <li><a href="#">InactivityTimeoutMeasure</a></li>
-      <li><a href="#">InvokeInOrder</a></li>
-      <li><a href="#">StorageManager</a></li>
-      <li><a href="#">MessageTypesToDrop</a></li>
+      <li><a href="#acknowledgementinterval">AcknowledgementInterval</a></li>
+      <li><a href="#retransmissioninterval">RetransmissionInterval</a></li>
+      <li><a href="#exponentialbackoff">ExponentialBackoff</a></li>
+      <li><a
+      href="#maximumretransmissioncount">MaximumRetransmissionCount</a></li>
+      <li><a href="#inactivitytimeout">InactivityTimeout</a></li>
+      <li><a
+      href="#inactivitytimeoutmeasure">InactivityTimeoutMeasure</a></li>
+      <li><a href="#invokeinorder">InvokeInOrder</a></li>
+      <li><a href="#storagemanager">StorageManager</a></li>
+      <li><a href="#messagetypestodrop">MessageTypesToDrop</a></li>
     </ul>
   </li>
 </ul>
 
+<a name="intro" href=""></a> 
 <h2>Introduction</h2>
 
 <p>Sandesha2 is a Web Service-ReliableMessaging (WS-RM) implementation for
@@ -87,9 +92,9 @@ Apache Axis2. With Sandesha2 you can make your Web services reliable, or you
 can invoke already hosted reliable Web services.</p>
 
 <p>If you want to learn more about Apache Axis2, refer to <a
-href="http://ws.apache.org/axis2/1_0/userguide.html">Apache Axis2 User
+href="http://ws.apache.org/axis2/0_95/userguide.html">Apache Axis2 User
 Guide</a> and <a
-href="http://ws.apache.org/axis2/1_0/Axis2ArchitectureGuide.html">Apache
+href="http://ws.apache.org/axis2/0_95/Axis2ArchitectureGuide.html">Apache
 Axis2 Architecture Guide</a>.</p>
 
 <p>If you want to know about the design of Sandesha2 refer to <a
@@ -99,10 +104,11 @@ href="architectureGuide.html">Sandesha2 Architecture Guide</a>.</p>
 supports WS-ReliableMessaging Feabruary 2005 specification which was created
 in collaboration with Microsoft, IBM, BEA and TOBCO Software. Later this
 specification was submitted to OASIS and is currently being standerdized
-under the OASIS WS-RX technical committee. Sandesha2 supports up to the
-revision &lt;VERSION NO&gt; of the specification being developed under this
-technical committee.</p>
+under the OASIS WS-RX technical committee. Sandesha2 currently support up to
+the revision CD 3 of the specification being developed under this technical
+committee.</p>
 
+<a name="yfs" href=""></a>
 <h2>Your First Service with Sandesha2</h2>
 
 <p>This section will give you step by step guidelines on createting a Web
@@ -110,75 +116,147 @@ service with reliability and making it available within your Axis2 server.
 This simple service will have a single one-way operation (ping) and a
 request-response operation (echoString).</p>
 
-<p>The steps are as follows:</p>
+<p>The steps are as follows:"</p>
 
 <p>1. Download the Axis2 Webapp distribution (Axis2.war file) and deploy it
-within Tomcat. You can do this simply by extracting axis2.war file to the
-'webapps' folder of Tomcat.</p>
+within Tomcat. Extract the webapp so that you can edit the files of the
+webapp. (this will also be done if you run tomcat with the axis2.war file
+within the webapps folder).</p>
 
 <p>2. Add a user phase named RMPhase to the inFlow, outFlow of inFaultFlow of
-the axis2.xml file which is situated under the webapps/axis2/WEB-INF
-directory. An example axis2.xml file with the RMPhase is given below.</p>
-<pre>&lt;Sample Axis2.xml &gt;</pre>
+the axis2.xml file which is situated under the webapps/axis2/WEB-INF/conf
+directory. The 'Phases' part of a axis2.xml file with RMPhase is given
+below.</p>
+<pre>&lt;axisconfig name="AxisJava2.0"&gt;
+    &lt;!-- OTHER PARTS OF THE CONFIGURATOIN--&gt;
+    &lt;phaseOrder type="inflow"&gt;
+         &lt;phase name="Transport"&gt;
+            &lt;!-- TRANSPORT PHASE HANDLERS--&gt;
+        &lt;/phase&gt;
+        &lt;phase name="Security"/&gt;
+        &lt;phase name="PreDispatch"/&gt;
+        &lt;phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase"&gt;
+            &lt;!-- DISPATCH PHASE HANDLERS--&gt;
+        &lt;/phase&gt;
+        &lt;phase name="OperationInPhase"/&gt;
+        &lt;phase name="RMPhase"/&gt;
+    &lt;/phaseOrder&gt;
+    &lt;phaseOrder type="outflow"&gt;
+        &lt;phase name="RMPhase"/&gt;
+        &lt;phase name="OperationOutPhase"/&gt;
+        &lt;phase name="PolicyDetermination"/&gt;
+        &lt;phase name="MessageOut"/&gt;
+    &lt;/phaseOrder&gt;
+    &lt;phaseOrder type="INfaultflow"&gt;
+        &lt;phase name="PreDispatch"/&gt;
+        &lt;phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase"&gt;
+            &lt;!-- DISPATCH PHASE HANDLERS--&gt;
+        &lt;/phase&gt;
+        &lt;phase name="OperationInFaultPhase"/&gt;
+        &lt;phase name="RMPhase"/&gt;
+    &lt;/phaseOrder&gt;
+    &lt;phaseOrder type="Outfaultflow"&gt;
+        &lt;!--      user can add his own phases to this area  --&gt;
+        &lt;phase name="RMPhase"/&gt;
+        &lt;phase name="OperationOutFaultPhase"/&gt;
+        &lt;phase name="PolicyDetermination"/&gt;
+        &lt;phase name="MessageOut"/&gt;
+    &lt;/phaseOrder&gt;
+&lt;/axisconfig&gt;</pre>
 
-<p>3. Engage the addressing module globally by adding following block to the
-axis2.xml</p>
-<pre>addressing block</pre>
+<p>2 Get a Sandesha2 binary distribution. Extract this to obtain the sandesha
+module file (which has the format sandesha2-&lt;VERSION&gt;.mar). Put this to
+the webapps/axis2/WEB-INF/modules directory.</p>
 
-<p>2 Get a compatible Sandesha2 binary distribution. Extract this to obtain
-the sandesha module file (for e.g. sandesha-1.0.mar). Put this to the
-webapps/axis2/WEB-INF/modules directory.</p>
+<p>3. Create the service implementation java file as given below. Compile
+this after adding all the libraries within the webapps/axis2/WEB-INF/lib
+directory to your classpath.</p>
 
-<p>3. Create the service implementation java file as given below.</p>
+<p><em><strong>RMSampleService.java</strong></em></p>
+<pre>package sandesha2.samples.userguide;
 
-<p><em><strong>RMSampleService.java file:</strong></em></p>
-<pre>package sandesha2.samples.userguide
-
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OFebruary
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 
 public class RMSampleService {
 
+    private static Map sequenceStrings = new HashMap();  //TODO make this non static
     private final String applicationNamespaceName = "http://tempuri.org/"; 
     private final String Text = "Text";
-    private final String echoStringResponse = "echoStringResponse"
+    private final String Sequence = "Sequence";
+    private final String echoStringResponse = "echoStringResponse";
+    private final String EchoStringReturn = "EchoStringReturn";
   
     public OMElement echoString(OMElement in) throws Exception {
+
         OMElement textElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Text));
-        
+        OMElement sequenceElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Sequence));
+
         if (textElem==null)
-            throw new Exception ("A required element is not available")
+            throw new Exception ("'Text' element is not present as a child of the 'echoString' element");
+        if (sequenceElem==null)
+            throw new Exception ("'Sequence' element is not present as a child of the 'echoString' element");
 
         String textStr = textElem.getText();
+        String sequenceStr = sequenceElem.getText();
+
         System.out.println("'EchoString' service got text '" + textStr + "' for the sequence '" + sequenceStr + "'");
 
-        OMFactory fac = in.getOMFactory();
+        String previousText = (String) sequenceStrings.get(sequenceStr);
+        String resultText = (previousText==null)?textStr:previousText+textStr;
+        sequenceStrings.put(sequenceStr,resultText);
+
+        OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
         OMElement echoStringResponseElem = fac.createOMElement(echoStringResponse, applicationNamespace);
-        
-        echoStringResponseElem.setText(textStr);
+        OMElement echoStringReturnElem = fac.createOMElement(EchoStringReturn, applicationNamespace);
+
+        echoStringReturnElem.setText(resultText);
+        echoStringResponseElem.addChild(echoStringReturnElem);
+
         return echoStringResponseElem;
     }
   
     public void ping(OMElement in) throws Exception  {
-        OMElement textElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Text);
+        OMElement textElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Text));
+        if (textElem==null)
+            throw new Exception ("'Text' element is not present as a child of the 'Ping' element");
+
         String textValue = textElem.getText();
+
         System.out.println("ping service got text:" + textValue);
     }
 }</pre>
 
 <p>4. Create the services.xml service configiration file as given below. Note
 that this has engaged the sandesha2 module for this service.</p>
-<pre>&lt;SERVICES.XML&gt;</pre>
 
-<p>5. Compile the RMSampleService.java file. Set the obtained class file and
-the services.xml file obtained from the previous step in the folder structure
-below. Create a RMInteropService.aar file by compressing the folder structure
-in jar or zip format. The files within the aar file should have following
-structure.</p>
+<p><em><strong>services.xml</strong></em></p>
+<pre>&lt;service name="RMSampleService"&gt;
+   &lt;parameter name="ServiceClass" locked="xsd:false"&gt;sandesha2.samples.userguide.RMSampleService&lt;/parameter&gt;
+
+   &lt;module ref="sandesha2" /&gt;
+
+   &lt;description&gt;
+        The userguide Sample service.
+   &lt;/description&gt;
+
+   &lt;operation name="ping" mep="http://www.w3.org/2004/08/wsdl/in-only"&gt; 
+       &lt;messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" /&gt;
+   &lt;/operation&gt;  
+   &lt;operation name="echoString"&gt;
+       &lt;messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" /&gt;
+   &lt;/operation&gt;
+&lt;/service&gt;</pre>
+
+<p>5. Set RMSampleService.class and the services.xml files obtained from the
+previous steps in the folder structure below. Create a RMInteropService.aar
+file by compressing it using the jar tool.</p>
 <pre>----META-INF
 --------services.xml
 ----sandesha2
@@ -191,57 +269,96 @@ directory.</p>
 
 <p>Now your service is deployed with reliable messaging capability!</p>
 
+<a name="wcfr" href=""></a>
 <h2>Writing Clients for Reliable Services</h2>
 
-<p>&lt;ADD BETTER IMAGES FOR FOLDER STRUCTURES&gt;</p>
+<p>1. Create a repository folder in your file system (let's call it Client
+Repo).</p>
 
-<p>1. Create a repository folder in your file system (let's call it
-CLIENT_REPO).</p>
+<p>2.Put the client_axis2.xml file that comes with the Sandesha2
+distributions to the Client Repo.</p>
 
-<p>2. Create a axis2.xml file for your Axis2 distribution and add a user
-phase named RMPhase to the inFlow, outFlow and inFaultFlow of that. Add
-module reference parts to this axis2.xml to engage the Sandesha2 and
-Addressing modules. For this sample you directly get the axis2_client.xml
-file that comes under the samples directory of the Sandesha2 binary
-distribution.</p>
-
-<p>2. Create a sub folder named 'modules' in the CLIENT_REPO and add the
+<p>2. Create a sub folder named 'modules' in the Client Repo and add the
 sandesha and addressing module files to that. Your folder structure should
 look like following now.</p>
-<pre>-- CLIENT_REPO  
+<pre>-- Client Repo  
 ------ client_axis2.xml
 -------modules
 -------------sandesha2.mar
 -------------addressing.mar</pre>
 
 <p>3. Write your client code as given in the following example scenarios. In
-these scenarios the variable CLIENT_REPO_PATH should be given the following
-path to the CLIENT_REPO folder in a java compatible manner.</p>
+these scenarios the variable CLIENT_REPO_PATH should be given the full path
+to the Client Repo folder in a java compatible manner. To compile these you
+will have to add all the library files that come with the Axis2 distribution
+and the sandesha2-client-&lt;VERSION&gt;.jar file to your classpath.</p>
 
 <p>For e.g.:</p>
-<pre>CLIENT_REPO_PATH = c:\\axis2\\repository</pre>
+<pre>CLIENT_REPO_PATH = c:\\sandesha2\\repository</pre>
 
+<p></p>
+
+<a name="oneway" href=""></a>
 <p><b>Client Code for a One-Way RM Service Call</b></p>
 
-<p>&lt;ADD THIS&gt;</p>
-<pre>ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_REPOSITORY,AXIS2_XML);
+<p><em><strong>UserguidePingClient.java</strong></em></p>
+<pre>package sandesha2.samples.userguide;
 
-Options clientOptions = new Options ();
-String to = http://localhost:8080/axis2/services/TestService;
-clientOptions.setTo(new EndpointReference (to));
-clientOptions.setAction("urn:wsrm:OneWay");
+import java.io.File;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 
-ServiceClient serviceClient = new ServiceClient (configContext,null);
-serviceClient.setOptions(clientOptions);
 
-//serviceClient.engageModule(new QName ("sandesha2"));
-//serviceClient.engageModule(new QName ("addressing"));
+public class UserguidePingClient {
 
-serviceClient.fireAndForget(OM_ELEMENT_1);
-serviceClient.fireAndForget(OM_ELEMENT_2);
-<a></a>
-clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE,"true");
-serviceClient.fireAndForget(OM_ELEMENT_3); </pre>
+    private static final String applicationNamespaceName = "http://tempuri.org/"; 
+    private static final String ping = "ping";
+    private static final String Text = "Text";
+    private static String toEPR = "http://127.0.0.1:8080/axis2/services/RMSampleService";
+    private static String CLIENT_REPO_PATH = "Full path to the Client Repo folder";
+
+    public static void main(String[] args) throws AxisFault {
+
+        String axis2_xml = CLIENT_REPO_PATH + File.separator + "client_axis2.xml";
+        ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(CLIENT_REPO_PATH,axis2_xml);
+
+        Options clientOptions = new Options ();
+        clientOptions.setTo(new EndpointReference (toEPR));
+
+        ServiceClient serviceClient = new ServiceClient (configContext,null);
+        clientOptions.setAction("urn:wsrm:Ping");
+        serviceClient.setOptions(clientOptions);
+
+        serviceClient.fireAndForget(getPingOMBlock("ping1"));
+        serviceClient.fireAndForget(getPingOMBlock("ping2"));
+
+        clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+        serviceClient.fireAndForget(getPingOMBlock("ping3"));
+
+        serviceClient.finalizeInvoke();
+    }
+
+    private static OMElement getPingOMBlock(String text) {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+        OMElement pingElem = fac.createOMElement(ping, namespace);
+        OMElement textElem = fac.createOMElement(Text, namespace);
+
+        textElem.setText(text);
+        pingElem.addChild(textElem);
+
+        return pingElem;
+    }
+}</pre>
 
 <p><em>Lst's find out the differences between this code and a client code
 without RM:</em></p>
@@ -253,42 +370,111 @@ the Sandesha2 distribution, these two lines have to be omitted. Otherwise
 Axis2 will through the exception "org.apache.axis2.AxisFault: Trying to
 engage a module which is already engaged".</p>
 
+<a name="lastmessage"></a>
 <p>Before the last invocation you have to set the LAST_MESSAGE property.
 Otherwise the sequence will not terminate properly.</p>
 
+<a name="reqres" href=""></a>
 <p><b>Client Code for a Request-Reply RM Service Call</b></p>
-<pre>&lt;CLIENT CODE&gt;</pre>
 
-<p>In the current implementation you are not able to get single channel
-responses with Sandesha2. Because of this if you expect a response message,
-you must have a return endpoint accessible from the server side. But making
-two channel blocking invocations is perfectly valid. But make sure that you
-have set a suitable timeout interval in your options object. &lt;**********
-TEST&gt;</p>
+<p><strong><em>UserguideEchoClient.java</em></strong></p>
+<pre>package sandesha2.samples.userguide;
 
-<p><strong><em>Here is a code sample for this scenario:</em></strong></p>
-<pre>ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_REPOSITORY,AXIS2_XML);
+import java.io.File;
+import javax.xml.namespace.QName;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAPBody;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.client.async.AsyncResult;
+import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 
-Options clientOptions = new Options ();
-String to = http://localhost:8080/axis2/services/TestService;
-clientOptions.setTo(new EndpointReference (to));
-clientOptions.setAction("urn:wsrm:RequestReply");
-clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-clientOptions.setUseSeparateListener(true);
+public class UserguideEchoClient {
 
-serviceClient.setOptions(clientOptions);
+    private final static String applicationNamespaceName = "http://tempuri.org/"; 
+    private final static String echoString = "echoString";
+    private final static String Text = "Text";
+    private final static String Sequence = "Sequence";
+    private final static String echoStringResponse = "echoStringResponse";
+    private final static String EchoStringReturn = "EchoStringReturn";
+    private static String toEPR = "http://127.0.0.1:8080/axis2/services/RMSampleService";
 
-//serviceClient.engageModule(new QName ("sandesha2"));
-//serviceClient.engageModule(new QName ("addressing"));
+    private static String CLIENT_REPO_PATH = "Full path to the Client Repo folder";
 
-Callback callback1 = new CallbackImpl ();
-serviceClient.sendReceiveNonBlocking(OM_ELEMENT_1,callback1);
-Callback callback2 = new CallbackImpl ();
-serviceClient.sendReceiveNonBlocking(OM_ELEMENT_2,callback2);
+    public static void main(String[] args) throws Exception {
 
-clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE,"true");
-Callback callback3 = new CallbackImpl ();
-serviceClient.sendReceiveNonBlocking(OM_ELEMENT_3,callback3);</pre>
+        String axis2_xml = CLIENT_REPO_PATH + File.separator +"client_axis2.xml";
+        ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(CLIENT_REPO_PATH,axis2_xml);
+        ServiceClient serviceClient = new ServiceClient (configContext,null);
+
+        Options clientOptions = new Options ();
+        clientOptions.setTo(new EndpointReference (toEPR));
+        clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+        clientOptions.setUseSeparateListener(true);
+        serviceClient.setOptions(clientOptions);
+
+        Callback callback1 = new TestCallback ("Callback 1");
+        serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1","sequence1"),callback1);
+        Callback callback2 = new TestCallback ("Callback 2");
+        serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2","sequence1"),callback2);
+
+        clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+        Callback callback3 = new TestCallback ("Callback 3");
+        serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3","sequence1"),callback3);
+
+        while (!callback3.isComplete()) {
+            Thread.sleep(1000);
+        }
+        
+        Thread.sleep(4000); 
+    }
+
+    private static OMElement getEchoOMBlock(String text, String sequenceKey) {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+        OMElement echoStringElement = fac.createOMElement(echoString, applicationNamespace);
+        OMElement textElem = fac.createOMElement(Text,applicationNamespace);
+        OMElement sequenceElem = fac.createOMElement(Sequence,applicationNamespace);
+
+        textElem.setText(text);
+        sequenceElem.setText(sequenceKey);
+        echoStringElement.addChild(textElem);
+        echoStringElement.addChild(sequenceElem);
+
+        return echoStringElement;
+    }
+
+    static class TestCallback extends Callback {
+
+        String name = null;
+        public TestCallback (String name) {
+            this.name = name;
+        }
+
+        public void onComplete(AsyncResult result) {
+            SOAPBody body = result.getResponseEnvelope().getBody();
+
+            OMElement echoStringResponseElem = body.getFirstChildWithName(new QName (applicationNamespaceName,echoStringResponse));
+            OMElement echoStringReturnElem = echoStringResponseElem.getFirstChildWithName(new QName (applicationNamespaceName,EchoStringReturn));
+
+            String resultStr = echoStringReturnElem.getText();
+            System.out.println("Callback '" + name +  "' got result:" + resultStr);
+        }
+
+        public void onError (Exception e) {
+            System.out.println("Error reported for test call back");
+            e.printStackTrace();
+        }
+    }
+}</pre>
 
 <p><em><strong>Here the differences from a normal request-reply client code
 is as follows:</strong></em></p>
@@ -304,10 +490,15 @@ method.</p>
 <p>Also you have to set the LAST_MESSAGE property as explained in the
 previous scenario.</p>
 
-<h2>Using Sandesha2 with Axis2 Generated Stubs</h2>
+<p>In the current implementation you are not able to get single channel
+responses with Sandesha2. Because of this if you expect a response message,
+you must have a return endpoint accessible from the server side. But making
+two channel blocking invocations is perfectly valid. But make sure that you
+have set a suitable timeout interval in your options object.</p>
 
-<p>&lt;FILL&gt;</p>
+<p></p>
 
+<a name="acs" href=""></a>
 <h2>Advance Client Scenarios</h2>
 
 <p>This section will introduce you to some Client API features which you may
@@ -321,6 +512,7 @@ others, you have to use a special class called SandeshaClient, which is
 available in the Sandesha-&lt;VERSION&gt;.jar file. Both these comes with
 Sandesha2 distributions.</p>
 
+<a name="gaa" href=""></a>
 <h3><b>Getting Acknowledgements and Faults to a Given Endpoint</b></h3>
 
 <p>In the default configuration, response path for acknowledgements and
@@ -333,6 +525,7 @@ the path of you application level faults. Only RM faults which occur within
 the Sandesha2 will be sent to this endpoint.</p>
 <pre>clientOptions.setProperty(SandeshaClientConstants.AcksTo,&lt;endpoint&gt;); //example endpoint - http://tempuri.org/acks.</pre>
 
+<a name="ms" href=""></a>
 <h3><b>Managing Sequences</b></h3>
 
 <p>In the default behaviour Sandesha2 assumes that messages going to the same
@@ -345,8 +538,8 @@ have to set a property called Sequence Key.</p>
 
 <p>If the sequence key is different, Sandesha2 will send messages in two
 sequences even if they are sent to the same endpoint.</p>
-<a></a>
 
+<a name="oas" href=""></a>
 <h3>Offering a Sequence ID for the Response Sequence</h3>
 
 <p>This is a concept of reliable messaging which may not be very useful to
@@ -358,6 +551,7 @@ Sequence message exchange in the response path. To do this, add the following
 to the client code.</p>
 <pre>clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,&lt;new uuid&gt;);</pre>
 
+<a name="cras" href=""></a>
 <h3>Creating a Sequence Without Sending any Messages</h3>
 
 <p>Sometimes you may need Sandesha2 client to start a sequence with a server
@@ -366,7 +560,7 @@ Sandesha2 will do a Create Sequence message exchange and obtain a new
 sequence ID from the server. Later you can send application messages with
 this newly created sequence. A boolean parameter in this can also be used to
 tell whether to send an offer (Read the previous part on <a
-href="#offering_seqID">offering sequence IDs</a> to learn more about this) .
+href="#oas">offering sequence IDs</a> to learn more about this) .
 The line you have to add to your client code for doing these is as
 follows.</p>
 <pre>SandeshaClient.createSequence (ServiceClient serviceClient, booleanoffer);</pre>
@@ -378,11 +572,12 @@ identified from different Sequence Keys.</p>
 <pre>SandeshaClient.createSequnce (ServiceClient serviceClient, boolean offer,
 String sequenceKey);</pre>
 
+<a name="sar" href=""></a>
 <h3>Sending Acknowledgement Requests from the Client Code</h3>
 
 <p>You can ask the Sandesha2 to get an acknowledgement from a server with
 which it is maintaining a sequence. This may be useful in a case where your
-<a href="#seqreports">SequenceReports</a> indicate that some of the messages
+<a href="#sequencereport">SequenceReports</a> indicate that some of the messages
 you sent have not been acknowledged and when you want to verify that. You can
 do this by adding one of the following line to the client code.</p>
 <pre>SandeshaClient.sendAckRequest (ServiceClient serviceClient);</pre>
@@ -390,8 +585,8 @@ do this by adding one of the following line to the client code.</p>
 <p>You can use following method to send an acknowledgement request to a
 specific sequence identified by the Sequence Key.</p>
 <pre>SandeshaClient.sendAckRequest (ServiceClient serviceClient, String sequenceKey);</pre>
-<a></a>
 
+<a name="sts" href=""></a>
 <h3>Selecting the Specification Version Which you Want to Work in</h3>
 
 <p>As I explained earlier Sandesha2 supports two WSRM specifications. The
@@ -404,26 +599,28 @@ the Options object.</p>
 follows.</p>
 <pre>clientOptions.setProperty(SandeshaClient.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRM);</pre>
 
+<a name="tas" href=""></a>
 <h3>Terminating a Sequence from the Client Code</h3>
 
 <p>You can terminate an on going sequence at any time by adding the line
 given in this section to your client code. Remember that if you terminate a
 sequence some of your messages may not get delivered to the service. This is
 the recommended way for old WSRM submitted specification (the default). See
-the section '<a href="#seqmgt">Sequence Management of Sandesha2</a>' for more
+the section '<a href="#smo">Sequence Management of Sandesha2</a>' for more
 details.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient serviceClient);</pre>
 
 <p>To terminate a specific sequence use following.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient serviceClient, String sequenceKey);</pre>
 
+<a name="clas" href=""></a>
 <h3>Closing a Sequence from the Client Code</h3>
 
 <p>You can close an ongoing sequence at any time by adding the line given in
 this section to your client code. Sequence close feature is only available
 for new WSRM specification being developed under OASIS. Remember that if you
 do not close elegantly, some of your messages may not get delivered to the
-service. Again, see the section on <a href="#seqmgt">Sequence Management of
+service. Again, see the section on <a href="#smo">Sequence Management of
 Sandesha2</a> for more details. You can issue following command from your
 client code to close a sequence.</p>
 <pre>SandeshaClient.closeSequence (ServiceClient serviceClient);</pre>
@@ -431,6 +628,7 @@ client code to close a sequence.</p>
 <p>To close a specific sequence use following.</p>
 <pre>SandeshaClient.closeSequence (ServiceClient serviceClient, String sequenceKey);</pre>
 
+<a name="btc" href=""></a>
 <h3>Blocking the Client Code until a Sequence is Complete</h3>
 
 <p>After your client code delivered some messages to the RM layer, you may
@@ -450,14 +648,15 @@ until you exit the program.</p>
 <pre>SandeshaClient.waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime);
 
 SandeshaClient.waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime, String sequenceKey);</pre>
-<a></a>
 
+<a name="smo" href=""></a>
 <h2>Sequence Management of Sandesha2</h2>
 
 <p>This section will explain you about the sequence managing method of
 Sandesha2. This is basically about four things, each explained in following
 sub topics.</p>
 
+<a name="san" href=""></a>
 <h3>Starting a New Sequence</h3>
 
 <p>Sandesha client gets two properties given by the client to decide the
@@ -474,17 +673,18 @@ request sequences and ones that carry messages from the server to the client
 are called response sequences. Sandesha2 always keep a single response
 sequence corresponding to a particular request sequence.</p>
 
+<a name="tas" href=""></a>
 <h3>Terminating a Sequence</h3>
 
 <p>There are currently two methods to terminate a particular sequence from
-the Client API. The first method is to <a href="#lastmethod">set the Last
-Message property</a> as it was explained earlier. After all the messages up
+the Client API. The first method is to set the Last
+Message propertyas it was explained <a href="#lastmessage">earlier</a>. After all the messages up
 to the last message get delivered reliably Sandesha2 will terminate that
 sequence. Remember that if you are working on the Submitted WSRM
 specification (the default), this is the only method you can use.</p>
 
 <p>If you are working on the new WSRM specification (see previous section on
-<a href="#selectversion">Selecting the Specification Version</a> if you want
+<a href="#sts">Selecting the Specification Version</a> if you want
 to know how to set this), these is a alternate method you can use to
 terminate a sequence. You can keep invoking the ServiceClient to send
 messages, without setting a Last Message property. After you finish your work
@@ -499,6 +699,7 @@ particular Sequence Key.</p>
 response messages are reliably delivered to the client and after which will
 terminate the response sequence as well.</p>
 
+<a name="cas" href=""></a>
 <h3>Closing a Sequence</h3>
 
 <p>New WSRM specification being developed under OASIS introduces a new
@@ -511,23 +712,28 @@ you can use following functions to close the current sequence.</p>
 <p>You can use the function below to close a sequence identified by a
 particular Sequence Key.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient,, SequenceKey);</pre>
+<a></a>
 
+<a name="toa" href=""></a>
 <h3>Timing Out a Sequence</h3>
 
 <p>Depending on its policy configurations Sandesha2 may time out certain
 sequences. When a sequence is timed out, it is considered finalized and
 cannot be used any more. There are basically two ways a sequence can time
 out, and both can be configured using policies. See '<a
-href="#">InactivityTimeout</a>' and '<a
-href="#">MaximumRetransmissionCount</a>' parts of the '<a
-href="#">Configuring Sandesha2</a>' sub topic for more details.</p>
+href="#inactivitytimeout">InactivityTimeout</a>' and '<a
+href="#maximumretransmissioncount">MaximumRetransmissionCount</a>' parts of the '<a
+href="#cs">Configuring Sandesha2</a>' sub topic for more details.</p>
 
+<a name="wwsr" href=""></a>
 <h2>Working with Sandesha Reports</h2>
 
 <p>Sandesha introduces a feature called Sandesha Reports with which you can
 get status information about the sequences managed by Sandesha2. There are
 basically two kinds of reports, each explained in following subtopics.</p>
+<a></a>
 
+<a name="sandeshareport" href=""></a>
 <h3>SandeshaReport</h3>
 
 <p>This gives information on all the incoming and outgoing sequences
@@ -548,8 +754,8 @@ information:</strong></em></p>
 <p>To get a SandeshaReport at any time, invoke following method from your
 client code.</p>
 <pre>SandeshaClient.getSandeshaReport (ConfigurationContext c);</pre>
-<a></a>
 
+<a name="sequencereport" href=""></a>
 <h3>SequenceReport</h3>
 
 <p>A SequnceReport gives information on a specific sequences that a Sandesha
@@ -593,6 +799,7 @@ functions.</p>
 SandeshaClient.getOutgoingSequenceReport (String to,String sequenceKey,ConfigurationContext configurationContext);
 SandeshaClient.getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext);</pre>
 
+<a name="slf" href=""></a>
 <h2>Sandesha Listener Feature</h2>
 
 <p>You can use this new feature to register a listener class in Sandesha2 and
@@ -610,6 +817,7 @@ in the Options object in your client code. An example is given below.</p>
 <p>Currently SandeshaListener defines the following two methods- onError
 &amp; onTimedOut.</p>
 
+<a name="onerror" href=""></a>
 <h3>onError</h3>
 
 <p>This will be invoked if Sandesha2 receives a fault SOAP message for one of
@@ -619,16 +827,18 @@ faults that occur due to application messages or any other messages that do
 not get originated from Sandesha2. They will not be considered by the
 Sandesha2 system as valid application messages.</p>
 
+<a name="ontimeout" href=""></a>
 <h3>onTimeOut</h3>
 
-<p>As mentioned in the earlier section <a href="#">Sequence Management of
+<p>As mentioned in the earlier section <a href="#smo">Sequence Management of
 Sanesha2</a>, there is a possibility of an inactive sequence timing out. When
 a specific sequence times out, this method of the SandeshaListener will be
 invoked giving a report of that sequence as a parameter.</p>
 
+<a name="dao" href=""></a>
 <h2>Delivery Assurances of Sandesha2</h2>
 
-<p>As it was mentioned in the <a href="">Architecture Guide</a>, Sandesha2
+<p>As it was mentioned in the <a href="architectureGuide.html">Architecture Guide</a>, Sandesha2
 provide an in-order exactly-once delivery assurance.
 <strong>In-order</strong> means that Sandesha2 will guarantee delivering of
 the messages to the Web service in the order of their message numbers. If you
@@ -644,6 +854,7 @@ ordering, you can configure Sandesha2 to invoke messages in the order they
 arrive. Read 'Configuring Sandesha2' section below to learn how to do
 this.</p>
 
+<a name="cs" href=""></a>
 <h2>Configuring Sandesha2</h2>
 
 <p>Sandesha2 provides a set of configurations which you can use to customize
@@ -661,6 +872,7 @@ Normally if Sandesha2 can detect that the value you have set is incompatible,
 it will set a default value which is mentioned in the SandeshaConstants
 class.</p>
 
+<a name="acknowledgementinterval" href=""></a>
 <h3>AcknowledgementInterval</h3>
 
 <p>When a RMD receives an application message and when it has to send
@@ -675,6 +887,7 @@ acknowledgement is sent as a stand alone message. This time interval is
 called the <strong>acknowledgement interval</strong> and can be configured in
 Sandesha2 policies. The measurement unit is in milliseconds.</p>
 
+<a name="retransmissioninterval" href=""></a>
 <h3>RetransmissionInterval</h3>
 
 <p>As it was mentioned earlier some messages in RM should be retransmitted
@@ -686,6 +899,7 @@ ExponentialBackoff is set to false the time gap between all the
 retransmissions attempts will have the same value, which is the
 RetransmissionInterval. Measurement unit is in milliseconds.</p>
 
+<a name="exponentialbackoff" href=""></a>
 <h3>ExponentialBackoff</h3>
 
 <p>Value of this can either be 'true' or 'false'. This measure is used to
@@ -698,6 +912,7 @@ sixth attempts will be forty seconds. If this property is set to 'false', all
 retransmissions will have the same value, which is given by the
 'RetransmissionInterval' property.</p>
 
+<a name="maximumretransmissioncount" href=""></a>
 <h3>MaximumRetransmissionCount</h3>
 
 <p>This gives the maximum number of times a message has to be retransmitted.
@@ -707,6 +922,7 @@ request will be marked as Timed Out. When a sequence is timed out, it cannot
 be used any more. If the value of this property is '-1' there is no limit in
 the number of retransmission attempts.</p>
 
+<a name="inactivitytimeout" href=""></a>
 <h3>InactivityTimeout</h3>
 
 <p>A Sandesha2 RMS always keeps track of the last time a particular RMD
@@ -714,15 +930,17 @@ responded to a request by it. If the RMD does not response within the time
 limit given by the time interval given by this measure, the RMS will give up
 attempting and will mark the sequence as Timed Out. After timing out the
 particular sequence, it cannot be used any more. If the value of this is -1,
-there is not inactivity timeout limit (&lt;IMPLEMENTED&gt;) The measure of
-this is given by the property 'InactivityTimeoutMeasure'.</p>
+there is not inactivity timeout limit The measure of this is given by the
+property 'InactivityTimeoutMeasure'.</p>
 
+<a name="inactivitytimeoutmeasure" href=""></a>
 <h3>InactivityTimeoutMeasure</h3>
 
 <p>This gives the measure of the property 'InactivityTimeout'. The value of
 this can be seconds, minutes, hours or days. If you give a value that cannot
-be interpreted the default (which is in 'seconds' &lt;CHECK) will be used.</p>
+be interpreted the default will be used.</p>
 
+<a name="invokeinorder" href=""></a>
 <h3>InvokeInOrder</h3>
 
 <p>As it was mentioned earlier, Sandesha2 implement the in-order invoking
@@ -733,16 +951,18 @@ this is a non-overridable property. I.e. value you set in the module.xml is
 the one that is used for all the services and will not be overridden for a
 perticular service by setting a different value there.</p>
 
+<a name="storagemanager" href=""></a>
 <h3>StorageManager</h3>
 
 <p>This gives the storage manager implementation class used by Sandesha2. You
 have to mention the full qualified class name here. Please read the Sandesha2
-<a href="architectureGuide.html">Architecture Guide</a> &lt;ADD A SEPERATE
-GUIDE&gt; for more details on creating your own storage manager. This is also
-a property that cannot be overridden, i.e., value you set in the module.xml
-is the one that is used for all the services and will not be overridden for a
-particular service by setting a different value there.</p>
+<a href="architectureGuide.html">Architecture Guide</a> for more details on
+creating your own storage manager. This is also a property that cannot be
+overridden, i.e., value you set in the module.xml is the one that is used for
+all the services and will not be overridden for a particular service by
+setting a different value there.</p>
 
+<a name="messagetypestodrop" href=""></a>
 <h3>MessageTypesToDrop</h3>
 
 <p>This is a property that may not be very useful to an end user, but may be
