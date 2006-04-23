@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.xml.namespace.QName;
-
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -31,13 +34,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
-import org.apache.sandesha2.client.reports.SequenceReport;
-import org.apache.ws.commons.om.OMAbstractFactory;
-import org.apache.ws.commons.om.OMElement;
-import org.apache.ws.commons.om.OMFactory;
-import org.apache.ws.commons.om.OMNamespace;
-import org.apache.ws.commons.soap.SOAP12Constants;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SequenceReport;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -91,7 +90,7 @@ public class Scenario_1_1 {
 			return;
 		}
 		
-		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
+		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
@@ -99,17 +98,17 @@ public class Scenario_1_1 {
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = "sequence1";
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		clientOptions.setAction("urn:wsrm:Ping");
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);		
-		
-		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
 		
 		serviceClient.setOptions(clientOptions);
 		
@@ -120,7 +119,7 @@ public class Scenario_1_1 {
 		SequenceReport sequenceReport = null;		
 		boolean complete = false;
 		while (!complete) {
-			sequenceReport = Sandesha2ClientAPI.getOutgoingSequenceReport(toEPR,sequenceKey,configContext);
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
 				complete = true;
 			else {
@@ -132,7 +131,7 @@ public class Scenario_1_1 {
 			}
 		} 		
 		
-		Sandesha2ClientAPI.terminateSequence(toEPR,sequenceKey,serviceClient,configContext);
+		SandeshaClient.terminateSequence(serviceClient);
 		serviceClient.finalizeInvoke();
 	}
 	

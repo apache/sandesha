@@ -23,6 +23,11 @@ import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -33,14 +38,10 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.client.Sandesha2ClientAPI;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.ws.commons.om.OMAbstractFactory;
-import org.apache.ws.commons.om.OMElement;
-import org.apache.ws.commons.om.OMFactory;
-import org.apache.ws.commons.om.OMNamespace;
-import org.apache.ws.commons.soap.SOAP12Constants;
-import org.apache.ws.commons.soap.SOAPBody;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -59,7 +60,7 @@ public class Scenario_2_1 {
 	private static String transportToIP = "127.0.0.1";
 	private static String transportToPort = "8070";
 	private static String servicePart = "/axis2/services/RMInteropService";
-	private static String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
+	private static String toAddress = "http://" + toIP +  ":" + toPort + servicePart;
 	private static String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
@@ -85,7 +86,7 @@ public class Scenario_2_1 {
 			properties.load(in);
 		}
 		
-		toEPR = properties.getProperty("to");
+		toAddress = properties.getProperty("to");
 		transportToEPR = properties.getProperty("transportTo");
 		
 		new Scenario_2_1 ().run();
@@ -98,7 +99,7 @@ public class Scenario_2_1 {
 			return;
 		}
 
-		String axis2_xml = AXIS2_CLIENT_PATH + "axis2.xml";
+		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
      
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 
@@ -107,47 +108,79 @@ public class Scenario_2_1 {
 		Options clientOptions = new Options ();
 		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setTo(new EndpointReference (toEPR));
+		
+		EndpointReference toEPR = new EndpointReference (toAddress);
+		
+		
+		OMFactory factory = OMAbstractFactory.getOMFactory();
+		OMNamespace namespace = factory.createOMNamespace("urn:wsrm:InteropOptions","rmi");
+		OMElement acceptOfferElem = factory.createOMElement("acceptOffer",namespace);
+		OMElement useOfferElem = factory.createOMElement("useOffer",namespace);
+		acceptOfferElem.setText("true");
+		useOfferElem.setText("true");
+		toEPR.addReferenceParameter(acceptOfferElem);
+		toEPR.addReferenceParameter(useOfferElem);
+//		clientOptions.setManageSession(true); // without this reference params wont go.
+		serviceClient.setTargetEPR(toEPR);
+		
+		clientOptions.setTo(toEPR);
 		
 		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
-		clientOptions.setProperty(Sandesha2ClientAPI.AcksTo,acksTo);
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
 		
 		String sequenceKey = "sequence4";
-		clientOptions.setProperty(Sandesha2ClientAPI.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
+		clientOptions.setAction("urn:wsrm:EchoString");
+		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
-		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
 		
-		clientOptions.setProperty(Sandesha2ClientAPI.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
 		
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
 		serviceClient.setOptions(clientOptions);
-		serviceClient.engageModule(new QName ("sandesha2"));  //engaging the sandesha2 module.
-		
+
 		Callback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
 		Callback callback2 = new TestCallback ("Callback 2");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo2",sequenceKey),callback2);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 
 		
 		Callback callback3 = new TestCallback ("Callback 3");
-		serviceClient.sendReceiveNonblocking(getEchoOMBlock("echo3",sequenceKey),callback3);
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		
         while (!callback3.isComplete()) {
             Thread.sleep(1000);
         }
         
+    	SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
+//			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+	    		}
+			}
+		} 	
        
-        Sandesha2ClientAPI.terminateSequence(toEPR,sequenceKey,serviceClient,configContext);
+        SandeshaClient.terminateSequence(serviceClient);
 //        serviceClient.finalizeInvoke();
         
 	}
