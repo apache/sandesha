@@ -18,7 +18,7 @@ package org.apache.sandesha2;
 
 import java.io.File;
 
-import javax.xml.namespace.QName;
+import junit.framework.TestCase;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -33,8 +33,6 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
-
-import junit.framework.TestCase;
 
 public class SandeshaClientTest extends TestCase {
 

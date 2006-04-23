@@ -2,7 +2,7 @@ package org.apache.sandesha2.versions;
 
 import java.io.File;
 
-import javax.xml.namespace.QName;
+import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -22,8 +22,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
-
-import junit.framework.TestCase;
 
 public class AddressingVersionTest extends TestCase {
 	

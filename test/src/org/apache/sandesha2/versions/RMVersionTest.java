@@ -2,7 +2,7 @@ package org.apache.sandesha2.versions;
 
 import java.io.File;
 
-import javax.xml.namespace.QName;
+import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -10,7 +10,6 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -23,8 +22,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
-
-import junit.framework.TestCase;
 
 public class RMVersionTest extends TestCase {
 

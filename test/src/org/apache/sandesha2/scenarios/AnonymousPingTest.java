@@ -18,8 +18,6 @@ package org.apache.sandesha2.scenarios;
 
 import java.io.File;
 
-import javax.xml.namespace.QName;
-
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;

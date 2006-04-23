@@ -2,7 +2,7 @@ package org.apache.sandesha2.versions;
 
 import java.io.File;
 
-import javax.xml.namespace.QName;
+import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -18,13 +18,10 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
-
-import junit.framework.TestCase;
 
 public class SOAPVersionTest extends TestCase {
 
