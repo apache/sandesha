@@ -5,7 +5,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
   <title>Sandesha2 Architecture guide</title>
-  <meta name="generator" content="amaya 9.2.1, see http://www.w3.org/Amaya/"
+  <meta name="generator" content="amaya 9.2.2, see http://www.w3.org/Amaya/"
   />
 </head>
 
@@ -25,8 +25,6 @@
     </ul>
   </li>
   <li><a href="#da">Delivery Assurances</a></li>
-  <li><a href="#ps">Policy Support</a></li>
-  <li><a href="#tm">Transaction Model</a></li>
   <li><a href="#es">Example Scenarios</a></li>
 </ul>
 <a name="intro"></a>
@@ -48,10 +46,10 @@ by a unique Sequence Identifier.</p>
 
 <p>Each message of a sequence is numbered, starting from one. In Sandesha2
 the maximum number of messages a sequence can support is 2 to the power 64
-(size of long). &lt;VERIFY&gt; But practically this may be limited by the
-memory available for your system . The message number is used by the
-destination to support additional delivery assurances. This will be explained
-later in this tutorial.</p>
+(size of long). But practically this may be limited by the memory available
+for your system . The message number is used by the destination to support
+additional delivery assurances. This will be explained later in this
+tutorial.</p>
 
 <p>The reliability is obtained basically using acknowledgements. RMS is
 required to send each message one or more times to the RMD. RMD sends back
@@ -71,8 +69,8 @@ deallocation will happen based on a timeout.</p>
 WS-ReliableMessaging February 2005 specification which was created by
 collaboration of several companies. Later this specification was submitted to
 OASIS and currently being standardized under the OASIS WS-RX technical
-committee. Sandesha2 support up to the revision &lt;VERSION NO&gt; of the
-specification being developed under this technical committee.</a> <a
+committee. Sandesha2 support up to the revision CD 3 of the specification
+being developed under this technical committee.</a> <a
 name="architecture"></a>
 
 <h2>Architecture</h2>
@@ -268,14 +266,6 @@ is guaranteed. You cannot ask Sandesha2 to invoke the same message more than
 once.</p>
 
 <p></p>
-<a name="ps"></a>
-
-<h3>Policy Support</h3>
-
-<p></p>
-
-<h3></h3>
-<a name="es"></a>
 
 <h2>Example Scenario</h2>
 
