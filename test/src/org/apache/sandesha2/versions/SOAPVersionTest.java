@@ -28,7 +28,7 @@ public class SOAPVersionTest extends TestCase {
 
 	SimpleHTTPServer httpServer = null;
 	private final String applicationNamespaceName = "http://tempuri.org/"; 
-	private final String Ping = "Ping";
+	private final String ping = "ping";
 	private final String Text = "Text";
 	
 	public void setUp () throws AxisFault {
@@ -141,7 +141,7 @@ public class SOAPVersionTest extends TestCase {
 	private OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
 		
 		textElem.setText(text);

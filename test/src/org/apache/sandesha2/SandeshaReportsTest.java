@@ -60,7 +60,7 @@ public class SandeshaReportsTest extends TestCase {
 	private final static String echoStringResponse = "echoStringResponse";
 	private final static String EchoStringReturn = "EchoStringReturn";
 	
-	private final String Ping = "Ping";
+	private final String ping = "ping";
 
 	
 	public void setUp () throws AxisFault {
@@ -291,7 +291,7 @@ public class SandeshaReportsTest extends TestCase {
 	private OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
 		
 		textElem.setText(text);
