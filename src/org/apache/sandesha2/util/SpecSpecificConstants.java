@@ -3,10 +3,6 @@ package org.apache.sandesha2.util;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.Sandesha2Constants.SPEC_2005_02;
-import org.apache.sandesha2.Sandesha2Constants.SPEC_2005_10;
-import org.apache.sandesha2.Sandesha2Constants.SPEC_VERSIONS;
-import org.apache.sandesha2.Sandesha2Constants.SPEC_2005_02.Actions;
 
 public class SpecSpecificConstants {
 

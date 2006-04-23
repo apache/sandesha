@@ -111,7 +111,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 										.getRelatesTo();
 		if (relatesTo==null) {
 			String message = "Invalid create sequence message. RelatesTo part is not available";
-			log.error("Invalid create sequence message. RelatesTo part is not available");
+			log.error("Invalid create sequence response message. RelatesTo part is not available");
 			throw new SandeshaException ("Invalid create sequence message. RelatesTo part is not available");
 		}
 		String createSeqMsgId = relatesTo.getValue();
