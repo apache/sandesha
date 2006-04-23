@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-      "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+       "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
@@ -12,36 +12,33 @@
 <body>
 <h1>Apache Sandesha2 Release Notes</h1>
 
-<p>This is the 0.9 release of Apache Sandesha2.</p>
-
-<p></p>
+<p>This is the 1.0 release of Apache Sandesha2.</p>
 
 <h2>What is in this release</h2>
 
 <p>Features available on this release of Sandesha2.</p>
-
-<p></p>
 <ol>
   <li>Support for WS-ReliableMessaging in both client side and server side of
     Axis2. (according the the WS-ReliableMessaging specification February
     2005).</li>
-  <li>Plugable storage framework which currently have an in memory
-    implementation but could be easily extended to provide permanent storage
-    based reliability in the future.</li>
+  <li>Plugable storage framework.</li>
   <li>Configurable delivery assurances.In-order exactly once delivery
     assurance is guaranteed. Users can also instruct the system to stop
     odering (this will give a higher performance).</li>
   <li>Support for both SOAP 1.1 and 1.2.</li>
   <li>Mechanisms to support WS-ReliableMessaging policy assertions in both
     server side and the client side.</li>
-  <li>Test cases</li>
-  <li>A project website was added
-  http://ws.apache.org/sandesha/sandesha2/</li>
+  <li>Improved client API, which provides features for both general and
+    advance users.</li>
+  <li>Sandesha Report functionality to get status information on Sandesha2
+    system and its sequences.</li>
+  <li>SandeshaListner feature to get informed when specefic events happen
+    (for example when a fault is retrieved or when a sequence times out).</li>
+  <li>Support for the WSRM specification being developed under OASIS WSRX
+    technical committee.</li>
+  <li>Test cases to test RM scenarios.</li>
   <li>Documentation</li>
 </ol>
-
-<p>An interop service endpoint for Sandesha2 is available at
-http://ws.zones.apache.org:6061/axis2/RMInteropService</p>
 
 <p>Thank you for using Apache Sandesha2.</p>
 
