@@ -4,7 +4,7 @@
     <!-- ================================================= -->
     <parameter name="hotdeployment" locked="false">true</parameter>
     <parameter name="hotupdate" locked="false">false</parameter>
-    <parameter name="enableMTOM" locked="false">true</parameter>
+    <parameter name="enableMTOM" locked="false">false</parameter>
     <parameter name="sendStacktraceDetailsWithFaults" locked="false">true</parameter>
 
     <!-- Uncomment this to enable REST support -->
@@ -104,13 +104,13 @@
         </phase>
         <!--  System pre defined phases       -->
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
-        <phase name="RMPhase"/>
         <phase name="OperationInPhase"/>
+        <phase name="RMPhase"/>
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="OperationOutPhase"/>
         <phase name="RMPhase"/>
+        <phase name="OperationOutPhase"/>
         <!--system predefined phase-->
         <!--these phase will run irrespective of the service-->
         <phase name="PolicyDetermination"/>
@@ -144,13 +144,13 @@
             </handler>
         </phase>
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
         <phase name="OperationInFaultPhase"/>
+        <phase name="RMPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="OperationOutFaultPhase"/>
         <phase name="RMPhase"/>
+        <phase name="OperationOutFaultPhase"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>
     </phaseOrder>
