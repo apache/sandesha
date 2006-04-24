@@ -152,6 +152,7 @@
             <ant:fileset dir="${dir.samples}/conf/userguide">
                 <ant:include name="*.bat" />
                 <ant:include name="*.sh" />
+                <ant:include name="*.html" />
             </ant:fileset>
         </ant:copy>
          
@@ -253,6 +254,7 @@
                 <ant:include name="clients/*.bat"/>
                 <ant:include name="clients/*.sh"/>
                 <ant:include name="clients/*.xml"/>
+                <ant:include name="clients/*.html"/>
             </ant:fileset>
         </ant:copy>
     
