@@ -24,7 +24,7 @@ features making you more familiar with the application.</p>
   <li><a href="#wcfr">Writing Clients for Reliable Services</a>
     <ul>
       <li><a href="#oneway">Client Code for a One-Way RM Service Call</a></li>
-      <li><a href="#reqres">Client code for a Request-Reply RM Service
+      <li><a href="#requestreply">Client code for a Request-Reply RM Service
         Call</a></li>
     </ul>
   </li>
@@ -32,6 +32,7 @@ features making you more familiar with the application.</p>
     <ul>
       <li><a href="#gaa">Getting Acknowledgements and Faults to a given
         Endpoint</a></li>
+      <li><a href="#ms">Managing Sequences</a></li>
       <li><a href="#oas">Offering a Sequence ID for the Response
       Sequence</a></li>
       <li><a href="#cras">Creating a Sequence Without Sending any
@@ -54,7 +55,7 @@ features making you more familiar with the application.</p>
       <li><a href="#toa">Timing Out a Sequence</a></li>
     </ul>
   </li>
-  <li><a href="#wwsr">Working with Sandesha Reports</a>
+  <li><a href="#wws">Working with Sandesha Reports</a>
     <ul>
       <li><a href="#sandeshareport">SandeshaReport</a></li>
       <li><a href="#sequencereport">SequenceReport</a></li>
@@ -83,8 +84,7 @@ features making you more familiar with the application.</p>
     </ul>
   </li>
 </ul>
-<a href=""></a>
-
+<a name="intro"></a>
 <h2>Introduction</h2>
 
 <p>Sandesha2 is a Web Service-ReliableMessaging (WS-RM) implementation for
@@ -92,13 +92,13 @@ Apache Axis2. With Sandesha2 you can make your Web services reliable, or you
 can invoke already hosted reliable Web services.</p>
 
 <p>If you want to learn more about Apache Axis2, refer to <a
-href="http://ws.apache.org/axis2/0_95/userguide.html">Apache Axis2 User
+href="http://ws.apache.org/axis2/0_95/userguide.html" target="_blank">Apache Axis2 User
 Guide</a> and <a
-href="http://ws.apache.org/axis2/0_95/Axis2ArchitectureGuide.html">Apache
+href="http://ws.apache.org/axis2/0_95/Axis2ArchitectureGuide.html" target="_blank">Apache
 Axis2 Architecture Guide</a>.</p>
 
 <p>If you want to know about the design of Sandesha2 refer to <a
-href="architectureGuide.html">Sandesha2 Architecture Guide</a>.</p>
+href="architectureGuide.html" target="_blank">Sandesha2 Architecture Guide</a>.</p>
 
 <p>Sandesha2 supports two reliable messaging specifications. It fully
 supports WS-ReliableMessaging Feabruary 2005 specification which was created
@@ -107,8 +107,7 @@ specification was submitted to OASIS and is currently being standerdized
 under the OASIS WS-RX technical committee. Sandesha2 currently support up to
 the revision CD 3 of the specification being developed under this technical
 committee.</p>
-<a href=""></a>
-
+<a name="yfs"></a>
 <h2>Your First Service with Sandesha2</h2>
 
 <p>This section will give you step by step guidelines on createting a Web
@@ -268,8 +267,7 @@ file by compressing it using the jar tool.</p>
 directory.</p>
 
 <p>Now your service is deployed with reliable messaging capability!</p>
-<a href=""></a>
-
+<a name="wcfr"></a>
 <h2>Writing Clients for Reliable Services</h2>
 
 <p>1. Create a repository folder in your file system (let's call it Client
@@ -278,7 +276,7 @@ Repo).</p>
 <p>2.Put the client_axis2.xml file that comes with the Sandesha2
 distributions to the Client Repo.</p>
 
-<p>2. Create a sub folder named 'modules' in the Client Repo and add the
+<p>3. Create a sub folder named 'modules' in the Client Repo and add the
 sandesha and addressing module files to that. Your folder structure should
 look like following now.</p>
 <pre>-- Client Repo  
@@ -287,7 +285,7 @@ look like following now.</p>
 -------------sandesha2.mar
 -------------addressing.mar</pre>
 
-<p>3. Write your client code as given in the following example scenarios. In
+<p>4. Write your client code as given in the following example scenarios. In
 these scenarios the variable CLIENT_REPO_PATH should be given the full path
 to the Client Repo folder in a java compatible manner. To compile these you
 will have to add all the library files that come with the Axis2 distribution
@@ -296,9 +294,7 @@ and the sandesha2-client-&lt;VERSION&gt;.jar file to your classpath.</p>
 <p>For e.g.:</p>
 <pre>CLIENT_REPO_PATH = c:\\sandesha2\\repository</pre>
 
-<p></p>
-<a href=""></a>
-
+<a name="oneway"></a>
 <p><b>Client Code for a One-Way RM Service Call</b></p>
 
 <p><em><strong>UserguidePingClient.java</strong></em></p>
@@ -369,11 +365,10 @@ you are using the axis2_client.xml as in the previous file that comes with
 the Sandesha2 distribution, these two lines have to be omitted. Otherwise
 Axis2 will through the exception "org.apache.axis2.AxisFault: Trying to
 engage a module which is already engaged".</p>
-<a></a>
-
+<a name="lastmessage"></a>
 <p>Before the last invocation you have to set the LAST_MESSAGE property.
 Otherwise the sequence will not terminate properly.</p>
-<a href=""></a>
+<a name="requestreply"></a>
 
 <p><b>Client Code for a Request-Reply RM Service Call</b></p>
 
@@ -496,9 +491,7 @@ you must have a return endpoint accessible from the server side. But making
 two channel blocking invocations is perfectly valid. But make sure that you
 have set a suitable timeout interval in your options object.</p>
 
-<p></p>
-<a href=""></a>
-
+<a name="acs"></a>
 <h2>Advance Client Scenarios</h2>
 
 <p>This section will introduce you to some Client API features which you may
@@ -511,8 +504,7 @@ to add the sandesha2-client-&lt;VERSION&gt;.jar to your classpath. For
 others, you have to use a special class called SandeshaClient, which is
 available in the Sandesha-&lt;VERSION&gt;.jar file. Both these comes with
 Sandesha2 distributions.</p>
-<a href=""></a>
-
+<a name="gaa"></a>
 <h3><b>Getting Acknowledgements and Faults to a Given Endpoint</b></h3>
 
 <p>In the default configuration, response path for acknowledgements and
@@ -524,8 +516,7 @@ the client code before doing any invocation. Note that this does not effect
 the path of you application level faults. Only RM faults which occur within
 the Sandesha2 will be sent to this endpoint.</p>
 <pre>clientOptions.setProperty(SandeshaClientConstants.AcksTo,&lt;endpoint&gt;); //example endpoint - http://tempuri.org/acks.</pre>
-<a href=""></a>
-
+<a name="ms"></a>
 <h3><b>Managing Sequences</b></h3>
 
 <p>In the default behaviour Sandesha2 assumes that messages going to the same
@@ -538,8 +529,7 @@ have to set a property called Sequence Key.</p>
 
 <p>If the sequence key is different, Sandesha2 will send messages in two
 sequences even if they are sent to the same endpoint.</p>
-<a href=""></a>
-
+<a name="oas"></a>
 <h3>Offering a Sequence ID for the Response Sequence</h3>
 
 <p>This is a concept of reliable messaging which may not be very useful to
@@ -550,8 +540,7 @@ server accepts the offered sequence ID it can refrain from doing the Create
 Sequence message exchange in the response path. To do this, add the following
 to the client code.</p>
 <pre>clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,&lt;new uuid&gt;);</pre>
-<a href=""></a>
-
+<a name="cras"></a>
 <h3>Creating a Sequence Without Sending any Messages</h3>
 
 <p>Sometimes you may need Sandesha2 client to start a sequence with a server
@@ -570,7 +559,7 @@ this). So with this you can create two or more sequences which can be
 identified from different Sequence Keys.</p>
 <pre>SandeshaClient.createSequnce (ServiceClient serviceClient, boolean offer,
 String sequenceKey);</pre>
-<a href=""></a>
+<a name="sar"></a>
 
 <h3>Sending Acknowledgement Requests from the Client Code</h3>
 
@@ -585,7 +574,7 @@ code.</p>
 <p>You can use following method to send an acknowledgement request to a
 specific sequence identified by the Sequence Key.</p>
 <pre>SandeshaClient.sendAckRequest (ServiceClient serviceClient, String sequenceKey);</pre>
-<a href=""></a>
+<a name="sts"></a>
 
 <h3>Selecting the Specification Version Which you Want to Work in</h3>
 
@@ -598,7 +587,7 @@ the Options object.</p>
 <p>To go back to the WSRM submitted specification set the property as
 follows.</p>
 <pre>clientOptions.setProperty(SandeshaClient.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRM);</pre>
-<a href=""></a>
+<a name="tas"></a>
 
 <h3>Terminating a Sequence from the Client Code</h3>
 
@@ -612,8 +601,7 @@ details.</p>
 
 <p>To terminate a specific sequence use following.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient serviceClient, String sequenceKey);</pre>
-<a href=""></a>
-
+<a name="clas"></a>
 <h3>Closing a Sequence from the Client Code</h3>
 
 <p>You can close an ongoing sequence at any time by adding the line given in
@@ -627,7 +615,7 @@ client code to close a sequence.</p>
 
 <p>To close a specific sequence use following.</p>
 <pre>SandeshaClient.closeSequence (ServiceClient serviceClient, String sequenceKey);</pre>
-<a href=""></a>
+<a name="btc"></a>
 
 <h3>Blocking the Client Code until a Sequence is Complete</h3>
 
@@ -648,14 +636,14 @@ until you exit the program.</p>
 <pre>SandeshaClient.waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime);
 
 SandeshaClient.waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime, String sequenceKey);</pre>
-<a href=""></a>
+<a name="smo"></a>
 
 <h2>Sequence Management of Sandesha2</h2>
 
 <p>This section will explain you about the sequence managing method of
 Sandesha2. This is basically about four things, each explained in following
 sub topics.</p>
-<a href=""></a>
+<a name="san"></a>
 
 <h3>Starting a New Sequence</h3>
 
@@ -672,13 +660,13 @@ sequence, until that particular sequence is terminated.</p>
 request sequences and ones that carry messages from the server to the client
 are called response sequences. Sandesha2 always keep a single response
 sequence corresponding to a particular request sequence.</p>
-<a href=""></a>
+<a name="tas"></a>
 
 <h3>Terminating a Sequence</h3>
 
 <p>There are currently two methods to terminate a particular sequence from
-the Client API. The first method is to set the Last Message propertyas it was
-explained <a href="#lastmessage">earlier</a>. After all the messages up to
+the Client API. The first method is to <a href="#lastmessage">set the Last Message property</a> as it was
+explained earlier. After all the messages up to
 the last message get delivered reliably Sandesha2 will terminate that
 sequence. Remember that if you are working on the Submitted WSRM
 specification (the default), this is the only method you can use.</p>
@@ -698,7 +686,7 @@ particular Sequence Key.</p>
 <p>When a request sequence is terminated, Sandesha2 will wait till all the
 response messages are reliably delivered to the client and after which will
 terminate the response sequence as well.</p>
-<a href=""></a>
+<a name="cas"></a>
 
 <h3>Closing a Sequence</h3>
 
@@ -712,7 +700,7 @@ you can use following functions to close the current sequence.</p>
 <p>You can use the function below to close a sequence identified by a
 particular Sequence Key.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient,, SequenceKey);</pre>
-<a></a> <a href=""></a>
+<a name="toa"></a>
 
 <h3>Timing Out a Sequence</h3>
 
@@ -723,14 +711,14 @@ out, and both can be configured using policies. See '<a
 href="#inactivitytimeout">InactivityTimeout</a>' and '<a
 href="#maximumretransmissioncount">MaximumRetransmissionCount</a>' parts of
 the '<a href="#cs">Configuring Sandesha2</a>' sub topic for more details.</p>
-<a href=""></a>
+<a name="wws"></a>
 
 <h2>Working with Sandesha Reports</h2>
 
 <p>Sandesha introduces a feature called Sandesha Reports with which you can
 get status information about the sequences managed by Sandesha2. There are
 basically two kinds of reports, each explained in following subtopics.</p>
-<a></a> <a href=""></a>
+<a name="sandeshareport"></a>
 
 <h3>SandeshaReport</h3>
 
@@ -752,8 +740,7 @@ information:</strong></em></p>
 <p>To get a SandeshaReport at any time, invoke following method from your
 client code.</p>
 <pre>SandeshaClient.getSandeshaReport (ConfigurationContext c);</pre>
-<a href=""></a>
-
+<a name="sequencereport"></a>
 <h3>SequenceReport</h3>
 
 <p>A SequnceReport gives information on a specific sequences that a Sandesha
@@ -796,7 +783,7 @@ functions.</p>
 <pre>SandeshaClient.getOutgoingSequenceReport (ServiceClient serviceClient);
 SandeshaClient.getOutgoingSequenceReport (String to,String sequenceKey,ConfigurationContext configurationContext);
 SandeshaClient.getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext);</pre>
-<a href=""></a>
+<a name="slf"></a>
 
 <h2>Sandesha Listener Feature</h2>
 
@@ -814,8 +801,7 @@ in the Options object in your client code. An example is given below.</p>
 
 <p>Currently SandeshaListener defines the following two methods- onError
 &amp; onTimedOut.</p>
-<a href=""></a>
-
+<a name="onerror"></a>
 <h3>onError</h3>
 
 <p>This will be invoked if Sandesha2 receives a fault SOAP message for one of
@@ -824,19 +810,17 @@ representing that fault message. Remember that this will not be invoked for
 faults that occur due to application messages or any other messages that do
 not get originated from Sandesha2. They will not be considered by the
 Sandesha2 system as valid application messages.</p>
-<a href=""></a>
-
+<a name="ontimeout"></a>
 <h3>onTimeOut</h3>
 
 <p>As mentioned in the earlier section <a href="#smo">Sequence Management of
 Sanesha2</a>, there is a possibility of an inactive sequence timing out. When
 a specific sequence times out, this method of the SandeshaListener will be
 invoked giving a report of that sequence as a parameter.</p>
-<a href=""></a>
-
+<a name="dao"></a>
 <h2>Delivery Assurances of Sandesha2</h2>
 
-<p>As it was mentioned in the <a href="architectureGuide.html">Architecture
+<p>As it was mentioned in the <a href="architectureGuide.html" target="_blank">Architecture
 Guide</a>, Sandesha2 provide an in-order exactly-once delivery assurance.
 <strong>In-order</strong> means that Sandesha2 will guarantee delivering of
 the messages to the Web service in the order of their message numbers. If you
@@ -851,8 +835,7 @@ assurance you can be sure that your service gets invoked only once.</p>
 ordering, you can configure Sandesha2 to invoke messages in the order they
 arrive. Read 'Configuring Sandesha2' section below to learn how to do
 this.</p>
-<a href=""></a>
-
+<a name="cs"></a>
 <h2>Configuring Sandesha2</h2>
 
 <p>Sandesha2 provides a set of configurations which you can use to customize
@@ -869,8 +852,7 @@ incompatible types or values may cause Sandesha system to malfunction.
 Normally if Sandesha2 can detect that the value you have set is incompatible,
 it will set a default value which is mentioned in the SandeshaConstants
 class.</p>
-<a href=""></a>
-
+<a name="acknowledgementinterval"></a>
 <h3>AcknowledgementInterval</h3>
 
 <p>When a RMD receives an application message and when it has to send
@@ -884,8 +866,7 @@ the destination of the acknowledgement within a specific time interval, the
 acknowledgement is sent as a stand alone message. This time interval is
 called the <strong>acknowledgement interval</strong> and can be configured in
 Sandesha2 policies. The measurement unit is in milliseconds.</p>
-<a href=""></a>
-
+<a name="retransmissioninterval"></a>
 <h3>RetransmissionInterval</h3>
 
 <p>As it was mentioned earlier some messages in RM should be retransmitted
@@ -896,7 +877,7 @@ attempts is given by this policy. If the policy given later called the
 ExponentialBackoff is set to false the time gap between all the
 retransmissions attempts will have the same value, which is the
 RetransmissionInterval. Measurement unit is in milliseconds.</p>
-<a href=""></a>
+<a name="exponentialbackoff"></a>
 
 <h3>ExponentialBackoff</h3>
 
@@ -909,8 +890,7 @@ retransmission attempts is twenty seconds the time gap between the fifth and
 sixth attempts will be forty seconds. If this property is set to 'false', all
 retransmissions will have the same value, which is given by the
 'RetransmissionInterval' property.</p>
-<a href=""></a>
-
+<a name="maximumretransmissioncount"></a>
 <h3>MaximumRetransmissionCount</h3>
 
 <p>This gives the maximum number of times a message has to be retransmitted.
@@ -919,8 +899,7 @@ still not sent correctly to the RMD, it will not be sent again and the
 request will be marked as Timed Out. When a sequence is timed out, it cannot
 be used any more. If the value of this property is '-1' there is no limit in
 the number of retransmission attempts.</p>
-<a href=""></a>
-
+<a name="inactivitytimeout"></a>
 <h3>InactivityTimeout</h3>
 
 <p>A Sandesha2 RMS always keeps track of the last time a particular RMD
@@ -930,17 +909,13 @@ attempting and will mark the sequence as Timed Out. After timing out the
 particular sequence, it cannot be used any more. If the value of this is -1,
 there is not inactivity timeout limit The measure of this is given by the
 property 'InactivityTimeoutMeasure'.</p>
-<a href=""></a>
-
+<a name="inactivitytimeoutmeasure"></a>
 <h3>InactivityTimeoutMeasure</h3>
-
 <p>This gives the measure of the property 'InactivityTimeout'. The value of
 this can be seconds, minutes, hours or days. If you give a value that cannot
 be interpreted the default will be used.</p>
-<a href=""></a>
-
+<a name="invokeinorder"></a>
 <h3>InvokeInOrder</h3>
-
 <p>As it was mentioned earlier, Sandesha2 implement the in-order invoking
 delivery assurance. This property can be used to turn this on or off. The
 value of this has to be 'true' if in-order invoking has to be enabled. It has
@@ -948,8 +923,7 @@ to be false if in-order invoking has to be disabled. Please remember that
 this is a non-overridable property. I.e. value you set in the module.xml is
 the one that is used for all the services and will not be overridden for a
 perticular service by setting a different value there.</p>
-<a href=""></a>
-
+<a name="storagemanager"></a>
 <h3>StorageManager</h3>
 
 <p>This gives the storage manager implementation class used by Sandesha2. You
@@ -959,7 +933,7 @@ creating your own storage manager. This is also a property that cannot be
 overridden, i.e., value you set in the module.xml is the one that is used for
 all the services and will not be overridden for a particular service by
 setting a different value there.</p>
-<a href=""></a>
+<a name="messagetypestodrop"></a>
 
 <h3>MessageTypesToDrop</h3>
 
