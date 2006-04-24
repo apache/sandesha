@@ -105,6 +105,8 @@ public class SandeshaClientTest extends TestCase {
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		
 		assertNotNull(sequenceReport.getSequenceID());
+		
+		serviceClient.finalizeInvoke();
 	}
 	
 //	public void testCreateSequenceWithoutOffer () {

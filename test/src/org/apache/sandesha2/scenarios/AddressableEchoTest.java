@@ -105,7 +105,6 @@ public class AddressableEchoTest extends TestCase {
 
         
         Thread.sleep(12000);
-		serviceClient.finalizeInvoke();
 		
         //assertions for the out sequence.
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -118,6 +117,8 @@ public class AddressableEchoTest extends TestCase {
 		assertTrue(callback2.isComplete());
 		assertEquals(callback1.getResult(),"echo1");
 		assertEquals(callback2.getResult(),"echo1echo2");
+		
+		serviceClient.finalizeInvoke();
 	}
 	
 	public void testAsyncEchoWithOffer () throws AxisFault, InterruptedException {
@@ -162,7 +163,6 @@ public class AddressableEchoTest extends TestCase {
 
         
         Thread.sleep(12000);
-		serviceClient.finalizeInvoke();
 		
         //assertions for the out sequence.
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -175,6 +175,8 @@ public class AddressableEchoTest extends TestCase {
 		assertTrue(callback2.isComplete());
 		assertEquals(callback1.getResult(),"echo1");
 		assertEquals(callback2.getResult(),"echo1echo2");
+		
+		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

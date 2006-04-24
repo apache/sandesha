@@ -89,13 +89,13 @@ public class SOAPVersionTest extends TestCase {
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
 		Thread.sleep(5000);
-		serviceClient.finalizeInvoke();
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 	
+		serviceClient.finalizeInvoke();
 	}
 	
 	public void testSOAP12 () throws AxisFault,InterruptedException  {
@@ -129,13 +129,13 @@ public class SOAPVersionTest extends TestCase {
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
 		Thread.sleep(5000);
-		serviceClient.finalizeInvoke();
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 	
+		serviceClient.finalizeInvoke();
 	}
 	
 	private OMElement getPingOMBlock(String text) {

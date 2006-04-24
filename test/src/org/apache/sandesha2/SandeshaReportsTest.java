@@ -130,7 +130,6 @@ public class SandeshaReportsTest extends TestCase {
 
         
         Thread.sleep(10000);
-		serviceClient.finalizeInvoke();
 		
         //testing outgoing sequence reports
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -150,6 +149,8 @@ public class SandeshaReportsTest extends TestCase {
 		assertNotNull(incomingSequenceReport.getInternalSequenceID());
 		
 		assertEquals(incomingSequenceReport.getSequenceID(),incomingSequenceReport.getInternalSequenceID());  //for the incoming side, internalSequenceID==sequenceID
+		
+		serviceClient.finalizeInvoke();
 	}
 	
 	public void testRMReport () throws AxisFault,InterruptedException {
@@ -221,6 +222,8 @@ public class SandeshaReportsTest extends TestCase {
 	 	
 	 	assertEquals(sequence1Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 	 	assertEquals(sequence2Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_ESTABLISHED);	
+	
+		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

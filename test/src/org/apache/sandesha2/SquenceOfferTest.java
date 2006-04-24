@@ -129,7 +129,6 @@ public class SquenceOfferTest extends TestCase {
 
         
         Thread.sleep(12000);
-		serviceClient.finalizeInvoke();
 		
         //assertions for the out sequence.
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -148,6 +147,8 @@ public class SquenceOfferTest extends TestCase {
 		ArrayList incomingSeqList = rmReport.getIncomingSequenceList();
 		assertEquals(incomingSeqList.size(),1);
 		assertEquals(incomingSeqList.get(0),offeredSequenceID);	
+	
+		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

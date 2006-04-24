@@ -103,7 +103,6 @@ public class AnonymousAckEchoTest extends TestCase {
 		
         
         Thread.sleep(10000);
-		serviceClient.finalizeInvoke();
 		
         //assertions for the out sequence.
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -113,7 +112,9 @@ public class AnonymousAckEchoTest extends TestCase {
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 		
 		assertEquals(callback1.getResult(),"echo1");
-		assertEquals(callback2.getResult(),"echo1echo2");		
+		assertEquals(callback2.getResult(),"echo1echo2");
+		
+		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {
