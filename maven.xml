@@ -3,7 +3,8 @@
 <project default="default" xmlns:j="jelly:core" xmlns:maven="jelly:maven" xmlns:deploy="deploy" xmlns:ant="jelly:ant">
 
     <j:set var="dist.name" value="${pom.artifactId}-${sandesha2.version}"/>
-    
+    <j:set var="dist.module.name" value="${pom.artifactId}-${sandesha2.module.version}"/>
+
     <ant:property name="build.dist.dir" value="${maven.build.dir}/dist"/>
     <ant:property name="build.temp.dir" value="${maven.build.dir}/temp"/>
     <ant:property name="build.repo.dir" value="${maven.build.dir}/repos"/>
@@ -11,7 +12,7 @@
     <ant:property name="build.samples.services.dir" value="${build.samples.dir}/services"/>
     <ant:property name="build.samples.clients.dir" value="${build.samples.dir}/clients"/>
     
-	<ant:property name="mar.name" value="${dist.name}.mar"/>
+	<ant:property name="mar.name" value="${dist.module.name}.mar"/>
 	<ant:property name="jar.name" value="${dist.name}.jar"/>
 	<ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
 	
