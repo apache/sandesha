@@ -97,8 +97,10 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		return new RMPolicyExtension();
 	}
 
-	// shutdown the module
-	public void shutdown(AxisConfiguration axisSystem) throws AxisFault {
+	public void shutdown(ConfigurationContext configurationContext) throws AxisFault {
+		//removing the threads started by Sandesha2.
+		SandeshaUtil.stopSender (configurationContext);
+		SandeshaUtil.stopInvoker(configurationContext);
 	}
 
 	// Removing data of uncontinuuable sequences so that the sandesha2 system

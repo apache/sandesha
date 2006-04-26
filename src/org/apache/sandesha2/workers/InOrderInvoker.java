@@ -61,8 +61,12 @@ public class InOrderInvoker extends Thread {
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
 		workingSequences.remove(sequenceID);
 		if (workingSequences.size()==0) {
-			//runInvoker = false;
+			runInvoker = false;
 		}
+	}
+	
+	public synchronized void stopInvoking () {
+		runInvoker = false;
 	}
 
 	public synchronized boolean isInvokerStarted() {

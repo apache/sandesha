@@ -67,8 +67,12 @@ public class Sender extends Thread {
 	public synchronized void stopSenderForTheSequence(String sequenceID) {
 		workingSequences.remove(sequenceID);
 		if (workingSequences.size() == 0) {
-			// stopSenderAfterWork = true;
+			 runSender = false;
 		}
+	}
+	
+	public synchronized void stopSending () {
+		runSender = false;
 	}
 
 	public synchronized boolean isSenderStarted() {

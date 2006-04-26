@@ -146,7 +146,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		terminateTransaction.commit(); 
 		
-		SandeshaUtil.stopSenderForTheSequence(sequenceId);
+		SandeshaUtil.stopSenderForTheSequence(sequenceId,context);
 		
 		//removing an entry from the listener
 		String transport = terminateSeqMsg.getTransportIn().getName().getLocalPart();

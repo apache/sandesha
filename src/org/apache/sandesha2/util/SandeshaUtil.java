@@ -217,8 +217,20 @@ public class SandeshaUtil {
 		}
 	}
 
-	public static void stopSenderForTheSequence(String sequenceID) {
-//		sender.stopSenderForTheSequence(sequenceID);
+	public static void stopSenderForTheSequence(String sequenceID, ConfigurationContext context) {
+		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
+		
+		if (sender!=null) {
+			sender.stopSenderForTheSequence(sequenceID);
+		}
+	}
+	
+	public static void stopSender(ConfigurationContext context) {
+		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
+		
+		if (sender!=null) {
+			sender.stopSending ();
+		}
 	}
 
 	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
@@ -238,8 +250,16 @@ public class SandeshaUtil {
 		
 	}
 
-	public static void stopInvokerForTheSequence(String sequenceID) {
-//		invoker.stopInvokerForTheSequence(sequenceID);
+	public static void stopInvokerForTheSequence(String sequenceID, ConfigurationContext context) {
+		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
+		if (invoker!=null)
+			invoker.stopInvokerForTheSequence(sequenceID);
+	}
+	
+	public static void stopInvoker(ConfigurationContext context) {
+		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
+		if (invoker!=null)
+			invoker.stopInvoking();
 	}
 
 	public static String getMessageTypeString(int messageType) {
