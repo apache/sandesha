@@ -131,30 +131,28 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 	}
 
 	public synchronized SenderBean getNextMsgToSend() {
-//		ArrayList beans = new ArrayList();
 		Iterator iterator = table.keySet().iterator();
 
-//		long lowestAppMsgNo = 0;
-//		while (iterator.hasNext()) {
-//			Object key = iterator.next();
-//			temp = (SenderBean) table.get(key);
-//
-//			if (temp.isSend()) {
-//				long timeToSend = temp.getTimeToSend();
-//				long timeNow = System.currentTimeMillis();
-//				if ((timeNow >= timeToSend)) {
-//					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
-//						long msgNo = temp.getMessageNumber();
-//						if (lowestAppMsgNo==0) {
-//							lowestAppMsgNo=msgNo;
-//						}else {
-//							if (msgNo<lowestAppMsgNo)
-//								lowestAppMsgNo = msgNo;
-//						}
-//					}
-//				}
-//			}
-//		}
+		long lowestAppMsgNo = 0;
+		while (iterator.hasNext()) {
+			Object key = iterator.next();
+			SenderBean temp = (SenderBean) table.get(key);
+			if (temp.isSend()) {
+				long timeToSend = temp.getTimeToSend();
+				long timeNow = System.currentTimeMillis();
+				if ((timeNow >= timeToSend)) {
+					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
+						long msgNo = temp.getMessageNumber();
+						if (lowestAppMsgNo==0) {
+							lowestAppMsgNo=msgNo;
+						}else {
+							if (msgNo<lowestAppMsgNo)
+								lowestAppMsgNo = msgNo;
+						}
+					}
+				}
+			}
+		}
 		
 		iterator = table.keySet().iterator();	
 		while (iterator.hasNext()) {
@@ -166,50 +164,28 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 				long timeToSend = temp.getTimeToSend();
 				long timeNow = System.currentTimeMillis();
 				if ((timeNow >= timeToSend)) {
-//					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
-//						if (temp.getMessageNumber()==lowestAppMsgNo)
-//							beans.add(temp);
-//					}else {
-//						beans.add(temp);
-//					}
-					updateNextSendingTime (temp);
-					return temp;
+					boolean valid = false;
+					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
+						if (temp.getMessageNumber()==lowestAppMsgNo)
+							valid = true;
+					}else {
+						valid = true;
+					}
+					
+					if (valid) {
+					    updateNextSendingTime (temp);
+					    return temp;
+					}
 				}
 			}
 		}
 		
 		return null;
-		
-//
-//		return beans;
 	}
 
 	private void updateNextSendingTime (SenderBean bean) {
 		
 	}
-	
-//	public synchronized Collection findMsgsToSend() {
-//		ArrayList beans = new ArrayList();
-//		Iterator iterator = table.keySet().iterator();
-//
-//		SenderBean temp;
-//
-//		while (iterator.hasNext()) {
-//			Object key = iterator.next();
-//			temp = (SenderBean) table.get(key);
-//
-//			if (temp.isSend()) {
-//
-//				long timeToSend = temp.getTimeToSend();
-//				long timeNow = System.currentTimeMillis();
-//				if ((timeNow >= timeToSend)) {
-//					beans.add(temp);
-//				}
-//			}
-//		}
-//
-//		return beans;
-//	}
 	
 	private synchronized ArrayList findBeansWithMsgNo(ArrayList list, long msgNo) {
 		ArrayList beans = new ArrayList();

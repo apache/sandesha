@@ -99,7 +99,6 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 	// shutdown the module
 	public void shutdown(AxisConfiguration axisSystem) throws AxisFault {
-
 	}
 
 	// Removing data of uncontinuuable sequences so that the sandesha2 system
