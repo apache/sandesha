@@ -47,10 +47,8 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 import junit.framework.TestCase;
 
-public class SquenceOfferTest extends TestCase {
+public class SquenceOfferTest extends SandeshaTestCase {
 
-	private static Log log = LogFactory.getLog(SquenceOfferTest.class);
-	
 	SimpleHTTPServer httpServer = null;
 	
 	private final static String applicationNamespaceName = "http://tempuri.org/"; 
@@ -59,15 +57,32 @@ public class SquenceOfferTest extends TestCase {
 	private final static String Sequence = "Sequence";
 	private final static String echoStringResponse = "echoStringResponse";
 	private final static String EchoStringReturn = "EchoStringReturn";
+	int serverPort = DEFAULT_SERVER_TEST_PORT;
+	private Log log = LogFactory.getLog(getClass());
+	
+	public SquenceOfferTest () {
+		super ("SquenceOfferTest");
+	}
 	
 	public void setUp () throws AxisFault {
+		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-		
+
+
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+
+		String serverPortStr = getTestProperty("test.server.port");
+		if (serverPortStr!=null) {
 		
-		httpServer = new SimpleHTTPServer (configContext,8060);
+			try {
+				serverPort = Integer.parseInt(serverPortStr);
+			} catch (NumberFormatException e) {
+				log.error(e);
+			}
+		}
 		
+		httpServer = new SimpleHTTPServer (configContext,serverPort);
 		httpServer.start();
 		try {
 			Thread.sleep(300);
@@ -89,8 +104,8 @@ public class SquenceOfferTest extends TestCase {
 	
 	public void testSequenceOffer () throws AxisFault, InterruptedException {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";

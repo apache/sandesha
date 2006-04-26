@@ -28,13 +28,19 @@
 	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
 	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
    
-    <goal name="build:all" prereqs="clean,mar,repo:create,jar,client:jar,sample:create" />
+    <goal name="build:all" prereqs="mar,jar,client:jar,sample:create" />
     
     <goal name="all:jar" prereqs="mar,jar,client:jar" />
         
     <goal name="default">
+        <attainGoal name="clean"/>
         <attainGoal name="build:all"/>
     </goal>
+    
+    <!-- Befor running the tests the repo should be created-->
+    <preGoal name="test:test">
+       <attainGoal name="repo:create"/>
+    </preGoal>
     
     <goal name="mar" prereqs="java:compile">
     	<ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
@@ -49,6 +55,10 @@
         </copy>
   
         <ant:jar jarfile="${maven.build.dir}/${mar.name}" basedir="${build.temp.dir}/module" /> 
+        
+        <copy file="${maven.build.dir}/${mar.name}" 
+            tofile="${maven.repo.local}/${pom.artifactId}/mars/${mar.name}"/>
+        
         <delete dir="${build.temp.dir}" />
     </goal>
     
@@ -310,5 +320,9 @@
     	<ant:delete file="target/${dist.name}-src.tar"/>
     </goal>
 
+    <goal name="dist" prereqs="clean">
+        <attainGoal name="dist-bin" />
+        <attainGoal name="dist-src" />
+    </goal>
 
 </project>

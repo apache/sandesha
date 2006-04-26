@@ -18,28 +18,46 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
-public class AddressingVersionTest extends TestCase {
+public class AddressingVersionTest extends SandeshaTestCase {
 	
 
 	SimpleHTTPServer httpServer = null;
 	private final String applicationNamespaceName = "http://tempuri.org/"; 
 	private final String ping = "ping";
 	private final String Text = "Text";
+	int serverPort = DEFAULT_SERVER_TEST_PORT;
+	private Log log = LogFactory.getLog(getClass());
+	
+	public AddressingVersionTest () {
+		super ("AddressingVersionTest");
+	}
 	
 	public void setUp () throws AxisFault {
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+		String serverPortStr = getTestProperty("test.server.port");
+		if (serverPortStr!=null) {
 		
-		httpServer = new SimpleHTTPServer (configContext,8060);
+			try {
+				serverPort = Integer.parseInt(serverPortStr);
+			} catch (NumberFormatException e) {
+				log.error(e);
+			}
+		}
+		
+		httpServer = new SimpleHTTPServer (configContext,serverPort);
 		httpServer.start();
 		try {
 			Thread.sleep(300);
@@ -61,8 +79,8 @@ public class AddressingVersionTest extends TestCase {
 	
 	public void testAddressingFinal () throws AxisFault,InterruptedException  {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
@@ -102,8 +120,8 @@ public class AddressingVersionTest extends TestCase {
 	
 	public void testAddressingSubmission () throws AxisFault,InterruptedException  {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";

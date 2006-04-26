@@ -35,7 +35,10 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
@@ -44,24 +47,39 @@ import org.apache.sandesha2.client.SequenceReport;
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
-public class AddressablePingTest extends TestCase {
+public class AddressablePingTest extends SandeshaTestCase {
 
 	SimpleHTTPServer httpServer = null;
 	
 	private final String applicationNamespaceName = "http://tempuri.org/"; 
 	private final String ping = "ping";
 	private final String Text = "Text";
+	int serverPort = DEFAULT_SERVER_TEST_PORT;
+	private Log log = LogFactory.getLog(getClass());
+	
+	public AddressablePingTest () {
+		super ("AddressablePingTest");
+	}
 	
 	public void setUp () throws AxisFault {
+		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-		
+
+
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+
+		String serverPortStr = getTestProperty("test.server.port");
+		if (serverPortStr!=null) {
 		
-		configContext.setProperty("test","test");
+			try {
+				serverPort = Integer.parseInt(serverPortStr);
+			} catch (NumberFormatException e) {
+				log.error(e);
+			}
+		}
 		
-		httpServer = new SimpleHTTPServer (configContext,8060);
-		
+		httpServer = new SimpleHTTPServer (configContext,serverPort);
 		httpServer.start();
 		try {
 			Thread.sleep(300);
@@ -83,8 +101,8 @@ public class AddressablePingTest extends TestCase {
 	
 	public void testAsyncPing () throws AxisFault,IOException {
 		
-		String to = "http://127.0.0.1:8060/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:8060/axis2/services/RMSampleService";
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		String acksToEPR = "http://127.0.0.1:6060/axis2/services/__ANONYMOUS_SERVICE__";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";

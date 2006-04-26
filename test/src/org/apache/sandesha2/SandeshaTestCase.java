@@ -8,11 +8,15 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.util.Properties;
+import java.util.logging.Logger;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
  *
@@ -30,14 +34,32 @@ import java.io.*;
  */
 
 public class SandeshaTestCase extends TestCase {
-    String resourceDir = "test-resources";
-
+ 
+	String resourceDir = ""; //"test-resources";
+    Properties properties = null;
+    final String PROPERTY_FILE_NAME = "sandesha2-test.properties";
+    public final int DEFAULT_SERVER_TEST_PORT = 8060;
+    
+	private Log log = LogFactory.getLog(getClass());
+    
     public SandeshaTestCase(String name) {
         super(name);
         File baseDir = new File("");
         String testRource = baseDir.getAbsolutePath() + File.separator + "test-resources";
         resourceDir = new File(testRource).getPath();
+        
+        String propFileStr = resourceDir + File.separator + PROPERTY_FILE_NAME;
 
+        properties = new Properties ();
+        
+        try {
+			FileInputStream propertyFile = new FileInputStream (new File(propFileStr));
+			properties.load(propertyFile);
+		} catch (FileNotFoundException e) {
+			log.error(e);
+		} catch (IOException e) {
+			log.error(e);
+		}
     }
 
     protected InputStreamReader getResource(String relativePath, String resourceName) {
@@ -70,14 +92,12 @@ public class SandeshaTestCase extends TestCase {
     protected SOAPEnvelope getEmptySOAPEnvelope() {
         return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
     }
-
-
-    private MessageContext getMessageContext() throws Exception{
-        AxisConfiguration axisConfig = new AxisConfiguration ();
-        ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
-        MessageContext msgCtx = new MessageContext();
-        msgCtx.setConfigurationContext(configCtx);
-        return msgCtx;
+    
+    public String getTestProperty (String key) {
+    	if (properties!=null)
+    		return properties.getProperty(key);
+    	else 
+    		return null;
     }
 
 
