@@ -333,7 +333,7 @@ public class TerminateManager {
 			}
 		}
 		
-		SandeshaUtil.stopSenderForTheSequence(internalSequenceID,configContext);
+//		SandeshaUtil.stopSenderForTheSequence(internalSequenceID,configContext);
 	}
 	
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage,

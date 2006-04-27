@@ -212,7 +212,7 @@ public class InOrderInvoker extends Thread {
 								TerminateManager.cleanReceivingSideAfterInvocation(context, sequenceId);
 								
 								//this sequence has no more invocations
-								stopInvokerForTheSequence(sequenceId);
+//								stopInvokerForTheSequence(sequenceId);
 								
 								//exit from current iteration. (since an entry was removed)
 								invocationTransaction.commit();
@@ -233,5 +233,7 @@ public class InOrderInvoker extends Thread {
 				e1.printStackTrace();
 			}
 		}
+		
+		int i = 1;
 	}
 }

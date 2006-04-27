@@ -217,7 +217,7 @@ public class SandeshaUtil {
 		}
 	}
 
-	public static void stopSenderForTheSequence(String sequenceID, ConfigurationContext context) {
+	private static void stopSenderForTheSequence(String sequenceID, ConfigurationContext context) {
 		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
 		
 		if (sender!=null) {
@@ -246,11 +246,9 @@ public class SandeshaUtil {
 			context.setProperty(Sandesha2Constants.INVOKER,invoker);
 			invoker.runInvokerForTheSequence(context,sequenceID);
 		}
- 			
-		
 	}
 
-	public static void stopInvokerForTheSequence(String sequenceID, ConfigurationContext context) {
+	private static void stopInvokerForTheSequence(String sequenceID, ConfigurationContext context) {
 		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
 		if (invoker!=null)
 			invoker.stopInvokerForTheSequence(sequenceID);
@@ -502,7 +500,7 @@ public class SandeshaUtil {
 				newMessageContext.setServiceGroupContext(serviceGroupContext);
 			}
 
-			if (referenceMessage.getAxisService() != null) {
+			if (referenceMessage.getServiceContext() != null) {
 				newMessageContext.setAxisService(referenceMessage.getAxisService());
 				newMessageContext.setServiceContext(referenceMessage.getServiceContext());
 				newMessageContext.setServiceContextID(referenceMessage.getServiceContextID());
