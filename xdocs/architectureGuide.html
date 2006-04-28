@@ -5,7 +5,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
   <title>Sandesha2 Architecture guide</title>
-  <meta name="generator" content="amaya 9.2.2, see http://www.w3.org/Amaya/"
+  <meta name="generator" content="amaya 9.2.1, see http://www.w3.org/Amaya/"
   />
 </head>
 
@@ -31,25 +31,25 @@
 
 <h2>Introduction</h2>
 
-<p>Sandesha2 gives reliable messaging capabilities Axis2. From the point of
-view of the Axis2 engine, Sandesha2 is a module. When this module is engaged
-to a service, clients have the option of invoking it in a reliable manner. In
-the client side Sandesha2 module can be used to interact with existing
-reliable web services.</p>
+<p>Sandesha2 gives reliable messaging capabilities to Axis2. From the point
+of view of the Axis2 engine, Sandesha2 is a module. When this module is
+engaged to a service, clients have the option of invoking it in a reliable
+manner. In the client side Sandesha2 module can be used to interact with
+existing reliable Web services.</p>
 
-<p>According to the WS-ReliableMessaging specification which is implemented
-by Sandesha2, reliable communication happens between two endpoints. These
-endpoints are called the RM Source (RMS) and the RM Destination (RMD). Before
-communication, RMS and RMD perform a message exchange to create a
-relationship called a Sequence between them. A sequence is always identified
-by a unique Sequence Identifier.</p>
+<p>According to the Web service-ReliableMessaging (WS-RM) specification which
+is implemented by Sandesha2, reliable communication happens between two
+endpoints. These endpoints are called the RM Source (RMS) and the RM
+Destination (RMD). Before communication, RMS and RMD perform a message
+exchange to create a relationship called a Sequence between them. A sequence
+is always identified by a unique Sequence Identifier.</p>
 
 <p>Each message of a sequence is numbered, starting from one. In Sandesha2
-the maximum number of messages a sequence can support is 2 to the power 64
-(size of long). But practically this may be limited by the memory available
-for your system . The message number is used by the destination to support
-additional delivery assurances. This will be explained later in this
-tutorial.</p>
+the maximum number of messages a sequence can support is 2 <sup>64</sup>
+(size of <em>long</em> data type). Of course practically this may be limited
+by the memory available for your system . The message number is used by the
+destination to support additional delivery assurances. This will be explained
+later in this tutorial.</p>
 
 <p>The reliability is obtained basically using acknowledgements. RMS is
 required to send each message one or more times to the RMD. RMD sends back
@@ -60,17 +60,17 @@ retransmission of that message.</p>
 <p>When all messages of a certain sequence have been successfully transmitted
 to RMD, RMS sends a TerminateSequence message. If RMD receives this message
 it can free any resources allocated for this sequence. Otherwise resource
-deallocation will happen based on a timeout.</p>
+de-allocation will happen based on a timeout.</p>
 
 <p>Following diagram explains operation of the RMS and the RMD.</p>
 
 <p><img alt="WS-RM Model" src="images/RMModel.jpg" /></p>
-<a>Sandesha2 support two reliable messaging specifications. It fully support
-WS-ReliableMessaging February 2005 specification which was created by
-collaboration of several companies. Later this specification was submitted to
-OASIS and currently being standardized under the OASIS WS-RX technical
-committee. Sandesha2 support up to the revision CD 3 of the specification
-being developed under this technical committee.</a> <a
+<a>Sandesha2 supports two reliable messaging specifications. It fully
+supports WS-ReliableMessaging February 2005 specification which was created
+by collaborative efforts of several companies. Later this specification was
+submitted to OASIS and currently being standardized under the OASIS WS-RX
+technical committee. Sandesha2 supports up to the revision CD 3 of the
+specification being developed under this technical committee.</a> <a
 name="architecture"></a>
 
 <h2>Architecture</h2>
@@ -80,8 +80,8 @@ name="architecture"></a>
 <p></p>
 
 <p>Sandesha2 components are used in a completely symmetric manner, in the
-server side and the client side, as shown in the diagram above. So lets
-consider a single side in this discussion.</p>
+server side and client as shown in the diagram above. Lets just consider a
+single side for this discussion.</p>
 <a name="hnd"></a>
 
 <h2>Handlers</h2>
