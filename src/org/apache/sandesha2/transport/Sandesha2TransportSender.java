@@ -16,6 +16,14 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class Sandesha2TransportSender implements TransportSender  {
 
+	public void cleanup(MessageContext msgContext) throws AxisFault {
+
+	}
+
+	public void stop() {
+
+	}
+
 	public void invoke(MessageContext msgContext) throws AxisFault {
 		
 		//setting the correct transport sender.
