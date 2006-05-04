@@ -2,8 +2,12 @@ package org.apache.sandesha2.storage;
 
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.PropertyManager;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaTestCase;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.context.ConfigurationContext;
 
@@ -34,6 +38,12 @@ public class SequencePropertyBeanMgrTest extends SandeshaTestCase {
 
     public void setUp() throws Exception {
         AxisConfiguration axisConfig = new AxisConfiguration();
+        SandeshaPropertyBean propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+        Parameter parameter = new Parameter ();
+        parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+        parameter.setValue(propertyBean);
+        axisConfig.addParameter(parameter);
+        
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
         StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx);
         transaction = storageManager.getTransaction();

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.apache.sandesha2.util.PropertyManager;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
 
 /**
  * @author Chamikara Jayalath <chamikaramj@gmail.com>
@@ -30,10 +31,9 @@ import org.apache.sandesha2.util.PropertyManager;
 
 public class PorpertyLoaderTest extends TestCase {
 	
-	PropertyManager manager = null;
+	SandeshaPropertyBean propertyBean = null;
 	
 	public void setUp () {
-		manager = PropertyManager.getInstance();
 		String fileName = "./test-resources/sandesha2.properties";
 		File file= new File (fileName);
 		if (!file.exists()) {
@@ -42,7 +42,7 @@ public class PorpertyLoaderTest extends TestCase {
 		
 		try {
 			InputStream in = new FileInputStream (file);
-			manager.loadPropertiesFromPropertyFile(in);
+			propertyBean = PropertyManager.loadPropertiesFromPropertyFile(in);
 			in.close();
 		} catch (Exception e) {
 			fail (e.getMessage());
@@ -51,27 +51,27 @@ public class PorpertyLoaderTest extends TestCase {
 	}
 	
 	public void testRetransmissionInterval () {
-		long value = manager.getRetransmissionInterval();
+		long value = propertyBean.getRetransmissionInterval();
 		assertEquals(value,20000);
 	}
 	
 	public void testExponentialBackOff () {
-		boolean value = manager.isExponentialBackoff();
+		boolean value = propertyBean.isExponentialBackoff();
 		assertEquals(value,false);
 	}
 	
 	public void testAcknowledgementInterval () {
-		long value = manager.getAcknowledgementInterval();
+		long value = propertyBean.getAcknowledgementInaterval();
 		assertEquals(value,8000);
 	}
 	
 	public void testInactivityTImeout () {
-		long value = manager.getInactivityTimeout();
+		long value = propertyBean.getInactiveTimeoutInterval();
 		assertEquals(value,(60*60*3*1000));
 	}
 	
 	public void testStorageManager () {
-		String storageMgr = manager.getStorageManagerClass();
+		String storageMgr = propertyBean.getStorageManagerClass();
 		assertEquals(storageMgr,"org.apache.sandesha2.storage.inmemory.InMemoryStorageManager1");
 	}
 }
