@@ -94,44 +94,6 @@ public class FaultManager {
 		boolean refuseSequence = false;
 		String reason = "";
 
-//		SequenceOffer offer = createSequence.getSequenceOffer();
-//		if (offer != null) {
-//	
-//			String offeredSequenceId = offer.getIdentifer().getIdentifier();
-//			if (offeredSequenceId == null || "".equals(offeredSequenceId)) {
-//				refuseSequence = true;
-//				reason = "Offered sequenceId is invalid";
-//			}
-//
-//			if (!refuseSequence) {
-//				NextMsgBeanMgr nextMsgBeanMgr = storageManager
-//						.getNextMsgBeanMgr();
-//				Collection collection = nextMsgBeanMgr.retrieveAll();
-//				Iterator it = collection.iterator();
-//				while (it.hasNext()) {
-//
-//					NextMsgBean nextMsgBean = (NextMsgBean) it.next();
-//					String tempSequenceID = nextMsgBean.getSequenceID();
-//					
-//					if (tempSequenceID.equals(offeredSequenceId)) {
-//						refuseSequence = true;
-//						reason = "An incoming sequence with offered sequenceId has been already established";
-//					}
-//
-//				}
-//				
-//				SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager
-//						.getSequencePropretyBeanMgr();
-//				SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr
-//						.retrieve(offeredSequenceId,Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-//				if (sequencePropertyBean != null) {
-//					refuseSequence = true;
-//					reason = "A outgoing sequence with offered sequenceId has been already established";
-//				}
-//			}
-//			
-//		}
-
 		if (refuseSequence) {
 			FaultData data = new FaultData();
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED);

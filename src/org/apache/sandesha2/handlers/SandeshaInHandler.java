@@ -42,7 +42,7 @@ import org.apache.sandesha2.util.MsgInitializer;
 
 public class SandeshaInHandler extends AbstractHandler {
 
-	protected Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
+	private static final Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
 
 	public QName getName() {
 		return new QName(Sandesha2Constants.IN_HANDLER_NAME);

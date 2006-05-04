@@ -46,7 +46,7 @@ import org.apache.sandesha2.wsrm.Sequence;
 
 public class SandeshaOutHandler extends AbstractHandler {
 
-	protected Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
+	private static final Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 

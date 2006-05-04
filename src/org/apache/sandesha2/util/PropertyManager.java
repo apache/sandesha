@@ -46,7 +46,7 @@ import org.apache.ws.policy.Policy;
 
 public class PropertyManager {
 
-	Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(PropertyManager.class);
 
 	public static SandeshaPropertyBean loadPropertiesFromDefaultValues() throws SandeshaException{
 		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();

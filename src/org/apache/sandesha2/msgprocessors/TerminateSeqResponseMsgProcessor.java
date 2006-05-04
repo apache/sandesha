@@ -29,7 +29,7 @@ import org.apache.sandesha2.SandeshaException;
  */
 public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(TerminateSeqResponseMsgProcessor.class);
 	
 	public void processInMessage(RMMsgContext terminateResRMMsg)
 			throws SandeshaException { 

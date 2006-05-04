@@ -382,7 +382,6 @@ public class SequenceManager {
 		else
 			sequencePropertyBeanMgr.update(lastActivatedBean);
 		
-	//	lastActivatedTransaction.commit();
 	}
 	
 	

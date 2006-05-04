@@ -37,7 +37,7 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 
 public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
 	
-	Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(InMemoryInvokerBeanMgr.class);
 	private Hashtable table = null;
 
 	public InMemoryInvokerBeanMgr(AbstractContext context) {

@@ -38,8 +38,6 @@ public interface SequencePropertyBeanMgr extends RMBeanManager {
 
 	public boolean insert(SequencePropertyBean bean) throws SandeshaStorageException;
 
-	//public ResultSet find(String query);
-
 	public Collection find(SequencePropertyBean bean) throws SandeshaStorageException;
 	
 	public SequencePropertyBean findUnique (SequencePropertyBean bean) throws SandeshaException;

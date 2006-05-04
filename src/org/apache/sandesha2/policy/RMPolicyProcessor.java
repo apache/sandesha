@@ -25,7 +25,7 @@ import org.apache.ws.policy.util.PolicyReader;
 
 public class RMPolicyProcessor {
 
-	Log logger = LogFactory.getLog(this.getClass().getName());
+	private static final Log logger = LogFactory.getLog(RMPolicyProcessor.class);
 
 	PolicyReader prdr = null;
 

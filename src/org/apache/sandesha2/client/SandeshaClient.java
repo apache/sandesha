@@ -65,7 +65,7 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class SandeshaClient {
 	
-	private static Log log = LogFactory.getLog(SandeshaClient.class);
+	private static final Log log = LogFactory.getLog(SandeshaClient.class);
 	
 	/**
 	 * Users can get a SequenceReport of the sequence defined by the information given from the

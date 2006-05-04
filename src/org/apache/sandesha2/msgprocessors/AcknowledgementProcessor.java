@@ -53,7 +53,7 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 public class AcknowledgementProcessor implements MsgProcessor {
 
-	Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(AcknowledgementProcessor.class);
 	
 	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 

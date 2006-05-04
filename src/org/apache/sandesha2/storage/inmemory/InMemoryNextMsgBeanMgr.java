@@ -37,7 +37,7 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 
 public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 
-	Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(InMemoryNextMsgBeanMgr.class);
 	private Hashtable table = null;
 
 	public InMemoryNextMsgBeanMgr(AbstractContext context) {

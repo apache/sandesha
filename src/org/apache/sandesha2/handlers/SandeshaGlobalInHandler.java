@@ -57,7 +57,7 @@ import org.apache.sandesha2.wsrm.Sequence;
 
 public class SandeshaGlobalInHandler extends AbstractHandler {
 
-	protected Log log = LogFactory.getLog(SandeshaGlobalInHandler.class
+	private static final Log log = LogFactory.getLog(SandeshaGlobalInHandler.class
 			.getName());
 
 	public void invoke(MessageContext msgContext) throws AxisFault {

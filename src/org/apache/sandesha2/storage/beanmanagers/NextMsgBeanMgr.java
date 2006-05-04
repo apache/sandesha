@@ -38,8 +38,6 @@ public interface NextMsgBeanMgr extends RMBeanManager {
 
 	public boolean insert(NextMsgBean bean) throws SandeshaStorageException;
 
-	//public ResultSet find(String query);
-
 	public Collection find(NextMsgBean bean) throws SandeshaStorageException;
 
 	public boolean update(NextMsgBean bean) throws SandeshaStorageException;

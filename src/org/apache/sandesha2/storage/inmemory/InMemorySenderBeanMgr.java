@@ -37,7 +37,7 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 
 public class InMemorySenderBeanMgr implements SenderBeanMgr {
 	
-	Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(InMemorySenderBeanMgr.class);
 	private Hashtable table = null;
 
 	public InMemorySenderBeanMgr(AbstractContext context) {

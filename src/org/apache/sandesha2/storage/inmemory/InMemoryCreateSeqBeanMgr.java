@@ -37,7 +37,7 @@ import org.apache.sandesha2.storage.beans.CreateSeqBean;
 
 public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 
-	Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(InMemoryCreateSeqBeanMgr.class);
 	private Hashtable table = null;
 	
 

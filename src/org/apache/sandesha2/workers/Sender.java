@@ -62,7 +62,7 @@ public class Sender extends Thread {
 	private boolean stopSenderAfterWork = false;
 	private ArrayList workingSequences = new ArrayList();
 	private ConfigurationContext context = null;
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(Sender.class);
 	private ThreadPool threadPool = new ThreadPool ();
 
 	public synchronized void stopSenderForTheSequence(String sequenceID) {

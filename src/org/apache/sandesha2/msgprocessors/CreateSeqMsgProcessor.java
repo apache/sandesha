@@ -57,7 +57,7 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 
 public class CreateSeqMsgProcessor implements MsgProcessor {
 
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(CreateSeqMsgProcessor.class);
 	
 	public void processInMessage(RMMsgContext createSeqRMMsg)
 			throws SandeshaException {
@@ -84,8 +84,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			
 			return;
 		}
-		
-		
+
 		MessageContext outMessage = null;
 		outMessage = Utils.createOutMessageContext(createSeqMsg);  //createing a new response message.
 		

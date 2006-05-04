@@ -27,7 +27,7 @@ public class RMProcessorContext {
 	
 	private int action = NONE;
 	
-	private Log logger = LogFactory.getLog(this.getClass().getName());
+	private static final Log logger = LogFactory.getLog(RMProcessorContext.class);
 
 	public RMProcessorContext() {
 	}

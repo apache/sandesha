@@ -62,7 +62,7 @@ import org.apache.axiom.soap.SOAPFactory;
  */
 public class AckRequestedProcessor implements MsgProcessor {
 
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(AckRequestedProcessor.class);
 	
 	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		
@@ -207,21 +207,11 @@ public class AckRequestedProcessor implements MsgProcessor {
 			// messages related to an incoming
 			//sequence is the actual sequence ID
 
-//			RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
-//					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
-		
-//			long ackInterval = PropertyManager.getInstance()
-//					.getAcknowledgementInterval();
-	
 			//operation is the lowest level, Sandesha2 can be engaged.
 			SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
 			
 			
 			long ackInterval = propertyBean.getAcknowledgementInaterval();
-			
-			//			if (policyBean != null) {
-//				ackInterval = policyBean.getAcknowledgementInaterval();
-//			}
 			
 			//Ack will be sent as stand alone, only after the retransmitter
 			// interval.

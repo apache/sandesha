@@ -45,5 +45,4 @@ public interface CreateSeqBeanMgr extends RMBeanManager {
 	
 	public CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException;
 
-	//public ResultSet find(String query);
 }

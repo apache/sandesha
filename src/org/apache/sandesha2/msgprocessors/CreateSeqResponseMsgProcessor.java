@@ -60,7 +60,7 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 	
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(CreateSeqResponseMsgProcessor.class);
 	
 	public void processInMessage(RMMsgContext createSeqResponseRMMsgCtx)
 			throws SandeshaException {
@@ -85,7 +85,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		}
 
 		ackProcessTransaction.commit();
-		
 		
 		//Processing the create sequence response.
 		
@@ -220,7 +219,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		offerProcessTransaction.commit();
 		
-		
 		Transaction updateAppMessagesTransaction = storageManager.getTransaction();
 		
 		SenderBean target = new SenderBean();
@@ -256,7 +254,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				log.debug(message);
 				throw new SandeshaException(message);
 			}
-			
 			
 			Identifier identifier = new Identifier(factory,assumedRMNamespace);
 			identifier.setIndentifer(newOutSequenceId);

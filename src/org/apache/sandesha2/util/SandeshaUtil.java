@@ -226,9 +226,6 @@ public class SandeshaUtil {
 	}
 
 	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
-//		if (!invoker.isInvokerStarted()) {
-//			invoker.runInvokerForTheSequence(context, sequenceID);
-//		}
 		
 		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
 		if (invoker!=null)
@@ -423,28 +420,6 @@ public class SandeshaUtil {
 		boolean rmGlobalMsg = false;
 
 		String action = msgCtx.getWSAAction();
-//		SOAPEnvelope env = msgCtx.getEnvelope();
-//		SOAPHeader header = null;
-//		if (env != null)
-//			header = env.getHeader();
-//		else {
-//			log.error("SOAP envelope is null");
-//			return false;
-//		}
-
-		// TODO make this spec indipendent
-
-//		OMElement sequenceElem = null;
-//		if (header != null)
-//			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI,
-//					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-//
-//		if (sequenceElem == null)
-//			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_10.NS_URI,
-//					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-//
-//		if (sequenceElem != null)
-//			rmGlobalMsg = true;
 
 
 		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE.equals(action))
@@ -452,12 +427,6 @@ public class SandeshaUtil {
 
 		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
-
-//		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
-//			rmGlobalMsg = true;
-//
-//		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE.equals(action))
-//			rmGlobalMsg = true;
 
 		return rmGlobalMsg;
 	}

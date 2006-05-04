@@ -38,8 +38,6 @@ public interface SenderBeanMgr extends RMBeanManager {
 
 	public boolean insert(SenderBean bean) throws SandeshaStorageException;
 
-	//public ResultSet find(String query);
-
 	public Collection find(SenderBean bean) throws SandeshaStorageException;
 
 	public Collection find(String internalSequenceID) throws SandeshaStorageException;

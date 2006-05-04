@@ -56,7 +56,7 @@ public class InOrderInvoker extends Thread {
 	private boolean runInvoker = false;
 	private ArrayList workingSequences = new ArrayList();
 	private ConfigurationContext context = null;
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(InOrderInvoker.class);
 	
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
 		workingSequences.remove(sequenceID);
@@ -199,11 +199,9 @@ public class InOrderInvoker extends Thread {
 							throw new SandeshaException(e);
 						}
 
-						//Transaction postInvocationTransaction = storageManager.getTransaction();
 						//undating the next msg to invoke
 
 
-						//terminate (AfterInvocation)
 						if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 							Sequence sequence = (Sequence) rmMsg
 									.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);

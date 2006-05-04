@@ -38,7 +38,7 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 
 public class MessageRetransmissionAdjuster {
 
-	Log log = LogFactory.getLog( getClass());
+	private static final Log log = LogFactory.getLog(MessageRetransmissionAdjuster.class);
 	
 	public boolean adjustRetransmittion(
 			SenderBean retransmitterBean,ConfigurationContext configContext) throws SandeshaException {
@@ -107,7 +107,6 @@ public class MessageRetransmissionAdjuster {
 		}
 
 		long newTimeToSend = 0;
-		//newTimeToSend = lastSentTime + newInterval;
 		
 		long timeNow = System.currentTimeMillis();
 		newTimeToSend = timeNow + newInterval;

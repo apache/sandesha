@@ -65,7 +65,7 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class TerminateSeqMsgProcessor implements MsgProcessor {
 
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(TerminateSeqMsgProcessor.class);
 	
 	public void processInMessage(RMMsgContext terminateSeqRMMsg)
 			throws SandeshaException {
@@ -106,7 +106,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			} catch (AxisFault e) {
 				throw new SandeshaException ("Could not send the fault message",e);
 			}
-			
 			return;
 		}
 		
@@ -122,15 +121,11 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		sequencePropertyBeanMgr.insert(terminateReceivedBean);
 		
-		
 		//add the terminate sequence response if required.
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired (terminateSeqRMMsg.getRMSpecVersion()))
 			addTerminateSequenceResponse (terminateSeqRMMsg,sequenceId);
 		
-		
-		
 		setUpHighestMsgNumbers(context,storageManager,sequenceId,terminateSeqRMMsg);
-		
 		
 		terminateReceivedTransaction.commit();
 		
@@ -146,20 +141,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		terminateTransaction.commit(); 
 		
-//		SandeshaUtil.stopSenderForTheSequence(sequenceId,context);
-		
 		//removing an entry from the listener
 		String transport = terminateSeqMsg.getTransportIn().getName().getLocalPart();
 	
 		Transaction lastUpdatedTransaction = storageManager.getTransaction();
 		SequenceManager.updateLastActivatedTime(sequenceId,context);
 		
-		
-		
-		lastUpdatedTransaction.commit();
-		
-		
-		
+		lastUpdatedTransaction.commit();		
 		terminateSeqRMMsg.pause();
 	}
 
@@ -318,10 +306,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException ("Could not register an outInAxisOperation");
 		}
 		
-		
-		
-		
-
 		if (terminated != null
 				&& "true".equals(terminated)) {
 			String message = "Terminate was added previously.";

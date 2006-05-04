@@ -84,7 +84,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private boolean letInvoke = false;
 
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(ApplicationMsgProcessor.class );
 	
 	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 
@@ -175,11 +175,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 		
-		
 		//setting mustUnderstand to false.
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
-		
 		
 		//throwing a fault if the sequence is closed.
 		faultMessageContext = faultManager. checkForSequenceClosed(rmMsgCtx,sequenceId);
@@ -196,8 +194,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-			
-		
 		Transaction lastUpdatedTimeTransaction = storageManager.getTransaction();
 		
 		//updating the last activated time of the sequence.
@@ -392,18 +388,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmMsgCtx.addSOAPEnvelope();
 		}
 		
-		LastMessage lastMessage = (LastMessage) sequence.getLastMessage();
-
-//		if (lastMessage!=null) {
-//			long messageNumber = sequence.getMessageNumber().getMessageNumber();
-//			SequencePropertyBean lastMessageBean = new SequencePropertyBean ();
-//			lastMessageBean.setSequenceID(sequenceId);
-//			lastMessageBean.setName(Sandesha2Constants.SequenceProperties.LAST_MESSAGE);
-//			lastMessageBean.setValue(new Long(messageNumber).toString());
-//			
-//			seqPropMgr.insert(lastMessageBean);
-//		}
-		
 	 	RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(rmMsgCtx,sequenceId);
 		
 	 	AxisEngine engine = new AxisEngine (configCtx);
@@ -434,24 +418,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//retrieving the the storage manager
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
-		
-//		Parameter policyParam = msgContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-//		if (policyParam == null) {
-//			SandeshaPropertyBean propertyBean = PropertyManager.getInstance().getPropertyBean();
-//			Parameter parameter = new Parameter();
-//			parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-//			parameter.setValue(propertyBean);
-//
-//			// TODO this should be added to the AxisMessage
-//			try {
-//				if (msgContext.getAxisOperation() != null)
-//					msgContext.getAxisOperation().addParameter(parameter);
-//				else if (msgContext.getAxisService() != null)
-//					msgContext.getAxisService().addParameter(parameter);
-//			} catch (AxisFault e) {
-//				throw new SandeshaException (e);
-//			}
-//		}
 
 		Transaction outHandlerTransaction = storageManager.getTransaction();
 		boolean serverSide = msgContext.isServerSide();  
@@ -960,12 +926,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				lastMessage = true;
 				sequence.setLastMessage(new LastMessage(factory,rmNamespaceValue));
 
-//				// saving the last message no.
-//				SequencePropertyBean lastOutMsgBean = new SequencePropertyBean(
-//						internalSequenceId,
-//						Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE,
-//						new Long(messageNumber).toString());
-//				sequencePropertyMgr.insert(lastOutMsgBean);
 			}
 
 		} else {

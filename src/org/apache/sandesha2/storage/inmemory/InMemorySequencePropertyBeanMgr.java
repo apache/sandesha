@@ -37,7 +37,7 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr {
 	
-	Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(InMemorySequencePropertyBeanMgr.class);
 	private Hashtable table = null;
 
 	public InMemorySequencePropertyBeanMgr(AbstractContext context) {

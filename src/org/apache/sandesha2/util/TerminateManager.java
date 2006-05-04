@@ -190,11 +190,7 @@ public class TerminateManager {
 		seqPropMgr.insert(seqTerminatedBean);
 		
 		cleanSendingSideData(configContext,internalSequenceID,serverSide);
-		
-		
 	}
-	
-	
 	
 	private static void doUpdatesIfNeeded (String sequenceID, SequencePropertyBean propertyBean, SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
 		
@@ -229,9 +225,7 @@ public class TerminateManager {
 			//TODO amazingly this property does not seem to get deleted without following - in the hibernate impl 
 			//(even though the lines efter current methodcall do this).
 			seqPropMgr.delete (propertyBean.getSequenceID(),propertyBean.getName());
-		}
-		
-		
+		}	
 	}
 	
 	private static boolean isProportyDeletable (String name) {
@@ -268,7 +262,6 @@ public class TerminateManager {
 		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (internalSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT,Sandesha2Constants.VALUE_TRUE);
 		seqPropMgr.insert(seqTerminatedBean);
 		
-		
 		cleanSendingSideData(context,internalSequenceID,serverside);
 	}
 	
@@ -297,8 +290,6 @@ public class TerminateManager {
 		}
 		
 		//removing retransmitterMgr entries
-		//SenderBean findRetransmitterBean = new SenderBean ();
-		//findRetransmitterBean.setInternalSequenceID(internalSequenceId);
 		Collection collection = retransmitterBeanMgr.find(internalSequenceID);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
@@ -329,15 +320,12 @@ public class TerminateManager {
 				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 			}
 		}
-		
-//		SandeshaUtil.stopSenderForTheSequence(internalSequenceID,configContext);
 	}
 	
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage,
 			String outSequenceId, String internalSequenceId)
 			throws SandeshaException {
 
-		
 		ConfigurationContext configurationContext = referenceMessage.getMessageContext().getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil
 				.getSandeshaStorageManager(configurationContext);
@@ -354,7 +342,6 @@ public class TerminateManager {
 				&& "true".equals(terminated.getValue())) {
 			String message = "Terminate was added previously.";
 			log.info(message);
-//			return;
 		}
 
 		RMMsgContext terminateRMMessage = RMMsgCreator

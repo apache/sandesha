@@ -38,7 +38,7 @@ public class RMPolicyToken {
 
 	private ArrayList childTokens = null;
 
-	private Log logger = LogFactory.getLog(this.getClass().getName());
+	private static final Log logger = LogFactory.getLog(RMPolicyToken.class);
 	
 	public RMPolicyToken(String token, int type, String[] attribs,
 			Object h) throws SecurityException, NoSuchMethodException {
