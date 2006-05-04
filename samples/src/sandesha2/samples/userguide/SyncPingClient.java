@@ -80,9 +80,7 @@ public class SyncPingClient {
 		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 		
-		Options clientOptions = new Options ();
-		
-		
+		Options clientOptions = new Options ();	
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
