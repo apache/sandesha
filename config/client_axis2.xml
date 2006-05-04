@@ -5,12 +5,21 @@
     <parameter name="hotdeployment" locked="false">true</parameter>
     <parameter name="hotupdate" locked="false">false</parameter>
     <parameter name="enableMTOM" locked="false">false</parameter>
+
+    <!--During a fault, stacktrace can be sent with the fault message. The following flag will control -->
+    <!--that behaviour.-->
     <parameter name="sendStacktraceDetailsWithFaults" locked="false">true</parameter>
+
+    <!--If there aren't any information available to find out the fault reason, we set the message of the expcetion-->
+    <!--as the faultreason/Reason. But when a fault is thrown from a service or some where, it will be -->
+    <!--wrapped by different levels. Due to this the initial exception message can be lost. If this flag-->
+    <!--is set then, Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
+    <parameter name="DrillDownToRootCauseForFaultReason" locked="false">false</parameter>
 
     <!-- Uncomment this to enable REST support -->
     <!--    <parameter name="enableREST" locked="false">true</parameter>-->
 
-
+    <!--This is the user name and password of admin console-->
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
 
@@ -67,8 +76,8 @@
         <parameter name="Transfer-Encoding" locked="false">chunked</parameter>
     </transportSender>
 
-   <module ref="addressing" />
-   <module ref="sandesha2" />
+    <module ref="addressing" />
+    <module ref="sandesha2" />
 
     <!-- ================================================= -->
     <!-- Phases  -->
@@ -104,13 +113,13 @@
         </phase>
         <!--  System pre defined phases       -->
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
-        <phase name="OperationInPhase"/>
         <phase name="RMPhase"/>
+        <phase name="OperationInPhase"/>
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
         <phase name="OperationOutPhase"/>
+        <phase name="RMPhase"/>
         <!--system predefined phase-->
         <!--these phase will run irrespective of the service-->
         <phase name="PolicyDetermination"/>
@@ -144,13 +153,13 @@
             </handler>
         </phase>
         <!--      user can add his own phases to this area  -->
-        <phase name="OperationInFaultPhase"/>
         <phase name="RMPhase"/>
+        <phase name="OperationInFaultPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
         <phase name="OperationOutFaultPhase"/>
+        <phase name="RMPhase"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>
     </phaseOrder>

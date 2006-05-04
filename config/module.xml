@@ -6,8 +6,8 @@
     
     <inflow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
-            <order phase="PreDispatch" after="AddressingFinalInHandler" />
-            <!-- <order after="addressingSubmissionInHandler" phase="PreDispatch"/>  cant do this-->
+            <!-- Global In handler should come before instance dispatching -->
+            <order phase="Dispatch" before="InstanceDispatcher" />
         </handler> 
         <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">
             <order phase="RMPhase"/>
