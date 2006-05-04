@@ -52,6 +52,14 @@ public class RMElements {
 	private String rmNamespaceValue = null;
 	private String addressingNamespaceValue = null;
 	
+	public RMElements () {
+		
+	}
+	
+	public RMElements (String addressingNamespace) {
+		this.addressingNamespaceValue = addressingNamespace;
+	}
+	
 	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws SandeshaException {
 
 		if (envelope == null)
@@ -72,11 +80,12 @@ public class RMElements {
 			return;
 		}
 		
-		//finding out the addressing version.
-		addressingNamespaceValue = getAddressingNamespaceValue (envelope,action);
-		if (addressingNamespaceValue==null) {
-			return;
+		String addressingNamespaceTmp = getAddressingNamespaceValue (envelope,action);
+		if (addressingNamespaceTmp!=null) {
+			addressingNamespaceValue = addressingNamespaceTmp;
 		}
+		if (addressingNamespaceValue==null)
+			addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;   //Final is the default version for addressing
 	
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));

@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.util;
 
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.RMMsgContext;
@@ -75,7 +76,9 @@ public class MsgInitializer {
 	private static void populateRMMsgContext(MessageContext msgCtx,
 			RMMsgContext rmMsgContext) throws SandeshaException {
 
-		RMElements elements = new RMElements();
+		String addressingNamespace = (String) msgCtx.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+			
+		RMElements elements = new RMElements(addressingNamespace);
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope(), msgCtx.getWSAAction());
 
 		String rmNamespace = null;

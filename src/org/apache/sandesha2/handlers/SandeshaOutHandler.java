@@ -101,9 +101,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 	
 	}
 
-	
-
-
 	public QName getName() {
 		return new QName(Sandesha2Constants.OUT_HANDLER_NAME);
 	}
