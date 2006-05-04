@@ -13,6 +13,18 @@ public class PolicyEngineData {
 	private String inmemoryStorageManager = null;	
 	private String storageManager = null;
 	private int maximumRetransmissionCount; 
+	
+	private boolean acknowledgementIntervalSet = false;
+	private boolean exponentialBackoffSet = false;
+	private boolean inactivityTimeoutSet = false;
+	private boolean inactivityTimeoutMeassureSet = false;
+	private boolean invokeInOrderSet = false;
+	private boolean messageTypesToDropSet = false;
+	private boolean retransmissionIntervalSet = false;
+	private boolean permanentStorageMgrSet = false;
+	private boolean inmemoryStorageManagerSet = false;	
+	private boolean storageManagerSet = false;
+	private boolean maximumRetransmissionCountSet = false;
 
 	public boolean isExponentialBackoff() {
 		return exponentialBackoff;
@@ -20,6 +32,7 @@ public class PolicyEngineData {
 
 	public void setExponentialBackoff(boolean exponentialBackoff) {
 		this.exponentialBackoff = exponentialBackoff;
+		setExponentialBackoffSet(true);
 	}
 
 	public long getInactivityTimeout() {
@@ -28,6 +41,7 @@ public class PolicyEngineData {
 
 	public void setInactivityTimeout(long inactivityTimeout) {
 		this.inactivityTimeout = inactivityTimeout;
+		setInactivityTimeoutSet(true);
 	}
 
 	public String getInactivityTimeoutMeassure() {
@@ -36,6 +50,7 @@ public class PolicyEngineData {
 
 	public void setInactivityTimeoutMeassure(String inactivityTimeoutMeassure) {
 		this.inactivityTimeoutMeassure = inactivityTimeoutMeassure;
+		setInactivityTimeoutMeassureSet(true);
 	}
 
 	public boolean isInvokeInOrder() {
@@ -44,6 +59,7 @@ public class PolicyEngineData {
 
 	public void setInvokeInOrder(boolean invokeInOrder) {
 		this.invokeInOrder = invokeInOrder;
+		setInvokeInOrderSet (true);
 	}
 
 	public String getMessageTypesToDrop() {
@@ -52,6 +68,7 @@ public class PolicyEngineData {
 
 	public void setMessageTypesToDrop(String messageTypesToDrop) {
 		this.messageTypesToDrop = messageTypesToDrop;
+		setMessageTypesToDropSet(true);
 	}
 
 	public long getRetransmissionInterval() {
@@ -60,6 +77,7 @@ public class PolicyEngineData {
 
 	public void setRetransmissionInterval(long retransmissionInterval) {
 		this.retransmissionInterval = retransmissionInterval;
+		setRetransmissionIntervalSet(true);
 	}
 
 //	public String getPermanentStorageManager() {
@@ -77,22 +95,41 @@ public class PolicyEngineData {
 	public PolicyEngineData copy() {
 		PolicyEngineData ped = new PolicyEngineData();
 		
-		ped.setAcknowledgementInterval(this.getAcknowledgementInterval());
-		ped.setExponentialBackoff(this.isExponentialBackoff());
-		ped.setInactivityTimeout(this.getInactivityTimeout());
-		ped.setInactivityTimeoutMeassure(this.getInactivityTimeoutMeassure());
-		ped.setInvokeInOrder(this.isInvokeInOrder());
-		ped.setMessageTypesToDrop(this.getMessageTypesToDrop());
-		ped.setRetransmissionInterval(this.getRetransmissionInterval());
+		if (isAcknowledgementIntervalSet())
+			ped.setAcknowledgementInterval(this.getAcknowledgementInterval());
+		
+		if (isExponentialBackoffSet())
+			ped.setExponentialBackoff(this.isExponentialBackoff());
+		
+		if (isInactivityTimeoutSet())
+			ped.setInactivityTimeout(this.getInactivityTimeout());
+		
+		if (isInactivityTimeoutMeassureSet())
+			ped.setInactivityTimeoutMeassure(this.getInactivityTimeoutMeassure());
+		
+		if (isInvokeInOrderSet())
+		    ped.setInvokeInOrder(this.isInvokeInOrder());
+		
+		if (isMessageTypesToDropSet())
+			ped.setMessageTypesToDrop(this.getMessageTypesToDrop());
+		
+		if (isRetransmissionIntervalSet())
+			ped.setRetransmissionInterval(this.getRetransmissionInterval());
+		
 		//ped.setPermanentStorageManager(this.getPermanentStorageManager());
-		ped.setStorageManager(this.getStorageManager());
-		ped.setMaximumRetransmissionCount(this.getMaximumRetransmissionCount());
+		
+		if (isStorageManagerSet())
+			ped.setStorageManager(this.getStorageManager());
+		
+		if (isMaximumRetransmissionCountSet())
+			ped.setMaximumRetransmissionCount(this.getMaximumRetransmissionCount());
 		
 		return ped;
 	}
 
 	public void setAcknowledgementInterval(long acknowledgementInterval) {
 		this.acknowledgementInterval = acknowledgementInterval;
+		setAcknowledgementIntervalSet(true);
 	}
 	
 	public long getAcknowledgementInterval() {
@@ -101,6 +138,7 @@ public class PolicyEngineData {
 	
 	public void setStorageManager(String storageManager) {
 		this.storageManager = storageManager;
+		setStorageManagerSet(true);
 	}
 	
 	public String getStorageManager() {
@@ -113,5 +151,112 @@ public class PolicyEngineData {
 
 	public void setMaximumRetransmissionCount(int maximumRetransmissionCount) {
 		this.maximumRetransmissionCount = maximumRetransmissionCount;
+		setMaximumRetransmissionCountSet(true);
+	}
+
+	public boolean isAcknowledgementIntervalSet() {
+		return acknowledgementIntervalSet;
+	}
+
+	public boolean isExponentialBackoffSet() {
+		return exponentialBackoffSet;
+	}
+
+	public boolean isInactivityTimeoutMeassureSet() {
+		return inactivityTimeoutMeassureSet;
+	}
+
+	public boolean isInactivityTimeoutSet() {
+		return inactivityTimeoutSet;
+	}
+
+	public String getInmemoryStorageManager() {
+		return inmemoryStorageManager;
+	}
+
+	public boolean isInmemoryStorageManagerSet() {
+		return inmemoryStorageManagerSet;
+	}
+
+	public boolean isInvokeInOrderSet() {
+		return invokeInOrderSet;
+	}
+
+	public boolean isMaximumRetransmissionCountSet() {
+		return maximumRetransmissionCountSet;
+	}
+
+	public boolean isMessageTypesToDropSet() {
+		return messageTypesToDropSet;
+	}
+
+	public String getPermanentStorageMgr() {
+		return permanentStorageMgr;
+	}
+
+	public boolean isPermanentStorageMgrSet() {
+		return permanentStorageMgrSet;
+	}
+
+	public boolean isRetransmissionIntervalSet() {
+		return retransmissionIntervalSet;
+	}
+
+	public boolean isStorageManagerSet() {
+		return storageManagerSet;
+	}
+
+	private void setAcknowledgementIntervalSet(boolean acknowledgementIntervalSet) {
+		this.acknowledgementIntervalSet = acknowledgementIntervalSet;
+	}
+
+	private void setExponentialBackoffSet(boolean exponentialBackoffSet) {
+		this.exponentialBackoffSet = exponentialBackoffSet;
+	}
+
+	private void setInactivityTimeoutMeassureSet(boolean inactivityTimeoutMeassureSet) {
+		this.inactivityTimeoutMeassureSet = inactivityTimeoutMeassureSet;
+	}
+
+	private void setInactivityTimeoutSet(boolean inactivityTimeoutSet) {
+		this.inactivityTimeoutSet = inactivityTimeoutSet;
+	}
+
+	public void setInmemoryStorageManager(String inmemoryStorageManager) {
+		this.inmemoryStorageManager = inmemoryStorageManager;
+		setInmemoryStorageManagerSet(true);
+	}
+
+	private void setInmemoryStorageManagerSet(boolean inmemoryStorageManagerSet) {
+		this.inmemoryStorageManagerSet = inmemoryStorageManagerSet;
+	}
+
+	private void setInvokeInOrderSet(boolean invokeInOrderSet) {
+		this.invokeInOrderSet = invokeInOrderSet;
+	}
+
+	public void setMaximumRetransmissionCountSet(boolean maximumRetransmissionCountSet) {
+		this.maximumRetransmissionCountSet = maximumRetransmissionCountSet;
+	}
+
+	private void setMessageTypesToDropSet(boolean messageTypesToDropSet) {
+		this.messageTypesToDropSet = messageTypesToDropSet;
+	}
+
+	public void setPermanentStorageMgr(String permanentStorageMgr) {
+		this.permanentStorageMgr = permanentStorageMgr;
+		setPermanentStorageMgrSet(true);
+	}
+
+	private void setPermanentStorageMgrSet(boolean permanentStorageMgrSet) {
+		this.permanentStorageMgrSet = permanentStorageMgrSet;
+	}
+
+	private void setRetransmissionIntervalSet(boolean retransmissionIntervalSet) {
+		this.retransmissionIntervalSet = retransmissionIntervalSet;
+	}
+
+	private void setStorageManagerSet(boolean storageManagerSet) {
+		this.storageManagerSet = storageManagerSet;
 	}
 }

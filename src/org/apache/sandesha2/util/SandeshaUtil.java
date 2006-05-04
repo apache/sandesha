@@ -52,6 +52,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
+import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
@@ -343,7 +344,9 @@ public class SandeshaUtil {
 		if (storageManager != null)
 			return storageManager;
 
-		String srotageManagerClassStr = PropertyManager.getInstance().getStorageManagerClass();
+		//Currently module policies (default) are used to find the storage manager. These cant be overriden
+		//TODO change this so that different services can hv different storage managers.
+		String srotageManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getStorageManagerClass();
 
 		try {
 			Class c = Class.forName(srotageManagerClassStr);
@@ -488,6 +491,8 @@ public class SandeshaUtil {
 			
 			newMessageContext.setOptions(newOptions);
 			
+			boolean newServiceGroup = false;
+			boolean newService = false;
 			if (referenceMessage.getAxisServiceGroup() != null) {
 				newMessageContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
 				newMessageContext.setServiceGroupContext(referenceMessage.getServiceGroupContext());
@@ -498,6 +503,8 @@ public class SandeshaUtil {
 
 				newMessageContext.setAxisServiceGroup(axisServiceGroup);
 				newMessageContext.setServiceGroupContext(serviceGroupContext);
+				
+				newServiceGroup = true;
 			}
 
 			if (referenceMessage.getServiceContext() != null) {
@@ -505,25 +512,31 @@ public class SandeshaUtil {
 				newMessageContext.setServiceContext(referenceMessage.getServiceContext());
 				newMessageContext.setServiceContextID(referenceMessage.getServiceContextID());
 			} else {
-				AxisService axisService = new AxisService("AnonymousRMService"); // just
-																					// a
-																					// dummy
-																					// name.
-				ServiceContext serviceContext = new ServiceContext(axisService, newMessageContext
-						.getServiceGroupContext());
+				AxisService axisService = new AxisService("AnonymousRMService"); 
+				
+				AxisServiceGroup serviceGroup = newMessageContext.getAxisServiceGroup();
+				axisService.setParent(serviceGroup);
+				serviceGroup.addChild(axisService);
+				
+				ServiceContext serviceContext = new ServiceContext(axisService, newMessageContext.getServiceGroupContext());
 
 				newMessageContext.setAxisService(axisService);
 				newMessageContext.setServiceContext(serviceContext);
+				
+				newService = true;
 			}
 
 			newMessageContext.setAxisOperation(operation);
 
 			// setting parent child relationships
 			AxisService service = newMessageContext.getAxisService();
+			AxisServiceGroup serviceGroup = newMessageContext.getAxisServiceGroup();
+			
 			if (service != null && operation != null) {
 				service.addChild(operation);
 				operation.setParent(service);
 			}
+			
 
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);
@@ -542,8 +555,6 @@ public class SandeshaUtil {
 			// copying transport info.
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
-			newMessageContext.setProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN, referenceMessage
-					.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN));
 
 			newMessageContext.setProperty(Constants.OUT_TRANSPORT_INFO, referenceMessage
 					.getProperty(Constants.OUT_TRANSPORT_INFO));
@@ -562,6 +573,17 @@ public class SandeshaUtil {
 			throw new SandeshaException(e.getMessage());
 		}
 
+	}
+	
+
+	
+	public static SandeshaPropertyBean getDefaultPropertyBean (AxisConfiguration axisConfiguration) throws SandeshaException {
+		Parameter parameter = axisConfiguration.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+		if (parameter==null)
+			throw new SandeshaException ("Default Sandesha Property Bean is not available");
+		
+		SandeshaPropertyBean sandeshaPropertyBean = (SandeshaPropertyBean) parameter.getValue();
+		return sandeshaPropertyBean;
 	}
 
 	private static void copyNecessaryPropertiesFromRelatedContext(MessageContext fromMessage, MessageContext toMessage) throws SandeshaException {
@@ -585,6 +607,7 @@ public class SandeshaUtil {
 		toMessage.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,addressingVersion);
 	}
 
+	//TODO change this method.
 	public static ArrayList getArrayListFromString(String str) throws SandeshaException {
 
 		if (str == null || "".equals(str))
@@ -823,17 +846,12 @@ public class SandeshaUtil {
 
 		return true; // all message upto the highest have been acked.
 	}
-
-	public static SandeshaPropertyBean getPropretyBean(MessageContext messageCtx) throws SandeshaException {
-		Parameter parameter = messageCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-		parameter = null;
-		if (parameter == null) {
-			// TODO - get actual values from the module.
-			log.debug("Property bean not set. Using the default one");
-			SandeshaPropertyBean defaultPropertyBean = PropertyManager.getInstance().getPropertyBean();
-			return defaultPropertyBean;
-		}
-
+	
+	public static SandeshaPropertyBean getPropertyBean (AxisDescription axisDescription) throws SandeshaException {
+		Parameter parameter = axisDescription.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+		if (parameter==null)
+			throw new SandeshaException ("Property bean is not set. Cant find Sandesha2 configuration data");
+		
 		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
 		return propertyBean;
 	}
@@ -931,4 +949,5 @@ public class SandeshaUtil {
 		}
 	}
 
+	
 }

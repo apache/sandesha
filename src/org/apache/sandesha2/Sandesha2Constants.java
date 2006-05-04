@@ -163,10 +163,6 @@ public interface Sandesha2Constants {
 		
 	}
 
-	public interface WSP {
-		String RM_POLICY_BEAN = "RMPolicyBean";
-	}
-
 	public interface MessageTypes {
 		int UNKNOWN = 0;
 
@@ -471,7 +467,7 @@ public interface Sandesha2Constants {
 	
 	String INTERNAL_SEQUENCE_PREFIX = "Sandesha2InternalSequence";
 	
-	String SANDESHA2_POLICY_BEAN = "Sandesha2PolicyBean";
+	String SANDESHA_PROPERTY_BEAN = "Sandesha2PropertyBean";
 	
 	String LIST_SEPERATOR = ",";
 	

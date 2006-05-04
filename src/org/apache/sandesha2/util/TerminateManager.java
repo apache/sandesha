@@ -73,13 +73,10 @@ public class TerminateManager {
 	 * @throws SandeshaException
 	 */
 	public static void cleanReceivingSideOnTerminateMessage (ConfigurationContext configContext, String sequenceID) throws SandeshaException {
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
-
 		//clean senderMap
 		
-		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
-		//SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) msgContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-		
+		//Currently in-order invocation is done for default values.
+		boolean inOrderInvocation = SandeshaUtil.getDefaultPropertyBean(configContext.getAxisConfiguration()).isInOrder();		
 		
 		if(!inOrderInvocation) { 
 			//there is no invoking by Sandesha2. So clean invocations storages.

@@ -282,24 +282,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException("Error- The sequence does not exist");
 
 		InvokerBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
-
-	//	long nextMsgno = bean.getNextMsgNoToProcess();
-
-//		boolean inOrderInvocation = PropertyManager.getInstance()
-//				.isInOrderInvocation();
-//		
-		//TODO currently this is an module-level property. Make this service specific.
-//		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) msgCtx.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN).getValue();
-//		boolean inOrderInvocation = propertyBean.isInOrder();
-		boolean inOrderInvocation = PropertyManager.getInstance().isInOrderInvocation();
 		
+		//inorder invocation is still a global property
+		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(msgCtx.getConfigurationContext().getAxisConfiguration()).isInOrder();
 		
 		if (inOrderInvocation) {
 			
 			//pause the message
 			rmMsgCtx.pause();
-//			rmMsgCtx.getMessageContext().setPausedTrue(
-//					new QName(Sandesha2Constants.IN_HANDLER_NAME));
 			
 			SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr
 					.retrieve(
@@ -445,23 +435,23 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 		
-		Parameter policyParam = msgContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-		if (policyParam == null) {
-			SandeshaPropertyBean propertyBean = PropertyManager.getInstance().getPropertyBean();
-			Parameter parameter = new Parameter();
-			parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-			parameter.setValue(propertyBean);
-
-			// TODO this should be addede to the AxisMessage
-			try {
-				if (msgContext.getAxisOperation() != null)
-					msgContext.getAxisOperation().addParameter(parameter);
-				else if (msgContext.getAxisService() != null)
-					msgContext.getAxisService().addParameter(parameter);
-			} catch (AxisFault e) {
-				throw new SandeshaException (e);
-			}
-		}
+//		Parameter policyParam = msgContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+//		if (policyParam == null) {
+//			SandeshaPropertyBean propertyBean = PropertyManager.getInstance().getPropertyBean();
+//			Parameter parameter = new Parameter();
+//			parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+//			parameter.setValue(propertyBean);
+//
+//			// TODO this should be added to the AxisMessage
+//			try {
+//				if (msgContext.getAxisOperation() != null)
+//					msgContext.getAxisOperation().addParameter(parameter);
+//				else if (msgContext.getAxisService() != null)
+//					msgContext.getAxisService().addParameter(parameter);
+//			} catch (AxisFault e) {
+//				throw new SandeshaException (e);
+//			}
+//		}
 
 		Transaction outHandlerTransaction = storageManager.getTransaction();
 		boolean serverSide = msgContext.isServerSide();  

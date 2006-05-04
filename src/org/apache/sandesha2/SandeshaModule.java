@@ -29,7 +29,6 @@ import org.apache.axis2.modules.PolicyExtension;
 import org.apache.sandesha2.policy.RMPolicyExtension;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.RMPolicyManager;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -48,10 +47,16 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 		// continueUncompletedSequences (storageManager,configCtx);
 
-		// loading properties to property manager.
-		// PropertyManager.getInstance().loadPropertiesFromModuleDesc(module);
-
-		PropertyManager.getInstance().loadPropertiesFromModuleDescPolicy(module);
+		SandeshaPropertyBean constantPropertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+		SandeshaPropertyBean propertyBean = PropertyManager.loadPropertiesFromModuleDescPolicy(module,constantPropertyBean);
+		if (propertyBean==null) {
+			propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+		}
+		
+		Parameter parameter = new Parameter ();
+		parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+		parameter.setValue(propertyBean);
+		configContext.getAxisConfiguration().addParameter(parameter);;
 		
 		configContext.setProperty(Sandesha2Constants.STORAGE_MANAGER,null);   // this must be resetted by the module settings.
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext);
@@ -59,21 +64,19 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 	}
 
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
-
-		// TODO add notify logic.
-				
-		SandeshaPropertyBean defaultPropertyBean = PropertyManager.getInstance().getPropertyBean();
-		SandeshaPropertyBean axisDescPropertyBean = RMPolicyManager.loadPoliciesFromAxisDescription(axisDescription);
 		
-		Parameter parameter = new Parameter ();
-		parameter.setName(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-		if (axisDescPropertyBean==null) {
-			parameter.setValue(defaultPropertyBean);
-		}else {
+		SandeshaPropertyBean parentPropertyBean = SandeshaUtil.getPropertyBean(axisDescription);
+		if (parentPropertyBean==null) 
+			throw new AxisFault ("Default Property Bean is not set");
+		
+		SandeshaPropertyBean axisDescPropertyBean = PropertyManager.loadPropertiesFromAxisDescription(axisDescription,parentPropertyBean);
+		
+		if (axisDescPropertyBean!=null) {
+			Parameter parameter = new Parameter ();
+			parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 			parameter.setValue(axisDescPropertyBean);
+			axisDescription.addParameter(parameter);
 		}
-		
-		axisDescription.addParameter(parameter);
 	}
 
 	private void continueUncompletedSequences(StorageManager storageManager,

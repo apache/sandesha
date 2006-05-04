@@ -212,15 +212,9 @@ public class AckRequestedProcessor implements MsgProcessor {
 		
 //			long ackInterval = PropertyManager.getInstance()
 //					.getAcknowledgementInterval();
-			
-			Parameter param = msgContext.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-			
-			SandeshaPropertyBean propertyBean = null;
-			if (param!=null) {
-				propertyBean = (SandeshaPropertyBean)  param.getValue();
-			}else {
-				propertyBean = PropertyManager.getInstance().getPropertyBean();
-			}
+	
+			//operation is the lowest level, Sandesha2 can be engaged.
+			SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
 			
 			
 			long ackInterval = propertyBean.getAcknowledgementInaterval();

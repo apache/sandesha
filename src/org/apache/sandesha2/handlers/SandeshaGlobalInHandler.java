@@ -235,8 +235,13 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				//TODO do not drop, relationshipTypes other than reply
 				
 				ConfigurationContext configurationContext = rmMsgContext.getMessageContext().getConfigurationContext();
-				OperationContext opCtx = configurationContext.getOperationContext(value);
-				if (opCtx==null) {
+				OperationContext operationContextFromMap = configurationContext.getOperationContext(value);
+				OperationContext operationContext = rmMsgContext.getMessageContext().getOperationContext();
+				
+				
+				//reply messages should be dropped if it cannot be instance dispatched.
+				//I.e. both not having a op. ctx not and not having a op. ctx in the global list.
+				if (operationContext==null && operationContextFromMap==null) {
 					String message = "Dropping duplicate RM message";
 					log.debug(message);
 					drop=true;

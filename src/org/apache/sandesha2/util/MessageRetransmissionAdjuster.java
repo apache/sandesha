@@ -55,7 +55,8 @@ public class MessageRetransmissionAdjuster {
 		String internalSequenceID = retransmitterBean.getInternalSequenceID();
 		String sequenceID = retransmitterBean.getSequenceID();
 		
-		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropretyBean(messageContext);
+		//operation is the lowest level Sandesha2 could be attached.
+		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(messageContext.getAxisOperation());
 		
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);

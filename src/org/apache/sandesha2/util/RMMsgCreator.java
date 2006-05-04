@@ -72,21 +72,43 @@ public class RMMsgCreator {
 	private static void initializeCreation(MessageContext relatedMessage,
 			MessageContext newMessage) throws SandeshaException {
 
-		Parameter policyParam = relatedMessage
-				.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-
-		if (policyParam != null) {
-
-			try {
-				// TODO this should be added to the AxisMessage
-				if (newMessage.getAxisOperation() != null)
-					newMessage.getAxisOperation().addParameter(policyParam);
-				else if (newMessage.getAxisService() != null) {
-					newMessage.getAxisService().addParameter(policyParam);
-
-				}
-			} catch (AxisFault e) {
-				throw new SandeshaException(e.getMessage());
+//		Parameter policyParam = relatedMessage
+//				.getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
+//
+//		if (policyParam != null) {
+//
+//			try {
+//				// TODO this should be added to the AxisMessage
+//				if (newMessage.getAxisOperation() != null)
+//					newMessage.getAxisOperation().addParameter(policyParam);
+//				else if (newMessage.getAxisService() != null) {
+//					newMessage.getAxisService().addParameter(policyParam);
+//
+//				}
+//			} catch (AxisFault e) {
+//				throw new SandeshaException(e.getMessage());
+//			}
+//		}
+		
+		if (relatedMessage.getAxisService()!=null &&  newMessage.getAxisService()!=null && 
+				newMessage.getAxisService()!=relatedMessage.getAxisService()) {
+			
+			Parameter referencePolicyParam = relatedMessage.getAxisService().getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+			if (referencePolicyParam!=null) {
+				Parameter newPolicyParam = new Parameter ();
+				newPolicyParam.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+				newPolicyParam.setValue(newPolicyParam.getValue());
+			}
+		}
+		
+		if (relatedMessage.getAxisOperation()!=null &&  newMessage.getAxisOperation()!=null && 
+				newMessage.getAxisOperation()!=relatedMessage.getAxisOperation()) {
+			
+			Parameter referencePolicyParam = relatedMessage.getAxisOperation().getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+			if (referencePolicyParam!=null) {
+				Parameter newPolicyParam = new Parameter ();
+				newPolicyParam.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+				newPolicyParam.setValue(newPolicyParam.getValue());
 			}
 		}
 	}

@@ -309,7 +309,7 @@ public class AcknowledgementManager {
 					Sandesha2Constants.VALUE_FALSE);
 			
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			long ackInterval = SandeshaUtil.getPropretyBean(referenceMsg).getAcknowledgementInaterval();
+			long ackInterval = SandeshaUtil.getPropertyBean(referenceMsg.getAxisOperation()).getAcknowledgementInaterval();
 			
 			//Ack will be sent as stand alone, only after the retransmitter
 			// interval.

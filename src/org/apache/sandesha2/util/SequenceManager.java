@@ -403,31 +403,19 @@ public class SequenceManager {
 	}
 		
 	public static boolean hasSequenceTimedOut (String propertyKey, RMMsgContext rmMsgCtx) throws SandeshaException {
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getMessageContext().getConfigurationContext());
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
 		
-		RMPolicyBean policyBean = (RMPolicyBean) rmMsgCtx
-			.getProperty(Sandesha2Constants.WSP.RM_POLICY_BEAN);
-		if (policyBean == null) {
-			//loading default policies.
-			//policyBean = PropertyManager.getInstance().getRMPolicyBean();
-			Parameter parameter =  rmMsgCtx.getMessageContext().getParameter(Sandesha2Constants.SANDESHA2_POLICY_BEAN);
-			SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
-			policyBean = propertyBean.getPolicyBean();
-		}
+		//operation is the lowest level, Sandesha2 could be engaged.
+		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisOperation());
 		
-		if (policyBean.getInactiveTimeoutInterval()<=0)
+		if (propertyBean.getInactiveTimeoutInterval()<=0)
 			return false;
 
 		boolean sequenceTimedOut = false;
 		
-		//SequencePropertyBean lastActivatedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
-		//if (lastActivatedBean!=null) {
 		long lastActivatedTime = getLastActivatedTime(propertyKey,rmMsgCtx.getMessageContext().getConfigurationContext());
 		long timeNow = System.currentTimeMillis();
-		if (lastActivatedTime>0 && (lastActivatedTime+policyBean.getInactiveTimeoutInterval()<timeNow))
+		if (lastActivatedTime>0 && (lastActivatedTime+propertyBean.getInactiveTimeoutInterval()<timeNow))
 			sequenceTimedOut = true;
-		//}
 		
 		return sequenceTimedOut;
 	}

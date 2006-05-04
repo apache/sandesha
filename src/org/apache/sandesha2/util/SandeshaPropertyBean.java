@@ -58,7 +58,7 @@ public class SandeshaPropertyBean {
         policyBean.setRetransmissionInterval(retransmissionInterval);
     }
     
-    public void setInactiveTimeoutInterval(int value, String measure) {
+    public void setInactiveTimeoutInterval(long value, String measure) {
     	long timeOut = -1;
     	
         if (measure==null) {
@@ -76,6 +76,10 @@ public class SandeshaPropertyBean {
         
         policyBean.setInactiveTimeoutInterval(timeOut);
         
+    }
+    
+    public void setInactiveTimeoutInterval(long inactivityTimeoutInterval) {
+    	policyBean.setInactiveTimeoutInterval(inactivityTimeoutInterval);
     }
     
     public void setAcknowledgementInterval(long acknowledgementInterval) {

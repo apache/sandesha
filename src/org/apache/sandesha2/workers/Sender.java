@@ -152,9 +152,8 @@ public class Sender extends Thread {
 
 				RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
-				// skip sending if this message has been mentioned as a
-				// message not to send (within sandesha2.properties)
-				ArrayList msgsNotToSend = PropertyManager.getInstance().getMessagesNotToSend();
+				//operation is the lowest level Sandesha2 should be attached
+				ArrayList msgsNotToSend = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation()).getMsgTypesToDrop();
 
 				if (msgsNotToSend != null && msgsNotToSend.contains(new Integer(rmMsgCtx.getMessageType()))) {
 					continue;
@@ -328,6 +327,7 @@ public class Sender extends Thread {
 		} catch (Exception e) {
 			String message = "No valid Sync response...";
 			log.info(message);
+			
 			throw new SandeshaException(message, e);
 
 		}

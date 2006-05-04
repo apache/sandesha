@@ -46,24 +46,10 @@ import org.apache.ws.policy.Policy;
 
 public class PropertyManager {
 
-	public static PropertyManager instance = null;
-
-	private final byte PROPERTY_FILE = 1;
-
-	private final byte MODULE_DESC = 2;
-
-	private byte LOAD_SOURCE = MODULE_DESC;
-
 	Log log = LogFactory.getLog(getClass());
 
-	private SandeshaPropertyBean propertyBean = null;
-
-	private PropertyManager() {
-		propertyBean = new SandeshaPropertyBean();
-		loadlPropertiesFromDefaultValues();
-	}
-
-	public void loadlPropertiesFromDefaultValues() {
+	public static SandeshaPropertyBean loadPropertiesFromDefaultValues() throws SandeshaException{
+		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();
 		propertyBean.setAcknowledgementInterval(Sandesha2Constants.Properties.DefaultValues.AcknowledgementInterval);
 		propertyBean.setExponentialBackoff(Sandesha2Constants.Properties.DefaultValues.ExponentialBackoff);
 		propertyBean.setInactiveTimeoutInterval(
@@ -75,9 +61,15 @@ public class PropertyManager {
 		propertyBean.setRetransmissionInterval(Sandesha2Constants.Properties.DefaultValues.RetransmissionInterval);
 		propertyBean.setStorageManagerClass(Sandesha2Constants.Properties.DefaultValues.StorageManager);
 		propertyBean.setMaximumRetransmissionCount(Sandesha2Constants.Properties.DefaultValues.MaximumRetransmissionCount);
+		
+		String msgTypesToDrop = Sandesha2Constants.Properties.DefaultValues.MessageTypesToDrop;
+		loadMessageTypesToDrop(msgTypesToDrop,propertyBean);
+		
+		return propertyBean;
 	}
 
-	public void loadPropertiesFromPropertyFile(InputStream in) {
+	public static SandeshaPropertyBean loadPropertiesFromPropertyFile(InputStream in) throws SandeshaException{
+		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();
 		try {
 			if (in == null)
 				in = Thread.currentThread().getContextClassLoader()
@@ -90,83 +82,85 @@ public class PropertyManager {
 
 			String expoBackoffStr = properties
 					.getProperty(Sandesha2Constants.Properties.ExponentialBackoff);
-			loadExponentialBackoff(expoBackoffStr);
+			loadExponentialBackoff(expoBackoffStr,propertyBean);
 
 			String retransmissionIntStr = properties
 					.getProperty(Sandesha2Constants.Properties.RetransmissionInterval);
-			loadRetransmissionInterval(retransmissionIntStr);
+			loadRetransmissionInterval(retransmissionIntStr,propertyBean);
 
 			String acknowledgementIntStr = properties
 					.getProperty(Sandesha2Constants.Properties.AcknowledgementInterval);
-			loadAcknowledgementInterval(acknowledgementIntStr);
+			loadAcknowledgementInterval(acknowledgementIntStr,propertyBean);
 
 			String inactivityTimeoutStr = properties
 					.getProperty(Sandesha2Constants.Properties.InactivityTimeout);
 			String inactivityTimeoutMeasure = properties
 					.getProperty(Sandesha2Constants.Properties.InactivityTimeoutMeasure);
 			loadInactivityTimeout(inactivityTimeoutStr,
-					inactivityTimeoutMeasure);
+					inactivityTimeoutMeasure,propertyBean);
 
 			String storageMgrClassStr = properties
 					.getProperty(Sandesha2Constants.Properties.StorageManager);
-			loadStoragemanagerClass(storageMgrClassStr);
+			loadStoragemanagerClass(storageMgrClassStr,propertyBean);
 
 			String inOrderInvocation = properties
 					.getProperty(Sandesha2Constants.Properties.InOrderInvocation);
-			loadInOrderInvocation(inOrderInvocation);
+			loadInOrderInvocation(inOrderInvocation,propertyBean);
 
 			String messageTypesToDrop = properties
 					.getProperty(Sandesha2Constants.Properties.MessageTypesToDrop);
-			loadMessageTypesToDrop(messageTypesToDrop);
+			loadMessageTypesToDrop(messageTypesToDrop,propertyBean);
 
-			// loadPropertiesToBean (properties);
 		} catch (IOException e) {
-			log
-					.info("A valid property file was not found. Using default values...");
+			throw new SandeshaException (e);
 		}
+		
+		return propertyBean;
 	}
 
-	public void loadPropertiesFromModuleDesc (AxisModule desc) {
+	public static SandeshaPropertyBean loadPropertiesFromModuleDesc (AxisModule desc) throws SandeshaException{
+		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();
 		
 		Parameter expoBackoffParam = desc.getParameter (Sandesha2Constants.Properties.ExponentialBackoff);
 		String expoBackoffStr = (String) expoBackoffParam.getValue();
-		loadExponentialBackoff(expoBackoffStr);
+		loadExponentialBackoff(expoBackoffStr,propertyBean);
 		
 		Parameter retransmissionIntParam = desc.getParameter (Sandesha2Constants.Properties.RetransmissionInterval);
 		String retransmissionIntStr = (String) retransmissionIntParam.getValue();
-		loadRetransmissionInterval(retransmissionIntStr);
+		loadRetransmissionInterval(retransmissionIntStr,propertyBean);
 		
 		Parameter acknowledgementIntParam = desc.getParameter(Sandesha2Constants.Properties.AcknowledgementInterval);
 		String acknowledgementIntStr = (String) acknowledgementIntParam.getValue();
-		loadAcknowledgementInterval(acknowledgementIntStr);		
+		loadAcknowledgementInterval(acknowledgementIntStr,propertyBean);		
 		
 		Parameter inactivityTimeoutParam = desc.getParameter(Sandesha2Constants.Properties.InactivityTimeout);
 		String inactivityTimeoutStr = (String) inactivityTimeoutParam.getValue();
 		Parameter inactivityTimeoutMeasureParam = desc.getParameter(Sandesha2Constants.Properties.InactivityTimeoutMeasure);
 		String inactivityTimeoutMeasure = (String) inactivityTimeoutMeasureParam.getValue();
-		loadInactivityTimeout(inactivityTimeoutStr,inactivityTimeoutMeasure);
+		loadInactivityTimeout(inactivityTimeoutStr,inactivityTimeoutMeasure,propertyBean);
 		
 		Parameter storageMgrClassParam = desc.getParameter(Sandesha2Constants.Properties.StorageManager);
 		String storageMgrClassStr = (String) storageMgrClassParam.getValue();
-		loadStoragemanagerClass(storageMgrClassStr);
+		loadStoragemanagerClass(storageMgrClassStr,propertyBean);
 		
 		Parameter inOrderInvocationParam = desc.getParameter(Sandesha2Constants.Properties.InOrderInvocation);
 		String inOrderInvocation = (String) inOrderInvocationParam.getValue();
-		loadInOrderInvocation (inOrderInvocation);
+		loadInOrderInvocation (inOrderInvocation,propertyBean);
 		
 		Parameter messageTypesToDropParam = desc.getParameter(Sandesha2Constants.Properties.MessageTypesToDrop); 
 		String messageTypesToDrop = (String) messageTypesToDropParam.getValue();
-		loadMessageTypesToDrop (messageTypesToDrop);
+		loadMessageTypesToDrop (messageTypesToDrop,propertyBean);
+		
+		return propertyBean;
 	}
 	
-	public void loadPropertiesFromModuleDescPolicy(AxisModule desc)
-			throws SandeshaException {
+	public static SandeshaPropertyBean loadPropertiesFromModuleDescPolicy(AxisModule desc, SandeshaPropertyBean parentPropertyBean) throws SandeshaException {
+		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();
+		
 		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 
 		if (policy == null) {
-			throw new SandeshaException(
-					"No configuration policy is found in module.xml");
-
+			return null; //no pilicy is available in the module description
 		}
 
 		RMPolicyProcessor processor = new RMPolicyProcessor();
@@ -182,92 +176,120 @@ public class PropertyManager {
 		RMProcessorContext ctx = processor.getContext();
 		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
 
-		propertyBean.setAcknowledgementInterval(data
-				.getAcknowledgementInterval());
-		propertyBean.setExponentialBackoff(data.isExponentialBackoff());
-		propertyBean.setInactiveTimeoutInterval((int) data
-				.getInactivityTimeout(), data.getInactivityTimeoutMeassure());
-		propertyBean.setInOrder(data.isInvokeInOrder());
-
-		// CHECKME
-		ArrayList msgTypesToDrop = new ArrayList();
-		msgTypesToDrop.add(data.getMessageTypesToDrop());
-		propertyBean.setMsgTypesToDrop(msgTypesToDrop);
-
-		propertyBean
-				.setRetransmissionInterval(data.getRetransmissionInterval());
-
-		// CHECKME
-		propertyBean.setStorageManagerClass(data.getStorageManager());
-		propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
-	}
-
-	public void loadPropertiesFromAxisDescription(AxisDescription desc)
-			throws SandeshaException {
-		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
-
-		if (policy == null) {
-			return;
-		}
-
-		RMPolicyProcessor processor = new RMPolicyProcessor();
-
-		try {
-			processor.setup();
-		} catch (NoSuchMethodException e) {
-			throw new SandeshaException(e.getMessage());
-		}
-
-		processor.processPolicy(policy);
-
-		RMProcessorContext ctx = processor.getContext();
-		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
-
-		if (data.getAcknowledgementInterval() != -1) {
-
-			propertyBean.setAcknowledgementInterval(data
-					.getAcknowledgementInterval());
-		}
-		if (data.isExponentialBackoff()) {
+		
+		if (data.isAcknowledgementIntervalSet()) 
+			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
+		else
+			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInaterval());
+		
+		if (data.isExponentialBackoffSet())
 			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
-		}
-		if (data.getInactivityTimeout() != -1) {
-			propertyBean.setInactiveTimeoutInterval((int) data
-					.getInactivityTimeout(), data
-					.getInactivityTimeoutMeassure());
-		}
-
-		if (!data.isInvokeInOrder()) {
+		else
+			propertyBean.setExponentialBackoff(parentPropertyBean.isExponentialBackoff());
+		
+		//Inactivity timeout given in the policy will affect only if it gives both the measure and the value.
+		//Otherwise value will be taken from the parent.
+		if (data.isInactivityTimeoutSet() && data.isInactivityTimeoutMeassureSet() )
+			propertyBean.setInactiveTimeoutInterval(data.getInactivityTimeout(),data.getInactivityTimeoutMeassure());
+		else 
+			propertyBean.setInactiveTimeoutInterval(parentPropertyBean.getInactiveTimeoutInterval());
+		
+		if (data.isInvokeInOrderSet()) 
 			propertyBean.setInOrder(data.isInvokeInOrder());
-		}
-
-		// CHECKME
-		if (data.getMessageTypesToDrop() != null) {
-			ArrayList msgTypesToDrop = new ArrayList();
-			msgTypesToDrop.add(data.getMessageTypesToDrop());
-			propertyBean.setMsgTypesToDrop(msgTypesToDrop);
-
-		}
-		if (data.getRetransmissionInterval() != -1) {
-			propertyBean.setRetransmissionInterval(data
-					.getRetransmissionInterval());
-		}
-		if (data.getStorageManager() != null) {
-			// CHECKME
-			propertyBean.setStorageManagerClass(data
-					.getStorageManager());
-		}
+		else
+			propertyBean.setInOrder(parentPropertyBean.isInOrder());
+		
+		if (data.isMaximumRetransmissionCountSet())
+			propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
+		else 
+			propertyBean.setMaximumRetransmissionCount(parentPropertyBean.getMaximumRetransmissionCount());
+		
+		if (data.isRetransmissionIntervalSet()) 
+			propertyBean.setRetransmissionInterval(data.getRetransmissionInterval());
+		else
+			propertyBean.setRetransmissionInterval(parentPropertyBean.getRetransmissionInterval());
+			
+		if (data.isStorageManagerSet())
+			propertyBean.setStorageManagerClass(data.getStorageManager());
+		else
+			propertyBean.setStorageManagerClass(data.getStorageManager());
+		
+		if (data.isMessageTypesToDropSet()) 
+			loadMessageTypesToDrop(data.getMessageTypesToDrop(),propertyBean);
+		else
+			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
+		
+		return propertyBean;
 	}
 
-	public static PropertyManager getInstance() {
-		if (instance == null) {
-			instance = new PropertyManager();
+	public static SandeshaPropertyBean loadPropertiesFromAxisDescription(AxisDescription desc, SandeshaPropertyBean parentPropertyBean)
+			throws SandeshaException {
+		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean ();
+		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
+
+		if (policy == null) {
+			return null; //no policy is available in this axis description
 		}
 
-		return instance;
+		RMPolicyProcessor processor = new RMPolicyProcessor();
+
+		try {
+			processor.setup();
+		} catch (NoSuchMethodException e) {
+			throw new SandeshaException(e.getMessage());
+		}
+
+		processor.processPolicy(policy);
+
+		RMProcessorContext ctx = processor.getContext();
+		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
+
+		if (data.isAcknowledgementIntervalSet()) 
+			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
+		else
+			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInaterval());
+		
+		if (data.isExponentialBackoffSet())
+			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
+		else
+			propertyBean.setExponentialBackoff(parentPropertyBean.isExponentialBackoff());
+		
+		//Inactivity timeout given in the policy will affect only if it gives both the measure and the value.
+		//Otherwise value will be taken from the parent.
+		if (data.isInactivityTimeoutSet() && data.isInactivityTimeoutMeassureSet() )
+			propertyBean.setInactiveTimeoutInterval(data.getInactivityTimeout(),data.getInactivityTimeoutMeassure());
+		else 
+			propertyBean.setInactiveTimeoutInterval(parentPropertyBean.getInactiveTimeoutInterval());
+		
+		if (data.isInvokeInOrderSet()) 
+			propertyBean.setInOrder(data.isInvokeInOrder());
+		else
+			propertyBean.setInOrder(parentPropertyBean.isInOrder());
+		
+		if (data.isMaximumRetransmissionCountSet())
+			propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
+		else 
+			propertyBean.setMaximumRetransmissionCount(parentPropertyBean.getMaximumRetransmissionCount());
+		
+		if (data.isRetransmissionIntervalSet()) 
+			propertyBean.setRetransmissionInterval(data.getRetransmissionInterval());
+		else
+			propertyBean.setRetransmissionInterval(parentPropertyBean.getRetransmissionInterval());
+			
+		if (data.isStorageManagerSet())
+			propertyBean.setStorageManagerClass(data.getStorageManager());
+		else
+			propertyBean.setStorageManagerClass(data.getStorageManager());
+		
+		if (data.isMessageTypesToDropSet()) 
+			loadMessageTypesToDrop(data.getMessageTypesToDrop(),propertyBean);
+		else
+			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
+		
+		return propertyBean;
 	}
 
-	public void reloadFromPropertyFile(InputStream stream) {
+	public static void reloadFromPropertyFile(InputStream stream) throws SandeshaException {
 		loadPropertiesFromPropertyFile(stream);
 	}
 
@@ -276,24 +298,16 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private void loadExponentialBackoff(String expoBackoffStr) {
-
-		boolean loaded = false;
+	private static void loadExponentialBackoff(String expoBackoffStr, SandeshaPropertyBean propertyBean) throws SandeshaException {
 
 		if (expoBackoffStr != null) {
 			expoBackoffStr = expoBackoffStr.trim();
 			if (expoBackoffStr.equals("true")) {
 				propertyBean.setExponentialBackoff(true);
-				loaded = true;
 			} else if (expoBackoffStr.equals("false")) {
 				propertyBean.setExponentialBackoff(false);
-				loaded = true;
 			}
 		}
-
-		if (!loaded)
-			propertyBean
-					.setExponentialBackoff(Sandesha2Constants.Properties.DefaultValues.ExponentialBackoff);
 	}
 
 	/**
@@ -301,9 +315,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private void loadRetransmissionInterval(String retransmissionIntStr) {
-
-		boolean loaded = false;
+	private static void loadRetransmissionInterval(String retransmissionIntStr, SandeshaPropertyBean propertyBean) throws SandeshaException  {
 
 		if (retransmissionIntStr != null) {
 			try {
@@ -311,19 +323,13 @@ public class PropertyManager {
 				int retransmissionInterval = Integer
 						.parseInt(retransmissionIntStr);
 				if (retransmissionInterval > 0) {
-					propertyBean
-							.setRetransmissionInterval(retransmissionInterval);
-					loaded = true;
+					propertyBean.setRetransmissionInterval(retransmissionInterval);
 				}
 			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				loaded = false;
+				String message = "Cannot derive the Acknowledgement Interval from the passed string";
+				throw new SandeshaException (message,e);
 			}
 		}
-
-		if (!loaded)
-			propertyBean
-					.setRetransmissionInterval(Sandesha2Constants.Properties.DefaultValues.RetransmissionInterval);
 	}
 
 	/**
@@ -331,9 +337,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private void loadAcknowledgementInterval(String acknowledgementIntStr) {
-
-		boolean loaded = false;
+	private static void loadAcknowledgementInterval(String acknowledgementIntStr, SandeshaPropertyBean propertyBean) throws SandeshaException  {
 
 		if (acknowledgementIntStr != null) {
 			try {
@@ -342,17 +346,12 @@ public class PropertyManager {
 						.parseInt(acknowledgementIntStr);
 				if (acknowledgementInt > 0) {
 					propertyBean.setAcknowledgementInterval(acknowledgementInt);
-					loaded = true;
 				}
 			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				loaded = false;
+				String message = "Cannot derive the Acknowledgement Interval from the passed string";
+				throw new SandeshaException(message,e);
 			}
 		}
-
-		if (!loaded)
-			propertyBean
-					.setAcknowledgementInterval(Sandesha2Constants.Properties.DefaultValues.AcknowledgementInterval);
 	}
 
 	/**
@@ -360,10 +359,8 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private void loadInactivityTimeout(String inactivityTimeoutStr,
-			String inactivityTimeoutMeasure) {
-
-		boolean loaded = false;
+	private static void loadInactivityTimeout(String inactivityTimeoutStr,
+			String inactivityTimeoutMeasure, SandeshaPropertyBean propertyBean) throws SandeshaException  {
 
 		if (inactivityTimeoutStr != null && inactivityTimeoutMeasure != null) {
 			try {
@@ -375,19 +372,12 @@ public class PropertyManager {
 				if (inactivityTimeoutVal > 0) {
 					propertyBean.setInactiveTimeoutInterval(
 							inactivityTimeoutVal, inactivityTimeoutMeasure);
-					loaded = true;
 				}
 			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				loaded = false;
+				String message = "Cannot derive the Inactivity Timeout from the passed string";
+				throw new SandeshaException(message,e);
 			}
 		}
-
-		if (!loaded)
-			propertyBean
-					.setInactiveTimeoutInterval(
-							Sandesha2Constants.Properties.DefaultValues.InactivityTimeout,
-							Sandesha2Constants.Properties.DefaultValues.InactivityTimeoutMeasure);
 	}
 
 	/**
@@ -395,45 +385,26 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private void loadStoragemanagerClass(String storageMgrClassStr) {
-
-		boolean loaded = false;
-
+	private static void loadStoragemanagerClass(String storageMgrClassStr, SandeshaPropertyBean propertyBean) throws SandeshaException  {
 		if (storageMgrClassStr != null) {
 			storageMgrClassStr = storageMgrClassStr.trim();
 			propertyBean.setStorageManagerClass(storageMgrClassStr);
-			loaded = true;
 		}
-
-		if (!loaded)
-			propertyBean
-					.setStorageManagerClass(Sandesha2Constants.Properties.DefaultValues.StorageManager);
 	}
 
-	private void loadInOrderInvocation(String inOrderInvocation) {
-
-		boolean loaded = false;
+	private static void loadInOrderInvocation(String inOrderInvocation, SandeshaPropertyBean propertyBean) throws SandeshaException  {
 
 		if (inOrderInvocation != null) {
 			inOrderInvocation = inOrderInvocation.trim();
 			if (inOrderInvocation.equalsIgnoreCase("true")) {
 				propertyBean.setInOrder(true);
-				loaded = true;
 			} else if (inOrderInvocation.equalsIgnoreCase("false")) {
 				propertyBean.setInOrder(false);
-				loaded = true;
 			}
 		}
-
-		if (!loaded)
-			propertyBean
-					.setInOrder(Sandesha2Constants.Properties.DefaultValues.InvokeInOrder);
-
 	}
 
-	private void loadMessageTypesToDrop(String messageTypesToDrop) {
-
-		boolean loaded = false;
+	private static void loadMessageTypesToDrop(String messageTypesToDrop, SandeshaPropertyBean propertyBean) throws SandeshaException  {
 
 		try {
 			if (messageTypesToDrop != null
@@ -451,54 +422,12 @@ public class PropertyManager {
 					propertyBean.addMsgTypeToDrop(typeNo);
 				}
 			}
-
-		} catch (SandeshaException e) {
-			log.error(e.getMessage());
 		} catch (NumberFormatException e) {
 			String message = "Property '"
 					+ Sandesha2Constants.Properties.MessageTypesToDrop
 					+ "' contains an invalid value.";
-			log.error(message);
-			log.error(e.getMessage());
+			throw new SandeshaException (message,e);
 		}
-
-	}
-
-	public boolean isExponentialBackoff() {
-
-		return propertyBean.isExponentialBackoff();
-	}
-
-	public long getRetransmissionInterval() {
-		return propertyBean.getRetransmissionInterval();
-	}
-
-	public long getAcknowledgementInterval() {
-		return propertyBean.getAcknowledgementInaterval();
-	}
-
-	public long getInactivityTimeout() {
-		return propertyBean.getInactiveTimeoutInterval();
-	}
-
-	public String getStorageManagerClass() {
-		return propertyBean.getStorageManagerClass();
-	}
-
-	public RMPolicyBean getRMPolicyBean() {
-		return propertyBean.getPolicyBean();
-	}
-
-	public boolean isInOrderInvocation() {
-		return propertyBean.isInOrder();
-	}
-
-	public ArrayList getMessagesNotToSend() {
-		return propertyBean.getMsgTypesToDrop();
-	}
-
-	public SandeshaPropertyBean getPropertyBean() {
-		return propertyBean;
 	}
 
 }
