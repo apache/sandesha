@@ -27,6 +27,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportSender;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.threadpool.ThreadPool;
 import org.apache.commons.logging.Log;
@@ -233,7 +234,7 @@ public class Sender extends Thread {
 			} catch (AxisFault e) {
 				String message = "An Exception was throws in sending";
 				log.debug(message,e);
-
+				
 				// TODO : when this is the client side throw the exception to
 				// the client when necessary.
 
@@ -285,12 +286,12 @@ public class Sender extends Thread {
 			//copying required properties from op. context to the response msg ctx.
 			OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
 			if (requestMsgOpCtx!=null) {
-			     if (responseMessageContext.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE)!=null) {
+			     if (responseMessageContext.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE)==null) {
 			    	 responseMessageContext.setProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE,
 			    			 requestMsgOpCtx.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
 			     }
 			     
-			     if (responseMessageContext.getProperty(HTTPConstants.CHAR_SET_ENCODING)!=null) {
+			     if (responseMessageContext.getProperty(HTTPConstants.CHAR_SET_ENCODING)==null) {
 			    	 responseMessageContext.setProperty(HTTPConstants.CHAR_SET_ENCODING,
 			    			 requestMsgOpCtx.getProperty(HTTPConstants.CHAR_SET_ENCODING));
 			     }
@@ -303,9 +304,9 @@ public class Sender extends Thread {
 
 			SOAPEnvelope resenvelope = null;
 			try {
-				resenvelope = SandeshaUtil.createSOAPEnvelopeFromTransportStream (
-						responseMessageContext, msgCtx.getEnvelope().getNamespace()
-								.getName());
+				resenvelope = TransportUtils.createSOAPMessage(msgCtx, 
+						msgCtx.getEnvelope().getNamespace().getName());
+				
 			} catch (AxisFault e) {
 				// TODO Auto-generated catch block
 				log.debug("Valid SOAP envelope not found");
@@ -327,9 +328,7 @@ public class Sender extends Thread {
 		} catch (Exception e) {
 			String message = "No valid Sync response...";
 			log.info(message);
-			
 			throw new SandeshaException(message, e);
-
 		}
 	}
 	

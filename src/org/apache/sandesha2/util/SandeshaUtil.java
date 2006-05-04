@@ -16,7 +16,6 @@
  */
 package org.apache.sandesha2.util;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -25,22 +24,16 @@ import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXBuilder;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -59,8 +52,6 @@ import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Handler;
-import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -491,8 +482,6 @@ public class SandeshaUtil {
 			
 			newMessageContext.setOptions(newOptions);
 			
-			boolean newServiceGroup = false;
-			boolean newService = false;
 			if (referenceMessage.getAxisServiceGroup() != null) {
 				newMessageContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
 				newMessageContext.setServiceGroupContext(referenceMessage.getServiceGroupContext());
@@ -503,8 +492,6 @@ public class SandeshaUtil {
 
 				newMessageContext.setAxisServiceGroup(axisServiceGroup);
 				newMessageContext.setServiceGroupContext(serviceGroupContext);
-				
-				newServiceGroup = true;
 			}
 
 			if (referenceMessage.getServiceContext() != null) {
@@ -522,16 +509,13 @@ public class SandeshaUtil {
 
 				newMessageContext.setAxisService(axisService);
 				newMessageContext.setServiceContext(serviceContext);
-				
-				newService = true;
 			}
 
 			newMessageContext.setAxisOperation(operation);
 
 			// setting parent child relationships
 			AxisService service = newMessageContext.getAxisService();
-			AxisServiceGroup serviceGroup = newMessageContext.getAxisServiceGroup();
-			
+
 			if (service != null && operation != null) {
 				service.addChild(operation);
 				operation.setParent(service);
@@ -886,68 +870,4 @@ public class SandeshaUtil {
 		return sequenceID;
 	}
 
-	public static SOAPEnvelope createSOAPEnvelopeFromTransportStream(MessageContext msgContext, String soapNamespaceURI)
-			throws AxisFault {
-		InputStream inStream = (InputStream) msgContext.getProperty(MessageContext.TRANSPORT_IN);
-
-		msgContext.setProperty(MessageContext.TRANSPORT_IN, null);
-
-		// this inputstram is set by the TransportSender represents a two way
-		// transport or
-		// by a Transport Recevier
-		if (inStream == null) {
-			throw new AxisFault(Messages.getMessage("inputstreamNull"));
-		}
-
-		return createSOAPMessage(msgContext, inStream, soapNamespaceURI);
-	}
-
-	public static SOAPEnvelope createSOAPMessage(MessageContext msgContext, InputStream inStream,
-			String soapNamespaceURI) throws AxisFault {
-		try {
-			Object contentType;
-
-			StAXBuilder builder;
-			SOAPEnvelope envelope;
-			String charSetEnc = (String) msgContext.getProperty(MessageContext.CHARACTER_SET_ENCODING);
-
-			if (charSetEnc == null) {
-				charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
-			}
-			
-			contentType = msgContext.getProperty(MessageContext.CHARACTER_SET_ENCODING);
-			
-
-			if (contentType != null) {
-				msgContext.setDoingMTOM(true);
-				builder = TransportUtils.selectBuilderForMIME(msgContext, inStream, (String) contentType);
-				envelope = (SOAPEnvelope) builder.getDocumentElement();
-			} else if (msgContext.isDoingREST()) {
-				XMLStreamReader xmlreader = XMLInputFactory.newInstance().createXMLStreamReader(inStream, charSetEnc);
-				SOAPFactory soapFactory = new SOAP11Factory();
-
-				builder = new StAXOMBuilder(xmlreader);
-				builder.setOMBuilderFactory(soapFactory);
-				envelope = soapFactory.getDefaultEnvelope();
-				envelope.getBody().addChild(builder.getDocumentElement());
-
-				// We now have the message inside an envolope. However, this is
-				// only an OM; We need to build a SOAP model from it.
-
-				builder = new StAXSOAPModelBuilder(envelope.getXMLStreamReader(), soapNamespaceURI);
-				envelope = (SOAPEnvelope) builder.getDocumentElement();
-			} else {
-				XMLStreamReader xmlreader = XMLInputFactory.newInstance().createXMLStreamReader(inStream, charSetEnc);
-
-				builder = new StAXSOAPModelBuilder(xmlreader, soapNamespaceURI);
-				envelope = (SOAPEnvelope) builder.getDocumentElement();
-			}
-
-			return envelope;
-		} catch (Exception e) {
-			throw new AxisFault(e);
-		}
-	}
-
-	
 }
