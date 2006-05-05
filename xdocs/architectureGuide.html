@@ -101,7 +101,8 @@ single side for this discussion.</p>
 these handlers are added to a special user phase called 'RMPhase' of in and
 out flows. The other handler is added to the predispatch phase of the inFlow.
 These handlers and their functions are given below.</p>
-<!--COMMENT-why not have a diagram here with the two pipes with their pre-defined phases & user-defined phases-->
+<p><img alt="Storage" src="images/handlers.jpg" /></p>
+
 <a name="in"></a>
 
 <h4>SandeshaInHandler</h4>
@@ -173,8 +174,7 @@ responsible for processing a certain type of message. For example,
 CreateSequenceProcessor will process CreateSequence messages and
 AcknowledgementProcessor will process Acknowledgement messages. The message
 processor interface defines two methods for processing incoming messages and
-outgoing messages.</p>
-<!-- COMMENT- where are the methods-->
+outgoing messages. (namely 'processInMessage' and 'processOutMessage')</p>
 <a name="ioi"></a>
 
 <h3>InOrderInvoker</h3>
@@ -361,6 +361,5 @@ mentioned earlier, in mind.</p>
     part of resources (which is required by the InOrderInvoker) is removed
     after the invocation of the last message.</li>
 </ul>
-<!--COMMENT-add infor on Sandesha2 policies-->
 </body>
 </html>
