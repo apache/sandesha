@@ -142,9 +142,9 @@ public class SequenceManager {
 		
 		String specVersion = null;
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(messageRMNamespace)) {
-			specVersion = Sandesha2Constants.SPEC_VERSIONS.WSRM;
+			specVersion = Sandesha2Constants.SPEC_VERSIONS.v1_0;
 		}else if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(messageRMNamespace)) {
-			specVersion = Sandesha2Constants.SPEC_VERSIONS.WSRX;
+			specVersion = Sandesha2Constants.SPEC_VERSIONS.v1_1;
 		} else {
 			throw new SandeshaException ("Create sequence message does not has a valid RM namespace value. Cant decide the RM version");
 		}

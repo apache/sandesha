@@ -157,7 +157,7 @@ public class RMPolicyProcessor {
 				}
 				/*
 				 * We need to pick only the primitive assertions which contain a
-				 * WSRM policy assertion. For that we'll check the namespace of
+				 * v1_0 policy assertion. For that we'll check the namespace of
 				 * the primitive assertion
 				 */
 				PrimitiveAssertion pa = (PrimitiveAssertion) assertion;

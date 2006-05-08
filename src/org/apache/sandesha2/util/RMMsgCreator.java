@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
@@ -508,7 +509,8 @@ public class RMMsgCreator {
 		response.toOMElement(envelope.getBody());
 		outMessage.setWSAAction(SpecSpecificConstants.getCreateSequenceResponseAction(SandeshaUtil.getRMVersion(newSequenceID,configurationContext)));
 		outMessage.setSoapAction(SpecSpecificConstants.getCreateSequenceResponseSOAPAction(SandeshaUtil.getRMVersion(newSequenceID,configurationContext)));
-
+		outMessage.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,addressingNamespaceValue);
+		
 		String newMessageId = SandeshaUtil.getUUID();
 		outMessage.setMessageID(newMessageId);
 
@@ -520,7 +522,7 @@ public class RMMsgCreator {
 		try {
 			createSeqResponse = MsgInitializer.initializeMessage(outMessage);
 		} catch (SandeshaException ex) {
-			throw new AxisFault("Cant initialize the message");
+			throw new AxisFault("Cant initialize the message",ex);
 		}
 		
 		createSeqResponse.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE,response);

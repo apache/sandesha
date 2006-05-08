@@ -84,8 +84,15 @@ public class RMElements {
 		if (addressingNamespaceTmp!=null) {
 			addressingNamespaceValue = addressingNamespaceTmp;
 		}
-		if (addressingNamespaceValue==null)
-			addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;   //Final is the default version for addressing
+		
+		if (addressingNamespaceValue==null) {
+			String message = "Cant find the addressing version";
+			throw new SandeshaException (message);
+//			return;
+		}
+		
+//		if (addressingNamespaceValue==null)
+//			addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;   //Final is the default version for addressing
 	
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));

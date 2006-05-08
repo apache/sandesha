@@ -453,8 +453,15 @@ public class SandeshaUtil {
 			
 			if (referenceMessage.getAxisServiceGroup() != null) {
 				newMessageContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
-				newMessageContext.setServiceGroupContext(referenceMessage.getServiceGroupContext());
-				newMessageContext.setServiceGroupContextId(referenceMessage.getServiceGroupContextId());
+				
+				if (referenceMessage.getServiceGroupContext()!=null) {
+					newMessageContext.setServiceGroupContext(referenceMessage.getServiceGroupContext());
+					newMessageContext.setServiceGroupContextId(referenceMessage.getServiceGroupContextId());
+				} else {
+					ServiceGroupContext serviceGroupContext = new ServiceGroupContext (
+							configContext,referenceMessage.getAxisServiceGroup());
+					newMessageContext.setServiceGroupContext(serviceGroupContext);
+				}
 			} else {
 				AxisServiceGroup axisServiceGroup = new AxisServiceGroup(axisConfiguration);
 				ServiceGroupContext serviceGroupContext = new ServiceGroupContext(configContext, axisServiceGroup);
@@ -463,10 +470,16 @@ public class SandeshaUtil {
 				newMessageContext.setServiceGroupContext(serviceGroupContext);
 			}
 
-			if (referenceMessage.getServiceContext() != null) {
+			if (referenceMessage.getAxisService() != null) {
 				newMessageContext.setAxisService(referenceMessage.getAxisService());
-				newMessageContext.setServiceContext(referenceMessage.getServiceContext());
-				newMessageContext.setServiceContextID(referenceMessage.getServiceContextID());
+				
+				if (referenceMessage.getServiceContext()!=null) {
+					newMessageContext.setServiceContext(referenceMessage.getServiceContext());
+					newMessageContext.setServiceContextID(referenceMessage.getServiceContextID());
+				} else {
+					ServiceContext serviceContext = new ServiceContext (referenceMessage.getAxisService(),newMessageContext.getServiceGroupContext());
+					newMessageContext.setServiceContext(serviceContext);
+				}
 			} else {
 				AxisService axisService = new AxisService("AnonymousRMService"); 
 				

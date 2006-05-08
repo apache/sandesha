@@ -23,6 +23,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.Sandesha2Constants.WSA;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -76,8 +77,11 @@ public class MsgInitializer {
 	private static void populateRMMsgContext(MessageContext msgCtx,
 			RMMsgContext rmMsgContext) throws SandeshaException {
 
+		//if client side and the addressing version is not set. assuming the default addressing version
 		String addressingNamespace = (String) msgCtx.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-			
+		if (addressingNamespace==null && !msgCtx.isServerSide())
+			addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;
+		
 		RMElements elements = new RMElements(addressingNamespace);
 		elements.fromSOAPEnvelope(msgCtx.getEnvelope(), msgCtx.getWSAAction());
 

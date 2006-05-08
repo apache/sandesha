@@ -32,8 +32,8 @@ public interface Sandesha2Constants {
 
 	
 	public interface SPEC_VERSIONS {
-		String WSRM = "Spec_2005_02";
-		String WSRX = "Spec_2005_10";
+		String v1_0 = "Spec_2005_02";
+		String v1_1 = "Spec_2005_10";
 	}
 	
 	public interface SPEC_2005_02 {

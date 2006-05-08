@@ -257,6 +257,8 @@ public class AcknowledgementManager {
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequenceID,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,configurationContext);
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 		
+		ackMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,addressingNamespaceURI);
+		
 		if (anonymousURI.equals(acksTo.getAddress())) {
 
 //			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext()

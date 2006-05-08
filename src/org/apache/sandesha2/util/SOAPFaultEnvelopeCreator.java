@@ -29,9 +29,12 @@ import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
+import org.apache.axiom.soap.impl.dom.soap11.SOAP11Factory;
+import org.apache.axiom.soap.impl.dom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.databinding.ADBSOAPModelBuilder.Envelope;
 import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -153,7 +156,11 @@ public class SOAPFaultEnvelopeCreator {
 
 		faultReason.setText(data.getReason());
 		faultCode.getValue().setText(data.getSubcode());
-		faultReason.getSOAPFaultText("en").setText(data.getReason());
+		SOAPFaultText faultText = faultReason.getSOAPFaultText("en");
+		if (faultText==null)
+			faultText = factory.createSOAPFaultText();
+		
+		faultText.setText(data.getReason());
 
 		//SequenceFault header is added only for SOAP 1.1
 		if (isSequenceFault(data))
@@ -195,7 +202,13 @@ public class SOAPFaultEnvelopeCreator {
 
 		SOAPFaultReason faultReason = fault.getReason();
 		SOAPFaultText faultText = faultReason.getSOAPFaultText("en");
-		faultText.setText(data.getReason());
+		
+		if (faultText==null) {
+			faultText = factory.createSOAPFaultText();
+		}
+		
+		if (data!=null && data.getReason()!=null)
+			faultText.setText(data.getReason());
 
 		SOAPFaultDetail faultDetail = fault.getDetail();
 

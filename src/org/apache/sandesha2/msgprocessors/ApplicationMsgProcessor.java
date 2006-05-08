@@ -611,7 +611,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 		
 		if (specVersion==null) 
-			specVersion = SpecSpecificConstants.getDefaultSpecVersion();   //TODO change the default to WSRX.
+			specVersion = SpecSpecificConstants.getDefaultSpecVersion();   //TODO change the default to v1_1.
 		
 		if (messageNumber == 1) {
 			if (outSeqBean == null) { // out sequence will be set for the server side, in the case of an offer.

@@ -254,9 +254,9 @@ public class RMMsgContext {
 		this.rmNamespaceValue = rmNamespaceValue;
 		
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespaceValue)) { 
-			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.WSRM;
+			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.v1_0;
 		} else if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(rmNamespaceValue)) {
-			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.WSRX;
+			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.v1_1;
 		}
 	}
 	

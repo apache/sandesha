@@ -147,7 +147,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		rmMsgCtx.getMessageContext()
 				.setProperty(Sandesha2Constants.ACK_PROCSSED, "true");
 
-		//Removing relatesTo - Some WSRM endpoints tend to set relatesTo value for ack messages.
+		//Removing relatesTo - Some v1_0 endpoints tend to set relatesTo value for ack messages.
 		//Because of this dispatching may go wrong. So we set relatesTo value to null for ackMessages. 
 		//(this happens in the SandeshaGlobal handler). Do this only if this is a standalone ACK.
 //		if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.ACK)

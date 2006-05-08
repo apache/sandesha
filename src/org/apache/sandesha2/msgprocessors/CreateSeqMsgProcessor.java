@@ -20,6 +20,7 @@ package org.apache.sandesha2.msgprocessors;
 import java.util.Collection;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;

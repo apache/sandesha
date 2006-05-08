@@ -528,10 +528,10 @@ public class SandeshaClient {
 		
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 		if (rmSpecVersion==null)
-			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.WSRM;
+			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.v1_0;
 		
-		if (Sandesha2Constants.SPEC_VERSIONS.WSRM.equals(rmSpecVersion)) {
-			throw new SandeshaException ("Empty AckRequest messages can only be sent with the WSRX spec");
+		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmSpecVersion)) {
+			throw new SandeshaException ("Empty AckRequest messages can only be sent with the v1_1 spec");
 		}
 		
 		String internalSequenceID = getInternalSequenceID(to,sequenceKey);
