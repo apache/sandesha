@@ -18,6 +18,8 @@ package sandesha2.samples.userguide;
 
 import java.io.File;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -80,6 +82,7 @@ public class AsyncPingClient {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
+//		serviceClient.engageModule(new QName ("sandesha2"));
 		
 		Options clientOptions = new Options ();
 		
@@ -87,7 +90,7 @@ public class AsyncPingClient {
 		
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-//		clientOptions.setProperty(SandeshaClient.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+//		clientOptions.setProperty(SandeshaClient.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
 		clientOptions.setTo(new EndpointReference (toEPR));
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToEPR);
