@@ -45,8 +45,6 @@ import org.apache.sandesha2.client.SandeshaReport;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
 
-import junit.framework.TestCase;
-
 public class SquenceOfferTest extends SandeshaTestCase {
 
 	SimpleHTTPServer httpServer = null;

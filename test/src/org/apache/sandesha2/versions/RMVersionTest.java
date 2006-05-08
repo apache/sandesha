@@ -2,8 +2,6 @@ package org.apache.sandesha2.versions;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;

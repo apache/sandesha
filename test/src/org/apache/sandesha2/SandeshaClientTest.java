@@ -18,8 +18,6 @@ package org.apache.sandesha2;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;

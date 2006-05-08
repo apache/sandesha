@@ -1,22 +1,25 @@
 package org.apache.sandesha2;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Properties;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import junit.framework.TestCase;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axiom.soap.SOAPEnvelope;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import java.io.*;
-import java.util.Properties;
-import java.util.logging.Logger;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
  *
