@@ -43,7 +43,7 @@ import org.apache.sandesha2.client.SequenceReport;
 public class Scenario_1_3 {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/"; 
-	private static final String Ping = "Ping";
+	private static final String ping = "ping";
 	private static final String Text = "Text";
 	
 	private static String toIP = "127.0.0.1";
@@ -103,7 +103,7 @@ public class Scenario_1_3 {
 		
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 
@@ -135,17 +135,17 @@ public class Scenario_1_3 {
 
 		SandeshaClient.closeSequence(serviceClient);
 		
-//		clientOptions.setProperty(SandeshaClient.MESSAGE_NUMBER,new Long(4));
-//		serviceClient.fireAndForget(getPingOMBlock("ping4"));	
+		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(4));
+		serviceClient.fireAndForget(getPingOMBlock("ping4"));	
 
-//		SandeshaClient.terminateSequence(serviceClient);		
+		SandeshaClient.terminateSequence(serviceClient);		
 		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
 		
 		textElem.setText(text);

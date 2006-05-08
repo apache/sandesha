@@ -45,7 +45,7 @@ public class Scenario_1_4 {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/";
 
-	private static final String Ping = "Ping";
+	private static final String ping = "ping";
 
 	private static final String Text = "Text";
 
@@ -132,9 +132,9 @@ public class Scenario_1_4 {
 		// //uncomment this to send messages in SOAP 1.2
 
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,
-				Sandesha2Constants.SPEC_VERSIONS.WSRX); // uncomment this to
+				Sandesha2Constants.SPEC_VERSIONS.v1_1); // uncomment this to
 														// send the messages
-														// according to the WSRX
+														// according to the v1_1
 														// spec.
 
 		serviceClient.setOptions(clientOptions);
@@ -165,7 +165,7 @@ public class Scenario_1_4 {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,
 				"ns1");
-		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
 
 		textElem.setText(text);

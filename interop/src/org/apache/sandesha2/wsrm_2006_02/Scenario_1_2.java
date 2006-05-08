@@ -43,7 +43,7 @@ import org.apache.sandesha2.client.SequenceReport;
 public class Scenario_1_2 {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/"; 
-	private static final String Ping = "Ping";
+	private static final String ping = "ping";
 	private static final String Text = "Text";
 	
 	private static String toIP = "127.0.0.1";
@@ -105,7 +105,7 @@ public class Scenario_1_2 {
 
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
 		clientOptions.setAction("urn:wsrm:Ping");
 		
@@ -159,7 +159,7 @@ public class Scenario_1_2 {
 	private static OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(Ping, namespace);
+		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
 		
 		textElem.setText(text);

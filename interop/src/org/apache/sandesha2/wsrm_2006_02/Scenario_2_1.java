@@ -139,7 +139,7 @@ public class Scenario_2_1 {
 		
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);  //uncomment this to send the messages according to the WSRX spec.
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 
@@ -168,7 +168,7 @@ public class Scenario_2_1 {
     	SequenceReport sequenceReport = null;		
 		boolean complete = false;
 		while (!complete) {
-//			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
 				complete = true;
 			else {
