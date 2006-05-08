@@ -319,8 +319,8 @@
     		</ant:tarfileset>
     	</ant:tar>
     	 
-    	<gzip src="target/${dist.name}-src.tar" zipfile="${build.dist.dir}/${dist.name}-src.tar.gz"/>
-    	<ant:delete file="target/${dist.name}-src.tar"/>
+    	<gzip src="${build.dist.dir}/${dist.name}-src.tar" zipfile="${build.dist.dir}/${dist.name}-src.tar.gz"/>
+    	<ant:delete file="${build.dist.dir}/${dist.name}-src.tar"/>
     	
     </goal>
 
