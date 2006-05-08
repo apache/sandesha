@@ -20,7 +20,6 @@ package org.apache.sandesha2.handlers;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContextFactory;

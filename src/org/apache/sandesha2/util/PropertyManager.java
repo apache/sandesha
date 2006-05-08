@@ -25,14 +25,12 @@ import java.util.Properties;
 
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
-
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.policy.PolicyEngineData;
-import org.apache.sandesha2.policy.RMPolicyBean;
 import org.apache.sandesha2.policy.RMPolicyProcessor;
 import org.apache.sandesha2.policy.RMProcessorContext;
 import org.apache.ws.policy.Policy;
