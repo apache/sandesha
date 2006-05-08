@@ -76,7 +76,12 @@
         </copy>
   
         <ant:jar jarfile="${maven.build.dir}/${client.jar.name}" basedir="${build.temp.dir}/client" /> 
+        
+        <copy file="${maven.build.dir}/${client.jar.name}" 
+            tofile="${maven.repo.local}/${pom.artifactId}/jars/${client.jar.name}"/>
+            
         <delete dir="${build.temp.dir}" />
+        
     </goal>
 
 	<goal name="client:create" prereqs="mar">
@@ -187,7 +192,6 @@
         </ant:copy>
     </goal> 
 
-
     <!-- to transforme htmls to xdocs -->
     <preGoal name="xdoc:jelly-transform">
         <attainGoal name="html2xdoc"/>
@@ -274,7 +278,6 @@
             </ant:fileset>
         </ant:copy>
    
-    
         <mkdir dir="${build.dist.dir}" />
     
         <ant:zip file="${build.dist.dir}/${dist.name}-bin.zip" basedir="${dir.temp.dist.bin.parent}" />
@@ -318,6 +321,7 @@
     	 
     	<gzip src="target/${dist.name}-src.tar" zipfile="${build.dist.dir}/${dist.name}-src.tar.gz"/>
     	<ant:delete file="target/${dist.name}-src.tar"/>
+    	
     </goal>
 
     <goal name="dist" prereqs="clean">
