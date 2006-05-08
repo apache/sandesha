@@ -75,7 +75,7 @@
          
       <wsrm:AcknowledgementInterval>4000</wsrm:AcknowledgementInterval>
        
-      <wsrm:RetransmissionInterval>6000</wsrm:RetransmissionInterval>
+      <wsrm:RetransmissionInterval>8000</wsrm:RetransmissionInterval>
       
       <!-- '-1' conveys that there is no limit to the max. number of retransmissions.-->
       <wsrm:MaximumRetransmissionCount>10</wsrm:MaximumRetransmissionCount>
@@ -88,12 +88,6 @@
       
       <wsrm:InvokeInOrder>true</wsrm:InvokeInOrder>
       
-      <!--
-      <wsrm:TerminateOnTimeout>true</wsrm:TerminateOnTimeout>
-      
-      <wsrm:TerminateInterval>3000</wsrm:TerminateInterval>
-      -->
-      
       <!-- These will not be overriden by service level policies -->
       <wsrm:MessageTypesToDrop>none</wsrm:MessageTypesToDrop>  
                               
@@ -104,25 +98,7 @@
             org.apache.sandesha2.storage.inmemory.InMemoryStorageManager 
         </wsrm:StorageManager> 
        
-       <!-- 
-        <wsrm:StorageManager>
-            org.apache.sandesha2.storage.persistent.hibernate.PersistentStorageManager
-        </wsrm:StorageManager> 
-       -->
-       
       </wsrm:StorageManagers>
-
-<!--
-	<wsrm:DBConnectionID>jdbc:derby:SANDESHA2DB;create=true</wsrm:DBConnectionID> 
-
-	<wsrm:DBDriver>org.apache.derby.jdbc.EmbeddedDriver</wsrm:DBDriver> 
-
-	<wsrm:DBSQLDialect>org.hibernate.dialect.DerbyDialect</wsrm:DBSQLDialect> 
-
-	<wsrm:DBUsername></wsrm:DBUsername> 
-
-	<wsrm:DBPassword></wsrm:DBPassword>  
--->
    
 </wsp:Policy>
 
