@@ -135,27 +135,21 @@ public class SquenceOfferTest extends SandeshaTestCase {
 		
 		serviceClient.setOptions(clientOptions);
 		
-		TestCallback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		TestCallback callback2 = new TestCallback ("Callback 2");
-		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
-
+		TestCallback callback1 = new TestCallback ("Callback 1");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
         
-        Thread.sleep(12000);
+        Thread.sleep(22000);
 		
         //assertions for the out sequence.
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 		
 		assertTrue(callback1.isComplete());
-		assertTrue(callback2.isComplete());
 		assertEquals(callback1.getResult(),"echo1");
-		assertEquals(callback2.getResult(),"echo1echo2");
 		
 		//checking weather the incomingSequenceReport has the offered sequence ID
 		SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);

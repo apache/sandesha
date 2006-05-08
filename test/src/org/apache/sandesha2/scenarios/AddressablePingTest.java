@@ -126,21 +126,18 @@ public class AddressablePingTest extends SandeshaTestCase {
 		//serviceClient.
 		
 		serviceClient.setOptions(clientOptions);
-		
-		serviceClient.fireAndForget(getPingOMBlock("ping1"));
-		
+				
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		try {
-			Thread.sleep(7000);
+			Thread.sleep(30000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 		

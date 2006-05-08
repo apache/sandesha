@@ -119,7 +119,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		
 		SandeshaClient.createSequence(serviceClient,true);
 		
-		Thread.sleep(3000);
+		Thread.sleep(15000);
 		
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		

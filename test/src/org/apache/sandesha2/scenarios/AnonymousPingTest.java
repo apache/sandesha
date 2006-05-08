@@ -120,17 +120,13 @@ public class AnonymousPingTest extends SandeshaTestCase  {
 
 		serviceClient.setOptions(clientOptions);
 		
-		serviceClient.fireAndForget(getPingOMBlock("ping1"));
-		serviceClient.fireAndForget(getPingOMBlock("ping2"));
-		
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 	

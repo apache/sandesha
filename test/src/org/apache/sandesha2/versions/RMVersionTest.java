@@ -98,7 +98,7 @@ public class RMVersionTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		//setting the addressing version as submission
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRM);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);
 
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
@@ -108,7 +108,7 @@ public class RMVersionTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
@@ -139,7 +139,7 @@ public class RMVersionTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		//setting the RM version as OASIS.
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.WSRX);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		//serviceClient.
@@ -149,7 +149,7 @@ public class RMVersionTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
