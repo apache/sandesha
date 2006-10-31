@@ -25,11 +25,13 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.handlers.addressing.AddressingFinalInHandler;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -301,10 +303,13 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqMsgProcessor::processOutMessage");
 
+		boolean returnValue = false;
+		
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 
 		// adding the SANDESHA_LISTENER
@@ -316,9 +321,12 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				operationContext.setProperty(SandeshaClientConstants.SANDESHA_LISTENER, faultCallback);
 			}
 		}
+						
 		if (log.isDebugEnabled())
-			log.debug("Exit: CreateSeqMsgProcessor::processOutMessage " + Boolean.FALSE);
-		return false;
+			log.debug("Exit: CreateSeqMsgProcessor::processOutMessage " + returnValue);
+	
+		return returnValue;
+
 	}
 	
 }

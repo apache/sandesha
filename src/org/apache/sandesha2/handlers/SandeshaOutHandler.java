@@ -31,6 +31,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
@@ -153,8 +154,13 @@ public class SandeshaOutHandler extends AbstractHandler {
 					//the msg was paused
 					returnValue = InvocationResponse.SUSPEND;
 				}
+			} else if (messageType==Sandesha2Constants.MessageTypes.ACK_REQUEST) {
+				AckRequestedProcessor ackRequestedProcessor = new AckRequestedProcessor ();
+				if(ackRequestedProcessor.processOutgoingAckRequestMessage (rmMsgCtx)){
+					//the msg was paused
+					returnValue = InvocationResponse.SUSPEND;
+				}
 			}
-				
 
 		} catch (Exception e) {
 			// message should not be sent in a exception situation.

@@ -735,44 +735,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT, "true");
 				seqPropMgr.insert(responseCreateSeqAdded);
 
-				if (serviceContext != null)
-						acksToEPR.setAddress((String) msgContext.getProperty(SandeshaClientConstants.AcksTo));
-
-				if (msgContext.isServerSide()) {
-					// we do not set acksTo value to anonymous when the create
-					// sequence is send from the server.
-					MessageContext requestMessage;
-					try {
-						requestMessage = operationContext
-								.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
-					} catch (AxisFault e) {
-						throw new SandeshaException(e);
-					}
-
-					if (requestMessage == null) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.requestMsgNotPresent);
-						log.debug(message);
-						throw new SandeshaException(message);
-					}
-					acksToEPR = requestMessage.getTo();
-
-				} else {
-					if (acksToEPR.getAddress() == null){
-						EndpointReference replyToEPR = msgContext.getReplyTo();
-						
-						if(replyToEPR!=null && !replyToEPR.getAddress().equals("")){
-							//use the replyTo address as acksTo
-							if (log.isDebugEnabled())
-								log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + acksToEPR.getAddress());
-							
-							acksToEPR = replyToEPR;
-						}
-						else{
-							acksToEPR.setAddress(anonymousURI);
-						}
-					}
-				}
-
+				acksToEPR = resolveAcksToValue(rmMsgCtx,anonymousURI);
+				
 				if (acksToEPR.getAddress()!=null && !anonymousURI.equals(acksToEPR.getAddress()) && !serverSide) {
 					String transportIn = (String) configContext // TODO verify
 							.getProperty(MessageContext.TRANSPORT_IN);
@@ -876,17 +840,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	private void addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
+	public void addCreateSequenceMessage(RMMsgContext referenceRMMsg, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::addCreateSequenceMessage, " + internalSequenceId);
 
-		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
+		MessageContext applicationMsg = referenceRMMsg.getMessageContext();
 		ConfigurationContext configCtx = applicationMsg.getConfigurationContext();
 
 		// generating a new create sequeuce message.
-		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(applicationRMMsg, sequencePropertyKey, acksTo,
+		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(referenceRMMsg, sequencePropertyKey, acksTo,
 				storageManager);
 
 		createSeqRMMessage.setFlow(MessageContext.OUT_FLOW);
@@ -1233,5 +1197,51 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return true;
 		
 		return false;
+	}
+	
+	public EndpointReference resolveAcksToValue (RMMsgContext rmMsgCtx, String addressingAnonymousURI) throws SandeshaException {
+
+		EndpointReference acksToEPR = new EndpointReference (null);
+		MessageContext msgCtx = rmMsgCtx.getMessageContext();
+		OperationContext operationContext = msgCtx.getOperationContext();
+		
+		acksToEPR.setAddress((String) msgCtx.getProperty(SandeshaClientConstants.AcksTo));
+
+		if (msgCtx.isServerSide()) {
+			// we do not set acksTo value to anonymous when the create
+			// sequence is send from the server.
+			MessageContext requestMessage;
+			try {
+				requestMessage = operationContext
+						.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+			} catch (AxisFault e) {
+				throw new SandeshaException(e);
+			}
+
+			if (requestMessage == null) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.requestMsgNotPresent);
+				log.debug(message);
+				throw new SandeshaException(message);
+			}
+			acksToEPR = requestMessage.getTo();
+
+		} else {
+			if (acksToEPR.getAddress() == null){
+				EndpointReference replyToEPR = msgCtx.getReplyTo();
+				
+				if(replyToEPR!=null && !replyToEPR.getAddress().equals("")){
+					//use the replyTo address as acksTo
+					if (log.isDebugEnabled())
+						log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + acksToEPR.getAddress());
+					
+					acksToEPR = replyToEPR;
+				}
+				else{
+					acksToEPR.setAddress(addressingAnonymousURI);
+				}
+			}
+		}
+		
+		return acksToEPR;
 	}
 }

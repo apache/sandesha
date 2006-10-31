@@ -92,7 +92,10 @@ public class SandeshaMessageKeys {
 	public static final String couldNotSendClose="couldNotSendClose";
 	public static final String couldNotSendAck="couldNotSendAck";
 	public static final String couldNotSendTerminateResponse="couldNotSendTerminateResponse";
+	public static final String couldNotSendCloseResponse="couldNotSendCloseResponse";
+	public static final String couldNotSendAckRequestSeqNotFound="couldNotSendAckRequestSeqNotFound";
 	public static final String couldNotSendTerminateSeqNotFound="couldNotSendTerminateSeqNotFound";
+	public static final String couldNotSendCloseSeqNotFound="couldNotSendCloseSeqNotFound";
 	public static final String couldNotSendFault="couldNotSendFault";
 	public static final String cannotSendAckRequestNotActive="cannotSendAckRequestNotActive";
 	public static final String cannotSendAckRequestException="cannotSendAckRequestException";

@@ -80,8 +80,7 @@ public class AcksTo implements IOMRMElement {
 
 		if (epr == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotSetAcksTo,
-					null));
+					SandeshaMessageKeys.cannotSetAcksTo, "EndPointReference"));
 
 		OMFactory factory = element.getOMFactory();
 		

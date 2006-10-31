@@ -322,5 +322,9 @@ public class SpecSpecificConstants {
 		
 		return null;
 	}
+	
+	public static String getDefaultAddressingNamespace () {
+		return AddressingConstants.Final.WSA_NAMESPACE;
+	}
 
 }

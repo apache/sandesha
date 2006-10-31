@@ -474,7 +474,8 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage " + Boolean.FALSE);
-		return false;
+		
+		return true;
 	}
 
 }
