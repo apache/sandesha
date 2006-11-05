@@ -112,6 +112,9 @@ public class SandeshaInHandler extends AbstractHandler {
 				returnValue = InvocationResponse.SUSPEND;
 			}
 
+			
+			
+			
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisServiceIsNull);

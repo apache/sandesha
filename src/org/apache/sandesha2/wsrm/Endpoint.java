@@ -6,13 +6,12 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.EndpointReferenceHelper;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.util.EndpointReferenceSerializer;
 
 public class Endpoint implements IOMRMElement {
 
@@ -43,7 +42,7 @@ public class Endpoint implements IOMRMElement {
 
 	public Object fromOMElement(OMElement endpointElement) throws OMException,AxisFault {
 
-		epr = EndpointReferenceHelper.fromOM (endpointElement);
+		epr = EndpointReferenceSerializer.fromOM (endpointElement);
 		if (epr==null) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.invalidElementFoundWithinElement,
@@ -65,7 +64,7 @@ public class Endpoint implements IOMRMElement {
 		OMFactory factory = element.getOMFactory();
 		
 		QName endpoint = new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.ENDPOINT, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-	    OMElement endpointElement =	EndpointReferenceHelper.toOM (factory,epr, endpoint,addressingNamespaceValue);
+	    OMElement endpointElement =	EndpointReferenceSerializer.toOM (factory,epr, endpoint,addressingNamespaceValue);
 		
 		element.addChild(endpointElement);
 		return element;

@@ -272,6 +272,13 @@ public class SandeshaUtil {
 		if (pollingManager!=null) 
 			pollingManager.stopPolling ();
 	}
+	
+	public static PollingManager getPollingManager (ConfigurationContext configurationContext) {
+		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
+				Sandesha2Constants.POLLING_MANAGER);
+		
+		return pollingManager;
+	}
 
 	private static void stopInvokerForTheSequence(String sequenceID, ConfigurationContext context) {
 		Invoker invoker = (Invoker) context.getProperty(Sandesha2Constants.INVOKER);
@@ -1177,6 +1184,11 @@ public class SandeshaUtil {
 		
 		return newMsg;
 		
+	}
+	
+	public static void shedulePollingRequest (String sequenceId, ConfigurationContext configurationContext) throws SandeshaException { 
+		PollingManager pollingManager = getPollingManager(configurationContext);
+		pollingManager.shedulePollingRequest(sequenceId);
 	}
 	
 }

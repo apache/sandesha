@@ -43,6 +43,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -380,7 +381,8 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		// outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
 		outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation
 				.getRemainingPhasesInFlow());
-
+		outInAxisOp.setMessageReceiver(new RMMessageReceiver ());
+		
 		OperationContext opcontext = OperationContextFactory
 				.createOperationContext(
 						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);

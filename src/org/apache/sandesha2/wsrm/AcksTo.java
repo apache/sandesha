@@ -24,11 +24,11 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.EndpointReferenceHelper;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.util.EndpointReferenceSerializer;
 
 /**
  * Represents an AcksTo element which comes within
@@ -71,7 +71,7 @@ public class AcksTo implements IOMRMElement {
 					SandeshaMessageKeys.noAcksToPart,
 					element.toString()));
 
-		epr = EndpointReferenceHelper.fromOM (acksToPart);
+		epr = EndpointReferenceSerializer.fromOM (acksToPart);
 
 		return this;
 	}
@@ -85,7 +85,7 @@ public class AcksTo implements IOMRMElement {
 		OMFactory factory = element.getOMFactory();
 		
 		QName acksTo = new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.ACKS_TO, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-	    OMElement endpointElement =	EndpointReferenceHelper.toOM (factory,epr, acksTo ,addressingNamespaceValue);
+	    OMElement endpointElement =	EndpointReferenceSerializer.toOM (factory,epr, acksTo ,addressingNamespaceValue);
 		
 		element.addChild(endpointElement);
 		return element;
