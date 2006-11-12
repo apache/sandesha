@@ -964,51 +964,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
 
-		SequencePropertyBean toBean = sequencePropertyMgr.retrieve(internalSequenceId,
-				Sandesha2Constants.SequenceProperties.TO_EPR);
-		SequencePropertyBean replyToBean = sequencePropertyMgr.retrieve(internalSequenceId,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
 
 		// again - looks weird in the client side - but consistent
 		SequencePropertyBean outSequenceBean = sequencePropertyMgr.retrieve(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 
-		if (toBean == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		EndpointReference toEPR = new EndpointReference(toBean.getValue());
-
-		EndpointReference replyToEPR = null;
-		if (replyToBean != null) {
-			replyToEPR = new EndpointReference(replyToBean.getValue());
-		}
-
-		if (toEPR == null || toEPR.getAddress() == null || "".equals(toEPR.getAddress())) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		String newToStr = null;
-		if (msg.isServerSide()) {
-
-			MessageContext requestMsg = msg.getOperationContext().getMessageContext(
-					OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
-			if (requestMsg != null) {
-				newToStr = requestMsg.getReplyTo().getAddress();
-			}
-		}
-
-		if (newToStr != null)
-			rmMsg.setTo(new EndpointReference(newToStr));
-		else
-			rmMsg.setTo(toEPR);
-
-		if (replyToEPR != null)
-			rmMsg.setReplyTo(replyToEPR);
 
 		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId, storageManager);
 		if (rmVersion == null)
@@ -1234,7 +1194,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					if (log.isDebugEnabled())
 						log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + acksToEPR.getAddress());
 					
-					acksToEPR = replyToEPR;
+					
+					acksToEPR = SandeshaUtil.cloneEPR(replyToEPR);
 				}
 				else{
 					acksToEPR.setAddress(addressingAnonymousURI);

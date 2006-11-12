@@ -271,6 +271,7 @@ public class SequenceManager {
 			if (replyToEPR!=null)		
 				replyToBean = new SequencePropertyBean(sequencePropertyKey,
 						Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyToEPR.getAddress());
+			
 		
 			//TODO set AcksToBean.
 		}

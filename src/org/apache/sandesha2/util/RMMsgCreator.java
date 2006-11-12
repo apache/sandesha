@@ -37,17 +37,16 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgprocessors.CreateSeqResponseMsgProcessor;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -215,7 +214,6 @@ public class RMMsgCreator {
 		if (context == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet));
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		MessageContext createSeqmsgContext;
 		try {
 			// creating by copying common contents. (this will not set contexts
@@ -250,28 +248,7 @@ public class RMMsgCreator {
 		}
 
 		createSeqmsgContext.setAxisOperation(createSeqOperation);
-
-		createSeqmsgContext.setTo(applicationRMMsg.getTo());
-		
-//		createSeqmsgContext.setReplyTo(applicationRMMsg.getReplyTo());
-		//generating a new replyTo address for the CreateSequenceMessage.
-		//Otherwise there will be errors when the app msg is InOnly.
-		
-		QName axisOperationName = createSeqmsgContext.getAxisOperation().getName();
-		TransportInDescription transportIn = createSeqmsgContext.getTransportIn();
-		QName transportInName = null;
-		if (transportIn!=null)
-			transportInName = transportIn.getName();
-		
-		EndpointReference referenceTo = applicationMsgContext.getTo();
-		EndpointReference referenceReplyTo = applicationMsgContext.getReplyTo();
-		
-		
-		if (referenceReplyTo!=null) {
-			EndpointReference createSeqReplyTo = new EndpointReference (referenceReplyTo.getAddress());
-        	createSeqmsgContext.setReplyTo(createSeqReplyTo);
-		}
-        
+		        
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
@@ -293,8 +270,12 @@ public class RMMsgCreator {
 			EndpointReference offeredEndpoint = (EndpointReference) applicationMsgContext
 					.getProperty(SandeshaClientConstants.OFFERED_ENDPOINT);
 			
-			if (offeredEndpoint==null)
-				offeredEndpoint = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
+			if (offeredEndpoint==null) {
+				EndpointReference replyTo = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
+				
+				if (replyTo!=null)
+					offeredEndpoint = SandeshaUtil.cloneEPR(replyTo);
+			}
 			
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(rmNamespaceValue);
@@ -317,33 +298,37 @@ public class RMMsgCreator {
 			}
 		}
 
-		//TODO remove setting addressing values following two beans.
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
-		SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.TO_EPR);
-
-		if (toBean == null || toBean.getValue() == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null));
-
-		EndpointReference toEPR = new EndpointReference(toBean.getValue());
-		EndpointReference replyToEPR = null;
-
+		String to = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
+										Sandesha2Constants.SequenceProperties.TO_EPR,storageManager);
+		String replyTo = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
+				 Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,storageManager);
+		
+		if (replyTo==null) {
+			//using wsa:Anonymous as ReplyTo
+			
+			String addressingNamespace = applicationRMMsg.getAddressingNamespaceValue();
+			if (AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNamespace))
+				replyTo = AddressingConstants.Submission.WSA_ANONYMOUS_URL;
+			else
+				replyTo = AddressingConstants.Final.WSA_ANONYMOUS_URL;
+		}
+		
+		if (to==null) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toBeanNotSet);
+			throw new SandeshaException (message);
+		}
+		
+		//TODO store and retrieve a full EPR instead of just the address.
+		EndpointReference toEPR = new EndpointReference (to);
+		EndpointReference replyToEPR = new EndpointReference (replyTo);
+		
+		createSeqRMMsg.setTo(toEPR);
+		createSeqRMMsg.setReplyTo(replyToEPR);
+		
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
 
 		if (acksToEPR==null || acksToEPR.getAddress() == null || "".equals(acksToEPR.getAddress()))
 			acksToEPR = new EndpointReference(anonymousURI);
-
-		if (replyToBean != null && replyToBean.getValue() != null)
-			replyToEPR = new EndpointReference(replyToBean.getValue());
-
-		if (createSeqRMMsg.getTo() == null)
-			createSeqRMMsg.setTo(toEPR);
-
-		// ReplyTo will be set only if not null.
-		if (replyToEPR != null)
-			createSeqRMMsg.setReplyTo(replyToEPR);
-
 
 		AcksTo acksTo = new AcksTo(acksToEPR,rmNamespaceValue,addressingNamespaceValue);
 		createSequencePart.setAcksTo(acksTo);
@@ -508,8 +493,6 @@ public class RMMsgCreator {
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(createSeqMessage
 				.getSOAPEnvelope()));
 
-		ConfigurationContext configurationContext = createSeqMessage.getMessageContext().getConfigurationContext();
-
 		IOMRMElement messagePart = createSeqMessage.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		CreateSequence cs = (CreateSequence) messagePart;
 
@@ -536,7 +519,7 @@ public class RMMsgCreator {
 			if (outSequenceId != null && !"".equals(outSequenceId)) {
 
 				Accept accept = new Accept(rmNamespaceValue, addressingNamespaceValue);
-				EndpointReference acksToEPR = createSeqMessage.getTo();
+				EndpointReference acksToEPR = SandeshaUtil.cloneEPR(createSeqMessage.getTo());
 				
 				//putting the To EPR as the AcksTo for the response sequence.
 				AcksTo acksTo = new AcksTo(acksToEPR,rmNamespaceValue, addressingNamespaceValue);
@@ -620,7 +603,6 @@ public class RMMsgCreator {
 			StorageManager storageManager) throws AxisFault {
 
 		RMMsgContext closeSeqResponseRMMsg = new RMMsgContext(outMessage);
-		ConfigurationContext configurationContext = closeSeqRMMsg.getMessageContext().getConfigurationContext();
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(closeSeqRMMsg
 				.getSOAPEnvelope()));
@@ -671,8 +653,6 @@ public class RMMsgCreator {
 		factory = (SOAPFactory) envelope.getOMFactory();
 		
 		envelope = applicationMsg.getSOAPEnvelope();
-
-		ConfigurationContext ctx = applicationMsg.getMessageContext().getConfigurationContext();
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
