@@ -37,10 +37,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -185,10 +185,10 @@ public class Invoker extends Thread {
 				StorageManager storageManager = SandeshaUtil
 						.getSandeshaStorageManager(context, context
 								.getAxisConfiguration());
-				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 
-				InvokerBeanMgr storageMapMgr = storageManager
-						.getStorageMapBeanMgr();
+				InvokerBeanMgr invokerBeanMgr = storageManager
+						.getInvokerBeanMgr();
 
 				SequencePropertyBeanMgr sequencePropMgr = storageManager
 						.getSequencePropertyBeanMgr();
@@ -218,8 +218,8 @@ public class Invoker extends Thread {
 				String sequenceId = (String) allSequencesList.get(nextIndex++);
 				
 
-				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
-				if (nextMsgBean == null) {
+				RMDBean rmdBean = rmdBeanMgr.retrieve(sequenceId);
+				if (rmdBean == null) {
 					String message = "Next message not set correctly. Removing invalid entry.";
 					log.debug(message);
 	
@@ -231,7 +231,7 @@ public class Invoker extends Thread {
 					continue;
 				}
 
-				long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
+				long nextMsgno = rmdBean.getNextMsgNoToProcess();
 				if (nextMsgno <= 0) {
 					if (log.isDebugEnabled())
 						log.debug("Invalid Next Message Number " + nextMsgno);
@@ -241,7 +241,7 @@ public class Invoker extends Thread {
 					throw new SandeshaException(message);
 				}
 
-				Iterator stMapIt = storageMapMgr.find(
+				Iterator stMapIt = invokerBeanMgr.find(
 						new InvokerBean(null, nextMsgno, sequenceId))
 						.iterator();
 

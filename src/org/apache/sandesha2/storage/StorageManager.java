@@ -20,9 +20,9 @@ package org.apache.sandesha2.storage;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 
@@ -52,15 +52,15 @@ public abstract class StorageManager {
 
 	public abstract Transaction getTransaction();
 
-	public abstract CreateSeqBeanMgr getCreateSeqBeanMgr();
+	public abstract RMSBeanMgr getRMSBeanMgr();
 
-	public abstract NextMsgBeanMgr getNextMsgBeanMgr();
+	public abstract RMDBeanMgr getRMDBeanMgr();
 
-	public abstract SenderBeanMgr getRetransmitterBeanMgr();
+	public abstract SenderBeanMgr getSenderBeanMgr();
 
 	public abstract SequencePropertyBeanMgr getSequencePropertyBeanMgr();
 
-	public abstract InvokerBeanMgr getStorageMapBeanMgr();
+	public abstract InvokerBeanMgr getInvokerBeanMgr();
 	
 	public abstract void storeMessageContext (String storageKey,MessageContext msgContext) throws SandeshaStorageException;
 	

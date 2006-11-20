@@ -40,6 +40,7 @@ public class UsesSequenceSTR implements IOMRMPart {
 	
 	private SOAPFactory defaultFactory;
 	private String namespaceValue = null;
+	private boolean mustUnderstand = true;
 	
 	public UsesSequenceSTR(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -83,7 +84,7 @@ public class UsesSequenceSTR implements IOMRMPart {
 			throw new OMException("Cant set UsesSequenceSTR since the element is null");
 
 		// This header _must_ always be understood
-		sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
+		sequenceAcknowledgementHeaderBlock.setMustUnderstand(mustUnderstand);
 
 		SOAPHeader.addChild(sequenceAcknowledgementHeaderBlock);
 
@@ -110,4 +111,12 @@ public class UsesSequenceSTR implements IOMRMPart {
 		return false;
 	}
 
+	public boolean isMustUnderstand() {
+		return mustUnderstand;
+	}
+
+	public void setMustUnderstand(boolean mustUnderstand) {
+		this.mustUnderstand = mustUnderstand;
+	}
+	
 }

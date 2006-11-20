@@ -76,7 +76,7 @@ public class AcknowledgementManager {
 
 		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
 
-		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
 		SenderBean findBean = new SenderBean();
 
@@ -86,7 +86,7 @@ public class AcknowledgementManager {
 
 		String carrietTo = rmMessageContext.getTo().getAddress();
 
-		Collection collection = retransmitterBeanMgr.find(findBean);
+		Collection collection = senderBeanMgr.find(findBean);
 
 		Iterator it = collection.iterator();
 
@@ -110,7 +110,7 @@ public class AcknowledgementManager {
 				if (log.isDebugEnabled()) log.debug("Adding ack headers");
 
 				// deleting the ack entry.
-				retransmitterBeanMgr.delete(ackBean.getMessageID());
+				senderBeanMgr.delete(ackBean.getMessageID());
 
 				// Adding the ack(s) to the application message
 				boolean acks = false;

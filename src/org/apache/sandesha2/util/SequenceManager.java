@@ -34,9 +34,9 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
@@ -115,8 +115,8 @@ public class SequenceManager {
 		if (toBean != null)
 			seqPropMgr.insert(toBean);
 
-		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
-		nextMsgMgr.insert(new NextMsgBean(sequenceId, 1)); // 1 will be the
+		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+		rmdBeanMgr.insert(new RMDBean(sequenceId, 1)); // 1 will be the
 															// next
 
 		// message to invoke. This will apply for only in-order invocations.

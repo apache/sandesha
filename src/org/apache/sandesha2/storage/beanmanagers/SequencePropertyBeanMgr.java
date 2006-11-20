@@ -42,14 +42,5 @@ public interface SequencePropertyBeanMgr extends RMBeanManager {
 
 	public boolean update(SequencePropertyBean bean) throws SandeshaStorageException;
 	
-	/**
-	 * @deprecated
-	 * 
-	 * @param bean
-	 * @return
-	 * @throws SandeshaStorageException
-	 */
-	public boolean updateOrInsert(SequencePropertyBean bean) throws SandeshaStorageException;
-
 	public Collection retrieveAll ();
 }

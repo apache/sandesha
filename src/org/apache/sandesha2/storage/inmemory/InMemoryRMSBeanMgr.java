@@ -31,16 +31,16 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beans.RMSBean;
 
-public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
+public class InMemoryRMSBeanMgr implements RMSBeanMgr {
 
-	private static final Log log = LogFactory.getLog(InMemoryCreateSeqBeanMgr.class);
+	private static final Log log = LogFactory.getLog(InMemoryRMSBeanMgr.class);
 	private Hashtable table = null;
 	
 
-	public InMemoryCreateSeqBeanMgr(AbstractContext context) {
+	public InMemoryRMSBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
 		if (obj != null) {
 			table = (Hashtable) obj;
@@ -50,7 +50,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		}
 	}
 
-	public synchronized boolean insert(CreateSeqBean bean) {
+	public synchronized boolean insert(RMSBean bean) {
 		table.put(bean.getCreateSeqMsgID(), bean);
 		return true;
 	}
@@ -59,27 +59,27 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		return table.remove(msgId) != null;
 	}
 
-	public synchronized CreateSeqBean retrieve(String msgId) {
-		return (CreateSeqBean) table.get(msgId);
+	public synchronized RMSBean retrieve(String msgId) {
+		return (RMSBean) table.get(msgId);
 	}
 
-	public synchronized boolean update(CreateSeqBean bean) {
+	public synchronized boolean update(RMSBean bean) {
 		if (table.get(bean.getCreateSeqMsgID())==null)
 			return false;
 
 		return table.put(bean.getCreateSeqMsgID(), bean) != null;
 	}
 
-	public synchronized List find(CreateSeqBean bean) {
+	public synchronized List find(RMSBean bean) {
 		ArrayList beans = new ArrayList();
 		if (bean == null)
 			return beans;
 
 		Iterator iterator = table.values().iterator();
 
-		CreateSeqBean temp;
+		RMSBean temp;
 		while (iterator.hasNext()) {
-			temp = (CreateSeqBean) iterator.next();
+			temp = (RMSBean) iterator.next();
 
 			boolean equal = true;
 
@@ -109,7 +109,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 				SandeshaMessageKeys.selectRSNotSupported));
 	}
 	
-	public synchronized CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException {
+	public synchronized RMSBean findUnique (RMSBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
 			String message = SandeshaMessageHelper.getMessage(
@@ -120,7 +120,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		
 		Iterator iter = coll.iterator();
 		if (iter.hasNext())
-			return (CreateSeqBean) iter.next();
+			return (RMSBean) iter.next();
 		else 
 			return null;
 	}

@@ -31,12 +31,12 @@ import org.apache.axis2.context.ConfigurationContext;
 import java.util.Iterator;
 
 
-public class RetransmitterBeanMgrTest extends SandeshaTestCase {
+public class SenderBeanMgrTest extends SandeshaTestCase {
     
 	private SenderBeanMgr mgr;
 	Transaction transaction;
 	
-    public RetransmitterBeanMgrTest() {
+    public SenderBeanMgrTest() {
         super("RetransmitterBeanMgrTest");
     }
 
@@ -55,7 +55,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getRetransmitterBeanMgr();
+        mgr = storageManager.getSenderBeanMgr();
     }
     
     public void tearDown() throws Exception {

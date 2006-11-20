@@ -17,8 +17,8 @@
 package org.apache.sandesha2.storage;
 
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -29,12 +29,12 @@ import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.Iterator;
 
-public class NextMsgBeanMgrTest extends SandeshaTestCase {
+public class RMDBeanMgrTest extends SandeshaTestCase {
     
-	private NextMsgBeanMgr mgr;
+	private RMDBeanMgr mgr;
 	Transaction transaction;
 	
-    public NextMsgBeanMgrTest(String name) {
+    public RMDBeanMgrTest(String name) {
         super(name);
     }
 
@@ -54,7 +54,7 @@ public class NextMsgBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getNextMsgBeanMgr();
+        mgr = storageManager.getRMDBeanMgr();
 
     }
     
@@ -63,52 +63,52 @@ public class NextMsgBeanMgrTest extends SandeshaTestCase {
     }
 
     public void testDelete() throws SandeshaStorageException{
-        mgr.insert(new NextMsgBean("SeqId1", 1001));
+        mgr.insert(new RMDBean("SeqId1", 1001));
         mgr.delete("SeqId1");
         assertNull(mgr.retrieve("SeqId1"));
     }
 
     public void testFind() throws SandeshaStorageException {
-        mgr.insert(new NextMsgBean("SeqId2", 1002));
-        mgr.insert(new NextMsgBean("SeqId3", 1002));
+        mgr.insert(new RMDBean("SeqId2", 1002));
+        mgr.insert(new RMDBean("SeqId3", 1002));
 
-        NextMsgBean target = new NextMsgBean();
+        RMDBean target = new RMDBean();
         target.setNextMsgNoToProcess(1002);
 
         Iterator iterator = mgr.find(target).iterator();
-        NextMsgBean tmp = (NextMsgBean) iterator.next();
+        RMDBean tmp = (RMDBean) iterator.next();
 
         if (tmp.getSequenceID().equals("SeqId2")) {
-            tmp = (NextMsgBean) iterator.next();
+            tmp = (RMDBean) iterator.next();
             tmp.getSequenceID().equals("SeqId3");
         } else {
-            tmp = (NextMsgBean) iterator.next();
+            tmp = (RMDBean) iterator.next();
             tmp.getSequenceID().equals("SeqId2");
         }
 
     }
 
     public void testInsert() throws SandeshaStorageException {
-        NextMsgBean bean = new NextMsgBean("SeqId4", 1004);
+        RMDBean bean = new RMDBean("SeqId4", 1004);
         mgr.insert(bean);
-        NextMsgBean tmp = mgr.retrieve("SeqId4");
+        RMDBean tmp = mgr.retrieve("SeqId4");
         assertTrue(tmp.getNextMsgNoToProcess() == 1004);
     }
 
     public void testRetrieve() throws SandeshaStorageException {
         assertNull(mgr.retrieve("SeqId5"));
-        mgr.insert(new NextMsgBean("SeqId5", 1005));
+        mgr.insert(new RMDBean("SeqId5", 1005));
 
-        NextMsgBean tmp = mgr.retrieve("SeqId5");
+        RMDBean tmp = mgr.retrieve("SeqId5");
         assertTrue(tmp.getNextMsgNoToProcess() == 1005);
     }
 
     public void testUpdate() throws SandeshaStorageException {
-        NextMsgBean bean = new NextMsgBean("SeqId6", 1006);
+        RMDBean bean = new RMDBean("SeqId6", 1006);
         mgr.insert(bean);
         bean.setNextMsgNoToProcess(1007);
         mgr.update(bean);
-        NextMsgBean tmp = mgr.retrieve("SeqId6");
+        RMDBean tmp = mgr.retrieve("SeqId6");
         assertTrue(tmp.getNextMsgNoToProcess() ==1007);
     }
 

@@ -56,7 +56,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		try {
 			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration());
-			SenderBeanMgr senderBeanMgr = storageManager.getRetransmitterBeanMgr();
+			SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 			
 			transaction = storageManager.getTransaction();
 

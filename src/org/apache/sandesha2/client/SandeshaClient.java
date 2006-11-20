@@ -51,11 +51,11 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -126,7 +126,7 @@ public class SandeshaClient {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
 
 		String withinTransactionStr = (String) configurationContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
 		boolean withinTransaction = false;
@@ -143,10 +143,10 @@ public class SandeshaClient {
 
 			sequenceReport.setInternalSequenceID(internalSequenceID);
 
-			CreateSeqBean createSeqFindBean = new CreateSeqBean();
-			createSeqFindBean.setInternalSequenceID(internalSequenceID);
+			RMSBean rmsFindBean = new RMSBean();
+			rmsFindBean.setInternalSequenceID(internalSequenceID);
 
-			CreateSeqBean createSeqBean = createSeqMgr.findUnique(createSeqFindBean);
+			RMSBean createSeqBean = rmsBeanMgr.findUnique(rmsFindBean);
 
 			// if data not is available sequence has to be terminated or
 			// timedOut.
@@ -964,10 +964,10 @@ public class SandeshaClient {
 			return SequenceReport.SEQUENCE_STATUS_TIMED_OUT;
 		}
 
-		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
-		NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceID);
+		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+		RMDBean rmdBean = rmdBeanMgr.retrieve(sequenceID);
 
-		if (nextMsgBean != null) {
+		if (rmdBean != null) {
 			return SequenceReport.SEQUENCE_STATUS_ESTABLISHED;
 		}
 

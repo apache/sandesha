@@ -45,9 +45,9 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -162,12 +162,12 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				if (offerEcepted) {
 					// Setting the CreateSequence table entry for the outgoing
 					// side.
-					CreateSeqBean createSeqBean = new CreateSeqBean();
-					createSeqBean.setSequenceID(offeredSequenceID);
+					RMSBean rmsBean = new RMSBean();
+					rmsBean.setSequenceID(offeredSequenceID);
 					String outgoingSideInternalSequenceId = SandeshaUtil
 							.getOutgoingSideInternalSequenceID(newSequenceId);
-					createSeqBean.setInternalSequenceID(outgoingSideInternalSequenceId);
-					createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); // this
+					rmsBean.setInternalSequenceID(outgoingSideInternalSequenceId);
+					rmsBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); // this
 																				// is a
 																				// dummy
 																				// value.
@@ -175,8 +175,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					
 					String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
-					CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
-					createSeqMgr.insert(createSeqBean);
+					RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+					rmsBeanMgr.insert(rmsBean);
 
 					// Setting sequence properties for the outgoing sequence.
 					// Only will be used by the server side response path. Will
@@ -281,11 +281,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			return false;
 		}
 
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
 
-		CreateSeqBean createSeqFindBean = new CreateSeqBean();
-		createSeqFindBean.setSequenceID(sequenceId);
-		Collection arr = createSeqMgr.find(createSeqFindBean);
+		RMSBean rmsFindBean = new RMSBean();
+		rmsFindBean.setSequenceID(sequenceId);
+		Collection arr = rmsBeanMgr.find(rmsFindBean);
 
 		if (arr.size() > 0) {
 			if (log.isDebugEnabled())

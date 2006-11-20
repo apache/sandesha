@@ -13,9 +13,9 @@ import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
@@ -41,8 +41,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		try {
 			
 			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-			InvokerBeanMgr invokerBeanMgr = storageManager.getStorageMapBeanMgr();
-			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+			InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
+			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 			
 			//starting a transaction
 			transaction = storageManager.getTransaction();
@@ -125,7 +125,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			// updating the next msg to invoke
 
 			String s = invokerBean.getSequenceID();
-			NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
+			RMDBean rmdBean = rmdBeanMgr.retrieve(sequenceId);
 
 			
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
@@ -142,7 +142,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				}
 			}
 			
-			long nextMsgNo = nextMsgBean.getNextMsgNoToProcess();
+			long nextMsgNo = rmdBean.getNextMsgNoToProcess();
 			
 			if (!(messageNo==nextMsgNo)) {
 				String message = "Operated message number is different from the Next Message Number to invoke";
@@ -151,8 +151,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			
 			if (invoked) {
 				nextMsgNo++;
-				nextMsgBean.setNextMsgNoToProcess(nextMsgNo);
-				nextMsgMgr.update(nextMsgBean);
+				rmdBean.setNextMsgNoToProcess(nextMsgNo);
+				rmdBeanMgr.update(rmdBean);
 			}
 		} catch (SandeshaStorageException e) {
 			transaction.rollback();

@@ -54,11 +54,11 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.CreateSequence;
@@ -213,29 +213,28 @@ public class FaultManager {
 
 		MessageContext messageContext = rmMessageContext.getMessageContext();
 
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
-		int type = rmMessageContext.getMessageType();
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
 
 		boolean validSequence = false;
 
 		// Look for an outbound sequence
-		CreateSeqBean createSeqFindBean = new CreateSeqBean();
-		createSeqFindBean.setSequenceID(sequenceID);
+		RMSBean rmsFindBean = new RMSBean();
+		rmsFindBean.setSequenceID(sequenceID);
 
-		Collection coll = createSeqMgr.find(createSeqFindBean);
+		Collection coll = rmsBeanMgr.find(rmsFindBean);
 		if (!coll.isEmpty()) {
 			validSequence = true;
 
 		} else {
 			// Look for an inbound sequence
-			NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
+			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 
-			coll = mgr.retrieveAll();
+			coll = rmdBeanMgr.retrieveAll();
 			Iterator it = coll.iterator();
 
 			while (it.hasNext()) {
-				NextMsgBean nextMsgBean = (NextMsgBean) it.next();
-				String tempId = nextMsgBean.getSequenceID();
+				RMDBean rmdBean = (RMDBean) it.next();
+				String tempId = rmdBean.getSequenceID();
 				if (tempId.equals(sequenceID)) {
 					validSequence = true;
 					break;

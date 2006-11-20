@@ -239,7 +239,7 @@ public class AckRequestedProcessor {
 
 		} else {
 
-			SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
+			SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
 			String key = SandeshaUtil.getUUID();
 
@@ -283,7 +283,7 @@ public class AckRequestedProcessor {
 			// this will be set to true in the sandesha2TransportSender.
 			findBean.setSend(true);
 			findBean.setReSend(false);
-			Collection coll = retransmitterBeanMgr.find(findBean);
+			Collection coll = senderBeanMgr.find(findBean);
 			Iterator it = coll.iterator();
 
 			if (it.hasNext()) {
@@ -293,7 +293,7 @@ public class AckRequestedProcessor {
 															// will be sent in
 															// the old
 															// timeToSend.
-				retransmitterBeanMgr.delete(oldAckBean.getMessageID());
+				senderBeanMgr.delete(oldAckBean.getMessageID());
 			}
 
 			ackBean.setTimeToSend(timeToSend);
@@ -302,7 +302,7 @@ public class AckRequestedProcessor {
 			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			
 			// inserting the new ack.
-			retransmitterBeanMgr.insert(ackBean);
+			senderBeanMgr.insert(ackBean);
 
 			// passing the message through sandesha2sender
 
@@ -460,9 +460,9 @@ public class AckRequestedProcessor {
 
 		ackRequestBean.setReSend(false);
 
-		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
-		retramsmitterMgr.insert(ackRequestBean);
+		senderBeanMgr.insert(ackRequestBean);
 
 		ackRequestRMMsg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 

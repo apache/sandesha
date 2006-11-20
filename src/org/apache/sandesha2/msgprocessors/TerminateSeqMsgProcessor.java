@@ -459,9 +459,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		terminateBean.setReSend(false);
 
-		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
-		retramsmitterMgr.insert(terminateBean);
+		senderBeanMgr.insert(terminateBean);
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);

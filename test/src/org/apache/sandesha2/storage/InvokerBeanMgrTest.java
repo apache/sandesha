@@ -29,12 +29,12 @@ import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.Iterator;
 
-public class StorageMapBeanMgrTest extends SandeshaTestCase {
+public class InvokerBeanMgrTest extends SandeshaTestCase {
 
     InvokerBeanMgr mgr;
     Transaction transaction;
     
-    public StorageMapBeanMgrTest() {
+    public InvokerBeanMgrTest() {
         super ("StorageMapBeanMgrTest");
     }
 
@@ -53,7 +53,7 @@ public class StorageMapBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getStorageMapBeanMgr();
+        mgr = storageManager.getInvokerBeanMgr();
     }
     
     public void tearDown() throws Exception {

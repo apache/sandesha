@@ -97,11 +97,11 @@ public class MessageRetransmissionAdjuster {
 	 * @param policyBean
 	 * @return
 	 */
-	private static SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPolicyBean propertyBean) {
+	private static SenderBean adjustNextRetransmissionTime(SenderBean senderBean, SandeshaPolicyBean propertyBean) {
 
 		// long lastSentTime = retransmitterBean.getTimeToSend();
 
-		int count = retransmitterBean.getSentCount();
+		int count = senderBean.getSentCount();
 
 		long baseInterval = propertyBean.getRetransmissionInterval();
 
@@ -115,9 +115,9 @@ public class MessageRetransmissionAdjuster {
 		long timeNow = System.currentTimeMillis();
 		newTimeToSend = timeNow + newInterval;
 
-		retransmitterBean.setTimeToSend(newTimeToSend);
+		senderBean.setTimeToSend(newTimeToSend);
 
-		return retransmitterBean;
+		return senderBean;
 	}
 
 	private static void stopRetransmission(SenderBean bean) {

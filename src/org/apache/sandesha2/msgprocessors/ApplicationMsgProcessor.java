@@ -51,14 +51,14 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -250,15 +250,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		// Pause the messages bean if not the right message to invoke.
-		NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
-		NextMsgBean bean = mgr.retrieve(sequenceId);
+		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+		RMDBean rmdBean = rmdBeanMgr.retrieve(sequenceId);
 
-		if (bean == null) {
+		if (rmdBean == null) {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
 					sequenceId));
 		}
 
-		InvokerBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
+		InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
 
 		// inorder invocation is still a global property
 		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(
@@ -300,7 +300,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// saving the message.
 			try {
 				storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());
-				storageMapMgr.insert(new InvokerBean(key, msgNo, sequenceId));
+				invokerBeanMgr.insert(new InvokerBean(key, msgNo, sequenceId));
 
 				// This will avoid performing application processing more
 				// than
@@ -393,7 +393,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// / Transaction asyncAckTransaction =
 			// storageManager.getTransaction();
 
-			SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
+			SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
 			String key = SandeshaUtil.getUUID();
 
@@ -426,7 +426,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// this will be set to true in the sandesha2TransportSender.
 			findBean.setSend(true);
 			findBean.setReSend(false);
-			Collection coll = retransmitterBeanMgr.find(findBean);
+			Collection coll = senderBeanMgr.find(findBean);
 			Iterator it = coll.iterator();
 
 			if (it.hasNext()) {
@@ -438,7 +438,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 															// timeToSend.
 
 				// removing the retransmitted entry for the oldAck
-				retransmitterBeanMgr.delete(oldAckBean.getMessageID());
+				senderBeanMgr.delete(oldAckBean.getMessageID());
 
 				// removing the message store entry for the old ack
 				storageManager.removeMessageContext(oldAckBean.getMessageContextRefKey());
@@ -450,7 +450,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			
 			// inserting the new ack.
-			retransmitterBeanMgr.insert(ackBean);
+			senderBeanMgr.insert(ackBean);
 			// / asyncAckTransaction.commit();
 
 			// passing the message through sandesha2sender
@@ -858,8 +858,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
-		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {
@@ -880,16 +880,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key taht will be used to store 
 																	   //the create sequence message.
 		
-		CreateSeqBean createSeqBean = new CreateSeqBean();
-		createSeqBean.setInternalSequenceID(internalSequenceId);
-		createSeqBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
-		createSeqBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
+		RMSBean rmsBean = new RMSBean();
+		rmsBean.setInternalSequenceID(internalSequenceId);
+		rmsBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
+		rmsBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
 		
 		//cloning the message and storing it as a reference.
 		MessageContext clonedMessage = SandeshaUtil.cloneMessageContext(createSeqMsg);
 		String clonedMsgStoreKey = SandeshaUtil.getUUID();
 		storageManager.storeMessageContext(clonedMsgStoreKey, clonedMessage);
-		createSeqBean.setReferenceMessageStoreKey(clonedMsgStoreKey);
+		rmsBean.setReferenceMessageStoreKey(clonedMsgStoreKey);
 		
 		
 		//TODO set the replyTo of CreateSeq (and others) to Anymomous if Application Msgs hv it as Anonymous.
@@ -913,7 +913,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(token != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
-			createSeqBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
+			rmsBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
 			
 			// If we are using token based security, and the 1.1 spec level, then we
 			// should introduce a UsesSequenceSTR header into the message.
@@ -923,7 +923,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		}
 		
-		createSeqMgr.insert(createSeqBean);
+		rmsBeanMgr.insert(rmsBean);
 
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
@@ -946,7 +946,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqMsg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 		storageManager.storeMessageContext(createSequenceMessageStoreKey, createSeqMsg); // storing the message
 		
-		retransmitterMgr.insert(createSeqEntry);
+		senderBeanMgr.insert(createSeqEntry);
 
 		SandeshaUtil.executeAndStore(createSeqRMMessage, createSequenceMessageStoreKey);
 		
@@ -962,7 +962,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext msg = rmMsg.getMessageContext();
 
 		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropertyBeanMgr();
-		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
 
 		// again - looks weird in the client side - but consistent
@@ -1082,7 +1082,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		storageManager.storeMessageContext(storageKey, msg);
 
 		msg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-		retransmitterMgr.insert(appMsgEntry);
+		senderBeanMgr.insert(appMsgEntry);
 
 		// increasing the current handler index, so that the message will not be
 		// going throught the SandeshaOutHandler again.

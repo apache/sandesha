@@ -28,9 +28,9 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -39,8 +39,8 @@ public class InMemoryStorageManager extends StorageManager {
 
 	private static InMemoryStorageManager instance = null;
     private final String MESSAGE_MAP_KEY = "Sandesha2MessageMap";
-    private CreateSeqBeanMgr  createSeqBeanMgr = null;
-    private NextMsgBeanMgr nextMsgBeanMgr = null;
+    private RMSBeanMgr  rmsBeanMgr = null;
+    private RMDBeanMgr nextMsgBeanMgr = null;
     private SequencePropertyBeanMgr sequencePropertyBeanMgr = null;
     private SenderBeanMgr senderBeanMgr = null;
     private InvokerBeanMgr invokerBeanMgr = null;
@@ -48,8 +48,8 @@ public class InMemoryStorageManager extends StorageManager {
 	public InMemoryStorageManager(ConfigurationContext context) {
 		super(context);
 		
-		this.createSeqBeanMgr = new InMemoryCreateSeqBeanMgr (context);
-		this.nextMsgBeanMgr = new InMemoryNextMsgBeanMgr (context);
+		this.rmsBeanMgr = new InMemoryRMSBeanMgr (context);
+		this.nextMsgBeanMgr = new InMemoryRMDBeanMgr (context);
 		this.senderBeanMgr = new InMemorySenderBeanMgr (context);
 		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (context);
 		this.sequencePropertyBeanMgr = new InMemorySequencePropertyBeanMgr (context);
@@ -59,15 +59,15 @@ public class InMemoryStorageManager extends StorageManager {
 		return new InMemoryTransaction();
 	}
 
-	public CreateSeqBeanMgr getCreateSeqBeanMgr() {
-		return createSeqBeanMgr;
+	public RMSBeanMgr getRMSBeanMgr() {
+		return rmsBeanMgr;
 	}
 
-	public NextMsgBeanMgr getNextMsgBeanMgr() {
+	public RMDBeanMgr getRMDBeanMgr() {
 		return nextMsgBeanMgr;
 	}
 
-	public SenderBeanMgr getRetransmitterBeanMgr() {
+	public SenderBeanMgr getSenderBeanMgr() {
 		return senderBeanMgr;
 	}
 
@@ -75,7 +75,7 @@ public class InMemoryStorageManager extends StorageManager {
 		return sequencePropertyBeanMgr;
 	}
 
-	public InvokerBeanMgr getStorageMapBeanMgr() {
+	public InvokerBeanMgr getInvokerBeanMgr() {
 		return invokerBeanMgr;
 	}
 

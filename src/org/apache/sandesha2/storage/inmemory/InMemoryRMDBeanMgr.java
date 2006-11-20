@@ -31,15 +31,15 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 
-public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
+public class InMemoryRMDBeanMgr implements RMDBeanMgr {
 
-	private static final Log log = LogFactory.getLog(InMemoryNextMsgBeanMgr.class);
+	private static final Log log = LogFactory.getLog(InMemoryRMDBeanMgr.class);
 	private Hashtable table = null;
 
-	public InMemoryNextMsgBeanMgr(AbstractContext context) {
+	public InMemoryRMDBeanMgr(AbstractContext context) {
 		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.NEXT_MESSAGE);
 
 		if (obj != null) {
@@ -54,11 +54,11 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		return table.remove(sequenceId) != null;
 	}
 
-	public synchronized NextMsgBean retrieve(String sequenceId) {
-		return (NextMsgBean) table.get(sequenceId);
+	public synchronized RMDBean retrieve(String sequenceId) {
+		return (RMDBean) table.get(sequenceId);
 	}
 
-	public synchronized boolean insert(NextMsgBean bean) {
+	public synchronized boolean insert(RMDBean bean) {
 		table.put(bean.getSequenceID(), bean);
 		return true;
 	}
@@ -68,16 +68,16 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 				SandeshaMessageKeys.selectRSNotSupported));
 	}
 
-	public synchronized List find(NextMsgBean bean) {
+	public synchronized List find(RMDBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 
 		if (bean == null)
 			return beans;
 
-		NextMsgBean temp;
+		RMDBean temp;
 		while (iterator.hasNext()) {
-			temp = (NextMsgBean) iterator.next();
+			temp = (RMDBean) iterator.next();
 
 			boolean equal = true;
 
@@ -97,7 +97,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		return beans;
 	}
 
-	public synchronized boolean update(NextMsgBean bean) {
+	public synchronized boolean update(RMDBean bean) {
 		if (table.get(bean.getSequenceID())==null)
 			return false;
 
@@ -108,7 +108,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		return table.values();
 	}
 	
-	public synchronized NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
+	public synchronized RMDBean findUnique(RMDBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
 			String message = SandeshaMessageHelper.getMessage(
@@ -119,7 +119,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 		
 		Iterator iter = coll.iterator();
 		if (iter.hasNext())
-			return (NextMsgBean) iter.next();
+			return (RMDBean) iter.next();
 		else 
 			return null;
 	}

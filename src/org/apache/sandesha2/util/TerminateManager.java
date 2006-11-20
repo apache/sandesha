@@ -37,14 +37,14 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
@@ -109,17 +109,17 @@ public class TerminateManager {
 	 */
 	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequencePropertyKey ,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
+		InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
 
 		// removing storageMap entries
-		InvokerBean findStorageMapBean = new InvokerBean();
-		findStorageMapBean.setSequenceID(sequenceId);
-		findStorageMapBean.setInvoked(true);
-		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
+		InvokerBean findInvokerBean = new InvokerBean();
+		findInvokerBean.setSequenceID(sequenceId);
+		findInvokerBean.setInvoked(true);
+		Collection collection = invokerBeanMgr.find(findInvokerBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			InvokerBean storageMapBean = (InvokerBean) iterator.next();
-			storageMapBeanMgr.delete(storageMapBean.getMessageContextRefKey());
+			invokerBeanMgr.delete(storageMapBean.getMessageContextRefKey());
 
 			// removing the respective message context from the message store.
 			// If this is an in-only message.
@@ -145,17 +145,16 @@ public class TerminateManager {
 	 */
 	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
-		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
+		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 
 		// removing nextMsgMgr entries
-		NextMsgBean findNextMsgBean = new NextMsgBean();
-		findNextMsgBean.setSequenceID(sequenceId);
-		Collection collection = nextMsgBeanMgr.find(findNextMsgBean);
+		RMDBean findRMDBean = new RMDBean();
+		findRMDBean.setSequenceID(sequenceId);
+		Collection collection = rmdBeanMgr.find(findRMDBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			NextMsgBean nextMsgBean = (NextMsgBean) iterator.next();
-			 nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
+			RMDBean nextMsgBean = (RMDBean) iterator.next();
+			 rmdBeanMgr.delete(nextMsgBean.getSequenceID());
 		}
 
 		// removing the HighestInMessage entry.
@@ -299,8 +298,8 @@ public class TerminateManager {
 			boolean serverSide, StorageManager storageManager) throws SandeshaException {
 
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
-		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
-		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
 
 		String outSequenceID = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
@@ -323,24 +322,24 @@ public class TerminateManager {
 		}
 
 		// removing retransmitterMgr entries and corresponding message contexts.
-		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
+		Collection collection = senderBeanMgr.find(internalSequenceId);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			SenderBean retransmitterBean = (SenderBean) iterator.next();
-			retransmitterBeanMgr.delete(retransmitterBean.getMessageID());
+			SenderBean senderBean = (SenderBean) iterator.next();
+			senderBeanMgr.delete(senderBean.getMessageID());
 
-			String messageStoreKey = retransmitterBean.getMessageContextRefKey();
+			String messageStoreKey = senderBean.getMessageContextRefKey();
 			storageManager.removeMessageContext(messageStoreKey);
 		}
 
 		// removing the createSeqMgrEntry
-		CreateSeqBean findCreateSequenceBean = new CreateSeqBean();
-		findCreateSequenceBean.setInternalSequenceID(internalSequenceId);
-		collection = createSeqBeanMgr.find(findCreateSequenceBean);
+		RMSBean findRMSBean = new RMSBean();
+		findRMSBean.setInternalSequenceID(internalSequenceId);
+		collection = rmsBeanMgr.find(findRMSBean);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			CreateSeqBean createSeqBean = (CreateSeqBean) iterator.next();
-			createSeqBeanMgr.delete(createSeqBean.getCreateSeqMsgID());
+			RMSBean rmsBean = (RMSBean) iterator.next();
+			rmsBeanMgr.delete(rmsBean.getCreateSeqMsgID());
 		}
 
 		// removing sequence properties
@@ -464,9 +463,9 @@ public class TerminateManager {
 		if (to!=null)
 			terminateBean.setToAddress(to.getAddress());
 
-		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
-		retramsmitterMgr.insert(terminateBean);
+		senderBeanMgr.insert(terminateBean);
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);

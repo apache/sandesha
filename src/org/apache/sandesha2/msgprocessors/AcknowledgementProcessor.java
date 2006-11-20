@@ -40,10 +40,10 @@ import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -127,7 +127,7 @@ public class AcknowledgementProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
 
-		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
@@ -172,7 +172,7 @@ public class AcknowledgementProcessor {
 		SenderBean input = new SenderBean();
 		input.setSend(true);
 		input.setReSend(true);
-		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input);
+		Collection retransmitterEntriesOfSequence = senderBeanMgr.find(input);
 
 		ArrayList ackedMessagesList = new ArrayList();
 		while (ackRangeIterator.hasNext()) {
@@ -181,9 +181,9 @@ public class AcknowledgementProcessor {
 			long upper = ackRange.getUpperValue();
 
 			for (long messageNo = lower; messageNo <= upper; messageNo++) {
-				SenderBean retransmitterBean = getRetransmitterEntry(retransmitterEntriesOfSequence, messageNo);
+				SenderBean retransmitterBean = getSenderEntry(retransmitterEntriesOfSequence, messageNo);
 				if (retransmitterBean != null) {
-					retransmitterMgr.delete(retransmitterBean.getMessageID());
+					senderBeanMgr.delete(retransmitterBean.getMessageID());
 
 					// removing the application message from the storage.
 					String storageKey = retransmitterBean.getMessageContextRefKey();
@@ -206,10 +206,10 @@ public class AcknowledgementProcessor {
 				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
 		if (offeredSequenceId!=null) {
 
-			NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
-			NextMsgBean nextMsgBean = nextMsgBeanMgr.retrieve(outSequenceId);
+			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+			RMDBean rmdBean = rmdBeanMgr.retrieve(outSequenceId);
 			
-			if (nextMsgBean!=null && nextMsgBean.isPollingMode())
+			if (rmdBean!=null && rmdBean.isPollingMode())
 				SandeshaUtil.shedulePollingRequest(offeredSequenceId, configCtx);
 			
 		}
@@ -288,7 +288,7 @@ public class AcknowledgementProcessor {
 		return returnValue;
 	}
 
-	private SenderBean getRetransmitterEntry(Collection collection, long msgNo) {
+	private SenderBean getSenderEntry(Collection collection, long msgNo) {
 		Iterator it = collection.iterator();
 		while (it.hasNext()) {
 			SenderBean bean = (SenderBean) it.next();

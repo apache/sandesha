@@ -34,6 +34,7 @@ import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
 import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
+import org.apache.sandesha2.msgprocessors.UsesSequenceSTRProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -112,9 +113,6 @@ public class SandeshaInHandler extends AbstractHandler {
 				returnValue = InvocationResponse.SUSPEND;
 			}
 
-			
-			
-			
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisServiceIsNull);
@@ -130,6 +128,15 @@ public class SandeshaInHandler extends AbstractHandler {
 				log.debug(message);
 				throw new AxisFault(message, ex);
 			}
+	
+			// validating the message
+			MessageValidator.validateMessage(rmMsgCtx, storageManager);
+	
+			//Processing possible usesSequenceSTR headers.
+			if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.CREATE_SEQ) {
+				UsesSequenceSTRProcessor usesSequenceSTRProcessor = new UsesSequenceSTRProcessor ();
+				usesSequenceSTRProcessor.processUseSequenceSTRHeader (rmMsgCtx);
+			}
 
 			//Ack messages will be paused
 			if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK) {
@@ -137,9 +144,6 @@ public class SandeshaInHandler extends AbstractHandler {
 				returnValue = InvocationResponse.SUSPEND;
 			}
 			
-			// validating the message
-			MessageValidator.validateMessage(rmMsgCtx, storageManager);
-
 			MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 
 			if (msgProcessor != null){
