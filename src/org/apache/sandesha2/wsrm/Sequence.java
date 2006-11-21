@@ -58,20 +58,7 @@ public class Sequence implements IOMRMPart {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement headerElement) throws OMException,SandeshaException {
-
-		SOAPHeader header = (SOAPHeader) headerElement;
-		if (header == null)
-			throw new OMException(
-					SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.seqElementCannotBeAddedToNonHeader));
-
-		OMElement sequencePart = headerElement.getFirstChildWithName(new QName(namespaceValue,
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-		if (sequencePart == null)
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noSequencePartInElement,
-					headerElement.toString()));
+	public Object fromOMElement(OMElement sequencePart) throws OMException,SandeshaException {
 		
 		identifier = new Identifier(namespaceValue);
 		messageNumber = new MessageNumber(namespaceValue);
@@ -146,6 +133,11 @@ public class Sequence implements IOMRMPart {
 
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
+		
+		if (header==null) {
+			SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
+			header = factory.createSOAPHeader(envelope);
+		}
 		
 		//detach if already exist.
 		OMElement elem = header.getFirstChildWithName(new QName(namespaceValue,

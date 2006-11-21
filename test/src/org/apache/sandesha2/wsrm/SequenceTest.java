@@ -21,6 +21,7 @@ import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 
@@ -39,7 +40,12 @@ public class SequenceTest extends SandeshaTestCase {
     public void testFromOMElement()  throws SandeshaException {
         SOAPEnvelope env = getSOAPEnvelope("", "Sequence.xml");
         Sequence sequence = new Sequence(rmNamespace);
-        sequence.fromOMElement(env.getHeader());
+        
+        SOAPHeader header = env.getHeader();
+        OMElement sequenceElement = header.getFirstChildWithName(
+        			new QName (rmNamespace,Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+        
+        sequence.fromOMElement(sequenceElement);
 
         Identifier identifier = sequence.getIdentifier();
         assertEquals("uuid:879da420-1624-11da-bed9-84d13db13902", identifier.getIdentifier());

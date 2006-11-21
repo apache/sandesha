@@ -56,12 +56,7 @@ public class UsesSequenceSTR implements IOMRMPart {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement header) throws OMException,SandeshaException {
-
-		OMFactory factory = header.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
-		
+	public Object fromOMElement(OMElement usesSequenceStrElement) throws OMException,SandeshaException {		
 		return this;
 	}
 
@@ -94,6 +89,11 @@ public class UsesSequenceSTR implements IOMRMPart {
 	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
 		SOAPHeader header = envelope.getHeader();
 
+		if (header==null) {
+			SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
+			header = factory.createSOAPHeader(envelope);
+		}
+		
 		//detach if already exist.
 		OMElement elem = header.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR));

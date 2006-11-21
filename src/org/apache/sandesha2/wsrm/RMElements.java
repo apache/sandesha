@@ -108,7 +108,7 @@ public class RMElements {
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequenceElement != null) {
 			sequence = new Sequence(rmNamespaceValue);
-			sequence.fromOMElement(envelope.getHeader());
+			sequence.fromOMElement(sequenceElement);
 		}
 
 		OMElement createSeqElement = envelope.getBody().getFirstChildWithName(
@@ -193,7 +193,7 @@ public class RMElements {
 						Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR));
 		if (usesSequenceSTRElement != null) {
 			usesSequenceSTR = new UsesSequenceSTR(factory, rmNamespaceValue);
-			usesSequenceSTR.fromOMElement(envelope.getHeader());
+			usesSequenceSTR.fromOMElement(usesSequenceSTRElement);
 		}
 		
 		OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(
