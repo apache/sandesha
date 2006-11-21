@@ -168,7 +168,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <version>${wsdl4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.ws.commons.neethi</groupId>
+            <groupId>org.apache.neethi</groupId>
             <artifactId>neethi</artifactId>
             <version>${neethi.version}</version>
         </dependency>
