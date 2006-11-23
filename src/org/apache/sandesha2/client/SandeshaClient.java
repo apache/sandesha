@@ -384,6 +384,14 @@ public class SandeshaClient {
 		return newSequenceKey;
 	}
 
+	/**
+	 * This could be used to create sequences with a given sequence key.
+	 * 
+	 * @param serviceClient - A configured ServiceClient to be used to invoke RM messages. This need to have Sandesha2 engaged.
+	 * @param offer - Weather a sequence should be offered for obtaining response messages.
+	 * @param sequenceKey The sequenceKey of the newly generated sequence.
+	 * @throws SandeshaException
+	 */
 	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey)
 			throws SandeshaException {
 
@@ -400,15 +408,6 @@ public class SandeshaClient {
 		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
 	}
 	
-	/**
-	 * User can terminate the sequence defined by the passed serviceClient.
-	 * 
-	 * @deprecated
-	 */
-	public static void createSequnce(ServiceClient serviceClient, boolean offer, String sequenceKey)
-		throws SandeshaException {
-		createSequence(serviceClient,offer,sequenceKey);
-	}
 
 	/**
 	 * User can terminate the sequence defined by the passed serviceClient.

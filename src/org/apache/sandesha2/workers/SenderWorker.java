@@ -224,16 +224,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 		} catch (SandeshaStorageException e) { 
+			String message = "Sender got an Storage exception. Transaction will be rollbacked";
+			log.error(message,e);
+
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
-		} catch (SandeshaException e) {
-			e.printStackTrace();
-		} catch (MissingResourceException e) {
-			e.printStackTrace();
-		} catch (AxisFault e) {
-			e.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
+			String message = "Sender got an  exception";
+			log.error(message,e);
 		} finally {
 			if (transaction!=null && transaction.isActive())
 				transaction.commit();

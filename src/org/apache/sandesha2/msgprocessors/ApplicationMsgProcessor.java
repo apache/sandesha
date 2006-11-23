@@ -540,9 +540,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(incomingSeqId);
 
+			
 			// deciding weather the last message.
 			String requestLastMsgNoStr = SandeshaUtil.getSequenceProperty(incomingSeqId,
 					Sandesha2Constants.SequenceProperties.LAST_IN_MESSAGE_NO, storageManager);
+			
 			if (requestLastMsgNoStr != null) {
 				long requestLastMsgNo = Long.parseLong(requestLastMsgNoStr);
 				if (requestLastMsgNo == requestMsgNo)

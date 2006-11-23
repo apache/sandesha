@@ -253,4 +253,7 @@ public class SandeshaMessageKeys {
     public final static String invalidOfferNoResponseEndpoint = "invalidOfferNoResponseEndpoint";
     public final static String invalidElementFoundWithinElement = "invalidElementFoundWithinElement";
     
+    public final static String couldNotLoadModulePolicies = "couldNotLoadModulePolicies";
+    public final static String modulePoliciesLoaded = "modulePoliciesLoaded";
+    
 }

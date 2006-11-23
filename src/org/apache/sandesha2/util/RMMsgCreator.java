@@ -239,7 +239,7 @@ public class RMMsgCreator {
 
 		AxisOperation createSeqOperation = createSeqmsgContext.getAxisOperation();
 
-		createSeqOperation.setName(new QName("CreateSequenceOperation"));
+		createSeqOperation.setName(new QName(Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
 		if (appMsgOperationDesc != null) {
 			createSeqOperation.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
 			createSeqOperation.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
