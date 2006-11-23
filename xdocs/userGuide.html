@@ -29,26 +29,24 @@ application.</p>
 
 	<li><a href="#writing_clients">Writing clients for the SimpleService</a>
 		<ul>
-		    <li>Configuring the client repository</li>
+		    <li><a href="#client_repo">Configuring the client repository</a></li>
 			<li><a href="#one_way">Doing One-Way invocation</a></li>
 			<li><a href="#request_reply">Doing a Request-Reply invocation</a></li>
 		</ul>
 	</li>
 	
 	<li>	
-		<a href="#features">Sandesha2 Client API</a>
+		<a href="#client_api">Sandesha2 Client API</a>
 		<ul>
-			<li><a href="#version">TODO: Selecting your RM version</a></li>
+			<li><a href="#version">Selecting your RM version</a></li>
 			<li><a href="#acks">Getting Acknowledgements and Faults to a given Endpoint</a></li>
 			<li><a href="#managing">Managing Sequences</a></li>
 			<li><a href="#offering">Offering a Sequence ID for the Response Sequence</a></li>
 			<li><a href="#creating">Creating a Sequence Without Sending any Messages</a></li>
 			<li><a href="#ack_requests">Sending Acknowledgement Requests from the Client Code</a></li>
-			<li><a href="#sts">Selecting the Specification Version which you want to Work in</a></li>
 			<li><a href="#terminating">Terminating a Sequence from the Client Code</a></li>
 			<li><a href="#closing">Closing a Sequence from the Client Code</a></li>
 			<li><a href="#blocking">Blocking the Client Code until a Sequence is complete</a></li>
-			<li><a href="#anonymous">TODO: RM for clients without an endpoint</a></li>
 			<li><a href="#reports">Working with Sandesha Reports</a>
 				<ul>
 					<li><a href="#sandesha_reports">SandeshaReports</a></li>
@@ -73,12 +71,6 @@ application.</p>
       </ul>
     </li> 
 
-	<li>TODO: Persistent reliability with Sandesha2</li>
-
-	<li><a href="#sec_con">TODO: Reliable Messaging with Secure Conversation</a></li>
-
-	<li><a href="#sec_con">TODO: Reliable Messaging with MTOM</a></li>
-	
 	<li><a href="#delivary_assurances">Delivery Assurances of Sandesha2</a></li>
 
 	<li><a href="#configuring">Configuring Sandesha2</a>
@@ -95,10 +87,9 @@ application.</p>
 		<li><a href="#securitymanager">SecurityManager</a></li>
 	</ul>
 	</li>
-
 </ul>
 
-<a name="intro"></a>
+<a name="introduction"></a>
 <h2>Introduction</h2>
 
 <p>Sandesha2 is a Web Service-ReliableMessaging (WS-RM)
@@ -132,6 +123,7 @@ being developed under this technical committee ( <a
 http://docs.oasis-open.org/ws-rx/wsrm/200602/wsrm-1.1-spec-cd-04.pdf </a>).
 </p>
 
+<a name="install"></a>
 <h2>Installing the Sandesa2 module</h2>
 
 <p>In this section you will be tought how to install the Sandesha2 module in a Axis2 environment. Simply follow the 
@@ -215,7 +207,7 @@ given instructions step by step.</p>
 </ol>
 
 
-<a name="yfs"></a>
+<a name="your_first_service"></a>
 <h2>Creating and deploying a RM enabled Web service - SimpleService</h2>
 
 <p>This section will give you step by step guidelines on creating a
@@ -342,7 +334,7 @@ public class RMSampleService {
 	<li>
 	<p>
 	Set RMSampleService.class and the services.xml files obtained from the previous steps in 
-	the folder structure below. Create a RMSampleService.aar file by compressing it using the jar tool.</p>
+	the folder structure below. Create a RMSampleService.aar file by compressing it using the jar or a zip tool.</p>
 	<pre>
 	
 		 ----META-INF
@@ -361,7 +353,7 @@ public class RMSampleService {
 	</li>
 	
 	<li>
-	<p>List the Axis2 services to see weather the SimpleService has been correctly deployed.</p>
+	<p>List the Axis2 services to see whether the SimpleService has been correctly deployed.</p>
 	</li>
 	
 	<li><p>Congradulations. You just deployed your first Web Service with Reliable Messaging support from Sandesha2.</p></li>
@@ -369,9 +361,10 @@ public class RMSampleService {
 </ol>
 
 
-<a name="wcfr"></a>
+<a name="writing_clients"></a>
 <h2>Writing Clients for Reliable Services</h2>
 
+<a name="client_repo"></a>
 <h3>Configuring the client repository</h3>
 <ol>
 
@@ -399,6 +392,7 @@ public class RMSampleService {
 
 </ol>
 
+<a name="one_way"></a>
 <h3>Doing One-Way invocation</h3>
 
 <ol>
@@ -408,7 +402,9 @@ public class RMSampleService {
 
 <li>
 
+<p>
 Create a 'UserguidePingClient.java' file with following content.
+</p>
 
 <pre>
 
@@ -492,7 +488,9 @@ e.g.: c:\\sandesha2\\repository
 <li>Run the above class.
 </li>
 
-<li>Observer the following differences between the RM client code and a normal Axis2 one-way client invocation.
+<li>
+
+<p>Observer the following differences between the RM client code and a normal Axis2 one-way client invocation.</p>
 
 <ul>
 <li>Angaging of the Sandesha2 module.</li>
@@ -506,7 +504,7 @@ e.g.: c:\\sandesha2\\repository
 </ol>
 
 
-
+<a name="request_reply"></a>
 <h3>Doing Request-Reply invocation</h3>
 
 <ol>
@@ -652,13 +650,9 @@ e.g.: c:\\sandesha2\\repository
 </ol>
 
 
-<h3>TODO: Client Code with generated stubs</h3>
 
 
-
-
-
-<a name="acs"></a>
+<a name="client_api"></a>
 <h2>Sandesha2 Client API</h2>
 
 <p>This section will introduce you to some client API features which
@@ -674,7 +668,7 @@ the Sandesha-&lt;VERSION&gt;.jar file. Both these comes with Sandesha2
 distributions.</p>
 
 
-
+<a name="version"></a>
 <h3>Selecting your RM version</h3>
 
 <p>As it was explained earlier Sandesha2 supports two WSRM
@@ -686,10 +680,9 @@ set the following property in the Options object.</p>
 <p>To go back to the WSRM submitted specification set the property
 as follows.</p>
 <pre>clientOptions.setProperty(SandeshaClient.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);</pre>
-<a name="tas"></a>
 
 
-<a name="gaa"></a>
+<a name="acks"></a>
 <h3><b>Getting Acknowledgements and Faults to a Given Endpoint</b></h3>
 
 <p>In the default configuration, response path for acknowledgements
@@ -701,9 +694,9 @@ following part to the client code before doing any invocation. Note that
 this does not effect the path of your application level faults. Only RM
 faults which occur within the Sandesha2 will be sent to this endpoint.</p>
 <pre>clientOptions.setProperty(SandeshaClientConstants.AcksTo,&lt;endpoint&gt;); //example endpoint - http://tempuri.org/acks.</pre>
-<a name="ms"></a>
 
 
+<a name=managing></a>
 <h3><b>Managing Sequences</b></h3>
 
 <p>In the default behaviour Sandesha2 assumes that messages going to
@@ -720,7 +713,7 @@ two sequences even if they are sent to the same endpoint.</p>
 
 
 
-<a name="oas"></a>
+<a name="offering"></a>
 <h3>Offering a Sequence ID for the Response Sequence</h3>
 
 <p>This is a concept of reliable messaging which may not be very
@@ -733,14 +726,14 @@ this, add the following to the client code.</p>
 <pre>clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,&lt;new uuid&gt;);</pre>
 
 
-<a name="cras"></a>
+<a name="creating"></a>
 <h3>Creating a Sequence Without Sending any Messages</h3>
 
 <p>Sometimes you may need Sandesha2 client to start a sequence with a server without sending 
 any application messages. When you ask for this, Sandesha2 will do a Create Sequence message 
 exchange and obtain a new sequence ID from the server. The sequenceKey value of the newly 
 created sequence will be returned from this method which could be used do message invocations 
-with it. This method also has a boolean parameter which tells weather to offer 
+with it. This method also has a boolean parameter which tells whether to offer 
 a sequence for the response side. (read the part on <a href="#oas">offering sequence IDs</a> 
 to learn more about offering sequences) . 
 	
@@ -749,9 +742,9 @@ The line you have to add to your client code for creating a sequence is as follo
 
 <p>These is overloaded method of this which takes the sequenceKey from the user.</p>
 <pre>SandeshaClient.createSequnce (ServiceClient serviceClient, boolean offer,String sequenceKey);</pre>
-<a name="sar"></a>
 
 
+<a name="ack_requests"></a>
 <h3>Sending Acknowledgement Requests from the Client Code</h3>
 
 <p>You can ask Sandesha2 to get an acknowledgement from a server
@@ -767,7 +760,7 @@ to a specific sequence identified by the Sequence Key.</p>
 <pre>SandeshaClient.sendAckRequest (ServiceClient serviceClient, String sequenceKey);</pre>
 
 
-<a name="sts"></a>
+<a name="terminating"></a>
 <h3>Terminating a Sequence from the Client Code</h3>
 
 <p>You can terminate an on going sequence at any time by adding the line given in this 
@@ -780,14 +773,14 @@ may not get delivered to the service.
 <p>To terminate a specific sequence identified by a sequenceKey use following.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient serviceClient, String sequenceKey);</pre>
 
-<a name="clas"></a>
+<a name="closing"></a>
 <h3>Closing a Sequence from the Client Code</h3>
 
 <p>You can close an ongoing sequence at any time by adding the line given in this section 
 to your client code. Sequence close feature is only available for new WSRM specification 
 being developed under OASIS. Remember that if you do not close elegantly, some of your 
 messages may not get delivered to the service. Again, see the section on 
-<a href="#smo">Sequence Management of Sandesha2</a> for more details. You can issue 
+<a href="#sequences">More about sequences</a> for more details. You can issue 
 following command from your client code to close a sequence.</p>
 
 <pre>SandeshaClient.closeSequence (ServiceClient serviceClient);</pre>
@@ -797,7 +790,7 @@ following command from your client code to close a sequence.</p>
 
 
 
-<a name="btc"></a>
+<a name="blocking"></a>
 <h3>Blocking the Client Code until a Sequence is Complete</h3>
 
 <p>After your client code delivered some messages to the RM layer,
@@ -818,19 +811,7 @@ layer will continue its work until you exit the program.</p>
 
 SandeshaClient.waitUntilSequenceCompleted (ServiceClient serviceClient, long maxWaitingTime, String sequenceKey);</pre>
 
-
-<a name="smo"></a>
-<h3>TODO: RM for clients without an endpoint</h3>
-
-Certain client may not pocess a endpoint for obtaining reply messages. But still them may need to do Reliable Messaging
-invocations with a service. Obviously there is no problem as long as the messages are in-only. But if they want to make 
-request-reply reliable message exchanges the situation becomes a bit complicated mainly due to the protocol messages
-that have to be exchange in a RM message exchange.
-
-The OASIS WSRM 1.1 specification introduces a new feature called MakeConnection to 
-
-
-
+<a name="reports"></a>
 <h3>Working with Sandesha Reports</h3>
 
 <p>Sandesha introduces a feature called Sandesha Reports with which
@@ -839,7 +820,7 @@ There are basically two kinds of reports, each explained in following
 subtopics.</p>
 
 
-<a name="sandeshareport"></a>
+<a name="sandesha_reports"></a>
 <h4>SandeshaReport</h4>
 
 <p>This gives information on all the incoming and outgoing sequences
@@ -848,8 +829,7 @@ incoming sequence is a sequence to which that endpoint is working as a
 RM-Destination (RMD). An outgoing sequence is a sequence to which this
 endpoint works as a RM-Source (RMS).</p>
 
-<p><em><strong>A SandeshaReport include following
-information:</strong></em></p>
+<p>A SandeshaReport include following information:</p>
 <ul>
 	<li>Sequence IDs of all the outgoing sequences.</li>
 	<li>Number of completed messages of each outgoing sequences.</li>
@@ -861,14 +841,14 @@ information:</strong></em></p>
 your client code.</p>
 <pre>SandeshaClient.getSandeshaReport (ConfigurationContext c);</pre>
 
-<a name="sequencereport"></a>
+<a name="sequence_reports"></a>
 <h4>SequenceReport</h4>
 
 <p>A SequenceReport gives information on a specific sequences that a
 Sandesha system is working on. This can be an incoming sequence or an
 outgoing sequence.</p>
 
-<p><em><strong>A SequenceReport will give following information:</strong></em></p>
+<p>A SequenceReport will give following information:</p>
 <ol>
 	<li>Status of the sequence which can be one of the following.
 	<ul>
@@ -903,8 +883,9 @@ following functions.</p>
 <pre>SandeshaClient.getOutgoingSequenceReport (ServiceClient serviceClient);
 SandeshaClient.getOutgoingSequenceReport (String to,String sequenceKey,ConfigurationContext configurationContext);
 SandeshaClient.getOutgoingSequenceReport (String internalSequenceID,ConfigurationContext configurationContext);</pre>
-<a name="slf"></a>
 
+
+<a name="listners"></a>
 <h3>Sandesha Listener Feature</h3>
 
 <p>You can use this new feature to register a listener class in
@@ -922,7 +903,8 @@ below.</p>
 
 <p>Currently SandeshaListener defines the following two methods-
 onError &amp; onTimedOut.</p>
-<a name="onerror"></a>
+
+<a name="on_error"></a>
 <h3>onError</h3>
 
 <p>This will be invoked if Sandesha2 receives a fault SOAP message
@@ -931,7 +913,8 @@ AxisFault representing that fault message. Remember that this will not
 be invoked for faults that occur due to application messages or any
 other messages that do not get originated from Sandesha2. They will not
 be considered by the Sandesha2 system as valid application messages.</p>
-<a name="ontimeout"></a>
+
+<a name="on_timeout"></a>
 <h3>onTimeOut</h3>
 
 <p>As mentioned in the earlier section <a href="#smo">Sequence
@@ -941,14 +924,16 @@ SandeshaListener will be invoked giving a report of that sequence as a
 parameter.</p>
 
 
-<h2>Sequence Management of Sandesha2</h2>
+<a name="sequences"></a>
+<h2>More about sequences</h2>
 
 <p>This section will explain you about the sequence management method
 of Sandesha2. This is basically about four things, each explained in
 following sub topics.</p>
-<a name="san"></a>
 
-<h3>Starting a New Sequence</h3>
+
+<a name="creation"></a>
+<h3>Creation of sequences</h3>
 
 <p>Sandesha client uses two properties given by the client to decide
 the sequence in which it should send a particular application message.
@@ -965,8 +950,8 @@ called request sequences and ones that carry messages from the server to
 the client are called response sequences. Sandesha2 always keep a single
 response sequence corresponding to a particular request sequence.</p>
 
-<a name="tas"></a>
-<h3>Terminating a Sequence</h3>
+<a name="termination"></a>
+<h3>Termination of sequences</h3>
 
 <p>There are currently two methods to terminate a particular
 sequence from the Client API. The first method is to 
@@ -992,8 +977,8 @@ by a particular Sequence Key.</p>
 all the response messages are reliably delivered to the client and after
 which will terminate the response sequence as well.</p>
 
-<a name="cas"></a>
-<h3>Closing a Sequence</h3>
+<a name="closing1"></a>
+<h3>Closing of sequences</h3>
 
 <p>New WSRM specification being developed under OASIS introduces a
 new feature called closing a sequence. When a sequence is closed the
@@ -1006,8 +991,9 @@ current sequence.</p>
 <p>You can use the function below to close a sequence identified by
 a particular Sequence Key.</p>
 <pre>SandeshaClient.terminateSequence (ServiceClient,, SequenceKey);</pre>
-<a name="toa"></a>
 
+
+<a name="timing_out"></a>
 <h3>Timing Out a Sequence</h3>
 
 <p>Depending on its policy configurations Sandesha2 may time out
@@ -1021,7 +1007,7 @@ more details.</p>
 <a name="wws"></a>
 
 
-<a name="dao"></a>
+<a name="delivary_assurances"></a>
 <h2>Delivery Assurances of Sandesha2</h2>
 
 <p>As it was mentioned in the <a href="architectureGuide.html"
@@ -1040,7 +1026,8 @@ can be sure that your service gets invoked only once.</p>
 want ordering, you can configure Sandesha2 to invoke messages in the
 order they arrive. Read 'Configuring Sandesha2' section below to learn
 how to do this.</p>
-<a name="cs"></a>
+
+<a name="configuring"></a>
 <h2>Configuring Sandesha2</h2>
 
 <p>Sandesha2 provides a set of configurations which you can use to
@@ -1146,24 +1133,33 @@ value there.</p>
 
 <p> This gives the storage manager implementation classes used by
 Sandesha2. You have to mention the full qualified class name here.
+</p>
 
-You can basically define two StorageManagers
 
-InMemoryStorageManager - Expected to store data in memory. Supposed to be faster.
+<p>You can basically define two StorageManagers</p>
 
-PermanentStorageManager - Will be storing data in a database. So will be little slower
+<p>InMemoryStorageManager - Expected to store data in memory. Supposed to be faster.</p>
+
+<p>PermanentStorageManager - Will be storing data in a database. So will be little slower
 but real business applications will most probably prefer this could provide additional
-features like recovery from failures.
+features like recovery from failures.</p>
 
-Sandesha2 comes with a default InMemory Storage manager. 
 
-Please read the Sandesha2 <a href="architectureGuide.html">Architecture
-Guide</a> for more details on creating your own storage manager. 
+<p>Only one of these StorageManagers will be active in a given Sandesha2 instance. By default it 
+will be the InMemorystoragemanager. If you want to make the PermanentStoragemanager active
+add the following property to the axis2.xml.</p>
 
+
+<p>&lt;parameter name="Sandesha2StorageManager" locked="false"&gt;persistent&lt;/parameter&gt;</p>
+
+<p>
 StorageManager property is not overridable, i.e., value you set in the
 module.xml is the one that is used for all the services and will not be
 overridden for a particular service by setting a different value there.
 </p>
+You can easily create your own Storage Manager. Please read the Sandesha2 
+<a href="architectureGuide.html">Architecture Guide</a> for more details on this.
+
 
 <a name="messagetypestodrop"></a>
 <h3>MessageTypesToDrop</h3>
@@ -1175,6 +1171,31 @@ Create Sequence messages will have the type 1 and Acknowledgement
 messages will have the type 4. You can add a comma separated list of
 integers in the property telling Sandesha2 not to send messages of those
 types.</p>
+
+<a name="securitymanager"></a>
+<h3>SecurityManager</h3>
+
+<p>The security manager allows you to plug a certain Secure Conversation implemenation into axis2. The 
+default is a DummySecurityManager which does not do any real work. We have also implemented a RamaprtBasedSecurityManager
+which allows you to use Rampart as your secure conversation implementation.</p>
+
+<p>To use the rampart follow the below steps.</p>
+
+
+<ol>
+<li><p>Add the wss4j jar file (wss4j-VERSION.jar) to your to your CLASSPATH. (If your are in the server side add this to
+the WEB-INF/lib folder of the Axis2 webapp).</p></li>
+
+<li><p>Add the Rampart and Rahas modules to the Axis2 modules directory.</p></li>
+
+<li><p>Change the SecurityManager policy of the Sandesha2 module.xml to the following</p>
+
+<p>org.apache.sandesha2.security.rampart.RampartBasedSecurityManager</p>
+
+</li>
+
+</ol>
+
 
 </body>
 </html>
