@@ -313,14 +313,14 @@ public class SandeshaClient {
 	}
 
 	/**
-	 * Clients can use this to create a sequence sequence.
+	 * This could be used to create sequences with a given sequence key.
 	 * 
 	 * @param serviceClient - A configured ServiceClient to be used to invoke RM messages. This need to have Sandesha2 engaged.
 	 * @param offer - Weather a sequence should be offered for obtaining response messages.
-	 * @return The sequenceKey of the newly generated sequence.
+	 * @param sequenceKey The sequenceKey of the newly generated sequence.
 	 * @throws SandeshaException
 	 */
-	public static String createSequence(ServiceClient serviceClient, boolean offer) throws SandeshaException {
+	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey) throws SandeshaException {
 		
 		setUpServiceClientAnonymousOperations (serviceClient);
 		
@@ -339,8 +339,6 @@ public class SandeshaClient {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.toEPRNotValid, null));
 
-		ConfigurationContext configurationContext = serviceClient.getServiceContext().getConfigurationContext();
-		
 		if (offer) {
 			String offeredSequenceID = SandeshaUtil.getUUID();
 			options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSequenceID);
@@ -349,16 +347,13 @@ public class SandeshaClient {
 		// setting a new squenceKey if not already set.
 		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 
-		String	newSequenceKey = SandeshaUtil.getUUID();
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, newSequenceKey);
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 
 		if (rmSpecVersion == null)
 			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
 
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
-		
 		//When the message is marked as Dummy the application processor will not actually try to send it. 
 		//But still the create Sequence will be added.
 
@@ -379,20 +374,17 @@ public class SandeshaClient {
 		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
 		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
 		
-		//the generated sequenceKey will be returned. Client can use this to work with this newly generated sequence.
-		
-		return newSequenceKey;
 	}
 
 	/**
-	 * This could be used to create sequences with a given sequence key.
+	 * Clients can use this to create a sequence sequence.
 	 * 
 	 * @param serviceClient - A configured ServiceClient to be used to invoke RM messages. This need to have Sandesha2 engaged.
 	 * @param offer - Weather a sequence should be offered for obtaining response messages.
-	 * @param sequenceKey The sequenceKey of the newly generated sequence.
+	 * @return The sequenceKey of the newly generated sequence.
 	 * @throws SandeshaException
 	 */
-	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey)
+	public static String createSequence(ServiceClient serviceClient, boolean offer)
 			throws SandeshaException {
 
 		Options options = serviceClient.getOptions();
@@ -400,12 +392,11 @@ public class SandeshaClient {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.optionsObjectNotSet));
 
-		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
-
-		createSequence(serviceClient, offer);
-
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
+		
+		String newSequenceKey = SandeshaUtil.getUUID();
+		createSequence(serviceClient, offer, newSequenceKey);
+		
+		return newSequenceKey;
 	}
 	
 
