@@ -1112,9 +1112,18 @@ public class SandeshaUtil {
 
 		if (msgContext.isPaused())
 			engine.resumeSend(msgContext);
-		else
+		else {
+			
+			//this invocation has to be a blocking one.
+			
+			Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.TRANSPORT_NON_BLOCKING);
+			if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue()==true)
+				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, new Boolean (false));
+			
 			engine.send(msgContext);
-
+			
+			msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
+		}
 
 	}
 	

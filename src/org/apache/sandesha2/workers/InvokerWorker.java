@@ -100,8 +100,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				invoked = true;
 
 			} catch (Exception e) {
-				if (log.isDebugEnabled())
-					log.debug("Exception :", e);
+				if (log.isErrorEnabled())
+					log.error ("Exception :", e);
 
 				handleFault(msgToInvoke, e);
 
@@ -157,11 +157,11 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		} catch (SandeshaStorageException e) {
 			transaction.rollback();
 		} catch (SandeshaException e) {
-			e.printStackTrace(); //TODO remove
-			log.error(e);
+			if (log.isErrorEnabled())
+					log.error(e);
 		} catch (Exception e) {
-			e.printStackTrace();
-			log.error(e);
+			if (log.isErrorEnabled())
+					log.error(e);
 		} finally {
 			if (transaction!=null && transaction.isActive())
 				transaction.commit();

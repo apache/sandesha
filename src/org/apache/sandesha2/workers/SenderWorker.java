@@ -171,7 +171,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			} catch (Exception e) {
 				String message = SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.sendMsgError, e.toString());
-				log.error(message, e);
+				
+				if (log.isErrorEnabled())
+					log.error(message, e);
 			} finally {
 				transaction = storageManager.getTransaction();
 				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
@@ -225,13 +227,16 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 		} catch (SandeshaStorageException e) { 
 			String message = "Sender got an Storage exception. Transaction will be rollbacked";
-			log.error(message,e);
+			if (log.isErrorEnabled())
+				log.error(message,e);
 
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
 		} catch (Exception e) {
 			String message = "Sender got an  exception";
-			log.error(message,e);
+			
+			if (log.isErrorEnabled())
+				log.error(message,e);
 		} finally {
 			if (transaction!=null && transaction.isActive())
 				transaction.commit();
@@ -338,7 +343,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noValidSyncResponse);
-			log.debug(message, e);
+			
+			if (log.isDebugEnabled())
+				log.debug(message, e);
+			
 			throw new SandeshaException(message, e);
 		}
 		if (log.isDebugEnabled())
