@@ -218,7 +218,11 @@ public class RMMsgCreator {
 		try {
 			// creating by copying common contents. (this will not set contexts
 			// except for configCtx).
-			AxisOperation createSequenceOperation = AxisOperationFactory
+			AxisOperation createSequenceOperation = applicationMsgContext.getAxisService()
+						.getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME)); 
+				
+			if (createSequenceOperation==null)	
+				createSequenceOperation = AxisOperationFactory
 					.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
 
 			createSeqmsgContext = SandeshaUtil
@@ -381,10 +385,11 @@ public class RMMsgCreator {
 		if (referenceMessage == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
 
-		AxisOperation terminateOperation = null;
+		AxisOperation terminateOperation = referenceMessage.getAxisService().getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
 
 		try {
-			terminateOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
+			if (terminateOperation==null)
+				terminateOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
 		} catch (AxisFault e1) {
 			throw new SandeshaException(e1.getMessage());
 		}
@@ -713,7 +718,10 @@ public class RMMsgCreator {
 		String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
 		String rmVersion = referenceRMMessage.getRMSpecVersion();
 		
-		AxisOperation makeConnectionOperation = AxisOperationFactory.getAxisOperation(
+		AxisOperation makeConnectionOperation = referenceMessage.
+						getAxisService().getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME)); 
+			
+		makeConnectionOperation = AxisOperationFactory.getAxisOperation(
 				WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
 		
 		MessageContext makeConnectionMessageCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,makeConnectionOperation);
