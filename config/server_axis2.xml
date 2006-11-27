@@ -38,7 +38,8 @@
     <!-- This will disable the separate servlet we have for REST handling. -->
     <parameter name="disableSeparateEndpointForREST" locked="true">false</parameter>
 
-
+	<!-- This specifies the Sandesha2 Storage Manager type the system should be using -->
+    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
 		
 
     <!-- ================================================= -->
