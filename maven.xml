@@ -32,8 +32,6 @@
     <ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
     <ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/${axis2.mar.groupId}/mars" />
     <ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
-    <ant:property name="repo.rampart.mar" value="${maven.repo.local}/${axis2.mar.groupId}/mars/rampart-${rampart.version}.mar" />
-	<ant:property name="repo.rahas.mar" value="${maven.repo.local}/${axis2.mar.groupId}/mars/rahas-${rahas.version}.mar" />
 	
 	
     <goal name="build:all" prereqs="mar,jar,client:jar,policy:jar,sample:create,repo:create,test:test" />
@@ -161,8 +159,7 @@
 		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${client.dist.path}/modules" />
 		
 		<!-- Copying addressing mar file--> 
-		<ant:copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
-		<ant:copy file="${repo.rampart.mar}" toDir="${client.dist.path}/modules/" />
+		<ant:copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />   
 	</goal>
 
 	<goal name="secure:create" prereqs="server:create,client:create">
@@ -214,8 +211,6 @@
         
         <!-- Copying addressing mar file-->
         <ant:copy file="${repo.addressing.mar}" toDir="${server.dist.path}/modules/" />
-		<ant:copy file="${repo.rampart.mar}" toDir="${server.dist.path}/modules/" />
-		<ant:copy file="${repo.rahas.mar}" toDir="${server.dist.path}/modules/" />
 	</goal>
 	
     <goal name="sample:compile">
