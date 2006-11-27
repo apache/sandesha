@@ -122,12 +122,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <type>mar</type>
         </dependency>
         <dependency>
-            <groupId>${axis2.mar.groupId}</groupId>
-            <artifactId>rahas</artifactId>
-            <version>${rahas.version}</version>
-            <type>mar</type>
-        </dependency>
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>${commons.logging.version}</version>
