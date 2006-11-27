@@ -1118,7 +1118,7 @@ public class SandeshaUtil {
 			
 			Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.TRANSPORT_NON_BLOCKING);
 			if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue()==true)
-				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, new Boolean (false));
+				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
 			
 			engine.send(msgContext);
 			

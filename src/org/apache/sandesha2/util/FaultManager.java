@@ -26,7 +26,9 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPFault;
 import org.apache.axiom.soap.SOAPFaultCode;
 import org.apache.axiom.soap.SOAPFaultDetail;
 import org.apache.axiom.soap.SOAPFaultReason;
@@ -43,6 +45,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
@@ -51,6 +54,8 @@ import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
@@ -483,12 +488,43 @@ public class FaultManager {
 		
 	}
 	
-	public void manageIncomingRMFault (AxisFault fault, MessageContext msgContext) {
+	private static void manageIncomingFault (AxisFault fault, MessageContext msgContext) {
+	
+		if (log.isErrorEnabled())
+			log.error(fault);
 		
-		//TODO implement code to handle the rm fault
-		
-		log.error(fault);
+		SandeshaListener listner = (SandeshaListener) msgContext.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
+		if (listner!=null)
+			listner.onError(fault);
 		
 	}
+	
+	
+	public static void processMessagesForFaults (MessageContext msgContext) {
+		
+		SOAPEnvelope envelope = msgContext.getEnvelope();
+		if (envelope==null) 
+			return;
+		
+		SOAPFault faultPart = envelope.getBody().getFault();
 
+		if (faultPart != null) {
+
+			// constructing the fault
+			AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
+			manageIncomingFault (axisFault, msgContext);
+
+			
+		}
+
+	}
+
+	
+	private static AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart) {
+		AxisFault axisFault = new AxisFault(faultPart.getCode(), faultPart.getReason(), faultPart.getNode(), faultPart
+				.getRole(), faultPart.getDetail());
+
+		return axisFault;
+	}
+	
 }
