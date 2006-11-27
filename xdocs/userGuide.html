@@ -435,7 +435,7 @@ public class UserguidePingClient {
     normal Axis2 one-way client invocation.</p>
     <ul>
       <li>Engaging Sandesha2 module.
-        <p>  style=""serviceClient.engageModule(new QName ("sandesha2"));</p>
+        <p>serviceClient.engageModule(new QName ("sandesha2"));</p>
       </li>
       <li>Engaging Addressing module
         <p>serviceClient.engageModule(new QName ("addressing"));</p>
@@ -654,7 +654,7 @@ sequence IDs</a> to learn more about offering sequences) . The line you have
 to add to your client code for creating a sequence is as follows.</p>
 <pre>String sequenceKey = SandeshaClient.createSequence (ServiceClient serviceClient, booleanoffer);</pre>
 
-<p>These is overloaded method of this which takes the sequenceKey from the
+<p>There is an overloaded method of this which takes the sequenceKey from the
 user.</p>
 <pre>SandeshaClient.createSequnce (ServiceClient serviceClient, boolean offer,String sequenceKey);</pre>
 <a name="ack_requests" id="ack_requests"></a>
