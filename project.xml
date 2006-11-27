@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
     <pomVersion>3</pomVersion>
-    <groupId>sandesha2</groupId>
+    <groupId>org.apache.sandesha2</groupId>
     <id>sandesha2</id>
     <name>Apache Sandesha2</name>
     <currentVersion>${sandesha2.version}</currentVersion>
@@ -105,24 +105,24 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
 
     <dependencies>
         <dependency>
-            <groupId>${axis2.jar.groupid}</groupId>
+            <groupId>${axis2.jar.groupId}</groupId>
             <artifactId>axis2</artifactId>
             <version>${axis2.version}</version>
         </dependency>
         <dependency>
-            <groupId>${axis2.mar.groupid}</groupId>
+            <groupId>${axis2.mar.groupId}</groupId>
             <artifactId>addressing</artifactId>
             <version>${addressing.version}</version>
             <type>mar</type>
         </dependency>
         <dependency>
-            <groupId>${axis2.mar.groupid}</groupId>
+            <groupId>${axis2.mar.groupId}</groupId>
             <artifactId>rampart</artifactId>
             <version>${rampart.version}</version>
             <type>mar</type>
         </dependency>
         <dependency>
-            <groupId>${axis2.mar.groupid}</groupId>
+            <groupId>${axis2.mar.groupId}</groupId>
             <artifactId>rahas</artifactId>
             <version>${rahas.version}</version>
             <type>mar</type>
@@ -158,7 +158,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <version>${stax.api.version}</version>
         </dependency>
         <dependency>
-            <groupId>${stax.impl.groupid}</groupId>
+            <groupId>${stax.impl.groupId}</groupId>
             <artifactId>${stax.impl.artifactid}</artifactId>
             <version>${stax.impl.version}</version>
         </dependency>
@@ -213,17 +213,17 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <version>${geronimo.spec.javamail.version}</version>
         </dependency>
         <dependency>
-            <groupId>${axis2.jar.groupid}</groupId>
+            <groupId>${axis2.jar.groupId}</groupId>
             <artifactId>axis2-security</artifactId>
             <version>${axis2.security.version}</version>
         </dependency>
         <dependency>
-            <groupId>${axis2.jar.groupid}</groupId>
+            <groupId>${axis2.jar.groupId}</groupId>
             <artifactId>axis2-rahas</artifactId>
             <version>${axis2.rahas.version}</version>
         </dependency>
         <dependency>
-            <groupId>${axis2.jar.groupid}</groupId>
+            <groupId>${axis2.jar.groupId}</groupId>
             <artifactId>axis2-secpolicy</artifactId>
             <version>${axis2.secpolicy.version}</version>
         </dependency>
