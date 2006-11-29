@@ -25,6 +25,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.rahas.RahasConstants;
 import org.apache.rahas.SimpleTokenStore;
@@ -42,6 +44,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.ws.secpolicy.WSSPolicyException;
@@ -64,6 +67,8 @@ import java.util.Vector;
 
 public class RampartBasedSecurityManager extends SecurityManager {
 
+	private static final Log log = LogFactory.getLog(RampartBasedSecurityManager.class);
+	
     TokenStorage storage = null;
     
     /**
@@ -245,7 +250,8 @@ public class RampartBasedSecurityManager extends SecurityManager {
                     
                 } else {
                     String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSecConvTokenInPolicy);
-                    throw new SandeshaException(msg);
+                	log.debug (msg);
+                	return null;
                 }
                 
             } catch (RampartException e) {
