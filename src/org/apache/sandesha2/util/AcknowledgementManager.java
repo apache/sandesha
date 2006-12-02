@@ -73,6 +73,7 @@ public class AcknowledgementManager {
 			throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
+		
 
 		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
 
@@ -224,7 +225,6 @@ public class AcknowledgementManager {
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
 
-		ConfigurationContext configurationContext = referenceRMMessage.getMessageContext().getConfigurationContext();
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		// Setting the ack depending on AcksTo.
@@ -259,6 +259,8 @@ public class AcknowledgementManager {
 																			// the
 																			// RMMsgCreator
 
+		ackMsgCtx.setServerSide(referenceMsg.isServerSide());
+		
 		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
