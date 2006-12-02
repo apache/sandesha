@@ -813,12 +813,9 @@ in the Options object in your client code. An example is given below.</p>
 
 <h3>onError</h3>
 
-<p>This will be invoked if Sandesha2 receives a fault SOAP message for one of
-the protocol messages it sent. The parameter will be an AxisFault
-representing that fault message. Remember that this will not be invoked for
-faults that occur due to application messages or any other messages that do
-not get originated from Sandesha2. They will not be considered by the
-Sandesha2 system as valid application messages.</p>
+<p>This will be invoked if Sandesha2 receives a fault SOAP message. The parameter will be an AxisFault
+representing that fault message. this will be specially useful for capturing the faults that get returned
+due to RM protocol messages, since they do not get returned to the client code.</p>
 <a name="on_timeout" id="on_timeout"></a>
 
 <h3>onTimeOut</h3>
