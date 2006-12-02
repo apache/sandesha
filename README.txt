@@ -20,6 +20,7 @@ Get the binary distribution of Sandesha2 and extract it. You will find the
 sandesha2-1.1.mar file inside that. This is the current Sandesha2 module 
 file.
 Put Sandesha2 module file to <Axis2_webapp>/WEB-INF/modules directory.
+Put sandesha2-policy-1.1.jar file that comes with the distribution to the <Axis2_webapp>/WEB-INF/lib directory.
  
 Using Sandesha2 in the server side
 ===================================
