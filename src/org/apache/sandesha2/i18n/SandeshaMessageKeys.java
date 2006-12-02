@@ -244,6 +244,7 @@ public class SandeshaMessageKeys {
 	public static final String maximumRetransmissionCountProcessor="maximumRetransmissionCountProcessor";
 	public static final String nullMsgId="nullMsgId";
 	public static final String storageMapNotPresent="storageMapNotPresent";
+	public static final String envelopeMapNotPresent="envelopeMapNotPresent";
 	public static final String entryNotPresentForUpdating="entryNotPresentForUpdating";
 	public static final String appMsgIsNull="appMsgIsNull";
 	public static final String terminateOpperationIsNull="terminateOpperationIsNull";
