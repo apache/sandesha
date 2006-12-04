@@ -39,7 +39,8 @@ Using Sandeshsa2 in the client side
 Engage sandesha2 and addressing modules to the ServiceClient object before
 doing any invocation. If you are not using any advance features add the 
 sandesha2-client-1.1.jar to your classpath. Otherwise you will have to add
-the sandesha2-1.1.jar file to the classpath.
+the sandesha2-1.1.jar file to the classpath. Add the sandesha2-policy-1.1.jar 
+to your classpath.
 
 Please see Sandesha2 user guide for more details and sample code on using 
 Sandesha2.
