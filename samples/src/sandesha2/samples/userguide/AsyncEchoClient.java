@@ -83,6 +83,7 @@ public class AsyncEchoClient {
 			System.out.println("ERROR: Please set the directory you unzipped Sandesha2 as the first option.");
 			return;
 		}
+		
 
 		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
      
@@ -121,27 +122,23 @@ public class AsyncEchoClient {
 		
 		serviceClient.setOptions(clientOptions);
 
-//		Callback callback1 = new TestCallback ("Callback 1");
-//		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
-//		
-//		Callback callback2 = new TestCallback ("Callback 2");
-//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
-//
-//		Callback callback3 = new TestCallback ("Callback 3");
-//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
-//		
-//		Callback callback4 = new TestCallback ("Callback 4");
-//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo4",sequenceKey),callback4);
+		Callback callback1 = new TestCallback ("Callback 1");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
+		
+		Callback callback2 = new TestCallback ("Callback 2");
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		Callback callback5 = new TestCallback ("Callback 5");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo5",sequenceKey),callback5);
+		Callback callback3 = new TestCallback ("Callback 3");
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		
-        while (!callback5.isComplete()) {
+        while (!callback1.isComplete() && 
+        	   !callback2.isComplete() &&
+        	   !callback3.isComplete()) {
             Thread.sleep(1000);
         }
         
-        Thread.sleep(4000);
+        Thread.sleep(6000);
         
         configContext.getListenerManager().stop();
         serviceClient.cleanup();

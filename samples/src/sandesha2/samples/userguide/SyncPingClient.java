@@ -48,14 +48,14 @@ public class SyncPingClient {
 	private String toPort = "8080";
 	private String transportToPort = "8070";
 	
-	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMSampleService";
+	private String toEPR = "http://" + toIP +  ":" + toPort + "/axis2/services/RMSampleServic";
 	private String transportToEPR = "http://" + toIP +  ":" + transportToPort + "/axis2/services/RMSampleService";
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
-	public static void main(String[] args) throws AxisFault {
+	public static void main(String[] args) throws Exception {
 		
 		String axisClientRepo = null;
 		if (args!=null && args.length>0)
@@ -65,12 +65,12 @@ public class SyncPingClient {
 			AXIS2_CLIENT_PATH = axisClientRepo;
 			SANDESHA2_HOME = "";
 		}
-
+		
 		
 		new SyncPingClient ().run();
 	}
 	
-	private void run () throws AxisFault {
+	private void run () throws Exception {
 		
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
@@ -106,7 +106,6 @@ public class SyncPingClient {
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
 		SequenceReport sequenceReport = null;
@@ -117,15 +116,15 @@ public class SyncPingClient {
 			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3)
 				complete = true;
 			else {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+
+				Thread.sleep(1000);
 			}
 		}
 		
-		serviceClient.cleanup();
+        Thread.sleep(4000);
+        
+        configContext.getListenerManager().stop();
+        serviceClient.cleanup();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

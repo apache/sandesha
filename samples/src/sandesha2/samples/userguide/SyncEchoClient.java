@@ -74,7 +74,7 @@ public class SyncEchoClient {
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
 		}
-		
+
 		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 
@@ -114,9 +114,16 @@ public class SyncEchoClient {
 		Callback callback3 = new TestCallback ("Callback 3");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		
-        while (!callback3.isComplete()) {
-            Thread.sleep(1000);
+        while (!callback1.isComplete() && 
+         	   !callback2.isComplete() &&
+         	   !callback3.isComplete()) {
+             Thread.sleep(1000);
         }
+        
+        Thread.sleep(6000);
+        
+        configContext.getListenerManager().stop();
+        serviceClient.cleanup();
 	}
 
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {		

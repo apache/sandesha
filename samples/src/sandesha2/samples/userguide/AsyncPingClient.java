@@ -17,14 +17,10 @@
 package sandesha2.samples.userguide;
 
 import java.io.File;
-
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -52,7 +48,7 @@ public class AsyncPingClient {
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
-	public static void main(String[] args) throws AxisFault {
+	public static void main(String[] args) throws Exception {
 		
 		String axisClientRepo = null;
 		if (args!=null && args.length>0)
@@ -66,7 +62,7 @@ public class AsyncPingClient {
 		new AsyncPingClient().run();
 	}
 	
-	private void run () throws AxisFault {
+	private void run () throws Exception {
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
@@ -89,7 +85,7 @@ public class AsyncPingClient {
 		EndpointReference endpoint = 	serviceClient.getMyEPR(Constants.TRANSPORT_HTTP);
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,endpoint.getAddress());
 		
-		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setTransportInProtocol(org.apache.axis2.Constants.TRANSPORT_HTTP);
 		clientOptions.setAction("urn:wsrm:Ping");
 		
 		String sequenceKey = "sequence2";
@@ -109,15 +105,15 @@ public class AsyncPingClient {
 			if (sequenceReport!=null && sequenceReport .getCompletedMessages().size()==3)
 				complete = true;
 			else {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+
+				Thread.sleep(1000);
 			}
 		}
 		
-		serviceClient.cleanup();
+        Thread.sleep(4000);
+        
+        configContext.getListenerManager().stop();
+        serviceClient.cleanup();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {
