@@ -612,7 +612,10 @@ acknowledgements and faults to a different endpoint, add following part to
 the client code before doing any invocation. Note that this does not effect
 the path of your application level faults. Only RM faults which occur within
 the Sandesha2 will be sent to this endpoint.</p>
-<pre>clientOptions.setProperty(SandeshaClientConstants.AcksTo,&lt;endpoint&gt;); //example endpoint - http://tempuri.org/acks.</pre>
+<pre>
+clientOptions.setTransportInProtocol(org.apache.axis2.Constants.TRANSPORT_HTTP);
+clientOptions.setProperty(SandeshaClientConstants.AcksTo,&lt;endpoint&gt;); //example endpoint - http://tempuri.org/acks.
+</pre>
 <a name="managing" id="managing"></a>
 
 <h3><b>Managing Sequences</b></h3>
