@@ -113,7 +113,7 @@ public class InMemoryStorageManager extends StorageManager {
 		
 		//Now clone the env and set it in the message context
 		if (envelope!=null) {
-			envelope.build();
+			
 			XMLStreamReader streamReader = envelope.cloneOMElement().getXMLStreamReader();
 			SOAPEnvelope clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
 			try {
@@ -147,7 +147,13 @@ public class InMemoryStorageManager extends StorageManager {
 			getContext().setProperty(ENVELOPE_MAP_KEY, envMap);
 		}
 		
-		envMap.put(key, msgContext.getEnvelope());
+		SOAPEnvelope envelope = msgContext.getEnvelope();
+		//storing a cloned version of the envelope in the Map.
+		if (envelope!=null) {			
+			XMLStreamReader streamReader = envelope.cloneOMElement().getXMLStreamReader();
+			SOAPEnvelope clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
+			envMap.put(key, clonedEnvelope);
+		}
 		
 	}
 
@@ -165,33 +171,25 @@ public class InMemoryStorageManager extends StorageManager {
 					SandeshaMessageKeys.entryNotPresentForUpdating));
 		
 		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
-		
-		if(envMap==null) {
-			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.envelopeMapNotPresent));
-		}
-		
-		oldEntry = envMap.get(key);
-		if (oldEntry==null)
-			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.entryNotPresentForUpdating));
-		
-		envMap.remove(key);
-		envMap.put(key, msgContext.getEnvelope());
+
+		storageMap.remove(key);
+		if (envMap!=null)
+			envMap.remove(key);
 		
 		storeMessageContext(key,msgContext);
 	}
 	
 	public void removeMessageContext(String key) throws SandeshaStorageException { 
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
+		HashMap envelopeMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
 		
-		if (storageMap==null) {
-			return;
-		}
-		
-		Object entry = storageMap.get(key);
-		if (entry!=null)
+
+		if (storageMap!=null)
 			storageMap.remove(key);
+		
+		if (envelopeMap!=null)
+			envelopeMap.remove(key);
+		
 	}
 	
 	public void  initStorage (AxisModule moduleDesc) {
