@@ -232,5 +232,6 @@ public class SandeshaMessageKeys {
 	public final static String cannotSetPolicyBeanServiceNull = "cannotSetPolicyBeanServiceNull";
 	public final static String noPolling="noPolling";
 	public final static String freeingTransport="freeingTransport";
+	public final static String offerRequiredForAnon = "offerRequiredForAnon";
 
 }
