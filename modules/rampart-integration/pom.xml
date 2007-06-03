@@ -5,7 +5,7 @@
     <parent>
 		<groupId>org.apache.sandesha2</groupId>
 		<artifactId>sandesha2-parent</artifactId>
-        <version>SNAPSHOT</version>
+        <version>${sandesha2.version}</version>
     </parent>
 	
     <modelVersion>4.0.0</modelVersion>
@@ -39,7 +39,7 @@
     	<dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${sandesha2.version}</version>
         </dependency>
 	
 			<!-- Rampart -->
@@ -61,10 +61,12 @@
             <version>${rampart.version}</version>
         </dependency>
 			
+		<dependency>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j</artifactId>
+            <version>${wss4j.version}</version>
+        </dependency>	
+        
     </dependencies>
-	
-	<properties>
-		<rampart.version>SNAPSHOT</rampart.version>
-     </properties>
 	 
 </project>

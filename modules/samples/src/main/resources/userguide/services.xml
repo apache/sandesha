@@ -7,6 +7,7 @@
         The userguide Sample service.
     </description>
 
+
     <module ref="sandesha2" />
        
     <operation name="ping" mep="http://www.w3.org/2006/01/wsdl/in-only">  
