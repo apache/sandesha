@@ -18,6 +18,8 @@ package sandesha2.samples.userguide;
 
 import java.io.File;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -124,6 +126,13 @@ public class SyncPingClient {
 			}
 		}
 		
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		configContext.terminate();
 		serviceClient.cleanup();
 	}
@@ -149,6 +158,12 @@ public class SyncPingClient {
 		public void onTimeOut(SequenceReport report) {
 			System.out.println("Sequence timed out");
 		} 	
+	}
+	
+	private OMElement getCustomHeader () {
+		OMFactory fac = OMAbstractFactory.getOMFactory();
+		OMElement elem = fac.createOMElement(new QName ("http://testns/","testElem"));
+		return elem;
 	}
 	
 }
