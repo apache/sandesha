@@ -73,10 +73,13 @@ public class SequenceIDDispatcher extends AbstractDispatcher {
 				rmdFindBean.setSequenceID(sequenceID);
 
 				RMDBean rmdBean = rmdBeanMgr.findUnique(rmdFindBean);
-				String serviceName = rmdBean.getServiceName();
-				if (serviceName != null) {
-					service = configurationContext.getAxisConfiguration()
-							.getService(serviceName);
+				if (rmdBean != null) {
+
+					String serviceName = rmdBean.getServiceName();
+					if (serviceName != null) {
+						service = configurationContext.getAxisConfiguration()
+								.getService(serviceName);
+					}
 				}
 
 				if (service == null && rmdBean == null) {
@@ -87,10 +90,13 @@ public class SequenceIDDispatcher extends AbstractDispatcher {
 
 					RMSBean rmsBean = rmsBeanMgr.findUnique(rmsfindBean);
 
-					serviceName = rmsBean.getServiceName();
-					if (serviceName != null) {
-						service = configurationContext.getAxisConfiguration()
-								.getService(serviceName);
+					if (rmsBean != null) {
+						String serviceName = rmsBean.getServiceName();
+						if (serviceName != null) {
+							service = configurationContext
+									.getAxisConfiguration().getService(
+											serviceName);
+						}
 					}
 				}
 
