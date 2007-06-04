@@ -18,7 +18,7 @@
     <ant:property name="mar.name" value="${dist.module.name}.mar"/>
     <ant:property name="policy.jar.name" value="${pom.artifactId}-policy-${sandesha2.version}.jar"/>
 	<ant:property name="jar.name" value="${pom.artifactId}-core-${sandesha2.module.version}.jar"/>
-    <ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
+    <ant:property name="client.jar.name" value="${pom.artifactId}-client-constants-${sandesha2.version}.jar"/>
 	
     <ant:property name="dir.samples" value="modules/samples"/>
     <ant:property name="dir.test.resources" value="modules/tests/resources"/>
