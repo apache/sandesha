@@ -8,7 +8,7 @@
     <description>
 Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache Axis2. By using Sandesha2 you can add reliable messaging capability to the Web services you have hosted in Axis2. You can also use Sandesha2 with Axis2 client to interact with already hosted web services in a reliable manner. Please see Sandesha2 user guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 works internally.
     </description>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <name>Apache Sandesha</name>
     <url>http://ws.apache.org/ws-fx/sandesha/sandesha2</url>
 
@@ -222,7 +222,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
   	</modules>
 
     <properties>
-		<sandesha2.version>1.2-SNAPSHOT</sandesha2.version>
+		<sandesha2.version>1.2</sandesha2.version>
 		<axis2.version>1.2</axis2.version>
 		<rampart.version>1.2</rampart.version>
 		<wss4j.version>1.5.2</wss4j.version>
