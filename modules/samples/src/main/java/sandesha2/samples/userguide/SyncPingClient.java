@@ -106,7 +106,6 @@ public class SyncPingClient {
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
 		SequenceReport sequenceReport = null;
@@ -125,6 +124,7 @@ public class SyncPingClient {
 			}
 		}
 		
+		configContext.terminate();
 		serviceClient.cleanup();
 	}
 	

@@ -71,6 +71,9 @@ public class UserguideEchoClient {
         }
         
         Thread.sleep(4000); 
+        
+        configContext.terminate();
+        serviceClient.cleanup();
 	}
 
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

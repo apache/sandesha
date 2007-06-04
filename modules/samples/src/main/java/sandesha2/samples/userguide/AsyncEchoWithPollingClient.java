@@ -140,6 +140,9 @@ public class AsyncEchoWithPollingClient {
         
         SandeshaClient.terminateSequence(serviceClient);
         
+        configContext.terminate();
+        serviceClient.cleanup();
+        
 	}
 
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

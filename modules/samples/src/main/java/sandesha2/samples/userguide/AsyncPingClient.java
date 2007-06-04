@@ -117,6 +117,7 @@ public class AsyncPingClient {
 			}
 		}
 		
+		configContext.terminate();
 		serviceClient.cleanup();
 	}
 	

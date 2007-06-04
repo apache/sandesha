@@ -107,6 +107,7 @@ public class MTOMPingClient {
 		serviceClient.fireAndForget(getPingOMBlock());
 		SandeshaClient.waitUntilSequenceCompleted(serviceClient);
 		
+		configContext.terminate();
 		serviceClient.cleanup();
 	}
 	

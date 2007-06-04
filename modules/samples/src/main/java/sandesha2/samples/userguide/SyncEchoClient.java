@@ -117,6 +117,11 @@ public class SyncEchoClient {
         while (!callback3.isComplete()) {
             Thread.sleep(1000);
         }
+        
+        Thread.sleep(4000);
+        
+        configContext.terminate();
+        serviceClient.cleanup();
 	}
 
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {		

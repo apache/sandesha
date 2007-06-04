@@ -33,9 +33,6 @@
     <ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/${axis2.mar.groupid}/mars" />
     <ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
 
-    <ant:property name="repo.rampart.mar" value="${maven.repo.local}/org.apache.axis2/mars/rampart-${rampart.version}.mar" />
-    <ant:property name="repo.trust.mar" value="${maven.repo.local}/org.apache.axis2/mars/rampart_sts-${rampart.version}.mar" />
-    	
 	<ant:property name="test.service.name" value="RMSampleService.aar" />
 	
 	
@@ -163,7 +160,6 @@
 		
 		<!-- Copying addressing mar file--> 
 		<ant:copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
-		<ant:copy file="${repo.rampart.mar}" toDir="${client.dist.path}/modules/" />
 	</goal>
 
 	<goal name="secure:create" prereqs="server:create,client:create">
@@ -196,6 +192,7 @@
 		<delete dir="${build.temp.dir}"/>
 	</goal>
 
+<!-- 
 	<goal name="secure:rampart:create" prereqs="server:create,client:create">
 		<ant:property name="secure.rampart.client.path" value="${build.repo.dir}/secure-rampart-client"/>
 		<ant:property name="secure.rampart.server.path" value="${build.repo.dir}/secure-rampart-server"/>
@@ -217,10 +214,8 @@
 		  </fileset>
 		</copy>
 		
-		<!-- creating the Sandesha2 module configured for Rampart -->
-		
 		<ant:mkdir dir="${secure.rampart.temp.path}/module" />
-		<!-- Replace the security manager in the module.xml file -->
+
 		<ant:unjar src="${maven.build.dir}/${mar.name}" dest="${secure.rampart.temp.path}/module"/>
 		
 		<ant:replace file="${secure.rampart.temp.path}/module/META-INF/module.xml" 
@@ -231,33 +226,27 @@
 		<ant:jar jarfile="${secure.rampart.server.path}/modules/${mar.name}" basedir="${secure.rampart.temp.path}/module"/>
 		
 		
-		<!-- Creating the service for UsernameToken+RM -->
 		<ant:mkdir dir="${secure.rampart.temp.path}/service1" />
 		<ant:unjar src="${build.repo.dir}/server/services/${test.service.name}" dest="${secure.rampart.temp.path}/service1"/>
    		<ant:copy file="${dir.test.resources}/rampart-config/UT-services.xml" toFile="${secure.rampart.temp.path}/service1/META-INF/services.xml" overwrite="true" />		
 		<ant:copy file="${dir.interop}/conf/store.jks" todir="${secure.rampart.temp.path}/service1" /> 
 		<ant:jar jarfile="${secure.rampart.server.path}/services/UTRMTestService.aar" basedir="${secure.rampart.temp.path}/service1"/>
 						
-		<!-- Creating the service for Assymetric+RM -->
 		<ant:mkdir dir="${secure.rampart.temp.path}/service2" />
 		<ant:unjar src="${build.repo.dir}/server/services/${test.service.name}" dest="${secure.rampart.temp.path}/service2"/>
    		<ant:copy file="${dir.test.resources}/rampart-config/Asymmetric-services.xml" toFile="${secure.rampart.temp.path}/service2/META-INF/services.xml" overwrite="true" />		
 		<ant:copy file="${dir.interop}/conf/store.jks" todir="${secure.rampart.temp.path}/service2" /> 
 		<ant:jar jarfile="${secure.rampart.server.path}/services/AsymmetricRMTestService.aar" basedir="${secure.rampart.temp.path}/service2"/>
 			
-			
-		<!-- Creating the service for SecCon+RM -->
 		<ant:mkdir dir="${secure.rampart.temp.path}/service3" />
 		<ant:unjar src="${build.repo.dir}/server/services/${test.service.name}" dest="${secure.rampart.temp.path}/service3"/>
    		<ant:copy file="${dir.test.resources}/rampart-config/SecCon-services.xml" toFile="${secure.rampart.temp.path}/service3/META-INF/services.xml" overwrite="true" />		
 		<ant:copy file="${dir.interop}/conf/store.jks" todir="${secure.rampart.temp.path}/service3" /> 
 		<ant:jar jarfile="${secure.rampart.server.path}/services/SecConRMTestService.aar" basedir="${secure.rampart.temp.path}/service3"/>
 							
-		<!-- 
-		<delete dir="${build.temp.dir}"/>
-		 -->
 	</goal>
-	
+	 -->
+	 
 	<goal name="serialize:create" prereqs="server:create,client:create">
 		<ant:property name="serialize.client.path" value="${build.repo.dir}/serialize-client"/>
 		<ant:property name="serialize.server.path" value="${build.repo.dir}/serialize-server"/>
@@ -306,7 +295,6 @@
         
         <!-- Copying addressing mar file-->
         <ant:copy file="${repo.addressing.mar}" toDir="${server.dist.path}/modules/" />
-		<ant:copy file="${repo.rampart.mar}" toDir="${server.dist.path}/modules/" />
 	</goal>
 	
     <goal name="sample:compile" prereqs="client:jar">
