@@ -17,7 +17,6 @@
  under the License.
 -->
 <project name="Sandesha2">
-    <title>Sandesha2</title>
     <body>
         <menu name="Apache Sandesha2">
             <item name="Home" href="index.html" />

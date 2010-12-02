@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements. See the NOTICE file
@@ -16,14 +17,13 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <title>Sandesha2 - Releases</title>
-<head>
+</head>
 <body class="composite">
 <div align="left">
 <p>Please select the Sandesha2 version you want to download. Latest release is 1.0. You can download both
@@ -113,4 +113,4 @@ following the links above. This <a href="http://www.apache.org/dist/ws/sandesha2
 public keys used for signing release. It is recommended that (when possible)
 a <a href="http://www.apache.org/dev/release-signing#web-of-trust" class="externalLink" title="External Link">web of
 trust</a> is used to confirm the identity of these keys.</p>
-</div></div></div></div><div class="clear"><hr></hr></div><div id="footer"><div class="xright">© 2005, Apache Web Services</div><div class="clear"><hr></hr></div></div></body></html>
+</div><div class="clear"><hr></hr></div><div id="footer"><div class="xright">© 2005, Apache Web Services</div><div class="clear"><hr></hr></div></div></body></html>
