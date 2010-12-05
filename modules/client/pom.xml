@@ -34,36 +34,33 @@
     <name>Sandesha2 - Client</name>
 
     <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/main/java</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.4</version>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>process-resources</phase>
+                        <phase>package</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.sandesha2</groupId>
-                                    <artifactId>sandesha2-core</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/classes/</outputDirectory>
-                                    <includes>org/apache/sandesha2/client/SandeshaClientConstants.class,org/apache/sandesha2/client/SandeshaListener.class,org/apache/sandesha2/client/SequenceReport.class</includes>
-                                </artifactItem>
-                            </artifactItems>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.apache.sandesha2:sandesha2-core</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>org.apache.sandesha2:sandesha2-core</artifact>
+                                    <includes>
+                                        <include>org/apache/sandesha2/client/SandeshaClientConstants.class</include>
+                                        <include>org/apache/sandesha2/client/SandeshaListener.class</include>
+                                        <include>org/apache/sandesha2/client/SequenceReport.class</include>
+                                    </includes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
