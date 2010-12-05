@@ -42,6 +42,8 @@
             <item name="Project Information">
                 <item name="Mailing Lists" href="mail-lists.html"/>
                 <item name="Project Team" href="team-list.html"/>
+                <item name="Issue Tracking" href="issue-tracking.html"/>
+                <item name="Source Repository" href="source-repository.html"/>
             </item>
         </menu>
     </body>
