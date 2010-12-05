@@ -34,6 +34,15 @@
     <description>Sandesha2 - Distribution</description>
     <packaging>pom</packaging>
 
+    <!-- This needs to be set explicitly because the project structure implies that the Maven calculated defaults are wrong -->
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/distribution</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/distribution</developerConnection>
+        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/trunk/modules/distribution</url>
+    </scm>
+    <!-- This also needs to be set explicitly because the Maven calculated URL would point to nowhere -->
+    <url>http://axis.apache.org/axis2/java/sandesha/</url>
+
     <build>
         <plugins>
             <plugin>

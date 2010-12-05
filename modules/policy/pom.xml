@@ -33,6 +33,15 @@
     <packaging>jar</packaging>
     <name>Sandesha2 - Policy</name>
 
+    <!-- This needs to be set explicitly because the project structure implies that the Maven calculated defaults are wrong -->
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/policy</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/policy</developerConnection>
+        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/trunk/modules/policy</url>
+    </scm>
+    <!-- This also needs to be set explicitly because the Maven calculated URL would point to nowhere -->
+    <url>http://axis.apache.org/axis2/java/sandesha/</url>
+
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/main/java</testSourceDirectory>

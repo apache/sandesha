@@ -32,6 +32,15 @@
     <packaging>jar</packaging>
     <name>Sandesha2 - Samples</name>
 
+    <!-- This needs to be set explicitly because the project structure implies that the Maven calculated defaults are wrong -->
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/samples</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/samples</developerConnection>
+        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/trunk/modules/samples</url>
+    </scm>
+    <!-- This also needs to be set explicitly because the Maven calculated URL would point to nowhere -->
+    <url>http://axis.apache.org/axis2/java/sandesha/</url>
+
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/main/java</testSourceDirectory>
