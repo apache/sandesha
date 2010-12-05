@@ -62,7 +62,7 @@
                                 <artifactItem>
                                     <groupId>org.apache.sandesha2</groupId>
                                     <artifactId>sandesha2</artifactId>
-                                    <version>${pom.version}</version>
+                                    <version>${project.version}</version>
                                     <type>mar</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
@@ -119,7 +119,7 @@
                         <configuration>
                             <tasks>
                                 <ant antfile="tests.build.xml" inheritAll="true" target="repo:create">
-                                    <property name="sandesha2.version" value="${sandesha2.version}"/>
+                                    <property name="sandesha2.version" value="${project.version}"/>
                                     <property name="build.dir" value="${project.build.directory}"/>
                                     <property name="local.repo" value="${settings.localRepository}"/>
                                     <property name="addressing.version" value="${axis2.version}"/>
@@ -161,17 +161,17 @@
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-policy</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-samples</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>

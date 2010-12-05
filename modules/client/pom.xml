@@ -57,7 +57,7 @@
                                 <artifactItem>
                                     <groupId>org.apache.sandesha2</groupId>
                                     <artifactId>sandesha2-core</artifactId>
-                                    <version>${pom.version}</version>
+                                    <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/classes/</outputDirectory>
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

@@ -302,7 +302,6 @@
     </modules>
 
     <properties>
-        <sandesha2.version>SNAPSHOT</sandesha2.version>
         <axis2.version>SNAPSHOT</axis2.version>
         <rampart.version>SNAPSHOT</rampart.version>
         <axiom.version>1.2.11-SNAPSHOT</axiom.version>

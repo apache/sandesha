@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     
         <!-- Rampart -->

@@ -51,7 +51,7 @@
                                 <artifactItem>
                                     <groupId>org.apache.sandesha2</groupId>
                                     <artifactId>sandesha2-core</artifactId>
-                                    <version>${pom.version}</version>
+                                    <version>${project.version}</version>
                                     <classifier>sources</classifier>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/sources/</outputDirectory>
@@ -59,7 +59,7 @@
                                 <artifactItem>
                                     <groupId>org.apache.sandesha2</groupId>
                                     <artifactId>sandesha2-interop</artifactId>
-                                    <version>${pom.version}</version>
+                                    <version>${project.version}</version>
                                     <classifier>sources</classifier>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/sources/</outputDirectory>
@@ -67,7 +67,7 @@
                                 <artifactItem>
                                     <groupId>org.apache.sandesha2</groupId>
                                     <artifactId>sandesha2-rampart-integration</artifactId>
-                                    <version>${pom.version}</version>
+                                    <version>${project.version}</version>
                                     <classifier>sources</classifier>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/sources/</outputDirectory>
@@ -127,7 +127,7 @@
                                 <descriptor>src/main/assembly/src.xml</descriptor>
                                 <descriptor>src/main/assembly/doc.xml</descriptor>
                             </descriptors>
-                            <finalName>sandesha2-${version}</finalName>
+                            <finalName>sandesha2-${project.version}</finalName>
                         </configuration>
                     </execution>
                 </executions>
