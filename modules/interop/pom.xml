@@ -21,8 +21,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-		<groupId>org.apache.sandesha2</groupId>
-		<artifactId>sandesha2-parent</artifactId>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
 
@@ -110,13 +110,13 @@
    
     <dependencies>
 
-    	<dependency>
+        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
-		
-    	<dependency>
+        
+        <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
             <version>${axis2.version}</version>
@@ -151,20 +151,20 @@
             <version>${geronimo.spec.javamail.version}</version>
         </dependency>
 
-		<!-- Rampart -->
+        <!-- Rampart -->
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
             <version>${rampart.version}</version>
         </dependency>
-		
+        
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-trust</artifactId>
             <version>${rampart.version}</version>
         </dependency>
         
-		<dependency>
+        <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-policy</artifactId>
             <version>${rampart.version}</version>
@@ -173,8 +173,8 @@
     </dependencies>
 
     <properties>
-	<rampart.version>SNAPSHOT</rampart.version>
-	<wsdl4j.version>1.6.2</wsdl4j.version>
+        <rampart.version>SNAPSHOT</rampart.version>
+        <wsdl4j.version>1.6.2</wsdl4j.version>
     </properties>
-	 
+     
 </project>

@@ -21,8 +21,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-	<groupId>org.apache.sandesha2</groupId>
-		<artifactId>sandesha2-parent</artifactId>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
     
@@ -41,33 +41,33 @@
             </resource>
         </resources>
         <plugins>
-<plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <executions>
-           <execution>
-             <id>unpack</id>
-             <phase>process-resources</phase>
-             <goals>
-               <goal>unpack</goal>
-             </goals>
-             <configuration>
-               <artifactItems>
-                 <artifactItem>
-                   <groupId>org.apache.sandesha2</groupId>
-                   <artifactId>sandesha2-core</artifactId>
-                   <version>${pom.version}</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes/</outputDirectory>
-                   <includes>org/apache/sandesha2/client/SandeshaClientConstants.class,org/apache/sandesha2/client/SandeshaListener.class,org/apache/sandesha2/client/SequenceReport.class</includes>
-                 </artifactItem>
-               </artifactItems>
-             </configuration>
-           </execution>
-         </executions>
-       </plugin>	
-             <plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.sandesha2</groupId>
+                                    <artifactId>sandesha2-core</artifactId>
+                                    <version>${pom.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/classes/</outputDirectory>
+                                    <includes>org/apache/sandesha2/client/SandeshaClientConstants.class,org/apache/sandesha2/client/SandeshaListener.class,org/apache/sandesha2/client/SequenceReport.class</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -75,13 +75,11 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-
-           </plugins>
-
+        </plugins>
     </build>
     
     <dependencies>
-    	<dependency>
+        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
             <version>SNAPSHOT</version>

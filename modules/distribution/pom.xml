@@ -22,8 +22,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-	<groupId>org.apache.sandesha2</groupId>
-	<artifactId>sandesha2-parent</artifactId>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
 
@@ -34,104 +34,103 @@
     <packaging>pom</packaging>
 
     <build>
-    <plugins>
-        <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <executions>
-           <execution>
-             <id>unpack</id>
-             <phase>process-resources</phase>
-             <goals>
-               <goal>unpack</goal>
-             </goals>
-             <configuration>
-               <artifactItems>
-                 <artifactItem>
-                   <groupId>org.apache.sandesha2</groupId>
-                   <artifactId>sandesha2-core</artifactId>
-                   <version>${pom.version}</version>
-                   <classifier>sources</classifier>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/sources/</outputDirectory>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>org.apache.sandesha2</groupId>
-                   <artifactId>sandesha2-interop</artifactId>
-                   <version>${pom.version}</version>
-                   <classifier>sources</classifier>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/sources/</outputDirectory>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>org.apache.sandesha2</groupId>
-                   <artifactId>sandesha2-rampart-integration</artifactId>
-                   <version>${pom.version}</version>
-                   <classifier>sources</classifier>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/sources/</outputDirectory>
-                 </artifactItem>
-               </artifactItems>
-             </configuration>
-           </execution>
-         </executions>
-       </plugin>
-	<plugin>
-	    <groupId>org.apache.maven.plugins</groupId>
-	    <artifactId>maven-antrun-plugin</artifactId>
-	    <version>1.1</version>
-	    <inherited>false</inherited>
-	    <executions>
-		    <execution>
-			    <id>javadoc-generation</id>
-			    <phase>package</phase>
-			    <configuration>
-				    <tasks>
-					    <mkdir dir="${basedir}/target/docs/apidocs"/>
-					    <javadoc packagenames="org.apache.sandesha2.*"
-							     destdir="${basedir}/target/docs/apidocs"
-							     classpathref="maven.runtime.classpath"
-							     author="true"
-							     version="true"
-							     use="true"
-							     windowtitle="Sandesha2 API"
-							     doctitle="Sandesha2"
-							     bottom="Copyright &#169; 2007 Apache Web Services Project. All Rights Reserved."
-							     >
-							    <packageset dir="target/sources/" defaultexcludes="yes">
-								    <include name="org/apache/sandesha2/**"/>
-							    </packageset>
-					      </javadoc>
-				        </tasks>
-				    </configuration>
-				    <goals>
-					    <goal>run</goal>
-				    </goals>
-			    </execution>
-		    </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.1</version>
-            <executions>
-                <execution>
-                    <id>distribution-package</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
-                    <configuration>
-                        <descriptors>
-                            <descriptor>src/main/assembly/bin.xml</descriptor>
-                            <descriptor>src/main/assembly/src.xml</descriptor>
-			    <descriptor>src/main/assembly/doc.xml</descriptor>
-                        </descriptors>
-                        <finalName>sandesha2-${version}</finalName>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
-</build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.sandesha2</groupId>
+                                    <artifactId>sandesha2-core</artifactId>
+                                    <version>${pom.version}</version>
+                                    <classifier>sources</classifier>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/sources/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.sandesha2</groupId>
+                                    <artifactId>sandesha2-interop</artifactId>
+                                    <version>${pom.version}</version>
+                                    <classifier>sources</classifier>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/sources/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.sandesha2</groupId>
+                                    <artifactId>sandesha2-rampart-integration</artifactId>
+                                    <version>${pom.version}</version>
+                                    <classifier>sources</classifier>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/sources/</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>javadoc-generation</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${basedir}/target/docs/apidocs"/>
+                                <javadoc packagenames="org.apache.sandesha2.*"
+                                         destdir="${basedir}/target/docs/apidocs"
+                                         classpathref="maven.runtime.classpath"
+                                         author="true"
+                                         version="true"
+                                         use="true"
+                                         windowtitle="Sandesha2 API"
+                                         doctitle="Sandesha2"
+                                         bottom="Copyright &#169; 2007 Apache Web Services Project. All Rights Reserved.">
+                                    <packageset dir="target/sources/" defaultexcludes="yes">
+                                        <include name="org/apache/sandesha2/**"/>
+                                    </packageset>
+                                </javadoc>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <id>distribution-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/bin.xml</descriptor>
+                                <descriptor>src/main/assembly/src.xml</descriptor>
+                                <descriptor>src/main/assembly/doc.xml</descriptor>
+                            </descriptors>
+                            <finalName>sandesha2-${version}</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

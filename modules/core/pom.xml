@@ -21,11 +21,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-		<groupId>org.apache.sandesha2</groupId>
-		<artifactId>sandesha2-parent</artifactId>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
-	
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
     <artifactId>sandesha2-core</artifactId>
@@ -49,23 +49,23 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
-		<dependency>
+        <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-codegen</artifactId>
             <version>${axis2.version}</version>

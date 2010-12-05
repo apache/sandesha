@@ -41,7 +41,7 @@
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
                     <include>**/*.xsl</include>
-					<include>**/*.dat</include>
+                    <include>**/*.dat</include>
                 </includes>
             </testResource>
         </testResources>
@@ -55,68 +55,68 @@
                 </configuration>
             </plugin>
 
-     <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.sandesha2</groupId>
-                  <artifactId>sandesha2</artifactId>
-                  <version>${pom.version}</version>
-                  <type>mar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.axis2</groupId>
-                  <artifactId>addressing</artifactId>
-                  <version>${addressing.version}</version>
-                  <type>mar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.rampart</groupId>
-                  <artifactId>rampart</artifactId>
-                  <version>${rampart.version}</version>
-                  <type>mar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.rampart</groupId>
-                  <artifactId>rampart-core</artifactId>
-                  <version>${rampart.version}</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/copiedjars</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.rampart</groupId>
-                  <artifactId>rampart-policy</artifactId>
-                  <version>${ramprt.version}</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/copiedjars</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/wars</outputDirectory>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>			
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.sandesha2</groupId>
+                                    <artifactId>sandesha2</artifactId>
+                                    <version>${pom.version}</version>
+                                    <type>mar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.axis2</groupId>
+                                    <artifactId>addressing</artifactId>
+                                    <version>${addressing.version}</version>
+                                    <type>mar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.rampart</groupId>
+                                    <artifactId>rampart</artifactId>
+                                    <version>${rampart.version}</version>
+                                    <type>mar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/copiedmars</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.rampart</groupId>
+                                    <artifactId>rampart-core</artifactId>
+                                    <version>${rampart.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/copiedjars</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.rampart</groupId>
+                                    <artifactId>rampart-policy</artifactId>
+                                    <version>${ramprt.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/copiedjars</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/wars</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.1</version>
@@ -126,13 +126,13 @@
                         <phase>process-test-resources</phase>
                         <configuration>
                             <tasks>
-								<ant antfile="tests.build.xml" inheritAll="true" target="repo:create">
-									<property name="sandesha2.version" value="${sandesha2.version}"/>
-									<property name="build.dir" value="${project.build.directory}"/>
-									<property name="local.repo" value="${settings.localRepository}"/>
-									<property name="addressing.version" value="${axis2.version}"/>
-									<property name="rampart.version" value="${rampart.version}"/>
-								</ant>
+                                <ant antfile="tests.build.xml" inheritAll="true" target="repo:create">
+                                    <property name="sandesha2.version" value="${sandesha2.version}"/>
+                                    <property name="build.dir" value="${project.build.directory}"/>
+                                    <property name="local.repo" value="${settings.localRepository}"/>
+                                    <property name="addressing.version" value="${axis2.version}"/>
+                                    <property name="rampart.version" value="${rampart.version}"/>
+                                </ant>
                             </tasks>
                         </configuration>
                         <goals>
@@ -141,21 +141,21 @@
                     </execution>
                 </executions>
             </plugin>
-			<plugin>
-    			<artifactId>maven-surefire-plugin</artifactId>
-    			<configuration>
-               		<includes>
-                 		<include>**/*Test.java</include>
-                	</includes>
-                	<forkMode>pertest</forkMode>
-                	<!--<argLine>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
-    			</configuration>
-			</plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                       <includes>
+                         <include>**/*Test.java</include>
+                    </includes>
+                    <forkMode>pertest</forkMode>
+                    <!--<argLine>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     
     <dependencies>
-	
+    
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-http</artifactId>
@@ -166,33 +166,33 @@
             <artifactId>axis2-transport-local</artifactId>
             <version>${axis2.version}</version>
         </dependency>
-    	<dependency>
+        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
             <version>${pom.version}</version>
         </dependency>
-    	<dependency>
+        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-policy</artifactId>
             <version>${pom.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-samples</artifactId>
             <version>${pom.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart</artifactId>
             <version>${rampart.version}</version>
-			<type>mar</type>
+            <type>mar</type>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
             <version>${rampart.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-policy</artifactId>
             <version>${rampart.version}</version>
@@ -208,28 +208,28 @@
             <version>${log4j.version}</version>
             <exclusions>
                 <exclusion>
-                  <groupId>javax.mail</groupId>
-                  <artifactId>mail</artifactId>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>javax.jms</groupId>
-                  <artifactId>jms</artifactId>
-                </exclusion>
-               <exclusion>
-                  <groupId>com.sun.jdmk</groupId>
-                  <artifactId>jmxtools</artifactId>
-                </exclusion>
-               <exclusion>
-                  <groupId>com.sun.jmx</groupId>
-                  <artifactId>jmxri</artifactId>
-                </exclusion>
-               <exclusion>
-                  <groupId>oro</groupId>
-                  <artifactId>oro</artifactId>
+                    <groupId>javax.jms</groupId>
+                    <artifactId>jms</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>junit</groupId>
-                  <artifactId>junit</artifactId>
+                    <groupId>com.sun.jdmk</groupId>
+                    <artifactId>jmxtools</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jmx</groupId>
+                    <artifactId>jmxri</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>oro</groupId>
+                    <artifactId>oro</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -240,9 +240,9 @@
         </dependency>
     </dependencies>
 
-	<properties>
-		<test.property>2.8.1</test.property>
-		<rampart.version>SNAPSHOT</rampart.version>
+    <properties>
+        <test.property>2.8.1</test.property>
+        <rampart.version>SNAPSHOT</rampart.version>
     </properties>
-	 
+     
 </project>

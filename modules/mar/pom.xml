@@ -21,8 +21,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-		<groupId>org.apache.sandesha2</groupId>
-		<artifactId>sandesha2-parent</artifactId>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
     
@@ -40,37 +40,35 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-		
+        
         <plugins>
-
-      <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <executions>
-           <execution>
-             <id>unpack</id>
-             <phase>process-resources</phase>
-             <goals>
-               <goal>unpack</goal>
-             </goals>
-             <configuration>
-               <artifactItems>
-                 <artifactItem>
-                   <groupId>org.apache.sandesha2</groupId>
-                   <artifactId>sandesha2-core</artifactId>
-                   <version>${pom.version}</version>
-                   <type>jar</type>
-                   <overWrite>false</overWrite>
-                   <outputDirectory>${project.build.directory}/classes/</outputDirectory>
-                   <includes>**/*.class,**/*.xml</includes>
-                   <excludes>**/*test.class</excludes>
-                 </artifactItem>
-               </artifactItems>
-             </configuration>
-           </execution>
-         </executions>
-       </plugin>	
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.sandesha2</groupId>
+                                    <artifactId>sandesha2-core</artifactId>
+                                    <version>${pom.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/classes/</outputDirectory>
+                                    <includes>**/*.class,**/*.xml</includes>
+                                    <excludes>**/*test.class</excludes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>    
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -80,12 +78,12 @@
                     <target>1.4</target>
                 </configuration>
             </plugin>
-	    	
-			<plugin>
-        		<groupId>org.apache.axis2</groupId>
-        		<artifactId>axis2-mar-maven-plugin</artifactId>
-        		<version>${axis2.version}</version>
-        		<extensions>true</extensions>
+            
+            <plugin>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-mar-maven-plugin</artifactId>
+                <version>${axis2.version}</version>
+                <extensions>true</extensions>
 
                 <dependencies>
                     <dependency>
@@ -96,15 +94,15 @@
                 </dependencies>
                 
                 <configuration>
-       	  			<includeDependencies>false</includeDependencies>
-					<moduleXmlFile>module.xml</moduleXmlFile>
-        		</configuration>
-      	     </plugin> 
-	</plugins>
+                    <includeDependencies>false</includeDependencies>
+                    <moduleXmlFile>module.xml</moduleXmlFile>
+                </configuration>
+            </plugin> 
+        </plugins>
     </build>
     
     <dependencies>
-    	<dependency>
+        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
             <version>SNAPSHOT</version>

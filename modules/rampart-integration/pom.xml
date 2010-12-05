@@ -21,11 +21,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-		<groupId>org.apache.sandesha2</groupId>
-		<artifactId>sandesha2-parent</artifactId>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
-	
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
     <artifactId>sandesha2-rampart-integration</artifactId>
@@ -49,53 +49,53 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
-	<dependencies>
-	
-    	<dependency>
+    <dependencies>
+    
+        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
-	
-			<!-- Rampart -->
+    
+        <!-- Rampart -->
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
             <version>${rampart.version}</version>
         </dependency>
-		
+        
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-trust</artifactId>
             <version>${rampart.version}</version>
         </dependency>
         
-		<dependency>
+        <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-policy</artifactId>
             <version>${rampart.version}</version>
         </dependency>
-			
+            
     </dependencies>
-	
+    
     <properties>
-	     <rampart.version>SNAPSHOT</rampart.version>
+         <rampart.version>SNAPSHOT</rampart.version>
     </properties>     
-	 
+     
 </project>
