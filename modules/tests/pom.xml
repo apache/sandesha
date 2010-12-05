@@ -176,18 +176,15 @@
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart</artifactId>
-            <version>${rampart.version}</version>
             <type>mar</type>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
-            <version>${rampart.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-policy</artifactId>
-            <version>${rampart.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -234,7 +231,6 @@
 
     <properties>
         <test.property>2.8.1</test.property>
-        <rampart.version>SNAPSHOT</rampart.version>
     </properties>
      
 </project>
