@@ -26,8 +26,8 @@
 
     <fileSets>
         <fileSet>
-            <directory>../../xdocs</directory>
-            <outputDirectory>xdocs</outputDirectory>
+            <directory>../../src/site/resources/images</directory>
+            <outputDirectory>guides/images</outputDirectory>
             <excludes>
                 <exclude>.svn/**</exclude>
             </excludes>
@@ -49,5 +49,20 @@
             </includes>
         </fileSet>
     </fileSets>
+    <files>
+        <!-- TODO: this is based on the misconception that XDoc is a subset of XHTML
+             or vice-versa. This is not correct and leads to all kinds of troubles.
+             However, for the moment we don't have any better solution. -->
+        <file>
+            <source>../../src/site/xdoc/architectureGuide.xml</source>
+            <outputDirectory>guides</outputDirectory>
+            <destName>architectureGuide.html</destName>
+        </file>
+        <file>
+            <source>../../src/site/xdoc/userGuide.xml</source>
+            <outputDirectory>guides</outputDirectory>
+            <destName>userGuide.html</destName>
+        </file>
+    </files>
 </assembly>
 
