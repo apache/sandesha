@@ -20,21 +20,21 @@
     <id>docs</id>
     <includeBaseDirectory>true</includeBaseDirectory> 
     <formats>
-	<!--<format>tar.gz</format>  //uncomment,if tar.gz archive needed-->
+        <!--<format>tar.gz</format>  //uncomment,if tar.gz archive needed-->
         <format>zip</format>
     </formats>
 
     <fileSets>
         <fileSet>
-	    <directory>../../xdocs</directory>
+            <directory>../../xdocs</directory>
             <outputDirectory>xdocs</outputDirectory>
             <excludes>
                 <exclude>.svn/**</exclude>
             </excludes>
         </fileSet>
         <fileSet>
-	    <directory>target/docs/apidocs</directory>
-	    <outputDirectory>apidocs</outputDirectory>
+            <directory>target/docs/apidocs</directory>
+            <outputDirectory>apidocs</outputDirectory>
             <excludes>
                 <exclude>.svn/**</exclude>
             </excludes>
