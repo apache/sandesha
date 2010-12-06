@@ -95,9 +95,9 @@
         <fileSet>
             <directory>../../modules/samples/src/main/resources/userguide</directory>
             <outputDirectory>sandesha2-${version}-bin/samples/clients</outputDirectory>
-	    <excludes>
-		<exclude>services.xml</exclude>
-	    </excludes>
+            <excludes>
+                <exclude>services.xml</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>../../modules/tests/test-resources</directory>
@@ -120,23 +120,23 @@
                 <include>UserguideSampleClients.jar</include>
             </includes>
         </fileSet>
-	<!-- Work-a-round to create empty folders -->
+        <!-- Work-a-round to create empty folders -->
         <fileSet>
-	    <directory>../../modules/distribution/src/main/assembly</directory>
+            <directory>../../modules/distribution/src/main/assembly</directory>
             <outputDirectory>sandesha2-${version}-bin/samples/clients/lib</outputDirectory>
             <includes>
                 <include>lib.txt</include>
             </includes>
         </fileSet>
         <fileSet>
-	    <directory>../../modules/distribution/src/main/assembly</directory>
+            <directory>../../modules/distribution/src/main/assembly</directory>
             <outputDirectory>sandesha2-${version}-bin/samples/clients/modules</outputDirectory>
             <includes>
                 <include>modules.txt</include>
             </includes>
         </fileSet>
         <fileSet>
-	    <directory>../../modules/distribution/src/main/assembly</directory>
+            <directory>../../modules/distribution/src/main/assembly</directory>
             <outputDirectory>sandesha2-${version}-bin/samples/clients/services</outputDirectory>
             <includes>
                 <include>services.txt</include>
