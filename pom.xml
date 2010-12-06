@@ -228,18 +228,6 @@
         </dependency>
 
         <dependency>
-            <groupId>${stax.impl.groupid}</groupId>
-            <artifactId>${stax.impl.artifactid}</artifactId>
-            <version>${stax.impl.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>stax</groupId>
-            <artifactId>stax-api</artifactId>
-            <version>${stax.api.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.2</version>
@@ -320,12 +308,6 @@
         <axiom.version>1.2.11-SNAPSHOT</axiom.version>
         <neethi.version>3.0.0-SNAPSHOT</neethi.version>
         <commons.logging.version>1.1.1</commons.logging.version>
-        <stax.api.version>1.0.1</stax.api.version>
-        <stax.impl.artifactid>wstx-asl</stax.impl.artifactid>
-        <stax.impl.groupid>org.codehaus.woodstox</stax.impl.groupid>
-        <stax.impl.version>3.2.4</stax.impl.version>
-        <geronimo.spec.activation.version>1.0.1</geronimo.spec.activation.version>
-        <geronimo.spec.javamail.version>1.2</geronimo.spec.javamail.version>
         <junit.version>3.8.2</junit.version>        
         <log4j.version>1.2.15</log4j.version>
     </properties>
