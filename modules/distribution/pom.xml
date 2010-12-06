@@ -43,6 +43,40 @@
     <!-- This also needs to be set explicitly because the Maven calculated URL would point to nowhere -->
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-client-constants</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-policy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-rampart-integration</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2</artifactId>
+            <version>${project.version}</version>
+            <type>mar</type>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

@@ -36,49 +36,6 @@
         </fileSet>
 
         <fileSet>
-            <directory>../../modules/core/target</directory>
-            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
-            <includes>
-                <include>sandesha2-core-${version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/client/target</directory>
-            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
-            <includes>
-                <include>sandesha2-client-constants-${version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/policy/target</directory>
-            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
-            <includes>
-                <include>sandesha2-policy-${version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/rampart-integration/target</directory>
-            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
-            <includes>
-                <include>sandesha2-rampart-integration-${version}.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../../modules/persistence/target</directory>
-            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
-            <includes>
-                <include>sandesha2-persistence-${version}.jar</include>
-            </includes>
-        </fileSet> 
-       
-        <fileSet>
-            <directory>../../modules/mar/target</directory>
-            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
-            <includes>
-                <include>sandesha2-${version}.mar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>../../xdocs</directory>
             <outputDirectory>sandesha2-${version}-bin/docs</outputDirectory>
             <includes>
@@ -143,4 +100,17 @@
             </includes>
         </fileSet>
     </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
+            <includes>
+                <include>org.apache.sandesha2:sandesha2-core</include>
+                <include>org.apache.sandesha2:sandesha2-client-constants</include>
+                <include>org.apache.sandesha2:sandesha2-policy</include>
+                <include>org.apache.sandesha2:sandesha2-rampart-integration</include>
+                <include>org.apache.sandesha2:sandesha2-persistence</include>
+                <include>org.apache.sandesha2:sandesha2</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
 </assembly>
