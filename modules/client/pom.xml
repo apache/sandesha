@@ -75,6 +75,22 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- This overrides the execution configured in the apache-release profile in
+                     the org.apache:apache super-POM. We don't want to generate a source JAR because
+                     it would be empty. Since the source:jar goal has no skip option, the trick is
+                     to bind it to a non existing phase. -->
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>never</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration>
                     <generateReports>false</generateReports>
