@@ -39,8 +39,6 @@
                 <include>project.xml</include>
                 <include>LICENSE.txt</include>
                 <include>project.properties</include>
-                <include>README.txt</include>
-                <include>release-notes.html</include>
             </includes>
             <excludes>
                 <exclude>**/target</exclude>
@@ -54,6 +52,15 @@
                 <exclude>**/.settings</exclude>
                 <exclude>**/.settings/**/*</exclude>
             </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>../..</directory>
+            <outputDirectory>sandesha2-${version}-src</outputDirectory>
+            <includes>
+                <include>README.txt</include>
+                <include>release-notes.html</include>
+            </includes>
+            <filtered>true</filtered>
         </fileSet>
     </fileSets>
 </assembly>

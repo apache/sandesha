@@ -44,9 +44,16 @@
             <outputDirectory></outputDirectory>
             <includes>
                 <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../..</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
                 <include>README.txt</include>
                 <include>release-notes.html</include>
             </includes>
+            <filtered>true</filtered>
         </fileSet>
     </fileSets>
     <files>
