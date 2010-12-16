@@ -43,14 +43,6 @@
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
 
     <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/main/java</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

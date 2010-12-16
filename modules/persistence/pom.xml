@@ -25,13 +25,6 @@
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
 
     <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
         <testResources>
             <testResource>
                 <directory>test-resources</directory>
