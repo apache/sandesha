@@ -166,8 +166,6 @@
                         <configuration>
                             <excludes>
                                 <exclude>dependency-reduced-pom.xml</exclude>
-                                <!-- TODO: this should not be necessary; it is a bad practice to generate log files in source directories -->
-                                <exclude>*.log</exclude>
                             </excludes>
                         </configuration> 
                     </execution>

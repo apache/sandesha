@@ -30,6 +30,7 @@
     	<java fork="yes" classpathref="test.class.path" classname="org.apache.derby.tools.ij">
     	   <arg file="${basedir}/src/resources/ddl/sandesha2-derby.ddl" />
     	   <jvmarg value="-Dij.connection.wsrm=jdbc:derby:${derby.dir}/wsrm;create=true"/>
+     	   <jvmarg value="-Dderby.stream.error.file=${build.dir}/derby.log"/>
     	</java>
     </target>
 	<target name="persistence:create">

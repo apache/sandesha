@@ -84,6 +84,12 @@
                     </includes>
                     <forkMode>pertest</forkMode>
                     <!--<argLine>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
+                    <systemProperties>
+                        <property>
+                            <name>derby.stream.error.file</name>
+                            <value>${project.build.directory}/derby.log</value>
+                        </property>
+                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>
