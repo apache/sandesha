@@ -118,35 +118,22 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
-                <inherited>false</inherited>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.5</version>
                 <executions>
                     <execution>
                         <id>javadoc-generation</id>
                         <phase>package</phase>
-                        <configuration>
-                            <tasks>
-                                <mkdir dir="${basedir}/target/docs/apidocs"/>
-                                <javadoc packagenames="org.apache.sandesha2.*"
-                                         destdir="${basedir}/target/docs/apidocs"
-                                         classpathref="maven.runtime.classpath"
-                                         author="true"
-                                         version="true"
-                                         use="true"
-                                         windowtitle="Sandesha2 API"
-                                         doctitle="Sandesha2"
-                                         bottom="Copyright &#169; 2007 Apache Web Services Project. All Rights Reserved.">
-                                    <packageset dir="target/sources/" defaultexcludes="yes">
-                                        <include name="org/apache/sandesha2/**"/>
-                                    </packageset>
-                                </javadoc>
-                            </tasks>
-                        </configuration>
                         <goals>
-                            <goal>run</goal>
+                            <goal>javadoc</goal>
                         </goals>
+                        <configuration>
+                            <sourcepath>target/sources</sourcepath>
+                            <excludePackageNames>org.tempuri</excludePackageNames>
+                            <reportOutputDirectory>${project.build.directory}/docs/apidocs</reportOutputDirectory>
+                            <windowtitle>Sandesha2 API</windowtitle>
+                            <doctitle>Sandesha2</doctitle>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
