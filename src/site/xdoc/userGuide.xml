@@ -114,9 +114,9 @@ Apache Axis2. With Sandesha2 you can make your Web services reliable, or you
 can invoke already hosted reliable Web services.</p>
 
 <p>If you want to learn more about Apache Axis2, refer to <a
-href="http://ws.apache.org/axis2/0_95/userguide.html">Apache Axis2 User
+href="http://axis.apache.org/axis2/java/core/docs/userguide.html">Apache Axis2 User
 Guide</a> and <a
-href="http://ws.apache.org/axis2/0_95/Axis2ArchitectureGuide.html">Apache
+href="http://axis.apache.org/axis2/java/core/docs/Axis2ArchitectureGuide.html">Apache
 Axis2 Architecture Guide</a>.</p>
 
 <p>Architecure guide for Sandesha2 is accessible at <a

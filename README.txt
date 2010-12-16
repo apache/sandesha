@@ -1,7 +1,7 @@
 ==========================================================================
 Apache Sandesha2 ${project.version} build
 
-http://ws.apache.org/sandesha/sandesha2
+http://axis.apache.org/axis2/java/sandesha
 ---------------------------------------------------------------------------
 
 Apache Sandesha2 is a WS-ReliableMessaging implementation on top of Apache 
@@ -13,7 +13,7 @@ http://svn.apache.org/repos/asf/webservices/sandesha/branches/sandesha_1_0/
 
 Installation
 ============
-Download and install Apache Axis2. (see http://ws.apache.org/axis2 for more
+Download and install Apache Axis2. (see http://axis.apache.org/axis2/java/core for more
 details).
 Add a user phase named RMPhase to the all four flows of the axis2.xml.
 Get the binary distribution of Sandesha2 and extract it. You will find the 
@@ -54,7 +54,7 @@ distribution.
 Support
 =======
 Please post any problem you encounter to the sandesha developer list 
-(sandesha-dev@ws.apache.org). Please remember to mark the subject with the [Sandesha2]
+(java-dev@axis.apache.org). Please remember to mark the subject with the [Sandesha2]
 prefix. Your comments are highly appreciated and really needed to make this distribution
 a successful one.
 
