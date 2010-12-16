@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.apache.sandesha2</groupId>
@@ -45,11 +43,11 @@
                         <configuration>
                             <tasks>
                                 <ant antfile="test.build.xml" inheritAll="true" target="prepare">
-                                    <property name="sandesha2.version" value="${project.version}"/>
-                                    <property name="build.dir" value="${project.build.directory}"/>
-                                    <property name="local.repo" value="${settings.localRepository}"/>
-                                    <property name="addressing.version" value="${axis2.version}"/>
-                                    <property name="rampart.version" value="${rampart.version}"/>
+                                    <property name="sandesha2.version" value="${project.version}" />
+                                    <property name="build.dir" value="${project.build.directory}" />
+                                    <property name="local.repo" value="${settings.localRepository}" />
+                                    <property name="addressing.version" value="${axis2.version}" />
+                                    <property name="rampart.version" value="${rampart.version}" />
                                 </ant>
                             </tasks>
                         </configuration>
