@@ -35,10 +35,7 @@
                 <include>**/pom.xml</include>
 
 		<!--root level files-->
-                <include>maven.xml</include>
-                <include>project.xml</include>
                 <include>LICENSE.txt</include>
-                <include>project.properties</include>
             </includes>
             <excludes>
                 <exclude>**/target</exclude>
