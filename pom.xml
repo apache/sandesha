@@ -36,7 +36,7 @@
         guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 works
         internally.
     </description>
-    <version>1.4-SNAPSHOT</version>
+    <version>SNAPSHOT</version>
     <name>Apache Sandesha</name>
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
 
@@ -240,9 +240,9 @@
     </reporting>
     
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4</developerConnection>
-        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/branches/1_4</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk</developerConnection>
+        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/trunk</url>
     </scm>
 
     <pluginRepositories>
