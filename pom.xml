@@ -375,19 +375,12 @@
     </properties>
 
     <distributionManagement>
-        <repository>
-            <id>apache-repo</id>
-            <name>Maven Central Repository</name>
-            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
+        <snapshotRepository>
+            <id>apache.snapshots.https</id>
+            <name>${distMgmtSnapshotsName}</name>
+            <url>${distMgmtSnapshotsUrl}</url>
             <uniqueVersion>false</uniqueVersion>
-        </repository>
-        <!--
-          <snapshotRepository>
-              <id>apache-snapshots</id>
-              <name>Apache Development Repository</name>
-              <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
-          </snapshotRepository>
-      -->
+        </snapshotRepository>
     </distributionManagement>
 
 </project>
