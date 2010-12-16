@@ -51,31 +51,54 @@
             </resource>
         </resources>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.4</version>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>process-resources</phase>
+                        <phase>package</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.sandesha2</groupId>
-                                    <artifactId>sandesha2-core</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/classes/</outputDirectory>
-                                    <includes>**/policy/**/*.class,**/*.properties,org/apache/sandesha2/i18n/**,**/*Sandesha2Constants*.class,**/*SandeshaException*.class</includes>
-                                    <excludes>META-INF/maven/org.apache.sandesha2/sandesha2-core/**</excludes>
-                                </artifactItem>
-                            </artifactItems>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.apache.sandesha2:sandesha2-core</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>org.apache.sandesha2:sandesha2-core</artifact>
+                                    <includes>
+                                        <include>**/policy/**/*.class</include>
+                                        <include>**/*.properties</include>
+                                        <include>org/apache/sandesha2/i18n/**</include>
+                                        <include>**/*Sandesha2Constants*.class</include>
+                                        <include>**/*SandeshaException*.class</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>META-INF/maven/org.apache.sandesha2/sandesha2-core/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- This overrides the execution configured in the apache-release profile in
+                     the org.apache:apache super-POM. We don't want to generate a source JAR because
+                     it would be empty. Since the source:jar goal has no skip option, the trick is
+                     to bind it to a non existing phase. -->
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>never</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
