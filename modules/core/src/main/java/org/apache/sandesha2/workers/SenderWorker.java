@@ -682,6 +682,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			//if the syncResponseWas not built here and the client was not expecting a sync response. We will not try to execute 
 			//here. Doing so will cause a double invocation for a async message. 
 			if (msgCtx.getOptions().isUseSeparateListener()==true &&  !syncResponseBuilt) {
+			    // Since the client is not expecting a sync response, it will not (necessarily) call cleanup.
+			    // If we discard the response, then we need to clean up here.
+			    msgCtx.getTransportOut().getSender().cleanup(msgCtx);
 				return;
 			}
 			
