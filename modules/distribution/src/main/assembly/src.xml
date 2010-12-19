@@ -36,6 +36,7 @@
 
 		<!--root level files-->
                 <include>LICENSE.txt</include>
+                <include>NOTICE.txt</include>
             </includes>
             <excludes>
                 <exclude>**/target</exclude>
