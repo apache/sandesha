@@ -81,17 +81,20 @@ public class SandeshaTestCase extends TestCase {
         String testRource = "target" + File.separator + "test-classes";
         resourceDir = new File(testRource).getPath();
         
-        String propFileStr = resourceDir + File.separator + PROPERTY_FILE_NAME;
-        properties = new Properties ();
-        
-        try {
-			FileInputStream propertyFile = new FileInputStream (new File(propFileStr));
-			properties.load(propertyFile);
-		} catch (FileNotFoundException e) {
-			log.error(e);
-		} catch (IOException e) {
-			log.error(e);
-		}
+        // TODO: This doesn't work as expected when the sandesha2-test module is executed in a multi-module build.
+        //       Anyway, sandesha2-test.properties only contains a value for the test server port. This value is
+        //       the same as the default, so we may as well skip the code.
+//        String propFileStr = resourceDir + File.separator + PROPERTY_FILE_NAME;
+//        properties = new Properties ();
+//        
+//        try {
+//			FileInputStream propertyFile = new FileInputStream (new File(propFileStr));
+//			properties.load(propertyFile);
+//		} catch (FileNotFoundException e) {
+//			log.error(e);
+//		} catch (IOException e) {
+//			log.error(e);
+//		}
     }
     
     public void setUp () throws Exception {
