@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements. See the NOTICE file
@@ -17,25 +18,23 @@
  under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <parent>
         <groupId>org.apache.sandesha2</groupId>
         <artifactId>sandesha2-parent</artifactId>
         <version>1.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
-    <artifactId>sandesha2-rampart-integration</artifactId>
+    <artifactId>sandesha2-resource-bundle</artifactId>
     <packaging>jar</packaging>
-    <name>Sandesha2 - Rampart Integration</name>
+    <name>Sandesha2 - Resource bundle</name>
 
     <!-- This needs to be set explicitly because the project structure implies that the Maven calculated defaults are wrong -->
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4/modules/rampart-integration</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4/modules/rampart-integration</developerConnection>
-        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/branches/1_4/modules/rampart-integration</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4/modules/resource-bundle</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4/modules/resource-bundle</developerConnection>
+        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/branches/1_4/modules/resource-bundle</url>
     </scm>
     <!-- This also needs to be set explicitly because the Maven calculated URL would point to nowhere -->
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
@@ -47,62 +46,28 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>process</goal>
+                            <goal>bundle</goal>
                         </goals>
-                        <configuration>
-                            <resourceBundles>
-                                <resourceBundle>org.apache.sandesha2:sandesha2-resource-bundle:${project.version}</resourceBundle>
-                            </resourceBundles>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
                         <phase>verify</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>check</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>src/main/resources/META-INF/*.vm</exclude>
+                            </excludes>
+                        </configuration> 
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-site-plugin</artifactId>
-                <configuration>
-                    <generateReports>false</generateReports>
-                </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-    
-        <dependency>
-            <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    
-        <!-- Rampart -->
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart-core</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart-trust</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart-policy</artifactId>
-        </dependency>
-            
-    </dependencies>
-     
 </project>
