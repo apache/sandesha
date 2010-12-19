@@ -179,4 +179,21 @@
             </plugin>
         </plugins>
     </build>
+    
+    <profiles>
+        <profile>
+            <id>apache-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- Generating checksums will make it easier to prepare distributions for upload -->
+                        <artifactId>maven-install-plugin</artifactId>
+                        <configuration>
+                            <createChecksum>true</createChecksum>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
