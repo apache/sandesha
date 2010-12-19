@@ -30,6 +30,7 @@
             <outputDirectory>sandesha2-${version}-bin</outputDirectory>
             <includes>
                 <include>LICENSE.txt</include>
+                <include>NOTICE.txt</include>
             </includes>
         </fileSet>
         <fileSet>
