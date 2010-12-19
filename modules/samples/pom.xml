@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.sandesha2</groupId>
         <artifactId>sandesha2-parent</artifactId>
-        <version>1.4</version>
+        <version>1.4.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -32,9 +32,9 @@
 
     <!-- This needs to be set explicitly because the project structure implies that the Maven calculated defaults are wrong -->
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/tags/1_4/modules/samples</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/tags/1_4/modules/samples</developerConnection>
-        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/tags/1_4/modules/samples</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4/modules/samples</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_4/modules/samples</developerConnection>
+        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/branches/1_4/modules/samples</url>
     </scm>
     <!-- This also needs to be set explicitly because the Maven calculated URL would point to nowhere -->
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
