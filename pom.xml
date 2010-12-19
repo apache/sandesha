@@ -352,6 +352,7 @@
     </dependencyManagement>
 
     <modules>
+        <module>modules/resource-bundle</module> <!-- Must be first in the list! -->
         <module>modules/core</module>
         <module>modules/mar</module>
         <module>modules/client</module>
