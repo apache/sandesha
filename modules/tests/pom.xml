@@ -40,8 +40,6 @@
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
 
     <build>
-        <sourceDirectory>src/test/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
         <testResources>
             <testResource>
                 <directory>test-resources</directory>
