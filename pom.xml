@@ -348,6 +348,14 @@
                 <artifactId>rampart-policy</artifactId>
                 <version>${rampart.version}</version>
             </dependency>
+            <!-- This ensures that we always use artifacts from the expected Axis2 version,
+                 even for transitive dependencies of Rampart -->
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>mex</artifactId>
+                <classifier>impl</classifier>
+                <version>${axis2.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
