@@ -26,7 +26,7 @@
 </head>
 <body class="composite">
 <div align="left">
-<p>Please select the Sandesha2 version you want to download. Latest release is 1.3. You can download both
+<p>Please select the Sandesha2 version you want to download. Latest release is ${sandesha2_version}. You can download both
 the binay distribution and the source distribution.</p>
 </div>
 
