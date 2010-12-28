@@ -82,7 +82,6 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-codegen</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
     </dependencies>
 

@@ -264,17 +264,14 @@
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
-            <version>${axiom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
-            <version>${axiom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-dom</artifactId>
-            <version>${axiom.version}</version>
         </dependency>
 
         <dependency>
@@ -307,20 +304,17 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>addressing</artifactId>
-            <version>${axis2.version}</version>
             <type>mar</type>
         </dependency>
 
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-mtompolicy</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
 
     </dependencies>
@@ -348,6 +342,70 @@
                 <artifactId>rampart-policy</artifactId>
                 <version>${rampart.version}</version>
             </dependency>
+            <!-- This ensures that we always use artifacts from the expected Axiom and Axis2 versions,
+                 even for transitive dependencies of Rampart -->
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-api</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-impl</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-dom</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-kernel</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-codegen</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-adb</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-adb-codegen</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>addressing</artifactId>
+                <version>${axis2.version}</version>
+                <type>mar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-mtompolicy</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>mex</artifactId>
+                <classifier>impl</classifier>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-http</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-local</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -374,6 +432,11 @@
         <commons.logging.version>1.1.1</commons.logging.version>
         <junit.version>3.8.2</junit.version>        
         <log4j.version>1.2.15</log4j.version>
+        
+        <!-- This variable is used in some Xdocs and is substituted using Velocity. Note that
+             we can't use the project.version variable directly because of the dot. See
+             http://maven.apache.org/plugins/maven-site-plugin/examples/creating-content.html -->
+        <sandesha2_version>${project.version}</sandesha2_version>
     </properties>
 
     <distributionManagement>
