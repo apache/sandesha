@@ -933,9 +933,9 @@ public class SandeshaUtil {
 			msgContext.setTransportOut(sandesha2TransportOutDesc);
 			
 			//this invocation has to be a blocking one.
-			Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.TRANSPORT_NON_BLOCKING);
+			Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.CLIENT_API_NON_BLOCKING);
 			if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue())
-				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
+				msgContext.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, Boolean.FALSE);
 	
 	 		// sending the message once through Sandesha2TransportSender.
 			if (msgContext.isPaused())
@@ -944,7 +944,7 @@ public class SandeshaUtil {
 				AxisEngine.send(msgContext);	
 			}
 			//put the original value of isTransportNonBlocking back on
-			msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
+			msgContext.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, isTransportNonBlocking);
 		}
 		if (LoggingControl.isAnyTracingEnabled() && log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::executeAndStore");

@@ -326,12 +326,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 						if (log.isDebugEnabled())
 							log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
 						msgCtx.setPaused(false);
-						msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
+						msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, Boolean.FALSE);
 						response = AxisEngine.resumeSend(msgCtx);
 					} else {
 						if (log.isDebugEnabled())
 							log.debug("Sending a message : " + msgCtx.getEnvelope().getHeader());
-						msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
+						msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, Boolean.FALSE);
 						AxisEngine.send(msgCtx);  // TODO check if this should return an invocation response
 					}
 				} else {
@@ -350,7 +350,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 					if (log.isDebugEnabled())
 						log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
-			        msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
+			        msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, Boolean.FALSE);
 					response = AxisEngine.resumeSend(msgCtx);
 				}
 				if(log.isDebugEnabled()) log.debug("Engine resume returned " + response);
