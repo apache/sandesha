@@ -627,5 +627,8 @@ public class SandeshaPolicyBean implements Assertion {
 	public void setParent(SandeshaPolicyBean parent) {
 		this.parent = parent;
 	}
-	
+
+    public boolean isIgnorable() {
+        return false;
+    }
 }

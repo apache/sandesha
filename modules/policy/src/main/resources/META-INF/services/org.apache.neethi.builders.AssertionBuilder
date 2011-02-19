@@ -16,3 +16,21 @@
 # under the License.
 
 org.apache.sandesha2.policy.builders.RMAssertionBuilder
+org.apache.sandesha2.policy.builders.MessageTypesToDropAssertionBuilder
+org.apache.sandesha2.policy.builders.SecurityManagerAssertionBuilder
+org.apache.sandesha2.policy.builders.ExponentialBackoffAssertionBuilder
+org.apache.sandesha2.policy.builders.SequenceRemovalTimeoutAssertionBuilder
+org.apache.sandesha2.policy.builders.InactivityTimeoutMeasureAssertionBuilder
+org.apache.sandesha2.policy.builders.AcknowledgementIntervalAssertionBuilder
+org.apache.sandesha2.policy.builders.InvokeInOrderAssertionBuilder
+org.apache.sandesha2.policy.builders.ContextManagerAssertionBuilder
+org.apache.sandesha2.policy.builders.EnforceRMAssertionBuilder
+org.apache.sandesha2.policy.builders.StorageManagersAssertionBuilder
+org.apache.sandesha2.policy.builders.SandeshaPropertyAssertion
+org.apache.sandesha2.policy.builders.RetransmissionIntervalAssertionBuilder
+org.apache.sandesha2.policy.builders.MaximumRetransmissionCountAssertionBuilder
+org.apache.sandesha2.policy.builders.SequenceRemovalTimeoutMeasureAssertionBuilder
+org.apache.sandesha2.policy.builders.EPRDecoratorAssertionBuilder
+org.apache.sandesha2.policy.builders.InactivityTimeoutAssertionBuilder
+org.apache.sandesha2.policy.builders.MakeConnectionAssertionBuilder
+org.apache.sandesha2.policy.builders.UseMessageSerializationAssertionBuilder
