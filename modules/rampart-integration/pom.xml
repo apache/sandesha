@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.sandesha2</groupId>
         <artifactId>sandesha2-parent</artifactId>
-        <version>1.6.0-SNAPSHOT</version>
+        <version>1.7.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
@@ -33,9 +33,9 @@
 
     <!-- This needs to be set explicitly because the project structure implies that the Maven calculated defaults are wrong -->
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_6/modules/rampart-integration</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/branches/1_6/modules/rampart-integration</developerConnection>
-        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/branches/1_6/modules/rampart-integration</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/rampart-integration</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk/modules/rampart-integration</developerConnection>
+        <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/trunk/modules/rampart-integration</url>
     </scm>
     <!-- This also needs to be set explicitly because the Maven calculated URL would point to nowhere -->
     <url>http://axis.apache.org/axis2/java/sandesha/</url>
