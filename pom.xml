@@ -436,10 +436,9 @@
     </modules>
 
     <properties>
-        <axis2.version>SNAPSHOT</axis2.version>
-        <rampart.version>SNAPSHOT</rampart.version>
+        <axis2.version>1.6.1-SNAPSHOT</axis2.version>
+        <rampart.version>1.6.0-SNAPSHOT</rampart.version>
         <axiom.version>1.2.12-SNAPSHOT</axiom.version>
-        <!-- TODO: revert back to 3.0.0-SNAPSHOT when the incompatibility with the neethi trunk is fixed -->
         <neethi.version>2.0.4</neethi.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <junit.version>3.8.2</junit.version>        
