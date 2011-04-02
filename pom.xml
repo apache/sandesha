@@ -425,10 +425,9 @@
 
     <properties>
         <axis2.version>1.5.5-SNAPSHOT</axis2.version>
-        <!-- TODO: set this to 1.5.2-SNAPSHOT when the 1.5.1 release is done -->
-        <rampart.version>1.5</rampart.version>
+        <rampart.version>1.5.2-SNAPSHOT</rampart.version>
         <axiom.version>1.2.11</axiom.version>
-        <neethi.version>2.0.4</neethi.version>
+        <neethi.version>2.0.5-SNAPSHOT</neethi.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <junit.version>3.8.2</junit.version>        
         <log4j.version>1.2.15</log4j.version>
