@@ -436,8 +436,8 @@
     </modules>
 
     <properties>
-        <axis2.version>1.6.1-SNAPSHOT</axis2.version>
-        <rampart.version>1.6.0-SNAPSHOT</rampart.version>
+        <axis2.version>1.6.0</axis2.version>
+        <rampart.version>1.6.0</rampart.version>
         <axiom.version>1.2.11</axiom.version>
         <neethi.version>2.0.5</neethi.version>
         <commons.logging.version>1.1.1</commons.logging.version>
