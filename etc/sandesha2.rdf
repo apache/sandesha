@@ -37,6 +37,7 @@
     <category rdf:resource="http://projects.apache.org/category/xml"/>
     <release><Version><name>Apache Sandesha2</name><created>08-10-2007</created><revision>1.3</revision></Version></release>
     <release><Version><name>Apache Sandesha2</name><created>19-12-2010</created><revision>1.4</revision></Version></release>
+    <release><Version><name>Apache Sandesha2</name><created>02-06-2011</created><revision>1.6.0</revision></Version></release>
     <repository>
       <SVNRepository>
         <location rdf:resource="http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk"/>
