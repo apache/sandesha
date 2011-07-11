@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.sandesha2.policy.builders;
 
 import javax.xml.namespace.QName;
@@ -24,29 +23,21 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
-import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 
-public class RMAssertionBuilder implements AssertionBuilder<OMElement> {
-
-    public Assertion build(OMElement element, AssertionBuilderFactory factory)
-            throws IllegalArgumentException {
-
-        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
-        Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
-
-        for (PolicyComponent component : policy.getPolicyComponents()) {
-            ((SandeshaPropertyAssertion)component).apply(propertyBean);
-        }
-        return propertyBean;
+public class InactivityTimeoutAssertionBuilder implements AssertionBuilder<OMElement> {
+    public QName[] getKnownElements() {
+        return new QName[] { Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT };
     }
 
-    public QName[] getKnownElements() {
-        return new QName[] { new QName(
-                Sandesha2Constants.Assertions.URI_RM_POLICY_NS, "RMAssertion") };
+    public Assertion build(OMElement element, AssertionBuilderFactory factory) throws IllegalArgumentException {
+        final long value = Long.parseLong(element.getText().trim());
+        return new SandeshaPropertyAssertion() {
+            public void apply(SandeshaPolicyBean propertyBean) {
+                propertyBean.setInactiveTimeoutValue(value);
+            }
+        };
     }
 }

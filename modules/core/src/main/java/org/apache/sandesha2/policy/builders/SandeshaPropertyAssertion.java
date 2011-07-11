@@ -16,37 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.sandesha2.policy.builders;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.neethi.Assertion;
-import org.apache.neethi.AssertionBuilderFactory;
-import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
-import org.apache.neethi.PolicyEngine;
-import org.apache.neethi.builders.AssertionBuilder;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 
-public class RMAssertionBuilder implements AssertionBuilder<OMElement> {
+public abstract class SandeshaPropertyAssertion implements Assertion {
+    public abstract void apply(SandeshaPolicyBean propertyBean);
 
-    public Assertion build(OMElement element, AssertionBuilderFactory factory)
-            throws IllegalArgumentException {
-
-        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
-        Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
-
-        for (PolicyComponent component : policy.getPolicyComponents()) {
-            ((SandeshaPropertyAssertion)component).apply(propertyBean);
-        }
-        return propertyBean;
+    public QName getName() {
+        throw new UnsupportedOperationException();
     }
 
-    public QName[] getKnownElements() {
-        return new QName[] { new QName(
-                Sandesha2Constants.Assertions.URI_RM_POLICY_NS, "RMAssertion") };
+    public boolean isIgnorable() {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isOptional() {
+        throw new UnsupportedOperationException();
+    }
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean equal(PolicyComponent policyComponent) {
+        throw new UnsupportedOperationException();
+    }
+
+    public short getType() {
+        throw new UnsupportedOperationException();
     }
 }
