@@ -354,6 +354,7 @@ public class RMSampleService {
     client repository (from now on referred as CLIENT_REPO).</li>
   <li>Put the configured the axis2.xml file from the previous section to the
     CLIENT_REPO directory &amp; rename it as client_axis2.xml.</li>
+    <li>Change http port in client_axis2.xml(we need different ports to run asynchronous invocation)</li>
   <li>Create a directory named 'modules' under the CLIENT_REPO.</li>
   <li>Put the Sandesha mar (sandesha2-&lt;VERSION&gt;.mar) file from the
     Sandesha2 binary distribution and the addressing mar file from the Axis2
@@ -401,7 +402,7 @@ public class UserguidePingClient {
         private static final String applicationNamespaceName = "http://tempuri.org/"; 
         private static final String ping = "ping";
         private static final String Text = "Text";
-        private static String toEPR = "http://127.0.0.1:8070/axis2/services/RMSampleService";
+        private static String toEPR = "http://127.0.0.1:8080/axis2/services/RMSampleService";
 
         private static String CLIENT_REPO_PATH = "CLIENT_REPO";
         
@@ -501,7 +502,7 @@ public class UserguideEchoClient {
         private final static String Sequence = "Sequence";
         private final static String echoStringResponse = "echoStringResponse";
         private final static String EchoStringReturn = "EchoStringReturn";
-        private static String toEPR = "http://127.0.0.1:8070/axis2/services/RMSampleService";
+        private static String toEPR = "http://127.0.0.1:8080/axis2/services/RMSampleService";
 
         private static String CLIENT_REPO_PATH = "Full path to the Client Repo folder";
         
