@@ -201,7 +201,7 @@ a Axis2 environment. Simply follow the given instructions step by step.</p>
     SANDESHA2_HOME directory and put it to the AXIS2_HOME/repository/modules
     directory.</p>
   </li>
-  <li><p>Get the Sandesha2-policy-&lt;VERSION&gt;.jar file from the
+  <li><p>Get the Sandesha2-core-&lt;VERSION&gt;.jar file from the
     SANDESHA2_HOME directory and put it to the AXIS2_HOME/lib directory.</p>
   </li>
   <li><p>Build the Axis2 web application by moving to the AXIS2_HOME/webapp
