@@ -375,7 +375,7 @@ public class RMSampleService {
 <ol>
   <li>Add all the jar files fromAXIS2_HOME/lib directory to your
   CLASSPATH.</li>
-  <li>Put the Sandesha2 jar file (sandesha2-&lt;VERSION&gt;.jar) to your
+  <li>Put Sandesha2-client-constants-&lt;VERSION&gt;.jar and Sandesha2-core-&lt;VERSION&gt;.jar files to your
     CLASSPATH.</li>
   <li><p>Create a 'UserguidePingClient.java' file with following content.</p>
     <pre>
@@ -414,7 +414,7 @@ public class UserguidePingClient {
                 clientOptions.setTo(new EndpointReference (toEPR));
 
                 ServiceClient serviceClient = new ServiceClient (configContext,null);
-                clientOptions.setAction("urn:wsrm:Ping");
+                clientOptions.setAction("urn:ping");
                 serviceClient.setOptions(clientOptions);
                 
                 serviceClient.engageModule(new QName ("sandesha2"));
