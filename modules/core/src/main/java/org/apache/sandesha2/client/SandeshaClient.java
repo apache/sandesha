@@ -27,12 +27,11 @@ import java.util.MissingResourceException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
-import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -857,10 +856,10 @@ public class SandeshaClient {
 		SOAPFactory factory = null;
 		SOAPEnvelope dummyEnvelope = null;
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
-			factory = new SOAP12Factory();
+			factory = OMAbstractFactory.getSOAP12Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
 		} else {
-			factory = new SOAP11Factory();
+			factory = OMAbstractFactory.getSOAP11Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
 		}
 
@@ -1022,10 +1021,10 @@ public class SandeshaClient {
 				soapNamespaceURI = getSOAPNamespaceURI(storageManager, internalSequenceID);
 
 			if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
-				factory = new SOAP12Factory();
+				factory = OMAbstractFactory.getSOAP12Factory();
 				dummyEnvelope = factory.getDefaultEnvelope();
 			} else {
-				factory = new SOAP11Factory();
+				factory = OMAbstractFactory.getSOAP11Factory();
 				dummyEnvelope = factory.getDefaultEnvelope();
 			}
 
@@ -1178,10 +1177,10 @@ public class SandeshaClient {
 		if (soapNamespaceURI == null) 
 			soapNamespaceURI = getSOAPNamespaceURI(storageManager, internalSequenceID);
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
-			factory = new SOAP12Factory();
+			factory = OMAbstractFactory.getSOAP12Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
 		} else {
-			factory = new SOAP11Factory();
+			factory = OMAbstractFactory.getSOAP11Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
 		}
 
