@@ -430,8 +430,8 @@
     </modules>
 
     <properties>
-        <axis2.version>1.6.1-SNAPSHOT</axis2.version>
-        <rampart.version>1.6.1-SNAPSHOT</rampart.version>
+        <axis2.version>1.6.1</axis2.version>
+        <rampart.version>1.6.1</rampart.version>
         <axiom.version>1.2.12</axiom.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <junit.version>3.8.2</junit.version>        
