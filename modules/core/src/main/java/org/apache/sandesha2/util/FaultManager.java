@@ -375,7 +375,7 @@ public class FaultManager {
 		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
 		SOAPFaultSubCode faultSubCode = factory.createSOAPFaultSubCode(faultCode);
 		
-		SOAPFaultValue faultColdValue = factory.createSOAPFaultValue(faultCode);
+		SOAPFaultValue faultCodeValue = factory.createSOAPFaultValue(faultCode);
 		SOAPFaultValue faultSubcodeValue = factory.createSOAPFaultValue(faultSubCode);
 		
 		faultSubcodeValue.setText(data.getSubcode());
@@ -398,18 +398,18 @@ public class FaultManager {
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-			faultColdValue.setText(data.getCode());
+			faultCodeValue.setText(data.getCode());
 			
 		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
 			reason.setText(data.getReason());
 			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
 			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
 			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
-			faultColdValue.setText(data.getSubcode());
+			faultCodeValue.setText(data.getSubcode());
 			
 		}
 		
-		AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+		AxisFault fault = new AxisFault(faultCodeValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
 		fault.setFaultAction(Sandesha2Constants.SPEC_2007_02.Actions.MC_FAULT);
 		
 		//if this is throwable throwing it out, else we will log here.
@@ -520,10 +520,10 @@ public class FaultManager {
 		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
 		SOAPFaultSubCode faultSubCode = factory.createSOAPFaultSubCode(faultCode);
 		
-		SOAPFaultValue faultColdValue = factory.createSOAPFaultValue(faultCode);
+		SOAPFaultValue faultCodeValue = factory.createSOAPFaultValue(faultCode);
 		SOAPFaultValue faultSubcodeValue = factory.createSOAPFaultValue(faultSubCode);
 		
-		faultColdValue.setText(data.getCode());
+		faultCodeValue.setText(data.getCode());
 		
 		faultSubcodeValue.setText(data.getSubcode());
 
@@ -546,7 +546,7 @@ public class FaultManager {
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
 			
-			AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+			AxisFault fault = new AxisFault(faultCodeValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
 			fault.setFaultAction(SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
 			
 			//if this is throwable throwing it out, else we will log here.
@@ -600,14 +600,14 @@ public class FaultManager {
 							TransportUtils.setResponseWritten(referenceRMMsgContext.getMessageContext(), true);
 						}
 					} catch (Exception e) {
-						AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+						AxisFault fault = new AxisFault(faultCodeValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFaultDueToException, fault.getMessage(), e.getMessage());
 						log.error(message);
 					}	
 				}
 				else
 				{
-					AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+					AxisFault fault = new AxisFault(faultCodeValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFaultDueToException, fault.getMessage());
 					log.error(message);
 				}
