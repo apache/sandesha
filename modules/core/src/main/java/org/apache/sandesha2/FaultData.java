@@ -32,7 +32,7 @@ public class FaultData {
 
 	private int type;
 
-	private String code;
+	private QName code;
 
 	private QName subcode;
 
@@ -89,11 +89,11 @@ public class FaultData {
 		this.type = type;
 	}
 
-	public String getCode() {
+	public QName getCode() {
 		return code;
 	}
 
-	public void setCode(String code) {
+	public void setCode(QName code) {
 		this.code = code;
 	}
 

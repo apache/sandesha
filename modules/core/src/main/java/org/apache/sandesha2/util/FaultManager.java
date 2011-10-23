@@ -36,6 +36,7 @@ import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
+import org.apache.axiom.soap.SOAPVersion;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -178,18 +179,13 @@ public class FaultManager {
 			// Return an UnknownSequence error
 			MessageContext messageContext = rmMessageContext.getMessageContext();
 
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
-
 			FaultData data = new FaultData();
-			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-			else
-				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+			data.setCode(messageContext.getEnvelope().getVersion().getSenderFaultCode());
 
 			data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMessageContext.getRMNamespaceValue(), 
 					Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE ));
 
-			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			SOAPFactory factory = (SOAPFactory)messageContext.getEnvelope().getOMFactory();
 
 			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
 					rmMessageContext.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
@@ -264,14 +260,11 @@ public class FaultManager {
 			SequenceAcknowledgement sequenceAcknowledgement, Range acknowledgementRange,
 			StorageManager storageManager, boolean piggybackedMessage, EndpointReference acksToEPR) throws AxisFault {
 		FaultData data = new FaultData();
-		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMsgCtx.getMessageContext().getEnvelope());
-		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-		else
-			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+		SOAPVersion version = rmMsgCtx.getMessageContext().getEnvelope().getVersion();
+		data.setCode(version.getSenderFaultCode());
 		
 		if (log.isDebugEnabled())
-			log.debug("makingInvalidAck piggy=" + piggybackedMessage + ": soap=" + SOAPVersion);
+			log.debug("makingInvalidAck piggy=" + piggybackedMessage + ": soap=" + version);
 
 		data.setType(Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT);
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMsgCtx.getRMNamespaceValue(), 
@@ -294,18 +287,13 @@ public class FaultManager {
 		// Return a CreateSequenceRefused error
 		MessageContext messageContext = rmMessageContext.getMessageContext();
 
-		int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
-
 		FaultData data = new FaultData();
-		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-		else
-			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+		data.setCode(messageContext.getEnvelope().getVersion().getSenderFaultCode());
 
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMessageContext.getRMNamespaceValue(), 
 				Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED ));
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+		SOAPFactory factory = (SOAPFactory)messageContext.getEnvelope().getOMFactory();
 		OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
 				rmMessageContext.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		identifierElement.setText(detail);
@@ -335,18 +323,13 @@ public class FaultManager {
 		
 		// Return a UnsupportedSelectionFault error
 
-		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMessageContext.getMessageContext().getEnvelope());
-
 		FaultData data = new FaultData();
-		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-			data.setCode(SOAP11Constants.FAULT_CODE_RECEIVER);
-		else
-			data.setCode(SOAP12Constants.FAULT_CODE_RECEIVER);
+		data.setCode(rmMessageContext.getMessageContext().getEnvelope().getVersion().getReceiverFaultCode());
 
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(Sandesha2Constants.SPEC_2007_02.MC_NS_URI, 
 				Sandesha2Constants.SOAPFaults.FaultType.UNSUPPORTED_SELECTION ));
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+		SOAPFactory factory = (SOAPFactory)rmMessageContext.getMessageContext().getEnvelope().getOMFactory();
 		OMElement element = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.UNSUPPORTED_ELEMENT,
 				Sandesha2Constants.SPEC_2007_02.MC_NS_URI, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_MC);
 		element.setText(unsupportedElement);
@@ -368,13 +351,8 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::makeMissingSelectionFault");
 		
-		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMessageContext.getMessageContext().getEnvelope());
-
 		FaultData data = new FaultData();
-		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-			data.setCode(SOAP11Constants.FAULT_CODE_RECEIVER);
-		else
-			data.setCode(SOAP12Constants.FAULT_CODE_RECEIVER);
+		data.setCode(rmMessageContext.getMessageContext().getEnvelope().getVersion().getReceiverFaultCode());
 
 		data.setSubcode(SpecSpecificConstants.getFaultSubcode(Sandesha2Constants.SPEC_2007_02.MC_NS_URI, 
 				Sandesha2Constants.SOAPFaults.FaultType.MISSING_SELECTION ));
@@ -456,18 +434,14 @@ public class FaultManager {
 		if (bean!=null && bean.isTerminated()) {
 			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 			FaultData data = new FaultData();
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
-			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-			else
-				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+			data.setCode(referenceMessage.getEnvelope().getVersion().getSenderFaultCode());
 
 			data.setSubcode(SpecSpecificConstants.getFaultSubcode(referenceRMMessage.getRMNamespaceValue(), 
 					Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED ));
 			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sequenceTerminatedFault, sequenceID));
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED);
 			
-			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			SOAPFactory factory = (SOAPFactory)referenceMessage.getEnvelope().getOMFactory();
 			String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
 			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
 					rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
@@ -496,18 +470,14 @@ public class FaultManager {
 		if (rmdBean!=null && rmdBean.isClosed()) {
 			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 			FaultData data = new FaultData();
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
-			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-			else
-				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+			data.setCode(referenceMessage.getEnvelope().getVersion().getSenderFaultCode());
 
 			data.setSubcode(SpecSpecificConstants.getFaultSubcode(referenceRMMessage.getRMNamespaceValue(), 
 					Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED ));
 			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotAcceptMsgAsSequenceClosedFault));
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED);
 			
-			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			SOAPFactory factory = (SOAPFactory)referenceMessage.getEnvelope().getOMFactory();
 			String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
 			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
 					rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
@@ -851,14 +821,12 @@ public class FaultManager {
 			// Return a CreateSequenceRefused error
 			MessageContext messageContext = rmMessageContext.getMessageContext();
 
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
-
 			FaultData data = new FaultData();
-			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+			data.setCode(messageContext.getEnvelope().getVersion().getSenderFaultCode());
 			data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMessageContext.getRMNamespaceValue(), 
 					Sandesha2Constants.SOAPFaults.FaultType.MESSAGE_NUMBER_ROLLOVER ));
 
-			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			SOAPFactory factory = (SOAPFactory)messageContext.getEnvelope().getOMFactory();
 			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
 					rmMessageContext.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 			identifierElement.setText(sequenceId);
