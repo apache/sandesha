@@ -25,7 +25,7 @@
   <Project rdf:about="http://axis.apache.org/axis2/java/sandesha/">
     <created>2010-12-19</created>
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20"/>
-    <name>Apache Axiom</name>
+    <name>Apache Sandesha2</name>
     <homepage rdf:resource="http://axis.apache.org/axis2/java/sandesha/"/>
     <asfext:pmc rdf:resource="http://axis.apache.org"/>
     <shortdesc>Apache Sandesha2 is an Axis2 module implementing WS-RM.</shortdesc>
