@@ -220,15 +220,15 @@ public class SandeshaTestCase extends TestCase {
 		boolean errorReported = false;
 		String resultStr;
 		
-		public boolean isComplete() {
+		public synchronized boolean isComplete() {
 			return completed;
 		}
 		
-		public boolean isErrorReported() {
+		public synchronized boolean isErrorReported() {
 			return errorReported;
 		}
 
-		public String getResult () {
+		public synchronized String getResult () {
 			return resultStr;
 		}
 		
@@ -236,23 +236,23 @@ public class SandeshaTestCase extends TestCase {
 			this.name = name;
 		}
 		
-		public void onComplete() {
+		public synchronized void onComplete() {
 			completed = true;
 		}
 
-		public void onMessage(MessageContext result) {
+		public synchronized void onMessage(MessageContext result) {
 			SOAPBody body = result.getEnvelope().getBody();
 			OMElement contents = body.getFirstElement();
 			this.resultStr = checkEchoOMBlock(contents);
 			System.out.println("TestCallback got text: '" + resultStr + "'");
 		}
 		
-		public void onFault(MessageContext result) {
+		public synchronized void onFault(MessageContext result) {
 			errorReported = true;
 			System.out.println("TestCallback got fault: " + result.getEnvelope());
 		}
 
-		public void onError (Exception e) {
+		public synchronized void onError (Exception e) {
 			errorReported = true;
 			System.out.println("TestCallback got exception");
 			e.printStackTrace();
