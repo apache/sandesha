@@ -47,6 +47,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.testutils.PortAllocator;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,7 +57,7 @@ public class SandeshaTestCase extends TestCase {
 	String resourceDir = ""; //"test-resources";
     Properties properties = null;
     final String PROPERTY_FILE_NAME = "sandesha2-test.properties";
-    public final int DEFAULT_SERVER_TEST_PORT = 8060;
+    public final int DEFAULT_SERVER_TEST_PORT = PortAllocator.allocatePort();
     public ConfigurationContext serverConfigurationContext = null;
     private final String RMServiceName = "RMSampleService";
 	private Log log = LogFactory.getLog(getClass());
