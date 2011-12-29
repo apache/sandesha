@@ -45,10 +45,16 @@ public class UnsupportedScenariosTest extends RMScenariosTest {
 	//
 	// Dummy test methods to stop us invoking the parent methods
 	//
-	public void testAsyncEcho() throws Exception {
-		// Do nothing
-	}
-	public void testPing() throws Exception {
+    public void testAsyncEchoWithSyncAcks() throws Exception {
+        // Do nothing
+    }
+    public void testAsyncEchoWithAsyncAcks() throws Exception {
+        // Do nothing
+    }
+    public void testAsyncEchoWithAsyncAcksAndOffer() throws Exception {
+        // Do nothing
+    }
+    public void testPing() throws Exception {
 		// Do nothing
 	}
 	public void testSyncEcho() throws Exception {
