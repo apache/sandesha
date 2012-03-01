@@ -91,8 +91,8 @@ public class RampartBasedSecurityManager extends SecurityManager {
 			OMElement messagePart, MessageContext message)
 			throws SandeshaException {
 
-		Vector results = null;
-		if ((results = (Vector) message
+		List<WSHandlerResult> results = null;
+		if ((results = (List<WSHandlerResult>) message
 				.getProperty(WSHandlerConstants.RECV_RESULTS)) == null) {
 			String msg = SandeshaMessageHelper
 					.getMessage(SandeshaMessageKeys.noSecurityResults);
@@ -100,17 +100,17 @@ public class RampartBasedSecurityManager extends SecurityManager {
 		} else {
 			boolean verified = false;
 			for (int i = 0; i < results.size() && !verified; i++) {
-				WSHandlerResult rResult = (WSHandlerResult) results.get(i);
-				Vector wsSecEngineResults = rResult.getResults();
+				WSHandlerResult rResult = results.get(i);
+				List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
 
 				for (int j = 0; j < wsSecEngineResults.size() && !verified; j++) {
-					WSSecurityEngineResult wser = (WSSecurityEngineResult) wsSecEngineResults
+					WSSecurityEngineResult wser = wsSecEngineResults
 							.get(j);
-					if (wser.getAction() == WSConstants.SIGN
-							&& wser.getPrincipal() != null) {
+					if ((Integer)wser.get(WSSecurityEngineResult.TAG_ACTION) == WSConstants.SIGN
+							&& wser.get(WSSecurityEngineResult.TAG_PRINCIPAL) != null) {
 
 						// first verify the base token
-						Principal principal = wser.getPrincipal();
+						Principal principal = (Principal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
 						if (principal instanceof WSDerivedKeyTokenPrincipal) {
 							//Get the id of the SCT that was used to create the DKT 
 							String baseTokenId = ((WSDerivedKeyTokenPrincipal) principal)
@@ -145,9 +145,13 @@ public class RampartBasedSecurityManager extends SecurityManager {
 									OMAttribute idattr = messagePart
 											.getAttribute(new QName(
 													WSConstants.WSU_NS, "Id"));
-									verified = wser.getSignedElements()
+                                    String processedId = (String)wser.get(WSSecurityEngineResult.TAG_ID);
+
+                                    // Please review following code
+                                    verified = processedId.equals(idattr.getAttributeValue());
+									/*verified = wser.getSignedElements()
 											.contains(
-													idattr.getAttributeValue());
+													idattr.getAttributeValue());*/
 									if (verified) {
 										break;
 									}
