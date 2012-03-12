@@ -125,7 +125,7 @@ public class RMMsgContext {
 				while(existingHeaders.hasNext()){
 					OMElement oe = (OMElement)existingHeaders.next();
 					if(rmNamespaceValue.equals(oe.getNamespace().getNamespaceURI())){
-						oe.detach();
+						existingHeaders.remove();
 					}
 				}
 			}
