@@ -38,6 +38,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -124,7 +125,7 @@ public class SandeshaUtil {
 	 */
 	public static String getUUID() {
 		// String uuid = "uuid:" + UUIDGenerator.getUUID();
-		String uuid = org.apache.axiom.om.util.UUIDGenerator.getUUID();
+		String uuid = UIDGenerator.generateURNString();
 
 		return uuid;
 	}
