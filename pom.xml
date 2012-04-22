@@ -434,14 +434,4 @@
              http://maven.apache.org/plugins/maven-site-plugin/examples/creating-content.html -->
         <sandesha2_version>${project.version}</sandesha2_version>
     </properties>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>apache.snapshots.https</id>
-            <name>${distMgmtSnapshotsName}</name>
-            <url>${distMgmtSnapshotsUrl}</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>
