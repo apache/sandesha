@@ -36,7 +36,7 @@ the binary distribution and the source distribution.</p>
             <td width="200">Description</td>
             <td width="200">Compatible Axis2 version</td>
       </tr>
-      <tr><td><a name="161"></a>1.6.2</td><td>Release</td><td>
+      <tr><td><a name="162"></a>1.6.2</td><td>Release</td><td>
               Source Distribution 
               <a href="[preferred]/axis/axis2/java/sandesha/1.6.2/sandesha2-1.6.2-src.zip">zip</a> |
               <a href="http://www.apache.org/dist/axis/axis2/java/sandesha/1.6.2/sandesha2-1.6.2-src.zip.md5">MD5</a> |
@@ -47,7 +47,7 @@ the binary distribution and the source distribution.</p>
               <a href="http://www.apache.org/dist/axis/axis2/java/sandesha/1.6.2/sandesha2-1.6.2-bin.zip.md5">MD5</a> |
               <a href="http://www.apache.org/dist/axis/axis2/java/sandesha/1.6.2/sandesha2-1.6.2-bin.zip.asc">PGP</a>
               <br></br>        
-            </td><td>26 - Apr - 2012</td>
+            </td><td>30 - Apr - 2012</td>
             <td>1.6.2 Release (Mirrored)</td>
             <td>1.6.2</td>
       </tr>
