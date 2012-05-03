@@ -39,6 +39,7 @@
     <release><Version><name>Apache Sandesha2</name><created>19-12-2010</created><revision>1.4</revision></Version></release>
     <release><Version><name>Apache Sandesha2</name><created>02-06-2011</created><revision>1.6.0</revision></Version></release>
     <release><Version><name>Apache Sandesha2</name><created>10-12-2011</created><revision>1.6.1</revision></Version></release>
+    <release><Version><name>Apache Sandesha2</name><created>30-04-2012</created><revision>1.6.2</revision></Version></release>
     <repository>
       <SVNRepository>
         <location rdf:resource="http://svn.apache.org/repos/asf/axis/axis2/java/sandesha/trunk"/>
