@@ -19,15 +19,11 @@ package org.apache.sandesha2;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import junit.framework.TestCase;
 
@@ -35,8 +31,8 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
-import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.client.async.AxisCallback;
@@ -128,11 +124,10 @@ public class SandeshaTestCase extends TestCase {
 		Thread.sleep(300);
 	}
 
-	protected InputStreamReader getResource(String relativePath, String resourceName) {
+	protected InputStream getResource(String relativePath, String resourceName) {
 		String resourceFile = resourceDir + relativePath + File.separator + resourceName;
 		try {
-			FileReader reader = new FileReader(resourceFile);
-			return reader;
+			return new FileInputStream(resourceFile);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("cannot load the test-resource", e);
 		}
@@ -143,16 +138,9 @@ public class SandeshaTestCase extends TestCase {
 	}
 
 	protected SOAPEnvelope getSOAPEnvelope(String relativePath, String resourceName) {
-		try {
-			XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(
-					getResource(relativePath, resourceName));
-			OMXMLParserWrapper wrapper = OMXMLBuilderFactory.createStAXSOAPModelBuilder(
-					OMAbstractFactory.getSOAP11Factory(), reader);
-			return (SOAPEnvelope) wrapper.getDocumentElement();
-
-		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
-		}
+		OMXMLParserWrapper wrapper = OMXMLBuilderFactory.createSOAPModelBuilder(
+				getResource(relativePath, resourceName), null);
+		return (SOAPEnvelope) wrapper.getDocumentElement();
 	}
 
 	protected SOAPEnvelope getEmptySOAPEnvelope() {
