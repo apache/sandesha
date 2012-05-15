@@ -74,7 +74,7 @@ public class SequenceAcknowledgement implements RMHeaderPart {
 	}
 
 	public Object fromHeaderBlock(SOAPHeaderBlock sequenceAckElement) throws OMException,SandeshaException {
-		originalSequenceAckElement = sequenceAckElement;
+		originalSequenceAckElement = sequenceAckElement.cloneOMElement();
 		OMElement identifierPart = null;
 		Iterator childElements = sequenceAckElement.getChildElements();
 		while(childElements.hasNext()){

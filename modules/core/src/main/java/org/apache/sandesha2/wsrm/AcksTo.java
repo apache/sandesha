@@ -102,7 +102,9 @@ public class AcksTo implements IOMRMElement {
 					SandeshaMessageKeys.cannotSetAcksTo,
 					null));
 
-		OMFactory factory = element.getOMFactory();
+		// Ensure that we use the plain OMFactory (and not SOAPFactory). This forces
+		// EndpointReferenceHelper.toOM to create an OMElement instead of a SOAPHeaderBlock.
+		OMFactory factory = element.getOMFactory().getMetaFactory().getOMFactory();
 		
 		QName acksTo = new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.ACKS_TO, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 	    OMElement endpointElement =	EndpointReferenceHelper.toOM (factory,epr, acksTo ,addressingNamespaceValue);
