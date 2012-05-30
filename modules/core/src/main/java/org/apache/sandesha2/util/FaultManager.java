@@ -42,7 +42,6 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.async.AxisCallback;
-import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -1020,15 +1019,7 @@ public class FaultManager {
 					if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver)) {
 						
 						Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
-						if (callback instanceof Callback) {
-							try {
-								((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
-							} catch (AxisFault axisFault) {
-								throw new SandeshaException(axisFault);
-							}
-							
-						((Callback)callback).onError(fault);
-						} else if(callback instanceof AxisCallback) {
+						if(callback instanceof AxisCallback) {
 							try {
 								((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
 							} catch (AxisFault axisFault) {

@@ -34,10 +34,10 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.client.async.AsyncResult;
-import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -124,17 +124,17 @@ public class Scenario_2_1 {
 		
 		serviceClient.setOptions(clientOptions);
 
-		Callback callback1 = new TestCallback ("Callback 1");
+		AxisCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
-		Callback callback2 = new TestCallback ("Callback 2");
+		AxisCallback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 
 		
-		Callback callback3 = new TestCallback ("Callback 3");
+		AxisCallback callback3 = new TestCallback ("Callback 3");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
 		
-        while (!callback3.isComplete()) {
+        while (!((TestCallback)callback3).isComplete()) {
             Thread.sleep(1000);
         }
         
@@ -156,17 +156,18 @@ public class Scenario_2_1 {
 		return echoStringElement;
 	}
 
-	class TestCallback extends Callback {
+	class TestCallback implements AxisCallback {
 
 		String name = null;
+		boolean completed = false;
 		
 		public TestCallback (String name) {
 			this.name = name;
 		}
 		
-		public void onComplete(AsyncResult result) {
+		public void onComplete(MessageContext msgCtx) {
 			//System.out.println("On Complete Called for " + text);
-			SOAPBody body = result.getResponseEnvelope().getBody();
+			SOAPBody body = msgCtx.getEnvelope().getBody();
 			
 			OMElement echoStringResponseElem = body.getFirstChildWithName(new QName (applicationNamespaceName,echoStringResponse));
 			if (echoStringResponseElem==null) { 
@@ -187,6 +188,22 @@ public class Scenario_2_1 {
 		public void onError (Exception e) {
 			System.out.println("Error reported for test call back");
 			e.printStackTrace();
+		}
+
+		public void onComplete() {
+			completed = true;			
+		}
+
+		public void onFault(MessageContext msgCtx) {
+			onComplete(msgCtx);				
+		}
+
+		public void onMessage(MessageContext msgCtx) {
+			onComplete(msgCtx);			
+		}
+		
+		public boolean isComplete(){
+			return completed;
 		}
 	}
 	

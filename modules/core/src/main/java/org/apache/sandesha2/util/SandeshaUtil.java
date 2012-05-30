@@ -45,7 +45,7 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -1114,7 +1114,7 @@ public class SandeshaUtil {
 				MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
 				Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(msgCtx.getMessageID());	
 				client.setAxisService(msgCtx.getAxisService());
-				client.sendReceiveNonBlocking(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement(), (Callback)callback);
+				client.sendReceiveNonBlocking(msgCtx.getEnvelope().getBody().cloneOMElement().getFirstElement(), (AxisCallback)callback);
 			}
 		}
 
