@@ -306,7 +306,7 @@ public class RMSampleService {
     &lt;module ref="sandesha2" /&gt;
     &lt;module ref="addressing" /&gt;
         
-    &lt;operation name="ping" mep="http://www.w3.org/2004/08/wsdl/in-only"&gt;  
+    &lt;operation name="ping" mep="http://www.w3.org/ns/wsdl/in-only"&gt;  
         &lt;messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" /&gt;
     &lt;/operation&gt;
     &lt;operation name="echoString"&gt;

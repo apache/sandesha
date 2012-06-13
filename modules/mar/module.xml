@@ -63,7 +63,7 @@
         </handler>   
     </OutFaultFlow>
 
-    <operation name="Sandesha2OperationInOnly" mep="http://www.w3.org/2006/01/wsdl/in-only">
+    <operation name="Sandesha2OperationInOnly" mep="http://www.w3.org/ns/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         
         <!-- namespaces for the 2005-02 spec -->
@@ -80,7 +80,7 @@
 
      </operation>
  
-     <operation name="Sandesha2OperationInOut" mep="http://www.w3.org/2006/01/wsdl/in-out">
+     <operation name="Sandesha2OperationInOut" mep="http://www.w3.org/ns/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         <!-- namespaces for the 2005-02 spec -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</actionMapping>
@@ -95,18 +95,18 @@
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsmc/200702/MakeConnection</actionMapping>
     </operation>
 
-    <operation name="Sandesha2OperationOutOnly" mep="http://www.w3.org/2006/01/wsdl/out-only">
+    <operation name="Sandesha2OperationOutOnly" mep="http://www.w3.org/ns/wsdl/out-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
-    <operation name="Sandesha2OperationOutIn" mep="http://www.w3.org/2006/01/wsdl/out-in">
-        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
-    </operation>
-
-		<operation name="Sandesha2OperationDuplicateInOnly" mep="http://www.w3.org/2006/01/wsdl/in-only">
+    <operation name="Sandesha2OperationOutIn" mep="http://www.w3.org/ns/wsdl/out-in">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 
-    <operation name="Sandesha2OperationDuplicateInOut" mep="http://www.w3.org/2006/01/wsdl/in-out">
+		<operation name="Sandesha2OperationDuplicateInOnly" mep="http://www.w3.org/ns/wsdl/in-only">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+    </operation>
+
+    <operation name="Sandesha2OperationDuplicateInOut" mep="http://www.w3.org/ns/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 
