@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -161,7 +160,7 @@ public class Scenario_4_1 {
         setUpOptions(serviceClient.getOptions());
         
         //engage Rampart
-        serviceClient.engageModule(new QName("rampart"));
+        serviceClient.engageModule("rampart");
         
 		Ping ping = new Ping ();
 		ping.setText("ping1");
