@@ -201,7 +201,7 @@ public class AcknowledgementManager {
 
 		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(referenceMsg.getEnvelope()));
+		SOAPFactory factory = (SOAPFactory)referenceMsg.getEnvelope().getOMFactory();
 
 		// Setting new envelope
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();

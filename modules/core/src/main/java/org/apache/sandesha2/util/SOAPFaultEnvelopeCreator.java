@@ -148,8 +148,7 @@ public class SOAPFaultEnvelopeCreator {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.soapEnvNotSet));
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
-				.getSOAPVersion(faultMsgEnvelope));
+		SOAPFactory factory = (SOAPFactory)faultMsgEnvelope.getOMFactory();
 
 		SOAPFault fault = faultMsgEnvelope.getBody().getFault();
 
@@ -182,8 +181,7 @@ public class SOAPFaultEnvelopeCreator {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.soapEnvNotSet));
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
-				.getSOAPVersion(faultEnvelope));
+		SOAPFactory factory = (SOAPFactory)faultEnvelope.getOMFactory();
 
 		SOAPFault fault = faultEnvelope.getBody().getFault();
 		if (fault == null)

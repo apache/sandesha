@@ -430,8 +430,7 @@ public class SandeshaUtil {
 			operationContext.addMessageContext(newMessageContext);
 
 			// adding a blank envelope
-			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(referenceMessage
-					.getEnvelope()));
+			SOAPFactory factory = (SOAPFactory)referenceMessage.getEnvelope().getOMFactory();
 			newMessageContext.setEnvelope(factory.getDefaultEnvelope());
 
 			newMessageContext.setTransportIn(referenceMessage.getTransportIn());

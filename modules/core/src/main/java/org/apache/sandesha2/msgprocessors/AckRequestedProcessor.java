@@ -51,7 +51,6 @@ import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.WSRMMessageSender;
@@ -163,7 +162,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
 		
 		//adding the SOAP Envelope
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(msgContext.getEnvelope()));
+		SOAPFactory factory = (SOAPFactory)msgContext.getEnvelope().getOMFactory();
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		try {
 			ackMsgCtx.setEnvelope(envelope);

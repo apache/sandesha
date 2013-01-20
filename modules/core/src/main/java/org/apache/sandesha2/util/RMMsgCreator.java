@@ -454,7 +454,7 @@ public class RMMsgCreator {
 		MessageContext outMessage = MessageContextBuilder.createOutMessageContext (requestMsg.getMessageContext());
 		RMMsgContext responseRMMsg = new RMMsgContext(outMessage);
 		
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(requestMsg.getSOAPEnvelope()));
+		SOAPFactory factory = (SOAPFactory)requestMsg.getSOAPEnvelope().getOMFactory();
 
 		String namespace = requestMsg.getRMNamespaceValue();
 		responseRMMsg.setRMNamespaceValue(namespace);
