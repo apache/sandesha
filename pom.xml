@@ -174,6 +174,16 @@
                         <goals>
                             <goal>aggregate</goal>
                         </goals>
+                        <configuration>
+                            <breakiterator>true</breakiterator>
+                            <!-- The notimestamp, windowtitle and bottom parameters are chosen to minimize the number
+                                 of changes between releases (to avoid mass changes when committing the site for a new release) -->
+                            <notimestamp>true</notimestamp>
+                            <windowtitle>Apache Sandesha2</windowtitle>
+                            <bottom>Copyright &#169; {organizationName}. All Rights Reserved.</bottom>
+                            <!-- doctitle only appears in the summary and we should include the version there -->
+                            <doctitle>Apache Sandesha2 ${project.version}</doctitle>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -194,6 +204,20 @@
                         </configuration> 
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <!-- Required by maven-scm-publish-plugin -->
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>1.0-beta-2</version>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -281,6 +305,13 @@
         <url>http://svn.apache.org/viewvc/axis/axis2/java/sandesha/trunk</url>
     </scm>
 
+    <distributionManagement>
+        <site>
+            <id>site</id>
+            <url>scm:svn:https://svn.apache.org/repos/asf/axis/site/axis2/java/sandesha</url>
+        </site>
+    </distributionManagement>
+    
     <pluginRepositories>
         <pluginRepository>
             <id>apache.snapshots</id>
