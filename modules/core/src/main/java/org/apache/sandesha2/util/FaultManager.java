@@ -381,14 +381,14 @@ public class FaultManager {
 		}
 		
 		SOAPFaultReason reason = factory.createSOAPFaultReason();
-		SOAPFaultText reasonText = factory.createSOAPFaultText();
-		reasonText.setText(data.getReason());
 		
 		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
 		if (data.getDetail() != null)
 			detail.addDetailEntry(data.getDetail());
 		
 		if (isSOAP12) {
+			SOAPFaultText reasonText = factory.createSOAPFaultText();
+			reasonText.setText(data.getReason());
                         reasonText.setLang(Sandesha2Constants.LANG_EN);
 			reason.addSOAPText(reasonText);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
