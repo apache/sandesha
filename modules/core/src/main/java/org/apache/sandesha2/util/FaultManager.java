@@ -405,8 +405,6 @@ public class FaultManager {
 		faultCode.setSubCode(faultSubCode);
 		
 		SOAPFaultReason reason = factory.createSOAPFaultReason();
-		SOAPFaultText reasonText = factory.createSOAPFaultText();
-		reasonText.setText(data.getReason());
 		
 		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
 		if (data.getDetail() != null)
@@ -415,6 +413,8 @@ public class FaultManager {
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+			SOAPFaultText reasonText = factory.createSOAPFaultText();
+			reasonText.setText(data.getReason());
                         reasonText.setLang(Sandesha2Constants.LANG_EN);
 			reason.addSOAPText(reasonText);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
